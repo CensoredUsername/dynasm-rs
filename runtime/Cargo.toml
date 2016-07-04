@@ -1,0 +1,6 @@
+[package]
+name = "dynasmrt"
+version = "0.0.1"
+authors = ["CensoredUsername <cens.username@gmail.com>"]
+
+[dependencies]

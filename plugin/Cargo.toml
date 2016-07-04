@@ -1,0 +1,10 @@
+[package]
+name = "dynasm"
+version = "0.0.1"
+authors = ["CensoredUsername <cens.username@gmail.com>"]
+
+[lib]
+name = "dynasm"
+plugin = true
+
+[dependencies]
