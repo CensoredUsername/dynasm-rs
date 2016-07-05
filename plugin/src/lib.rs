@@ -6,6 +6,7 @@ extern crate rustc_plugin;
 
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
+use syntax::fold::Folder;
 use syntax::codemap::Span;
 use syntax::ast;
 use syntax::util::small_vector::SmallVector;
@@ -32,9 +33,11 @@ pub fn registrar(reg: &mut Registry) {
 
 fn main<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
 -> Box<MacResult + 'cx> {
-    // ident represents the Vec<u8> we're assembling into.
+    // expand all macros in our token tree first. This enables the use of rust macros
+    // within dynasm
+    let token_tree = ecx.expander().fold_tts(token_tree.to_vec());
 
-    let mut parser = ecx.new_parser_from_tts(token_tree);
+    let mut parser = ecx.new_parser_from_tts(&token_tree);
 
     // construct an ast of assembly nodes
     let (name, ast) = match parser::parse(ecx, &mut parser) {

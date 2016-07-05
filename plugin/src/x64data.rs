@@ -167,60 +167,60 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "int" => Op!(
             "ib", [0xCD];
         ), "jo"   => Op!(
-            "cb", [0x70];
             "c*", [0x0F, 0x80];
+            "cb", [0x70];
         ), "jno"  => Op!(
-            "cb", [0x71];
             "c*", [0x0F, 0x81];
+            "cb", [0x71];
         ), "jb"   | "jc"  | "jnae" => Op!(
-            "cb", [0x72];
             "c*", [0x0F, 0x82];
+            "cb", [0x72];
         ), "jnb"  | "jnc" | "jae"  => Op!(
-            "cb", [0x73];
             "c*", [0x0F, 0x83];
+            "cb", [0x73];
         ), "jz"   | "je"  => Op!(
-            "cb", [0x74];
             "c*", [0x0F, 0x84];
+            "cb", [0x74];
         ), "jnz"  | "jne" => Op!(
-            "cb", [0x75];
             "c*", [0x0F, 0x85];
+            "cb", [0x75];
         ), "jbe"  | "jna" => Op!(
-            "cb", [0x76];
             "c*", [0x0F, 0x86];
+            "cb", [0x76];
         ), "jnbe" | "ja"  => Op!(
-            "cb", [0x77];
             "c*", [0x0F, 0x87];
+            "cb", [0x77];
         ), "js"   => Op!(
-            "cb", [0x78];
             "c*", [0x0F, 0x88];
+            "cb", [0x78];
         ), "jns"  => Op!(
-            "cb", [0x79];
             "c*", [0x0F, 0x89];
+            "cb", [0x79];
         ), "jp"   | "jpe" => Op!(
-            "cb", [0x7A];
             "c*", [0x0F, 0x8A];
+            "cb", [0x7A];
         ), "jnp"  | "jpo" => Op!(
-            "cb", [0x7B];
             "c*", [0x0F, 0x8B];
+            "cb", [0x7B];
         ), "jl"   | "jnge"=> Op!(
-            "cb", [0x7C];
             "c*", [0x0F, 0x8C];
+            "cb", [0x7C];
         ), "jnl"  | "jge" => Op!(
-            "cb", [0x7D];
             "c*", [0x0F, 0x8D];
+            "cb", [0x7D];
         ), "jle"  | "jng" => Op!(
-            "cb", [0x7E];
             "c*", [0x0F, 0x8E];
+            "cb", [0x7E];
         ), "jnle" | "jg"  => Op!(
-            "cb", [0x7F];
             "c*", [0x0F, 0x8F];
+            "cb", [0x7F];
         ), "jecxz" => Op!(
             "cb", [0xE3], 0, flags::REQUIRES_ADDRSIZE;
         ), "jrcxz" => Op!(
             "cb", [0xE3];
         ), "jmp" => Op!(
-            "cb", [0xE8];
             "c*", [0xE9];
+            "cb", [0xEB];
             "v*", [0xFF], 4;
         ), "lahf" => Op!(
             [0x9F];

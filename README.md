@@ -16,19 +16,21 @@ It is currently heavily pre-alpha, so don't expect anything here to actually wro
     let d = 1;
     let c = -5;
     dynasm!(ops
-         ; mov DWORD [rax], 1
-         ; mov rax, QWORD -1
-         ; mov BYTE [rax + rax + rcx], 1
-         ; mov BYTE [9*r15], 1
-         ; fs imul sp, WORD [r8 * 2 + rcx + 0x77], 0x77
-         ; mov QWORD [rax * 2 + rbx + c + d], 1
+        ;     jmp test
+        ;     mov DWORD [rax], 1
+        ;     mov rax, QWORD -1
+        ;     mov BYTE [rax + rax + rcx], 1
+        ; test:
+        ;     mov BYTE [9*r15], 1
+        ;     fs imul sp, WORD [r8 * 2 + rcx + 0x77], 0x77
+        ;     mov QWORD [rax * 2 + rbx + c + d], 1
     );
 ```
 
 ## Limitations
 
 - Currently only supports a subset of x64 assembly (only long mode, general use instructions)
-- No label support yet
+- No nonlocal label support
 - No documentation yet
 
 ## License

@@ -21,7 +21,7 @@ pub enum Item {
 pub enum Arg {
     Indirect(MemoryRef), // indirect memory reference supporting scale, index, base and displacement.
     Direct(Spanned<Register>), // a bare register (rax, ...)
-    Immediate(P<ast::Expr>, Option<SizeHint>), // an expression that evaluates to a value. basically, anything that ain't the other two.
+    Immediate(P<ast::Expr>, Option<Size>, bool), // an expression that evaluates to a value. basically, anything that ain't the other two.
     Invalid // placeholder value
 }
 
@@ -31,7 +31,7 @@ pub struct MemoryRef {
     pub scale: isize,
     pub base:  Option<Register>,
     pub disp:  Option<P<ast::Expr>>,
-    pub size:  Option<SizeHint>,
+    pub size:  Option<Size>,
     pub span:  Span
 }
 
@@ -65,12 +65,12 @@ pub enum Register {
 }
 
 impl Register {
-    pub fn size(&self) -> SizeHint {
+    pub fn size(&self) -> Size {
         match (*self as u16) & 0x0300 {
-            0x0000 => SizeHint::BYTE,
-            0x0100 => SizeHint::WORD,
-            0x0200 => SizeHint::DWORD,
-            0x0300 => SizeHint::QWORD,
+            0x0000 => Size::BYTE,
+            0x0100 => Size::WORD,
+            0x0200 => Size::DWORD,
+            0x0300 => Size::QWORD,
             _ => unreachable!()
         }
     }
@@ -81,11 +81,17 @@ impl Register {
 } 
 
 #[derive(PartialOrd, PartialEq, Ord, Eq, Debug, Clone, Copy)]
-pub enum SizeHint {
-    BYTE  = 0,
-    WORD  = 1,
-    DWORD = 2,
-    QWORD = 3
+pub enum Size {
+    BYTE  = 1,
+    WORD  = 2,
+    DWORD = 4,
+    QWORD = 8
+}
+
+impl Size {
+    pub fn in_bytes(&self) -> u8 {
+        *self as u8
+    }
 }
 
 // tokentree is a list of tokens and delimited lists of tokens.
@@ -104,9 +110,17 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &'a mut Parser) -> PResult<'a, (Ident, V
 
         let startspan = parser.span;
 
-        // parse PREFIXES + 
+        // parse PREFIXES+ op | label :
+
         let mut span = parser.span;
         let mut op = Spanned {node: try!(parser.parse_ident()), span: span};
+
+        if parser.eat(&token::Colon) {
+            // label ":"" branch
+            ins.push(Item::Label(op));
+            continue;
+        }
+        // PREFIXES+ op branch
         let mut ops = Vec::new();
         while is_prefix(op) {
             ops.push(op);
@@ -148,13 +162,13 @@ fn is_prefix(token: Ident) -> bool {
     PREFIXES.contains(&&*token.node.name.as_str())
 }
 
-const SIZES:    [(&'static str, SizeHint); 4] = [
-    ("BYTE", SizeHint::BYTE),
-    ("WORD", SizeHint::WORD),
-    ("DWORD", SizeHint::DWORD),
-    ("QWORD", SizeHint::QWORD)
+const SIZES:    [(&'static str, Size); 4] = [
+    ("BYTE", Size::BYTE),
+    ("WORD", Size::WORD),
+    ("DWORD", Size::DWORD),
+    ("QWORD", Size::QWORD)
 ];
-fn eat_size_hint(parser: &mut Parser) -> Option<SizeHint> {
+fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
     for &(kw, size) in SIZES.iter() {
         if eat_pseudo_keyword(parser, kw) {
             return Some(size);
@@ -172,7 +186,7 @@ fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
     true
 }
 
-fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<SizeHint>) -> Arg {
+fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<Size>) -> Arg {
     use syntax::ast::ExprKind;
 
     let arg = arg.unwrap();
@@ -268,7 +282,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<SizeHint>) -> Ar
     }
 
     // immediate
-    Arg::Immediate(P(arg), size)
+    Arg::Immediate(P(arg), size, false)
 }
 
 fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
