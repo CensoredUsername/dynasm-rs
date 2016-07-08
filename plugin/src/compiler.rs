@@ -29,7 +29,8 @@ impl StmtBuffer {
     pub fn push(&mut self, s: Stmt) {
         self.pos += match s {
             Stmt::Const(_) => 1,
-            Stmt::Var(_, s) => s.in_bytes() as usize
+            Stmt::Var(_, s) => s.in_bytes() as usize,
+            Stmt::Align(_) => panic!("can't inc pos over align")
         };
         self.buf.push(s);
     }
@@ -66,7 +67,8 @@ impl Extend<Stmt> for StmtBuffer {
 #[derive(Clone, Debug)]
 pub enum Stmt {
     Const(u8),
-    Var(P<ast::Expr>, Size)
+    Var(P<ast::Expr>, Size),
+    Align(P<ast::Expr>)
 }
 
 /*
@@ -82,7 +84,7 @@ pub mod flags {
     pub const REQUIRES_OPSIZE   : u16 = 0x0010;
     pub const REQUIRES_REXSIZE  : u16 = 0x0020;
     // parsing modifiers
-    pub const MISMATCHING_SIZES : u16 = 0x0040; // the operand sizes of the opcodes don't match up
+    pub const SIZE_OVERRIDE     : u16 = 0x0040; // the operand sizes of the opcodes don't match up
     pub const EAX_ONLY          : u16 = 0x0080; // some instructions only operate on al/ax/eax
     // allowed prefixes
     pub const CAN_LOCK          : u16 = 0x0100;
@@ -148,7 +150,18 @@ pub fn compile(ecx: &ExtCtxt, nodes: Vec<parser::Item>) -> Result<StmtBuffer, ()
                     }
                 }
             },
-            Item::Label(ident) => stmts.make_label(ident)
+            Item::Label(ident) => stmts.make_label(ident),
+            Item::Directive(op, args, span) => {
+                match compile_directive(ecx, &mut stmts, op, args) {
+                    Ok(_) => (),
+                    Err(e) => {
+                        successful = false;
+                        if let Some(e) = e {
+                            ecx.span_err(span, &e)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -159,12 +172,59 @@ pub fn compile(ecx: &ExtCtxt, nodes: Vec<parser::Item>) -> Result<StmtBuffer, ()
     }
 }
 
+fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut args: Vec<Arg>) -> Result<(), Option<String>> {
+    match &*dir.node.name.as_str() {
+        "byte"  => directive_const(ecx, buffer, args, Size::BYTE),
+        "word"  => directive_const(ecx, buffer, args, Size::WORD),
+        "dword" => directive_const(ecx, buffer, args, Size::DWORD),
+        "qword" => directive_const(ecx, buffer, args, Size::QWORD),
+        "align" => {
+            if args.len() != 1 {
+                return Err(Some(format!("Invalid amount of arguments")));
+            }
+
+            match args.pop().unwrap() {
+                Arg::Immediate(expr, _, _) => {
+                    buffer.push(Stmt::Align(expr));
+                },
+                _ => return Err(Some(format!("this directive only uses immediate arguments")))
+            }
+            Ok(())
+        },
+        d => {
+            ecx.span_err(dir.span, &format!("unknown directive '{}'", d));
+            Err(None)
+        }
+    }
+}
+
+fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size: Size) -> Result<(), Option<String>> {
+    if args.len() == 0 {
+        return Err(Some(format!("this directive requires at least one argument")));
+    }
+
+    for arg in args {
+        match arg {
+            Arg::Immediate(expr, s, _) => {
+                if s.is_some() && s != Some(size) {
+                    ecx.span_err(expr.span, "wrong argument size");
+                    return Err(None)
+                }
+                buffer.push(Stmt::Var(expr, size));
+            },
+            _ => return Err(Some(format!("this directive only uses immediate arguments")))
+        }
+    }
+
+    Ok(())
+} 
+
 fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<Ident>, mut args: Vec<Arg>) -> Result<(), Option<String>> {
     // this call also inserts more size information in the AST if applicable.
     let data = try!(match_op_format(ecx, op, &mut args));
 
     // determine operand size if not overridden
-    let mut op_size = if (data.flags & flags::MISMATCHING_SIZES) == 0 {
+    let mut op_size = if (data.flags & flags::SIZE_OVERRIDE) == 0 {
         try!(get_operand_size(ecx, &args))
     } else {
         Size::DWORD
@@ -363,7 +423,6 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     Ok(())
 }
 
-
 fn extract_args(fmt: &'static Opdata, mut args: Vec<Arg>) -> (Option<Arg>, Option<Arg>, Vec<Arg>) {
     // determine the operand encoding
     let mut regidx = fmt.args.chars().position(|c| c == 'r').map(|i| i / 2);
@@ -528,8 +587,6 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
         Ok(im_size)
     } else if has_args {
         return Err(Some(format!("Unkonwn argument size")));
-    } else if has_immediate {
-        return Err(Some(format!("Unknown immediate size")));
     } else {
         Ok(Size::DWORD)
     }

@@ -33,7 +33,8 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
             Var(expr, Size::BYTE)  => ("push_8",  expr),
             Var(expr, Size::WORD)  => ("push_16", expr),
             Var(expr, Size::DWORD) => ("push_32", expr),
-            Var(expr, Size::QWORD) => ("push_64", expr)
+            Var(expr, Size::QWORD) => ("push_64", expr),
+            Align(expr)            => ("align",   expr)
         };
 
         let op = ecx.expr_path(ast::Path::from_ident(name.span, name.node));

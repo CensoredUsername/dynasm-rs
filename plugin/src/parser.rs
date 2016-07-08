@@ -14,7 +14,8 @@ pub type Ident = Spanned<ast::Ident>;
 #[derive(Debug)]
 pub enum Item {
     Instruction(Vec<Ident>, Vec<Arg>, Span),
-    Label(Ident)
+    Label(Ident),
+    Directive(Ident, Vec<Arg>, Span)
 }
 
 #[derive(Debug)]
@@ -110,24 +111,30 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &'a mut Parser) -> PResult<'a, (Ident, V
 
         let startspan = parser.span;
 
+        // parse leading dot for directive
+
+        let directive = parser.eat(&token::Dot);
+
         // parse PREFIXES+ op | label :
 
         let mut span = parser.span;
         let mut op = Spanned {node: try!(parser.parse_ident()), span: span};
-
-        if parser.eat(&token::Colon) {
-            // label ":"" branch
-            ins.push(Item::Label(op));
-            continue;
-        }
-        // PREFIXES+ op branch
         let mut ops = Vec::new();
-        while is_prefix(op) {
-            ops.push(op);
-            span = parser.span;
-            op = Spanned {node: try!(parser.parse_ident()), span: span};
+
+        if !directive {
+            if parser.eat(&token::Colon) {
+                // label ":"" branch
+                ins.push(Item::Label(op));
+                continue;
+            }
+
+            // PREFIXES+ op branch
+            while is_prefix(op) {
+                ops.push(op);
+                span = parser.span;
+                op = Spanned {node: try!(parser.parse_ident()), span: span};
+            }
         }
-        ops.push(op);
 
         // parse (expr),*
         let mut args = Vec::new();
@@ -146,7 +153,12 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &'a mut Parser) -> PResult<'a, (Ident, V
 
         let span = Span {hi: parser.last_span.hi, ..startspan};
 
-        ins.push(Item::Instruction(ops, args, span));
+        if !directive {
+            ops.push(op);
+            ins.push(Item::Instruction(ops, args, span));
+        } else {
+            ins.push(Item::Directive(op, args, span));
+        }
     }
 
     Ok((name, ins))
@@ -302,25 +314,27 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
 
     use self::Register::*;
     let reg = match &*segment.identifier.name.as_str() {
-        "rax"  => RAX,  "rcx"  => RCX,  "rdx"  => RDX,  "rbx"  => RBX,
-        "rsp"  => RSP,  "rbp"  => RBP,  "rsi"  => RSI,  "rdi"  => RDI,
-        "r8"   => R8,   "r9"   => R9,   "r10"  => R10,  "r11"  => R11,
-        "r12"  => R12,  "r13"  => R13,  "r14"  => R14,  "r15"  => R15,
+        "rax"|"r0" => RAX, "rcx"|"r1" => RCX, "rdx"|"r2" => RDX, "rbx"|"r3" => RBX,
+        "rsp"|"r4" => RSP, "rbp"|"r5" => RBP, "rsi"|"r6" => RSI, "rdi"|"r7" => RDI,
+        "r8"       => R8,  "r9"       => R9,  "r10"      => R10, "r11"      => R11,
+        "r12"      => R12, "r13"      => R13, "r14"      => R14, "r15"      => R15,
 
-        "eax"  => EAX,  "ecx"  => ECX,  "edx"  => EDX,  "ebx"  => EBX,
-        "esp"  => ESP,  "ebp"  => EBP,  "esi"  => ESI,  "edi"  => EDI,
-        "r8d"  => R8D,  "r9d"  => R9D,  "r10d" => R10D, "r11d" => R11D,
-        "r12d" => R12D, "r13d" => R13D, "r14d" => R14D, "r15d" => R15D,
+        "eax"|"r0d" => EAX, "ecx"|"r1d" => ECX, "edx"|"r2d" => EDX, "ebx"|"r3d" => EBX,
+        "esp"|"r4d" => ESP, "ebp"|"r5d" => EBP, "esi"|"r6d" => ESI, "edi"|"r7d" => EDI,
+        "r8d"       => R8D, "r9d"       => R9D, "r10d"      => R10D,"r11d"      => R11D,
+        "r12d"      => R12D,"r13d"      => R13D,"r14d"      => R14D,"r15d"      => R15D,
 
-        "ax"   => AX,   "cx"   => CX,   "dx"   => DX,   "bx"   => BX, 
-        "sp"   => SP,   "bp"   => BP,   "si"   => SI,   "di"   => DI, 
-        "r8w"  => R8W,  "r9w"  => R9W,  "r10w" => R10W, "r11w" => R11W,
-        "r12w" => R12W, "r13w" => R13W, "r14w" => R14W, "r15w" => R15W,
+        "ax"|"r0w" => AX,  "cx"|"r1w" => CX,  "dx"|"r2w" => DX,  "bx"|"r3w" => BX, 
+        "sp"|"r4w" => SP,  "bp"|"r5w" => BP,  "si"|"r6w" => SI,  "di"|"r7w" => DI, 
+        "r8w"      => R8W, "r9w"      => R9W, "r10w"     => R10W,"r11w"     => R11W,
+        "r12w"     => R12W,"r13w"     => R13W,"r14w"     => R14W,"r15w"     => R15W,
 
-        "al"   => AL,   "cl"   => CL,   "dl"   => DL,   "bl"   => BL, 
-        "spl"  => SPL,  "bpl"  => BPL,  "sil"  => SIL,  "dil"  => DIL,
-        "r8b"  => R8B,  "r9b"  => R9B,  "r10b" => R10B, "r11b" => R11B,
-        "r12b" => R12B, "r13b" => R13B, "r14b" => R14B, "r15b" => R15B,
+        "al"|"r0b" => AL,  "cl"|"r1b" => CL,  "dl"|"r2b" => DL,  "bl"|"r3b" => BL, 
+        "spl"      => SPL, "bpl"      => BPL, "sil"      => SIL, "dil"      => DIL,
+        "r8b"      => R8B, "r9b"      => R9B, "r10b"     => R10B,"r11b"     => R11B,
+        "r12b"     => R12B,"r13b"     => R13B,"r14b"     => R14B,"r15b"     => R15B,
+
+        // not encodable yet: AH, CH, DH, BH
 
         "rip"  => RIP,
         _ => return None

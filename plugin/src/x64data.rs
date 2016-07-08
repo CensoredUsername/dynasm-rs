@@ -128,9 +128,9 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "v*r*", [0x0F, 0xB1], 0, flags::CAN_LOCK;
             "vbrb", [0x0F, 0xB0], 0, flags::CAN_LOCK;
         ), "cmpxchg8b"  => Op!( // actually a QWORD
-            "m!", [0x0F, 0xC7], 1, flags::MISMATCHING_SIZES | flags::CAN_LOCK;
+            "m!", [0x0F, 0xC7], 1, flags::SIZE_OVERRIDE | flags::CAN_LOCK;
         ), "cmpxchg16b" => Op!( // actually an OWORD
-            "m!", [0x0F, 0xC7], 1, flags::MISMATCHING_SIZES | flags::CAN_LOCK | flags::REQUIRES_REXSIZE;
+            "m!", [0x0F, 0xC7], 1, flags::SIZE_OVERRIDE | flags::CAN_LOCK | flags::REQUIRES_REXSIZE;
         ), "cpuid" => Op!(
             [0x0F, 0xA2];
         ), "dec" => Op!(
@@ -140,7 +140,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "v*", [0xF7], 6;
             "vb", [0xF6], 6;
         ), "enter" => Op!(
-            "iwib", [0xC8], 0, flags::MISMATCHING_SIZES;
+            "iwib", [0xC8], 0, flags::SIZE_OVERRIDE;
         ), "idiv" => Op!(
             "v*", [0xF7], 7;
             "vb", [0xF6], 7;
@@ -271,19 +271,19 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "movsq" => Op!(
             "", [0xA5], 0, flags::REQUIRES_REXSIZE; 
         ), "movsx" => Op!( // currently this defaults to 32-bit memory if not specified. do we want this?
-            "rdvw", [0x0F, 0xBF], 0, flags::MISMATCHING_SIZES;
-            "rqvw", [0x0F, 0xBF], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_REXSIZE;
-            "rwvb", [0x0F, 0xBE], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_OPSIZE;
-            "rdvb", [0x0F, 0xBE], 0, flags::MISMATCHING_SIZES;
-            "rqvb", [0x0F, 0xBE], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_REXSIZE;
+            "rdvw", [0x0F, 0xBF], 0, flags::SIZE_OVERRIDE;
+            "rqvw", [0x0F, 0xBF], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_REXSIZE;
+            "rwvb", [0x0F, 0xBE], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_OPSIZE;
+            "rdvb", [0x0F, 0xBE], 0, flags::SIZE_OVERRIDE;
+            "rqvb", [0x0F, 0xBE], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_REXSIZE;
         ), "movsxd" => Op!(
-            "rqvd", [0x63], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_REXSIZE;
+            "rqvd", [0x63], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_REXSIZE;
         ), "movzx" => Op!( // currently this defaults to 32-bit memory if not specified. do we want this?
-            "rdvw", [0x0F, 0xBF], 0, flags::MISMATCHING_SIZES;
-            "rqvw", [0x0F, 0xBF], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_REXSIZE;
-            "rwvb", [0x0F, 0xBE], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_OPSIZE;
-            "rdvb", [0x0F, 0xBE], 0, flags::MISMATCHING_SIZES;
-            "rqvb", [0x0F, 0xBE], 0, flags::MISMATCHING_SIZES | flags::REQUIRES_REXSIZE;
+            "rdvw", [0x0F, 0xBF], 0, flags::SIZE_OVERRIDE;
+            "rqvw", [0x0F, 0xBF], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_REXSIZE;
+            "rwvb", [0x0F, 0xBE], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_OPSIZE;
+            "rdvb", [0x0F, 0xBE], 0, flags::SIZE_OVERRIDE;
+            "rqvb", [0x0F, 0xBE], 0, flags::SIZE_OVERRIDE | flags::REQUIRES_REXSIZE;
         ), "mul" => Op!(
             "v*", [0xF7], 4;
             "vb", [0xF6], 4;
@@ -369,7 +369,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "r*", [0x0F, 0xC7], 6;
         ), "ret" => Op!(
             [0xC3];
-            "iw", [0xC2], 0, flags::MISMATCHING_SIZES;
+            "iw", [0xC2], 0, flags::SIZE_OVERRIDE;
         ), "rol" => Op!(
             "v*",  [0xD3], 0;
             "vb",  [0xD2], 0;

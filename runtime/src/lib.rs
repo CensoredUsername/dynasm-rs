@@ -27,6 +27,14 @@ impl AssemblingBuffer {
     pub fn push_64(&mut self, value: i64) {
         self.0.extend( unsafe { ::std::mem::transmute::<_, [u8; 8]>(value.to_le())}.into_iter() );
     }
+
+    pub fn align(&mut self, to: usize) {
+        if self.0.len() % to != 0 {
+            for _ in 0..(to - self.0.len() % to) {
+                self.0.push(0x90)
+            }
+        }
+    }
 }
 
 impl Deref for AssemblingBuffer {
