@@ -1,38 +1,154 @@
-#[derive(Debug)]
-pub struct AssemblingBuffer(Vec<u8>);
+use std::collections::HashMap;
+use std::collections::hash_map::Entry::*;
+use std::ops::Deref;
+use std::mem;
 
-use std::ops::{Deref, DerefMut};
+#[derive(Debug)]
+struct PatchLoc(usize, u8);
+
+#[derive(Debug)]
+pub struct AssemblingBuffer {
+    // instruction buffer while building the assembly
+    ops: Vec<u8>,
+
+    // label name -> target loc
+    global_labels: HashMap<&'static str, usize>,
+    // end of patch location -> name
+    global_relocs: Vec<(PatchLoc, &'static str)>, 
+
+    // label id -> target loc
+    dynamic_labels: HashMap<usize, usize>,
+    // location to be resolved, loc, label id
+    dynamic_relocs: Vec<(PatchLoc, usize)>,
+
+    // labelname -> most recent patch location
+    local_labels: HashMap<&'static str, usize>,
+    // locations to be patched once this label gets seen. name -> Vec<locs>
+    local_relocs: HashMap<&'static str, Vec<PatchLoc>>
+}
 
 impl AssemblingBuffer {
     pub fn new() -> AssemblingBuffer {
-        AssemblingBuffer(Vec::new())
+        AssemblingBuffer {
+            ops: Vec::new(),
+            global_labels: HashMap::new(),
+            dynamic_labels: HashMap::new(),
+            local_labels: HashMap::new(),
+            global_relocs: Vec::new(),
+            dynamic_relocs: Vec::new(),
+            local_relocs: HashMap::new()
+        }
     }
 
     pub fn push(&mut self, value: u8) {
-        self.0.push(value);
+        self.ops.push(value);
     }
 
     pub fn push_8(&mut self, value: i8) {
-        self.0.push(value as u8);
+        self.ops.push(value as u8);
     }
 
     pub fn push_16(&mut self, value: i16) {
-        self.0.extend( unsafe { ::std::mem::transmute::<_, [u8; 2]>(value.to_le())}.into_iter() );
+        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 2]>(value.to_le())}.into_iter() );
     }
 
     pub fn push_32(&mut self, value: i32) {
-        self.0.extend( unsafe { ::std::mem::transmute::<_, [u8; 4]>(value.to_le())}.into_iter() );
+        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 4]>(value.to_le())}.into_iter() );
     }
 
     pub fn push_64(&mut self, value: i64) {
-        self.0.extend( unsafe { ::std::mem::transmute::<_, [u8; 8]>(value.to_le())}.into_iter() );
+        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 8]>(value.to_le())}.into_iter() );
     }
 
     pub fn align(&mut self, to: usize) {
-        if self.0.len() % to != 0 {
-            for _ in 0..(to - self.0.len() % to) {
-                self.0.push(0x90)
+        if self.ops.len() % to != 0 {
+            for _ in 0..(to - self.ops.len() % to) {
+                self.ops.push(0x90)
             }
+        }
+    }
+
+    fn patch_loc(ops: &mut [u8], loc: PatchLoc, target: usize) {
+        let buf = &mut ops[loc.0 - loc.1 as usize .. loc.0];
+
+        unsafe { match loc.1 {
+            1 => buf.copy_from_slice(&mem::transmute::<_, [u8; 1]>( ((target - loc.0) as i8 ).to_le() )),
+            2 => buf.copy_from_slice(&mem::transmute::<_, [u8; 2]>( ((target - loc.0) as i16).to_le() )),
+            4 => buf.copy_from_slice(&mem::transmute::<_, [u8; 4]>( ((target - loc.0) as i32).to_le() )),
+            8 => buf.copy_from_slice(&mem::transmute::<_, [u8; 8]>( ((target - loc.0) as i64).to_le() )),
+            _ => panic!("invalid patch size")
+        } }
+    }
+
+    pub fn global_label(&mut self, name: &'static str) {
+        if let Some(name) = self.global_labels.insert(name, self.ops.len()) {
+            panic!("Duplicate global label '{}'", name);
+        }
+    }
+
+    pub fn global_reloc(&mut self, name: &'static str, size: u8) {
+        self.global_relocs.push((PatchLoc(self.ops.len(), size), name));
+    }
+
+    pub fn dynamic_label(&mut self, id: usize) {
+        if let Some(id) = self.dynamic_labels.insert(id, self.ops.len()) {
+            panic!("Duplicate label '{}'", id);
+        }
+    }
+
+    pub fn dynamic_reloc(&mut self, id: usize, size: u8) {
+        self.dynamic_relocs.push((PatchLoc(self.ops.len(), size), id));
+    }
+
+    pub fn local_label(&mut self, name: &'static str) {
+        if let Some(relocs) = self.local_relocs.remove(&name) {
+            for loc in relocs {
+                let len = self.ops.len();
+                Self::patch_loc(&mut self.ops, loc, len);
+            }
+        }
+        self.local_labels.insert(name, self.ops.len());
+    }
+
+    pub fn forward_reloc(&mut self, name: &'static str, size: u8) {
+        match self.local_relocs.entry(name) {
+            Occupied(mut o) => {
+                o.get_mut().push(PatchLoc(self.ops.len(), size));
+            },
+            Vacant(v)   => {
+                v.insert(vec![PatchLoc(self.ops.len(), size)]);
+            }
+        }
+    }
+
+    pub fn backward_reloc(&mut self, name: &'static str, size: u8) {
+        if let Some(&target) = self.local_labels.get(&name) {
+            let len = self.ops.len();
+            Self::patch_loc(&mut self.ops, PatchLoc(len, size), target)
+        } else {
+            panic!("Unknown local label '{}'", name);
+        }
+    }
+
+    pub fn encode_relocs(&mut self) {
+        for (loc, name) in self.global_relocs.drain(..) {
+            if let Some(&target) = self.global_labels.get(&name) {
+                Self::patch_loc(&mut self.ops, loc, target)
+            } else {
+                panic!("Unkonwn global label '{}'", name);
+            }
+        }
+
+        for (loc, id) in self.dynamic_relocs.drain(..) {
+            if let Some(&target) = self.dynamic_labels.get(&id) {
+                Self::patch_loc(&mut self.ops, loc, target)
+            } else {
+                panic!("Unkonwn dynamic label '{}'", id);
+            }
+        }
+
+        if let Some(name) = self.local_relocs.keys().next() {
+            panic!("Unknown local label '{}'", name);
         }
     }
 }
@@ -40,12 +156,6 @@ impl AssemblingBuffer {
 impl Deref for AssemblingBuffer {
     type Target = Vec<u8>;
     fn deref(&self) -> &Vec<u8> {
-        &self.0
-    }
-}
-
-impl DerefMut for AssemblingBuffer {
-    fn deref_mut(&mut self) -> &mut Vec<u8> {
-        &mut self.0
+        &self.ops
     }
 }

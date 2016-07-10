@@ -11,10 +11,14 @@ use std::collections::HashMap;
 
 pub type Ident = Spanned<ast::Ident>;
 
+/**
+ * collections
+ */
+
 #[derive(Debug)]
 pub enum Item {
     Instruction(Vec<Ident>, Vec<Arg>, Span),
-    Label(Ident),
+    Label(LabelType),
     Directive(Ident, Vec<Arg>, Span)
 }
 
@@ -22,7 +26,8 @@ pub enum Item {
 pub enum Arg {
     Indirect(MemoryRef), // indirect memory reference supporting scale, index, base and displacement.
     Direct(Spanned<Register>), // a bare register (rax, ...)
-    Immediate(P<ast::Expr>, Option<Size>, bool), // an expression that evaluates to a value. basically, anything that ain't the other two.
+    JumpTarget(JumpType, Option<Size>), // jump target.
+    Immediate(P<ast::Expr>, Option<Size>), // an expression that evaluates to a value. basically, anything that ain't the other three
     Invalid // placeholder value
 }
 
@@ -34,6 +39,24 @@ pub struct MemoryRef {
     pub disp:  Option<P<ast::Expr>>,
     pub size:  Option<Size>,
     pub span:  Span
+}
+
+#[derive(Debug)]
+pub enum LabelType {
+    Global(Ident),         // . label :
+    Local(Ident),          // label :
+    Dynamic(P<ast::Expr>), // => expr :
+}
+
+#[derive(Debug)]
+pub enum JumpType {
+    // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
+    // in order to allow the full range of expressions to be used. the only currently existing ambiguity is 
+    // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
+    Global(Ident),         // . label
+    Backward(Ident),       // > label
+    Forward(Ident),        // < label
+    Dynamic(P<ast::Expr>), // => expr
 }
 
 // encoding of this:
@@ -65,6 +88,18 @@ pub enum Register {
     RIP = 0x0310,
 }
 
+#[derive(PartialOrd, PartialEq, Ord, Eq, Debug, Clone, Copy)]
+pub enum Size {
+    BYTE  = 1,
+    WORD  = 2,
+    DWORD = 4,
+    QWORD = 8
+}
+
+/*
+ * impls
+ */
+
 impl Register {
     pub fn size(&self) -> Size {
         match (*self as u16) & 0x0300 {
@@ -81,25 +116,21 @@ impl Register {
     }
 } 
 
-#[derive(PartialOrd, PartialEq, Ord, Eq, Debug, Clone, Copy)]
-pub enum Size {
-    BYTE  = 1,
-    WORD  = 2,
-    DWORD = 4,
-    QWORD = 8
-}
-
 impl Size {
     pub fn in_bytes(&self) -> u8 {
         *self as u8
     }
 }
 
+/*
+ * Code
+ */
+
 // tokentree is a list of tokens and delimited lists of tokens.
 // this means we don't have to figure out nesting via []'s by ourselves.
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 
-pub fn parse<'a>(ecx: &ExtCtxt, parser: &'a mut Parser) -> PResult<'a, (Ident, Vec<Item>)> {
+pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Ident, Vec<Item>)> {
     let span = parser.span;
     let name = Spanned {node: try!(parser.parse_ident()), span: span};
 
@@ -111,24 +142,38 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &'a mut Parser) -> PResult<'a, (Ident, V
 
         let startspan = parser.span;
 
-        // parse leading dot for directive
+        // parse . or => indicating possible label/directive or label
 
-        let directive = parser.eat(&token::Dot);
+        let has_dot = parser.eat(&token::Dot);
 
-        // parse PREFIXES+ op | label :
+        if !has_dot && parser.eat(&token::FatArrow) {
+            // dynamic label branch
+            let expr = try!(parser.parse_expr());
+
+            ins.push(Item::Label(LabelType::Dynamic(expr)));
+            continue;
+        }
+
+        // parse the first part of an op or a label
 
         let mut span = parser.span;
         let mut op = Spanned {node: try!(parser.parse_ident()), span: span};
+
+        // parse a colon indicating we were in a label
+
+        if parser.eat(&token::Colon) {
+            ins.push(Item::Label(if has_dot {
+                LabelType::Global(op)
+            } else {
+                LabelType::Local(op)
+            }));
+            continue;
+        }
+
+        // if op was a prefix, continue parsing ops
+
         let mut ops = Vec::new();
-
-        if !directive {
-            if parser.eat(&token::Colon) {
-                // label ":"" branch
-                ins.push(Item::Label(op));
-                continue;
-            }
-
-            // PREFIXES+ op branch
+        if !has_dot {
             while is_prefix(op) {
                 ops.push(op);
                 span = parser.span;
@@ -136,24 +181,20 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &'a mut Parser) -> PResult<'a, (Ident, V
             }
         }
 
-        // parse (expr),*
+        // parse (sizehint? expr),*
         let mut args = Vec::new();
 
         if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-            let sizehint = eat_size_hint(parser);
-            args.push((try!(parser.parse_expr()), sizehint));
+            args.push(try!(parse_arg(ecx, parser)));
 
             while parser.eat(&token::Comma) {
-                let sizehint = eat_size_hint(parser);
-                args.push((try!(parser.parse_expr()), sizehint));
+                args.push(try!(parse_arg(ecx, parser)));
             }
         }
 
-        let args: Vec<Arg> = args.into_iter().map(|x| parse_arg(ecx, x.0, x.1)).collect();
-
         let span = Span {hi: parser.last_span.hi, ..startspan};
 
-        if !directive {
+        if !has_dot {
             ops.push(op);
             ins.push(Item::Instruction(ops, args, span));
         } else {
@@ -198,24 +239,58 @@ fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
     true
 }
 
-fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<Size>) -> Arg {
+fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     use syntax::ast::ExprKind;
 
-    let arg = arg.unwrap();
+    // sizehint
+    let size = eat_size_hint(parser);
+
+    let start = parser.span;
+
+    // global label
+    if parser.eat(&token::Dot) {
+        let name = try!(parser.parse_ident());
+        return Ok(Arg::JumpTarget(JumpType::Global(
+            Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
+        ), size));
+
+    // forward local label
+    } else if parser.eat(&token::Gt) {
+        let name = try!(parser.parse_ident());
+        return Ok(Arg::JumpTarget(JumpType::Forward(
+            Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
+        ), size));
+
+    // forward global label
+    } else if parser.eat(&token::Lt) {
+        let name = try!(parser.parse_ident());
+        return Ok(Arg::JumpTarget(JumpType::Backward(
+            Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
+        ), size));
+
+    // dynamic label
+    } else if parser.eat(&token::FatArrow) {
+        let id = try!(parser.parse_expr());
+        return Ok(Arg::JumpTarget(JumpType::Dynamic(id), size));
+
+    }
+
+    // it's a normal (register/immediate/memoryref) operand
+    let arg = try!(parser.parse_expr()).unwrap();
 
     // direct register reference
     if let Some(reg) = parse_reg(&arg) {
         if size.is_some() {
             ecx.span_err(arg.span, "size hint with direct register");
         }
-        return Arg::Direct(reg)
+        return Ok(Arg::Direct(reg))
     }
 
     // memory location
     if let ast::Expr {node: ExprKind::Vec(mut items), span, ..} = arg {
         if items.len() != 1 {
             ecx.span_err(span, "Comma in memory reference");
-            return Arg::Invalid;
+            return Ok(Arg::Invalid);
         }
 
         let mut added = Vec::new();
@@ -253,7 +328,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<Size>) -> Arg {
         // scale, index, base
         if regs.len() > 2 {
             ecx.span_err(span, "Invalid memory reference: too many registers");
-            return Arg::Invalid;
+            return Ok(Arg::Invalid);
         }
         let mut drain = regs.drain();
         let (index, scale, base) = match (drain.next(), drain.next()) {
@@ -266,7 +341,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<Size>) -> Arg {
             (Some((index, scale)),  Some((base, 1)))      => (Some(index), scale, Some(base)),
             _ => {
                 ecx.span_err(span, "Invalid memory reference: only one register can be scaled");
-                return Arg::Invalid;
+                return Ok(Arg::Invalid);
             }
         };
 
@@ -283,21 +358,21 @@ fn parse_arg<'a>(ecx: &ExtCtxt, arg: P<ast::Expr>, size: Option<Size>) -> Arg {
         };
 
         // assemble the memory location
-        return Arg::Indirect(MemoryRef {
+        return Ok(Arg::Indirect(MemoryRef {
             index: index,
             scale: scale,
             base:  base,
             disp:  disp,
             size:  size,
             span:  span
-        });
+        }));
     }
 
     // immediate
-    Arg::Immediate(P(arg), size, false)
+    Ok(Arg::Immediate(P(arg), size))
 }
 
-fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
+fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     let path = match expr {
         &ast::Expr {node: ast::ExprKind::Path(None, ref path) , ..} => path,
         _ => return None
@@ -312,8 +387,18 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
         return None;
     }
 
+    Some(Ident {node: segment.identifier, span: path.span})
+}
+
+fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
+    let path = if let Some(path) = as_simple_name(expr) {
+        path
+    } else {
+        return None
+    };
+
     use self::Register::*;
-    let reg = match &*segment.identifier.name.as_str() {
+    let reg = match &*path.node.name.as_str() {
         "rax"|"r0" => RAX, "rcx"|"r1" => RCX, "rdx"|"r2" => RDX, "rbx"|"r3" => RBX,
         "rsp"|"r4" => RSP, "rbp"|"r5" => RBP, "rsi"|"r6" => RSI, "rdi"|"r7" => RDI,
         "r8"       => R8,  "r9"       => R9,  "r10"      => R10, "r11"      => R11,

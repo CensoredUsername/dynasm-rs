@@ -9,16 +9,6 @@ use syntax::parse::token::intern;
 
 pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) -> Vec<ast::Stmt> {
     let mut buffer = Vec::new();
-    let (stmts, labels) = stmts.into_vec();
-
-    // construction for `let label = value usize is as follows`
-    // expr = expr_lit(span, LitKind::Int(val, LitIntType::Signed(IntTy::Is)))
-    // stmt_let(span, false, ident, expr);
-
-    for (label, value) in labels {
-        let expr = ecx.expr_lit(label.span, ast::LitKind::Int(value as u64, ast::LitIntType::Unsuffixed));
-        buffer.push(ecx.stmt_let(label.span, false, label.node, expr));
-    }
 
     // construction for `op.push(expr)` is as follows
     // op = Path::from_ident(name)
@@ -28,18 +18,47 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
 
     for stmt in stmts {
         use compiler::Stmt::*;
-        let (method, expr) = match stmt {
-            Const(byte)            => ("push",    ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte))),
-            Var(expr, Size::BYTE)  => ("push_8",  expr),
-            Var(expr, Size::WORD)  => ("push_16", expr),
-            Var(expr, Size::DWORD) => ("push_32", expr),
-            Var(expr, Size::QWORD) => ("push_64", expr),
-            Align(expr)            => ("align",   expr)
+        let (method, args) = match stmt {
+            Const(byte)            => ("push",    vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte))]), // this span should never appear in an error message
+
+            Var(expr, Size::BYTE)  => ("push_8",  vec![expr]),
+            Var(expr, Size::WORD)  => ("push_16", vec![expr]),
+            Var(expr, Size::DWORD) => ("push_32", vec![expr]),
+            Var(expr, Size::QWORD) => ("push_64", vec![expr]),
+
+            Align(expr)            => ("align",   vec![expr]),
+
+            GlobalLabel(ident)     => ("global_label", vec![ecx.expr_lit(
+                ident.span,
+                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+            )]),
+            LocalLabel(ident)      => ("local_label", vec![ecx.expr_lit(
+                ident.span,
+                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+            )]),
+            DynamicLabel(expr)     => ("dynamic_label", vec![expr]),
+
+            GlobalJumpTarget(ident, size) => ("global_reloc", vec![ecx.expr_lit(
+                ident.span,
+                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+            ), ecx.expr_u8(ident.span, size.in_bytes())]),
+            ForwardJumpTarget(ident, size) => ("forward_reloc", vec![ecx.expr_lit(
+                ident.span,
+                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+            ), ecx.expr_u8(ident.span, size.in_bytes())]),
+            BackwardJumpTarget(ident, size) => ("backward_reloc", vec![ecx.expr_lit(
+                ident.span,
+                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+            ), ecx.expr_u8(ident.span, size.in_bytes())]),
+            DynamicJumpTarget(expr, size) => {
+                let span = expr.span;
+                ("dynamic_reloc", vec![expr, ecx.expr_u8(span, size.in_bytes())])
+            }
         };
 
         let op = ecx.expr_path(ast::Path::from_ident(name.span, name.node));
         let method = ast::Ident::with_empty_ctxt(intern(method));
-        let expr = ecx.expr_method_call(ecx.call_site(), op, method, vec![expr]);
+        let expr = ecx.expr_method_call(ecx.call_site(), op, method, args);
 
         buffer.push(ecx.stmt_semi(expr));
     }

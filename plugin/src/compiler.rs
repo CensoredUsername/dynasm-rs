@@ -1,74 +1,33 @@
-use std::ops::Deref;
-use std::iter::Extend;
-
-use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
 use syntax::ast;
 use syntax::ptr::P;
 use syntax::codemap::Spanned;
 
-use parser::{self, Item, Arg, Ident, MemoryRef, Register, Size};
+use parser::{self, Item, Arg, Ident, MemoryRef, Register, Size, LabelType, JumpType};
 use x64data::get_mnemnonic_data;
 
 /*
  * Compilation output
  */
 
-#[derive(Clone, Debug)]
-pub struct StmtBuffer {
-    buf: Vec<Stmt>,
-    labels: Vec<(Ident, usize)>,
-    pos: usize
-}
-
-impl StmtBuffer {
-    pub fn new() -> StmtBuffer {
-        StmtBuffer {buf: Vec::new(), labels: Vec::new(), pos: 0}
-    }
-
-    pub fn push(&mut self, s: Stmt) {
-        self.pos += match s {
-            Stmt::Const(_) => 1,
-            Stmt::Var(_, s) => s.in_bytes() as usize,
-            Stmt::Align(_) => panic!("can't inc pos over align")
-        };
-        self.buf.push(s);
-    }
-
-    pub fn make_label(&mut self, ident: Ident) {
-        self.labels.push((ident, self.pos));
-    }
-
-    pub fn into_vec(self) -> (Vec<Stmt>, Vec<(Ident, usize)>) {
-        (self.buf, self.labels)
-    }
-
-    pub fn offset(&self) -> usize {
-        self.pos
-    }
-}
-
-impl Deref for StmtBuffer {
-    type Target = Vec<Stmt>;
-
-    fn deref(&self) -> &Vec<Stmt> {
-        &self.buf
-    }
-}
-
-impl Extend<Stmt> for StmtBuffer {
-    fn extend<T: IntoIterator<Item=Stmt>>(&mut self, iter: T) {
-        for i in iter {
-            self.push(i)
-        }
-    }
-}
+pub type StmtBuffer = Vec<Stmt>;
 
 #[derive(Clone, Debug)]
 pub enum Stmt {
     Const(u8),
+
     Var(P<ast::Expr>, Size),
-    Align(P<ast::Expr>)
+
+    Align(P<ast::Expr>),
+
+    GlobalLabel(Ident),
+    LocalLabel(Ident),
+    DynamicLabel(P<ast::Expr>),
+
+    GlobalJumpTarget(Ident, Size),
+    ForwardJumpTarget(Ident, Size),
+    BackwardJumpTarget(Ident, Size),
+    DynamicJumpTarget(P<ast::Expr>, Size)
 }
 
 /*
@@ -150,7 +109,7 @@ pub fn compile(ecx: &ExtCtxt, nodes: Vec<parser::Item>) -> Result<StmtBuffer, ()
                     }
                 }
             },
-            Item::Label(ident) => stmts.make_label(ident),
+            Item::Label(label) => compile_label(&mut stmts, label),
             Item::Directive(op, args, span) => {
                 match compile_directive(ecx, &mut stmts, op, args) {
                     Ok(_) => (),
@@ -184,7 +143,7 @@ fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut arg
             }
 
             match args.pop().unwrap() {
-                Arg::Immediate(expr, _, _) => {
+                Arg::Immediate(expr, _) => {
                     buffer.push(Stmt::Align(expr));
                 },
                 _ => return Err(Some(format!("this directive only uses immediate arguments")))
@@ -205,7 +164,7 @@ fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size:
 
     for arg in args {
         match arg {
-            Arg::Immediate(expr, s, _) => {
+            Arg::Immediate(expr, s) => {
                 if s.is_some() && s != Some(size) {
                     ecx.span_err(expr.span, "wrong argument size");
                     return Err(None)
@@ -217,7 +176,15 @@ fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size:
     }
 
     Ok(())
-} 
+}
+
+fn compile_label(stmts: &mut StmtBuffer, label: LabelType) {
+    stmts.push(match label {
+        LabelType::Global(ident) => Stmt::GlobalLabel(ident),
+        LabelType::Local(ident)  => Stmt::LocalLabel(ident),
+        LabelType::Dynamic(expr) => Stmt::DynamicLabel(expr),
+    });
+}
 
 fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<Ident>, mut args: Vec<Arg>) -> Result<(), Option<String>> {
     // this call also inserts more size information in the AST if applicable.
@@ -394,27 +361,23 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     // immediates
     for arg in args {
         let stmt = match arg {
-            Arg::Immediate(expr, Some(size), false) => Stmt::Var(expr, size),
-            Arg::Immediate(expr, None,       false) => Stmt::Var(expr, if op_size != Size::QWORD {op_size} else {Size::DWORD}),
-            Arg::Immediate(expr, size,       true)  => {
-                let size = if let Some(size) = size {
-                    size
-                } else if op_size != Size::QWORD {
-                    op_size
-                } else {
-                    Size::DWORD
-                };
+            Arg::Immediate(expr, Some(size)) => Stmt::Var(expr, size),
+            Arg::Immediate(expr, None)       => Stmt::Var(expr, if op_size != Size::QWORD {op_size} else {Size::DWORD}),
+            Arg::JumpTarget(target, size)    => {
+                let size = size.unwrap_or(Size::DWORD);
 
-                // we can safely do this as there's a guarantee of only one immediate if it's a code offset
-                let offset = buffer.offset() + size.in_bytes() as usize;
-                let span = expr.span;
+                // placeholder
+                for _ in 0..size.in_bytes() {
+                    buffer.push(Stmt::Const(0));
+                }
 
-                // generate the expression to subtract this offset
-                let value = ast::LitKind::Int(offset as u64, ast::LitIntType::Unsuffixed);
-                let expr = ecx.expr_binary(span, ast::BinOpKind::Sub, expr, ecx.expr_lit(span, value));
-
-                Stmt::Var(expr, size)
-            },
+                match target {
+                    JumpType::Global(ident)   => Stmt::GlobalJumpTarget(ident, size),
+                    JumpType::Forward(ident)  => Stmt::ForwardJumpTarget(ident, size),
+                    JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, size),
+                    JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, size)
+                }
+            }
             _ => continue 
         };
         buffer.push(stmt);
@@ -531,7 +494,7 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
     let mut im_size = None;
     let mut has_immediate = false;
     let mut has_args = false;
-    let mut has_code_offset = false;
+    let mut has_jumptarget = false;
 
     for arg in args {
         match *arg {
@@ -556,24 +519,29 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                     }
                 }
             },
-            Arg::Immediate(_, size, relative) => {
-                if relative {
-                    if has_immediate {
-                        panic!("multiple code offsets in format string");
-                    }
-                    has_code_offset = true;
-                } else if has_code_offset {
-                    panic!("multiple code offsets in format string");
-                }
+            Arg::Immediate(_, size) => {
                 has_immediate = true;
                 if let Some(size) = size {
-                    if im_size.is_none() || im_size.unwrap() < size  {
+                    if im_size.is_none() || im_size.unwrap() < size {
                         im_size = Some(size);
                     }
                 }
             },
+            Arg::JumpTarget(_, size) => {
+                if has_jumptarget {
+                    panic!("bad encoding data: multiple jump targets in the same instruction");
+                }
+                has_jumptarget = true;
+                if let Some(size) = size {
+                    im_size = Some(size);
+                }
+            }
             Arg::Invalid => unreachable!()
         }
+    }
+
+    if has_jumptarget && has_immediate {
+        panic!("bad encoding data: jump target and immediate in the same instruction");
     }
 
     if let Some(op_size) = op_size {
@@ -693,8 +661,9 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
             let arg = args.next().unwrap();
 
             let size = match (code, arg) {
-                ('i', &Arg::Immediate(_, size, _)) |
-                ('c', &Arg::Immediate(_, size, _)) => size,
+                ('i', &Arg::Immediate(_, size)) |
+                ('c', &Arg::Immediate(_, size)) => size,
+                ('c', &Arg::JumpTarget(_, size)) => size,
                 ('r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
                 ('v', &Arg::Direct(Spanned {node: ref reg, ..} )) => Some(reg.size()),
                 ('m', &Arg::Indirect(MemoryRef {size, ..} )) |
@@ -725,12 +694,13 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
     {
         let mut fmt = fmt.chars();
         let mut args = args.iter_mut();
-        while let Some(code) = fmt.next() {
+        while let Some(_) = fmt.next() {
             let fsize = fmt.next().unwrap();
             let arg: &mut Arg = args.next().unwrap();
 
             match *arg {
-                Arg::Immediate(_, ref mut size @ None, _) |
+                Arg::Immediate(_, ref mut size @ None) |
+                Arg::JumpTarget(_, ref mut size @ None) |
                 Arg::Indirect(MemoryRef {size: ref mut size @ None, ..} ) => *size = match fsize {
                     'b' => Some(Size::BYTE),
                     'w' => Some(Size::WORD),
@@ -742,13 +712,6 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
                 },
                 _ => ()
             };
-
-            // make any code offsets relative
-            if 'c' == code {
-                if let &mut Arg::Immediate(_, _, ref mut relative) = arg {
-                    *relative = true
-                }
-            }
         }
     }
 
