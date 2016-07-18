@@ -142,18 +142,27 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Ident, 
 
         let startspan = parser.span;
 
-        // parse . or => indicating possible label/directive or label
+        // possible prefix symbols: => (dynamic label), -> (global label), . (directive)
 
-        let has_dot = parser.eat(&token::Dot);
-
-        if !has_dot && parser.eat(&token::FatArrow) {
+        if parser.eat(&token::FatArrow) {
             // dynamic label branch
             let expr = try!(parser.parse_expr());
 
             ins.push(Item::Label(LabelType::Dynamic(expr)));
+            // note: we explicitly do not try to parse a : here as it is a valid symbol inside of an expression
             continue;
+
+        } else if parser.eat(&token::RArrow) {
+            // global label branch
+            let name = Spanned {node: try!(parser.parse_ident()), span: startspan};
+
+            ins.push(Item::Label(LabelType::Global(name)));
+            try!(parser.expect(&token::Colon));
+            continue;
+
         }
 
+        let is_directive = parser.eat(&token::Dot);
         // parse the first part of an op or a label
 
         let mut span = parser.span;
@@ -162,18 +171,14 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Ident, 
         // parse a colon indicating we were in a label
 
         if parser.eat(&token::Colon) {
-            ins.push(Item::Label(if has_dot {
-                LabelType::Global(op)
-            } else {
-                LabelType::Local(op)
-            }));
+            ins.push(Item::Label(LabelType::Local(op)));
             continue;
         }
 
-        // if op was a prefix, continue parsing ops
+        // if we're parsing an instruction, read prefixes
 
         let mut ops = Vec::new();
-        if !has_dot {
+        if !is_directive {
             while is_prefix(op) {
                 ops.push(op);
                 span = parser.span;
@@ -194,11 +199,11 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Ident, 
 
         let span = Span {hi: parser.last_span.hi, ..startspan};
 
-        if !has_dot {
+        if is_directive {
+            ins.push(Item::Directive(op, args, span));
+        } else {
             ops.push(op);
             ins.push(Item::Instruction(ops, args, span));
-        } else {
-            ins.push(Item::Directive(op, args, span));
         }
     }
 
@@ -248,7 +253,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     let start = parser.span;
 
     // global label
-    if parser.eat(&token::Dot) {
+    if parser.eat(&token::RArrow) {
         let name = try!(parser.parse_ident());
         return Ok(Arg::JumpTarget(JumpType::Global(
             Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }

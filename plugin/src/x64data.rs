@@ -151,10 +151,12 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "r*v*i*", [0x69];
             "r*v*ib", [0x68];
         ), "in" => Op!(
-            "r*i*", [0xE5], 0, flags::EAX_ONLY;
-            "rbi*", [0xE4], 0, flags::EAX_ONLY;
-            "r*",   [0xED], 0, flags::EAX_ONLY;
-            "rb",   [0xEC], 0, flags::EAX_ONLY;
+            "rbib", [0xE4], 0, flags::RAX_ONLY;
+            "rwib", [0xE5], 0, flags::RAX_ONLY;
+            "rdib", [0xE5], 0, flags::RAX_ONLY;
+            "rb",   [0xEC], 0, flags::RAX_ONLY;
+            "rw",   [0xED], 0, flags::RAX_ONLY;
+            "rd",   [0xED], 0, flags::RAX_ONLY;
         ), "inc" => Op!(
             "v*", [0xFF], 0, flags::CAN_LOCK;
             "vb", [0xFE], 0, flags::CAN_LOCK;
@@ -259,6 +261,15 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "v*i*", [0xC7], 0;
             "rqiq", [0xB8], 0, flags::REGISTER_IN_OPCODE;
             "vbib", [0xC6], 0;
+        ), "movabs" => Op!( // not an actual instruction, but the used asm dialect does not allow the specification of memory offset sizes
+            "rbib", [0xA0], 0, flags::RAX_ONLY;
+            "rwiw", [0xA1], 0, flags::RAX_ONLY;
+            "rdid", [0xA1], 0, flags::RAX_ONLY;
+            "rqiq", [0xA1], 0, flags::RAX_ONLY;
+            "ibrb", [0xA2], 0, flags::RAX_ONLY;
+            "iwrw", [0xA3], 0, flags::RAX_ONLY;
+            "idrd", [0xA3], 0, flags::RAX_ONLY;
+            "iqrq", [0xA3], 0, flags::RAX_ONLY;
         ), "movbe" => Op!(
             "r*m*", [0x0F, 0x38, 0xF0];
             "m*r*", [0x0F, 0x38, 0xF1];
@@ -305,10 +316,12 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "r*v*", [0x0B], 0, flags::CAN_LOCK;
             "rbvb", [0x0A], 0, flags::CAN_LOCK;
         ), "out" => Op!(
-            "ibr*", [0xE7], 0, flags::EAX_ONLY;
-            "ibrb", [0xE6], 0, flags::EAX_ONLY;
-            "r*",  [0xEF], 0, flags::EAX_ONLY;
-            "rb",  [0xEE], 0, flags::EAX_ONLY;
+            "ibrb", [0xE6], 0, flags::RAX_ONLY;
+            "ibrw", [0xE7], 0, flags::RAX_ONLY;
+            "ibrd", [0xE7], 0, flags::RAX_ONLY;
+            "rb",  [0xEE], 0, flags::RAX_ONLY;
+            "rw",  [0xEF], 0, flags::RAX_ONLY;
+            "rd",  [0xEF], 0, flags::RAX_ONLY;
         ), "outsb" => Op!(
             "", [0xEE], 0, flags::CAN_REP;
         ), "outsw" => Op!(

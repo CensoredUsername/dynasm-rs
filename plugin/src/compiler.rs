@@ -44,7 +44,7 @@ pub mod flags {
     pub const REQUIRES_REXSIZE  : u16 = 0x0020;
     // parsing modifiers
     pub const SIZE_OVERRIDE     : u16 = 0x0040; // the operand sizes of the opcodes don't match up
-    pub const EAX_ONLY          : u16 = 0x0080; // some instructions only operate on al/ax/eax
+    pub const RAX_ONLY          : u16 = 0x0080; // some instructions only operate on al/ax/eax
     // allowed prefixes
     pub const CAN_LOCK          : u16 = 0x0100;
     pub const CAN_REP           : u16 = 0x0200;
@@ -217,7 +217,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     let need_rexsize = op_size == Size::QWORD || (data.flags & flags::REQUIRES_REXSIZE) != 0;
 
     // no register args
-    if rm.is_none() {
+    if rm.is_none() || (data.flags & flags::RAX_ONLY) != 0 {
 
         // rex prefix
         if need_rexsize {
@@ -419,10 +419,8 @@ fn guard_impossible_regs(ecx: &ExtCtxt, fmt: &'static Opdata, reg: Spanned<Regis
     if reg.node == Register::RIP {
         ecx.span_err(reg.span, "'rip' can only be used as a memory offset");
         Err(None)
-    } else if (fmt.flags & flags::EAX_ONLY) != 0 && !(reg.node == Register::AL || 
-                                                      reg.node == Register::AX ||
-                                                      reg.node == Register::EAX) {
-        ecx.span_err(reg.span, "this instruction only allows AL, AX or EAX to be used as argument");
+    } else if (fmt.flags & flags::RAX_ONLY) != 0 && reg.node.code() != Register::RAX.code() {
+        ecx.span_err(reg.span, "this instruction only allows AL, AX, EAX or RAX to be used as argument");
         Err(None)
     } else {
         Ok(reg.node.code())
