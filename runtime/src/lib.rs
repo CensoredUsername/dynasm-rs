@@ -40,26 +40,32 @@ impl AssemblingBuffer {
         }
     }
 
+    #[inline]
     pub fn push(&mut self, value: u8) {
         self.ops.push(value);
     }
 
+    #[inline]
     pub fn push_8(&mut self, value: i8) {
         self.ops.push(value as u8);
     }
 
+    #[inline]
     pub fn push_16(&mut self, value: i16) {
-        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 2]>(value.to_le())}.into_iter() );
+        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 2]>(value.to_le()) }.into_iter() );
     }
 
+    #[inline]
     pub fn push_32(&mut self, value: i32) {
-        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 4]>(value.to_le())}.into_iter() );
+        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 4]>(value.to_le()) }.into_iter() );
     }
 
+    #[inline]
     pub fn push_64(&mut self, value: i64) {
-        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 8]>(value.to_le())}.into_iter() );
+        self.ops.extend( unsafe { ::std::mem::transmute::<_, [u8; 8]>(value.to_le()) }.into_iter() );
     }
 
+    #[inline]
     pub fn align(&mut self, to: usize) {
         if self.ops.len() % to != 0 {
             for _ in 0..(to - self.ops.len() % to) {
@@ -68,6 +74,7 @@ impl AssemblingBuffer {
         }
     }
 
+    #[inline]
     fn patch_loc(ops: &mut [u8], loc: PatchLoc, target: usize) {
         let buf = &mut ops[loc.0 - loc.1 as usize .. loc.0];
 
@@ -80,26 +87,31 @@ impl AssemblingBuffer {
         } }
     }
 
+    #[inline]
     pub fn global_label(&mut self, name: &'static str) {
         if let Some(name) = self.global_labels.insert(name, self.ops.len()) {
             panic!("Duplicate global label '{}'", name);
         }
     }
 
+    #[inline]
     pub fn global_reloc(&mut self, name: &'static str, size: u8) {
         self.global_relocs.push((PatchLoc(self.ops.len(), size), name));
     }
 
+    #[inline]
     pub fn dynamic_label(&mut self, id: usize) {
         if let Some(id) = self.dynamic_labels.insert(id, self.ops.len()) {
             panic!("Duplicate label '{}'", id);
         }
     }
 
+    #[inline]
     pub fn dynamic_reloc(&mut self, id: usize, size: u8) {
         self.dynamic_relocs.push((PatchLoc(self.ops.len(), size), id));
     }
 
+    #[inline]
     pub fn local_label(&mut self, name: &'static str) {
         if let Some(relocs) = self.local_relocs.remove(&name) {
             for loc in relocs {
@@ -110,6 +122,7 @@ impl AssemblingBuffer {
         self.local_labels.insert(name, self.ops.len());
     }
 
+    #[inline]
     pub fn forward_reloc(&mut self, name: &'static str, size: u8) {
         match self.local_relocs.entry(name) {
             Occupied(mut o) => {
@@ -121,6 +134,7 @@ impl AssemblingBuffer {
         }
     }
 
+    #[inline]
     pub fn backward_reloc(&mut self, name: &'static str, size: u8) {
         if let Some(&target) = self.local_labels.get(&name) {
             let len = self.ops.len();
