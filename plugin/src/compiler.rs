@@ -546,7 +546,8 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                     }
                 }
             },
-            Arg::JumpTarget(_, size) => {
+            Arg::JumpTarget(_, size)         |
+            Arg::IndirectJumpTarget(_, size) => { // TODO: check if this codepath is still relevant
                 if has_jumptarget {
                     panic!("bad encoding data: multiple jump targets in the same instruction");
                 }
@@ -554,7 +555,7 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                 if let Some(size) = size {
                     im_size = Some(size);
                 }
-            }
+            },
             Arg::Invalid => unreachable!()
         }
     }

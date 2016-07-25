@@ -28,7 +28,7 @@ pub enum Arg {
     Indirect(MemoryRef), // indirect memory reference supporting scale, index, base and displacement.
     Direct(Spanned<Register>), // a bare register (rax, ...)
     JumpTarget(JumpType, Option<Size>), // jump target.
-    // IndirectJumpTarget(JumpType, Option<Size>), // indirect jump target i.e. rip-relative displacement
+    IndirectJumpTarget(JumpType, Option<Size>), // indirect jump target i.e. rip-relative displacement
     Immediate(P<ast::Expr>, Option<Size>), // an expression that evaluates to a value. basically, anything that ain't the other three
     Invalid // placeholder value
 }
@@ -55,9 +55,9 @@ pub enum JumpType {
     // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
     // in order to allow the full range of expressions to be used. the only currently existing ambiguity is 
     // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
-    Global(Ident),         // . label
-    Backward(Ident),       // > label
-    Forward(Ident),        // < label
+    Global(Ident),         // -> label
+    Backward(Ident),       //  > label
+    Forward(Ident),        //  < label
     Dynamic(P<ast::Expr>), // => expr
 }
 
@@ -339,32 +339,54 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
 
     let start = parser.span;
 
+    let in_bracket = parser.check(&token::OpenDelim(token::Bracket));
+    if in_bracket && parser.look_ahead(1, |x| match x {
+            &token::RArrow |
+            &token::Gt     |
+            &token::Lt     |
+            &token::FatArrow => true,
+            _ => false
+        }) {
+        parser.bump();
+    }
+
+    macro_rules! label_return {
+        ($jump:expr, $size:expr) => {
+            return Ok(if in_bracket {
+                try!(parser.expect(&token::CloseDelim(token::Bracket)));
+                Arg::IndirectJumpTarget($jump, $size)
+            } else {
+                Arg::JumpTarget($jump, $size)
+            });
+        }
+    }
+
     // global label
     if parser.eat(&token::RArrow) {
         let name = try!(parser.parse_ident());
-        return Ok(Arg::JumpTarget(JumpType::Global(
+        let jump = JumpType::Global(
             Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
-        ), size));
-
+        );
+        label_return!(jump, size);
     // forward local label
     } else if parser.eat(&token::Gt) {
         let name = try!(parser.parse_ident());
-        return Ok(Arg::JumpTarget(JumpType::Forward(
+        let jump = JumpType::Forward(
             Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
-        ), size));
-
+        );
+        label_return!(jump, size);
     // forward global label
     } else if parser.eat(&token::Lt) {
         let name = try!(parser.parse_ident());
-        return Ok(Arg::JumpTarget(JumpType::Backward(
+        let jump = JumpType::Backward(
             Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
-        ), size));
-
+        );
+        label_return!(jump, size);
     // dynamic label
     } else if parser.eat(&token::FatArrow) {
         let id = try!(parser.parse_expr());
-        return Ok(Arg::JumpTarget(JumpType::Dynamic(id), size));
-
+        let jump = JumpType::Dynamic(id);
+        label_return!(jump, size);
     }
 
     // it's a normal (register/immediate/memoryref) operand
