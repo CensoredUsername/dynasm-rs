@@ -79,10 +79,10 @@ impl AssemblingBuffer {
         let buf = &mut ops[loc.0 - loc.1 as usize .. loc.0];
 
         unsafe { match loc.1 {
-            1 => buf.copy_from_slice(&mem::transmute::<_, [u8; 1]>( ((target - loc.0) as i8 ).to_le() )),
-            2 => buf.copy_from_slice(&mem::transmute::<_, [u8; 2]>( ((target - loc.0) as i16).to_le() )),
-            4 => buf.copy_from_slice(&mem::transmute::<_, [u8; 4]>( ((target - loc.0) as i32).to_le() )),
-            8 => buf.copy_from_slice(&mem::transmute::<_, [u8; 8]>( ((target - loc.0) as i64).to_le() )),
+            1 => buf.copy_from_slice(&mem::transmute::<_, [u8; 1]>( ((target as isize - loc.0 as isize) as i8 ).to_le() )),
+            2 => buf.copy_from_slice(&mem::transmute::<_, [u8; 2]>( ((target as isize - loc.0 as isize) as i16).to_le() )),
+            4 => buf.copy_from_slice(&mem::transmute::<_, [u8; 4]>( ((target as isize - loc.0 as isize) as i32).to_le() )),
+            8 => buf.copy_from_slice(&mem::transmute::<_, [u8; 8]>( ((target as isize - loc.0 as isize) as i64).to_le() )),
             _ => panic!("invalid patch size")
         } }
     }

@@ -4,6 +4,7 @@ use parser::{Ident, Size};
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
 use syntax::ast;
+use syntax::ptr::P;
 use syntax::parse::token::intern;
 
 
@@ -20,6 +21,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
         use compiler::Stmt::*;
         let (method, args) = match stmt {
             Const(byte)            => ("push",    vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte))]), // this span should never appear in an error message
+            ExprConst(expr)        => ("push",    vec![expr]),
 
             Var(expr, Size::BYTE)  => ("push_8",  vec![expr]),
             Var(expr, Size::WORD)  => ("push_16", vec![expr]),
@@ -64,4 +66,25 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
     }
 
     buffer
+}
+
+pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Expr>, mask: u64, shift: i8) -> P<ast::Expr> {
+    let span = expr.span;
+    // take expr and return !((expr & mask) << shift)
+
+    expr = ecx.expr_binary(span, ast::BinOpKind::BitAnd, expr, ecx.expr_lit(
+        span, ast::LitKind::Int(mask as u64, ast::LitIntType::Unsuffixed)
+    ));
+
+    if shift < 0 {
+        expr = ecx.expr_binary(span, ast::BinOpKind::Shr, expr, ecx.expr_lit(
+            span, ast::LitKind::Int((-shift) as u64, ast::LitIntType::Unsuffixed)
+        ));
+    } else if shift > 0 {
+        expr = ecx.expr_binary(span, ast::BinOpKind::Shl, expr, ecx.expr_lit(
+            span, ast::LitKind::Int(shift as u64, ast::LitIntType::Unsuffixed)
+        ));
+    }
+
+    ecx.expr_binary(span, ast::BinOpKind::BitOr, orig, expr)
 }

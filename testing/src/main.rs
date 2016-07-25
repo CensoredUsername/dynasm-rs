@@ -11,22 +11,78 @@ fn main() {
     let d = 3;
     let c = 4;
 
+    // interesting testcases
     dynasm!(ops
-//         ; test!()                                                // currently macro expansion in here doesn't work yet, but this is a rustc issue
-//         ; mov                                                    // no args
-//         ; mov rax                                                // invalid args combination
-         ; jmp label
-         ; mov DWORD [rax], 1
-         ; mov rax, QWORD -1                                        // immediate size override
-//         ; movz DWORD [rax], 1                                    // invalid opcode
-         ; label:
-         ; mov BYTE [rax + rax + rcx], 1                            // odd memory ref
-         ; mov BYTE [9*r15], 1                                      // odd scale
-         ; fs imul sp, WORD [r8 * 2 + rcx + 0x77], 0x77             // 3 prefixes, opcode, ModRM, SIB, disp and immediate
-//         ; mov rax, ecx                                           // arg size confusion
-//         ; mov [rip*2], rax                                       // rip cannot be used as index
-         ; mov QWORD [rax * 2 + rbx + c + d], 1                     // run time variables
+        // no args
+        ; ret
+        // immediate
+        ; ret 16
+        // register
+        ; inc rax
+        // memory ref
+        ; inc DWORD [16]
+        ; inc DWORD [rax]
+        ; inc DWORD [rax*2]
+        ; inc DWORD [rax*3]
+        ; inc DWORD [rax*4]
+        ; inc DWORD [rax*5]
+        ; inc DWORD [rax*8]
+        ; inc DWORD [rax*9]
+        ; inc DWORD [rax + 16]
+        ; inc DWORD [rax*8 + 16]
+        ; inc DWORD [rax + rbx]
+        ; inc DWORD [rax + rbx + 16]
+        ; inc DWORD [rax*8 + rbx + 16]
+        // special memoryref cases
+        ; inc DWORD [rsp]
+        // ; inc DWORD [rsp + rax] // fixme: rsp can be used as base. just not as index
+        // ; inc DWORD [rax + rsp] // fixme: rsp can be used as base. just not as index
+        ; inc DWORD [rbp]
+        ; inc DWORD [rbp + 16]
+        ; inc DWORD [rbp*8]
+        ; inc DWORD [rip]
+        ; inc DWORD [rip + 16]
+        // multi arg forms
+        ; mov rax, rbx
+        ; mov rax, [rbx]
+        ; mov [rbx], rax
+        ; mov rax, 1
+        ; mov [rax], BYTE 1
+        ; imul rax, rbx, 1
+        ; imul rax, [rbx], 1
+        // prefixes
+        ; fs inc DWORD [rax]
+        ; lock fs inc DWORD [rax]
+        ; rep stosq
+        // really long instructions
+        ; fs imul r9w, [r10w*8 + r11w + 0x66778899], 0x1122
+        ; fs imul r9,  [r10w*8 + r11w + 0x66778899], 0x11223344
+        ; fs mov r9, QWORD 0x1122334455667788 // I'm actually not sure if it's valid to use extended registers with instructions that encode the register in the opcode byte
+        ; fs movabs rax, 0x1122334455667788
+        // funky syntax features
+        ; inc BYTE [rax]
+        ; inc WORD [rax]
+        ; inc DWORD [rax]
+        ; inc QWORD [rax]
+        // very odd memoryrefs
+        ; mov rax, [rbx + rbx * 3 + 2 + c + rax + d]
+        // labels
+        ; a: // local
+        ; -> b: // global
+        ; => 1 // dynamic
+        // jumps
+        ; jmp <a
+        ; jmp -> b
+        ; jmp => 1
+        // dynamic registers
+        ; inc Rb(1)
+        ; inc Rw(1)
+        ; inc Rd(1)
+        ; inc Rq(1)
+        ; mov Rb(7), [Rb(3)*4 + rax]
     );
+
+    ops.encode_relocs();
 
     println!("Generated assembly:");
     for i in ops.iter() {

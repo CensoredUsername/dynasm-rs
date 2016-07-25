@@ -8,6 +8,7 @@ use syntax::ptr::P;
 use syntax::codemap::{Spanned, Span};
 
 use std::collections::HashMap;
+use std::cmp::PartialEq;
 
 pub type Ident = Spanned<ast::Ident>;
 
@@ -27,6 +28,7 @@ pub enum Arg {
     Indirect(MemoryRef), // indirect memory reference supporting scale, index, base and displacement.
     Direct(Spanned<Register>), // a bare register (rax, ...)
     JumpTarget(JumpType, Option<Size>), // jump target.
+    // IndirectJumpTarget(JumpType, Option<Size>), // indirect jump target i.e. rip-relative displacement
     Immediate(P<ast::Expr>, Option<Size>), // an expression that evaluates to a value. basically, anything that ain't the other three
     Invalid // placeholder value
 }
@@ -63,32 +65,29 @@ pub enum JumpType {
 // lower byte indicates which register it is
 // upper byte is used to indicate which size group it falls under.
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum Register {
-    RAX  = 0x0300, RCX  = 0x0301, RDX  = 0x0302, RBX  = 0x0303,
-    RSP  = 0x0304, RBP  = 0x0305, RSI  = 0x0306, RDI  = 0x0307,
-    R8   = 0x0308, R9   = 0x0309, R10  = 0x030A, R11  = 0x030B,
-    R12  = 0x030C, R13  = 0x030D, R14  = 0x030E, R15  = 0x030F,
-
-    EAX  = 0x0200, ECX  = 0x0201, EDX  = 0x0202, EBX  = 0x0203,
-    ESP  = 0x0204, EBP  = 0x0205, ESI  = 0x0206, EDI  = 0x0207,
-    R8D  = 0x0208, R9D  = 0x0209, R10D = 0x020A, R11D = 0x020B,
-    R12D = 0x020C, R13D = 0x020D, R14D = 0x020E, R15D = 0x020F,
-
-    AX   = 0x0100, CX   = 0x0101, DX   = 0x0102, BX   = 0x0103,
-    SP   = 0x0104, BP   = 0x0105, SI   = 0x0106, DI   = 0x0107,
-    R8W  = 0x0108, R9W  = 0x0109, R10W = 0x010A, R11W = 0x010B,
-    R12W = 0x010C, R13W = 0x010D, R14W = 0x010E, R15W = 0x010F,
-
-    AL   = 0x0000, CL   = 0x0001, DL   = 0x0002, BL   = 0x0003,
-    SPL  = 0x0004, BPL  = 0x0005, SIL  = 0x0006, DIL  = 0x0007,
-    R8B  = 0x0008, R9B  = 0x0009, R10B = 0x000A, R11B = 0x000B,
-    R12B = 0x000C, R13B = 0x000D, R14B = 0x000E, R15B = 0x000F,
-
-    RIP = 0x0310,
+#[derive(Debug, Clone)]
+pub struct Register {
+    pub size: Size,
+    pub kind: RegKind
 }
 
-#[derive(PartialOrd, PartialEq, Ord, Eq, Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
+pub enum RegKind {
+    Static(RegId),
+    Dynamic(P<ast::Expr>)
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub enum RegId {
+    RAX = 0x00, RCX = 0x01, RDX = 0x02, RBX = 0x03,
+    RSP = 0x04, RBP = 0x05, RSI = 0x06, RDI = 0x07,
+    R8  = 0x08, R9  = 0x09, R10 = 0x0A, R11 = 0x0B,
+    R12 = 0x0C, R13 = 0x0D, R14 = 0x0E, R15 = 0x0F,
+
+    RIP = 0x10
+}
+
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 pub enum Size {
     BYTE  = 1,
     WORD  = 2,
@@ -101,18 +100,106 @@ pub enum Size {
  */
 
 impl Register {
+    pub fn new_static(size: Size, id: RegId) -> Register {
+        Register {size: size, kind: RegKind::Static(id) }
+    }
+
+    pub fn new_dynamic(size: Size, id: P<ast::Expr>) -> Register {
+        Register {size: size, kind: RegKind::Dynamic(id) }
+    }
+
     pub fn size(&self) -> Size {
-        match (*self as u16) & 0x0300 {
-            0x0000 => Size::BYTE,
-            0x0100 => Size::WORD,
-            0x0200 => Size::DWORD,
-            0x0300 => Size::QWORD,
-            _ => unreachable!()
+        self.size
+    }
+}
+
+impl RegKind {
+    pub fn code(&self) -> Option<u8> {
+        match *self {
+            RegKind::Static(code) => Some(code.code()),
+            RegKind::Dynamic(_) => None
         }
     }
 
+    pub fn is_dynamic(&self) -> bool {
+        match *self {
+            RegKind::Static(_) => false,
+            RegKind::Dynamic(_) => true
+        }
+    }
+
+    pub fn is_extended(&self) -> bool {
+        self.code().unwrap_or(8) > 7
+    }
+
+    pub fn encode(&self) -> u8 {
+        self.code().unwrap_or(0)
+    }
+
+    pub fn from_number(id: u8) -> RegKind {
+        RegKind::Static(RegId::from_number(id))
+    }
+}
+
+impl PartialEq<RegId> for Register {
+    fn eq(&self, other: &RegId) -> bool {
+        self.kind == *other
+    }
+}
+
+impl PartialEq<RegId> for RegKind {
+    fn eq(&self, other: &RegId) -> bool {
+        match *self {
+            RegKind::Static(id) => id == *other,
+            RegKind::Dynamic(_) => false
+        }
+    }
+}
+
+// workarounds to mask an impl<A, B> PartialEq<B> for Option<A: PartialEq<B>>
+impl PartialEq<RegId> for Option<Register> {
+    fn eq(&self, other: &RegId) -> bool {
+        match *self {
+            Some(ref a) => a == other,
+            None => false
+        }
+    }
+}
+
+impl PartialEq<RegId> for Option<RegKind> {
+    fn eq(&self, other: &RegId) -> bool {
+        match *self {
+            Some(ref a) => a == other,
+            None => false
+        }
+    }
+}
+
+impl RegId {
     pub fn code(&self) -> u8 {
         *self as u8
+    }
+
+    pub fn from_number(id: u8) -> RegId {
+        match id {
+            0  => RegId::RAX,
+            1  => RegId::RCX,
+            2  => RegId::RDX,
+            3  => RegId::RBX,
+            4  => RegId::RSP,
+            5  => RegId::RBP,
+            6  => RegId::RSI,
+            7  => RegId::RDI,
+            8  => RegId::R8,
+            9  => RegId::R9,
+            10 => RegId::R10,
+            11 => RegId::R11,
+            12 => RegId::R12,
+            13 => RegId::R13,
+            14 => RegId::R14,
+            15 => RegId::R15,
+            _ => panic!("invalid register code")
+        }
     }
 } 
 
@@ -301,27 +388,41 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
         let mut added = Vec::new();
         parse_adds(items.pop().unwrap().unwrap(), &mut added);
 
-        let mut regs: HashMap<Register, isize> = HashMap::new();
+        // as dynamic regs aren't hashable (and we don't combine them), we count them separate at first
+        let mut regs: Vec<(Register, isize)> = Vec::new();
+        let mut static_regs: HashMap<(RegId, Size), isize> = HashMap::new();
         let mut immediates = Vec::new();
 
+        // static reg combiner. we do not combine dynamic regs as the equation used to construct them might have side effects.
         for node in added {
-            if let Some(reg) = parse_reg(&node) {
-                *regs.entry(reg.node).or_insert(0) += 1;
+            // simple reg
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(&node) {
+                match reg.kind {
+                    RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
+                    RegKind::Dynamic(_) => regs.push((reg, 1))
+                }
                 continue;
             }
             if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = node {
-
-                if let Some(reg) = parse_reg(&**left) {
+                // reg * const
+                if let Some(Spanned {node: reg, ..} ) = parse_reg(&**left) {
                     if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
                         if let ast::LitKind::Int(value, _) = scale.node {
-                            *regs.entry(reg.node).or_insert(0) += value as isize;
+                            match reg.kind {
+                                RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
+                                RegKind::Dynamic(_) => regs.push((reg, value as isize))
+                            }
                             continue;
                         }
                     }
-                } else if let Some(reg) = parse_reg(&**right) {
+                // const * reg
+                } else if let Some(Spanned {node: reg, ..} ) = parse_reg(&**right) {
                     if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
                         if let ast::LitKind::Int(value, _) = scale.node {
-                            *regs.entry(reg.node).or_insert(0) += value as isize;
+                            match reg.kind {
+                                RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
+                                RegKind::Dynamic(_) => regs.push((reg, value as isize))
+                            }
                             continue;
                         }
                     }
@@ -330,12 +431,19 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
             immediates.push(node);
         }
 
-        // scale, index, base
+        // flush combined static regs
+        regs.extend(static_regs.drain().map(|x| {
+            let ((id, size), amount) = x;
+            (Register::new_static(size, id), amount)
+        }));
+
+        // can only have two regs at most
         if regs.len() > 2 {
             ecx.span_err(span, "Invalid memory reference: too many registers");
             return Ok(Arg::Invalid);
         }
-        let mut drain = regs.drain();
+
+        let mut drain = regs.drain(..);
         let (index, scale, base) = match (drain.next(), drain.next()) {
             (None,                  None)                 => (None, 0, None),
             (Some((index, scale)),  None)                 | 
@@ -396,44 +504,69 @@ fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
 }
 
 fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
-    let path = if let Some(path) = as_simple_name(expr) {
-        path
+    if let Some(path) = as_simple_name(expr) {
+        // static register names
+        use self::RegId::*;
+        use self::Size::*;
+        let (reg, size) = match &*path.node.name.as_str() {
+            "rax"|"r0" => (RAX, QWORD), "rcx"|"r1" => (RCX, QWORD), "rdx"|"r2" => (RDX, QWORD), "rbx"|"r3" => (RBX, QWORD),
+            "rsp"|"r4" => (RSP, QWORD), "rbp"|"r5" => (RBP, QWORD), "rsi"|"r6" => (RSI, QWORD), "rdi"|"r7" => (RDI, QWORD),
+            "r8"       => (R8,  QWORD), "r9"       => (R9,  QWORD), "r10"      => (R10, QWORD), "r11"      => (R11, QWORD),
+            "r12"      => (R12, QWORD), "r13"      => (R13, QWORD), "r14"      => (R14, QWORD), "r15"      => (R15, QWORD),
+
+            "eax"|"r0d" => (RAX, DWORD), "ecx"|"r1d" => (RCX, DWORD), "edx"|"r2d" => (RDX, DWORD), "ebx"|"r3d" => (RBX, DWORD),
+            "esp"|"r4d" => (RSP, DWORD), "ebp"|"r5d" => (RBP, DWORD), "esi"|"r6d" => (RSI, DWORD), "edi"|"r7d" => (RDI, DWORD),
+            "r8d"       => (R8,  DWORD), "r9d"       => (R9,  DWORD), "r10d"      => (R10, DWORD), "r11d"      => (R11, DWORD),
+            "r12d"      => (R12, DWORD), "r13d"      => (R13, DWORD), "r14d"      => (R14, DWORD), "r15d"      => (R15, DWORD),
+
+            "ax"|"r0w" => (RAX, WORD), "cx"|"r1w" => (RCX, WORD), "dx"|"r2w" => (RDX, WORD), "bx"|"r3w" => (RBX, WORD),
+            "sp"|"r4w" => (RSP, WORD), "bp"|"r5w" => (RBP, WORD), "si"|"r6w" => (RSI, WORD), "di"|"r7w" => (RDI, WORD),
+            "r8w"      => (R8,  WORD), "r9w"      => (R9,  WORD), "r10w"     => (R10, WORD), "r11w"     => (R11, WORD),
+            "r12w"     => (R12, WORD), "r13w"     => (R13, WORD), "r14w"     => (R14, WORD), "r15w"     => (R15, WORD),
+
+            "al"|"r0b" => (RAX, BYTE), "cl"|"r1b" => (RCX, BYTE), "dl"|"r2b" => (RDX, BYTE), "bl"|"r3b" => (RBX, BYTE),
+            "spl"      => (RSP, BYTE), "bpl"      => (RBP, BYTE), "sil"      => (RSI, BYTE), "dil"      => (RDI, BYTE),
+            "r8b"      => (R8,  BYTE), "r9b"      => (R9,  BYTE), "r10b"     => (R10, BYTE), "r11b"     => (R11, BYTE),
+            "r12b"     => (R12, BYTE), "r13b"     => (R13, BYTE), "r14b"     => (R14, BYTE), "r15b"     => (R15, BYTE),
+
+            // not encodable yet: AH, CH, DH, BH
+
+            "rip"  => (RIP, QWORD),
+            _ => return None
+        };
+
+        Some(Spanned {
+            node: Register::new_static(size, reg),
+            span: path.span
+        })
+
+    } else if let &ast::Expr {node: ast::ExprKind::Call(ref called, ref args), span, ..} = expr {
+        // dynamically chosen registers
+        if args.len() != 1 {
+            return None;
+        }
+
+        let called = if let Some(called) = as_simple_name(called) {
+            called
+        } else {
+            return None;
+        };
+
+        let size = match &*called.node.name.as_str() {
+            "Rb" => Size::BYTE,
+            "Rw" => Size::WORD,
+            "Rd" => Size::DWORD,
+            "Rq" => Size::QWORD,
+            _ => return None
+        };
+
+        Some(Spanned {
+            node: Register::new_dynamic(size, args[0].clone()),
+            span: span
+        })
     } else {
-        return None
-    };
-
-    use self::Register::*;
-    let reg = match &*path.node.name.as_str() {
-        "rax"|"r0" => RAX, "rcx"|"r1" => RCX, "rdx"|"r2" => RDX, "rbx"|"r3" => RBX,
-        "rsp"|"r4" => RSP, "rbp"|"r5" => RBP, "rsi"|"r6" => RSI, "rdi"|"r7" => RDI,
-        "r8"       => R8,  "r9"       => R9,  "r10"      => R10, "r11"      => R11,
-        "r12"      => R12, "r13"      => R13, "r14"      => R14, "r15"      => R15,
-
-        "eax"|"r0d" => EAX, "ecx"|"r1d" => ECX, "edx"|"r2d" => EDX, "ebx"|"r3d" => EBX,
-        "esp"|"r4d" => ESP, "ebp"|"r5d" => EBP, "esi"|"r6d" => ESI, "edi"|"r7d" => EDI,
-        "r8d"       => R8D, "r9d"       => R9D, "r10d"      => R10D,"r11d"      => R11D,
-        "r12d"      => R12D,"r13d"      => R13D,"r14d"      => R14D,"r15d"      => R15D,
-
-        "ax"|"r0w" => AX,  "cx"|"r1w" => CX,  "dx"|"r2w" => DX,  "bx"|"r3w" => BX, 
-        "sp"|"r4w" => SP,  "bp"|"r5w" => BP,  "si"|"r6w" => SI,  "di"|"r7w" => DI, 
-        "r8w"      => R8W, "r9w"      => R9W, "r10w"     => R10W,"r11w"     => R11W,
-        "r12w"     => R12W,"r13w"     => R13W,"r14w"     => R14W,"r15w"     => R15W,
-
-        "al"|"r0b" => AL,  "cl"|"r1b" => CL,  "dl"|"r2b" => DL,  "bl"|"r3b" => BL, 
-        "spl"      => SPL, "bpl"      => BPL, "sil"      => SIL, "dil"      => DIL,
-        "r8b"      => R8B, "r9b"      => R9B, "r10b"     => R10B,"r11b"     => R11B,
-        "r12b"     => R12B,"r13b"     => R13B,"r14b"     => R14B,"r15b"     => R15B,
-
-        // not encodable yet: AH, CH, DH, BH
-
-        "rip"  => RIP,
-        _ => return None
-    };
-
-    Some(Spanned {
-        node: reg,
-        span: path.span
-    })
+        None
+    }
 }
 
 fn parse_adds(node: ast::Expr, collection: &mut Vec<ast::Expr>) {
