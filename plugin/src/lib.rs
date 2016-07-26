@@ -45,6 +45,8 @@ fn main<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
         Err(mut e) => {e.emit(); return DummyResult::any(span)}
     };
 
+    // println!("{:?}", ast);
+
     let stmts = if let Ok(stmts) = compiler::compile(ecx, ast) {
         stmts
     } else {

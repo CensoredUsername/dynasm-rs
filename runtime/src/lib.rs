@@ -128,7 +128,7 @@ impl AssemblingBuffer {
             Occupied(mut o) => {
                 o.get_mut().push(PatchLoc(self.ops.len(), size));
             },
-            Vacant(v)   => {
+            Vacant(v) => {
                 v.insert(vec![PatchLoc(self.ops.len(), size)]);
             }
         }

@@ -8,6 +8,8 @@ use parser::{self, Item, Arg, Ident, MemoryRef, Register, RegKind, RegId, Size, 
 use x64data::get_mnemnonic_data;
 use serialize::or_mask_shift_expr;
 
+use std::mem::swap;
+
 /*
  * Compilation output
  */
@@ -180,6 +182,9 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         Size::DWORD
     };
 
+    // determine address size
+    let addr_size = try!(get_address_size(ecx, &args));
+
     // correct for ops which by default operate on QWORDS instead of DWORDS
     if (data.flags & flags::DEFAULT_REXSIZE) != 0 {
         if op_size == Size::DWORD {
@@ -191,7 +196,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     }
 
     // determine legacy prefixes
-    let prefixes = try!(get_legacy_prefixes(ecx, data, prefixes, op_size));
+    let prefixes = try!(get_legacy_prefixes(ecx, data, prefixes, op_size, addr_size));
     buffer.extend(prefixes.into_iter().filter_map(|x| x.clone()));
 
     let (reg, rm, args) = extract_args(data, args);
@@ -202,9 +207,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     // no register args
     if rm.is_none() {
 
-        // rex prefix
         compile_rex(ecx, buffer, need_rexsize, RegKind::from_number(0), RegKind::from_number(0), RegKind::from_number(0));
-        // opcode
         buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
 
     // register encoded in opcode byte
@@ -216,9 +219,8 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             panic!("bad encoding data, expected register");
         };
 
-        // rex prefix
         compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), RegKind::from_number(0));
-        // opcode
+
         let (last, rest) = data.ops.split_last().expect("bad encoding data, no opcode specified");
         buffer.extend(rest.into_iter().map(|x| Stmt::Const(*x)));
 
@@ -240,9 +242,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             RegKind::from_number(data.reg)
         };
 
-        // rex prefix
         compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), rm.clone());
-        // opcode
         buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
         // ModRM. if RAX_ONLY is used we don't encode this.
         if (data.flags & flags::RAX_ONLY) == 0 {
@@ -264,7 +264,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         // TODO: if the arg is constant we should be able to optimize to MOD_DISP8.
         // encoding special cases
         let rip_relative = mem.base == RegId::RIP;
-        let rbp_relative = mem.base == RegId::RBP;
+        let rbp_relative = mem.base == RegId::RBP || mem.base == RegId::R13;
         let no_base      = mem.base.is_none();
 
         // RBP can only be encoded as base if a displacement is present.
@@ -290,11 +290,8 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
 
             // rex prefix
             compile_rex(ecx, buffer, need_rexsize, reg.clone(), index.clone(), base.clone());
-            // opcode
             buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
-            // ModRM
             compile_modrm_sib(ecx, buffer, mode, reg, RegKind::Static(RegId::RSP));
-            // SIB
             compile_modrm_sib(ecx, buffer, mem.scale as u8, index, base);
 
         // no index, only a base.
@@ -307,22 +304,16 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
                 base.kind
             };
 
-            // rex prefix
             compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), base.clone());
-            // opcode
             buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
-            // ModRM
             compile_modrm_sib(ecx, buffer, mode, reg, base);
 
         // no base, no index. only disp
         } else {
             // escape using RBP as base and RSP as index
             compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), RegKind::from_number(0));
-            // opcode
             buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
-            // ModRM
             compile_modrm_sib(ecx, buffer, mode, reg, RegKind::Static(RegId::RSP));
-            // SIB
             compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
 
         }
@@ -338,6 +329,31 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         } else if rbp_relative {
             buffer.push(Stmt::Const(0));
         }
+    // RIP-relative label. encoded as memoryref with only a base
+    } else if let Some(Arg::IndirectJumpTarget(target, _)) = rm {
+        let reg = if let Some(Arg::Direct(reg)) = reg {
+            try!(guard_impossible_regs(ecx, data, reg))
+        } else { // reg is given by the instruction encoding
+            RegKind::from_number(data.reg)
+        };
+
+        compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), RegKind::from_number(0));
+        buffer.extend(data.ops.iter().cloned().map(Stmt::Const));
+        compile_modrm_sib(ecx, buffer, MOD_NODISP, reg, RegKind::Static(RegId::RBP));
+
+        // note: get_oprand_size ensures that no immediates are encoded afterwards.
+        // they potentially could be, but currently the runtime doens't support it
+        for _ in 0..Size::DWORD.in_bytes() {
+            buffer.push(Stmt::Const(0));
+        }
+        buffer.push(match target {
+            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(ident, Size::DWORD),
+            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget(ident, Size::DWORD),
+            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, Size::DWORD),
+            JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, Size::DWORD)
+        });
+    } else {
+        unreachable!();
     }
 
     // immediates
@@ -447,8 +463,6 @@ fn guard_impossible_regs(ecx: &ExtCtxt, fmt: &'static Opdata, reg: Spanned<Regis
 }
 
 fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<String>> {
-    // TODO: check that sizes make sense?
-
     // sort out impossible scales
     mem.scale = match (mem.scale, &mut mem.base) {
         (0, _   ) => 0, // no index
@@ -476,13 +490,18 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
 
     // RSP as index field can not be represented.
     if mem.index == RegId::RSP {
-        // as we always fill the base field first this is impossible to satisfy
-        ecx.span_err(mem.span, "'rsp' cannot be used as index field");
-        return Err(None);
+        if mem.scale == 0 && mem.base != RegId::RSP {
+            // swap index and base to make it encodable
+            swap(&mut mem.base, &mut mem.index);
+        } else {
+            // as we always fill the base field first this is impossible to satisfy
+            ecx.span_err(mem.span, "'rsp' cannot be used as index field");
+            return Err(None);
+        }
     }
 
-    // RSP as base without index (add an index so we escape into SIB)
-    if mem.base == RegId::RSP && mem.index.is_none() {
+    // RSP or R12 as base without index (add an index so we escape into SIB)
+    if (mem.base == RegId::RSP || mem.base == RegId::R12) && mem.index.is_none() {
         mem.index = Some(Register::new_static(Size::QWORD, RegId::RSP));
         mem.scale = 0;
     }
@@ -504,6 +523,34 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     Ok(())
 }
 
+fn get_address_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>> {
+    let mut addr_size = None;
+    for arg in args {
+        if let Arg::Indirect(MemoryRef {span, ref index, ref base, ..}) = *arg {
+            if let &Some(ref reg) = base {
+                if addr_size.is_some() && addr_size != Some(reg.size()) {
+                    ecx.span_err(span, "Conflicting address sizes");
+                    return Err(None);
+                }
+                addr_size = Some(reg.size());
+            }
+            if let &Some(ref reg) = index {
+                if addr_size.is_some() && addr_size != Some(reg.size()) {
+                    ecx.span_err(span, "Conflicting address sizes");
+                    return Err(None);
+                }
+                addr_size = Some(reg.size());
+            }
+        }
+    }
+
+    let addr_size = addr_size.unwrap_or(Size::QWORD);
+    if addr_size != Size::DWORD && addr_size != Size::QWORD {
+        return Err(Some(format!("Impossible address size")));
+    }
+    Ok(addr_size)
+}
+
 fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>> {
     // determine operand size.
     // ensures that all operands have the same size, and that the immediate size is smaller or equal.
@@ -523,9 +570,8 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                 if op_size.is_some() && op_size != Some(size) {
                     ecx.span_err(span, "Conflicting operand sizes");
                     return Err(None);
-                } else {
-                    op_size = Some(size)
                 }
+                op_size = Some(size)
             },
             Arg::Indirect(MemoryRef {size, span, ..}) => {
                 has_args = true;
@@ -533,9 +579,8 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                     if op_size.is_some() && op_size != Some(size) {
                         ecx.span_err(span, "Conflicting operand sizes");
                         return Err(None);
-                    } else {
-                        op_size = Some(size);
                     }
+                    op_size = Some(size);
                 }
             },
             Arg::Immediate(_, size) => {
@@ -546,14 +591,26 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                     }
                 }
             },
-            Arg::JumpTarget(_, size)         |
-            Arg::IndirectJumpTarget(_, size) => { // TODO: check if this codepath is still relevant
+            Arg::JumpTarget(_, size) => { // TODO: check if this codepath is still relevant
                 if has_jumptarget {
                     panic!("bad encoding data: multiple jump targets in the same instruction");
                 }
                 has_jumptarget = true;
                 if let Some(size) = size {
                     im_size = Some(size);
+                }
+            },
+            Arg::IndirectJumpTarget(_, size) => {
+                has_args = true;
+                if has_jumptarget {
+                    panic!("bad encoding data: multiple jump targets in the same instruction");
+                }
+                has_jumptarget = true;
+                if let Some(size) = size {
+                    if op_size.is_some() && op_size != Some(size) {
+                        return Err(Some("conflicting operand sizes".to_string()));
+                    }
+                    op_size = Some(size)
                 }
             },
             Arg::Invalid => unreachable!()
@@ -574,13 +631,13 @@ fn get_operand_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
     } else if let Some(im_size) = im_size {
         Ok(im_size)
     } else if has_args {
-        return Err(Some(format!("Unkonwn argument size")));
+        return Err(Some(format!("Unknown argument size")));
     } else {
         Ok(Size::DWORD)
     }
 }
 
-fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>, op_size: Size) -> Result<[Option<Stmt>; 4], Option<String>> {
+fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>, op_size: Size, addr_size: Size) -> Result<[Option<Stmt>; 4], Option<String>> {
     let mut group1 = None;
     let mut group2 = None;
     let mut group3 = None;
@@ -633,7 +690,7 @@ fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>, 
         group3 = Some(Stmt::Const(0x66));
     }
 
-    if (fmt.flags & flags::REQUIRES_ADDRSIZE) != 0 {
+    if (fmt.flags & flags::REQUIRES_ADDRSIZE) != 0 || addr_size == Size::DWORD {
         group4 = Some(Stmt::Const(0x67));
     }
 
@@ -687,6 +744,7 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
                 ('r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
                 ('v', &Arg::Direct(Spanned {node: ref reg, ..} )) => Some(reg.size()),
                 ('m', &Arg::Indirect(MemoryRef {size, ..} )) |
+                ('m', &Arg::IndirectJumpTarget(_, size)) |
                 ('v', &Arg::Indirect(MemoryRef {size, ..} )) => size,
                 _ => return Err("argument type mismatch")
             };

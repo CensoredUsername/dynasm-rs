@@ -227,7 +227,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "lahf" => Op!(
             [0x9F];
         ), "lea" => Op!(
-            "r*m*", [0xED];
+            "r*m*", [0x8D];
         ), "leave" => Op!(
             [0xC9];
         ), "lfence" => Op!(
