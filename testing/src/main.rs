@@ -7,7 +7,7 @@ macro_rules! test {
 }
 
 fn main() {
-    let mut ops = dynasmrt::AssemblingBuffer::new();
+    let mut ops = dynasmrt::Assembler::new();
     let d = 3;
     let c = 4;
 
@@ -87,11 +87,25 @@ fn main() {
         ; mov Rb(7), [Rq(3)*4 + rax]
     );
 
-    ops.encode_relocs();
+    ops.commit();
+
+    let index = ops.offset();
+    dynasm!(ops
+        ; mov eax, 10203040
+        ; ret
+    );
+
+    ops.commit();
 
     println!("Generated assembly:");
-    for i in ops.iter() {
+    let reader = ops.reader();
+    for i in reader.lock().iter() {
         print!("{:02x }", i);
     }
     println!("");
+    {
+        let guard = reader.lock();
+        let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(guard.get_ptr(index)) };
+        println!("10203040 == {}", func() );
+    }
 }
