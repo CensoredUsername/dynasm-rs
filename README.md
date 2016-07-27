@@ -12,7 +12,7 @@ It is currently heavily pre-alpha, so don't expect anything here to actually wro
 - Write the to be generated assembly inline in nasm-like syntax using a simple macro:
 
 ```rust
-    let ops = AssemblingBuffer::new();
+    let ops = dynasmrt::Assembler::new();
     let d = 1;
     let c = -5;
     dynasm!(ops
@@ -25,7 +25,7 @@ It is currently heavily pre-alpha, so don't expect anything here to actually wro
         ;     fs imul sp, WORD [r8 * 2 + rcx + 0x77], 0x77
         ;     mov QWORD [rax * 2 + rbx + c + d], 1
     );
-    ops.encode_relocs()
+    ops.commit()
 ```
 
 ## Limitations
