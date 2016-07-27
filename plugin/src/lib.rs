@@ -35,7 +35,7 @@ fn main<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
 -> Box<MacResult + 'cx> {
     // expand all macros in our token tree first. This enables the use of rust macros
     // within dynasm
-    let token_tree = ecx.expander().fold_tts(token_tree.to_vec());
+    let token_tree = ecx.expander().fold_tts(token_tree);
 
     let mut parser = ecx.new_parser_from_tts(&token_tree);
 
