@@ -25,7 +25,7 @@ It is currently heavily pre-alpha, so don't expect anything here to actually wro
         ;     fs imul sp, WORD [r8 * 2 + rcx + 0x77], 0x77
         ;     mov QWORD [rax * 2 + rbx + c + d], 1
     );
-    ops.commit()
+    ops.finalize()
 ```
 
 ## Limitations

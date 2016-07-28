@@ -92,25 +92,20 @@ fn main() {
         ; mov Rb(7), [Rq(3)*4 + rax]
     );
 
-    ops.commit();
-
     let index = ops.offset();
     dynasm!(ops
         ; mov eax, 10203040
         ; ret
     );
 
-    ops.commit();
+    let buf = ops.finalize().unwrap();
 
     println!("Generated assembly:");
-    let reader = ops.reader();
-    for i in reader.lock().iter() {
+    for i in buf.iter() {
         print!("{:02x }", i);
     }
     println!("");
-    {
-        let guard = reader.lock();
-        let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(guard.get_ptr(index)) };
-        println!("10203040 == {}", func() );
-    }
+
+    let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(buf.ptr(index)) };
+    println!("assembled function result: {}", func() );
 }

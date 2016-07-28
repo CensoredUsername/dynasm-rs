@@ -43,8 +43,12 @@ pub struct Executor {
     execbuffer: Arc<RwLock<Mmap>>
 }
 
-pub struct ExecutorGuard<'a> {
+pub struct ExecutionGuard<'a> {
     guard: RwLockReadGuard<'a, Mmap>
+}
+
+pub struct ExecutableBuffer {
+    backing: Mmap
 }
 
 impl Assembler {
@@ -243,6 +247,19 @@ impl Assembler {
         self.asmoffset = new_len;
     }
 
+    pub fn finalize(mut self) -> Result<ExecutableBuffer, Assembler> {
+        self.commit();
+        match Arc::try_unwrap(self.execbuffer) {
+            Ok(map) => Ok(ExecutableBuffer {
+                backing: map.into_inner().unwrap()
+            }),
+            Err(arc) => Err(Assembler {
+                execbuffer: arc,
+                ..self
+            })
+        }
+    }
+
     pub fn reader(&self) -> Executor {
         Executor {
             execbuffer: self.execbuffer.clone()
@@ -251,22 +268,39 @@ impl Assembler {
 }
 
 impl Executor {
-    pub fn lock(&self) -> ExecutorGuard {
-        ExecutorGuard {
+    pub fn lock(&self) -> ExecutionGuard {
+        ExecutionGuard {
             guard: self.execbuffer.read().unwrap()
         }
     }
 }
 
-impl<'a> ExecutorGuard<'a> {
-    pub fn get_ptr(&self, idx: usize) -> *const u8 {
+impl<'a> ExecutionGuard<'a> {
+    pub fn ptr(&self, idx: usize) -> *const u8 {
         &self[idx] as *const u8
     }
 }
 
-impl<'a> Deref for ExecutorGuard<'a> {
+impl<'a> Deref for ExecutionGuard<'a> {
     type Target = [u8];
     fn deref(&self) -> &[u8] {
         unsafe { &self.guard.as_slice() }
+    }
+}
+
+impl ExecutableBuffer {
+    pub fn into_intter(self) -> Mmap {
+        self.backing
+    }
+
+    pub fn ptr(&self, idx: usize) -> *const u8 {
+        &self[idx] as *const u8
+    }
+}
+
+impl Deref for ExecutableBuffer {
+    type Target = [u8];
+    fn deref(&self) -> &[u8] {
+        unsafe { self.backing.as_slice() }
     }
 }
