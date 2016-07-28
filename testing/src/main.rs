@@ -44,6 +44,11 @@ fn main() {
         ; inc DWORD [rbp*8]
         ; inc DWORD [rip]
         ; inc DWORD [rip + 16]
+        // weird registers
+        ; xchg al, ah
+        ; xchg al, dil
+        // register-specific forms
+        ; adc rax, 5
         // multi arg forms
         ; mov rax, rbx
         ; mov rax, [rbx]

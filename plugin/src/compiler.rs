@@ -49,7 +49,6 @@ pub mod flags {
     pub const REQUIRES_REXSIZE  : u16 = 0x0020;
     // parsing modifiers
     pub const SIZE_OVERRIDE     : u16 = 0x0040; // the operand sizes of the opcodes don't match up
-    // pub const RAX_ONLY          : u16 = 0x0080; // some instructions only operate on al/ax/eax
     // allowed prefixes
     pub const CAN_LOCK          : u16 = 0x0100;
     pub const CAN_REP           : u16 = 0x0200;
@@ -201,13 +200,10 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
 
     let (reg, rm, args) = extract_args(data, args);
 
-    // do we need to encode a REX byte
-    let need_rexsize = op_size == Size::QWORD || (data.flags & flags::REQUIRES_REXSIZE) != 0;
-
     // no register args
     if rm.is_none() {
 
-        compile_rex(ecx, buffer, need_rexsize, RegKind::from_number(0), RegKind::from_number(0), RegKind::from_number(0));
+        try!(compile_rex(ecx, buffer, data, op_size, RegKind::from_number(0), RegKind::from_number(0), RegKind::from_number(0)));
         buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
 
     // register encoded in opcode byte
@@ -219,7 +215,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             panic!("bad encoding data, expected register");
         };
 
-        compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), RegKind::from_number(0));
+        try!(compile_rex(ecx, buffer, data, op_size, reg.clone(), RegKind::from_number(0), RegKind::from_number(0)));
 
         let (last, rest) = data.ops.split_last().expect("bad encoding data, no opcode specified");
         buffer.extend(rest.into_iter().map(|x| Stmt::Const(*x)));
@@ -242,7 +238,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             RegKind::from_number(data.reg)
         };
 
-        compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), rm.clone());
+        try!(compile_rex(ecx, buffer, data, op_size, reg.clone(), RegKind::from_number(0), rm.clone()));
         buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
         compile_modrm_sib(ecx, buffer, MOD_DIRECT, reg, rm);
 
@@ -286,7 +282,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             };
 
             // rex prefix
-            compile_rex(ecx, buffer, need_rexsize, reg.clone(), index.clone(), base.clone());
+            try!(compile_rex(ecx, buffer, data, op_size, reg.clone(), index.clone(), base.clone()));
             buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
             compile_modrm_sib(ecx, buffer, mode, reg, RegKind::Static(RegId::RSP));
             compile_modrm_sib(ecx, buffer, mem.scale as u8, index, base);
@@ -294,21 +290,15 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         // no index, only a base.
         } else if let Some(base) = mem.base {
 
-            // RBP at MOD_NODISP is used to encode RIP
-            let base = if rip_relative {
-                RegKind::Static(RegId::RBP)
-            } else {
-                base.kind
-            };
-
-            compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), base.clone());
+            // RBP at MOD_NODISP is used to encode RIP, but this is already handled
+            try!(compile_rex(ecx, buffer, data, op_size, reg.clone(), RegKind::from_number(0), base.kind.clone()));
             buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
-            compile_modrm_sib(ecx, buffer, mode, reg, base);
+            compile_modrm_sib(ecx, buffer, mode, reg, base.kind);
 
         // no base, no index. only disp
         } else {
             // escape using RBP as base and RSP as index
-            compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), RegKind::from_number(0));
+            try!(compile_rex(ecx, buffer, data, op_size, reg.clone(), RegKind::from_number(0), RegKind::from_number(0)));
             buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
             compile_modrm_sib(ecx, buffer, mode, reg, RegKind::Static(RegId::RSP));
             compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
@@ -334,7 +324,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             RegKind::from_number(data.reg)
         };
 
-        compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), RegKind::from_number(0));
+        try!(compile_rex(ecx, buffer, data, op_size, reg.clone(), RegKind::from_number(0), RegKind::from_number(0)));
         buffer.extend(data.ops.iter().cloned().map(Stmt::Const));
         compile_modrm_sib(ecx, buffer, MOD_NODISP, reg, RegKind::Static(RegId::RBP));
 
@@ -381,8 +371,24 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     Ok(())
 }
 
-fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, rexsize: bool, reg: RegKind, index: RegKind, base: RegKind) {
-    if rexsize || reg.is_extended() || index.is_extended() || base.is_extended() {
+fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, data: &'static Opdata, op_size: Size, reg: RegKind, index: RegKind, base: RegKind) -> Result<(), Option<String>>  {
+    let rexsize = op_size == Size::QWORD || (data.flags & flags::REQUIRES_REXSIZE) != 0;
+
+    // SPL, BPL, DIL and SIL require a REX prefix to be encoded. otherwise their encoding maps to AH - BH
+    let need_rex = op_size == Size::BYTE && (
+        (reg   == RegId::RSP || reg   == RegId::RBP || reg   == RegId::RSI || reg   == RegId::RDI) ||
+        (index == RegId::RSP || index == RegId::RBP || index == RegId::RSI || index == RegId::RDI) ||
+        (base  == RegId::RSP || base  == RegId::RBP || base  == RegId::RSI || base  == RegId::RDI)
+    );
+
+    if rexsize || need_rex || reg.is_extended() || index.is_extended() || base.is_extended() {
+    // AH, BH, CH and DH require a REX prefix to be encoded. otherwise their encoding maps to AL - BL
+        if (reg   == RegId::AH || reg   == RegId::CH || reg   == RegId::DH || reg   == RegId::BH) ||
+           (index == RegId::AH || index == RegId::CH || index == RegId::DH || index == RegId::BH) ||
+           (base  == RegId::AH || base  == RegId::CH || base  == RegId::DH || base  == RegId::BH) {
+            return Err(Some("Impossible to encode register combination: High byte registers combined with extended registers".to_string()));
+        }
+
         let rex = 0x40 | (rexsize as u8)      << 3 | 
                          (reg.encode()   & 8) >> 1 |
                          (index.encode() & 8) >> 2 |
@@ -400,6 +406,7 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, rexsize: bool, reg: RegKi
         }
         buffer.push(Stmt::ExprConst(rex));
     }
+    Ok(())
 }
 
 fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut StmtBuffer, mode: u8, reg1: RegKind, reg2: RegKind) {

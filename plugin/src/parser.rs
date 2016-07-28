@@ -84,7 +84,9 @@ pub enum RegId {
     R8  = 0x08, R9  = 0x09, R10 = 0x0A, R11 = 0x0B,
     R12 = 0x0C, R13 = 0x0D, R14 = 0x0E, R15 = 0x0F,
 
-    RIP = 0x10
+    AH = 0x14, CH = 0x15, DH = 0x16, BH = 0x17,
+
+    RIP = 0x25
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
@@ -177,7 +179,7 @@ impl PartialEq<RegId> for Option<RegKind> {
 
 impl RegId {
     pub fn code(&self) -> u8 {
-        *self as u8
+        *self as u8 & 0xF
     }
 
     pub fn from_number(id: u8) -> RegId {
@@ -551,7 +553,7 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             "r8b"      => (R8,  BYTE), "r9b"      => (R9,  BYTE), "r10b"     => (R10, BYTE), "r11b"     => (R11, BYTE),
             "r12b"     => (R12, BYTE), "r13b"     => (R13, BYTE), "r14b"     => (R14, BYTE), "r15b"     => (R15, BYTE),
 
-            // not encodable yet: AH, CH, DH, BH
+            "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
 
             "rip"  => (RIP, QWORD),
             _ => return None
