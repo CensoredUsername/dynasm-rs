@@ -49,7 +49,7 @@ pub mod flags {
     pub const REQUIRES_REXSIZE  : u16 = 0x0020;
     // parsing modifiers
     pub const SIZE_OVERRIDE     : u16 = 0x0040; // the operand sizes of the opcodes don't match up
-    pub const RAX_ONLY          : u16 = 0x0080; // some instructions only operate on al/ax/eax
+    // pub const RAX_ONLY          : u16 = 0x0080; // some instructions only operate on al/ax/eax
     // allowed prefixes
     pub const CAN_LOCK          : u16 = 0x0100;
     pub const CAN_REP           : u16 = 0x0200;
@@ -214,7 +214,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     } else if (data.flags & flags::REGISTER_IN_OPCODE) != 0 {
 
         let reg = if let Some(Arg::Direct(reg)) = rm {
-            try!(guard_impossible_regs(ecx, data, reg))
+            try!(guard_impossible_regs(ecx, reg))
         } else {
             panic!("bad encoding data, expected register");
         };
@@ -233,10 +233,10 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
 
     // ModRM byte
     } else if let Some(Arg::Direct(rm)) = rm {
-        let rm = try!(guard_impossible_regs(ecx, data, rm));
+        let rm = try!(guard_impossible_regs(ecx, rm));
 
         let reg = if let Some(Arg::Direct(reg)) = reg {
-            try!(guard_impossible_regs(ecx, data, reg))
+            try!(guard_impossible_regs(ecx, reg))
         } else {
             // reg is given by the instruction encoding
             RegKind::from_number(data.reg)
@@ -244,16 +244,13 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
 
         compile_rex(ecx, buffer, need_rexsize, reg.clone(), RegKind::from_number(0), rm.clone());
         buffer.extend(data.ops.iter().map(|x| Stmt::Const(*x)));
-        // ModRM. if RAX_ONLY is used we don't encode this.
-        if (data.flags & flags::RAX_ONLY) == 0 {
-            compile_modrm_sib(ecx, buffer, MOD_DIRECT, reg, rm);
-        }
+        compile_modrm_sib(ecx, buffer, MOD_DIRECT, reg, rm);
 
     // ModRM and SIB byte
     } else if let Some(Arg::Indirect(mut mem)) = rm {
 
         let reg = if let Some(Arg::Direct(reg)) = reg {
-            try!(guard_impossible_regs(ecx, data, reg))
+            try!(guard_impossible_regs(ecx, reg))
         } else { // reg is given by the instruction encoding
             RegKind::from_number(data.reg)
         };
@@ -332,7 +329,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     // RIP-relative label. encoded as memoryref with only a base
     } else if let Some(Arg::IndirectJumpTarget(target, _)) = rm {
         let reg = if let Some(Arg::Direct(reg)) = reg {
-            try!(guard_impossible_regs(ecx, data, reg))
+            try!(guard_impossible_regs(ecx, reg))
         } else { // reg is given by the instruction encoding
             RegKind::from_number(data.reg)
         };
@@ -450,12 +447,9 @@ fn extract_args(fmt: &'static Opdata, mut args: Vec<Arg>) -> (Option<Arg>, Optio
     }
 }
 
-fn guard_impossible_regs(ecx: &ExtCtxt, fmt: &'static Opdata, reg: Spanned<Register>) -> Result<RegKind, Option<String>> {
+fn guard_impossible_regs(ecx: &ExtCtxt, reg: Spanned<Register>) -> Result<RegKind, Option<String>> {
     if reg.node == RegId::RIP {
         ecx.span_err(reg.span, "'rip' can only be used as a memory offset");
-        Err(None)
-    } else if (fmt.flags & flags::RAX_ONLY) != 0 && reg.node != RegId::RAX {
-        ecx.span_err(reg.span, "this instruction only allows AL, AX, EAX or RAX to be used as argument");
         Err(None)
     } else {
         Ok(reg.node.kind)
@@ -713,6 +707,7 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
             Err(_) => ()
         }
     }
+
     Err(Some(format!("'{}': argument type/size mismatch", name)))
 }
 
@@ -738,14 +733,17 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
             let arg = args.next().unwrap();
 
             let size = match (code, arg) {
-                ('i', &Arg::Immediate(_, size)) |
-                ('c', &Arg::Immediate(_, size)) => size,
+                ('i', &Arg::Immediate(_, size))  |
+                ('c', &Arg::Immediate(_, size))  => size,
                 ('c', &Arg::JumpTarget(_, size)) => size,
+                (x @ 'A' ... 'P', &Arg::Direct(Spanned {node: ref reg, ..}))
+                    if reg.kind.code() == Some((x as u32 - 'A' as u32) as u8) => Some(reg.size()),
                 ('r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
                 ('v', &Arg::Direct(Spanned {node: ref reg, ..} )) => Some(reg.size()),
                 ('m', &Arg::Indirect(MemoryRef {size, ..} )) |
-                ('m', &Arg::IndirectJumpTarget(_, size)) |
-                ('v', &Arg::Indirect(MemoryRef {size, ..} )) => size,
+                ('m', &Arg::IndirectJumpTarget(_, size))     |
+                ('v', &Arg::Indirect(MemoryRef {size, ..} )) |
+                ('v', &Arg::IndirectJumpTarget(_, size))     => size,
                 _ => return Err("argument type mismatch")
             };
 
