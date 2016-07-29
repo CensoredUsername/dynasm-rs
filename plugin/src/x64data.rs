@@ -18,6 +18,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 
     // I blame intel for the following match
     Some(match name {
+        // general purpose instructions according to AMD's AMD64 Arch Programmer's Manual Vol. 3
         "adc" => Op!(
             "A*i*", [0x15], 0, CAN_LOCK;
             "Abib", [0x14], 0, CAN_LOCK;
@@ -143,10 +144,10 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "cmpxchg" => Op!(
             "v*r*", [0x0F, 0xB1], 0, CAN_LOCK;
             "vbrb", [0x0F, 0xB0], 0, CAN_LOCK;
-        ), "cmpxchg8b"  => Op!( // actually a QWORD
-            "m!", [0x0F, 0xC7], 1, SIZE_OVERRIDE | CAN_LOCK;
-        ), "cmpxchg16b" => Op!( // actually an OWORD
-            "m!", [0x0F, 0xC7], 1, SIZE_OVERRIDE | CAN_LOCK | REQUIRES_REXSIZE;
+        ), "cmpxchg8b"  => Op!(
+            "mq", [0x0F, 0xC7], 1, SIZE_OVERRIDE | CAN_LOCK;
+        ), "cmpxchg16b" => Op!(
+            "mo", [0x0F, 0xC7], 1, SIZE_OVERRIDE | CAN_LOCK | REQUIRES_REXSIZE;
         ), "cpuid" => Op!(
             "", [0x0F, 0xA2];
         ), "dec" => Op!(
@@ -239,9 +240,15 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "jmp" => Op!(
             "c*", [0xE9];
             "cb", [0xEB];
-            "v*", [0xFF], 4;
+            "v*", [0xFF], 4, DEFAULT_REXSIZE;
         ), "lahf" => Op!(
             "", [0x9F];
+        ), "lfs" => Op!(
+            "r*m!", [0x0F, 0xB4];
+        ), "lgs" => Op!(
+            "r*m!", [0x0F, 0xB5];
+        ), "lss" => Op!(
+            "r*m!", [0x0F, 0xB2];
         ), "lea" => Op!(
             "r*m!", [0x8D];
         ), "leave" => Op!(
@@ -266,17 +273,35 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "r*m*", [0x0F, 0xBD], 0, REQUIRES_REP;
         ), "mfence" => Op!(
             "", [0x0F, 0xAE, 0xF0];
-        ), "mov" => Op!( // also has segment reg forms
+        ), "mov" => Op!(
             "v*r*", [0x89];
             "vbrb", [0x88];
             "r*v*", [0x8B];
             "rbvb", [0x8A];
+            "rwsw", [0x8C], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+            "rdsw", [0x8C], 0, SIZE_OVERRIDE;
+            "rqsw", [0x8C], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
+            "mwsw", [0x8C], 0, SIZE_OVERRIDE;
+            "swmw", [0x8C], 0, SIZE_OVERRIDE;
+            "swr*", [0x8C], 0, SIZE_OVERRIDE;
             "rbib", [0xB0], 0, REGISTER_IN_OPCODE;
             "rwiw", [0xB8], 0, REGISTER_IN_OPCODE;
             "rdid", [0xB8], 0, REGISTER_IN_OPCODE;
             "v*i*", [0xC7], 0;
             "rqiq", [0xB8], 0, REGISTER_IN_OPCODE;
             "vbib", [0xC6], 0;
+            "ndrd", [0x0F, 0x22]; // 32 bit mode only
+            "nqrq", [0x0F, 0x22], 0, DEFAULT_REXSIZE;
+            "rdnd", [0x0F, 0x20];
+            "rqnq", [0x0F, 0x20], 0, DEFAULT_REXSIZE;
+            "Wdrd", [0x0F, 0x22], 0, REQUIRES_LOCK;
+            "Wqrq", [0x0F, 0x22], 0, REQUIRES_LOCK | DEFAULT_REXSIZE;
+            "rdWd", [0x0F, 0x22], 0, REQUIRES_LOCK;
+            "rqWq", [0x0F, 0x22], 0, REQUIRES_LOCK | DEFAULT_REXSIZE;
+            "ddrd", [0x0F, 0x23]; // 32 bit mode only
+            "dqrq", [0x0F, 0x23], 0, DEFAULT_REXSIZE;
+            "rddd", [0x0F, 0x21];
+            "rqdq", [0x0F, 0x21], 0, DEFAULT_REXSIZE;
         ), "movabs" => Op!( // special syntax for 64-bit disp only mov
             "Abib", [0xA0];
             "Awiw", [0xA1];
@@ -289,6 +314,22 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "movbe" => Op!(
             "r*m*", [0x0F, 0x38, 0xF0];
             "m*r*", [0x0F, 0x38, 0xF1];
+        ), "movd" => Op!(
+            "yovd", [0x0F, 0x6E], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+            "yovq", [0x0F, 0x6E], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE | REQUIRES_REXSIZE;
+            "vdyo", [0x0F, 0x7E], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+            "vqyo", [0x0F, 0x7E], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE | REQUIRES_REXSIZE;
+            "xqvd", [0x0F, 0x6E], 0, SIZE_OVERRIDE;
+            "xqvq", [0x0F, 0x6E], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
+            "vdxq", [0x0F, 0x7E], 0, SIZE_OVERRIDE;
+            "vqxq", [0x0F, 0x7E], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
+        ), "movmskpd" => Op!(
+            "rdyo", [0x0F, 0x50], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+        ), "movmskps" => Op!(
+            "rdyo", [0x0F, 0x50], 0, SIZE_OVERRIDE;
+        ), "movnti" => Op!(
+            "mdrd", [0x0F, 0xC3];
+            "mqrq", [0x0F, 0xC3];
         ), "movsb" => Op!(
             "", [0xA4]; 
         ), "movsw" => Op!(
@@ -297,7 +338,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "", [0xA5];
         ), "movsq" => Op!(
             "", [0xA5], 0, REQUIRES_REXSIZE; 
-        ), "movsx" => Op!( // currently this defaults to 32-bit memory if not specified. do we want this?
+        ), "movsx" => Op!( // currently this defaults to a certain memory size
             "rdvw", [0x0F, 0xBF], 0, SIZE_OVERRIDE;
             "rqvw", [0x0F, 0xBF], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
             "rwvb", [0x0F, 0xBE], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
@@ -305,7 +346,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "rqvb", [0x0F, 0xBE], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
         ), "movsxd" => Op!(
             "rqvd", [0x63], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
-        ), "movzx" => Op!( // currently this defaults to 32-bit memory if not specified. do we want this?
+        ), "movzx" => Op!( // currently this defaults to a certain memory size
             "rdvw", [0x0F, 0xB7], 0, SIZE_OVERRIDE;
             "rqvw", [0x0F, 0xB7], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
             "rwvb", [0x0F, 0xB6], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
@@ -351,6 +392,8 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "pop" => Op!(
             "r*", [0x8F], 0, DEFAULT_REXSIZE;
             "v*", [0x58], 0, DEFAULT_REXSIZE | REGISTER_IN_OPCODE;
+            "Uw", [0x0F, 0xA1], 0, SIZE_OVERRIDE;
+            "vw", [0x0F, 0xA9], 0, SIZE_OVERRIDE;
         ), "popcnt" => Op!(
             "r*v*", [0x0F, 0xB8], 0, REQUIRES_REP;
         ), "popf" => Op!(
@@ -375,6 +418,8 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "ib", [0x6A], 0;
             "iw", [0x68], 0, REQUIRES_OPSIZE;
             "iq", [0x68], 0;
+            "Uw", [0x0F, 0xA0], 0, SIZE_OVERRIDE;
+            "vw", [0x0F, 0xA8], 0, SIZE_OVERRIDE;
         ), "pushf" => Op!(
             "", [0x9C], 0, REQUIRES_OPSIZE;
         ), "pushfq" => Op!(
@@ -544,6 +589,113 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "vbrb", [0x30], 0, CAN_LOCK;
             "r*v*", [0x33], 0, CAN_LOCK;
             "rbvb", [0x32], 0, CAN_LOCK;
+        ),
+        // System instructions
+        "clgi" => Op!(
+            "", [0x0F, 0x01, 0xDD];
+        ), "cli" => Op!(
+            "", [0xFA];
+        ), "clts" => Op!(
+            "", [0x0F, 0x06];
+        ), "hlt" => Op!(
+            "", [0xF4];
+        ), "int3" => Op!(
+            "", [0xCC];
+        ), "invd" => Op!(
+            "", [0x0F, 0x08];
+        ), "invlpg" => Op!(
+            "mb", [0x0F, 0x01], 7;
+        ), "invlpga" => Op!(
+            "AqBd", [0x0F, 0x01, 0xDF];
+        ), "iret" => Op!(
+            "", [0xCF], 0, REQUIRES_OPSIZE;
+        ), "iretd" => Op!(
+            "", [0xCF];
+        ), "iretq" => Op!(
+            "", [0xCF], 0, REQUIRES_REXSIZE;
+        ), "lar" => Op!(
+            "rwvw", [0x0F, 0x02];
+            "rdvw", [0x0F, 0x02], 0, SIZE_OVERRIDE;
+            "rqvw", [0x0F, 0x02], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
+        ), "lgdt" => Op!(
+            "m!", [0x0F, 0x01], 2;
+        ), "lidt" => Op!(
+            "m!", [0x0F, 0x01], 3;
+        ), "lldt" => Op!(
+            "vw", [0x0F, 0x00], 2, SIZE_OVERRIDE;
+        ), "lmsw" => Op!(
+            "vw", [0x0F, 0x01], 6, SIZE_OVERRIDE;
+        ), "lsl" => Op!(
+            "rwvw", [0x0F, 0x03];
+            "rdvw", [0x0F, 0x03], 0, SIZE_OVERRIDE;
+            "rqvw", [0x0F, 0x03], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
+        ), "ltr" => Op!(
+            "vw", [0x0F, 0x00], 3, SIZE_OVERRIDE;
+        ), "monitor" => Op!(
+            "", [0x0F, 0x01, 0xC8];
+        ), "monitorx" => Op!(
+            "", [0x0F, 0x01, 0xFA];
+        ), "mwait" => Op!(
+            "", [0x0F, 0x01, 0xC9];
+        ), "mwaitx" => Op!(
+            "", [0x0F, 0x01, 0xFB];
+        ), "rdmsr" => Op!(
+            "", [0x0F, 0x32];
+        ), "rdpmc" => Op!(
+            "", [0x0F, 0x33];
+        ), "rdtsc" => Op!(
+            "", [0x0F, 0x31];
+        ), "rdtscp" => Op!(
+            "", [0x0F, 0x01, 0xF9];
+        ), "rsm" => Op!(
+            "", [0x0F, 0xAA];
+        ), "sgdt" => Op!(
+            "m!", [0x0F, 0x01], 0;
+        ), "sidt" => Op!(
+            "m!", [0x0F, 0x01, 1];
+        ), "skinit" => Op!(
+            "Ad", [0x0F, 0x01, 0xDE];
+        ), "sldt" => Op!(
+            "r*", [0x0F, 0x00], 0;
+            "mw", [0x0F, 0x00], 0, SIZE_OVERRIDE;
+        ), "smsw" => Op!(
+            "r*", [0x0F, 0x01], 4;
+            "mw", [0x0F, 0x01], 4, SIZE_OVERRIDE;
+        ), "sti" => Op!(
+            "", [0xFB];
+        ), "stgi" => Op!(
+            "", [0x0F, 0x01, 0xDC];
+        ), "str" => Op!(
+            "r*", [0x0F, 0x00], 1;
+            "mw", [0x0F, 0x00], 1, SIZE_OVERRIDE;
+        ), "swapgs" => Op!(
+            "", [0x0F, 0x01, 0xF8];
+        ), "syscall" => Op!(
+            "", [0x0F, 0x05];
+        ), "sysenter" => Op!(
+            "", [0x0F, 0x34];
+        ), "sysexit" => Op!(
+            "", [0x0F, 0x35];
+        ), "sysret" => Op!(
+            "", [0x0F, 0x07];
+        ), "ud2" => Op!(
+            "", [0x0F, 0x0B];
+        ), "verr" => Op!(
+            "vw", [0x0F, 0x00], 4, SIZE_OVERRIDE;
+        ), "verw" => Op!(
+            "vw", [0x0F, 0x00], 5, SIZE_OVERRIDE;
+        ), "vmload" => Op!(
+            "Aq", [0x0F, 0x01, 0xDA];
+        ), "vmmcall" => Op!(
+            "", [0x0F, 0x01, 0xD9];
+        ), "vmrun" => Op!(
+            "Aq", [0x0F, 0x01, 0xD8];
+        ), "vmsave" => Op!(
+            "Aq", [0x0F, 0x01, 0xDB];
+        ), "wbinvd" => Op!(
+            "", [0x0F, 0x09];
+        ), "wrmsr" => Op!(
+            "", [0x0F, 0x30];
         ),
         _ => return None
     })

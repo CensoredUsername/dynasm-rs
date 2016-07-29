@@ -8,3 +8,4 @@ name = "dynasm"
 plugin = true
 
 [dependencies]
+itertools = "0.4.*"

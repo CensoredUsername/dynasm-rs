@@ -4,4 +4,4 @@ version = "0.0.1"
 authors = ["CensoredUsername <cens.username@gmail.com>"]
 
 [dependencies]
-memmap = "0.4.0"
+memmap = "0.4.*"

@@ -74,19 +74,67 @@ pub struct Register {
 #[derive(Debug, Clone)]
 pub enum RegKind {
     Static(RegId),
-    Dynamic(P<ast::Expr>)
+    Dynamic(RegFamily, P<ast::Expr>)
 }
 
+// this map identifies the different registers that exist. some of these can be referred to as different sizes
+// but they share the same ID here (think AL/AX/EAX/RAX, XMM/YMM)
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum RegId {
+    // size: 1, 2, 4 or 8 bytes
     RAX = 0x00, RCX = 0x01, RDX = 0x02, RBX = 0x03,
     RSP = 0x04, RBP = 0x05, RSI = 0x06, RDI = 0x07,
     R8  = 0x08, R9  = 0x09, R10 = 0x0A, R11 = 0x0B,
     R12 = 0x0C, R13 = 0x0D, R14 = 0x0E, R15 = 0x0F,
 
-    AH = 0x14, CH = 0x15, DH = 0x16, BH = 0x17,
+    // size: 8 bytes
+    RIP = 0x15,
 
-    RIP = 0x25
+    // size: 1 byte
+    AH = 0x24, CH = 0x25, DH = 0x26, BH = 0x27,
+
+    // size: 10 bytes
+    ST0 = 0x30, ST1 = 0x31, ST2 = 0x32, ST3 = 0x33,
+    ST4 = 0x34, ST5 = 0x35, ST6 = 0x36, ST7 = 0x37,
+
+    // size: 8 bytes. alternative encoding exists
+    MMX0 = 0x40, MMX1 = 0x41, MMX2 = 0x42, MMX3 = 0x43,
+    MMX4 = 0x44, MMX5 = 0x45, MMX6 = 0x46, MMX7 = 0x47,
+
+    // size: 16 bytes or 32 bytes
+    XMM0  = 0x50, XMM1  = 0x51, XMM2  = 0x52, XMM3  = 0x53,
+    XMM4  = 0x54, XMM5  = 0x55, XMM6  = 0x56, XMM7  = 0x57,
+    XMM8  = 0x58, XMM9  = 0x59, XMM10 = 0x5A, XMM11 = 0x5B,
+    XMM12 = 0x5C, XMM13 = 0x5D, XMM14 = 0x5E, XMM15 = 0x5F,
+
+    // size: 2 bytes. alternative encoding exists
+    ES = 0x60, CS = 0x61, SS = 0x62, DS = 0x63,
+    FS = 0x64, GS = 0x65,
+
+    // size: 4 bytes
+    CR0  = 0x70, CR1  = 0x71, CR2  = 0x72, CR3  = 0x73,
+    CR4  = 0x74, CR5  = 0x75, CR6  = 0x76, CR7  = 0x77,
+    CR8  = 0x78, CR9  = 0x79, CR10 = 0x7A, CR11 = 0x7B,
+    CR12 = 0x7C, CR13 = 0x7D, CR14 = 0x7E, CR15 = 0x7F,
+
+    // size: 4 bytes
+    DR0  = 0x80, DR1  = 0x81, DR2  = 0x82, DR3  = 0x83,
+    DR4  = 0x84, DR5  = 0x85, DR6  = 0x86, DR7  = 0x87,
+    DR8  = 0x88, DR9  = 0x89, DR10 = 0x8A, DR11 = 0x8B,
+    DR12 = 0x8C, DR13 = 0x8D, DR14 = 0x8E, DR15 = 0x8F,
+}
+
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
+pub enum RegFamily {
+    LEGACY = 0,
+    RIP = 1,
+    HIGHBYTE = 2,
+    FP = 3,
+    MMX = 4,
+    XMM = 5,
+    SEGMENT = 6,
+    CONTROL = 7,
+    DEBUG = 8,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
@@ -94,7 +142,10 @@ pub enum Size {
     BYTE  = 1,
     WORD  = 2,
     DWORD = 4,
-    QWORD = 8
+    QWORD = 8,
+    PWORD = 10,
+    OWORD = 16,
+    HWORD = 32
 }
 
 /*
@@ -106,8 +157,8 @@ impl Register {
         Register {size: size, kind: RegKind::Static(id) }
     }
 
-    pub fn new_dynamic(size: Size, id: P<ast::Expr>) -> Register {
-        Register {size: size, kind: RegKind::Dynamic(id) }
+    pub fn new_dynamic(size: Size, family: RegFamily, id: P<ast::Expr>) -> Register {
+        Register {size: size, kind: RegKind::Dynamic(family, id) }
     }
 
     pub fn size(&self) -> Size {
@@ -119,14 +170,21 @@ impl RegKind {
     pub fn code(&self) -> Option<u8> {
         match *self {
             RegKind::Static(code) => Some(code.code()),
-            RegKind::Dynamic(_) => None
+            RegKind::Dynamic(_, _) => None
+        }
+    }
+
+    pub fn family(&self) -> RegFamily {
+        match *self {
+            RegKind::Static(code) => code.family(),
+            RegKind::Dynamic(family, _) => family
         }
     }
 
     pub fn is_dynamic(&self) -> bool {
         match *self {
             RegKind::Static(_) => false,
-            RegKind::Dynamic(_) => true
+            RegKind::Dynamic(_, _) => true
         }
     }
 
@@ -153,7 +211,7 @@ impl PartialEq<RegId> for RegKind {
     fn eq(&self, other: &RegId) -> bool {
         match *self {
             RegKind::Static(id) => id == *other,
-            RegKind::Dynamic(_) => false
+            RegKind::Dynamic(_, _) => false
         }
     }
 }
@@ -180,6 +238,21 @@ impl PartialEq<RegId> for Option<RegKind> {
 impl RegId {
     pub fn code(&self) -> u8 {
         *self as u8 & 0xF
+    }
+
+    pub fn family(&self) -> RegFamily {
+        match *self as u8 >> 4 {
+                0 => RegFamily::LEGACY,
+                1 => RegFamily::RIP,
+                2 => RegFamily::HIGHBYTE,
+                3 => RegFamily::FP,
+                4 => RegFamily::MMX,
+                5 => RegFamily::XMM,
+                6 => RegFamily::SEGMENT,
+                7 => RegFamily::CONTROL,
+                8 => RegFamily::DEBUG,
+                _ => unreachable!()
+        }
     }
 
     pub fn from_number(id: u8) -> RegId {
@@ -423,7 +496,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
             if let Some(Spanned {node: reg, ..} ) = parse_reg(&node) {
                 match reg.kind {
                     RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
-                    RegKind::Dynamic(_) => regs.push((reg, 1))
+                    RegKind::Dynamic(_, _) => regs.push((reg, 1))
                 }
                 continue;
             }
@@ -434,7 +507,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
                         if let ast::LitKind::Int(value, _) = scale.node {
                             match reg.kind {
                                 RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
-                                RegKind::Dynamic(_) => regs.push((reg, value as isize))
+                                RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
                             }
                             continue;
                         }
@@ -445,7 +518,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
                         if let ast::LitKind::Int(value, _) = scale.node {
                             match reg.kind {
                                 RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
-                                RegKind::Dynamic(_) => regs.push((reg, value as isize))
+                                RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
                             }
                             continue;
                         }
@@ -553,9 +626,39 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             "r8b"      => (R8,  BYTE), "r9b"      => (R9,  BYTE), "r10b"     => (R10, BYTE), "r11b"     => (R11, BYTE),
             "r12b"     => (R12, BYTE), "r13b"     => (R13, BYTE), "r14b"     => (R14, BYTE), "r15b"     => (R15, BYTE),
 
+            "rip"  => (RIP, QWORD),
+
             "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
 
-            "rip"  => (RIP, QWORD),
+            "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
+            "st4" => (ST4, PWORD), "st5" => (ST5, PWORD), "st6" => (ST6, PWORD), "st7" => (ST7, PWORD),
+
+            "mmx0" => (MMX0, QWORD), "mmx1" => (MMX1, QWORD), "mmx2" => (MMX2, QWORD), "mmx3" => (MMX3, QWORD),
+            "mmx4" => (MMX4, QWORD), "mmx5" => (MMX5, QWORD), "mmx6" => (MMX6, QWORD), "mmx7" => (MMX7, QWORD),
+
+            "xmm0"  => (XMM0 , OWORD), "xmm1"  => (XMM1 , OWORD), "xmm2"  => (XMM2 , OWORD), "xmm3"  => (XMM3 , OWORD),
+            "xmm4"  => (XMM4 , OWORD), "xmm5"  => (XMM5 , OWORD), "xmm6"  => (XMM6 , OWORD), "xmm7"  => (XMM7 , OWORD),
+            "xmm8 " => (XMM8 , OWORD), "xmm9 " => (XMM9 , OWORD), "xmm10" => (XMM10, OWORD), "xmm11" => (XMM11, OWORD),
+            "xmm12" => (XMM12, OWORD), "xmm13" => (XMM13, OWORD), "xmm14" => (XMM14, OWORD), "xmm15" => (XMM15, OWORD),
+
+            "ymm0"  => (XMM0 , HWORD), "ymm1"  => (XMM1 , HWORD), "ymm2"  => (XMM2 , HWORD), "ymm3"  => (XMM3 , HWORD),
+            "ymm4"  => (XMM4 , HWORD), "ymm5"  => (XMM5 , HWORD), "ymm6"  => (XMM6 , HWORD), "ymm7"  => (XMM7 , HWORD),
+            "ymm8 " => (XMM8 , HWORD), "ymm9 " => (XMM9 , HWORD), "ymm10" => (XMM10, HWORD), "ymm11" => (XMM11, HWORD),
+            "ymm12" => (XMM12, HWORD), "ymm13" => (XMM13, HWORD), "ymm14" => (XMM14, HWORD), "ymm15" => (XMM15, HWORD),
+
+            "es" => (ES, WORD), "cs" => (CS, WORD), "ss" => (SS, WORD), "ds" => (DS, WORD),
+            "fs" => (FS, WORD), "gs" => (GS, WORD),
+
+            "cr0"  => (CR0 , QWORD), "cr1"  => (CR1 , QWORD), "cr2"  => (CR2 , QWORD), "cr3"  => (CR3 , QWORD),
+            "cr4"  => (CR4 , QWORD), "cr5"  => (CR5 , QWORD), "cr6"  => (CR6 , QWORD), "cr7"  => (CR7 , QWORD),
+            "cr8"  => (CR8 , QWORD), "cr9"  => (CR9 , QWORD), "cr10" => (CR10, QWORD), "cr11" => (CR11, QWORD),
+            "cr12" => (CR12, QWORD), "cr13" => (CR13, QWORD), "cr14" => (CR14, QWORD), "cr15" => (CR15, QWORD),
+
+            "dr0"  => (DR0 , QWORD), "dr1"  => (DR1 , QWORD), "dr2"  => (DR2 , QWORD), "dr3"  => (DR3 , QWORD),
+            "dr4"  => (DR4 , QWORD), "dr5"  => (DR5 , QWORD), "dr6"  => (DR6 , QWORD), "dr7"  => (DR7 , QWORD),
+            "dr8"  => (DR8 , QWORD), "dr9"  => (DR9 , QWORD), "dr10" => (DR10, QWORD), "dr11" => (DR11, QWORD),
+            "dr12" => (DR12, QWORD), "dr13" => (DR13, QWORD), "dr14" => (DR14, QWORD), "dr15" => (DR15, QWORD),
+
             _ => return None
         };
 
@@ -576,16 +679,24 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             return None;
         };
 
-        let size = match &*called.node.name.as_str() {
-            "Rb" => Size::BYTE,
-            "Rw" => Size::WORD,
-            "Rd" => Size::DWORD,
-            "Rq" => Size::QWORD,
+        let (size, family) = match &*called.node.name.as_str() {
+            "Rb" => (Size::BYTE,  RegFamily::LEGACY),
+            "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
+            "Rw" => (Size::WORD,  RegFamily::LEGACY),
+            "Rd" => (Size::DWORD, RegFamily::LEGACY),
+            "Rq" => (Size::QWORD, RegFamily::LEGACY),
+            "Rf" => (Size::PWORD, RegFamily::FP),
+            "Rm" => (Size::QWORD, RegFamily::MMX),
+            "Rx" => (Size::OWORD, RegFamily::XMM),
+            "Ry" => (Size::HWORD, RegFamily::XMM),
+            "Rs" => (Size::WORD,  RegFamily::XMM),
+            "Rc" => (Size::DWORD, RegFamily::CONTROL),
+            "RD" => (Size::DWORD, RegFamily::DEBUG),
             _ => return None
         };
 
         Some(Spanned {
-            node: Register::new_dynamic(size, args[0].clone()),
+            node: Register::new_dynamic(size, family, args[0].clone()),
             span: span
         })
     } else {

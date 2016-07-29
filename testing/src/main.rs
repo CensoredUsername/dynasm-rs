@@ -90,6 +90,14 @@ fn main() {
         ; inc Rd(1)
         ; inc Rq(1)
         ; mov Rb(7), [Rq(3)*4 + rax]
+        // other register families
+        ; mov cr1, rax
+        ; mov dr1, rax
+        ; pop fs
+        ; movmskps eax, xmm7
+        ; movd mmx1, eax
+        ; movd eax, mmx1
+
     );
 
     let index = ops.offset();

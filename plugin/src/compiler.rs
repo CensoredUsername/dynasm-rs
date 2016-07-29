@@ -4,11 +4,12 @@ use syntax::ast;
 use syntax::ptr::P;
 use syntax::codemap::Spanned;
 
-use parser::{self, Item, Arg, Ident, MemoryRef, Register, RegKind, RegId, Size, LabelType, JumpType};
+use parser::{self, Item, Arg, Ident, MemoryRef, Register, RegKind, RegFamily, RegId, Size, LabelType, JumpType};
 use x64data::get_mnemnonic_data;
 use serialize::or_mask_shift_expr;
 
 use std::mem::swap;
+use itertools::Itertools;
 
 /*
  * Compilation output
@@ -47,8 +48,9 @@ pub mod flags {
     pub const REQUIRES_ADDRSIZE : u16 = 0x0008;
     pub const REQUIRES_OPSIZE   : u16 = 0x0010;
     pub const REQUIRES_REXSIZE  : u16 = 0x0020;
+    pub const REQUIRES_LOCK     : u16 = 0x0040;
     // parsing modifiers
-    pub const SIZE_OVERRIDE     : u16 = 0x0040; // the operand sizes of the opcodes don't match up
+    pub const SIZE_OVERRIDE     : u16 = 0x0080; // the operand sizes of the opcodes don't match up
     // allowed prefixes
     pub const CAN_LOCK          : u16 = 0x0100;
     pub const CAN_REP           : u16 = 0x0200;
@@ -220,7 +222,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         let (last, rest) = data.ops.split_last().expect("bad encoding data, no opcode specified");
         buffer.extend(rest.into_iter().map(|x| Stmt::Const(*x)));
 
-        if let RegKind::Dynamic(expr) = reg {
+        if let RegKind::Dynamic(_, expr) = reg {
             let last = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(*last));
             buffer.push(Stmt::ExprConst(or_mask_shift_expr(ecx, last, expr, 7, 0)));
         } else {
@@ -383,9 +385,9 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, data: &'static Opdata, op
 
     if rexsize || need_rex || reg.is_extended() || index.is_extended() || base.is_extended() {
     // AH, BH, CH and DH require a REX prefix to be encoded. otherwise their encoding maps to AL - BL
-        if (reg   == RegId::AH || reg   == RegId::CH || reg   == RegId::DH || reg   == RegId::BH) ||
-           (index == RegId::AH || index == RegId::CH || index == RegId::DH || index == RegId::BH) ||
-           (base  == RegId::AH || base  == RegId::CH || base  == RegId::DH || base  == RegId::BH) {
+        if (reg.family()   == RegFamily::HIGHBYTE) ||
+           (index.family() == RegFamily::HIGHBYTE) ||
+           (base.family()  == RegFamily::HIGHBYTE) {
             return Err(Some("Impossible to encode register combination: High byte registers combined with extended registers".to_string()));
         }
 
@@ -395,13 +397,13 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, data: &'static Opdata, op
                          (base.encode()  & 8) >> 3 ;
         let mut rex = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(rex));
 
-        if let RegKind::Dynamic(expr) = reg {
+        if let RegKind::Dynamic(_, expr) = reg {
             rex = or_mask_shift_expr(ecx, rex, expr, 8, -1);
         }
-        if let RegKind::Dynamic(expr) = index {
+        if let RegKind::Dynamic(_, expr) = index {
             rex = or_mask_shift_expr(ecx, rex, expr, 8, -2);
         }
-        if let RegKind::Dynamic(expr) = base {
+        if let RegKind::Dynamic(_, expr) = base {
             rex = or_mask_shift_expr(ecx, rex, expr, 8, -3);
         }
         buffer.push(Stmt::ExprConst(rex));
@@ -416,24 +418,33 @@ fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut StmtBuffer, mode: u8, reg1: Reg
 
     let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
 
-    if let RegKind::Dynamic(expr) = reg1 {
+    if let RegKind::Dynamic(_, expr) = reg1 {
         byte = or_mask_shift_expr(ecx, byte, expr, 7, 3);
     }
-    if let RegKind::Dynamic(expr) = reg2 {
+    if let RegKind::Dynamic(_, expr) = reg2 {
         byte = or_mask_shift_expr(ecx, byte, expr, 7, 0);
     }
     buffer.push(Stmt::ExprConst(byte));
 }
 
 fn extract_args(fmt: &'static Opdata, mut args: Vec<Arg>) -> (Option<Arg>, Option<Arg>, Vec<Arg>) {
+    // way operand order works:
+    // if there's a memory/reg operand, this operand goes into modrm.r/m
+    // otherwise, the first reg from the left goes to modrm.r/m
+    // the next register goes into modrm.reg
     // determine the operand encoding
-    let mut regidx = fmt.args.chars().position(|c| c == 'r').map(|i| i / 2);
-    let mut rmidx  = fmt.args.chars().position(|c| c == 'm' || c == 'v').map(|i| i / 2);
+    let mut rmidx  = fmt.args.chars().step(2).position(|c| c == 'm' || c == 'v');
+    let mut iter = fmt.args.chars().step(2);
 
-    if rmidx.is_none() {
-        rmidx = regidx;
-        regidx = None;
-    }
+    let regidx = if rmidx.is_none() {
+        rmidx =  iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
+                                   c == 's' || c == 'n' || c == 'd');
+        iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
+                          c == 's' || c == 'n' || c == 'd').map(|i| i + rmidx.unwrap())
+    } else {
+        iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
+                          c == 's' || c == 'n' || c == 'd')
+    };
 
     if let Some(regidx) = regidx {
         let rmidx = rmidx.unwrap();
@@ -533,11 +544,19 @@ fn get_address_size(ecx: &ExtCtxt, args: &[Arg]) -> Result<Size, Option<String>>
                     ecx.span_err(span, "Conflicting address sizes");
                     return Err(None);
                 }
+                if reg.kind.family() != RegFamily::LEGACY && reg.kind.family() != RegFamily::RIP {
+                    ecx.span_err(span, "Can only use normal registers as addresses");
+                    return Err(None);
+                }
                 addr_size = Some(reg.size());
             }
             if let &Some(ref reg) = index {
                 if addr_size.is_some() && addr_size != Some(reg.size()) {
                     ecx.span_err(span, "Conflicting address sizes");
+                    return Err(None);
+                }
+                if reg.kind.family() != RegFamily::LEGACY && reg.kind.family() != RegFamily::RIP {
+                    ecx.span_err(span, "Can only use normal registers as addresses");
                     return Err(None);
                 }
                 addr_size = Some(reg.size());
@@ -685,6 +704,8 @@ fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>, 
 
     if (fmt.flags & flags::REQUIRES_REP) != 0 {
         group1 = Some(Stmt::Const(0xF3));
+    } else if (fmt.flags & flags::REQUIRES_LOCK) != 0 {
+        group1 = Some(Stmt::Const(0xF3));
     }
 
     if (fmt.flags & flags::REQUIRES_OPSIZE) != 0 || op_size == Size::WORD {
@@ -715,38 +736,108 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
         }
     }
 
+    /*
+    let allowed = String::new("Invaild arguments. Allowed formats:\n");
+    for format in data {
+        iter = format.args.iter();
+        while Some(ty) = iter.next();
+            let size = iter.next().expect("invalid format string");
+            let size = match size {
+                'b' => "8",
+                'w' => "16",
+                'd' => "32",
+                'q' => "64",
+                '*' => "*",
+                '!' => "",
+                _ => panic!("invalid format string")
+            });
+            allowed.push_str(match ty {
+                'i' => format!("imm{}", size),
+                'c' => format!("rel{}off", size),
+                'r' => format!("reg", size),
+                'v' => format!("reg/mem", size),
+                'm' => format!("mem", size),
+                'A' ... 'P' =>
+                _   => panic!("invalid format string")
+            });
+
+    }*/
+
     Err(Some(format!("'{}': argument type/size mismatch", name)))
 }
 
-fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'static str> {
-    if fmt.len() != args.len() * 2 {
+fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(), &'static str> {
+    if fmtstr.len() != args.len() * 2 {
         return Err("argument length mismatch");
     }
 
-    // i matches an immediate
-    // c matches an instruction offset
-    // r matches a reg
-    // m matches memory
-    // v matches r and m
+    // i : immediate
+    // c : instruction offset
+    // r : legacy reg
+    // m : memory
+    // v : r and m
+    // f : fp reg
+    // x : mmx reg
+    // y : xmm reg
+    // s : segment reg
+    // n : control reg
+    // d : debug reg
+    // A ... P: match rax - r15
+    // Q ... V: match es, cs, ss, ds, fs, gs
+    // W: matches CR8 (not sure why)
 
     // b, w, d, q match a byte, word, doubleword and quadword.
     // * matches w, d, q if applied to reg/mem (default q), it matches w/d when applied to i or c. (default d)
     // ! matches a lack of size, only useful in combination of m and i
     {
-        let mut fmt = fmt.chars();
+        let mut fmt = fmtstr.chars();
         let mut args = args.iter();
         while let Some(code) = fmt.next() {
             let fsize = fmt.next().expect("invalid format string");
             let arg = args.next().unwrap();
 
             let size = match (code, arg) {
-                ('i', &Arg::Immediate(_, size))  |
+                // immediates
+                ('i', &Arg::Immediate(_, size))  => size,
                 ('c', &Arg::Immediate(_, size))  => size,
                 ('c', &Arg::JumpTarget(_, size)) => size,
-                (x @ 'A' ... 'P', &Arg::Direct(Spanned {node: ref reg, ..}))
-                    if reg.kind.code() == Some((x as u32 - 'A' as u32) as u8) => Some(reg.size()),
+
+                // generic legacy regs
                 ('r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
-                ('v', &Arg::Direct(Spanned {node: ref reg, ..} )) => Some(reg.size()),
+                ('v', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                    reg.kind.family() == RegFamily::LEGACY ||
+                    reg.kind.family() == RegFamily::HIGHBYTE => Some(reg.size()),
+
+                // specific legacy regs
+                (x @ 'A' ... 'P', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::LEGACY &&
+                    reg.kind.code() == Some(x as u8 - 'A' as u8) => Some(reg.size()),
+
+                // specific segment regs
+                (x @ 'Q' ... 'V', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::SEGMENT &&
+                    reg.kind.code() == Some(x as u8 - 'Q' as u8) => Some(reg.size()),
+
+                // CR8 can be specially referenced
+                ('W', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::CONTROL &&
+                    reg.kind == RegId::CR8 => Some(reg.size()),
+
+                // other reg types
+                ('f', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::FP => Some(reg.size()),
+                ('x', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::MMX => Some(reg.size()),
+                ('y', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::XMM => Some(reg.size()),
+                ('s', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::SEGMENT => Some(reg.size()),
+                ('n', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::CONTROL => Some(reg.size()),
+                ('d', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind.family() == RegFamily::DEBUG => Some(reg.size()),
+
+                // memory offsets
                 ('m', &Arg::Indirect(MemoryRef {size, ..} )) |
                 ('m', &Arg::IndirectJumpTarget(_, size))     |
                 ('v', &Arg::Indirect(MemoryRef {size, ..} )) |
@@ -761,11 +852,14 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
                     ('w', _)   => size == Size::WORD,
                     ('d', _)   => size == Size::DWORD,
                     ('q', _)   => size == Size::QWORD,
+                    ('p', _)   => size == Size::PWORD,
+                    ('o', _)   => size == Size::OWORD,
+                    ('h', _)   => size == Size::HWORD,
                     ('*', 'i') => size == Size::WORD || size == Size::DWORD,
                     ('*', 'c') => size == Size::WORD || size == Size::DWORD,
                     ('*', _)   => size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
                     ('!', _)   => false,
-                    _ => panic!("invalid format string")
+                    _ => panic!("invalid format string '{}'", fmtstr)
                 } {
                     return Err("argument size mismatch");
                 }
@@ -775,7 +869,7 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
 
     // we've found a match, update all specific constraints
     {
-        let mut fmt = fmt.chars();
+        let mut fmt = fmtstr.chars();
         let mut args = args.iter_mut();
         while let Some(_) = fmt.next() {
             let fsize = fmt.next().unwrap();
@@ -789,6 +883,9 @@ fn match_format_string(fmt: &'static str, mut args: &mut [Arg]) -> Result<(), &'
                     'w' => Some(Size::WORD),
                     'd' => Some(Size::DWORD),
                     'q' => Some(Size::QWORD),
+                    'p' => Some(Size::PWORD),
+                    'o' => Some(Size::OWORD),
+                    'h' => Some(Size::HWORD),
                     '*' => None,
                     '!' => None,
                     _ => unreachable!()

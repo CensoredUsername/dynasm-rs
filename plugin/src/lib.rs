@@ -3,6 +3,7 @@
 
 extern crate syntax;
 extern crate rustc_plugin;
+extern crate itertools;
 
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
