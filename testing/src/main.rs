@@ -93,10 +93,12 @@ fn main() {
         // other register families
         ; mov cr1, rax
         ; mov dr1, rax
+        ; mov rax, cr1
+        ; mov rax, dr1
         ; pop fs
         ; movmskps eax, xmm7
-        ; movd mmx1, eax
-        ; movd eax, mmx1
+        ; movd mmx7, eax
+        ; movd eax, mmx7
 
     );
 

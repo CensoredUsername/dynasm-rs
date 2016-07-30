@@ -54,6 +54,8 @@ pub mod flags {
     // allowed prefixes
     pub const CAN_LOCK          : u16 = 0x0100;
     pub const CAN_REP           : u16 = 0x0200;
+    // encoding order in case two register operands are used
+    pub const DEST_IN_REG       : u16 = 0x0400;
 }
 
 pub struct Opdata {
@@ -435,16 +437,25 @@ fn extract_args(fmt: &'static Opdata, mut args: Vec<Arg>) -> (Option<Arg>, Optio
     // determine the operand encoding
     let mut rmidx  = fmt.args.chars().step(2).position(|c| c == 'm' || c == 'v');
     let mut iter = fmt.args.chars().step(2);
+    let mut regidx;
 
-    let regidx = if rmidx.is_none() {
-        rmidx =  iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
-                                   c == 's' || c == 'n' || c == 'd');
-        iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
-                          c == 's' || c == 'n' || c == 'd').map(|i| i + rmidx.unwrap())
+    if rmidx.is_none() {
+        // dest
+        rmidx  = iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
+                                   c == 's' || c == 'c' || c == 'd');
+        // src
+        regidx = iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
+                                   c == 's' || c == 'c' || c == 'd').map(|i| i + 1 + rmidx.unwrap());
+
+        // we assume the first reg (dest), to usually go in modrm.r/m if two register operands are used
+        // the flag indicates this is false, so we swap the two indices
+        if (fmt.flags & flags::DEST_IN_REG) != 0 {
+            swap(&mut rmidx, &mut regidx);
+        }
     } else {
-        iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
-                          c == 's' || c == 'n' || c == 'd')
-    };
+        regidx = iter.position(|c| c == 'r' || c == 'f' || c == 'x' || c == 'y' ||
+                                   c == 's' || c == 'c' || c == 'd')
+    }
 
     if let Some(regidx) = regidx {
         let rmidx = rmidx.unwrap();
@@ -772,15 +783,15 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
     }
 
     // i : immediate
-    // c : instruction offset
+    // o : instruction offset
     // r : legacy reg
     // m : memory
     // v : r and m
     // f : fp reg
     // x : mmx reg
-    // y : xmm reg
+    // y : xmm/ymm reg
     // s : segment reg
-    // n : control reg
+    // c : control reg
     // d : debug reg
     // A ... P: match rax - r15
     // Q ... V: match es, cs, ss, ds, fs, gs
@@ -799,8 +810,8 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
             let size = match (code, arg) {
                 // immediates
                 ('i', &Arg::Immediate(_, size))  => size,
-                ('c', &Arg::Immediate(_, size))  => size,
-                ('c', &Arg::JumpTarget(_, size)) => size,
+                ('o', &Arg::Immediate(_, size))  => size,
+                ('o', &Arg::JumpTarget(_, size)) => size,
 
                 // generic legacy regs
                 ('r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
@@ -820,8 +831,11 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
 
                 // CR8 can be specially referenced
                 ('W', &Arg::Direct(Spanned {node: ref reg, ..})) if
-                    reg.kind.family() == RegFamily::CONTROL &&
                     reg.kind == RegId::CR8 => Some(reg.size()),
+
+                // top of the fp stack is also often used
+                ('X', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                    reg.kind == RegId::ST0 => Some(reg.size()),
 
                 // other reg types
                 ('f', &Arg::Direct(Spanned {node: ref reg, ..})) if
@@ -832,7 +846,7 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
                     reg.kind.family() == RegFamily::XMM => Some(reg.size()),
                 ('s', &Arg::Direct(Spanned {node: ref reg, ..})) if
                     reg.kind.family() == RegFamily::SEGMENT => Some(reg.size()),
-                ('n', &Arg::Direct(Spanned {node: ref reg, ..})) if
+                ('c', &Arg::Direct(Spanned {node: ref reg, ..})) if
                     reg.kind.family() == RegFamily::CONTROL => Some(reg.size()),
                 ('d', &Arg::Direct(Spanned {node: ref reg, ..})) if
                     reg.kind.family() == RegFamily::DEBUG => Some(reg.size()),

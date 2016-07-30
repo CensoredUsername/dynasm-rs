@@ -69,7 +69,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "v*r*", [0x0F, 0xAB], 0, CAN_LOCK;
             "v*ib", [0x0F, 0xBA], 5, CAN_LOCK;
         ), "call" => Op!(
-            "c*", [0xE8];
+            "o*", [0xE8];
             "r*", [0xFF], 2;
         ), "cbw" => Op!(
             "", [0x98], 0, REQUIRES_OPSIZE;
@@ -186,60 +186,60 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "int" => Op!(
             "ib", [0xCD];
         ), "jo"   => Op!(
-            "c*", [0x0F, 0x80];
-            "cb", [0x70];
+            "o*", [0x0F, 0x80];
+            "ob", [0x70];
         ), "jno"  => Op!(
-            "c*", [0x0F, 0x81];
-            "cb", [0x71];
+            "o*", [0x0F, 0x81];
+            "ob", [0x71];
         ), "jb"   | "jc"  | "jnae" => Op!(
-            "c*", [0x0F, 0x82];
-            "cb", [0x72];
+            "o*", [0x0F, 0x82];
+            "ob", [0x72];
         ), "jnb"  | "jnc" | "jae"  => Op!(
-            "c*", [0x0F, 0x83];
-            "cb", [0x73];
+            "o*", [0x0F, 0x83];
+            "ob", [0x73];
         ), "jz"   | "je"  => Op!(
-            "c*", [0x0F, 0x84];
-            "cb", [0x74];
+            "o*", [0x0F, 0x84];
+            "ob", [0x74];
         ), "jnz"  | "jne" => Op!(
-            "c*", [0x0F, 0x85];
-            "cb", [0x75];
+            "o*", [0x0F, 0x85];
+            "ob", [0x75];
         ), "jbe"  | "jna" => Op!(
-            "c*", [0x0F, 0x86];
-            "cb", [0x76];
+            "o*", [0x0F, 0x86];
+            "ob", [0x76];
         ), "jnbe" | "ja"  => Op!(
-            "c*", [0x0F, 0x87];
-            "cb", [0x77];
+            "o*", [0x0F, 0x87];
+            "ob", [0x77];
         ), "js"   => Op!(
-            "c*", [0x0F, 0x88];
-            "cb", [0x78];
+            "o*", [0x0F, 0x88];
+            "ob", [0x78];
         ), "jns"  => Op!(
-            "c*", [0x0F, 0x89];
-            "cb", [0x79];
+            "o*", [0x0F, 0x89];
+            "ob", [0x79];
         ), "jp"   | "jpe" => Op!(
-            "c*", [0x0F, 0x8A];
-            "cb", [0x7A];
+            "o*", [0x0F, 0x8A];
+            "ob", [0x7A];
         ), "jnp"  | "jpo" => Op!(
-            "c*", [0x0F, 0x8B];
-            "cb", [0x7B];
+            "o*", [0x0F, 0x8B];
+            "ob", [0x7B];
         ), "jl"   | "jnge"=> Op!(
-            "c*", [0x0F, 0x8C];
-            "cb", [0x7C];
+            "o*", [0x0F, 0x8C];
+            "ob", [0x7C];
         ), "jnl"  | "jge" => Op!(
-            "c*", [0x0F, 0x8D];
-            "cb", [0x7D];
+            "o*", [0x0F, 0x8D];
+            "ob", [0x7D];
         ), "jle"  | "jng" => Op!(
-            "c*", [0x0F, 0x8E];
-            "cb", [0x7E];
+            "o*", [0x0F, 0x8E];
+            "ob", [0x7E];
         ), "jnle" | "jg"  => Op!(
-            "c*", [0x0F, 0x8F];
-            "cb", [0x7F];
+            "o*", [0x0F, 0x8F];
+            "ob", [0x7F];
         ), "jecxz" => Op!(
-            "cb", [0xE3], 0, REQUIRES_ADDRSIZE;
+            "ob", [0xE3], 0, REQUIRES_ADDRSIZE;
         ), "jrcxz" => Op!(
-            "cb", [0xE3];
+            "ob", [0xE3];
         ), "jmp" => Op!(
-            "c*", [0xE9];
-            "cb", [0xEB];
+            "o*", [0xE9];
+            "ob", [0xEB];
             "v*", [0xFF], 4, DEFAULT_REXSIZE;
         ), "lahf" => Op!(
             "", [0x9F];
@@ -264,11 +264,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "lodsq" => Op!(
             "", [0xAD], 0, REQUIRES_REXSIZE;
         ), "loop" => Op!(
-            "cb", [0xE2];
+            "ob", [0xE2];
         ), "loope" | "loopz" => Op!(
-            "cb", [0xE1];
+            "ob", [0xE1];
         ), "loopne" | "loopnz" => Op!(
-            "cb", [0xE0];
+            "ob", [0xE0];
         ), "lzcnt" => Op!(
             "r*m*", [0x0F, 0xBD], 0, REQUIRES_REP;
         ), "mfence" => Op!(
@@ -283,23 +283,23 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "rqsw", [0x8C], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
             "mwsw", [0x8C], 0, SIZE_OVERRIDE;
             "swmw", [0x8C], 0, SIZE_OVERRIDE;
-            "swr*", [0x8C], 0, SIZE_OVERRIDE;
+            "swr*", [0x8C], 0, SIZE_OVERRIDE | DEST_IN_REG;
             "rbib", [0xB0], 0, REGISTER_IN_OPCODE;
             "rwiw", [0xB8], 0, REGISTER_IN_OPCODE;
             "rdid", [0xB8], 0, REGISTER_IN_OPCODE;
             "v*i*", [0xC7], 0;
             "rqiq", [0xB8], 0, REGISTER_IN_OPCODE;
             "vbib", [0xC6], 0;
-            "ndrd", [0x0F, 0x22]; // 32 bit mode only
-            "nqrq", [0x0F, 0x22], 0, DEFAULT_REXSIZE;
-            "rdnd", [0x0F, 0x20];
-            "rqnq", [0x0F, 0x20], 0, DEFAULT_REXSIZE;
+            "cdrd", [0x0F, 0x22], 0, DEST_IN_REG; // 32 bit mode only
+            "cqrq", [0x0F, 0x22], 0, DEST_IN_REG | DEFAULT_REXSIZE;
+            "rdcd", [0x0F, 0x20];
+            "rqcq", [0x0F, 0x20], 0, DEFAULT_REXSIZE;
             "Wdrd", [0x0F, 0x22], 0, REQUIRES_LOCK;
             "Wqrq", [0x0F, 0x22], 0, REQUIRES_LOCK | DEFAULT_REXSIZE;
             "rdWd", [0x0F, 0x22], 0, REQUIRES_LOCK;
             "rqWq", [0x0F, 0x22], 0, REQUIRES_LOCK | DEFAULT_REXSIZE;
-            "ddrd", [0x0F, 0x23]; // 32 bit mode only
-            "dqrq", [0x0F, 0x23], 0, DEFAULT_REXSIZE;
+            "ddrd", [0x0F, 0x23], 0, DEST_IN_REG; // 32 bit mode only
+            "dqrq", [0x0F, 0x23], 0, DEST_IN_REG | DEFAULT_REXSIZE;
             "rddd", [0x0F, 0x21];
             "rqdq", [0x0F, 0x21], 0, DEFAULT_REXSIZE;
         ), "movabs" => Op!( // special syntax for 64-bit disp only mov
@@ -324,9 +324,9 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
             "vdxq", [0x0F, 0x7E], 0, SIZE_OVERRIDE;
             "vqxq", [0x0F, 0x7E], 0, SIZE_OVERRIDE | REQUIRES_REXSIZE;
         ), "movmskpd" => Op!(
-            "rdyo", [0x0F, 0x50], 0, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+            "rdyo", [0x0F, 0x50], 0, DEST_IN_REG | SIZE_OVERRIDE | REQUIRES_OPSIZE;
         ), "movmskps" => Op!(
-            "rdyo", [0x0F, 0x50], 0, SIZE_OVERRIDE;
+            "rdyo", [0x0F, 0x50], 0, DEST_IN_REG | SIZE_OVERRIDE;
         ), "movnti" => Op!(
             "mdrd", [0x0F, 0xC3];
             "mqrq", [0x0F, 0xC3];
@@ -697,6 +697,267 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
         ), "wrmsr" => Op!(
             "", [0x0F, 0x30];
         ),
+        // x87 FPU instruction set, data taken from amd's programmer manual vol. 5
+        "f2xm1" => Op!(
+            "", [0xD9, 0xF0];
+        ), "fabs" => Op!(
+            "", [0xD9, 0xE1];
+        ), "fadd" => Op!(
+            "Xpfp", [0xD8, 0xC0], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDC, 0xC0], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 0;
+            "mq", [0xDC], 0, SIZE_OVERRIDE;
+        ), "faddp" => Op!(
+            "",     [0xDE, 0xC1], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDE, 0xC0], 0, REGISTER_IN_OPCODE;
+        ), "fiadd" => Op!(
+            "mw", [0xDE], 0, SIZE_OVERRIDE;
+            "md", [0xDA], 0;
+        ), "fbld" => Op!(
+            "mp", [0xDF], 4;
+        ), "fbstp" => Op!(
+            "mp", [0xDF], 6;
+        ), "fchs" => Op!(
+            "", [0xD9, 0xE0];
+        ), "fclex" => Op!( // this is actually ;wait ;fnclex
+            "", [0x9B, 0xDB, 0xE2];
+        ), "fnclex" => Op!(
+            "", [0xDB, 0xE2];
+        ), "fcmovb" => Op!(
+            "Xpfp", [0xDA, 0xC0], 0, REGISTER_IN_OPCODE;
+        ), "fcmovbe" => Op!(
+            "Xpfp", [0xDA, 0xD0], 0, REGISTER_IN_OPCODE;
+        ), "fcmove" => Op!(
+            "Xpfp", [0xDA, 0xC8], 0, REGISTER_IN_OPCODE;
+        ), "fcmovnb" => Op!(
+            "Xpfp", [0xDB, 0xC0], 0, REGISTER_IN_OPCODE;
+        ), "fcmovnbe" => Op!(
+            "Xpfp", [0xDB, 0xD0], 0, REGISTER_IN_OPCODE;
+        ), "fcmovne" => Op!(
+            "Xpfp", [0xDB, 0xC8], 0, REGISTER_IN_OPCODE;
+        ), "fcmovnu" => Op!(
+            "Xpfp", [0xDB, 0xD8], 0, REGISTER_IN_OPCODE;
+        ), "fcmovu" => Op!(
+            "Xpfp", [0xDA, 0xD8], 0, REGISTER_IN_OPCODE;
+        ), "fcom" => Op!(
+            "", [0xD8, 0xD1];
+            "fp", [0xD8, 0xD0], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 2;
+            "mq", [0xDC], 2, SIZE_OVERRIDE;
+        ), "fcomp" => Op!(
+            "", [0xD8, 0xD9];
+            "fp", [0xD8, 0xD8], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 3;
+            "mq", [0xDC], 3, SIZE_OVERRIDE;
+        ), "fcompp" => Op!(
+            "", [0xDE, 0xD9];
+        ), "fcomi" => Op!(
+            "Xpfp", [0xDB, 0xF0], 0, REGISTER_IN_OPCODE;
+        ), "fcomip" => Op!(
+            "fpXp", [0xDF, 0xF0], 0, REGISTER_IN_OPCODE;
+        ), "fcos" => Op!(
+            "", [0xD9, 0xFF];
+        ), "fdecstp" => Op!(
+            "", [0xD9, 0xF6];
+        ), "fdiv" => Op!(
+            "Xpfp", [0xD8, 0xF0], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDC, 0xF8], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 6;
+            "mq", [0xDC], 6, SIZE_OVERRIDE;
+        ), "fdivp" => Op!(
+            "", [0xDE, 0xF9];
+            "fpXp", [0xDE, 0xF8], 0, REGISTER_IN_OPCODE;
+        ), "fidiv" => Op!(
+            "mw", [0xDE], 6, SIZE_OVERRIDE;
+            "md", [0xDA], 6;
+        ), "fdivr" => Op!(
+            "Xpfp", [0xD8, 0xF8], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDC, 0xF0], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 7;
+            "mq", [0xDC], 7, SIZE_OVERRIDE;
+        ), "fdivrp" => Op!(
+            "", [0xDE, 0xF1];
+            "fpXp", [0xDE, 0xF0], 0, REGISTER_IN_OPCODE;
+        ), "fidivr" => Op!(
+            "mw", [0xDE], 7, SIZE_OVERRIDE;
+            "md", [0xDA], 7;
+        ), "ffree" => Op!(
+            "fp", [0xDD, 0xC0], 0, REGISTER_IN_OPCODE;
+        ), "ficom" => Op!(
+            "mw", [0xDE], 2, SIZE_OVERRIDE;
+            "md", [0xDA], 2;
+        ), "ficomp" => Op!(
+            "mw", [0xDE], 3, SIZE_OVERRIDE;
+            "md", [0xDA], 3;
+        ), "fild" => Op!(
+            "mw", [0xDF], 0, SIZE_OVERRIDE;
+            "md", [0xDB], 0;
+            "mq", [0xDF], 5, SIZE_OVERRIDE;
+        ), "fincstp" => Op!(
+            "", [0xD9, 0xF7];
+        ), "finit" => Op!( // this is actually ;wait ;fninit
+            "", [0x9B, 0xDB, 0xE3];
+        ), "fninit" => Op!(
+            "", [0xDB, 0xE3];
+        ), "fist" => Op!(
+            "mw", [0xDF], 2, SIZE_OVERRIDE;
+            "md", [0xDB], 2;
+            "mw", [0xDF], 3, SIZE_OVERRIDE;
+            "md", [0xDB], 3;
+            "mq", [0xDF], 7, SIZE_OVERRIDE;
+        ), "fisttp" => Op!(
+            "mw", [0xDF], 1, SIZE_OVERRIDE;
+            "md", [0xDB], 1;
+            "mq", [0xDD], 1, SIZE_OVERRIDE;
+        ), "fld" => Op!(
+            "fp", [0xD9, 0xC0], 0, REGISTER_IN_OPCODE;
+            "md", [0xD9], 0;
+            "mq", [0xDD], 0, SIZE_OVERRIDE;
+            "mp", [0xDB], 5;
+        ), "fld1" => Op!(
+            "", [0xD9, 0xE8];
+        ), "fldcw" => Op!(
+            "mw", [0xD9], 5, SIZE_OVERRIDE;
+        ), "fldenv" => Op!(
+            "m!", [0xD9], 4, SIZE_OVERRIDE;
+        ), "fldenvw" => Op!(
+            "m!", [0xD9], 4, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+        ), "fldl2e" => Op!(
+            "", [0xD9, 0xEA];
+        ), "fldl2t" => Op!(
+            "", [0xD9, 0xE9];
+        ), "fldlg2" => Op!(
+            "", [0xD9, 0xEC];
+        ), "fldln2" => Op!(
+            "", [0xD9, 0xED];
+        ), "fldpi" => Op!(
+            "", [0xD9, 0xEB];
+        ), "fldz" => Op!(
+            "", [0xD9, 0xEE];
+        ), "fmul" => Op!(
+            "Xpfp", [0xD8, 0xC8], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDC, 0xC8], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 1;
+            "mq", [0xDC], 1, SIZE_OVERRIDE;
+        ), "fmulp" => Op!(
+            "", [0xDE, 0xC9];
+            "fpXp", [0xDE, 0xC8], 0, REGISTER_IN_OPCODE;
+        ), "fimul" => Op!(
+            "mw", [0xDE], 1, SIZE_OVERRIDE;
+            "md", [0xDA], 1;
+        ), "fnop" => Op!(
+            "", [0xD9, 0xD0];
+        ), "fpatan" => Op!(
+            "", [0xD9, 0xF3];
+        ), "fprem" => Op!(
+            "", [0xD9, 0xF8];
+        ), "fprem1" => Op!(
+            "", [0xD9, 0xF5];
+        ), "fptan" => Op!(
+            "", [0xD9, 0xF2];
+        ), "frndint" => Op!(
+            "", [0xD9, 0xFC];
+        ), "frstor" => Op!(
+            "m!", [0xDD], 4, SIZE_OVERRIDE;
+        ), "frstorw" => Op!(
+            "m!", [0xDD], 4, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+        ), "fsave" => Op!( // note: this is actually ; wait; fnsavew
+            "m!", [0x9B, 0xDD], 6, SIZE_OVERRIDE;
+        ), "fsavew" => Op!( // note: this is actually ; wait; OPSIZE fnsave
+            "m!", [0x9B, 0x66, 0xDD], 6, SIZE_OVERRIDE;
+        ), "fnsave" => Op!(
+            "m!", [0xDD], 6, SIZE_OVERRIDE;
+        ), "fnsavew" => Op!(
+            "m!", [0xDD], 6, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+        ), "fscale" => Op!(
+            "", [0xD9, 0xFD];
+        ), "fsin" => Op!(
+            "", [0xD9, 0xFE];
+        ), "fsincos" => Op!(
+            "", [0xD9, 0xFB];
+        ), "fsqrt" => Op!(
+            "", [0xD9, 0xFA];
+        ), "fst" => Op!(
+            "fp", [0xDD, 0xD0], 0, REGISTER_IN_OPCODE;
+            "md", [0xD9], 2;
+            "mq", [0xDD], 2, SIZE_OVERRIDE;
+        ), "fstp" => Op!(
+            "fp", [0xDD, 0xD8], 0, REGISTER_IN_OPCODE;
+            "md", [0xD9], 3;
+            "mq", [0xDD], 3, SIZE_OVERRIDE;
+            "mp", [0xDB], 7;
+        ), "fstcw" => Op!( // note: this is actually ; wait; fnstcw
+            "mw", [0x9B, 0xD9], 7, SIZE_OVERRIDE;
+        ), "fnstcw" => Op!(
+            "mw", [0xD9], 7, SIZE_OVERRIDE;
+        ), "fstenv" => Op!( // note: this is actually ; wait; fnstenv
+            "m!", [0x9B, 0xD9], 6, SIZE_OVERRIDE;
+        ), "fstenvw" => Op!( // note: this is actually ; wait; OPSIZE fnsten
+            "m!", [0x9B, 0x66, 0xD9], 6, SIZE_OVERRIDE;
+        ), "fnstenv" => Op!(
+            "m!", [0xD9], 6, SIZE_OVERRIDE;
+        ), "fnstenvw" => Op!(
+            "m!", [0xD9], 6, SIZE_OVERRIDE | REQUIRES_OPSIZE;
+        ), "fstsw" => Op!( // note: this is actually ; wait; fnstsw
+            "Aw", [0x9B, 0xDF, 0xE0], 0, SIZE_OVERRIDE;
+            "mw", [0x9B, 0xDD], 7, SIZE_OVERRIDE;
+        ), "fnstsw" => Op!(
+            "Aw", [0xDF, 0xE0], 0, SIZE_OVERRIDE;
+            "mw", [0xDD], 7, SIZE_OVERRIDE;
+        ), "fsub" => Op!(
+            "Xpfp", [0xD8, 0xE0], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDC, 0xE8], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 4;
+            "mq", [0xDC], 4, SIZE_OVERRIDE;
+        ), "fsubp" => Op!(
+            "", [0xDE, 0xE9];
+            "fpXp", [0xDE, 0xE8], 0, REGISTER_IN_OPCODE;
+        ), "fisub" => Op!(
+            "mw", [0xDE], 4, SIZE_OVERRIDE;
+            "md", [0xDA], 4;
+        ), "fsubr" => Op!(
+            "Xpfp", [0xD8, 0xE8], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDC, 0xE0], 0, REGISTER_IN_OPCODE;
+            "md", [0xD8], 5;
+            "mq", [0xDC], 5, SIZE_OVERRIDE;
+        ), "fsubrp" => Op!(
+            "", [0xDE, 0xE1];
+            "fpXp", [0xDE, 0xE0], 0, REGISTER_IN_OPCODE;
+        ), "fisubr" => Op!(
+            "mw", [0xDE], 5, SIZE_OVERRIDE;
+            "md", [0xDA], 5;
+        ), "ftst" => Op!(
+            "", [0xD9, 0xE4];
+        ), "fucom" => Op!(
+            "", [0xDD, 0xE1];
+            "fp", [0xDD, 0xE0], 0, REGISTER_IN_OPCODE;
+        ), "fucomp" => Op!(
+            "", [0xDD, 0xE9];
+            "fp", [0xDD, 0xE8], 0, REGISTER_IN_OPCODE;
+        ), "fucompp" => Op!(
+            "", [0xDA, 0xE9];
+        ), "fucomi" => Op!(
+            "Xpfp", [0xDB, 0xE8], 0, REGISTER_IN_OPCODE;
+            "fpXp", [0xDF, 0xE8], 0, REGISTER_IN_OPCODE;
+        ), "fwait" | "wait" => Op!(
+            "", [0x9B];
+        ), "fxam" => Op!(
+            "", [0xD9, 0xE5];
+        ), "fxch" => Op!(
+            "", [0xD9, 0xC9];
+            "fp", [0xD9, 0xC8], 0, REGISTER_IN_OPCODE;
+        ), "fxrstor" => Op!(
+            "m!", [0x0F, 0xAE], 1, SIZE_OVERRIDE;
+        ), "fxsave" => Op!(
+            "m!", [0x0F, 0xAE], 0, SIZE_OVERRIDE;
+        ), "fxtract" => Op!(
+            "", [0xD9, 0xF4];
+        ), "fyl2x" => Op!(
+            "", [0xD9, 0xF1];
+        ), "fyl2xp1" => Op!(
+            "", [0xD9, 0xF9];
+        ),
+
         _ => return None
     })
 }
