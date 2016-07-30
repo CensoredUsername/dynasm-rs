@@ -690,8 +690,8 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             "Rx" => (Size::OWORD, RegFamily::XMM),
             "Ry" => (Size::HWORD, RegFamily::XMM),
             "Rs" => (Size::WORD,  RegFamily::XMM),
-            "Rc" => (Size::DWORD, RegFamily::CONTROL),
-            "RD" => (Size::DWORD, RegFamily::DEBUG),
+            "RC" => (Size::QWORD, RegFamily::CONTROL),
+            "RD" => (Size::QWORD, RegFamily::DEBUG),
             _ => return None
         };
 
