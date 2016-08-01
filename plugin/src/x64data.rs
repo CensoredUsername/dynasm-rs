@@ -56,6 +56,19 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbrb",   [0x20            ], X,             LOCK;
                     "r*v*",   [0x23            ], X, AUTO_SIZE;
                     "rbvb",   [0x22            ], X;
+] "andn"        = [ "r*r*v*", [0x02, 0xF2      ], X, AUTO_SIZE | VEX_OP; // 3 args, 2nd arg in vex
+] "bextr"       = [ "r*v*r*", [0x02, 0xF7      ], X, AUTO_SIZE | VEX_OP; // 3 args, 3rd arg in vex
+                    "r*v*i*", [0x0A, 0x10      ], X, AUTO_SIZE | XOP_OP; // 2 args
+] "blcfill"     = [ "r*v*",   [0x09, 0x01      ], 1, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blci"        = [ "r*v*",   [0x09, 0x02      ], 6, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blcic"       = [ "r*v*",   [0x09, 0x01      ], 5, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blcmsk"      = [ "r*v*",   [0x09, 0x02      ], 1, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blcs"        = [ "r*v*",   [0x09, 0x01      ], 3, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blsfill"     = [ "r*v*",   [0x09, 0x01      ], 2, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blsi"        = [ "r*v*",   [0x02, 0xF3      ], 3, AUTO_SIZE | VEX_OP; // 2 args, 1st arg in vex
+] "blsic"       = [ "r*v*",   [0x09, 0x01      ], 6, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "blsmsk"      = [ "r*v*",   [0x02, 0xF3      ], 2, AUTO_SIZE | VEX_OP; // 2 args, 1st arg in vex
+] "blsr"        = [ "r*v*",   [0x02, 0xF3      ], 1, AUTO_SIZE | VEX_OP; // 2 args, 1st arg in vex
 ] "bsf"         = [ "r*v*",   [0x0F, 0xBC      ], X, AUTO_SIZE;
 ] "bsr"         = [ "r*v*",   [0x0F, 0xBD      ], X, AUTO_SIZE;
 ] "bswap"       = [ "rd",     [0x0F, 0xC8      ], 0;
@@ -128,6 +141,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "cmpxchg8b"   = [ "mq",     [0x0F, 0xC7      ], 1,              LOCK;
 ] "cmpxchg16b"  = [ "mo",     [0x0F, 0xC7      ], 1, LARGE_SIZE | LOCK;
 ] "cpuid"       = [ "",       [0x0F, 0xA2      ], X;
+] "crc32"       = [ "rdvb",   [0x0F, 0x38, 0xF0], X,              PREF_F2; // unique size encoding scheme
+                    "rqvb",   [0x0F, 0x38, 0xF0], X, LARGE_SIZE | PREF_F2;
+                    "rdvw",   [0x0F, 0x38, 0xF1], X, SMALL_SIZE | PREF_F2;
+                    "rdvd",   [0x0F, 0x38, 0xF1], X,              PREF_F2;
+                    "rqvq",   [0x0F, 0x38, 0xF1], X, LARGE_SIZE | PREF_F2;
 ] "dec"         = [ "v*",     [0xFF            ], 1, AUTO_SIZE  | LOCK;
                     "vb",     [0xFE            ], 1, AUTO_SIZE  | LOCK;
 ] "div"         = [ "v*",     [0xF7            ], 6, AUTO_SIZE;
@@ -210,6 +228,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "lea"         = [ "r*m!",   [0x8D            ], X, AUTO_SIZE;
 ] "leave"       = [ "",       [0xC9            ], X;
 ] "lfence"      = [ "",       [0x0F, 0xAE, 0xE8], X;
+] "llwpcb"      = [ "r*",     [0x09, 0x12      ], 0, AUTO_SIZE  | XOP_OP; // 1 arg, in r/m
 ] "lodsb"       = [ "",       [0xAC            ], X;
 ] "lodsw"       = [ "",       [0xAD            ], X, SMALL_SIZE;
 ] "lodsd"       = [ "",       [0xAD            ], X;
@@ -219,7 +238,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
   "loopz"       = [ "ob",     [0xE1            ], X;
 ] "loopne"      |
   "loopnz"      = [ "ob",     [0xE0            ], X;
-] "lzcnt"       = [ "r*v*",   [0x0F, 0xBD      ], X, AUTO_SIZE | PREF_F3;
+] "lwpins"      = [ "rdvdid", [0x0A, 0x12      ], 0,              XOP_OP; // 2 args, 1st arg in vex
+                    "rqvdid", [0x0A, 0x12      ], 0, LARGE_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "lwpval"      = [ "rdvdid", [0x0A, 0x12      ], 1,              XOP_OP; // 2 args, 1st arg in vex
+                    "rqvdid", [0x0A, 0x12      ], 1, LARGE_SIZE | XOP_OP; // 2 args, 1st arg in vex
+] "lzcnt"       = [ "r*v*",   [0x0F, 0xBD      ], X, AUTO_SIZE  | PREF_F3;
 ] "mfence"      = [ "",       [0x0F, 0xAE, 0xF0], X;
 ] "mov"         = [ "v*r*",   [0x89            ], X, AUTO_SIZE;
                     "vbrb",   [0x88            ], X;
@@ -288,6 +311,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "rqvb",   [0x0F, 0xB6      ], X, LARGE_SIZE;
 ] "mul"         = [ "v*",     [0xF7            ], 4, AUTO_SIZE;
                     "vb",     [0xF6            ], 4;
+] "mulx"        = [ "r*r*v*", [0x02, 0xF6      ], X, AUTO_SIZE | VEX_OP | PREF_F2; // 3 args, 2nd arg in vex
 ] "neg"         = [ "v*",     [0xF7            ], 3, AUTO_SIZE | LOCK;
                     "vb",     [0xF6            ], 3,             LOCK;
 ] "nop"         = [ "",       [0x90            ], X;
@@ -313,6 +337,8 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "outsw"       = [ "",       [0x6F            ], X, SMALL_SIZE | REP;
 ] "outsd"       = [ "",       [0x6F            ], X,              REP;
 ] "pause"       = [ "",       [0xF3, 0x90      ], X;
+] "pdep"        = [ "r*r*v*", [0x02, 0xF5      ], X, AUTO_SIZE  | VEX_OP | PREF_F2; // 3 args, 2nd arg in vex
+] "pext"        = [ "r*r*v*", [0x02, 0xF5      ], X, AUTO_SIZE  | VEX_OP | PREF_F3; // 3 args, 2nd arg in vex
 ] "pop"         = [ "r*",     [0x58            ], X, AUTO_LARGE | SHORT_ARG;
                     "v*",     [0x8F            ], 0, AUTO_LARGE;
                     "Uw",     [0x0F, 0xA1      ], X;
@@ -358,6 +384,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbBb",   [0xD2            ], 1;
                     "v*ib",   [0xC1            ], 1, AUTO_SIZE;
                     "vbib",   [0xC0            ], 1;
+] "rorx"        = [ "r*v*ib", [0x03, 0xF0      ], X, AUTO_SIZE  | VEX_OP | PREF_F2; // 2 args, none in vex
 ] "sahf"        = [ "",       [0x9E            ], X;
 ] "sal"         |
   "shl"         = [ "v*Bb",   [0xD3            ], 4, AUTO_SIZE;
@@ -368,6 +395,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbBb",   [0xD2            ], 7;
                     "v*ib",   [0xC1            ], 7, AUTO_SIZE;
                     "vbib",   [0xC0            ], 7;
+] "sarx"        = [ "r*v*r*", [0x02, 0xF7      ], X, AUTO_SIZE  | VEX_OP | PREF_F3; // 3 args, 3rd arg in vex
 ] "sbb"         = [ "A*i*",   [0x1D            ], X, AUTO_SIZE;
                     "Abib",   [0x1C            ], X;
                     "v*i*",   [0x81            ], 3, AUTO_SIZE  | LOCK;
@@ -414,12 +442,15 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "sfence"      = [ "",       [0x0F, 0xAE, 0xF8], X;
 ] "shld"        = [ "v*r*Bb", [0x0F, 0xA5      ], X, AUTO_SIZE;
                     "v*r*ib", [0x0F, 0xA4      ], X, AUTO_SIZE;
+] "shlx"        = [ "r*v*r*", [0x02, 0xF7      ], X, AUTO_SIZE  | VEX_OP | PREF_66; // 3 args, 3rd arg in vex
 ] "shr"         = [ "v*Bb",   [0xD3            ], 5, AUTO_SIZE;
                     "vbBb",   [0xD2            ], 5;
                     "v*ib",   [0xC1            ], 5, AUTO_SIZE;
                     "vbib",   [0xC0            ], 5;
 ] "shrd"        = [ "v*r*Bb", [0x0F, 0xAD      ], X, AUTO_SIZE;
                     "v*r*ib", [0x0F, 0xAC      ], X, AUTO_SIZE;
+] "shrx"        = [ "r*v*r*", [0x02, 0xF7      ], X, AUTO_SIZE  | VEX_OP | PREF_F2; // 3 args, 3rd arg in vex
+] "slwpcb"      = [ "r*",     [0x09, 0x12      ], 1, AUTO_SIZE  | XOP_OP; // 1 arg, not in vex
 ] "stc"         = [ "",       [0xF9            ], X;
 ] "std"         = [ "",       [0xFD            ], X;
 ] "stosb"       = [ "",       [0xAA            ], X,              REP;
@@ -435,6 +466,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbrb",   [0x28            ], X,              LOCK;
                     "r*v*",   [0x2B            ], X, AUTO_SIZE;
                     "rbvb",   [0x2A            ], X;
+] "t1mskc"      = [ "r*v*",   [0x09, 0x01      ], 7, AUTO_SIZE | XOP_OP; // 2 args, 1st arg in vex
 ] "test"        = [ "A*i*",   [0xA9            ], X, AUTO_SIZE;
                     "Abib",   [0xA8            ], X;
                     "v*i*",   [0xF7            ], 0, AUTO_SIZE;
@@ -442,6 +474,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "v*r*",   [0x85            ], X, AUTO_SIZE;
                     "vbrb",   [0x84            ], X;
 ] "tzcnt"       = [ "r*v*",   [0x0F, 0xBC      ], X, AUTO_SIZE  | PREF_F3;
+] "tzmsk"       = [ "r*v*",   [0x09, 0x01      ], 4, AUTO_SIZE  | XOP_OP; // 2 args, 1st arg in vex
 ] "wrfsbase"    = [ "rd",     [0x0F, 0xAE      ], 2,              PREF_F3;
                     "rq",     [0x0F, 0xAE      ], 2, LARGE_SIZE | PREF_F3;
 ] "wrgsbase"    = [ "rd",     [0x0F, 0xAE      ], 3,              PREF_F3;
@@ -685,21 +718,91 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "fyl2x"       = [ "",       [0xD9, 0xF1      ], X;
 ] "fyl2xp1"     = [ "",       [0xD9, 0xF9      ], X;
 ]
-// MMX instruction (also vol. 5)
-        /*
-  "cvtpd2pi"    = [ "xqwo",   [0x0F, 0x2D      ], 0, PREF_66;
-] "cvtpi2pd"    = [ "youq",   [0x0F, 0x2A      ], 0, PREF_66;
-] "cvtpi2ps"    = [ "youq",   [0x0F, 0x2A      ], 0;
-] "cvtps2pi"    = [ "xqwo",   [0x0F, 0x2D      ], 0;
-] "cvttpd2pi"   = [ "xqwo",   [0x0F, 0x2C      ], 0, PREF_66;
-] "cvttps2pi"   = [ "xqyo",   [0x0F, 0x2C      ], 0, DEST_IN_REG;
-                    "xqmq",   [0x0F, 0x2C      ], 0;
-] "emms"        = [ "",       [0x0F, 0x77      ], 0;
-] "maskmovq"
-
-        "movdq2q" => Op!(
-                    "xqyo",   [0x0F, 0xD6      ], 0, PREF_F3NE | ) // operand order?
-        */
+// MMX instruction (also vol. 5) (note that 3DNow! instructions aren't supported)
+        
+  "cvtpd2pi"    = [ "xqwo",   [0x0F, 0x2D      ], X, PREF_66;
+] "cvtpi2pd"    = [ "youq",   [0x0F, 0x2A      ], X, PREF_66;
+] "cvtpi2ps"    = [ "youq",   [0x0F, 0x2A      ], X;
+] "cvtps2pi"    = [ "xqwo",   [0x0F, 0x2D      ], X;
+] "cvttpd2pi"   = [ "xqwo",   [0x0F, 0x2C      ], X, PREF_66;
+] "cvttps2pi"   = [ "xqyo",   [0x0F, 0x2C      ], X, DEST_IN_REG;
+                    "xqmq",   [0x0F, 0x2C      ], X;
+] "emms"        = [ "",       [0x0F, 0x77      ], X;
+] "maskmovq"    = [ "xqxq",   [0x0F, 0xF7      ], X, DEST_IN_REG;
+] "movdq2q"     = [ "xqyo",   [0x0F, 0xD6      ], X, DEST_IN_REG | PREF_F2;
+] "movntq"      = [ "mqxq",   [0x0F, 0xE7      ], X;
+] "movq"        = [ "xquq",   [0x0F, 0x6F      ], X;
+                    "uqxq",   [0x0F, 0x7F      ], X;
+] "movq2dq"     = [ "yoxq",   [0x0F, 0xD6      ], X, DEST_IN_REG | PREF_F3;
+] "packssdw"    = [ "xquq",   [0x0F, 0x6B      ], X;
+] "packsswb"    = [ "xquq",   [0x0F, 0x63      ], X;
+] "packuswb"    = [ "xquq",   [0x0F, 0x67      ], X;
+] "paddb"       = [ "xquq",   [0x0F, 0xFC      ], X;
+] "paddd"       = [ "xquq",   [0x0F, 0xFE      ], X;
+] "paddq"       = [ "xquq",   [0x0F, 0xD4      ], X;
+] "paddsb"      = [ "xquq",   [0x0F, 0xEC      ], X;
+] "paddsw"      = [ "xquq",   [0x0F, 0xED      ], X;
+] "paddusb"     = [ "xquq",   [0x0F, 0xDC      ], X;
+] "paddusw"     = [ "xquq",   [0x0F, 0xDD      ], X;
+] "paddw"       = [ "xquq",   [0x0F, 0xFD      ], X;
+] "pand"        = [ "xquq",   [0x0F, 0xDB      ], X;
+] "pandn"       = [ "xquq",   [0x0F, 0xDF      ], X;
+] "pavgb"       = [ "xquq",   [0x0F, 0xE0      ], X;
+] "pavgw"       = [ "xquq",   [0x0F, 0xE3      ], X;
+] "pcmpeqb"     = [ "xquq",   [0x0F, 0x74      ], X;
+] "pcmpeqd"     = [ "xquq",   [0x0F, 0x76      ], X;
+] "pcmpeqw"     = [ "xquq",   [0x0F, 0x75      ], X;
+] "pcmpgtb"     = [ "xquq",   [0x0F, 0x64      ], X;
+] "pcmpgtd"     = [ "xquq",   [0x0F, 0x66      ], X;
+] "pcmpgtw"     = [ "xquq",   [0x0F, 0x65      ], X;
+] "pextrw"      = [ "rdxqib", [0x0F, 0xC5      ], X, DEST_IN_REG;
+] "pinsrw"      = [ "xqrdib", [0x0F, 0xC4      ], X, DEST_IN_REG;
+                    "xqmwib", [0x0F, 0xC4      ], X;
+] "pmaddwd"     = [ "xquq",   [0x0F, 0xF5      ], X;
+] "pmaxsw"      = [ "xquq",   [0x0F, 0xEE      ], X;
+] "pmaxub"      = [ "xquq",   [0x0F, 0xDE      ], X;
+] "pminsw"      = [ "xquq",   [0x0F, 0xEA      ], X;
+] "pminub"      = [ "xquq",   [0x0F, 0xDA      ], X;
+] "pmovmskb"    = [ "rdxq",   [0x0F, 0xD7      ], X, DEST_IN_REG;
+] "pmulhuw"     = [ "xquq",   [0x0F, 0xE4      ], X;
+] "pmulhw"      = [ "xquq",   [0x0F, 0xE5      ], X;
+] "pmullw"      = [ "xquq",   [0x0F, 0xD5      ], X;
+] "pmuludq"     = [ "xquq",   [0x0F, 0xF4      ], X;
+] "por"         = [ "xquq",   [0x0F, 0xEB      ], X;
+] "psadbw"      = [ "xquq",   [0x0F, 0xF6      ], X;
+] "pshufw"      = [ "xquqib", [0x0F, 0x70      ], X;
+] "pslld"       = [ "xquq",   [0x0F, 0xF2      ], X;
+                    "xqib",   [0x0F, 0x72      ], 6;
+] "psllq"       = [ "xquq",   [0x0F, 0xF3      ], X;
+                    "xqib",   [0x0F, 0x73      ], 6;
+] "psllw"       = [ "xquq",   [0x0F, 0xF1      ], X;
+                    "xqib",   [0x0F, 0x71      ], 6;
+] "psrad"       = [ "xquq",   [0x0F, 0xE2      ], X;
+                    "xqib",   [0x0F, 0x72      ], 4;
+] "psraw"       = [ "xquq",   [0x0F, 0xE1      ], X;
+                    "xqib",   [0x0F, 0x71      ], 4;
+] "psrld"       = [ "xquq",   [0x0F, 0xD2      ], X;
+                    "xqib",   [0x0F, 0x72      ], 2;
+] "psrlq"       = [ "xquq",   [0x0F, 0xD3      ], X;
+                    "xqib",   [0x0F, 0x73      ], 2;
+] "psrlw"       = [ "xquq",   [0x0F, 0xD1      ], X;
+                    "xqib",   [0x0F, 0x71      ], 2;
+] "psubb"       = [ "xquq",   [0x0F, 0xF8      ], X;
+] "psubd"       = [ "xquq",   [0x0F, 0xFA      ], X;
+] "psubq"       = [ "xquq",   [0x0F, 0xDB      ], X;
+] "psubsb"      = [ "xquq",   [0x0F, 0xE8      ], X;
+] "psubsw"      = [ "xquq",   [0x0F, 0xE9      ], X;
+] "psubusb"     = [ "xquq",   [0x0F, 0xD8      ], X;
+] "psubusw"     = [ "xquq",   [0x0F, 0xD9      ], X;
+] "psubw"       = [ "xquq",   [0x0F, 0xF9      ], X;
+] "punpckhbw"   = [ "xquq",   [0x0F, 0x68      ], X;
+] "punpckhdq"   = [ "xquq",   [0x0F, 0x6A      ], X;
+] "punpckhwd"   = [ "xquq",   [0x0F, 0x69      ], X;
+] "punpcklbw"   = [ "xquq",   [0x0F, 0x60      ], X;
+] "punpckldq"   = [ "xquq",   [0x0F, 0x62      ], X;
+] "punpcklwd"   = [ "xquq",   [0x0F, 0x61      ], X;
+] "pxor"        = [ "xquq",   [0x0F, 0xEF      ], X;
+]
 
 // AVX instructions (vol. 4)
     }))
