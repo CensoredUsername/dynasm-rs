@@ -65,7 +65,7 @@ fn main() {
         // really long instructions
         ; fs imul r9w, [r10d*8 + r11d + 0x66778899], 0x1122
         ; fs imul r9,  [edi*8 + r11d + 0x66778899], 0x11223344
-        ; fs mov r9, QWORD 0x1122334455667788 // I'm actually not sure if it's valid to use extended registers with instructions that encode the register in the opcode byte
+        ; fs mov r9, QWORD 0x1122334455667788
         ; fs movabs rax, 0x1122334455667788
         // funky syntax features
         ; inc BYTE [rax]
@@ -99,7 +99,6 @@ fn main() {
         ; movmskps eax, xmm7
         ; movd mmx7, eax
         ; movd eax, mmx7
-
     );
 
     let index = ops.offset();
