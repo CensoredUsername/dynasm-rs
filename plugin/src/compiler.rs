@@ -47,19 +47,26 @@ pub mod flags {
     pub const SHORT_ARG: u16 =   0x0004; // a register argument is encoded in the last byte of the opcode
     pub const DEST_IN_REG: u16 = 0x0008; // destination operand should be encoded as the modrm.reg operand
 
-    pub const AUTO_SIZE: u16 =   0x0010; // automatically derive the necessity of an operand size prefix / REX.W / VEX.~W / XOP.~W
-    pub const SMALL_SIZE: u16 =  0x0020; // implies that this instruction operates on a smaller operand size than default default
-    pub const LARGE_SIZE: u16 =  0x0040; // implies that this instruction operates on a larger operand size than the default
-    pub const AUTO_LARGE: u16 =  0x0080; // same as AUTO_SIZE, but the instruction is 64 bit by default.
+    // note: the first 4 in this block are mutually exclusive
+    pub const AUTO_SIZE: u16 =   0x0010; // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+    pub const AUTO_NO32: u16 =   0x0020; // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
+    pub const AUTO_REXW: u16 =   0x0040; // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+    pub const AUTO_VEXL: u16 =   0x0080; // 128bit -> None   , 256bit -> VEX.L
+    pub const SMALL_SIZE: u16 =  0x0100; // implies opsize prefix
+    pub const LARGE_SIZE: u16 =  0x0200; // implies REX.W/VEX.W/XOP.W
 
     pub const PREF_66: u16 =     SMALL_SIZE; // mandatory prefix (same as SMALL_SIZE)
-    pub const PREF_67: u16 =     0x0100; // mandatory prefix (same as SMALL_ADDRESS)
-    pub const PREF_F0: u16 =     0x0200; // mandatory prefix (same as LOCK)
-    pub const PREF_F2: u16 =     0x0400; // mandatory prefix (REPNE)
-    pub const PREF_F3: u16 =     0x0800; // mandatory prefix (REP)
+    pub const PREF_67: u16 =     0x0400; // mandatory prefix (same as SMALL_ADDRESS)
+    pub const PREF_F0: u16 =     0x0800; // mandatory prefix (same as LOCK)
+    pub const PREF_F2: u16 =     0x1000; // mandatory prefix (REPNE)
+    pub const PREF_F3: u16 =     0x2000; // mandatory prefix (REP)
 
-    pub const LOCK: u16 =        0x1000; // user lock prefix is valid with this instruction
-    pub const REP: u16 =         0x2000; // user rep prefix is valid with this instruction
+    pub const LOCK: u16 =        0x4000; // user lock prefix is valid with this instruction
+    pub const REP: u16 =         0x8000; // user rep prefix is valid with this instruction
+
+    pub const LARGE_VEC: u16 = 0xFFFF;
+    pub const FOURTH_ARG: u16 = 0xFFFF;
+
 }
 
 pub struct Opdata {
@@ -199,11 +206,11 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
     let mut rex_w = false;
 
     // determine if size prefixes are necessary
-    if (data.flags & (flags::AUTO_SIZE | flags::AUTO_LARGE)) != 0 {
+    if (data.flags & (flags::AUTO_SIZE | flags::AUTO_NO32)) != 0 {
         // determine operand size
         op_size = try!(get_operand_size(data, &args));
         // correct for ops which are by default 64 bit in long mode
-        if (data.flags & flags::AUTO_LARGE) != 0 {
+        if (data.flags & flags::AUTO_NO32) != 0 {
             if op_size == Size::DWORD {
                 return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", &*op.node.name.as_str())));
             } else if op_size == Size::QWORD {
@@ -489,6 +496,8 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
     // o : instruction offset
 
     // m : memory
+    // k : vsib addressing, 32 bit result, size determines xmm or ymm
+    // l : vsib addressing, 64 bit result, size determines xmm or ymm
 
     // r : legacy reg
     // f : fp reg
@@ -509,6 +518,7 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
     // b, w, d, q match a byte, word, doubleword and quadword.
     // * matches all possible sizes for this operand (w/d for i/o, w/d/q for r/v, o/h for y/w and everything for m)
     // ! matches a lack of size, only useful in combination of m and i
+    // ? matches any size and doesn't participate in the operand size calculation
     {
         let mut fmt = fmtstr.chars();
         let mut args = args.iter();
@@ -591,6 +601,7 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
                     ('*', 'v') => size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
                     ('*', 'm') => true,
                     ('*', _)   => panic!("Invalid size wildcard"),
+                    ('?', _)   => true,
                     ('!', _)   => false,
                     _ => panic!("invalid format string '{}'", fmtstr)
                 } {
