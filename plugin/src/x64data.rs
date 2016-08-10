@@ -1,33 +1,100 @@
+use std::collections::HashMap;
+
 use compiler::Opdata;
-use compiler::flags::*;
+
 
 macro_rules! constify {
     ($t:ty, $e:expr) => { {const C: &'static $t = &$e; C} }
 }
 
 macro_rules! OpInner {
-    ($fmt:expr, $ops:expr, $reg:expr)          => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags:  0}  };
-    ($fmt:expr, $ops:expr, $reg:expr, $f:expr) => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: $f}  };
+    ($fmt:expr, $ops:expr, $reg:expr)          => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag( 0) }  };
+    ($fmt:expr, $ops:expr, $reg:expr, $f:expr) => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag($f) }  };
 }
 
 macro_rules! Ops {
-    ($search:expr, $notfound:expr, {
-        $( $name:pat $(| $more:pat)* = [ $( $( $e:expr ),+ ; )+ ] )*
-    } ) => { match $search {
-        $( $name $(| $more)* => {const C: &'static [Opdata] = &[$( OpInner!($( $e ),*) ,)+]; C}, )+
-        _ => $notfound
-    } };
+    ( $bind:ident; $( $name:tt $(| $more:tt)* = [ $( $( $e:expr ),+ ; )+ ] )* ) => { 
+        lazy_static! {
+            static ref $bind: HashMap<&'static str, &'static [Opdata]> = {
+                let mut map = HashMap::new();
+                const X: u8 = 0xFF;
+                $({
+                    const DATA: &'static [Opdata] = &[$( OpInner!($( $e ),*) ,)+];
+                    map.insert($name, DATA);
+                    $(
+                        map.insert($more, DATA);
+                    )*
+                })+
+                map
+            };
+        }
+    };
 }
 
 pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
-    // note: currently only listing instructions that are usable in long mode, with 64-bit addrs, no VEX/XOP prefixes or segment overrides, without requiring privileges, that are not an extension
-    // this helps preserve my sanity for now
+    return OPMAP.get(&name).map(|x| *x);
+}
+#[macro_use]
+pub mod flags {
+    bitflags! {
+        pub flags Flags: u32 {
+            const VEX_OP    = 0x0000_0001, // this instruction requires a VEX prefix to be encoded
+            const XOP_OP    = 0x0000_0002, // this instruction requires a XOP prefix to be encoded
 
-    // marking for when the reg replacement isn't used
-    const X: u8 = 0xFF;
+            // note: the first 4 in this block are mutually exclusive
+            const AUTO_SIZE = 0x0000_0008, // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+            const AUTO_NO32 = 0x0000_0010, // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
+            const AUTO_REXW = 0x0000_0020, // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+            const AUTO_VEXL = 0x0000_0040, // 128bit -> None   , 256bit -> VEX.L
+            const WORD_SIZE = 0x0000_0080, // implies opsize prefix
+            const WITH_REXW = 0x0000_0100, // implies REX.W/VEX.W/XOP.W
+            const WITH_VEXL = 0x0000_0200, // implies VEX.L/XOP.L
 
-    // I blame intel for the following match
-    Some(Ops!(name, return None, {
+            const PREF_66   = WORD_SIZE.bits,// mandatory prefix (same as WORD_SIZE)
+            const PREF_67   = 0x0000_0400, // mandatory prefix (same as SMALL_ADDRESS)
+            const PREF_F0   = 0x0000_0800, // mandatory prefix (same as LOCK)
+            const PREF_F2   = 0x0000_1000, // mandatory prefix (REPNE)
+            const PREF_F3   = 0x0000_2000, // mandatory prefix (REP)
+
+            const LOCK      = 0x0000_4000, // user lock prefix is valid with this instruction
+            const REP       = 0x0000_8000, // user rep prefix is valid with this instruction
+
+            const SHORT_ARG = 0x0000_0004, // a register argument is encoded in the last byte of the opcode
+            const ENC_MR    = 0x0001_0000, //  select alternate arg encoding
+            const ENC_VM    = 0x0002_0000, //  select alternate arg encoding
+        }
+    }
+    // workaround until bitflags can be used in const
+    pub const fn flag_bits(flag: Flags) -> u32 {
+        flag.bits
+    }
+    pub const fn make_flag(bits: u32) -> Flags {
+        Flags {bits: bits}
+    }
+}
+
+// workaround until bitflags can be used in const
+const VEX_OP   : u32 = flags::flag_bits(flags::VEX_OP);
+const XOP_OP   : u32 = flags::flag_bits(flags::XOP_OP);
+const SHORT_ARG: u32 = flags::flag_bits(flags::SHORT_ARG);
+const AUTO_SIZE: u32 = flags::flag_bits(flags::AUTO_SIZE);
+const AUTO_NO32: u32 = flags::flag_bits(flags::AUTO_NO32);
+const AUTO_REXW: u32 = flags::flag_bits(flags::AUTO_REXW);
+const AUTO_VEXL: u32 = flags::flag_bits(flags::AUTO_VEXL);
+const WORD_SIZE: u32 = flags::flag_bits(flags::WORD_SIZE);
+const WITH_REXW: u32 = flags::flag_bits(flags::WITH_REXW);
+const WITH_VEXL: u32 = flags::flag_bits(flags::WITH_VEXL);
+const PREF_66  : u32 = flags::flag_bits(flags::PREF_66);
+const PREF_67  : u32 = flags::flag_bits(flags::PREF_67);
+const PREF_F0  : u32 = flags::flag_bits(flags::PREF_F0);
+const PREF_F2  : u32 = flags::flag_bits(flags::PREF_F2);
+const PREF_F3  : u32 = flags::flag_bits(flags::PREF_F3);
+const LOCK     : u32 = flags::flag_bits(flags::LOCK);
+const REP      : u32 = flags::flag_bits(flags::REP);
+const ENC_MR   : u32 = flags::flag_bits(flags::ENC_MR);
+const ENC_VM   : u32 = flags::flag_bits(flags::ENC_VM);
+
+Ops!(OPMAP;
 // general purpose instructions according to AMD's AMD64 Arch Programmer's Manual Vol. 3
   "adc"         = [ "A*i*",     [0x15            ], X, AUTO_SIZE;
                     "Abib",     [0x14            ], X;
@@ -56,19 +123,19 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbrb",     [0x20            ], X,             LOCK;
                     "r*v*",     [0x23            ], X, AUTO_SIZE;
                     "rbvb",     [0x22            ], X;
-] "andn"        = [ "r*r*v*",   [   2, 0xF2      ], X, AUTO_REXW | VEX_OP; // 3 args, 2nd arg in vex
-] "bextr"       = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW | VEX_OP; // 3 args, 3rd arg in vex
-                    "r*v*i*",   [  10, 0x10      ], X, AUTO_REXW | XOP_OP; // 2 args
-] "blcfill"     = [ "r*v*",     [   9, 0x01      ], 1, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blci"        = [ "r*v*",     [   9, 0x02      ], 6, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blcic"       = [ "r*v*",     [   9, 0x01      ], 5, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blcmsk"      = [ "r*v*",     [   9, 0x02      ], 1, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blcs"        = [ "r*v*",     [   9, 0x01      ], 3, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blsfill"     = [ "r*v*",     [   9, 0x01      ], 2, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blsi"        = [ "r*v*",     [   2, 0xF3      ], 3, AUTO_REXW | VEX_OP; // 2 args, 1st arg in vex
-] "blsic"       = [ "r*v*",     [   9, 0x01      ], 6, AUTO_REXW | XOP_OP; // 2 args, 1st arg in vex
-] "blsmsk"      = [ "r*v*",     [   2, 0xF3      ], 2, AUTO_REXW | VEX_OP; // 2 args, 1st arg in vex
-] "blsr"        = [ "r*v*",     [   2, 0xF3      ], 1, AUTO_REXW | VEX_OP; // 2 args, 1st arg in vex
+] "andn"        = [ "r*r*v*",   [   2, 0xF2      ], X, AUTO_REXW | VEX_OP;
+] "bextr"       = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW | VEX_OP;
+                    "r*v*id",   [  10, 0x10      ], X, AUTO_REXW | XOP_OP;
+] "blcfill"     = [ "r*v*",     [   9, 0x01      ], 1, AUTO_REXW | XOP_OP | ENC_VM;
+] "blci"        = [ "r*v*",     [   9, 0x02      ], 6, AUTO_REXW | XOP_OP | ENC_VM;
+] "blcic"       = [ "r*v*",     [   9, 0x01      ], 5, AUTO_REXW | XOP_OP | ENC_VM;
+] "blcmsk"      = [ "r*v*",     [   9, 0x02      ], 1, AUTO_REXW | XOP_OP | ENC_VM;
+] "blcs"        = [ "r*v*",     [   9, 0x01      ], 3, AUTO_REXW | XOP_OP | ENC_VM;
+] "blsfill"     = [ "r*v*",     [   9, 0x01      ], 2, AUTO_REXW | XOP_OP | ENC_VM;
+] "blsi"        = [ "r*v*",     [   2, 0xF3      ], 3, AUTO_REXW | VEX_OP | ENC_VM;
+] "blsic"       = [ "r*v*",     [   9, 0x01      ], 6, AUTO_REXW | XOP_OP | ENC_VM;
+] "blsmsk"      = [ "r*v*",     [   2, 0xF3      ], 2, AUTO_REXW | VEX_OP | ENC_VM;
+] "blsr"        = [ "r*v*",     [   2, 0xF3      ], 1, AUTO_REXW | VEX_OP | ENC_VM;
 ] "bsf"         = [ "r*v*",     [0x0F, 0xBC      ], X, AUTO_SIZE;
 ] "bsr"         = [ "r*v*",     [0x0F, 0xBD      ], X, AUTO_SIZE;
 ] "bswap"       = [ "r*",       [0x0F, 0xC8      ], 0, AUTO_REXW;
@@ -80,14 +147,15 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "v*ib",     [0x0F, 0xBA      ], 6, AUTO_SIZE | LOCK;
 ] "bts"         = [ "v*r*",     [0x0F, 0xAB      ], X, AUTO_SIZE | LOCK;
                     "v*ib",     [0x0F, 0xBA      ], 5, AUTO_SIZE | LOCK;
+] "bzhi"        = [ "r*v*r*",   [   2, 0xF5      ], X, AUTO_REXW | VEX_OP;
 ] "call"        = [ "o*",       [0xE8            ], X, AUTO_SIZE;
                     "r*",       [0xFF            ], 2, AUTO_SIZE;
-] "cbw"         = [ "",         [0x98            ], X, SMALL_SIZE;
+] "cbw"         = [ "",         [0x98            ], X, WORD_SIZE;
 ] "cwde"        = [ "",         [0x98            ], X;
-] "cdqe"        = [ "",         [0x98            ], X, LARGE_SIZE;
-] "cwd"         = [ "",         [0x99            ], X, SMALL_SIZE;
+] "cdqe"        = [ "",         [0x98            ], X, WITH_REXW;
+] "cwd"         = [ "",         [0x99            ], X, WORD_SIZE;
 ] "cdq"         = [ "",         [0x99            ], X;
-] "cqo"         = [ "",         [0x99            ], X, LARGE_SIZE;
+] "cqo"         = [ "",         [0x99            ], X, WITH_REXW;
 ] "clc"         = [ "",         [0xF8            ], X;
 ] "cld"         = [ "",         [0xFC            ], X;
 ] "clflush"     = [ "mb",       [0x0F, 0xAE      ], 7;
@@ -131,21 +199,21 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbrb",     [0x38            ], X;
                     "r*v*",     [0x3B            ], X, AUTO_SIZE;
                     "rbvb",     [0x3A            ], X;
-] "cmpsb"       = [ "",         [0xA6            ], X,              REP;
-] "cmpsw"       = [ "",         [0xA7            ], X, SMALL_SIZE | REP;
-] "cmpsd"       = [ "",         [0xA7            ], X,              REP;
+] "cmpsb"       = [ "",         [0xA6            ], X,             REP;
+] "cmpsw"       = [ "",         [0xA7            ], X, WORD_SIZE | REP;
+] "cmpsd"       = [ "",         [0xA7            ], X,             REP;
                     "yowoib",   [0x0F, 0xC2      ], X, PREF_F2;
-] "cmpsq"       = [ "",         [0xA7            ], X, LARGE_SIZE | REP;
-] "cmpxchg"     = [ "v*r*",     [0x0F, 0xB1      ], X, AUTO_SIZE  | LOCK;
-                    "vbrb",     [0x0F, 0xB0      ], X,              LOCK;
-] "cmpxchg8b"   = [ "mq",       [0x0F, 0xC7      ], 1,              LOCK;
-] "cmpxchg16b"  = [ "mo",       [0x0F, 0xC7      ], 1, LARGE_SIZE | LOCK;
+] "cmpsq"       = [ "",         [0xA7            ], X, WITH_REXW | REP;
+] "cmpxchg"     = [ "v*r*",     [0x0F, 0xB1      ], X, AUTO_SIZE | LOCK;
+                    "vbrb",     [0x0F, 0xB0      ], X,             LOCK;
+] "cmpxchg8b"   = [ "mq",       [0x0F, 0xC7      ], 1,             LOCK;
+] "cmpxchg16b"  = [ "mo",       [0x0F, 0xC7      ], 1, WITH_REXW | LOCK;
 ] "cpuid"       = [ "",         [0x0F, 0xA2      ], X;
-] "crc32"       = [ "r*vb",     [0x0F, 0x38, 0xF0], X, AUTO_REXW  | PREF_F2; // unique size encoding scheme
-                    "rdvw",     [0x0F, 0x38, 0xF1], X, SMALL_SIZE | PREF_F2; // also odd default
-                    "r*v*",     [0x0F, 0x38, 0xF1], X, AUTO_REXW  | PREF_F2;
-] "dec"         = [ "v*",       [0xFF            ], 1, AUTO_SIZE  | LOCK;
-                    "vb",       [0xFE            ], 1,              LOCK;
+] "crc32"       = [ "r*vb",     [0x0F, 0x38, 0xF0], X, AUTO_REXW | PREF_F2; // unique size encoding scheme
+                    "rdvw",     [0x0F, 0x38, 0xF1], X, WORD_SIZE | PREF_F2; // also odd default
+                    "r*v*",     [0x0F, 0x38, 0xF1], X, AUTO_REXW | PREF_F2;
+] "dec"         = [ "v*",       [0xFF            ], 1, AUTO_SIZE | LOCK;
+                    "vb",       [0xFE            ], 1,             LOCK;
 ] "div"         = [ "v*",       [0xF7            ], 6, AUTO_SIZE;
                     "vb",       [0xF6            ], 6;
 ] "enter"       = [ "iwib",     [0xC8            ], X;
@@ -157,15 +225,15 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "r*v*i*",   [0x69            ], X, AUTO_SIZE;
                     "r*v*ib",   [0x68            ], X, AUTO_SIZE;
 ] "in"          = [ "Abib",     [0xE4            ], X;
-                    "Awib",     [0xE5            ], X, SMALL_SIZE;
+                    "Awib",     [0xE5            ], X, WORD_SIZE;
                     "Adib",     [0xE5            ], X;
                     "AbCw",     [0xEC            ], X;
-                    "AwCw",     [0xED            ], X, SMALL_SIZE;
+                    "AwCw",     [0xED            ], X, WORD_SIZE;
                     "AdCw",     [0xED            ], X;
 ] "inc"         = [ "v*",       [0xFF            ], 0, AUTO_SIZE | LOCK;
                     "vb",       [0xFE            ], 0,             LOCK;
 ] "insb"        = [ "",         [0x6C            ], X;
-] "insw"        = [ "",         [0x6D            ], X, SMALL_SIZE;
+] "insw"        = [ "",         [0x6D            ], X, WORD_SIZE;
 ] "insd"        = [ "",         [0x6D            ], X;
 ] "int"         = [ "ib",       [0xCD            ], X;
 ] "jo"          = [ "o*",       [0x0F, 0x80      ], X, AUTO_SIZE;
@@ -226,19 +294,19 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "lea"         = [ "r*m!",     [0x8D            ], X, AUTO_SIZE;
 ] "leave"       = [ "",         [0xC9            ], X;
 ] "lfence"      = [ "",         [0x0F, 0xAE, 0xE8], X;
-] "llwpcb"      = [ "r*",       [   9, 0x12      ], 0, AUTO_REXW | XOP_OP; // 1 arg, in r/m
+] "llwpcb"      = [ "r*",       [   9, 0x12      ], 0, AUTO_REXW | XOP_OP;
 ] "lodsb"       = [ "",         [0xAC            ], X;
-] "lodsw"       = [ "",         [0xAD            ], X, SMALL_SIZE;
+] "lodsw"       = [ "",         [0xAD            ], X, WORD_SIZE;
 ] "lodsd"       = [ "",         [0xAD            ], X;
-] "lodsq"       = [ "",         [0xAD            ], X, LARGE_SIZE;
+] "lodsq"       = [ "",         [0xAD            ], X, WITH_REXW;
 ] "loop"        = [ "ob",       [0xE2            ], X;
 ] "loope"       |
   "loopz"       = [ "ob",       [0xE1            ], X;
 ] "loopne"      |
   "loopnz"      = [ "ob",       [0xE0            ], X;
-] "lwpins"      = [ "r*vdid",   [  10, 0x12      ], 0, AUTO_REXW  | XOP_OP; // 2 args, 1st arg in vex
-] "lwpval"      = [ "r*vdid",   [  10, 0x12      ], 1, AUTO_REXW  | XOP_OP; // 2 args, 1st arg in vex
-] "lzcnt"       = [ "r*v*",     [0x0F, 0xBD      ], X, AUTO_SIZE  | PREF_F3;
+] "lwpins"      = [ "r*vdid",   [  10, 0x12      ], 0, AUTO_REXW | XOP_OP | ENC_VM;
+] "lwpval"      = [ "r*vdid",   [  10, 0x12      ], 1, AUTO_REXW | XOP_OP | ENC_VM;
+] "lzcnt"       = [ "r*v*",     [0x0F, 0xBD      ], X, AUTO_SIZE | PREF_F3;
 ] "mfence"      = [ "",         [0x0F, 0xAE, 0xF0], X;
 ] "mov"         = [ "v*r*",     [0x89            ], X, AUTO_SIZE;
                     "vbrb",     [0x88            ], X;
@@ -248,11 +316,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "mwsw",     [0x8C            ], X;
                     "swmw",     [0x8C            ], X;
                     "swrw",     [0x8C            ], X;
-                    "rbib",     [0xB0            ], X,              SHORT_ARG;
-                    "rwiw",     [0xB8            ], X, SMALL_SIZE | SHORT_ARG;
-                    "rdid",     [0xB8            ], X,              SHORT_ARG;
+                    "rbib",     [0xB0            ], X,             SHORT_ARG;
+                    "rwiw",     [0xB8            ], X, WORD_SIZE | SHORT_ARG;
+                    "rdid",     [0xB8            ], X,             SHORT_ARG;
                     "v*i*",     [0xC7            ], 0, AUTO_SIZE;
-                    "rqiq",     [0xB8            ], X, LARGE_SIZE | SHORT_ARG;
+                    "rqiq",     [0xB8            ], X, WITH_REXW | SHORT_ARG;
                     "vbib",     [0xC6            ], 0;
                     "cdrd",     [0x0F, 0x22      ], X; // can only match in 32 bit mode due to "cd"
                     "cqrq",     [0x0F, 0x22      ], X; // doesn't need a prefix to be encoded, as it's 64 bit natural in 64 bit mode
@@ -267,37 +335,37 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "rddd",     [0x0F, 0x21      ], X;
                     "rqdq",     [0x0F, 0x21      ], X;
 ] "movabs"      = [ "Abib",     [0xA0            ], X; // special syntax for 64-bit disp only mov
-                    "Awiw",     [0xA1            ], X, SMALL_SIZE;
+                    "Awiw",     [0xA1            ], X, WORD_SIZE;
                     "Adid",     [0xA1            ], X;
-                    "Aqiq",     [0xA1            ], X, LARGE_SIZE;
+                    "Aqiq",     [0xA1            ], X, WITH_REXW;
                     "ibAb",     [0xA2            ], X;
-                    "iwAw",     [0xA3            ], X, SMALL_SIZE;
+                    "iwAw",     [0xA3            ], X, WORD_SIZE;
                     "idAd",     [0xA3            ], X;
-                    "iqAq",     [0xA3            ], X, LARGE_SIZE;
+                    "iqAq",     [0xA3            ], X, WITH_REXW;
 ] "movbe"       = [ "r*m*",     [0x0F, 0x38, 0xF0], X, AUTO_SIZE;
                     "m*r*",     [0x0F, 0x38, 0xF1], X, AUTO_SIZE;
-] "movd"        = [ "yov*",     [0x0F, 0x6E      ], X, AUTO_REXW  | PREF_66;
-                    "v*yo",     [0x0F, 0x7E      ], X, AUTO_REXW  | PREF_66;
+] "movd"        = [ "yov*",     [0x0F, 0x6E      ], X, AUTO_REXW | PREF_66;
+                    "v*yo",     [0x0F, 0x7E      ], X, AUTO_REXW | PREF_66;
                     "xqv*",     [0x0F, 0x6E      ], X, AUTO_REXW;
                     "v*xq",     [0x0F, 0x7E      ], X, AUTO_REXW;
-] "movmskpd"    = [ "r?yo",     [0x0F, 0x50      ], X, DEST_IN_REG | PREF_66;
-] "movmskps"    = [ "r?yo",     [0x0F, 0x50      ], X, DEST_IN_REG;
+] "movmskpd"    = [ "r?yo",     [0x0F, 0x50      ], X, PREF_66;
+] "movmskps"    = [ "r?yo",     [0x0F, 0x50      ], X;
 ] "movnti"      = [ "m*r*",     [0x0F, 0xC3      ], X, AUTO_REXW;
 ] "movsb"       = [ "",         [0xA4            ], X;
-] "movsw"       = [ "",         [0xA5            ], X, SMALL_SIZE;
+] "movsw"       = [ "",         [0xA5            ], X, WORD_SIZE;
 ] "movsd"       = [ "",         [0xA5            ], X;
-                    "yoyo",     [0x0F, 0x10      ], X, PREF_F2 | DEST_IN_REG;
+                    "yoyo",     [0x0F, 0x10      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x10      ], X, PREF_F2;
                     "mqyo",     [0x0F, 0x11      ], X, PREF_F2;
-] "movsq"       = [ "",         [0xA5            ], X, LARGE_SIZE;
+] "movsq"       = [ "",         [0xA5            ], X, WITH_REXW;
 ] "movsx"       = [ "r*vw",     [0x0F, 0xBF      ], X, AUTO_REXW; // currently this defaults to a certain memory size
                     "r*vb",     [0x0F, 0xBE      ], X, AUTO_SIZE;
-] "movsxd"      = [ "rqvd",     [0x63            ], X, LARGE_SIZE;
+] "movsxd"      = [ "rqvd",     [0x63            ], X, WITH_REXW;
 ] "movzx"       = [ "r*vw",     [0x0F, 0xB7      ], X, AUTO_REXW; // currently this defaults to a certain memory size
                     "r*vb",     [0x0F, 0xB6      ], X, AUTO_SIZE;
 ] "mul"         = [ "v*",       [0xF7            ], 4, AUTO_SIZE;
                     "vb",       [0xF6            ], 4;
-] "mulx"        = [ "r*r*v*",   [   2, 0xF6      ], X, AUTO_REXW | VEX_OP | PREF_F2; // 3 args, 2nd arg in vex
+] "mulx"        = [ "r*r*v*",   [   2, 0xF6      ], X, AUTO_REXW | VEX_OP | PREF_F2;
 ] "neg"         = [ "v*",       [0xF7            ], 3, AUTO_SIZE | LOCK;
                     "vb",       [0xF6            ], 3,             LOCK;
 ] "nop"         = [ "",         [0x90            ], X;
@@ -317,15 +385,15 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "ibAw",     [0xE7            ], X;
                     "ibAd",     [0xE7            ], X;
                     "CwAb",     [0xEE            ], X;
-                    "CwAw",     [0xEF            ], X, SMALL_SIZE;
+                    "CwAw",     [0xEF            ], X, WORD_SIZE;
                     "CwAd",     [0xEF            ], X;
-] "outsb"       = [ "",         [0x6E            ], X,              REP;
-] "outsw"       = [ "",         [0x6F            ], X, SMALL_SIZE | REP;
-] "outsd"       = [ "",         [0x6F            ], X,              REP;
+] "outsb"       = [ "",         [0x6E            ], X,             REP;
+] "outsw"       = [ "",         [0x6F            ], X, WORD_SIZE | REP;
+] "outsd"       = [ "",         [0x6F            ], X,             REP;
 ] "pause"       = [ "",         [0xF3, 0x90      ], X;
-] "pdep"        = [ "r*r*v*",   [   2, 0xF5      ], X, AUTO_REXW  | VEX_OP | PREF_F2; // 3 args, 2nd arg in vex
-] "pext"        = [ "r*r*v*",   [   2, 0xF5      ], X, AUTO_REXW  | VEX_OP | PREF_F3; // 3 args, 2nd arg in vex
-] "pop"         = [ "r*",       [0x58            ], X, AUTO_NO32  | SHORT_ARG;
+] "pdep"        = [ "r*r*v*",   [   2, 0xF5      ], X, AUTO_REXW | VEX_OP | PREF_F2;
+] "pext"        = [ "r*r*v*",   [   2, 0xF5      ], X, AUTO_REXW | VEX_OP | PREF_F3;
+] "pop"         = [ "r*",       [0x58            ], X, AUTO_NO32 | SHORT_ARG;
                     "v*",       [0x8F            ], 0, AUTO_NO32 ;
                     "Uw",       [0x0F, 0xA1      ], X;
                     "Vw",       [0x0F, 0xA9      ], X;
@@ -338,10 +406,10 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "prefetcht0"  = [ "mb",       [0x0F, 0x18      ], 1;
 ] "prefetcht1"  = [ "mb",       [0x0F, 0x18      ], 2;
 ] "prefetcht2"  = [ "mb",       [0x0F, 0x18      ], 3;
-] "push"        = [ "r*",       [0x50            ], X, AUTO_NO32  | SHORT_ARG;
+] "push"        = [ "r*",       [0x50            ], X, AUTO_NO32 | SHORT_ARG;
                     "v*",       [0xFF            ], 6, AUTO_NO32 ;
                     "iq",       [0x68            ], X;
-                    "iw",       [0x68            ], X, SMALL_SIZE;
+                    "iw",       [0x68            ], X, WORD_SIZE;
                     "ib",       [0x6A            ], X;
                     "Uw",       [0x0F, 0xA0      ], X;
                     "Vw",       [0x0F, 0xA8      ], X;
@@ -368,7 +436,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbBb",     [0xD2            ], 1;
                     "v*ib",     [0xC1            ], 1, AUTO_SIZE;
                     "vbib",     [0xC0            ], 1;
-] "rorx"        = [ "r*v*ib",   [   3, 0xF0      ], X, AUTO_REXW | VEX_OP | PREF_F2; // 2 args, none in vex
+] "rorx"        = [ "r*v*ib",   [   3, 0xF0      ], X, AUTO_REXW | VEX_OP | PREF_F2;
 ] "sahf"        = [ "",         [0x9E            ], X;
 ] "sal"         |
   "shl"         = [ "v*Bb",     [0xD3            ], 4, AUTO_SIZE;
@@ -379,20 +447,20 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "vbBb",     [0xD2            ], 7;
                     "v*ib",     [0xC1            ], 7, AUTO_SIZE;
                     "vbib",     [0xC0            ], 7;
-] "sarx"        = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW  | VEX_OP | PREF_F3; // 3 args, 3rd arg in vex
+] "sarx"        = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW | VEX_OP | PREF_F3;
 ] "sbb"         = [ "A*i*",     [0x1D            ], X, AUTO_SIZE;
                     "Abib",     [0x1C            ], X;
-                    "v*i*",     [0x81            ], 3, AUTO_SIZE  | LOCK;
-                    "v*ib",     [0x83            ], 3, AUTO_SIZE  | LOCK;
-                    "vbib",     [0x80            ], 3,              LOCK;
-                    "v*r*",     [0x19            ], X, AUTO_SIZE  | LOCK;
-                    "vbrb",     [0x18            ], X,              LOCK;
+                    "v*i*",     [0x81            ], 3, AUTO_SIZE | LOCK;
+                    "v*ib",     [0x83            ], 3, AUTO_SIZE | LOCK;
+                    "vbib",     [0x80            ], 3,             LOCK;
+                    "v*r*",     [0x19            ], X, AUTO_SIZE | LOCK;
+                    "vbrb",     [0x18            ], X,             LOCK;
                     "r*v*",     [0x1B            ], X, AUTO_SIZE;
                     "rbvb",     [0x1A            ], X;
-] "scasb"       = [ "",         [0xAE            ], X,              REP;
-] "scasw"       = [ "",         [0xAF            ], X, SMALL_SIZE | REP;
-] "scasd"       = [ "",         [0xAF            ], X,              REP;
-] "scasq"       = [ "",         [0xAF            ], X, LARGE_SIZE | REP;
+] "scasb"       = [ "",         [0xAE            ], X,             REP;
+] "scasw"       = [ "",         [0xAF            ], X, WORD_SIZE | REP;
+] "scasd"       = [ "",         [0xAF            ], X,             REP;
+] "scasq"       = [ "",         [0xAF            ], X, WITH_REXW | REP;
 ] "seto"        = [ "vb",       [0x0F, 0x90      ], 0;
 ] "setno"       = [ "vb",       [0x0F, 0x91      ], 0;
 ] "setb"        |
@@ -426,57 +494,57 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "sfence"      = [ "",         [0x0F, 0xAE, 0xF8], X;
 ] "shld"        = [ "v*r*Bb",   [0x0F, 0xA5      ], X, AUTO_SIZE;
                     "v*r*ib",   [0x0F, 0xA4      ], X, AUTO_SIZE;
-] "shlx"        = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW  | VEX_OP | PREF_66; // 3 args, 3rd arg in vex
+] "shlx"        = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW | VEX_OP | PREF_66;
 ] "shr"         = [ "v*Bb",     [0xD3            ], 5, AUTO_SIZE;
                     "vbBb",     [0xD2            ], 5;
                     "v*ib",     [0xC1            ], 5, AUTO_SIZE;
                     "vbib",     [0xC0            ], 5;
 ] "shrd"        = [ "v*r*Bb",   [0x0F, 0xAD      ], X, AUTO_SIZE;
                     "v*r*ib",   [0x0F, 0xAC      ], X, AUTO_SIZE;
-] "shrx"        = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW  | VEX_OP | PREF_F2; // 3 args, 3rd arg in vex
-] "slwpcb"      = [ "r*",       [   9, 0x12      ], 1, AUTO_REXW  | XOP_OP; // 1 arg, not in vex
+] "shrx"        = [ "r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW | VEX_OP | PREF_F2;
+] "slwpcb"      = [ "r*",       [   9, 0x12      ], 1, AUTO_REXW | XOP_OP;
 ] "stc"         = [ "",         [0xF9            ], X;
 ] "std"         = [ "",         [0xFD            ], X;
-] "stosb"       = [ "",         [0xAA            ], X,              REP;
-] "stosw"       = [ "",         [0xAB            ], X, SMALL_SIZE | REP;
-] "stosd"       = [ "",         [0xAB            ], X,              REP;
-] "stosq"       = [ "",         [0xAB            ], X, LARGE_SIZE | REP;
+] "stosb"       = [ "",         [0xAA            ], X,             REP;
+] "stosw"       = [ "",         [0xAB            ], X, WORD_SIZE | REP;
+] "stosd"       = [ "",         [0xAB            ], X,             REP;
+] "stosq"       = [ "",         [0xAB            ], X, WITH_REXW | REP;
 ] "sub"         = [ "A*i*",     [0x2D            ], X, AUTO_SIZE;
                     "Abib",     [0x2C            ], X;
-                    "v*i*",     [0x81            ], 5, AUTO_SIZE  | LOCK;
-                    "v*ib",     [0x83            ], 5, AUTO_SIZE  | LOCK;
-                    "vbib",     [0x80            ], 5,              LOCK;
-                    "v*r*",     [0x29            ], X, AUTO_SIZE  | LOCK;
-                    "vbrb",     [0x28            ], X,              LOCK;
+                    "v*i*",     [0x81            ], 5, AUTO_SIZE | LOCK;
+                    "v*ib",     [0x83            ], 5, AUTO_SIZE | LOCK;
+                    "vbib",     [0x80            ], 5,             LOCK;
+                    "v*r*",     [0x29            ], X, AUTO_SIZE | LOCK;
+                    "vbrb",     [0x28            ], X,             LOCK;
                     "r*v*",     [0x2B            ], X, AUTO_SIZE;
                     "rbvb",     [0x2A            ], X;
-] "t1mskc"      = [ "r*v*",     [   9, 0x01      ], 7, AUTO_REXW  | XOP_OP; // 2 args, 1st arg in vex
+] "t1mskc"      = [ "r*v*",     [   9, 0x01      ], 7, AUTO_REXW | XOP_OP | ENC_VM;
 ] "test"        = [ "A*i*",     [0xA9            ], X, AUTO_SIZE;
                     "Abib",     [0xA8            ], X;
                     "v*i*",     [0xF7            ], 0, AUTO_SIZE;
                     "vbib",     [0xF6            ], 0;
                     "v*r*",     [0x85            ], X, AUTO_SIZE;
                     "vbrb",     [0x84            ], X;
-] "tzcnt"       = [ "r*v*",     [0x0F, 0xBC      ], X, AUTO_SIZE  | PREF_F3;
-] "tzmsk"       = [ "r*v*",     [   9, 0x01      ], 4, AUTO_REXW  | XOP_OP; // 2 args, 1st arg in vex
-] "wrfsbase"    = [ "r*",       [0x0F, 0xAE      ], 2, AUTO_REXW  | PREF_F3;
-] "wrgsbase"    = [ "r*",       [0x0F, 0xAE      ], 3, AUTO_REXW  | PREF_F3;
-] "xadd"        = [ "v*r*",     [0x0F, 0xC1      ], X, AUTO_SIZE  | LOCK;
-                    "vbrb",     [0x0F, 0xC0      ], X,              LOCK;
-] "xchg"        = [ "A*r*",     [0x90            ], X, AUTO_SIZE  | SHORT_ARG;
-                    "r*A*",     [0x90            ], X, AUTO_SIZE  | SHORT_ARG;
-                    "v*r*",     [0x87            ], X, AUTO_SIZE  | LOCK;
-                    "r*v*",     [0x87            ], X, AUTO_SIZE  | LOCK;
-                    "vbrb",     [0x86            ], X,              LOCK;
-                    "rbvb",     [0x86            ], X,              LOCK;
+] "tzcnt"       = [ "r*v*",     [0x0F, 0xBC      ], X, AUTO_SIZE | PREF_F3;
+] "tzmsk"       = [ "r*v*",     [   9, 0x01      ], 4, AUTO_REXW | XOP_OP  | ENC_VM;
+] "wrfsbase"    = [ "r*",       [0x0F, 0xAE      ], 2, AUTO_REXW | PREF_F3;
+] "wrgsbase"    = [ "r*",       [0x0F, 0xAE      ], 3, AUTO_REXW | PREF_F3;
+] "xadd"        = [ "v*r*",     [0x0F, 0xC1      ], X, AUTO_SIZE | LOCK;
+                    "vbrb",     [0x0F, 0xC0      ], X,             LOCK;
+] "xchg"        = [ "A*r*",     [0x90            ], X, AUTO_SIZE | SHORT_ARG;
+                    "r*A*",     [0x90            ], X, AUTO_SIZE | SHORT_ARG;
+                    "v*r*",     [0x87            ], X, AUTO_SIZE | LOCK;
+                    "r*v*",     [0x87            ], X, AUTO_SIZE | LOCK;
+                    "vbrb",     [0x86            ], X,             LOCK;
+                    "rbvb",     [0x86            ], X,             LOCK;
 ] "xlatb"       = [ "",         [0xD7            ], X;
 ] "xor"         = [ "A*i*",     [0x35            ], X, AUTO_SIZE;
                     "Abib",     [0x34            ], X;
-                    "v*i*",     [0x81            ], 6, AUTO_SIZE  | LOCK;
-                    "v*ib",     [0x83            ], 6, AUTO_SIZE  | LOCK;
-                    "vbib",     [0x80            ], 6,              LOCK;
-                    "v*r*",     [0x31            ], X, AUTO_SIZE  | LOCK;
-                    "vbrb",     [0x30            ], X,              LOCK;
+                    "v*i*",     [0x81            ], 6, AUTO_SIZE | LOCK;
+                    "v*ib",     [0x83            ], 6, AUTO_SIZE | LOCK;
+                    "vbib",     [0x80            ], 6,             LOCK;
+                    "v*r*",     [0x31            ], X, AUTO_SIZE | LOCK;
+                    "vbrb",     [0x30            ], X,             LOCK;
                     "r*v*",     [0x33            ], X, AUTO_SIZE;
                     "rbvb",     [0x32            ], X;
 ]
@@ -489,9 +557,9 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "invd"        = [ "",         [0x0F, 0x08      ], X;
 ] "invlpg"      = [ "mb",       [0x0F, 0x01      ], 7;
 ] "invlpga"     = [ "AqBd",     [0x0F, 0x01, 0xDF], X;
-] "iret"        = [ "",         [0xCF            ], X, SMALL_SIZE;
+] "iret"        = [ "",         [0xCF            ], X, WORD_SIZE;
 ] "iretd"       = [ "",         [0xCF            ], X;
-] "iretq"       = [ "",         [0xCF            ], X, LARGE_SIZE;
+] "iretq"       = [ "",         [0xCF            ], X, WITH_REXW;
 ] "lar"         = [ "r*vw",     [0x0F, 0x02      ], X, AUTO_SIZE;
 ] "lgdt"        = [ "m!",       [0x0F, 0x01      ], 2;
 ] "lidt"        = [ "m!",       [0x0F, 0x01      ], 3;
@@ -613,7 +681,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "fld1"        = [ "",         [0xD9, 0xE8      ], X;
 ] "fldcw"       = [ "mw",       [0xD9            ], 5;
 ] "fldenv"      = [ "m!",       [0xD9            ], 4;
-] "fldenvw"     = [ "m!",       [0xD9            ], 4, SMALL_SIZE;
+] "fldenvw"     = [ "m!",       [0xD9            ], 4, WORD_SIZE;
 ] "fldl2e"      = [ "",         [0xD9, 0xEA      ], X;
 ] "fldl2t"      = [ "",         [0xD9, 0xE9      ], X;
 ] "fldlg2"      = [ "",         [0xD9, 0xEC      ], X;
@@ -635,11 +703,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "fptan"       = [ "",         [0xD9, 0xF2      ], X;
 ] "frndint"     = [ "",         [0xD9, 0xFC      ], X;
 ] "frstor"      = [ "m!",       [0xDD            ], 4;
-] "frstorw"     = [ "m!",       [0xDD            ], 4, SMALL_SIZE;
+] "frstorw"     = [ "m!",       [0xDD            ], 4, WORD_SIZE;
 ] "fsave"       = [ "m!",       [0x9B, 0xDD      ], 6; // note: this is actually ; wait; fnsavew
 ] "fsavew"      = [ "m!",       [0x9B, 0x66, 0xDD], 6; // note: this is actually ; wait; OPSIZE fnsave
 ] "fnsave"      = [ "m!",       [0xDD            ], 6;
-] "fnsavew"     = [ "m!",       [0xDD            ], 6, SMALL_SIZE;
+] "fnsavew"     = [ "m!",       [0xDD            ], 6, WORD_SIZE;
 ] "fscale"      = [ "",         [0xD9, 0xFD      ], X;
 ] "fsin"        = [ "",         [0xD9, 0xFE      ], X;
 ] "fsincos"     = [ "",         [0xD9, 0xFB      ], X;
@@ -656,7 +724,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "fstenv"      = [ "m!",       [0x9B, 0xD9      ], 6; // note: this is actually ; wait; fnstenv
 ] "fstenvw"     = [ "m!",       [0x9B, 0x66, 0xD9], 6; // note: this is actually ; wait; OPSIZE fnsten
 ] "fnstenv"     = [ "m!",       [0xD9            ], 6;
-] "fnstenvw"    = [ "m!",       [0xD9            ], 6, SMALL_SIZE;
+] "fnstenvw"    = [ "m!",       [0xD9            ], 6, WORD_SIZE;
 ] "fstsw"       = [ "Aw",       [0x9B, 0xDF, 0xE0], X; // note: this is actually ; wait; fnstsw
                     "mw",       [0x9B, 0xDD      ], 7;
 ] "fnstsw"      = [ "Aw",       [0xDF, 0xE0      ], X;
@@ -703,18 +771,18 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "cvtpi2ps"    = [ "youq",     [0x0F, 0x2A      ], X;
 ] "cvtps2pi"    = [ "xqwo",     [0x0F, 0x2D      ], X;
 ] "cvttpd2pi"   = [ "xqwo",     [0x0F, 0x2C      ], X, PREF_66;
-] "cvttps2pi"   = [ "xqyo",     [0x0F, 0x2C      ], X, DEST_IN_REG;
+] "cvttps2pi"   = [ "xqyo",     [0x0F, 0x2C      ], X;
                     "xqmq",     [0x0F, 0x2C      ], X;
 ] "emms"        = [ "",         [0x0F, 0x77      ], X;
-] "maskmovq"    = [ "xqxq",     [0x0F, 0xF7      ], X, DEST_IN_REG;
-] "movdq2q"     = [ "xqyo",     [0x0F, 0xD6      ], X, DEST_IN_REG | PREF_F2;
+] "maskmovq"    = [ "xqxq",     [0x0F, 0xF7      ], X;
+] "movdq2q"     = [ "xqyo",     [0x0F, 0xD6      ], X, PREF_F2;
 ] "movntq"      = [ "mqxq",     [0x0F, 0xE7      ], X;
 ] "movq"        = [ "xquq",     [0x0F, 0x6F      ], X;
                     "uqxq",     [0x0F, 0x7F      ], X;
-                    "yoyo",     [0x0F, 0x7E      ], X, PREF_F3 | DEST_IN_REG;
+                    "yoyo",     [0x0F, 0x7E      ], X, PREF_F3;
                     "yomq",     [0x0F, 0x7E      ], X, PREF_F3;
                     "mqyo",     [0x0F, 0xD6      ], X, PREF_66;
-] "movq2dq"     = [ "yoxq",     [0x0F, 0xD6      ], X, DEST_IN_REG | PREF_F3;
+] "movq2dq"     = [ "yoxq",     [0x0F, 0xD6      ], X, PREF_F3;
 ] "packssdw"    = [ "xquq",     [0x0F, 0x6B      ], X;
                     "yowo",     [0x0F, 0x6B      ], X, PREF_66;
 ] "packsswb"    = [ "xquq",     [0x0F, 0x63      ], X;
@@ -757,12 +825,12 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "yowo",     [0x0F, 0x66      ], X, PREF_66;
 ] "pcmpgtw"     = [ "xquq",     [0x0F, 0x65      ], X;
                     "yowo",     [0x0F, 0x65      ], X, PREF_66;
-] "pextrw"      = [ "rdxqib",   [0x0F, 0xC5      ], X, DEST_IN_REG;
-                    "r?yoib",   [0x0F, 0xC5      ], X, PREF_66 | DEST_IN_REG;
+] "pextrw"      = [ "rdxqib",   [0x0F, 0xC5      ], X;
+                    "r?yoib",   [0x0F, 0xC5      ], X, PREF_66;
                     "mwyoib",   [0x0F, 0x3A, 0x15], X, PREF_66;
-] "pinsrw"      = [ "xqrdib",   [0x0F, 0xC4      ], X, DEST_IN_REG;
+] "pinsrw"      = [ "xqrdib",   [0x0F, 0xC4      ], X;
                     "xqmwib",   [0x0F, 0xC4      ], X;
-                    "yordib",   [0x0F, 0xC4      ], X, PREF_66 | DEST_IN_REG;
+                    "yordib",   [0x0F, 0xC4      ], X, PREF_66;
                     "yomwib",   [0x0F, 0xC4      ], X, PREF_66;
 ] "pmaddwd"     = [ "xquq",     [0x0F, 0xF5      ], X;
                     "yowo",     [0x0F, 0xF5      ], X, PREF_66;
@@ -774,8 +842,8 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "yowo",     [0x0F, 0xEA      ], X, PREF_66;
 ] "pminub"      = [ "xquq",     [0x0F, 0xDA      ], X;
                     "yowo",     [0x0F, 0xDA      ], X, PREF_66;
-] "pmovmskb"    = [ "rdxq",     [0x0F, 0xD7      ], X,           DEST_IN_REG;
-                    "rdyo",     [0x0F, 0xD7      ], X, PREF_66 | DEST_IN_REG;
+] "pmovmskb"    = [ "rdxq",     [0x0F, 0xD7      ], X;
+                    "rdyo",     [0x0F, 0xD7      ], X, PREF_66;
 ] "pmulhuw"     = [ "xquq",     [0x0F, 0xE4      ], X;
                     "yowo",     [0x0F, 0xE4      ], X, PREF_66;
 ] "pmulhw"      = [ "xquq",     [0x0F, 0xE5      ], X;
@@ -859,11 +927,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vaddpd"      = [ "y*y*w*",   [   1, 0x58      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "addps"       = [ "yowo",     [0x0F, 0x58      ], X;
 ] "vaddps"      = [ "y*y*w*",   [   1, 0x58      ], X,           AUTO_VEXL | VEX_OP;
-] "addsd"       = [ "yoyo",     [0x0F, 0x58      ], X, PREF_F2                      | DEST_IN_REG;
+] "addsd"       = [ "yoyo",     [0x0F, 0x58      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x58      ], X, PREF_F2;
 ] "vaddsd"      = [ "yoyoyo",   [   1, 0x58      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x58      ], X, PREF_F2             | VEX_OP;
-] "addss"       = [ "yoyo",     [0x0F, 0x58      ], X, PREF_F3                      | DEST_IN_REG;
+] "addss"       = [ "yoyo",     [0x0F, 0x58      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x58      ], X, PREF_F3;
 ] "vaddss"      = [ "yoyoyo",   [   1, 0x58      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x58      ], X, PREF_F3             | VEX_OP;
@@ -898,9 +966,9 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "blendps"     = [ "yowoib",   [0x0F, 0x3A, 0x0C], X, PREF_66;
 ] "vblendps"    = [ "y*y*w*ib", [   3, 0x0C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "blendvpd"    = [ "yowo",     [0x0F, 0x38, 0x15], X, PREF_66;
-] "vblendvpd"   = [ "y*y*w*y*", [   3, 0x4B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
+] "vblendvpd"   = [ "y*y*w*y*", [   3, 0x4B      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "blendvps"    = [ "yowo",     [0x0F, 0x38, 0x14], X, PREF_66;
-] "vblendvps"   = [ "y*y*w*y*", [   3, 0x4A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
+] "vblendvps"   = [ "y*y*w*y*", [   3, 0x4A      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "cmppd"       = [ "yowoib",   [0x0F, 0xC2      ], X, PREF_66;
 ] "vcmppd"      = [ "y*y*w*ib", [   1, 0xC2      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "cmpps"       = [ "yowoib",   [0x0F, 0xC2      ], X;
@@ -909,21 +977,21 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
   "vcmpsd"      = [ "y*y*w*ib", [   1, 0xC2      ], X, PREF_F2 | AUTO_VEXL | VEX_OP;
 ] "cmpss"       = [ "yowoib",   [0x0F, 0xC2      ], X, PREF_F3;
 ] "vcmpss"      = [ "y*y*w*ib", [   1, 0xC2      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
-] "comisd"      = [ "yoyo",     [0x0F, 0x2F      ], X, PREF_66                      | DEST_IN_REG;
+] "comisd"      = [ "yoyo",     [0x0F, 0x2F      ], X, PREF_66;
                     "yomq",     [0x0F, 0x2F      ], X, PREF_66;
-] "vcomisd"     = [ "yoyo",     [   1, 0x2F      ], X, PREF_66             | VEX_OP | DEST_IN_REG;
+] "vcomisd"     = [ "yoyo",     [   1, 0x2F      ], X, PREF_66             | VEX_OP;
                     "yomq",     [   1, 0x2F      ], X, PREF_66             | VEX_OP;
-] "comiss"      = [ "yoyo",     [0x0F, 0x2F      ], X,                                DEST_IN_REG;
+] "comiss"      = [ "yoyo",     [0x0F, 0x2F      ], X;
                     "yomd",     [0x0F, 0x2F      ], X;
-] "vcomiss"     = [ "yoyo",     [   1, 0x2F      ], X,                       VEX_OP | DEST_IN_REG;
+] "vcomiss"     = [ "yoyo",     [   1, 0x2F      ], X,                       VEX_OP;
                     "yomd",     [   1, 0x2F      ], X,                       VEX_OP;
 ]
 
-  "cvtdq2pd"    = [ "yoyo",     [0x0F, 0xE6      ], X, PREF_F3                      | DEST_IN_REG;
+  "cvtdq2pd"    = [ "yoyo",     [0x0F, 0xE6      ], X, PREF_F3;
                     "yomq",     [0x0F, 0xE6      ], X, PREF_F3;
-] "vcvtdq2pd"   = [ "y*y*",     [   1, 0xE6      ], X, PREF_F3 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vcvtdq2pd"   = [ "y*y*",     [   1, 0xE6      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   1, 0xE6      ], X, PREF_F3             | VEX_OP;
-                    "yhmo",     [   1, 0xE6      ], X, PREF_F3 | LARGE_VEC | VEX_OP; // intel/amd disagree over this memory ops size
+                    "yhmo",     [   1, 0xE6      ], X, PREF_F3 | WITH_VEXL | VEX_OP; // intel/amd disagree over this memory ops size
 ] "cvtdq2ps"    = [ "yowo",     [0x0F, 0x5B      ], X;
 ] "vcvtdq2ps"   = [ "y*w*",     [   1, 0x5B      ], X,           AUTO_VEXL | VEX_OP;
 ] "cvtpd2dq"    = [ "yowo",     [0x0F, 0xE6      ], X, PREF_F2;
@@ -932,42 +1000,42 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vcvtpd2dS"   = [ "y*w*",     [   1, 0x5A      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "cvtps2dq"    = [ "yowo",     [0x0F, 0x5B      ], X, PREF_66;
 ] "vcvtps2dq"   = [ "y*w*",     [   1, 0x5B      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "cvtps2pd"    = [ "yoyo",     [0x0F, 0x5A      ], X,                                DEST_IN_REG;
+] "cvtps2pd"    = [ "yoyo",     [0x0F, 0x5A      ], X;
                     "yomq",     [0x0F, 0x5A      ], X;
-] "vcvtps2pd"   = [ "y*y*",     [   1, 0x5A      ], X,           AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vcvtps2pd"   = [ "y*y*",     [   1, 0x5A      ], X,           AUTO_VEXL | VEX_OP;
                     "yomq",     [   1, 0x5A      ], X,                       VEX_OP;
-                    "yhmo",     [   1, 0x5A      ], X,           LARGE_VEC | VEX_OP; // intel/amd disagree over this memory ops size
-] "cvtsd2si"    = [ "r*yo",     [0x0F, 0x2D      ], X, PREF_F2 | AUTO_REXW          | DEST_IN_REG;
+                    "yhmo",     [   1, 0x5A      ], X,           WITH_VEXL | VEX_OP; // intel/amd disagree over this memory ops size
+] "cvtsd2si"    = [ "r*yo",     [0x0F, 0x2D      ], X, PREF_F2 | AUTO_REXW;
                     "r*mq",     [0x0F, 0x2D      ], X, PREF_F2 | AUTO_REXW;
-] "vcvtsd2si"   = [ "r*yo",     [   1, 0x2D      ], X, PREF_F2 | AUTO_REXW | VEX_OP | DEST_IN_REG;
+] "vcvtsd2si"   = [ "r*yo",     [   1, 0x2D      ], X, PREF_F2 | AUTO_REXW | VEX_OP;
                     "r*mq",     [   1, 0x2D      ], X, PREF_F2 | AUTO_REXW | VEX_OP;
-] "cvtsd2ss"    = [ "yoyo",     [0x0F, 0x5A      ], X, PREF_F2                      | DEST_IN_REG;
+] "cvtsd2ss"    = [ "yoyo",     [0x0F, 0x5A      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x5A      ], X, PREF_F2;
-] "vcvtsd2ss"   = [ "yoyoyo",   [   1, 0x5A      ], X, PREF_F2             | VEX_OP | DEST_IN_REG;
+] "vcvtsd2ss"   = [ "yoyoyo",   [   1, 0x5A      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x5A      ], X, PREF_F2             | VEX_OP;
 ] "cvtsi2sd"    = [ "yov*",     [0x0F, 0x2A      ], X, PREF_F2 | AUTO_REXW;
 ] "vcvtsi2sd"   = [ "yoyov*",   [   1, 0x2A      ], X, PREF_F2 | AUTO_REXW | VEX_OP;
 ] "cvtsi2ss"    = [ "yov*",     [0x0F, 0x2A      ], X, PREF_F3 | AUTO_REXW;
 ] "vcvtsi2ss"   = [ "yoyov*",   [   1, 0x2A      ], X, PREF_F3 | AUTO_REXW | VEX_OP;
-] "cvtss2sd"    = [ "yoyo",     [0x0F, 0x5A      ], X, PREF_F3                      | DEST_IN_REG;
+] "cvtss2sd"    = [ "yoyo",     [0x0F, 0x5A      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x5A      ], X, PREF_F3;
-] "vcvtss2sd"   = [ "yoyo",     [   1, 0x5A      ], X, PREF_F3             | VEX_OP | DEST_IN_REG;
+] "vcvtss2sd"   = [ "yoyo",     [   1, 0x5A      ], X, PREF_F3             | VEX_OP;
                     "yomq",     [   1, 0x5A      ], X, PREF_F3             | VEX_OP;
-] "cvtss2si"    = [ "r*yo",     [0x0F, 0x2D      ], X, PREF_F3 | AUTO_REXW          | DEST_IN_REG;
+] "cvtss2si"    = [ "r*yo",     [0x0F, 0x2D      ], X, PREF_F3 | AUTO_REXW;
                     "r*m*",     [0x0F, 0x2D      ], X, PREF_F3 | AUTO_REXW;
-] "vcvtss2si"   = [ "r*yo",     [   1, 0x2D      ], X, PREF_F3 | AUTO_REXW | VEX_OP | DEST_IN_REG;
+] "vcvtss2si"   = [ "r*yo",     [   1, 0x2D      ], X, PREF_F3 | AUTO_REXW | VEX_OP;
                     "r*m*",     [   1, 0x2D      ], X, PREF_F3 | AUTO_REXW | VEX_OP;
 ] "cvttpd2dq"   = [ "yowo",     [0x0F, 0xE6      ], X, PREF_66;
 ] "vcvttpd2dq"  = [ "y*w*",     [   1, 0xE6      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "cvttps2dq"   = [ "yowo",     [0x0F, 0x5B      ], X, PREF_F3;
 ] "vcvttps2dq"  = [ "y*w*",     [   1, 0x5B      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
-] "cvttsd2si"   = [ "r*yo",     [0x0F, 0x2C      ], X, PREF_F2 | AUTO_REXW          | DEST_IN_REG;
+] "cvttsd2si"   = [ "r*yo",     [0x0F, 0x2C      ], X, PREF_F2 | AUTO_REXW;
                     "r*mq",     [0x0F, 0x2C      ], X, PREF_F2 | AUTO_REXW;
-] "vcvttsd2si"  = [ "r*yo",     [   1, 0x2C      ], X, PREF_F2 | AUTO_REXW | VEX_OP | DEST_IN_REG;
+] "vcvttsd2si"  = [ "r*yo",     [   1, 0x2C      ], X, PREF_F2 | AUTO_REXW | VEX_OP;
                     "r*mq",     [   1, 0x2C      ], X, PREF_F2 | AUTO_REXW | VEX_OP;
-] "cvttss2si"   = [ "r*yo",     [0x0F, 0x2C      ], X, PREF_F3 | AUTO_REXW          | DEST_IN_REG;
+] "cvttss2si"   = [ "r*yo",     [0x0F, 0x2C      ], X, PREF_F3 | AUTO_REXW;
                     "r*m*",     [0x0F, 0x2C      ], X, PREF_F3 | AUTO_REXW;
-] "vcvttss2si"  = [ "r*yo",     [   1, 0x2C      ], X, PREF_F3 | AUTO_REXW | VEX_OP | DEST_IN_REG;
+] "vcvttss2si"  = [ "r*yo",     [   1, 0x2C      ], X, PREF_F3 | AUTO_REXW | VEX_OP;
                     "r*m*",     [   1, 0x2C      ], X, PREF_F3 | AUTO_REXW | VEX_OP;
 ]
 
@@ -975,11 +1043,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vdivpd"      = [ "y*y*w*",   [   1, 0x5E      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "divps"       = [ "yowo",     [0x0F, 0x5E      ], X;
 ] "vdivps"      = [ "y*y*w*",   [   1, 0x5E      ], X,           AUTO_VEXL | VEX_OP;
-] "divsd"       = [ "yoyo",     [0x0F, 0x5E      ], X, PREF_F2                      | DEST_IN_REG;
+] "divsd"       = [ "yoyo",     [0x0F, 0x5E      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x5E      ], X, PREF_F2;
 ] "vdivsd"      = [ "yoyoyo",   [   1, 0x5E      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x5E      ], X, PREF_F2             | VEX_OP;
-] "divss"       = [ "yoyo",     [0x0F, 0x5E      ], X, PREF_F3                      | DEST_IN_REG;
+] "divss"       = [ "yoyo",     [0x0F, 0x5E      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x5E      ], X, PREF_F3;
 ] "vdivss"      = [ "yoyoyo",   [   1, 0x5E      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x5E      ], X, PREF_F3             | VEX_OP;
@@ -1003,17 +1071,17 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vlddqu"      = [ "y*m*",     [   1, 0xF0      ], X, PREF_F2 | AUTO_VEXL | VEX_OP;
 ] "ldmxcsr"     = [ "md",       [0x0F, 0xAE      ], 2;
 ] "vldmxcsr"    = [ "md",       [   1, 0xAE      ], 2,                       VEX_OP;
-] "maskmovdqu"  = [ "yoyo",     [0x0F, 0xF7      ], X, PREF_66                      | DEST_IN_REG;
-] "vmaskmovdqu" = [ "yoyo",     [   1, 0xF7      ], X, PREF_66             | VEX_OP | DEST_IN_REG;
+] "maskmovdqu"  = [ "yoyo",     [0x0F, 0xF7      ], X, PREF_66;
+] "vmaskmovdqu" = [ "yoyo",     [   1, 0xF7      ], X, PREF_66             | VEX_OP;
 ] "maxpd"       = [ "yowo",     [0x0F, 0x5F      ], X, PREF_66;
 ] "vmaxpd"      = [ "y*y*w*",   [   1, 0x5F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "maxps"       = [ "yowo",     [0x0F, 0x5F      ], X;
 ] "vmaxps"      = [ "y*y*w*",   [   1, 0x5F      ], X,           AUTO_VEXL | VEX_OP;
-] "maxsd"       = [ "yoyo",     [0x0F, 0x5F      ], X, PREF_F2                      | DEST_IN_REG;
+] "maxsd"       = [ "yoyo",     [0x0F, 0x5F      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x5F      ], X, PREF_F2;
 ] "vmaxsd"      = [ "yoyoyo",   [   1, 0x5F      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x5F      ], X, PREF_F2             | VEX_OP;
-] "maxss"       = [ "yoyo",     [0x0F, 0x5F      ], X, PREF_F3                      | DEST_IN_REG;
+] "maxss"       = [ "yoyo",     [0x0F, 0x5F      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x5F      ], X, PREF_F3;
 ] "vmaxss"      = [ "yoyoyo",   [   1, 0x5F      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x5F      ], X, PREF_F3             | VEX_OP;
@@ -1021,11 +1089,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vminpd"      = [ "y*y*w*",   [   1, 0x5D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "minps"       = [ "yowo",     [0x0F, 0x5D      ], X;
 ] "vminps"      = [ "y*y*w*",   [   1, 0x5D      ], X,           AUTO_VEXL | VEX_OP;
-] "minsd"       = [ "yoyo",     [0x0F, 0x5D      ], X, PREF_F2                      | DEST_IN_REG;
+] "minsd"       = [ "yoyo",     [0x0F, 0x5D      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x5D      ], X, PREF_F2;
 ] "vminsd"      = [ "yoyoyo",   [   1, 0x5D      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x5D      ], X, PREF_F2             | VEX_OP;
-] "minss"       = [ "yoyo",     [0x0F, 0x5D      ], X, PREF_F3                      | DEST_IN_REG;
+] "minss"       = [ "yoyo",     [0x0F, 0x5D      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x5D      ], X, PREF_F3;
 ] "vminss"      = [ "yoyoyo",   [   1, 0x5D      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x5D      ], X, PREF_F3             | VEX_OP;
@@ -1042,11 +1110,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] // movd is found under the general purpose instructions
   "vmovd"       = [ "yov*",     [   1, 0x6E      ], X, PREF_66 | AUTO_REXW | VEX_OP;
                     "v*yo",     [   1, 0x7E      ], X, PREF_66 | AUTO_REXW | VEX_OP;
-] "movddup"     = [ "yoyo",     [0x0F, 0x12      ], X, PREF_F2                      | DEST_IN_REG;
+] "movddup"     = [ "yoyo",     [0x0F, 0x12      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x12      ], X, PREF_F2;
 ] "vmovddup"    = [ "y*y*",     [   1, 0x12      ], X, PREF_F2 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   1, 0x12      ], X, PREF_F2             | VEX_OP;
-                    "yhyhmh",   [   1, 0x12      ], X, PREF_F2 | LARGE_VEC | VEX_OP;
+                    "yomq",     [   1, 0x12      ], X, PREF_F2             | VEX_OP;
+                    "yhmh",     [   1, 0x12      ], X, PREF_F2 | WITH_VEXL | VEX_OP;
 ] "movdqa"      = [ "yowo",     [0x0F, 0x6F      ], X, PREF_66;
                     "woyo",     [0x0F, 0x7F      ], X, PREF_66;
 ] "vmovdqa"     = [ "y*w*",     [   1, 0x6F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
@@ -1055,7 +1123,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "woyo",     [0x0F, 0x7F      ], X, PREF_F3;
 ] "vmovdqu"     = [ "y*w*",     [   1, 0x6F      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
                     "w*y*",     [   1, 0x7F      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
-] "movhlps"     = [ "yoyo",     [0x0F, 0x12      ], X,                                DEST_IN_REG;
+] "movhlps"     = [ "yoyo",     [0x0F, 0x12      ], X;
 ] "vmovhlps"    = [ "yoyoyo",   [   1, 0x12      ], X,                       VEX_OP;
 ] "movhpd"      = [ "yomq",     [0x0F, 0x16      ], X, PREF_66;
                     "mqyo",     [0x0F, 0x17      ], X, PREF_66;
@@ -1065,7 +1133,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
                     "mqyo",     [0x0F, 0x17      ], X;
 ] "vmovhps"     = [ "yoyomq",   [   1, 0x16      ], X,                       VEX_OP;
                     "mqyo",     [   1, 0x17      ], X,                       VEX_OP;
-] "movlhps"     = [ "yoyo",     [0x0F, 0x16      ], X,                                DEST_IN_REG;
+] "movlhps"     = [ "yoyo",     [0x0F, 0x16      ], X;
 ] "vmovlhps"    = [ "yoyoyo",   [   1, 0x16      ], X,                       VEX_OP;
 ] "movlpd"      = [ "yomq",     [0x0F, 0x12      ], X, PREF_66;
                     "mqyo",     [0x0F, 0x13      ], X, PREF_66;
@@ -1090,7 +1158,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "movntsd"     = [ "mqyo",     [0x0F, 0x2B      ], X, PREF_F2;
 ] "movntss"     = [ "mdyo",     [0x0F, 0x2B      ], X, PREF_F3;
   // movq variants can be found in the MMX section
-] "vmovq"       = [ "yoyo",     [   1, 0x7E      ], X, PREF_F3             | VEX_OP | DEST_IN_REG;
+] "vmovq"       = [ "yoyo",     [   1, 0x7E      ], X, PREF_F3             | VEX_OP;
                     "yomq",     [   1, 0x7E      ], X, PREF_F3             | VEX_OP;
                     "mqyo",     [   1, 0xD6      ], X, PREF_66             | VEX_OP;
   // movsd variants can be found in the general purpose section
@@ -1101,7 +1169,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vmovshdup"   = [ "y*w*",     [   1, 0x16      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
 ] "movsldup"    = [ "yowo",     [0x0F, 0x12      ], X, PREF_F3;
 ] "vmovsldup"   = [ "y*w*",     [   1, 0x12      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
-] "movss"       = [ "yoyo",     [0x0F, 0x10      ], X, PREF_F3                      | DEST_IN_REG;
+] "movss"       = [ "yoyo",     [0x0F, 0x10      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x10      ], X, PREF_F3;
                     "mdyo",     [0x0F, 0x11      ], X, PREF_F3;
 ] "vmovss"      = [ "yoyoyo",   [   1, 0x10      ], X, PREF_F3             | VEX_OP;
@@ -1123,11 +1191,11 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vmulpd"      = [ "y*y*w*",   [   1, 0x59      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "mulps"       = [ "yowo",     [0x0F, 0x59      ], X;
 ] "vmulps"      = [ "y*y*w*",   [   1, 0x59      ], X,           AUTO_VEXL | VEX_OP;
-] "mulsd"       = [ "yoyo",     [0x0F, 0x59      ], X, PREF_F2                      | DEST_IN_REG;
+] "mulsd"       = [ "yoyo",     [0x0F, 0x59      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x59      ], X, PREF_F2;
 ] "vmulsd"      = [ "yoyoyo",   [   1, 0x59      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x59      ], X, PREF_F2             | VEX_OP;
-] "mulss"       = [ "yoyo",     [0x0F, 0x59      ], X, PREF_F3                      | DEST_IN_REG;
+] "mulss"       = [ "yoyo",     [0x0F, 0x59      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x59      ], X, PREF_F3;
 ] "vmulss"      = [ "yoyoyo",   [   1, 0x59      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x59      ], X, PREF_F3             | VEX_OP;
@@ -1166,7 +1234,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vpavgb"      = [ "y*y*w*",   [   1, 0xE0      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vpavgw"      = [ "y*y*w*",   [   1, 0xE3      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "pblendvb"    = [ "yowo",     [0x0F, 0x38, 0x10], X, PREF_66;
-] "vpblendvb"   = [ "y*y*w*y*", [   3, 0x4C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
+] "vpblendvb"   = [ "y*y*w*y*", [   3, 0x4C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "pblenddw"    = [ "yowoib",   [0x0F, 0x3A, 0x0E], X, PREF_66;
 ] "vpblenddw"   = [ "y*y*w*ib", [   3, 0x0E      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "pclmulqdq"   = [ "yowoib",   [0x0F, 0x3A, 0x44], X, PREF_66;
@@ -1195,16 +1263,16 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vpcmpistri"  = [ "yowoib",   [   3, 0x63      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "pcmpistrm"   = [ "yowoib",   [0x0F, 0x3A, 0x62], X, PREF_66;
 ] "vpcmpistrm"  = [ "yowoib",   [   3, 0x62      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "pextrb"      = [ "r?yoib",   [0x0F, 0x3A, 0x14], X, PREF_66; // DEST NOT IN REG
+] "pextrb"      = [ "r?yoib",   [0x0F, 0x3A, 0x14], X, PREF_66                      | ENC_MR;
                     "mbyoib",   [0x0F, 0x3A, 0x14], X, PREF_66;
-] "vpextrb"     = [ "r?yoib",   [   3, 0x14      ], X, PREF_66             | VEX_OP; // DEST NOT IN REG
+] "vpextrb"     = [ "r?yoib",   [   3, 0x14      ], X, PREF_66             | VEX_OP | ENC_MR;
                     "mbyoib",   [   3, 0x14      ], X, PREF_66             | VEX_OP;
 ] "pextrd"      = [ "vdyoib",   [0x0F, 0x3A, 0x16], X, PREF_66;
 ] "vpextrd"     = [ "vdyoib",   [   3, 0x16      ], X, PREF_66             | VEX_OP;
-] "pextrq"      = [ "vqyoib",   [0x0F, 0x3A, 0x16], X, PREF_66 | LARGE_SIZE;
-] "vpextrq"     = [ "vqyoib",   [   3, 0x16      ], X, PREF_66 | LARGE_SIZE| VEX_OP;
+] "pextrq"      = [ "vqyoib",   [0x0F, 0x3A, 0x16], X, PREF_66 | WITH_REXW;
+] "vpextrq"     = [ "vqyoib",   [   3, 0x16      ], X, PREF_66 | WITH_REXW| VEX_OP;
 ] // pextrw is in the MMX section
-  "vpextrw"     = [ "r?yoib",   [   1, 0xC5      ], X, PREF_66             | VEX_OP; // DEST NOT IN REG
+  "vpextrw"     = [ "r?yoib",   [   1, 0xC5      ], X, PREF_66             | VEX_OP | ENC_MR;
                     "mwyoib",   [   3, 0x15      ], X, PREF_66             | VEX_OP;
 ] "phaddd"      = [ "yowo",     [0x0F, 0x38, 0x02], X, PREF_66;
 ] "vphaddd"     = [ "y*y*w*",   [   2, 0x02      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
@@ -1220,16 +1288,16 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vphsubsw"    = [ "y*y*w*",   [   2, 0x07      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "phsubw"      = [ "yowo",     [0x0F, 0x38, 0x05], X, PREF_66;
 ] "vphsubw"     = [ "y*y*w*",   [   2, 0x05      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "pinsrb"      = [ "yordib",   [0x0F, 0x3A, 0x20], X, PREF_66                      | DEST_IN_REG;
+] "pinsrb"      = [ "yordib",   [0x0F, 0x3A, 0x20], X, PREF_66;
                     "yombib",   [0x0F, 0x3A, 0x20], X, PREF_66;
-] "vpinsrb"     = [ "yordyoib", [   3, 0x20      ], X, PREF_66             | VEX_OP | DEST_IN_REG;
+] "vpinsrb"     = [ "yordyoib", [   3, 0x20      ], X, PREF_66             | VEX_OP;
                     "yombyoib", [   3, 0x20      ], X, PREF_66             | VEX_OP;
 ] "pinsrd"      = [ "yovdib",   [0x0F, 0x3A, 0x22], X, PREF_66;
 ] "vpinsrd"     = [ "yovdyoib", [   3, 0x22      ], X, PREF_66             | VEX_OP;
-] "pinsrq"      = [ "yovqib",   [0x0F, 0x3A, 0x22], X, PREF_66 | LARGE_SIZE;
-] "vpinsrq"     = [ "yovqyoib", [   3, 0x22      ], X, PREF_66 | LARGE_SIZE| VEX_OP;
+] "pinsrq"      = [ "yovqib",   [0x0F, 0x3A, 0x22], X, PREF_66 | WITH_REXW;
+] "vpinsrq"     = [ "yovqyoib", [   3, 0x22      ], X, PREF_66 | WITH_REXW| VEX_OP;
 ] // pinsrw is in the MMX section
-  "vpinsrw"     = [ "yordyoib", [   1, 0xC4      ], X, PREF_66             | VEX_OP | DEST_IN_REG;
+  "vpinsrw"     = [ "yordyoib", [   1, 0xC4      ], X, PREF_66             | VEX_OP | ENC_MR;
                     "yomwyoib", [   1, 0xC4      ], X, PREF_66             | VEX_OP;
 ] "pmaddubsw"   = [ "yowo",     [0x0F, 0x38, 0x04], X, PREF_66;
 ] "vpmaddubsw"  = [ "y*y*w*",   [   2, 0x04      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
@@ -1263,67 +1331,67 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ]
 // back to move ops
   // pmovmskb is in the MMX section
-  "vpmovmskb"   = [ "rqy*",     [   1, 0xD7      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
-] "pmovsxbd"    = [ "yoyo",     [0x0F, 0x38, 0x21], X, PREF_66                      | DEST_IN_REG;
+  "vpmovmskb"   = [ "rqy*",     [   1, 0xD7      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "pmovsxbd"    = [ "yoyo",     [0x0F, 0x38, 0x21], X, PREF_66;
                     "yomd",     [0x0F, 0x38, 0x21], X, PREF_66;
-] "vpmovsxbd"   = [ "y*y*",     [   2, 0x21      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovsxbd"   = [ "y*y*",     [   2, 0x21      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomd",     [   2, 0x21      ], X, PREF_66             | VEX_OP;
-                    "yhmq",     [   2, 0x21      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovsxbq"    = [ "yoyo",     [0x0F, 0x38, 0x22], X, PREF_66                      | DEST_IN_REG;
+                    "yhmq",     [   2, 0x21      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovsxbq"    = [ "yoyo",     [0x0F, 0x38, 0x22], X, PREF_66;
                     "yomw",     [0x0F, 0x38, 0x22], X, PREF_66;
-] "vpmovsxbq"   = [ "y*y*",     [   2, 0x22      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovsxbq"   = [ "y*y*",     [   2, 0x22      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomw",     [   2, 0x22      ], X, PREF_66             | VEX_OP;
-                    "yhmd",     [   2, 0x22      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovsxbw"    = [ "yoyo",     [0x0F, 0x38, 0x20], X, PREF_66                      | DEST_IN_REG;
+                    "yhmd",     [   2, 0x22      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovsxbw"    = [ "yoyo",     [0x0F, 0x38, 0x20], X, PREF_66;
                     "yomq",     [0x0F, 0x38, 0x20], X, PREF_66;
-] "vpmovsxbw"   = [ "y*y*",     [   2, 0x20      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovsxbw"   = [ "y*y*",     [   2, 0x20      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x20      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x20      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovsxdq"    = [ "yoyo",     [0x0F, 0x38, 0x25], X, PREF_66                      | DEST_IN_REG;
+                    "yhmo",     [   2, 0x20      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovsxdq"    = [ "yoyo",     [0x0F, 0x38, 0x25], X, PREF_66;
                     "yomq",     [0x0F, 0x38, 0x25], X, PREF_66;
-] "vpmovsxdq"   = [ "y*y*",     [   2, 0x25      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovsxdq"   = [ "y*y*",     [   2, 0x25      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x25      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x25      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovsxwd"    = [ "yoyo",     [0x0F, 0x38, 0x23], X, PREF_66                      | DEST_IN_REG;
+                    "yhmo",     [   2, 0x25      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovsxwd"    = [ "yoyo",     [0x0F, 0x38, 0x23], X, PREF_66;
                     "yomq",     [0x0F, 0x38, 0x23], X, PREF_66;
-] "vpmovsxwd"   = [ "y*y*",     [   2, 0x23      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovsxwd"   = [ "y*y*",     [   2, 0x23      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x23      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x23      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovsxwq"    = [ "yoyo",     [0x0F, 0x38, 0x24], X, PREF_66                      | DEST_IN_REG;
+                    "yhmo",     [   2, 0x23      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovsxwq"    = [ "yoyo",     [0x0F, 0x38, 0x24], X, PREF_66;
                     "yomd",     [0x0F, 0x38, 0x24], X, PREF_66;
-] "vpmovsxwq"   = [ "y*y*",     [   2, 0x24      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovsxwq"   = [ "y*y*",     [   2, 0x24      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomd",     [   2, 0x24      ], X, PREF_66             | VEX_OP;
-                    "yhmq",     [   2, 0x24      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovzxbd"    = [ "yoyo",     [0x0F, 0x38, 0x31], X, PREF_66                      | DEST_IN_REG;
+                    "yhmq",     [   2, 0x24      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovzxbd"    = [ "yoyo",     [0x0F, 0x38, 0x31], X, PREF_66;
                     "yomd",     [0x0F, 0x38, 0x31], X, PREF_66;
-] "vpmovzxbd"   = [ "y*y*",     [   2, 0x31      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovzxbd"   = [ "y*y*",     [   2, 0x31      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomd",     [   2, 0x31      ], X, PREF_66             | VEX_OP;
-                    "yhmq",     [   2, 0x31      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovzxbq"    = [ "yoyo",     [0x0F, 0x38, 0x32], X, PREF_66                      | DEST_IN_REG;
+                    "yhmq",     [   2, 0x31      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovzxbq"    = [ "yoyo",     [0x0F, 0x38, 0x32], X, PREF_66;
                     "yomw",     [0x0F, 0x38, 0x32], X, PREF_66;
-] "vpmovzxbq"   = [ "y*y*",     [   2, 0x32      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovzxbq"   = [ "y*y*",     [   2, 0x32      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomw",     [   2, 0x32      ], X, PREF_66             | VEX_OP;
-                    "yhmd",     [   2, 0x32      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovzxbw"    = [ "yoyo",     [0x0F, 0x38, 0x30], X, PREF_66                      | DEST_IN_REG;
+                    "yhmd",     [   2, 0x32      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovzxbw"    = [ "yoyo",     [0x0F, 0x38, 0x30], X, PREF_66;
                     "yomq",     [0x0F, 0x38, 0x30], X, PREF_66;
-] "vpmovzxbw"   = [ "y*y*",     [   2, 0x30      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovzxbw"   = [ "y*y*",     [   2, 0x30      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x30      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x30      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovzxdq"    = [ "yoyo",     [0x0F, 0x38, 0x35], X, PREF_66                      | DEST_IN_REG;
+                    "yhmo",     [   2, 0x30      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovzxdq"    = [ "yoyo",     [0x0F, 0x38, 0x35], X, PREF_66;
                     "yomq",     [0x0F, 0x38, 0x35], X, PREF_66;
-] "vpmovzxdq"   = [ "y*y*",     [   2, 0x35      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovzxdq"   = [ "y*y*",     [   2, 0x35      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x35      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x35      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovzxwd"    = [ "yoyo",     [0x0F, 0x38, 0x33], X, PREF_66                      | DEST_IN_REG;
+                    "yhmo",     [   2, 0x35      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovzxwd"    = [ "yoyo",     [0x0F, 0x38, 0x33], X, PREF_66;
                     "yomq",     [0x0F, 0x38, 0x33], X, PREF_66;
-] "vpmovzxwd"   = [ "y*y*",     [   2, 0x33      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovzxwd"   = [ "y*y*",     [   2, 0x33      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x33      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x33      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "pmovzxwq"    = [ "yoyo",     [0x0F, 0x38, 0x34], X, PREF_66                      | DEST_IN_REG;
+                    "yhmo",     [   2, 0x33      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "pmovzxwq"    = [ "yoyo",     [0x0F, 0x38, 0x34], X, PREF_66;
                     "yomd",     [0x0F, 0x38, 0x34], X, PREF_66;
-] "vpmovzxwq"   = [ "y*y*",     [   2, 0x34      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpmovzxwq"   = [ "y*y*",     [   2, 0x34      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomd",     [   2, 0x34      ], X, PREF_66             | VEX_OP;
-                    "yhmq",     [   2, 0x34      ], X, PREF_66 | LARGE_VEC | VEX_OP;
+                    "yhmq",     [   2, 0x34      ], X, PREF_66 | WITH_VEXL | VEX_OP;
 ] // and back to arithmetric
   "pmuldq"      = [ "yowo",     [0x0F, 0x38, 0x28], X, PREF_66;
 ] "vpmuldq"     = [ "y*y*w*",   [   2, 0x28      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
@@ -1359,25 +1427,25 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vpsignw"     = [ "y*y*w*",   [   2, 0x09      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] // Legacy forms of the shift instructions are in the MMX section
   "vpslld"      = [ "y*y*wo",   [   1, 0xF2      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x72      ], 6, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x72      ], 6, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "pslldq"      = [ "yoib",     [0x0F, 0x73      ], 7, PREF_66;
-] "vpslldq"     = [ "y*y*ib",   [   1, 0x73      ], 7, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpslldq"     = [ "y*y*ib",   [   1, 0x73      ], 7, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsllq"      = [ "y*y*wo",   [   1, 0xF3      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x73      ], 6, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x73      ], 6, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsllw"      = [ "y*y*wo",   [   1, 0xF1      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x71      ], 6, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x71      ], 6, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsrad"      = [ "y*y*wo",   [   1, 0xE2      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x72      ], 4, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x72      ], 4, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsraw"      = [ "y*y*wo",   [   1, 0xE1      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x71      ], 4, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x71      ], 4, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsrld"      = [ "y*y*wo",   [   1, 0xD2      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*y*ib",   [   1, 0x72      ], 2, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "psrldq"      = [ "yoib",     [0x0F, 0x73      ], 3, PREF_66;
-] "vpsrldq"     = [ "y*y*ib",   [   1, 0x73      ], 3, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpsrldq"     = [ "y*y*ib",   [   1, 0x73      ], 3, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsrlq"      = [ "y*y*wo",   [   1, 0xD3      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x73      ], 2, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x73      ], 2, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsrlw"      = [ "y*y*wo",   [   1, 0xD1      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "y*y*ib",   [   1, 0x71      ], 2, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*ib",   [   1, 0x71      ], 2, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] // legacy padd forms are in the MMX section
   "vpsubb"      = [ "y*y*w*",   [   1, 0xF8      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vpsubd"      = [ "y*y*w*",   [   1, 0xFA      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
@@ -1410,33 +1478,33 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vroundpd"    = [ "y*w*ib",   [   3, 0x09      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "roundps"     = [ "yowoib",   [0x0F, 0x3A, 0x08], X, PREF_66;
 ] "vroundps"    = [ "y*w*ib",   [   3, 0x08      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "roundsd"     = [ "yoyoib",   [0x0F, 0x3A, 0x0B], X, PREF_66                      | DEST_IN_REG;
+] "roundsd"     = [ "yoyoib",   [0x0F, 0x3A, 0x0B], X, PREF_66;
                     "yomqib",   [0x0F, 0x3A, 0x0B], X, PREF_66;
 ] "vroundsd"    = [ "yoyoyoib", [   3, 0x0B      ], X, PREF_66             | VEX_OP;
                     "yoyomqib", [   3, 0x0B      ], X, PREF_66             | VEX_OP;
-] "roundss"     = [ "yoyoib",   [0x0F, 0x3A, 0x0A], X, PREF_66                      | DEST_IN_REG;
+] "roundss"     = [ "yoyoib",   [0x0F, 0x3A, 0x0A], X, PREF_66;
                     "yomqib",   [0x0F, 0x3A, 0x0A], X, PREF_66;
 ] "vroundss"    = [ "yoyoyoib", [   3, 0x0A      ], X, PREF_66             | VEX_OP;
                     "yoyomqib", [   3, 0x0A      ], X, PREF_66             | VEX_OP;
 ] "rsqrtps"     = [ "yowo",     [0x0F, 0x52      ], X;
 ] "vrsqrtps"    = [ "y*w*",     [   1, 0x52      ], X,           AUTO_VEXL | VEX_OP;
-] "rsqrtss"     = [ "yoyo",     [0x0F, 0x52      ], X, PREF_F3                      | DEST_IN_REG;
+] "rsqrtss"     = [ "yoyo",     [0x0F, 0x52      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x52      ], X, PREF_F3;
 ] "vrsqrtss"    = [ "yoyoyo",   [   1, 0x52      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
                     "yoyomd",   [   1, 0x52      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
 ] "shufpd"      = [ "yowoib",   [0x0F, 0xC6      ], X, PREF_66;
-] "vshufpd"     = [ "y*Y*w*ib", [   1, 0xC6      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vshufpd"     = [ "y*y*w*ib", [   1, 0xC6      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "shufps"      = [ "yowoib",   [0x0F, 0xC6      ], X;
-] "vshufps"     = [ "y*Y*w*ib", [   1, 0xC6      ], X,           AUTO_VEXL | VEX_OP;
+] "vshufps"     = [ "y*y*w*ib", [   1, 0xC6      ], X,           AUTO_VEXL | VEX_OP;
 ] "sqrtpd"      = [ "yowo",     [0x0F, 0x51      ], X, PREF_66;
 ] "vsqrtpd"     = [ "y*w*",     [   1, 0x51      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "sqrtps"      = [ "yowo",     [0x0F, 0x51      ], X;
 ] "vsqrtps"     = [ "y*w*",     [   1, 0x51      ], X,           AUTO_VEXL | VEX_OP;
-] "sqrtsd"      = [ "yoyo",     [0x0F, 0x51      ], X, PREF_F2                      | DEST_IN_REG;
+] "sqrtsd"      = [ "yoyo",     [0x0F, 0x51      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x51      ], X, PREF_F2;
 ] "vsqrtsd"     = [ "yoyoyo",   [   1, 0x51      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x51      ], X, PREF_F2             | VEX_OP;
-] "sqrtss"      = [ "yoyo",     [0x0F, 0x51      ], X, PREF_F3                      | DEST_IN_REG;
+] "sqrtss"      = [ "yoyo",     [0x0F, 0x51      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x51      ], X, PREF_F3;
 ] "vsqrtss"     = [ "yoyoyo",   [   1, 0x51      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x51      ], X, PREF_F3             | VEX_OP;
@@ -1446,19 +1514,19 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vsubpd"      = [ "y*y*w*",   [   1, 0x5C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "subps"       = [ "yowo",     [0x0F, 0x5C      ], X;
 ] "vsubps"      = [ "y*y*w*",   [   1, 0x5C      ], X,           AUTO_VEXL | VEX_OP;
-] "subsd"       = [ "yoyo",     [0x0F, 0x5C      ], X, PREF_F2                      | DEST_IN_REG;
+] "subsd"       = [ "yoyo",     [0x0F, 0x5C      ], X, PREF_F2;
                     "yomq",     [0x0F, 0x5C      ], X, PREF_F2;
 ] "vsubsd"      = [ "yoyoyo",   [   1, 0x5C      ], X, PREF_F2             | VEX_OP;
                     "yoyomq",   [   1, 0x5C      ], X, PREF_F2             | VEX_OP;
-] "subss"       = [ "yoyo",     [0x0F, 0x5C      ], X, PREF_F3                      | DEST_IN_REG;
+] "subss"       = [ "yoyo",     [0x0F, 0x5C      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x5C      ], X, PREF_F3;
 ] "vsubss"      = [ "yoyoyo",   [   1, 0x5C      ], X, PREF_F3             | VEX_OP;
                     "yoyomd",   [   1, 0x5C      ], X, PREF_F3             | VEX_OP;
-] "ucomisd"     = [ "yoyo",     [0x0F, 0x2E      ], X, PREF_66                      | DEST_IN_REG;
+] "ucomisd"     = [ "yoyo",     [0x0F, 0x2E      ], X, PREF_66;
                     "yomq",     [0x0F, 0x2E      ], X, PREF_66;
 ] "vucomisd"    = [ "yoyoyo",   [   1, 0x2E      ], X, PREF_66             | VEX_OP;
                     "yoyomq",   [   1, 0x2E      ], X, PREF_66             | VEX_OP;
-] "ucomiss"     = [ "yoyo",     [0x0F, 0x2E      ], X,                                DEST_IN_REG;
+] "ucomiss"     = [ "yoyo",     [0x0F, 0x2E      ], X;
                     "yomd",     [0x0F, 0x2E      ], X;
 ] "vucomiss"    = [ "yoyoyo",   [   1, 0x2E      ], X,                       VEX_OP;
                     "yoyomd",   [   1, 0x2E      ], X,                       VEX_OP;
@@ -1472,206 +1540,206 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vunpcklps"   = [ "y*y*w*",   [   1, 0x14      ], X,           AUTO_VEXL | VEX_OP;
 ] // vex only operand forms
   "vbroadcastf128"
-                = [ "yhmo",     [   2, 0x1A      ], X, PREF_66 | LARGE_VEC | VEX_OP;
+                = [ "yhmo",     [   2, 0x1A      ], X, PREF_66 | WITH_VEXL | VEX_OP;
 ] "vbroadcasti128"
-                = [ "yhmo",     [   2, 0x5A      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vbroadcastsd"= [ "yhyo",     [   2, 0x19      ], X, PREF_66 | LARGE_VEC | VEX_OP | DEST_IN_REG;
-                    "yhmq",     [   2, 0x19      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vbroadcastss"= [ "y*yo",     [   2, 0x18      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+                = [ "yhmo",     [   2, 0x5A      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vbroadcastsd"= [ "yhyo",     [   2, 0x19      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+                    "yhmq",     [   2, 0x19      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vbroadcastss"= [ "y*yo",     [   2, 0x18      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*md",     [   2, 0x18      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vcvtph2ps"   = [ "y*yo",     [   2, 0x13      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vcvtph2ps"   = [ "y*yo",     [   2, 0x13      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "yomq",     [   2, 0x13      ], X, PREF_66             | VEX_OP;
-                    "yhmo",     [   2, 0x13      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vcvtps2ph"   = [ "yoy*ib",   [   3, 0x1D      ], X, PREF_66 | AUTO_VEXL | VEX_OP; // no DEST_IN_REG
+                    "yhmo",     [   2, 0x13      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vcvtps2ph"   = [ "yoy*ib",   [   3, 0x1D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | ENC_MR;
                     "mqyoib",   [   3, 0x1D      ], X, PREF_66             | VEX_OP;
-                    "moyhib",   [   3, 0x1D      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vextractf128"= [ "woyhib",   [   3, 0x19      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vextracti128"= [ "woyhib",   [   3, 0x39      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vfmaddpd"    = [ "y*y*w*y*", [   3, 0x69      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x69      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmadd132pd" = [ "y*y*w*",   [   2, 0x98      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmadd213pd" = [ "y*y*w*",   [   2, 0xA8      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmadd231pd" = [ "y*y*w*",   [   2, 0xB8      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmaddps"    = [ "y*y*w*y*", [   3, 0x68      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x68      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+                    "moyhib",   [   3, 0x1D      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vextractf128"= [ "woyhib",   [   3, 0x19      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vextracti128"= [ "woyhib",   [   3, 0x39      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vfmaddpd"    = [ "y*y*w*y*", [   3, 0x69      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x69      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmadd132pd" = [ "y*y*w*",   [   2, 0x98      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmadd213pd" = [ "y*y*w*",   [   2, 0xA8      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmadd231pd" = [ "y*y*w*",   [   2, 0xB8      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmaddps"    = [ "y*y*w*y*", [   3, 0x68      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x68      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vfmadd132ps" = [ "y*y*w*",   [   2, 0x98      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmadd213ps" = [ "y*y*w*",   [   2, 0xA8      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmadd231ps" = [ "y*y*w*",   [   2, 0xB8      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmaddsd"    = [ "yoyoyoyo", [   3, 0x6B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x6B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x6B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmadd132sd" = [ "yoyoyo",   [   2, 0x99      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0x99      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmadd213sd" = [ "yoyoyo",   [   2, 0xA9      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xA9      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmadd231sd" = [ "yoyoyo",   [   2, 0xB9      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xB9      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmaddss"    = [ "yoyoyoyo", [   3, 0x6A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x6A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x6A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmadd132ss" = [ "yoyoyo",   [   2, 0x99      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0x99      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmadd213ss" = [ "yoyoyo",   [   2, 0xA9      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xA9      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmadd231ss" = [ "yoyoyo",   [   2, 0xB9      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xB9      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmaddsuppd"   =["y*y*w*y*", [   3, 0x5D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x5D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmaddsub132pd"=["y*y*w*",   [   2, 0x96      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmaddsub213pd"=["y*y*w*",   [   2, 0xA6      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmaddsub231pd"=["y*y*w*",   [   2, 0xB6      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmaddsubps"   =["y*y*w*y*", [   3, 0x5C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x5C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+] "vfmaddsd"    = [ "yoyoyoyo", [   3, 0x6B      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x6B      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x6B      ], X, PREF_66             | VEX_OP;
+] "vfmadd132sd" = [ "yoyoyo",   [   2, 0x99      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0x99      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfmadd213sd" = [ "yoyoyo",   [   2, 0xA9      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xA9      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfmadd231sd" = [ "yoyoyo",   [   2, 0xB9      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xB9      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfmaddss"    = [ "yoyoyoyo", [   3, 0x6A      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x6A      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x6A      ], X, PREF_66             | VEX_OP;
+] "vfmadd132ss" = [ "yoyoyo",   [   2, 0x99      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0x99      ], X, PREF_66             | VEX_OP;
+] "vfmadd213ss" = [ "yoyoyo",   [   2, 0xA9      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xA9      ], X, PREF_66             | VEX_OP;
+] "vfmadd231ss" = [ "yoyoyo",   [   2, 0xB9      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xB9      ], X, PREF_66             | VEX_OP;
+] "vfmaddsuppd"   =["y*y*w*y*", [   3, 0x5D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x5D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmaddsub132pd"=["y*y*w*",   [   2, 0x96      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmaddsub213pd"=["y*y*w*",   [   2, 0xA6      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmaddsub231pd"=["y*y*w*",   [   2, 0xB6      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmaddsubps"   =["y*y*w*y*", [   3, 0x5C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x5C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vfmaddsub132ps"=["y*y*w*",   [   2, 0x96      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmaddsub213ps"=["y*y*w*",   [   2, 0xA6      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmaddsub231ps"=["y*y*w*",   [   2, 0xB6      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmsubaddpd"   =["y*y*w*y*", [   3, 0x5F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x5F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmsubadd132pd"=["y*y*w*",   [   2, 0x97      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsubadd213pd"=["y*y*w*",   [   2, 0xA7      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsubadd231pd"=["y*y*w*",   [   2, 0xB7      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsubaddps"   =["y*y*w*y*", [   3, 0x5E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x5E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+] "vfmsubaddpd"   =["y*y*w*y*", [   3, 0x5F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x5F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsubadd132pd"=["y*y*w*",   [   2, 0x97      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsubadd213pd"=["y*y*w*",   [   2, 0xA7      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsubadd231pd"=["y*y*w*",   [   2, 0xB7      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsubaddps"   =["y*y*w*y*", [   3, 0x5E      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x5E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vfmsubadd132ps"=["y*y*w*",   [   2, 0x97      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmsubadd213ps"=["y*y*w*",   [   2, 0xA7      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmsubadd231ps"=["y*y*w*",   [   2, 0xB7      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmsubpd"    = [ "y*y*w*y*", [   3, 0x6D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x6D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmsub132pd" = [ "y*y*w*",   [   2, 0x9A      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsub213pd" = [ "y*y*w*",   [   2, 0xAA      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsub231pd" = [ "y*y*w*",   [   2, 0xBA      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsubps"    = [ "y*y*w*y*", [   3, 0x6C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x6C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+] "vfmsubpd"    = [ "y*y*w*y*", [   3, 0x6D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x6D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsub132pd" = [ "y*y*w*",   [   2, 0x9A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsub213pd" = [ "y*y*w*",   [   2, 0xAA      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsub231pd" = [ "y*y*w*",   [   2, 0xBA      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfmsubps"    = [ "y*y*w*y*", [   3, 0x6C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x6C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vfmsub132ps" = [ "y*y*w*",   [   2, 0x9A      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmsub213ps" = [ "y*y*w*",   [   2, 0xAA      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfmsub231ps" = [ "y*y*w*",   [   2, 0xBA      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmsubsd"    = [ "yoyoyoyo", [   3, 0x6F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x6F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x6F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmsub132sd" = [ "yoyoyo",   [   2, 0x9B      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0x9B      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsub213sd" = [ "yoyoyo",   [   2, 0xAB      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xAB      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsub231sd" = [ "yoyoyo",   [   2, 0xBB      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xBB      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfmsubss"    = [ "yoyoyoyo", [   3, 0x6E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x6E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x6E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfmsub132ss" = [ "yoyoyo",   [   2, 0x9B      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0x9B      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmsub213ss" = [ "yoyoyo",   [   2, 0xAB      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xAB      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfmsub231ss" = [ "yoyoyo",   [   2, 0xBB      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xBB      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmaddpd"   = [ "y*y*w*y*", [   3, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfnmadd132pd"= [ "y*y*w*",   [   2, 0x9C      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmadd213pd"= [ "y*y*w*",   [   2, 0xAC      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmadd231pd"= [ "y*y*w*",   [   2, 0xBC      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmaddps"   = [ "y*y*w*y*", [   3, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+] "vfmsubsd"    = [ "yoyoyoyo", [   3, 0x6F      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x6F      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x6F      ], X, PREF_66             | VEX_OP;
+] "vfmsub132sd" = [ "yoyoyo",   [   2, 0x9B      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0x9B      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfmsub213sd" = [ "yoyoyo",   [   2, 0xAB      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xAB      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfmsub231sd" = [ "yoyoyo",   [   2, 0xBB      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xBB      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfmsubss"    = [ "yoyoyoyo", [   3, 0x6E      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x6E      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x6E      ], X, PREF_66             | VEX_OP;
+] "vfmsub132ss" = [ "yoyoyo",   [   2, 0x9B      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0x9B      ], X, PREF_66             | VEX_OP;
+] "vfmsub213ss" = [ "yoyoyo",   [   2, 0xAB      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xAB      ], X, PREF_66             | VEX_OP;
+] "vfmsub231ss" = [ "yoyoyo",   [   2, 0xBB      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xBB      ], X, PREF_66             | VEX_OP;
+] "vfnmaddpd"   = [ "y*y*w*y*", [   3, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmadd132pd"= [ "y*y*w*",   [   2, 0x9C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmadd213pd"= [ "y*y*w*",   [   2, 0xAC      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmadd231pd"= [ "y*y*w*",   [   2, 0xBC      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmaddps"   = [ "y*y*w*y*", [   3, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vfnmadd132ps"= [ "y*y*w*",   [   2, 0x9C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfnmadd213ps"= [ "y*y*w*",   [   2, 0xAC      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfnmadd231ps"= [ "y*y*w*",   [   2, 0xBC      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmaddsd"   = [ "yoyoyoyo", [   3, 0x7B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x7B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x7B      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfnmadd132sd"= [ "yoyoyo",   [   2, 0x9D      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0x9D      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmadd213sd"= [ "yoyoyo",   [   2, 0xAD      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xAD      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmadd231sd"= [ "yoyoyo",   [   2, 0xBD      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xBD      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmaddss"   = [ "yoyoyoyo", [   3, 0x7A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x7A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x7A      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfnmadd132ss"= [ "yoyoyo",   [   2, 0x9D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0x9D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmadd213ss"= [ "yoyoyo",   [   2, 0xAD      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xAD      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmadd231ss"= [ "yoyoyo",   [   2, 0xBD      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xBD      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmsubpd"   = [ "y*y*w*y*", [   3, 0x7D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x7D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfnmsub132pd"= [ "y*y*w*",   [   2, 0x9E      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmsub213pd"= [ "y*y*w*",   [   2, 0xAE      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmsub231pd"= [ "y*y*w*",   [   2, 0xBE      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmsubps"   = [ "y*y*w*y*", [   3, 0x7C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*", [   3, 0x7C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+] "vfnmaddsd"   = [ "yoyoyoyo", [   3, 0x7B      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x7B      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x7B      ], X, PREF_66             | VEX_OP;
+] "vfnmadd132sd"= [ "yoyoyo",   [   2, 0x9D      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0x9D      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfnmadd213sd"= [ "yoyoyo",   [   2, 0xAD      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xAD      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfnmadd231sd"= [ "yoyoyo",   [   2, 0xBD      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xBD      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfnmaddss"   = [ "yoyoyoyo", [   3, 0x7A      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x7A      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x7A      ], X, PREF_66             | VEX_OP;
+] "vfnmadd132ss"= [ "yoyoyo",   [   2, 0x9D      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0x9D      ], X, PREF_66             | VEX_OP;
+] "vfnmadd213ss"= [ "yoyoyo",   [   2, 0xAD      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xAD      ], X, PREF_66             | VEX_OP;
+] "vfnmadd231ss"= [ "yoyoyo",   [   2, 0xBD      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xBD      ], X, PREF_66             | VEX_OP;
+] "vfnmsubpd"   = [ "y*y*w*y*", [   3, 0x7D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x7D      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmsub132pd"= [ "y*y*w*",   [   2, 0x9E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmsub213pd"= [ "y*y*w*",   [   2, 0xAE      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmsub231pd"= [ "y*y*w*",   [   2, 0xBE      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vfnmsubps"   = [ "y*y*w*y*", [   3, 0x7C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*", [   3, 0x7C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vfnmsub132ps"= [ "y*y*w*",   [   2, 0x9E      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfnmsub213ps"= [ "y*y*w*",   [   2, 0xAE      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vfnmsub231ps"= [ "y*y*w*",   [   2, 0xBE      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmsubsd"   = [ "yoyoyoyo", [   3, 0x7F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x7F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x7F      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfnmsub132sd"= [ "yoyoyo",   [   2, 0x9F      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0x9F      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmsub213sd"= [ "yoyoyo",   [   2, 0xAF      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xAF      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmsub231sd"= [ "yoyoyo",   [   2, 0xBF      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "yoyomq",   [   2, 0xBF      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vfnmsubss"   = [ "yoyoyoyo", [   3, 0x7E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG; // why
-                    "yoyomqyo", [   3, 0x7E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "yoyoyomq", [   3, 0x7E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vfnmsub132ss"= [ "yoyoyo",   [   2, 0x9F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0x9F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmsub213ss"= [ "yoyoyo",   [   2, 0xAF      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xAF      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vfnmsub231ss"= [ "yoyoyo",   [   2, 0xBF      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    "yoyomq",   [   2, 0xBF      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vfnmsubsd"   = [ "yoyoyoyo", [   3, 0x7F      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x7F      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x7F      ], X, PREF_66             | VEX_OP;
+] "vfnmsub132sd"= [ "yoyoyo",   [   2, 0x9F      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0x9F      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfnmsub213sd"= [ "yoyoyo",   [   2, 0xAF      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xAF      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfnmsub231sd"= [ "yoyoyo",   [   2, 0xBF      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomq",   [   2, 0xBF      ], X, PREF_66             | VEX_OP | WITH_REXW;
+] "vfnmsubss"   = [ "yoyoyoyo", [   3, 0x7E      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyoyomq", [   3, 0x7E      ], X, PREF_66             | VEX_OP | WITH_REXW;
+                    "yoyomqyo", [   3, 0x7E      ], X, PREF_66             | VEX_OP;
+] "vfnmsub132ss"= [ "yoyoyo",   [   2, 0x9F      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0x9F      ], X, PREF_66             | VEX_OP;
+] "vfnmsub213ss"= [ "yoyoyo",   [   2, 0xAF      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xAF      ], X, PREF_66             | VEX_OP;
+] "vfnmsub231ss"= [ "yoyoyo",   [   2, 0xBF      ], X, PREF_66             | VEX_OP;
+                    "yoyomq",   [   2, 0xBF      ], X, PREF_66             | VEX_OP;
 ] "vfrczpd"     = [ "y*w*",     [   9, 0x81      ], X,           AUTO_VEXL | XOP_OP;
 ] "vfrczps"     = [ "y*w*",     [   9, 0x80      ], X,           AUTO_VEXL | XOP_OP;
-] "vfrczsd"     = [ "yoyo",     [   9, 0x83      ], X,                       XOP_OP | DEST_IN_REG;
+] "vfrczsd"     = [ "yoyo",     [   9, 0x83      ], X,                       XOP_OP;
                     "yomq",     [   9, 0x83      ], X,                       XOP_OP;
-] "vfrczss"     = [ "yoyo",     [   9, 0x82      ], X,                       XOP_OP | DEST_IN_REG;
+] "vfrczss"     = [ "yoyo",     [   9, 0x82      ], X,                       XOP_OP;
                     "yomd",     [   9, 0x82      ], X,                       XOP_OP;
-] "vgatherdpd"  = [ "y*koy*",   [   2, 0x92      ], X, PREF_66 | AUTO_VEXL | VEX_OP               | LARGE_SIZE;
+] "vgatherdpd"  = [ "y*koy*",   [   2, 0x92      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vgatherdps"  = [ "y*k*y*",   [   2, 0x92      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vgatherqpd"  = [ "y*l*y*",   [   2, 0x93      ], X, PREF_66 | AUTO_VEXL | VEX_OP               | LARGE_SIZE;
+] "vgatherqpd"  = [ "y*l*y*",   [   2, 0x93      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vgatherqps"  = [ "yol*yo",   [   2, 0x93      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vinsertf128" = [ "yhyhwoib", [   3, 0x18      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vinserti128" = [ "yhyhwoib", [   3, 0x38      ], X, PREF_66 | LARGE_VEC | VEX_OP;
+] "vinsertf128" = [ "yhyhwoib", [   3, 0x18      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vinserti128" = [ "yhyhwoib", [   3, 0x38      ], X, PREF_66 | WITH_VEXL | VEX_OP;
 ] "vmaskmovpd"  = [ "y*y*m*",   [   2, 0x2D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "m*y*y*",   [   2, 0x2F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vmaskmovps"  = [ "y*y*m*",   [   2, 0x2C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "m*y*y*",   [   2, 0x2E      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vpblendd"    = [ "y*y*w*ib", [   3, 0x02      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpbroadcastb"= [ "y*yo",     [   2, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpbroadcastb"= [ "y*yo",     [   2, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*mb",     [   2, 0x78      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpbroadcastd"= [ "y*yo",     [   2, 0x58      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpbroadcastd"= [ "y*yo",     [   2, 0x58      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*md",     [   2, 0x58      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpbroadcastq"= [ "y*yo",     [   2, 0x59      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpbroadcastq"= [ "y*yo",     [   2, 0x59      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*mq",     [   2, 0x59      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpbroadcastw"= [ "y*yo",     [   2, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP | DEST_IN_REG;
+] "vpbroadcastw"= [ "y*yo",     [   2, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*mw",     [   2, 0x79      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpcmov"      = [ "y*y*w*y*", [   8, 0xA2      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-                    "y*y*y*w*", [   8, 0xA2      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG | LARGE_SIZE;
-] "vpcomb"      = [ "yoyowoib", [   8, 0xCC      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomd"      = [ "yoyowoib", [   8, 0xCE      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomq"      = [ "yoyowoib", [   8, 0xCF      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomub"     = [ "yoyowoib", [   8, 0xEC      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomud"     = [ "yoyowoib", [   8, 0xEE      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomuq"     = [ "yoyowoib", [   8, 0xEF      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomuw"     = [ "yoyowoib", [   8, 0xED      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vpcomw"      = [ "yoyowoib", [   8, 0xCD      ], X,           AUTO_VEXL | XOP_OP | DEST_IN_REG;
-] "vperm2f128"  = [ "yhyhwhib", [   3, 0x06      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vperm2i128"  = [ "yhyhwhib", [   3, 0x46      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vpermd"      = [ "yhyhwh",   [   3, 0x36      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vpermil2pd"  = [ "y*y*w*y*ib",[  3, 0x49      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*ib",[  3, 0x49      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
-] "vpermil2pS"  = [ "y*y*w*y*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG;
-                    "y*y*y*w*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP | FOURTH_ARG | LARGE_SIZE;
+] "vpcmov"      = [ "y*y*w*y*", [   8, 0xA2      ], X,           AUTO_VEXL | XOP_OP;
+                    "y*y*y*w*", [   8, 0xA2      ], X,           AUTO_VEXL | XOP_OP | WITH_REXW;
+] "vpcomb"      = [ "yoyowoib", [   8, 0xCC      ], X,                       XOP_OP;
+] "vpcomd"      = [ "yoyowoib", [   8, 0xCE      ], X,                       XOP_OP;
+] "vpcomq"      = [ "yoyowoib", [   8, 0xCF      ], X,                       XOP_OP;
+] "vpcomub"     = [ "yoyowoib", [   8, 0xEC      ], X,                       XOP_OP;
+] "vpcomud"     = [ "yoyowoib", [   8, 0xEE      ], X,                       XOP_OP;
+] "vpcomuq"     = [ "yoyowoib", [   8, 0xEF      ], X,                       XOP_OP;
+] "vpcomuw"     = [ "yoyowoib", [   8, 0xED      ], X,                       XOP_OP;
+] "vpcomw"      = [ "yoyowoib", [   8, 0xCD      ], X,                       XOP_OP;
+] "vperm2f128"  = [ "yhyhwhib", [   3, 0x06      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vperm2i128"  = [ "yhyhwhib", [   3, 0x46      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vpermd"      = [ "yhyhwh",   [   3, 0x36      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vpermil2pd"  = [ "y*y*w*y*ib",[  3, 0x49      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*ib",[  3, 0x49      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vpermil2pS"  = [ "y*y*w*y*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+                    "y*y*y*w*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vpermilpd"   = [ "y*y*w*",   [   2, 0x0D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*w*ib",   [   3, 0x05      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vpermilps"   = [ "y*y*w*",   [   2, 0x0C      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     "y*w*ib",   [   3, 0x04      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpermpd"     = [ "yhwhib",   [   3, 0x01      ], X, PREF_66 | LARGE_VEC | VEX_OP             | LARGE_SIZE;
-] "vpermps"     = [ "yhyhwh",   [   2, 0x01      ], X, PREF_66 | LARGE_VEC | VEX_OP;
-] "vpermq"      = [ "yhwhib",   [   3, 0x00      ], X, PREF_66 | LARGE_VEC | VEX_OP             | LARGE_SIZE;
+] "vpermpd"     = [ "yhwhib",   [   3, 0x01      ], X, PREF_66 | WITH_VEXL | VEX_OP | WITH_REXW;
+] "vpermps"     = [ "yhyhwh",   [   2, 0x01      ], X, PREF_66 | WITH_VEXL | VEX_OP;
+] "vpermq"      = [ "yhwhib",   [   3, 0x00      ], X, PREF_66 | WITH_VEXL | VEX_OP | WITH_REXW;
 ] "vpgatherdd"  = [ "y*k*y*",   [   2, 0x90      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpgatherdq"  = [ "y*koy*",   [   2, 0x90      ], X, PREF_66 | AUTO_VEXL | VEX_OP             | LARGE_SIZE;
+] "vpgatherdq"  = [ "y*koy*",   [   2, 0x90      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vpgatherqd"  = [ "yok*yo",   [   2, 0x91      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpgatherqq"  = [ "y*k*y*",   [   2, 0x91      ], X, PREF_66 | AUTO_VEXL | VEX_OP             | LARGE_SIZE;
+] "vpgatherqq"  = [ "y*k*y*",   [   2, 0x91      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vphaddbd"    = [ "yowo",     [   9, 0xC2      ], X,                       XOP_OP;
 ] "vphaddbq"    = [ "yowo",     [   9, 0xC3      ], X,                       XOP_OP;
 ] "vphaddbw"    = [ "yowo",     [   9, 0xC1      ], X,                       XOP_OP;
@@ -1687,60 +1755,60 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "vphsubbw"    = [ "yowo",     [   9, 0xE1      ], X,                       XOP_OP;
 ] "vphsubdq"    = [ "yowo",     [   9, 0xE3      ], X,                       XOP_OP;
 ] "vphsubwd"    = [ "yowo",     [   9, 0xE2      ], X,                       XOP_OP;
-] "vpmacsdd"    = [ "yoyowoyo", [   8, 0x9E      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacsdqh"   = [ "yoyowoyo", [   8, 0x9F      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacsdql"   = [ "yoyowoyo", [   8, 0x97      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacssdd"   = [ "yoyowoyo", [   8, 0x8E      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacssdqh"  = [ "yoyowoyo", [   8, 0x8F      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacssdql"  = [ "yoyowoyo", [   8, 0x87      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacsswd"   = [ "yoyowoyo", [   8, 0x86      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacssww"   = [ "yoyowoyo", [   8, 0x85      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacswd"    = [ "yoyowoyo", [   8, 0x96      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmacsww"    = [ "yoyowoyo", [   8, 0x95      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmadcsswd"  = [ "yoyowoyo", [   8, 0xA6      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmadcswd"   = [ "yoyowoyo", [   8, 0xB6      ], X,                       XOP_OP | FOURTH_ARG;
-] "vpmaskmovd"  = [ "y*y*m*",   [   2, 0x8C      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "m*y*y*",   [   2, 0x8E      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vpmaskmovq"  = [ "y*y*m*",   [   2, 0x8C      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-                    "m*y*y*",   [   2, 0x8E      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
-] "vpperm"      = [ "yoyowoyo", [   8, 0xA3      ], X,                       XOP_OP | FOURTH_ARG;
-                    "yoyoyowo", [   8, 0xA3      ], X,                       XOP_OP | FOURTH_ARG | LARGE_SIZE;
+] "vpmacsdd"    = [ "yoyowoyo", [   8, 0x9E      ], X,                       XOP_OP;
+] "vpmacsdqh"   = [ "yoyowoyo", [   8, 0x9F      ], X,                       XOP_OP;
+] "vpmacsdql"   = [ "yoyowoyo", [   8, 0x97      ], X,                       XOP_OP;
+] "vpmacssdd"   = [ "yoyowoyo", [   8, 0x8E      ], X,                       XOP_OP;
+] "vpmacssdqh"  = [ "yoyowoyo", [   8, 0x8F      ], X,                       XOP_OP;
+] "vpmacssdql"  = [ "yoyowoyo", [   8, 0x87      ], X,                       XOP_OP;
+] "vpmacsswd"   = [ "yoyowoyo", [   8, 0x86      ], X,                       XOP_OP;
+] "vpmacssww"   = [ "yoyowoyo", [   8, 0x85      ], X,                       XOP_OP;
+] "vpmacswd"    = [ "yoyowoyo", [   8, 0x96      ], X,                       XOP_OP;
+] "vpmacsww"    = [ "yoyowoyo", [   8, 0x95      ], X,                       XOP_OP;
+] "vpmadcsswd"  = [ "yoyowoyo", [   8, 0xA6      ], X,                       XOP_OP;
+] "vpmadcswd"   = [ "yoyowoyo", [   8, 0xB6      ], X,                       XOP_OP;
+] "vpmaskmovd"  = [ "y*y*m*",   [   2, 0x8C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+                    "m*y*y*",   [   2, 0x8E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vpmaskmovq"  = [ "y*y*m*",   [   2, 0x8C      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+                    "m*y*y*",   [   2, 0x8E      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
+] "vpperm"      = [ "yoyowoyo", [   8, 0xA3      ], X,                       XOP_OP;
+                    "yoyoyowo", [   8, 0xA3      ], X,                       XOP_OP | WITH_REXW;
 ] "vprotb"      = [ "yowoyo",   [   9, 0x90      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x90      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x90      ], X,                       XOP_OP | WITH_REXW;
                     "yowoib",   [   8, 0xC0      ], X,                       XOP_OP;
 ] "vprotd"      = [ "yowoyo",   [   9, 0x92      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x92      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x92      ], X,                       XOP_OP | WITH_REXW;
                     "yowoib",   [   8, 0xC2      ], X,                       XOP_OP;
 ] "vprotq"      = [ "yowoyo",   [   9, 0x93      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x93      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x93      ], X,                       XOP_OP | WITH_REXW;
                     "yowoib",   [   8, 0xC3      ], X,                       XOP_OP;
 ] "vprotw"      = [ "yowoyo",   [   9, 0x91      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x91      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x91      ], X,                       XOP_OP | WITH_REXW;
                     "yowoib",   [   8, 0xC1      ], X,                       XOP_OP;
 ] "vpshab"      = [ "yowoyo",   [   9, 0x98      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x98      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x98      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshad"      = [ "yowoyo",   [   9, 0x9A      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x9A      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x9A      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshaq"      = [ "yowoyo",   [   9, 0x9B      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x9B      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x9B      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshaw"      = [ "yowoyo",   [   9, 0x99      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x99      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x99      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshlb"      = [ "yowoyo",   [   9, 0x94      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x94      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x94      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshld"      = [ "yowoyo",   [   9, 0x96      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x96      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x96      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshlq"      = [ "yowoyo",   [   9, 0x97      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x97      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x97      ], X,                       XOP_OP | WITH_REXW;
 ] "vpshlw"      = [ "yowoyo",   [   9, 0x95      ], X,                       XOP_OP;
-                    "yoyowo",   [   9, 0x95      ], X,                       XOP_OP              | LARGE_SIZE;
+                    "yoyowo",   [   9, 0x95      ], X,                       XOP_OP | WITH_REXW;
 ] "vpsllvd"     = [ "y*y*w*",   [   2, 0x47      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpsllvq"     = [ "y*y*w*",   [   2, 0x47      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
+] "vpsllvq"     = [ "y*y*w*",   [   2, 0x47      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vpsravd"     = [ "y*y*w*",   [   2, 0x46      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vpsrlvd"     = [ "y*y*w*",   [   2, 0x45      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vpsrlvq"     = [ "y*y*w*",   [   2, 0x45      ], X, PREF_66 | AUTO_VEXL | VEX_OP              | LARGE_SIZE;
+] "vpsrlvq"     = [ "y*y*w*",   [   2, 0x45      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vtestpd"     = [ "y*w*",     [   2, 0x0F      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "vtestps"     = [ "y*w*",     [   2, 0x0E      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-] "vzeroall"    = [ "",         [   1, 0x77      ], X,           LARGE_VEC | VEX_OP;
+] "vzeroall"    = [ "",         [   1, 0x77      ], X,           WITH_VEXL | VEX_OP;
 ] "vzeroupper"  = [ "",         [   1, 0x77      ], X,                       VEX_OP;
 ] "xgetbv"      = [ "",         [0x0F, 0x01, 0xD0], X;
 ] // Do not ask me why there are separate mnemnonics for single and double precision float xors. This
@@ -1753,7 +1821,6 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 ] "xrstor"      = [ "m!",       [0x0F, 0xAE      ], 5;
 ] "xsave"       = [ "m!",       [0x0F, 0xAE      ], 4;
 ] "xsaveopt"    = [ "m!",       [0x0F, 0xAE      ], 6;
-] "xsetbv"      = [ "",         [0x0F, 0x01, 0xD1], 4;
+] "xsetbv"      = [ "",         [0x0F, 0x01, 0xD1], X;
 ] // and we're done. well, until intel's new extensions get more use
-    }))
-}
+);

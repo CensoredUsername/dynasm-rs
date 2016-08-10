@@ -189,7 +189,13 @@ impl RegKind {
     }
 
     pub fn is_extended(&self) -> bool {
-        self.code().unwrap_or(8) > 7
+        match self.family() {
+            RegFamily::LEGACY  |
+            RegFamily::XMM     |
+            RegFamily::CONTROL |
+            RegFamily::DEBUG   => self.code().unwrap_or(8) > 7,
+            _ => false
+        }
     }
 
     pub fn encode(&self) -> u8 {
@@ -242,16 +248,16 @@ impl RegId {
 
     pub fn family(&self) -> RegFamily {
         match *self as u8 >> 4 {
-                0 => RegFamily::LEGACY,
-                1 => RegFamily::RIP,
-                2 => RegFamily::HIGHBYTE,
-                3 => RegFamily::FP,
-                4 => RegFamily::MMX,
-                5 => RegFamily::XMM,
-                6 => RegFamily::SEGMENT,
-                7 => RegFamily::CONTROL,
-                8 => RegFamily::DEBUG,
-                _ => unreachable!()
+            0 => RegFamily::LEGACY,
+            1 => RegFamily::RIP,
+            2 => RegFamily::HIGHBYTE,
+            3 => RegFamily::FP,
+            4 => RegFamily::MMX,
+            5 => RegFamily::XMM,
+            6 => RegFamily::SEGMENT,
+            7 => RegFamily::CONTROL,
+            8 => RegFamily::DEBUG,
+            _ => unreachable!()
         }
     }
 
@@ -638,12 +644,12 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
 
             "xmm0"  => (XMM0 , OWORD), "xmm1"  => (XMM1 , OWORD), "xmm2"  => (XMM2 , OWORD), "xmm3"  => (XMM3 , OWORD),
             "xmm4"  => (XMM4 , OWORD), "xmm5"  => (XMM5 , OWORD), "xmm6"  => (XMM6 , OWORD), "xmm7"  => (XMM7 , OWORD),
-            "xmm8 " => (XMM8 , OWORD), "xmm9 " => (XMM9 , OWORD), "xmm10" => (XMM10, OWORD), "xmm11" => (XMM11, OWORD),
+            "xmm8"  => (XMM8 , OWORD), "xmm9"  => (XMM9 , OWORD), "xmm10" => (XMM10, OWORD), "xmm11" => (XMM11, OWORD),
             "xmm12" => (XMM12, OWORD), "xmm13" => (XMM13, OWORD), "xmm14" => (XMM14, OWORD), "xmm15" => (XMM15, OWORD),
 
             "ymm0"  => (XMM0 , HWORD), "ymm1"  => (XMM1 , HWORD), "ymm2"  => (XMM2 , HWORD), "ymm3"  => (XMM3 , HWORD),
             "ymm4"  => (XMM4 , HWORD), "ymm5"  => (XMM5 , HWORD), "ymm6"  => (XMM6 , HWORD), "ymm7"  => (XMM7 , HWORD),
-            "ymm8 " => (XMM8 , HWORD), "ymm9 " => (XMM9 , HWORD), "ymm10" => (XMM10, HWORD), "ymm11" => (XMM11, HWORD),
+            "ymm8"  => (XMM8 , HWORD), "ymm9"  => (XMM9 , HWORD), "ymm10" => (XMM10, HWORD), "ymm11" => (XMM11, HWORD),
             "ymm12" => (XMM12, HWORD), "ymm13" => (XMM13, HWORD), "ymm14" => (XMM14, HWORD), "ymm15" => (XMM15, HWORD),
 
             "es" => (ES, WORD), "cs" => (CS, WORD), "ss" => (SS, WORD), "ds" => (DS, WORD),
@@ -689,7 +695,7 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             "Rm" => (Size::QWORD, RegFamily::MMX),
             "Rx" => (Size::OWORD, RegFamily::XMM),
             "Ry" => (Size::HWORD, RegFamily::XMM),
-            "Rs" => (Size::WORD,  RegFamily::XMM),
+            "Rs" => (Size::WORD,  RegFamily::SEGMENT),
             "RC" => (Size::QWORD, RegFamily::CONTROL),
             "RD" => (Size::QWORD, RegFamily::DEBUG),
             _ => return None

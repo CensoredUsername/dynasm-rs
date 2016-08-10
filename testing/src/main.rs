@@ -86,10 +86,12 @@ fn main() {
         ; lea rax, [->b]
         // dynamic registers
         ; inc Rb(1)
+        ; inc Rh(5)
         ; inc Rw(1)
         ; inc Rd(1)
         ; inc Rq(1)
         ; mov Rb(7), [Rq(3)*4 + rax]
+        ; fsub Rf(5), st0
         // other register families
         ; mov cr1, rax
         ; mov dr1, rax
@@ -99,6 +101,16 @@ fn main() {
         ; movmskps eax, xmm7
         ; movd mmx7, eax
         ; movd eax, mmx7
+        ; fcomp st0
+        // VEX/XOP instructions
+        ; andn rax, rcx, rdx
+        ; andn r8, r9, r10
+        ; bextr rax, rbx, 1
+        ; vaddpd xmm0, xmm1, [rax]
+        // VSIB addressing
+        ; vgatherqpd ymm1, QWORD [ymm15*8 + rsi + 0x11112222], ymm8
+        // 4 argument instructions
+        ; vfmaddss xmm0, xmm1, xmm2, xmm3
     );
 
     let index = ops.offset();

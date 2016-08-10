@@ -1,9 +1,12 @@
 #![feature(plugin_registrar, rustc_private)]
-#![feature(trace_macros)]
+#![feature(const_fn)]
 
 extern crate syntax;
 extern crate rustc_plugin;
-extern crate itertools;
+#[macro_use]
+extern crate lazy_static;
+#[macro_use]
+extern crate bitflags;
 
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
