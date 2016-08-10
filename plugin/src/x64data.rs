@@ -1248,9 +1248,9 @@ Ops!(OPMAP;
 ] // pcmpeqw is in the MMX section
   "vpcmpeqw"    = [ "y*y*w*",   [   1, 0x75      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "pcmpestri"   = [ "yowoib",   [0x0F, 0x3A, 0x61], X, PREF_66;
-] "vpcmpestri"  = [ "yowoib",   [   3, 0x61      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpcmpestri"  = [ "yowoib",   [   3, 0x61      ], X, PREF_66             | VEX_OP;
 ] "pcmpestrm"   = [ "yowoib",   [0x0F, 0x3A, 0x60], X, PREF_66;
-] "vpcmpestrm"  = [ "yowoib",   [   3, 0x60      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpcmpestrm"  = [ "yowoib",   [   3, 0x60      ], X, PREF_66             | VEX_OP;
 ] // pcmpgtb is in the MMX section
   "vpcmpgtb"    = [ "y*y*w*",   [   1, 0x64      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] // pcmpgtd is in the MMX section
@@ -1260,9 +1260,9 @@ Ops!(OPMAP;
 ] // pcmpgtw is in the MMX section
   "vpcmpgtw"    = [ "y*y*w*",   [   1, 0x65      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "pcmpistri"   = [ "yowoib",   [0x0F, 0x3A, 0x63], X, PREF_66;
-] "vpcmpistri"  = [ "yowoib",   [   3, 0x63      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpcmpistri"  = [ "yowoib",   [   3, 0x63      ], X, PREF_66             | VEX_OP;
 ] "pcmpistrm"   = [ "yowoib",   [0x0F, 0x3A, 0x62], X, PREF_66;
-] "vpcmpistrm"  = [ "yowoib",   [   3, 0x62      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpcmpistrm"  = [ "yowoib",   [   3, 0x62      ], X, PREF_66             | VEX_OP;
 ] "pextrb"      = [ "r?yoib",   [0x0F, 0x3A, 0x14], X, PREF_66                      | ENC_MR;
                     "mbyoib",   [0x0F, 0x3A, 0x14], X, PREF_66;
 ] "vpextrb"     = [ "r?yoib",   [   3, 0x14      ], X, PREF_66             | VEX_OP | ENC_MR;
@@ -1490,8 +1490,8 @@ Ops!(OPMAP;
 ] "vrsqrtps"    = [ "y*w*",     [   1, 0x52      ], X,           AUTO_VEXL | VEX_OP;
 ] "rsqrtss"     = [ "yoyo",     [0x0F, 0x52      ], X, PREF_F3;
                     "yomd",     [0x0F, 0x52      ], X, PREF_F3;
-] "vrsqrtss"    = [ "yoyoyo",   [   1, 0x52      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
-                    "yoyomd",   [   1, 0x52      ], X, PREF_F3 | AUTO_VEXL | VEX_OP;
+] "vrsqrtss"    = [ "yoyoyo",   [   1, 0x52      ], X, PREF_F3             | VEX_OP;
+                    "yoyomd",   [   1, 0x52      ], X, PREF_F3             | VEX_OP;
 ] "shufpd"      = [ "yowoib",   [0x0F, 0xC6      ], X, PREF_66;
 ] "vshufpd"     = [ "y*y*w*ib", [   1, 0xC6      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
 ] "shufps"      = [ "yowoib",   [0x0F, 0xC6      ], X;
