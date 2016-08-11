@@ -8,6 +8,7 @@ use parser::{self, Item, Arg, Ident, MemoryRef, Register, RegKind, RegFamily, Re
 use x64data::get_mnemnonic_data;
 use x64data::flags::*;
 use serialize::or_mask_shift_expr;
+use debug::format_opdata_list;
 
 use std::mem::swap;
 use std::str;
@@ -53,7 +54,7 @@ pub struct FormatStringIterator<'a> {
 }
 
 impl<'a> FormatStringIterator<'a> {
-    fn new(buf: &'a str) -> FormatStringIterator<'a> {
+    pub fn new(buf: &'a str) -> FormatStringIterator<'a> {
         FormatStringIterator {inner: buf.chars()}
     }
 }
@@ -219,7 +220,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             if op_size == Size::HWORD {
                 vex_l = true;
             } else if op_size != Size::OWORD {
-                panic!("bad encoding data");
+                panic!("bad formatting data");
             }
         } else {
             if op_size == Size::WORD {
@@ -227,7 +228,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             } else if op_size == Size::QWORD {
                 rex_w = true;
             } else if op_size != Size::DWORD {
-                panic!("bad encoding data");
+                panic!("bad formatting data");
             }
         }
     }
@@ -432,7 +433,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             if let Arg::Immediate(expr, Some(Size::BYTE)) = args.remove(0) {
                 byte = or_mask_shift_expr(ecx, byte, expr, 0xF, 0);
             } else {
-                panic!("bad encoding data")
+                panic!("bad formatting data")
             }
         }
         buffer.push(Stmt::ExprConst(byte))
@@ -618,7 +619,9 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
         }
     }
 
-    Err(Some(format!("'{}': argument type/size mismatch", name)))
+    Err(Some(
+        format!("'{}': argument type/size mismatch, expected one of the following forms:\n{}", name, format_opdata_list(name, data))
+    ))
 }
 
 fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(), &'static str> {
@@ -647,6 +650,7 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
     // A ... P: match rax - r15
     // Q ... V: match es, cs, ss, ds, fs, gs
     // W: matches CR8
+    // X: matches st0
 
     // b, w, d, q match a byte, word, doubleword and quadword.
     // * matches all possible sizes for this operand (w/d for i/o, w/d/q for r/v, o/h for y/w and everything for m)
@@ -792,9 +796,14 @@ fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>) 
     for prefix in idents {
         let name = &*prefix.node.name.as_str();
         let (group, value) = match name {
-            "rep"   |
+            "rep"   => if fmt.flags.contains(REP) {
+                (&mut group1, 0xF3)
+            } else {
+                ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
+                return Err(None);
+            },
             "repe"  |
-            "repz"  => if fmt.flags.contains(REP) {
+            "repz"  => if fmt.flags.contains(REPE) {
                 (&mut group1, 0xF3)
             } else {
                 ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));

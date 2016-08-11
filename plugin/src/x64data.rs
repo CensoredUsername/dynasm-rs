@@ -42,26 +42,27 @@ pub mod flags {
             const XOP_OP    = 0x0000_0002, // this instruction requires a XOP prefix to be encoded
 
             // note: the first 4 in this block are mutually exclusive
-            const AUTO_SIZE = 0x0000_0008, // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
-            const AUTO_NO32 = 0x0000_0010, // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
-            const AUTO_REXW = 0x0000_0020, // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
-            const AUTO_VEXL = 0x0000_0040, // 128bit -> None   , 256bit -> VEX.L
-            const WORD_SIZE = 0x0000_0080, // implies opsize prefix
-            const WITH_REXW = 0x0000_0100, // implies REX.W/VEX.W/XOP.W
-            const WITH_VEXL = 0x0000_0200, // implies VEX.L/XOP.L
+            const AUTO_SIZE = 0x0000_0004, // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+            const AUTO_NO32 = 0x0000_0008, // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
+            const AUTO_REXW = 0x0000_0010, // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+            const AUTO_VEXL = 0x0000_0020, // 128bit -> None   , 256bit -> VEX.L
+            const WORD_SIZE = 0x0000_0040, // implies opsize prefix
+            const WITH_REXW = 0x0000_0080, // implies REX.W/VEX.W/XOP.W
+            const WITH_VEXL = 0x0000_0100, // implies VEX.L/XOP.L
 
             const PREF_66   = WORD_SIZE.bits,// mandatory prefix (same as WORD_SIZE)
-            const PREF_67   = 0x0000_0400, // mandatory prefix (same as SMALL_ADDRESS)
-            const PREF_F0   = 0x0000_0800, // mandatory prefix (same as LOCK)
-            const PREF_F2   = 0x0000_1000, // mandatory prefix (REPNE)
-            const PREF_F3   = 0x0000_2000, // mandatory prefix (REP)
+            const PREF_67   = 0x0000_0200, // mandatory prefix (same as SMALL_ADDRESS)
+            const PREF_F0   = 0x0000_0400, // mandatory prefix (same as LOCK)
+            const PREF_F2   = 0x0000_0800, // mandatory prefix (REPNE)
+            const PREF_F3   = 0x0000_1000, // mandatory prefix (REP)
 
-            const LOCK      = 0x0000_4000, // user lock prefix is valid with this instruction
-            const REP       = 0x0000_8000, // user rep prefix is valid with this instruction
+            const LOCK      = 0x0000_2000, // user lock prefix is valid with this instruction
+            const REP       = 0x0000_4000, // user rep prefix is valid with this instruction
+            const REPE      = 0x0000_8000,
 
-            const SHORT_ARG = 0x0000_0004, // a register argument is encoded in the last byte of the opcode
-            const ENC_MR    = 0x0001_0000, //  select alternate arg encoding
-            const ENC_VM    = 0x0002_0000, //  select alternate arg encoding
+            const SHORT_ARG = 0x0001_0000, // a register argument is encoded in the last byte of the opcode
+            const ENC_MR    = 0x0002_0000, //  select alternate arg encoding
+            const ENC_VM    = 0x0004_0000, //  select alternate arg encoding
         }
     }
     // workaround until bitflags can be used in const
@@ -91,6 +92,7 @@ const PREF_F2  : u32 = flags::flag_bits(flags::PREF_F2);
 const PREF_F3  : u32 = flags::flag_bits(flags::PREF_F3);
 const LOCK     : u32 = flags::flag_bits(flags::LOCK);
 const REP      : u32 = flags::flag_bits(flags::REP);
+const REPE     : u32 = flags::flag_bits(flags::REPE);
 const ENC_MR   : u32 = flags::flag_bits(flags::ENC_MR);
 const ENC_VM   : u32 = flags::flag_bits(flags::ENC_VM);
 
@@ -199,9 +201,9 @@ Ops!(OPMAP;
                     "vbrb",     [0x38            ], X;
                     "r*v*",     [0x3B            ], X, AUTO_SIZE;
                     "rbvb",     [0x3A            ], X;
-] "cmpsb"       = [ "",         [0xA6            ], X,             REP;
-] "cmpsw"       = [ "",         [0xA7            ], X, WORD_SIZE | REP;
-] "cmpsd"       = [ "",         [0xA7            ], X,             REP;
+] "cmpsb"       = [ "",         [0xA6            ], X,             REPE;
+] "cmpsw"       = [ "",         [0xA7            ], X, WORD_SIZE | REPE;
+] "cmpsd"       = [ "",         [0xA7            ], X,             REPE;
                     "yowoib",   [0x0F, 0xC2      ], X, PREF_F2;
 ] "cmpsq"       = [ "",         [0xA7            ], X, WITH_REXW | REP;
 ] "cmpxchg"     = [ "v*r*",     [0x0F, 0xB1      ], X, AUTO_SIZE | LOCK;
@@ -457,10 +459,10 @@ Ops!(OPMAP;
                     "vbrb",     [0x18            ], X,             LOCK;
                     "r*v*",     [0x1B            ], X, AUTO_SIZE;
                     "rbvb",     [0x1A            ], X;
-] "scasb"       = [ "",         [0xAE            ], X,             REP;
-] "scasw"       = [ "",         [0xAF            ], X, WORD_SIZE | REP;
-] "scasd"       = [ "",         [0xAF            ], X,             REP;
-] "scasq"       = [ "",         [0xAF            ], X, WITH_REXW | REP;
+] "scasb"       = [ "",         [0xAE            ], X,             REPE;
+] "scasw"       = [ "",         [0xAF            ], X, WORD_SIZE | REPE;
+] "scasd"       = [ "",         [0xAF            ], X,             REPE;
+] "scasq"       = [ "",         [0xAF            ], X, WITH_REXW | REPE;
 ] "seto"        = [ "vb",       [0x0F, 0x90      ], 0;
 ] "setno"       = [ "vb",       [0x0F, 0x91      ], 0;
 ] "setb"        |

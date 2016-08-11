@@ -21,6 +21,7 @@ mod parser;
 mod compiler;
 mod x64data;
 mod serialize;
+mod debug;
 
 
 #[plugin_registrar]
