@@ -2,7 +2,7 @@
 
 The purpose of this tool is to ease the creation of programs that require run-time assembling.
 
-It is currently heavily pre-alpha, so don't expect anything here to actually wrok.
+It is currently pre-alpha, a lot of testing is still necessary
 
 ## Features
 
@@ -30,10 +30,8 @@ It is currently heavily pre-alpha, so don't expect anything here to actually wro
 
 ## Limitations
 
-- Currently only supports a subset of x64 assembly (only long mode, general use instructions)
-- no floating point
-- no xmm/ymm ops
-- No documentation yet
+- Currently only supports long mode (with several extensions)
+- No documentation
 
 ## License
 
