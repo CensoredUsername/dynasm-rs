@@ -3,6 +3,7 @@ extern crate memmap;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry::*;
 use std::ops::Deref;
+use std::iter::Extend;
 use std::mem;
 use std::cmp;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
@@ -49,6 +50,12 @@ pub struct ExecutionGuard<'a> {
 
 pub struct ExecutableBuffer {
     backing: Mmap
+}
+
+impl Extend<u8> for Assembler {
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        self.ops.extend(iter)
+    }
 }
 
 impl Assembler {

@@ -111,6 +111,9 @@ fn main() {
         ; vgatherqpd ymm1, QWORD [ymm15*8 + rsi + 0x11112222], ymm8
         // 4 argument instructions
         ; vfmaddss xmm0, xmm1, xmm2, xmm3
+        // directives
+        ; string:
+        ; .bytes "Hello world!\0".bytes()
     );
 
     let index = ops.offset();

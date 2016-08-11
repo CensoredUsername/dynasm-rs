@@ -25,6 +25,7 @@ pub enum Stmt {
     ExprConst(P<ast::Expr>),
 
     Var(P<ast::Expr>, Size),
+    Extend(P<ast::Expr>),
 
     Align(P<ast::Expr>),
 
@@ -135,6 +136,7 @@ fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut arg
         "word"  => directive_const(ecx, buffer, args, Size::WORD),
         "dword" => directive_const(ecx, buffer, args, Size::DWORD),
         "qword" => directive_const(ecx, buffer, args, Size::QWORD),
+        "bytes" => directive_iter(ecx, buffer, args),
         "align" => {
             if args.len() != 1 {
                 return Err(Some(format!("Invalid amount of arguments")));
@@ -173,6 +175,19 @@ fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size:
         }
     }
 
+    Ok(())
+}
+
+fn directive_iter(_ecx: &ExtCtxt, buffer: &mut StmtBuffer, mut args: Vec<Arg>) -> Result<(), Option<String>> {
+    if args.len() != 1 {
+        return Err(Some(format!("Wrong amount of arguments for this directive")))
+    }
+
+    if let Arg::Immediate(expr, None) = args.pop().unwrap() {
+        buffer.push(Stmt::Extend(expr));
+    } else {
+        return Err(Some(format!("wrong argument size")));
+    }
     Ok(())
 }
 

@@ -29,6 +29,8 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
             Var(expr, Size::QWORD) => ("push_64", vec![expr]),
             Var(_, _)           => panic!("immediate serializaiton of this size is not supported yet"),
 
+            Extend(expr)           => ("extend", vec![expr]),
+
             Align(expr)            => ("align",   vec![expr]),
 
             GlobalLabel(ident)     => ("global_label", vec![ecx.expr_lit(
