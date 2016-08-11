@@ -30,7 +30,7 @@ It is currently pre-alpha, a lot of testing is still necessary
 
 ## Limitations
 
-- Currently only supports long mode (with several extensions)
+- Currently only supports x64 long mode (with several extensions)
 - No documentation
 
 ## License
