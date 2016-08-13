@@ -1,6 +1,7 @@
 #![feature(plugin)]
 #![plugin(dynasm)]
 extern crate dynasmrt;
+use dynasmrt::DynAsmApi;
 
 macro_rules! test {
     () => (mov rax, rbx)
