@@ -11,7 +11,8 @@ use serialize::or_mask_shift_expr;
 use debug::format_opdata_list;
 
 use std::mem::swap;
-use std::str;
+use std::slice;
+use std::iter;
 
 /*
  * Compilation output
@@ -44,26 +45,26 @@ pub enum Stmt {
  */
 
 pub struct Opdata {
-    pub args:  &'static str,  // format string of arg format
+    pub args:  &'static [u8],  // format string of arg format
     pub ops:   &'static [u8],
     pub reg:   u8,
     pub flags: Flags
 }
 
 pub struct FormatStringIterator<'a> {
-    inner: str::Chars<'a>
+    inner: iter::Cloned<slice::Iter<'a, u8>>
 }
 
 impl<'a> FormatStringIterator<'a> {
-    pub fn new(buf: &'a str) -> FormatStringIterator<'a> {
-        FormatStringIterator {inner: buf.chars()}
+    pub fn new(buf: &'a [u8]) -> FormatStringIterator<'a> {
+        FormatStringIterator {inner: buf.into_iter().cloned()}
     }
 }
 
 impl<'a> Iterator for FormatStringIterator<'a> {
-    type Item = (char, char);
+    type Item = (u8, u8);
 
-    fn next(&mut self) -> Option<(char, char)> {
+    fn next(&mut self) -> Option<(u8, u8)> {
         if let Some(ty) = self.inner.next() {
             let size = self.inner.next().expect("Invalid format string data");
             Some((ty, size))
@@ -639,7 +640,7 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     ))
 }
 
-fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(), &'static str> {
+fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<(), &'static str> {
     if fmtstr.len() != args.len() * 2 {
         return Err("argument length mismatch");
     }
@@ -678,65 +679,65 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
 
             let size = match (code, arg) {
                 // immediates
-                ('i', &Arg::Immediate(_, size))  => size,
-                ('o', &Arg::Immediate(_, size))  => size,
-                ('o', &Arg::JumpTarget(_, size)) => size,
+                (b'i', &Arg::Immediate(_, size))  => size,
+                (b'o', &Arg::Immediate(_, size))  => size,
+                (b'o', &Arg::JumpTarget(_, size)) => size,
 
                 // specific legacy regs
-                (x @ 'A' ... 'P', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (x @ b'A' ... b'P', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::LEGACY &&
-                    reg.kind.code() == Some(x as u8 - 'A' as u8) => Some(reg.size()),
+                    reg.kind.code() == Some(x - b'A') => Some(reg.size()),
 
                 // specific segment regs
-                (x @ 'Q' ... 'V', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (x @ b'Q' ... b'V', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::SEGMENT &&
-                    reg.kind.code() == Some(x as u8 - 'Q' as u8) => Some(reg.size()),
+                    reg.kind.code() == Some(x - b'Q') => Some(reg.size()),
 
                 // CR8 can be specially referenced
-                ('W', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'W', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind == RegId::CR8 => Some(reg.size()),
 
                 // top of the fp stack is also often used
-                ('X', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'X', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind == RegId::ST0 => Some(reg.size()),
 
                 // generic legacy regs
-                ('r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
-                ('v', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'r', &Arg::Direct(Spanned {node: ref reg, ..} )) |
+                (b'v', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::LEGACY ||
                     reg.kind.family() == RegFamily::HIGHBYTE => Some(reg.size()),
 
                 // other reg types often mixed with memory refs
-                ('x', &Arg::Direct(Spanned {node: ref reg, ..} )) |
-                ('u', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'x', &Arg::Direct(Spanned {node: ref reg, ..} )) |
+                (b'u', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::MMX => Some(reg.size()),
-                ('y', &Arg::Direct(Spanned {node: ref reg, ..} )) |
-                ('w', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'y', &Arg::Direct(Spanned {node: ref reg, ..} )) |
+                (b'w', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::XMM => Some(reg.size()),
 
                 // other reg types
-                ('f', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'f', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::FP => Some(reg.size()),
-                ('s', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b's', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::SEGMENT => Some(reg.size()),
-                ('c', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'c', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::CONTROL => Some(reg.size()),
-                ('d', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                (b'd', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::DEBUG => Some(reg.size()),
 
                 // memory offsets
-                ('m',         &Arg::Indirect(MemoryRef {size, ref index, ..} )) |
-                ('u' ... 'w', &Arg::Indirect(MemoryRef {size, ref index, ..} )) if
+                (b'm',          &Arg::Indirect(MemoryRef {size, ref index, ..} )) |
+                (b'u' ... b'w', &Arg::Indirect(MemoryRef {size, ref index, ..} )) if
                     index.is_none() || index.as_ref().unwrap().kind.family() != RegFamily::XMM => size,
 
-                ('m',         &Arg::IndirectJumpTarget(_, size)) |
-                ('u' ... 'w', &Arg::IndirectJumpTarget(_, size)) => size,
+                (b'm',          &Arg::IndirectJumpTarget(_, size)) |
+                (b'u' ... b'w', &Arg::IndirectJumpTarget(_, size)) => size,
 
                 // vsib addressing. as they have two sizes that must be checked they check one of the sizes here
-                ('k', &Arg::Indirect(MemoryRef {size, index: Some(ref index), ..} )) if
+                (b'k', &Arg::Indirect(MemoryRef {size, index: Some(ref index), ..} )) if
                     (size.is_none() || size == Some(Size::DWORD)) &&
                     index.kind.family() == RegFamily::XMM => Some(index.size()),
-                ('l', &Arg::Indirect(MemoryRef {size, index: Some(ref index), ..} )) if
+                (b'l', &Arg::Indirect(MemoryRef {size, index: Some(ref index), ..} )) if
                     (size.is_none() ||  size == Some(Size::QWORD)) &&
                     index.kind.family() == RegFamily::XMM => Some(index.size()),
                 _ => return Err("argument type mismatch")
@@ -745,27 +746,27 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
             // if size is none it always matches (and will later be coerced to a more specific type if the match is successful)
             if let Some(size) = size {
                 if !match (fsize, code) {
-                    ('b', _)   => size == Size::BYTE,
-                    ('w', _)   => size == Size::WORD,
-                    ('d', _)   => size == Size::DWORD,
-                    ('q', _)   => size == Size::QWORD,
-                    ('p', _)   => size == Size::PWORD,
-                    ('o', _)   => size == Size::OWORD,
-                    ('h', _)   => size == Size::HWORD,
-                    ('*', 'i') |
-                    ('*', 'o') => size == Size::WORD || size == Size::DWORD,
-                    ('*', 'k') |
-                    ('*', 'l') |
-                    ('*', 'y') |
-                    ('*', 'w') => size == Size::OWORD || size == Size::HWORD,
-                    ('*', 'r') |
-                    ('*', 'A' ... 'P') |
-                    ('*', 'v') => size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
-                    ('*', 'm') => true,
-                    ('*', _)   => panic!("Invalid size wildcard"),
-                    ('?', _)   => true,
-                    ('!', _)   => false,
-                    _ => panic!("invalid format string '{}'", fmtstr)
+                    (b'b', _)    => size == Size::BYTE,
+                    (b'w', _)    => size == Size::WORD,
+                    (b'd', _)    => size == Size::DWORD,
+                    (b'q', _)    => size == Size::QWORD,
+                    (b'p', _)    => size == Size::PWORD,
+                    (b'o', _)    => size == Size::OWORD,
+                    (b'h', _)    => size == Size::HWORD,
+                    (b'*', b'i') |
+                    (b'*', b'o') => size == Size::WORD || size == Size::DWORD,
+                    (b'*', b'k') |
+                    (b'*', b'l') |
+                    (b'*', b'y') |
+                    (b'*', b'w') => size == Size::OWORD || size == Size::HWORD,
+                    (b'*', b'r') |
+                    (b'*', b'A' ... b'P') |
+                    (b'*', b'v') => size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
+                    (b'*', b'm') => true,
+                    (b'*', _)    => panic!("Invalid size wildcard"),
+                    (b'?', _)    => true,
+                    (b'!', _)    => false,
+                    _ => panic!("invalid format string")
                 } {
                     return Err("argument size mismatch");
                 }
@@ -783,17 +784,17 @@ fn match_format_string(fmtstr: &'static str, mut args: &mut [Arg]) -> Result<(),
                 Arg::Immediate(_, ref mut size @ None) |
                 Arg::JumpTarget(_, ref mut size @ None) |
                 Arg::Indirect(MemoryRef {size: ref mut size @ None, ..} ) => *size = match (fsize, code) {
-                    ('b', _) => Some(Size::BYTE),
-                    ('w', _) => Some(Size::WORD),
-                    (_, 'k') |
-                    ('d', _) => Some(Size::DWORD),
-                    (_, 'l') |
-                    ('q', _) => Some(Size::QWORD),
-                    ('p', _) => Some(Size::PWORD),
-                    ('o', _) => Some(Size::OWORD),
-                    ('h', _) => Some(Size::HWORD),
-                    ('*', _) => None,
-                    ('!', _) => None,
+                    (b'b', _) => Some(Size::BYTE),
+                    (b'w', _) => Some(Size::WORD),
+                    (_, b'k') |
+                    (b'd', _) => Some(Size::DWORD),
+                    (_, b'l') |
+                    (b'q', _) => Some(Size::QWORD),
+                    (b'p', _) => Some(Size::PWORD),
+                    (b'o', _) => Some(Size::OWORD),
+                    (b'h', _) => Some(Size::HWORD),
+                    (b'*', _) => None,
+                    (b'!', _) => None,
                     _ => unreachable!()
                 },
                 _ => ()
@@ -865,7 +866,7 @@ fn get_operand_size(fmt: &'static Opdata, args: &[Arg]) -> Result<Size, Option<S
 
     // only scan args which have wildcarded size
     for (arg, (_, size)) in args.iter().zip(FormatStringIterator::new(fmt.args)) {
-        if size != '*' {
+        if size != b'*' {
             continue
         }
         match *arg {
@@ -937,7 +938,7 @@ fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool
 
     for (arg, (c, _)) in args.iter().zip(FormatStringIterator::new(fmt.args)) {
         // only scan args that are actually encoded
-        if let 'a' ... 'z' = c {
+        if let b'a' ... b'z' = c {
             match *arg {
                 Arg::Direct(Spanned {node: ref reg, ..}) => {
                     if reg.kind.family() == RegFamily::HIGHBYTE {
@@ -1000,20 +1001,20 @@ fn extract_args(fmt: &'static Opdata, args: Vec<Arg>) -> (Option<Arg>, Option<Ar
 
     for (arg, (c, _)) in args.into_iter().zip(FormatStringIterator::new(fmt.args)) {
         match c {
-            'm' | 'u' | 'v' | 'w' | 'k' | 'l'  => if memarg.is_some() {
+            b'm' | b'u' | b'v' | b'w' | b'k' | b'l'  => if memarg.is_some() {
                 panic!("multiple memory arguments in format string");
             } else {
                 memarg = Some(regs.len());
                 regs.push(arg)
             },
-            'f' | 'x' | 'r' | 'y' => regs.push(arg),
-            'c' | 'd' | 's'       => if regarg.is_some() {
+            b'f' | b'x' | b'r' | b'y' => regs.push(arg),
+            b'c' | b'd' | b's'        => if regarg.is_some() {
                 panic!("multiple segment, debug or control registers in format string");
             } else {
                 regarg = Some(regs.len());
                 regs.push(arg)
             },
-            'i' | 'o' => immediates.push(arg),
+            b'i' | b'o' => immediates.push(arg),
             _ => () // hardcoded regs don't have to be encoded
         }
     }
