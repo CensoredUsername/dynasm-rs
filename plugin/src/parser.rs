@@ -1,6 +1,6 @@
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
-use syntax::parse::parser::Parser;
+use syntax::parse::parser::{Parser, PathStyle};
 use syntax::parse::token;
 use syntax::parse::PResult;
 use syntax::ast;
@@ -9,6 +9,8 @@ use syntax::codemap::{Spanned, Span};
 
 use std::collections::HashMap;
 use std::cmp::PartialEq;
+
+use serialize::{offset_of, size_of};
 
 pub type Ident = Spanned<ast::Ident>;
 
@@ -35,12 +37,13 @@ pub enum Arg {
 
 #[derive(Debug)]
 pub struct MemoryRef {
-    pub index: Option<Register>,
-    pub scale: isize,
-    pub base:  Option<Register>,
-    pub disp:  Option<P<ast::Expr>>,
-    pub size:  Option<Size>,
-    pub span:  Span
+    pub index:      Option<Register>,
+    pub scale:      isize,
+    pub scale_expr: Option<P<ast::Expr>>,
+    pub base:       Option<Register>,
+    pub disp:       Option<P<ast::Expr>>,
+    pub size:       Option<Size>,
+    pub span:       Span
 }
 
 #[derive(Debug)]
@@ -388,11 +391,12 @@ fn is_prefix(token: Ident) -> bool {
     PREFIXES.contains(&&*token.node.name.as_str())
 }
 
-const SIZES:    [(&'static str, Size); 4] = [
+const SIZES:    [(&'static str, Size); 5] = [
     ("BYTE", Size::BYTE),
     ("WORD", Size::WORD),
     ("DWORD", Size::DWORD),
-    ("QWORD", Size::QWORD)
+    ("QWORD", Size::QWORD),
+    ("AWORD", Size::QWORD)
 ];
 fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
     for &(kw, size) in SIZES.iter() {
@@ -470,8 +474,51 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
         label_return!(jump, size);
     }
 
-    // it's a normal (register/immediate/memoryref) operand
+    // it's a normal (register/immediate/memoryref/typemapped) operand
     let arg = try!(parser.parse_expr()).unwrap();
+
+    // typemapped
+    if parser.eat(&token::FatArrow) {
+        let base = parse_reg(&arg);
+        if base.is_none() {
+            ecx.span_err(arg.span, "Expected register");
+            return Ok(Arg::Invalid);
+        }
+
+        let ty = try!(parser.parse_path(PathStyle::Type));
+
+        let mut attr = None;
+        let mut index = None;
+        if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
+            let idx_reg = try!(parser.parse_expr()).unwrap();
+            try!(parser.expect(&token::CloseDelim(token::DelimToken::Bracket)));
+
+            index = parse_reg(&idx_reg);
+            if index.is_none() {
+                ecx.span_err(idx_reg.span, "Expected register");
+                return Ok(Arg::Invalid);
+            }
+        }
+        if parser.eat(&token::Dot) {
+            attr = Some(try!(parser.parse_ident()));
+        }
+        if index.is_none() && attr.is_none() {
+            return parser.unexpected();
+        }
+
+        let scale = if index.is_some() { Some(size_of(ecx, ty.clone())) } else { None };
+        let disp = attr.map(|attr| offset_of(ecx, ty, attr));
+
+        return Ok(Arg::Indirect(MemoryRef {
+            index:      index.map(|s| s.node),
+            scale:      8, // scale is set to 8 as to avoid optimizations by the compiler
+            scale_expr: scale,
+            base:       base.map(|s| s.node),
+            disp:       disp,
+            size:       size,
+            span:       Span {hi: parser.last_span.hi, ..start}
+        }));
+    }
 
     // direct register reference
     if let Some(reg) = parse_reg(&arg) {
@@ -575,12 +622,13 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
 
         // assemble the memory location
         return Ok(Arg::Indirect(MemoryRef {
-            index: index,
-            scale: scale,
-            base:  base,
-            disp:  disp,
-            size:  size,
-            span:  span
+            index:      index,
+            scale:      scale,
+            scale_expr: None,
+            base:       base,
+            disp:       disp,
+            size:       size,
+            span:       span
         }));
     }
 

@@ -1,5 +1,7 @@
 #![feature(plugin)]
 #![plugin(dynasm)]
+
+#[macro_use]
 extern crate dynasmrt;
 use dynasmrt::DynAsmApi;
 
@@ -114,7 +116,24 @@ fn main() {
         ; vfmaddss xmm0, xmm1, xmm2, xmm3
         // directives
         ; string:
-        ; .bytes "Hello world!\0".bytes()
+        //; .bytes "Hello world!\0".bytes()
+    );
+
+    // typemap support
+    #[allow(dead_code)]
+    struct Test {
+        foo: i32,
+        bar: u32
+    }
+    let mut test_array = [Test {foo: 1, bar: 2}, Test {foo: 3, bar: 4}, Test {foo: 5, bar: 6}];
+    let mut test_single = Test {foo: 7, bar: 8};
+    dynasm!(ops
+        ; mov rax, AWORD MutPointer!(test_array)
+        ; mov ebx, 2
+        ; inc DWORD rax => Test[rbx].bar
+        ; inc DWORD rax => Test[rbx]
+        ; mov rax, AWORD MutPointer!(test_single)
+        ; inc DWORD rax => Test.bar
     );
 
     let index = ops.offset();

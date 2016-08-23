@@ -28,6 +28,8 @@ pub enum Stmt {
     Var(P<ast::Expr>, Size),
     Extend(P<ast::Expr>),
 
+    DynScale(P<ast::Expr>, P<ast::Expr>),
+
     Align(P<ast::Expr>),
 
     GlobalLabel(Ident),
@@ -348,7 +350,11 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
                 (RegKind::Static(RegId::RBP), MOD_NOBASE)
             };
             compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-            compile_modrm_sib(ecx, buffer, mem.scale as u8, index, base);
+            if let Some(expr) = mem.scale_expr {
+                compile_sib_dynscale(ecx, buffer, expr, index, base);
+            } else {
+                compile_modrm_sib(ecx, buffer, mem.scale as u8, index, base);
+            }
 
             if mode == MOD_DISP8 {
                 buffer.push(Stmt::Const(0));
@@ -388,7 +394,11 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
                 };
 
                 compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-                compile_modrm_sib(ecx, buffer, mem.scale as u8, index.kind, base);
+                if let Some(expr) = mem.scale_expr {
+                    compile_sib_dynscale(ecx, buffer, expr, index.kind, base);
+                } else {
+                    compile_modrm_sib(ecx, buffer, mem.scale as u8, index.kind, base);
+                }
 
             // no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled
             } else if let Some(base) = mem.base {
@@ -1106,6 +1116,11 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, rex_w: bool, reg: &Option
                      (reg_k.encode()   & 8) >> 1 |
                      (index_k.encode() & 8) >> 2 |
                      (base_k.encode()  & 8) >> 3 ;
+    if !reg_k.is_dynamic() && !index_k.is_dynamic() && !base_k.is_dynamic() {
+        buffer.push(Stmt::Const(rex));
+        return;
+    }
+
     let mut rex = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(rex));
 
     if let RegKind::Dynamic(_, expr) = reg_k {
@@ -1157,45 +1172,81 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
 
     if data.flags.contains(VEX_OP) && (byte1 & 0x7F) == 0x61 && (byte2 & 0x80) == 0 && !index_k.is_dynamic() && !base_k.is_dynamic() {
         // 2-byte vex
+        buffer.push(Stmt::Const(0xC5));
+
         let byte1 = (byte1 & 0x80) | (byte2 & 0x7F);
+        if !reg_k.is_dynamic() {
+            buffer.push(Stmt::Const(byte1));
+            return;
+        }
+
         let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
         if let RegKind::Dynamic(_, expr) = reg_k {
             let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
             byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 4)
         }
-        buffer.push(Stmt::Const(0xC5));
         buffer.push(Stmt::ExprConst(byte1));
         return;
     }
 
-    let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
-    let mut byte2 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte2));
-
-    if let RegKind::Dynamic(_, expr) = reg_k {
-        let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-        byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 4);
-    }
-    if let RegKind::Dynamic(_, expr) = index_k {
-        let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-        byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 3);
-    }
-    if let RegKind::Dynamic(_, expr) = base_k {
-        let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-        byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 2);
-    }
-    if let RegKind::Dynamic(_, expr) = vvvv_k {
-        let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-        byte2 = or_mask_shift_expr(ecx, byte2, expr, 0xF, 3)
-    }
     buffer.push(Stmt::Const(if data.flags.contains(VEX_OP) {0xC4} else {0x8F}));
-    buffer.push(Stmt::ExprConst(byte1));
-    buffer.push(Stmt::ExprConst(byte2));
+
+    if reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic() {
+        let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
+
+        if let RegKind::Dynamic(_, expr) = reg_k {
+            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
+            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 4);
+        }
+        if let RegKind::Dynamic(_, expr) = index_k {
+            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
+            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 3);
+        }
+        if let RegKind::Dynamic(_, expr) = base_k {
+            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
+            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 2);
+        }
+        buffer.push(Stmt::ExprConst(byte1));
+    } else {
+        buffer.push(Stmt::Const(byte1));
+    }
+
+    if vvvv_k.is_dynamic() {
+        let mut byte2 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte2));
+
+        if let RegKind::Dynamic(_, expr) = vvvv_k {
+            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
+            byte2 = or_mask_shift_expr(ecx, byte2, expr, 0xF, 3)
+        }
+        buffer.push(Stmt::ExprConst(byte2));
+    } else {
+        buffer.push(Stmt::Const(byte2));
+    }
 }
 
 fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut StmtBuffer, mode: u8, reg1: RegKind, reg2: RegKind) {
-    let byte = mode               << 6 |
-                (reg1.encode() & 7) << 3 |
-                (reg2.encode()  & 7)      ;
+    let byte = mode                << 6 |
+              (reg1.encode()  & 7) << 3 |
+              (reg2.encode()  & 7)     ;
+
+    if !reg1.is_dynamic() && !reg2.is_dynamic() {
+        buffer.push(Stmt::Const(byte));
+        return;
+    }
+
+    let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
+    if let RegKind::Dynamic(_, expr) = reg1 {
+        byte = or_mask_shift_expr(ecx, byte, expr, 7, 3);
+    }
+    if let RegKind::Dynamic(_, expr) = reg2 {
+        byte = or_mask_shift_expr(ecx, byte, expr, 7, 0);
+    }
+    buffer.push(Stmt::ExprConst(byte));
+}
+
+fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut StmtBuffer, scale: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
+    let byte = (reg1.encode()  & 7) << 3 |
+               (reg2.encode()  & 7)      ;
 
     let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
 
@@ -1205,5 +1256,5 @@ fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut StmtBuffer, mode: u8, reg1: Reg
     if let RegKind::Dynamic(_, expr) = reg2 {
         byte = or_mask_shift_expr(ecx, byte, expr, 7, 0);
     }
-    buffer.push(Stmt::ExprConst(byte));
+    buffer.push(Stmt::DynScale(scale, byte));
 }

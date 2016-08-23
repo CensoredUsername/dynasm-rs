@@ -10,9 +10,19 @@ use std::sync::{Arc, RwLock, RwLockReadGuard};
 
 use memmap::{Mmap, Protection};
 
+#[macro_export]
+macro_rules! Pointer {
+    ($e:expr) => {&$e as *const _ as _};
+}
+
+#[macro_export]
+macro_rules! MutPointer {
+    ($e:expr) => {&mut $e as *mut _ as _};
+}
+
 /// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
-pub trait DynAsmApi : Extend<u8> {
+pub trait DynAsmApi<'a> : Extend<u8> + Extend<&'a u8> {
     /// Report the current offset into the assembling target
     fn offset(&self) -> usize;
     /// Push a byte into the assembling target
@@ -44,15 +54,7 @@ pub trait DynAsmApi : Extend<u8> {
         }.iter().cloned());
     }
     /// Push nops until the assembling target end is aligned to the given alignment
-    #[inline]
-    fn align(&mut self, alignment: usize) {
-        let offset = self.offset() % alignment;
-        if offset != 0 {
-            for _ in 0..(alignment - offset) {
-                self.push(0x90);
-            }
-        }
-    }
+    fn align(&mut self, alignment: usize);
     /// Record the definition of a local label
     fn local_label(  &mut self, name: &'static str);
     /// Record the definition of a global label
@@ -68,6 +70,12 @@ pub trait DynAsmApi : Extend<u8> {
     fn global_reloc(  &mut self, name: &'static str, size: u8);
     /// Record a relocation spot for a reference to a dynamic label
     fn dynamic_reloc( &mut self, id: usize,          size: u8);
+
+    /// This function is called in when a runtime error has to be generated. It panics.
+    #[inline]
+    fn runtime_error(&self, msg: &'static str) -> ! {
+        panic!(msg);
+    }
 }
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
@@ -128,7 +136,14 @@ impl Extend<u8> for Assembler {
     }
 }
 
-impl DynAsmApi for Assembler {
+impl<'a> Extend<&'a u8> for Assembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
+        self.ops.extend(iter)
+    }
+}
+
+impl<'a> DynAsmApi<'a> for Assembler {
     #[inline]
     fn offset(&self) -> usize {
         self.ops.len() + self.asmoffset
@@ -137,6 +152,16 @@ impl DynAsmApi for Assembler {
     #[inline]
     fn push(&mut self, value: u8) {
         self.ops.push(value);
+    }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        let offset = self.offset() % alignment;
+        if offset != 0 {
+            for _ in 0..(alignment - offset) {
+                self.push(0x90);
+            }
+        }
     }
 
     #[inline]

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use compiler;
 use parser::{Ident, Size};
 
@@ -6,6 +8,7 @@ use syntax::ext::base::ExtCtxt;
 use syntax::ast;
 use syntax::ptr::P;
 use syntax::parse::token::intern;
+use syntax::codemap::Spanned;
 
 
 pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) -> Vec<ast::Stmt> {
@@ -17,10 +20,28 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
     // expr = expr_lit(span, LitKind::Byte)
     // expr_method_call(span, op, Vec![expr])
 
-    for stmt in stmts {
+    let mut stmts = stmts.into_iter().peekable();
+
+    while let Some(stmt) = stmts.next() {
         use compiler::Stmt::*;
+
         let (method, args) = match stmt {
-            Const(byte)            => ("push",    vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte))]), // this span should never appear in an error message
+            Const(byte)            => {
+                let mut bytes = vec![byte];
+                while let Some(&Const(byte)) = stmts.peek() {
+                    bytes.push(byte);
+                    stmts.next();
+                    if stmts.len() == 32 {
+                        break;
+                    }
+                }
+
+                if bytes.len() == 1 {
+                    ("push",   vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(bytes[0]))])
+                } else {
+                    ("extend", vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::ByteStr(Rc::new(bytes)))])
+                }
+            },
             ExprConst(expr)        => ("push",    vec![expr]),
 
             Var(expr, Size::BYTE)  => ("push_8",  vec![expr]),
@@ -30,6 +51,12 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
             Var(_, _)           => panic!("immediate serializaiton of this size is not supported yet"),
 
             Extend(expr)           => ("extend", vec![expr]),
+
+            DynScale(scale, rest)  => {
+                let temp = ast::Ident::with_empty_ctxt(intern("temp"));
+                buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size(ecx, name, scale)));
+                ("push", vec![or_mask_shift_expr(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)])
+            },
 
             Align(expr)            => ("align",   vec![expr]),
 
@@ -90,4 +117,115 @@ pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Ex
     }
 
     ecx.expr_binary(span, ast::BinOpKind::BitOr, orig, expr)
+}
+
+pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Expr> {
+    // generate a P<Expr> that resolves into the offset of an attribute to a type.
+    // this is somewhat ridiculously complex because we can't expand macros here
+
+    let span = path.span;
+
+    let structpat = ecx.pat_struct(span, path.clone(), vec![
+        Spanned {span: span, node: ast::FieldPat {
+            ident: attr,
+            pat: ecx.pat_wild(span),
+            is_shorthand: false
+        }},
+    ]).map(|mut pat| {
+        if let ast::PatKind::Struct(_, _, ref mut dotdot) = pat.node {
+            *dotdot = true;
+        }
+        pat
+    });
+
+    // there's no default constructor function for let pattern;
+    let validation_stmt = ast::Stmt {
+        id: ast::DUMMY_NODE_ID,
+        span: span,
+        node: ast::StmtKind::Local(P(ast::Local {
+            pat: structpat,
+            ty: None,
+            init: None,
+            id: ast::DUMMY_NODE_ID,
+            span: span,
+            attrs: ast::ThinVec::new()
+        }))
+    };
+
+    let temp     = ast::Ident::with_empty_ctxt(intern("temp"));
+    let rv       = ast::Ident::with_empty_ctxt(intern("rv"));
+    let usize_id = ast::Ident::with_empty_ctxt(intern("usize"));
+    let i32_id   = ast::Ident::with_empty_ctxt(intern("i32"));
+    let uninitialized = ["std", "mem", "uninitialized"].iter().cloned().map(intern).map(ast::Ident::with_empty_ctxt).collect();
+    let forget        = ["std", "mem", "forget"       ].iter().cloned().map(intern).map(ast::Ident::with_empty_ctxt).collect();
+
+    // unsafe {
+    let block = ecx.block(span, vec![
+        // let path { attr: _, ..};
+        validation_stmt,
+        // let temp: path = ::std::mem::uninitialized();
+        ecx.stmt_let_typed(span, false, temp, ecx.ty_path(path),
+            ecx.expr_call_global(span, uninitialized, Vec::new())
+        ).unwrap(),
+        // let rv = &temp.attr as *const _ as usize - &temp as *const _ as usize;
+        ecx.stmt_let(span,
+            false,
+            rv,
+            ecx.expr_binary(span, ast::BinOpKind::Sub,
+                ecx.expr_cast(span,
+                    ecx.expr_cast(span,
+                        ecx.expr_addr_of(span,
+                            ecx.expr_field_access(span,
+                                ecx.expr_ident(span, temp),
+                                attr
+                            )
+                        ), ecx.ty_ptr(span, ecx.ty_infer(span), ast::Mutability::Immutable)
+                    ), ecx.ty_ident(span, usize_id)
+                ),
+                ecx.expr_cast(span,
+                    ecx.expr_cast(span,
+                        ecx.expr_addr_of(span, ecx.expr_ident(span, temp)),
+                        ecx.ty_ptr(span, ecx.ty_infer(span), ast::Mutability::Immutable)
+                    ), ecx.ty_ident(span, usize_id)
+                )
+            )
+        ),
+        // ::std::mem::forget(temp);
+        ecx.stmt_semi(ecx.expr_call_global(span, forget, vec![ecx.expr_ident(span, temp)])),
+        // rv as u32
+        ecx.stmt_expr(ecx.expr_cast(span, ecx.expr_ident(span, rv), ecx.ty_ident(span, i32_id)))
+    ]).map(|mut b| {
+        b.rules = ast::BlockCheckMode::Unsafe(ast::UnsafeSource::CompilerGenerated);
+        b
+    });
+
+    ecx.expr_block(block)
+}
+
+pub fn size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
+    // generate a P<Expr> that returns the size of type at path
+    let span = path.span;
+
+    let ty = ecx.ty_path(path);
+    let idents = ["std", "mem", "size_of"].iter().cloned().map(intern).map(ast::Ident::with_empty_ctxt).collect();
+    let size_of = ecx.path_all(span, true, idents, Vec::new(), vec![ty], Vec::new());
+    ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
+}
+
+pub fn encoded_size(ecx: &ExtCtxt, name: Ident, size: P<ast::Expr>) -> P<ast::Expr> {
+    let span = size.span;
+
+    ecx.expr_match(span, size, vec![
+        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 8))], ecx.expr_u8(span, 3)),
+        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 4))], ecx.expr_u8(span, 2)),
+        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 2))], ecx.expr_u8(span, 1)),
+        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 1))], ecx.expr_u8(span, 0)),
+        ecx.arm(span, vec![ecx.pat_wild(span)], ecx.expr_method_call(span,
+            ecx.expr_ident(name.span, name.node),
+            ast::Ident::with_empty_ctxt(intern("runtime_error")),
+            vec![ecx.expr_str(span,
+                intern("Type size not representable as scale").as_str()
+            )]
+        ))
+    ])
 }
