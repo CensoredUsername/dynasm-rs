@@ -1,0 +1,9 @@
+*.log
+*.txt
+*.sublime-*
+*.exe
+*.pdb
+
+target/
+build_docs/
+Cargo.lock
