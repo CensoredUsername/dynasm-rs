@@ -391,12 +391,14 @@ fn is_prefix(token: Ident) -> bool {
     PREFIXES.contains(&&*token.node.name.as_str())
 }
 
-const SIZES:    [(&'static str, Size); 5] = [
+const SIZES:    [(&'static str, Size); 7] = [
     ("BYTE", Size::BYTE),
     ("WORD", Size::WORD),
     ("DWORD", Size::DWORD),
+    ("AWORD", Size::QWORD),
     ("QWORD", Size::QWORD),
-    ("AWORD", Size::QWORD)
+    ("OWORD", Size::OWORD),
+    ("HWORD", Size::HWORD)
 ];
 fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
     for &(kw, size) in SIZES.iter() {
@@ -738,6 +740,7 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
             "Rw" => (Size::WORD,  RegFamily::LEGACY),
             "Rd" => (Size::DWORD, RegFamily::LEGACY),
+            "Ra" => (Size::QWORD, RegFamily::LEGACY),
             "Rq" => (Size::QWORD, RegFamily::LEGACY),
             "Rf" => (Size::PWORD, RegFamily::FP),
             "Rm" => (Size::QWORD, RegFamily::MMX),

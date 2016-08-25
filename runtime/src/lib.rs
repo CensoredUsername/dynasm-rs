@@ -10,11 +10,14 @@ use std::sync::{Arc, RwLock, RwLockReadGuard};
 
 use memmap::{Mmap, Protection};
 
+/// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
+/// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
 #[macro_export]
 macro_rules! Pointer {
     ($e:expr) => {&$e as *const _ as _};
 }
 
+/// Preforms the same action as the Pointer! macro, but casts to a *mut pointer.
 #[macro_export]
 macro_rules! MutPointer {
     ($e:expr) => {&mut $e as *mut _ as _};
