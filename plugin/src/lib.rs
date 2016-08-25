@@ -17,11 +17,11 @@ use syntax::util::small_vector::SmallVector;
 use syntax::parse::token::intern;
 use syntax::tokenstream::TokenTree;
 
-mod parser;
-mod compiler;
-mod x64data;
-mod serialize;
-mod debug;
+pub mod parser;
+pub mod compiler;
+pub mod x64data;
+pub mod serialize;
+pub mod debug;
 
 
 #[plugin_registrar]
