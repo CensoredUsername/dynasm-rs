@@ -5,4 +5,5 @@
 *.pdb
 
 target/
+build_docs/
 Cargo.lock
