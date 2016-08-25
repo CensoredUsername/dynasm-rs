@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -o errexit
+
+shopt -s globstar
+
 # build individual documentation
 (cd plugin && cargo doc --no-deps)
 (cd runtime && cargo doc --no-deps)
@@ -22,5 +26,18 @@ cp ./plugin/doc/formatting.css ./build_docs/language/formatting.css
 # copy over the docs folders
 cp -r ./plugin/target/doc/* ./build_docs/plugin
 cp -r ./runtime/target/doc/* ./build_docs/runtime
+
+if [ "$1" == "commit" ]; then
+    git clone --branch gh-pages --depth 1 "git@github.com:CensoredUsername/dynasm-rs.git" deploy_docs
+    cd deploy_docs
+    git config user.name "CensoredUsername"
+    git config user.email "cens.username@gmail.com"
+    cp ../build_docs/* ./ -r
+    git add .
+    git commit -m "Rebuild docs"
+    git push origin gh-pages
+    cd ..
+    rm deploy_docs -rf
+fi
 
 exit

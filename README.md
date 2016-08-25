@@ -2,13 +2,13 @@
 
 The purpose of this tool is to ease the creation of programs that require run-time assembling.
 
-It is currently pre-alpha, a lot of testing is still necessary
+It is currently in alpha, meaning that while everything should work, a lot of features need to be tested
 
 ## Features
 
 - Fully integrated in the rust toolchain, no other tools necessary.
 - The assembly is optimized into a series of Vec<u8>.push statements for high performance.
-- Errors are fully diagnosed at compile time in a clear fashion.
+- Errors are almost all diagnosed at compile time in a clear fashion.
 - Write the to be generated assembly inline in nasm-like syntax using a simple macro:
 
 ```rust
@@ -28,10 +28,13 @@ It is currently pre-alpha, a lot of testing is still necessary
     ops.finalize().unwrap()
 ```
 
+## Documentation
+
+Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/language/index.html).
+
 ## Limitations
 
 - Currently only supports x64 long mode (with several extensions)
-- No documentation
 
 ## License
 
