@@ -148,6 +148,63 @@ assert!(
 ```
 And finally we can call this function, asserting that it returns true to ensure that it managed to print the encoded message!
 
+And for the people interested in the behind-the-scenes, here's what the `dynasm!` macros expand to:
+
+```
+#![feature(plugin)]
+#![plugin(dynasm)]
+
+#[macro_use]
+extern crate dynasmrt;
+
+use dynasmrt::DynasmApi;
+
+use std::{io, slice, mem};
+use std::io::Write;
+
+fn main() {
+    let mut ops = dynasmrt::Assembler::new();
+    let string = "Hello World!";
+
+// dynasm!(
+    ops.global_label("hello");
+    ops.extend(string.as_bytes());
+// )
+
+    let hello = ops.offset();
+// dynasm!(
+    ops.extend(b"H\x8d\r\x00\x00\x00\x00");
+    ops.global_reloc("hello", 4u8);
+    ops.extend(b"1\xd2\xb2");
+    ops.push_8(string.len() as _);
+    ops.extend(b"H\xb8");
+    ops.push_64(print as _);
+    ops.extend(b"H\x83\xec");
+    ops.push_8(40);
+    ops.extend(b"\xff\xd0H\x83\xc4");
+    ops.push_8(40);
+    ops.push(b'\xc3');
+// )
+
+    let buf = ops.finalize().unwrap();
+
+    let hello_fn: extern "win64" fn() -> bool = unsafe {
+        mem::transmute(buf.ptr(hello))
+    };
+
+    assert!(
+        hello_fn()
+    );
+}
+
+pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
+    io::stdout().write_all(unsafe {
+        slice::from_raw_parts(buffer, length as usize)
+    }).is_ok()
+}
+```
+As you can see, the encoding has been determined fully at compile time, and the assembly has been reduced to a series of push and extend calls.
+
 # Advanced usage
 
 Coming soon.
