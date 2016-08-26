@@ -1733,7 +1733,7 @@ Ops!(OPMAP;
 ] "vpermd"      = [ b"yhyhwh",   [   3, 0x36      ], X, PREF_66 | WITH_VEXL | VEX_OP;
 ] "vpermil2pd"  = [ b"y*y*w*y*ib",[  3, 0x49      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     b"y*y*y*w*ib",[  3, 0x49      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
-] "vpermil2pS"  = [ b"y*y*w*y*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
+] "vpermil2ps"  = [ b"y*y*w*y*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     b"y*y*y*w*ib",[  3, 0x48      ], X, PREF_66 | AUTO_VEXL | VEX_OP | WITH_REXW;
 ] "vpermilpd"   = [ b"y*y*w*",   [   2, 0x0D      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     b"y*w*ib",   [   3, 0x05      ], X, PREF_66 | AUTO_VEXL | VEX_OP;

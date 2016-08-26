@@ -1,3 +1,0 @@
-% Instruction Reference
-
-Coming soon.
