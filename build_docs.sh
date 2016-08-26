@@ -17,6 +17,9 @@ mkdir ./build_docs/language
 mkdir ./build_docs/plugin
 mkdir ./build_docs/runtime
 
+# create instruction reference markdown file
+(cd doc/insref && cargo run > ../instructionref.md)
+
 # build plugin docs
 for f in ./doc/*.md; do
     rustdoc $f -o ./build_docs/language --markdown-no-toc --html-before-content=./doc/pre.html --html-after-content=./doc/post.html --markdown-css=./formatting.css

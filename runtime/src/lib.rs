@@ -14,18 +14,18 @@ use memmap::{Mmap, Protection};
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
 #[macro_export]
 macro_rules! Pointer {
-    ($e:expr) => {&$e as *const _ as _};
+    ($e:expr) => {$e as *const _ as _};
 }
 
 /// Preforms the same action as the Pointer! macro, but casts to a *mut pointer.
 #[macro_export]
 macro_rules! MutPointer {
-    ($e:expr) => {&mut $e as *mut _ as _};
+    ($e:expr) => {$e as *mut _ as _};
 }
 
 /// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
-pub trait DynAsmApi<'a> : Extend<u8> + Extend<&'a u8> {
+pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     /// Report the current offset into the assembling target
     fn offset(&self) -> usize;
     /// Push a byte into the assembling target
@@ -146,7 +146,7 @@ impl<'a> Extend<&'a u8> for Assembler {
     }
 }
 
-impl<'a> DynAsmApi<'a> for Assembler {
+impl<'a> DynasmApi<'a> for Assembler {
     #[inline]
     fn offset(&self) -> usize {
         self.ops.len() + self.asmoffset
@@ -381,7 +381,7 @@ impl Executor {
 /// A structure wrapping some executable memory. It dereferences into a &[u8] slice.
 impl ExecutableBuffer {
     /// Obtain a pointer into the executable memory from an offset into it.
-    /// When an offset returned from DynAsmApi::offset is used, the resulting pointer
+    /// When an offset returned from DynasmApi::offset is used, the resulting pointer
     /// will point to the start of the first instruction after the offset call,
     /// which can then be jumped or called to divert control flow into the executable
     /// buffer. Note that if this buffer is accessed through an Executor, these pointers

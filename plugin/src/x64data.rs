@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map};
 
 use compiler::Opdata;
 
@@ -72,6 +72,10 @@ pub mod flags {
     pub const fn make_flag(bits: u32) -> Flags {
         Flags {bits: bits}
     }
+}
+
+pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> {
+    OPMAP.keys()
 }
 
 // workaround until bitflags can be used in const
@@ -151,7 +155,7 @@ Ops!(OPMAP;
                     b"v*ib",     [0x0F, 0xBA      ], 5, AUTO_SIZE | LOCK;
 ] "bzhi"        = [ b"r*v*r*",   [   2, 0xF5      ], X, AUTO_REXW | VEX_OP;
 ] "call"        = [ b"o*",       [0xE8            ], X, AUTO_SIZE;
-                    b"r*",       [0xFF            ], 2, AUTO_SIZE;
+                    b"r*",       [0xFF            ], 2, AUTO_NO32;
 ] "cbw"         = [ b"",         [0x98            ], X, WORD_SIZE;
 ] "cwde"        = [ b"",         [0x98            ], X;
 ] "cdqe"        = [ b"",         [0x98            ], X, WITH_REXW;

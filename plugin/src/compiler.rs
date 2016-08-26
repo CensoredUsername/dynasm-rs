@@ -223,9 +223,9 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         op_size = try!(get_operand_size(data, &args));
 
         if data.flags.contains(AUTO_NO32) {
-            if op_size == Size::QWORD {
+            if op_size == Size::WORD {
                 pref_size = true;
-            } else if op_size != Size::WORD {
+            } else if op_size != Size::QWORD {
                 return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", &*op.node.name.as_str())));
             }
         } else if data.flags.contains(AUTO_REXW) {
