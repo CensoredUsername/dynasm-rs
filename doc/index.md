@@ -24,3 +24,20 @@ also read through the [runtime documentation](../runtime/dynasmrt/index.html) to
 runtime API. The [instruction reference](./instructionref.html) lists all assembly mnemnonics
 and formats supported by dynasm-rs. Finally, documentation on the
 [internals on dynasm-rs](../plugin/dynasm/index.html) can be referenced.
+
+# Differences from LuaJit Dynasm
+
+The following list summarizes some of the larger differences between LuaJIT dynasm and dynasm-rs.
+
+- LuaJIT dynasm uses full program analysis, allowing it to compile local and global labels down to
+enums. Dynasm-rs however uses Hashmaps keyed by static strings, meaning label resolution in dynasm-rs
+can be a bit slower.
+- LuaJIT uses the `mov64` mnemnonic to encode 64-bit displacement mov. Dynasm-rs uses the `movabs`
+mnemnonic with a 64-bit immediate parameter to encode this.
+- Dynasm-rs does not (directly) support stand-alone files.
+- Dynasm-rs is not sensitive to the order of parameters inside a memory reference.
+- LuaJIT local labels are integer literals. Dynasm-rs local labels are identifiers.
+- The syntax used for type maps is significantly different. In LuaJit dynasm it is `Type:reg->attr`
+in dynasm-rs it is `reg => Type.attr`.
+- LuaJIT dynasm uses a special preprocessor which detects lines starting with pipes (`|`) as dynasm
+instructions, dynasm-rs uses the `dynasm!` procedural macro with lines starting with semicolons (`;`).
