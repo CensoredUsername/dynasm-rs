@@ -102,7 +102,7 @@ Global labels can only be defined once, and all references to a global label wil
 
 ### Dynamic labels
 
-Dynamic labels are similar to global labels in that they can be defined only once, but instead of a name, they are identified by an expression that evaluates into an usize. This expression is evaluated at the point where the label is defined or referenced, and the labels will be resolved at only at commit time.
+Dynamic labels are similar to global labels in that they can be defined only once, but instead of a name, they are identified by an expression. New dynamic labels can be created at runtime by the assembler. This expression is evaluated at the point where the label is defined or referenced, and the labels will be resolved at only at commit time.
 
 ## Instructions
 

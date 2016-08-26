@@ -23,11 +23,20 @@ macro_rules! MutPointer {
     ($e:expr) => {$e as *mut _ as _};
 }
 
+/// A struct representing an offset into the assembling buffer of a `DynasmApi` struct.
+/// The wrapped `usize` is the offset from the start of the assembling buffer in bytes.
+#[derive(Debug, Clone, Copy)]
+pub struct AssemblyOffset(pub usize);
+
+/// A dynamic label
+#[derive(Debug, Clone, Copy)]
+pub struct DynamicLabel(usize);
+
 /// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
 pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     /// Report the current offset into the assembling target
-    fn offset(&self) -> usize;
+    fn offset(&self) -> AssemblyOffset;
     /// Push a byte into the assembling target
     fn push(&mut self, byte: u8);
     /// Push a signed byte into the assembling target
@@ -63,7 +72,7 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     /// Record the definition of a global label
     fn global_label( &mut self, name: &'static str);
     /// Record the definition of a dynamic label
-    fn dynamic_label(&mut self, id: usize);
+    fn dynamic_label(&mut self, id: DynamicLabel);
 
     /// Record a relocation spot for a forward reference to a local label
     fn forward_reloc( &mut self, name: &'static str, size: u8);
@@ -72,7 +81,7 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     /// Record a relocation spot for a reference to a global label
     fn global_reloc(  &mut self, name: &'static str, size: u8);
     /// Record a relocation spot for a reference to a dynamic label
-    fn dynamic_reloc( &mut self, id: usize,          size: u8);
+    fn dynamic_reloc( &mut self, id: DynamicLabel,   size: u8);
 
     /// This function is called in when a runtime error has to be generated. It panics.
     #[inline]
@@ -103,9 +112,9 @@ pub struct Assembler {
     global_relocs: Vec<(PatchLoc, &'static str)>, 
 
     // label id -> target loc
-    dynamic_labels: HashMap<usize, usize>,
+    dynamic_labels: Vec<Option<usize>>,
     // location to be resolved, loc, label id
-    dynamic_relocs: Vec<(PatchLoc, usize)>,
+    dynamic_relocs: Vec<(PatchLoc, DynamicLabel)>,
 
     // labelname -> most recent patch location
     local_labels: HashMap<&'static str, usize>,
@@ -117,7 +126,7 @@ pub struct Assembler {
 struct PatchLoc(usize, u8);
 
 /// A read-only shared reference to the executable buffer inside an Assembler. By
-/// locking it the internal ExecutableBuffer can be accessed and executed.
+/// locking it the internal `ExecutableBuffer` can be accessed and executed.
 #[derive(Debug, Clone)]
 pub struct Executor {
     execbuffer: Arc<RwLock<ExecutableBuffer>>
@@ -148,8 +157,8 @@ impl<'a> Extend<&'a u8> for Assembler {
 
 impl<'a> DynasmApi<'a> for Assembler {
     #[inline]
-    fn offset(&self) -> usize {
-        self.ops.len() + self.asmoffset
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.ops.len() + self.asmoffset)
     }
 
     #[inline]
@@ -159,7 +168,7 @@ impl<'a> DynasmApi<'a> for Assembler {
 
     #[inline]
     fn align(&mut self, alignment: usize) {
-        let offset = self.offset() % alignment;
+        let offset = self.offset().0 % alignment;
         if offset != 0 {
             for _ in 0..(alignment - offset) {
                 self.push(0x90);
@@ -169,7 +178,7 @@ impl<'a> DynasmApi<'a> for Assembler {
 
     #[inline]
     fn global_label(&mut self, name: &'static str) {
-        let offset = self.offset();
+        let offset = self.offset().0;
         if let Some(name) = self.global_labels.insert(name, offset) {
             panic!("Duplicate global label '{}'", name);
         }
@@ -177,27 +186,29 @@ impl<'a> DynasmApi<'a> for Assembler {
 
     #[inline]
     fn global_reloc(&mut self, name: &'static str, size: u8) {
-        let offset = self.offset();
+        let offset = self.offset().0;
         self.global_relocs.push((PatchLoc(offset, size), name));
     }
 
     #[inline]
-    fn dynamic_label(&mut self, id: usize) {
-        let offset = self.offset();
-        if let Some(id) = self.dynamic_labels.insert(id, offset) {
-            panic!("Duplicate label '{}'", id);
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        let offset = self.offset().0;
+        let entry = &mut self.dynamic_labels[id.0];
+        if entry.is_some() {
+            panic!("Duplicate label '{}'", id.0);
         }
+        *entry = Some(offset);
     }
 
     #[inline]
-    fn dynamic_reloc(&mut self, id: usize, size: u8) {
-        let offset = self.offset();
+    fn dynamic_reloc(&mut self, id: DynamicLabel, size: u8) {
+        let offset = self.offset().0;
         self.dynamic_relocs.push((PatchLoc(offset, size), id));
     }
 
     #[inline]
     fn local_label(&mut self, name: &'static str) {
-        let offset = self.offset();
+        let offset = self.offset().0;
         if let Some(relocs) = self.local_relocs.remove(&name) {
             for loc in relocs {
                 self.patch_loc(loc, offset);
@@ -208,7 +219,7 @@ impl<'a> DynasmApi<'a> for Assembler {
 
     #[inline]
     fn forward_reloc(&mut self, name: &'static str, size: u8) {
-        let offset = self.offset();
+        let offset = self.offset().0;
         match self.local_relocs.entry(name) {
             Occupied(mut o) => {
                 o.get_mut().push(PatchLoc(offset, size));
@@ -222,7 +233,7 @@ impl<'a> DynasmApi<'a> for Assembler {
     #[inline]
     fn backward_reloc(&mut self, name: &'static str, size: u8) {
         if let Some(&target) = self.local_labels.get(&name) {
-            let len = self.offset();
+            let len = self.offset().0;
             self.patch_loc(PatchLoc(len, size), target)
         } else {
             panic!("Unknown local label '{}'", name);
@@ -231,7 +242,7 @@ impl<'a> DynasmApi<'a> for Assembler {
 }
 
 impl Assembler {
-    /// Create a new Assembler instance
+    /// Create a new `Assembler` instance
     pub fn new() -> Assembler {
         const MMAP_INIT_SIZE: usize = 1024 * 256;
         Assembler {
@@ -243,12 +254,18 @@ impl Assembler {
             map_len: MMAP_INIT_SIZE,
             ops: Vec::new(),
             global_labels: HashMap::new(),
-            dynamic_labels: HashMap::new(),
+            dynamic_labels: Vec::new(),
             local_labels: HashMap::new(),
             global_relocs: Vec::new(),
             dynamic_relocs: Vec::new(),
             local_relocs: HashMap::new()
         }
+    }
+
+    pub fn new_dynamic_label(&mut self) -> DynamicLabel {
+        let id = self.dynamic_labels.len();
+        self.dynamic_labels.push(None);
+        DynamicLabel(id)
     }
 
     #[inline]
@@ -280,10 +297,10 @@ impl Assembler {
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.dynamic_relocs);
         for (loc, id) in relocs {
-            if let Some(&target) = self.dynamic_labels.get(&id) {
+            if let Some(&Some(target)) = self.dynamic_labels.get(id.0) {
                 self.patch_loc(loc, target)
             } else {
-                panic!("Unkonwn dynamic label '{}'", id);
+                panic!("Unkonwn dynamic label '{}'", id.0);
             }
         }
 
@@ -302,7 +319,7 @@ impl Assembler {
         // length of the initialized part of the execbuffer before
         let old_len = self.asmoffset;
         // length of the initialized part of the execbuffer afterwards
-        let new_len = self.offset();
+        let new_len = self.offset().0;
 
 
         if new_len > self.map_len {
@@ -342,7 +359,7 @@ impl Assembler {
     }
 
     /// Consumes the assembler to return the internal ExecutableBuffer. This
-    /// method can fail if an Executor currently holds a lock on the datastructure,
+    /// method will only fail if an `Executor` currently holds a lock on the datastructure,
     /// in which case it will return itself.
     pub fn finalize(mut self) -> Result<ExecutableBuffer, Assembler> {
         self.commit();
@@ -355,9 +372,9 @@ impl Assembler {
         }
     }
 
-    /// Creates a read-only reference to the internal ExecutableBuffer that must
+    /// Creates a read-only reference to the internal `ExecutableBuffer` that must
     /// be locked to access it. Multiple of such read-only locks can be obtained
-    /// at the same time, but as long as they are alive they will block any commit()
+    /// at the same time, but as long as they are alive they will block any `self.commit()`
     /// calls.
     pub fn reader(&self) -> Executor {
         Executor {
@@ -369,9 +386,9 @@ impl Assembler {
 /// A read-only lockable refernce to the internal ExecutableBuffer of an Assembler.
 /// To gain access to this buffer, it must be locked.
 impl Executor {
-    /// Gain read-access to the internal ExecutableBuffer. While the returned guard
-    /// is alive, it can be used to read and execute from the ExecutableBuffer.
-    /// Any pointers created to the Executablebuffer should no longer be used when
+    /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
+    /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
+    /// Any pointers created to the `Executablebuffer` should no longer be used when
     /// the guard is dropped.
     pub fn lock<'a>(&'a self) -> RwLockReadGuard<'a, ExecutableBuffer> {
         self.execbuffer.read().unwrap()
@@ -381,15 +398,15 @@ impl Executor {
 /// A structure wrapping some executable memory. It dereferences into a &[u8] slice.
 impl ExecutableBuffer {
     /// Obtain a pointer into the executable memory from an offset into it.
-    /// When an offset returned from DynasmApi::offset is used, the resulting pointer
+    /// When an offset returned from `DynasmApi::offset` is used, the resulting pointer
     /// will point to the start of the first instruction after the offset call,
     /// which can then be jumped or called to divert control flow into the executable
     /// buffer. Note that if this buffer is accessed through an Executor, these pointers
     /// will only be valid as long as its lock is held. When no locks are held, 
     /// The assembler is free to relocate the executable buffer when it requires
     /// more memory than available. 
-    pub fn ptr(&self, offset: usize) -> *const u8 {
-        &self[offset] as *const u8
+    pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
+        &self[offset.0] as *const u8
     }
 }
 
