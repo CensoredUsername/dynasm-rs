@@ -340,13 +340,13 @@ Ops!(OPMAP;
                     b"dqrq",     [0x0F, 0x23      ], X;
                     b"rddd",     [0x0F, 0x21      ], X;
                     b"rqdq",     [0x0F, 0x21      ], X;
-] "movabs"      = [ b"Abib",     [0xA0            ], X; // special syntax for 64-bit disp only mov
-                    b"Awiw",     [0xA1            ], X, WORD_SIZE;
-                    b"Adid",     [0xA1            ], X;
+] "movabs"      = [ b"Abiq",     [0xA0            ], X; // special syntax for 64-bit disp only mov
+                    b"Awiq",     [0xA1            ], X, WORD_SIZE;
+                    b"Adiq",     [0xA1            ], X;
                     b"Aqiq",     [0xA1            ], X, WITH_REXW;
-                    b"ibAb",     [0xA2            ], X;
-                    b"iwAw",     [0xA3            ], X, WORD_SIZE;
-                    b"idAd",     [0xA3            ], X;
+                    b"iqAb",     [0xA2            ], X;
+                    b"iqAw",     [0xA3            ], X, WORD_SIZE;
+                    b"iqAd",     [0xA3            ], X;
                     b"iqAq",     [0xA3            ], X, WITH_REXW;
 ] "movbe"       = [ b"r*m*",     [0x0F, 0x38, 0xF0], X, AUTO_SIZE;
                     b"m*r*",     [0x0F, 0x38, 0xF1], X, AUTO_SIZE;
