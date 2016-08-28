@@ -13,6 +13,7 @@ use debug::format_opdata_list;
 use std::mem::swap;
 use std::slice;
 use std::iter;
+use std::collections::hash_map::Entry;
 
 /*
  * Compilation output
@@ -151,6 +152,37 @@ fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut arg
                 },
                 _ => return Err(Some(format!("this directive only uses immediate arguments")))
             }
+            Ok(())
+        },
+        "alias" => {
+            if args.len() != 2 {
+                return Err(Some(format!("Invalid amount of arguments")));
+            }
+
+            let reg = match args.pop().unwrap() {
+                Arg::Direct(Spanned {node: Register {kind: RegKind::Static(id), size}, ..}) => (id, size),
+                _ => {
+                    return Err(Some(format!("The second argument to alias should be a static register")));
+                }
+            };
+
+            let alias = match args.pop().unwrap() {
+                Arg::Immediate(expr, _) => parser::as_simple_name(&*expr),
+                _ => None
+            };
+
+            let alias = if let Some(alias) = alias {
+                alias.node.name
+            } else {
+                return Err(Some(format!("The first argument to alias should be a non-keyword immediate")));
+            };
+
+            let global_data = super::crate_local_data(ecx);
+            let mut lock = global_data.write();
+            match lock.aliases.entry(alias) {
+                Entry::Occupied(_) => return Err(Some(format!("Duplicate alias definition, alias '{}' was earlier defined", alias.as_str()))),
+                Entry::Vacant(v) => v.insert(reg)
+            };
             Ok(())
         },
         d => {

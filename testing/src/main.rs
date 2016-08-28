@@ -9,6 +9,11 @@ macro_rules! test {
     () => (mov rax, rbx)
 }
 
+// aliases, and dynasm! in item position
+dynasm!(ops
+    ; .alias test, rax
+);
+
 fn main() {
     let mut ops = dynasmrt::Assembler::new();
     let d = 3;
@@ -23,10 +28,10 @@ fn main() {
         // immediate
         ; ret 16
         // register
-        ; inc rax
+        ; inc test
         // memory ref
         ; inc DWORD [16]
-        ; inc DWORD [rax]
+        ; inc DWORD [test]
         ; inc DWORD [rax*2]
         ; inc DWORD [rax*3]
         ; inc DWORD [rax*4]

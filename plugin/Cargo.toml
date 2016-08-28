@@ -10,3 +10,4 @@ plugin = true
 [dependencies]
 lazy_static = "0.2.*"
 bitflags = "0.7.*"
+owning_ref = "0.2.*"

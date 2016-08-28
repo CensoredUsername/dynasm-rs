@@ -7,6 +7,7 @@ extern crate rustc_plugin;
 extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
+extern crate owning_ref;
 
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
@@ -16,13 +17,18 @@ use syntax::ast;
 use syntax::util::small_vector::SmallVector;
 use syntax::parse::token::intern;
 use syntax::tokenstream::TokenTree;
+use syntax::ptr::P;
+
+use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::collections::HashMap;
+
+use owning_ref::{OwningRef, RwLockReadGuardRef};
 
 pub mod parser;
 pub mod compiler;
 pub mod x64data;
 pub mod serialize;
 pub mod debug;
-
 
 #[plugin_registrar]
 pub fn registrar(reg: &mut Registry) {
@@ -71,4 +77,66 @@ impl MacResult for DynAsm {
     fn make_stmts(self: Box<Self>) -> Option<SmallVector<ast::Stmt>> {
         Some(self.stmts)
     }
+
+    fn make_items(self: Box<Self>) -> Option<SmallVector<P<ast::Item>>> {
+        if self.stmts.len() == 0 {
+            Some(SmallVector::zero())
+        } else {
+            None
+        }
+    }
+}
+
+// Crate local data implementation.
+
+pub struct DynasmData {
+    aliases: HashMap<ast::Name, (parser::RegId, parser::Size)>
+}
+
+pub struct CrateLocalData {
+    inner: OwningRef<
+        RwLockReadGuard<'static, DynasmStorage>,
+        RwLock<DynasmData>
+    >
+}
+
+impl CrateLocalData {
+    fn read(&self) ->RwLockReadGuard<DynasmData> {
+        self.inner.read().unwrap()
+    }
+
+    fn write(&self) -> RwLockWriteGuard<DynasmData> {
+        self.inner.write().unwrap()
+    }
+}
+
+pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
+    let id = ecx.mod_path()[0];
+
+    {
+        let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
+
+        if data.get(&id).is_some() {
+            return CrateLocalData {
+                inner: data.map(|x| x.get(&id).unwrap())
+            }
+        }
+    }
+
+    {
+        let mut lock = DYNASM_STORAGE.write().unwrap();
+        lock.insert(id, RwLock::new(DynasmData {
+            aliases: HashMap::new()
+        }));
+    }
+    CrateLocalData {
+        inner: RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&id).unwrap())
+    }
+}
+
+// the root of all crate-local data
+type DynasmStorage = HashMap<ast::Ident, RwLock<DynasmData>>;
+
+lazy_static! {
+    pub static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
 }

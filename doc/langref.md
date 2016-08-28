@@ -14,7 +14,7 @@ The following syntax units used in dynasm syntax are defined by the [rust gramma
 Dynasm-rs defines the following base syntax units:
 
 - `prefix : "cs" | "ds" | "es" | "fs" | "gs" | "ss" | "lock" | "rep" | "repne" | "repe" | "repnz" | "repz" ;`
-- `static_reg` matches any valid register name as seen in table 3
+- `static_reg` matches any valid register name as seen in table 3, or any previously defined alias
 - `dynamic_reg_family` matches any valid register family from table 3
 - `size : "BYTE" | "WORD" | "DWORD" | "AWORD" | "QWORD" | "OWORD" | "HWORD"`
 
@@ -71,12 +71,17 @@ Table 1: dynasm-rs directives
 
 Name      | Argument format | Description
 ----------|-----------------|------------
+`.alias`  | An name followed by a register | defines the name as an alias for the wanted register.
 `.align`  | An expression of type usize | Pushes NOPs until the assembling head has reached the desired alignment.
 `.byte`   | One or more expressions of the type `i8`  | Pushes the values into the assembling buffer.
 `.word`   | One or more expressions of the type `i16` | Pushes the values into the assembling buffer.
 `.dword`  | One or more expressions of the type `i32` | Pushes the values into the assembling buffer.
 `.qword`  | One or more expressions of the type `i64` | Pushes the values into the assembling buffer.
 `.bytes`  | An expression of that implements `IntoIterator<Item=u8>` or `IntoIterator<Item=&u8>` | extends the assembling buffer with the iterator.
+
+## Aliases
+
+Dynasm-rs allows the user to define aliases for registers using the `.alias name, register` directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are only usable after the end of the `dynasm!` block in which they were defined, and their scoping is crate-global. They are defined in lexical parsing order.
 
 ## Labels
 

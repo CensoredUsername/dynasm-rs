@@ -481,7 +481,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
 
     // typemapped
     if parser.eat(&token::FatArrow) {
-        let base = parse_reg(&arg);
+        let base = parse_reg(ecx, &arg);
         if base.is_none() {
             ecx.span_err(arg.span, "Expected register");
             return Ok(Arg::Invalid);
@@ -495,7 +495,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
             let idx_reg = try!(parser.parse_expr()).unwrap();
             try!(parser.expect(&token::CloseDelim(token::DelimToken::Bracket)));
 
-            index = parse_reg(&idx_reg);
+            index = parse_reg(ecx, &idx_reg);
             if index.is_none() {
                 ecx.span_err(idx_reg.span, "Expected register");
                 return Ok(Arg::Invalid);
@@ -503,9 +503,6 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
         }
         if parser.eat(&token::Dot) {
             attr = Some(try!(parser.parse_ident()));
-        }
-        if index.is_none() && attr.is_none() {
-            return parser.unexpected();
         }
 
         let scale = if index.is_some() { Some(size_of(ecx, ty.clone())) } else { None };
@@ -523,7 +520,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     }
 
     // direct register reference
-    if let Some(reg) = parse_reg(&arg) {
+    if let Some(reg) = parse_reg(ecx, &arg) {
         if size.is_some() {
             ecx.span_err(arg.span, "size hint with direct register");
         }
@@ -548,7 +545,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
         // static reg combiner. we do not combine dynamic regs as the equation used to construct them might have side effects.
         for node in added {
             // simple reg
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(&node) {
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &node) {
                 match reg.kind {
                     RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
                     RegKind::Dynamic(_, _) => regs.push((reg, 1))
@@ -557,7 +554,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
             }
             if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = node {
                 // reg * const
-                if let Some(Spanned {node: reg, ..} ) = parse_reg(&**left) {
+                if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &**left) {
                     if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
                         if let ast::LitKind::Int(value, _) = scale.node {
                             match reg.kind {
@@ -568,7 +565,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
                         }
                     }
                 // const * reg
-                } else if let Some(Spanned {node: reg, ..} ) = parse_reg(&**right) {
+                } else if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &**right) {
                     if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
                         if let ast::LitKind::Int(value, _) = scale.node {
                             match reg.kind {
@@ -638,7 +635,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     Ok(Arg::Immediate(P(arg), size))
 }
 
-fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
+pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     let path = match expr {
         &ast::Expr {node: ast::ExprKind::Path(None, ref path) , ..} => path,
         _ => return None
@@ -656,7 +653,7 @@ fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     Some(Ident {node: segment.identifier, span: path.span})
 }
 
-fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
+fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
     if let Some(path) = as_simple_name(expr) {
         // static register names
         use self::RegId::*;
@@ -715,7 +712,15 @@ fn parse_reg(expr: &ast::Expr) -> Option<Spanned<Register>> {
             "dr8"  => (DR8 , QWORD), "dr9"  => (DR9 , QWORD), "dr10" => (DR10, QWORD), "dr11" => (DR11, QWORD),
             "dr12" => (DR12, QWORD), "dr13" => (DR13, QWORD), "dr14" => (DR14, QWORD), "dr15" => (DR15, QWORD),
 
-            _ => return None
+            _ => {
+                let global_data = super::crate_local_data(ecx);
+                let lock = global_data.read();
+                if let Some(x) = lock.aliases.get(&path.node.name) {
+                    x.clone()
+                } else {
+                    return None;
+                }
+            }
         };
 
         Some(Spanned {
