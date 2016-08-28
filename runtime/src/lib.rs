@@ -41,26 +41,26 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     fn push(&mut self, byte: u8);
     /// Push a signed byte into the assembling target
     #[inline]
-    fn push_8(&mut self, value: i8) {
+    fn push_i8(&mut self, value: i8) {
         self.push(value as u8);
     }
     /// Push a signed word into the assembling target
     #[inline]
-    fn push_16(&mut self, value: i16) {
+    fn push_i16(&mut self, value: i16) {
         self.extend(unsafe {
             mem::transmute::<_, [u8; 2]>(value.to_le())
         }.iter().cloned());
     }
     /// Push a signed doubleword into the assembling target
     #[inline]
-    fn push_32(&mut self, value: i32) {
+    fn push_i32(&mut self, value: i32) {
         self.extend(unsafe {
             mem::transmute::<_, [u8; 4]>(value.to_le())
         }.iter().cloned());
     }
     /// Push a signed quadword into the assembling target
     #[inline]
-    fn push_64(&mut self, value: i64) {
+    fn push_i64(&mut self, value: i64) {
         self.extend(unsafe {
             mem::transmute::<_, [u8; 8]>(value.to_le())
         }.iter().cloned());
@@ -262,6 +262,7 @@ impl Assembler {
         }
     }
 
+    /// Create a new dynamic label that can be referenced and defined.
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         let id = self.dynamic_labels.len();
         self.dynamic_labels.push(None);

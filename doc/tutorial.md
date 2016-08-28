@@ -61,7 +61,7 @@ We will now examine this code snippet piece by piece.
 #![feature(plugin)]
 #![plugin(dynasm)]
 ```
-To use the dynasm! procedural macro, first the dynasm plugin has to be loaded. As plugins are currently unstable, the plugin feature first needs to be enabled. This currently requires a nightly version of rustc.
+To use the `dynasm!` procedural macro, first the dynasm plugin has to be loaded. As plugins are currently unstable, the plugin feature first needs to be enabled. This currently requires a nightly version of rustc.
 
 ```
 #[macro_use]
@@ -176,13 +176,13 @@ fn main() {
     ops.extend(b"H\x8d\r\x00\x00\x00\x00");
     ops.global_reloc("hello", 4u8);
     ops.extend(b"1\xd2\xb2");
-    ops.push_8(string.len() as _);
+    ops.push_i8(string.len() as _);
     ops.extend(b"H\xb8");
-    ops.push_64(print as _);
+    ops.push_i64(print as _);
     ops.extend(b"H\x83\xec");
-    ops.push_8(40);
+    ops.push_i8(40);
     ops.extend(b"\xff\xd0H\x83\xc4");
-    ops.push_8(40);
+    ops.push_i8(40);
     ops.push(b'\xc3');
 // )
 

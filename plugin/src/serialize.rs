@@ -44,10 +44,10 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
             },
             ExprConst(expr)        => ("push",    vec![expr]),
 
-            Var(expr, Size::BYTE)  => ("push_8",  vec![expr]),
-            Var(expr, Size::WORD)  => ("push_16", vec![expr]),
-            Var(expr, Size::DWORD) => ("push_32", vec![expr]),
-            Var(expr, Size::QWORD) => ("push_64", vec![expr]),
+            Var(expr, Size::BYTE)  => ("push_i8",  vec![expr]),
+            Var(expr, Size::WORD)  => ("push_i16", vec![expr]),
+            Var(expr, Size::DWORD) => ("push_i32", vec![expr]),
+            Var(expr, Size::QWORD) => ("push_i64", vec![expr]),
             Var(_, _)           => panic!("immediate serializaiton of this size is not supported yet"),
 
             Extend(expr)           => ("extend", vec![expr]),
