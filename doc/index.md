@@ -23,7 +23,7 @@ to read through the [tutorial](./tutorial.html). After this, you can read throug
 also read through the [runtime documentation](../runtime/dynasmrt/index.html) to learn about the
 runtime API. The [instruction reference](./instructionref.html) lists all assembly mnemnonics
 and formats supported by dynasm-rs. Finally, documentation on the
-[internals on dynasm-rs](../plugin/dynasm/index.html) can be referenced.
+[internals on dynasm-rs](../plugin/dynasm/index.html) can be browsed here.
 
 # Differences from LuaJit Dynasm
 
@@ -41,3 +41,5 @@ mnemnonic with a 64-bit immediate parameter to encode this.
 in dynasm-rs it is `reg => Type.attr`.
 - LuaJIT dynasm uses a special preprocessor which detects lines starting with pipes (`|`) as dynasm
 instructions, dynasm-rs uses the `dynasm!` procedural macro with lines starting with semicolons (`;`).
+- LuaJIT has macros in its invocations, dynasm-rs uses macros that expand to `dynasm!` invocations.
+- DYnasm-rs doesn't have typed aliases

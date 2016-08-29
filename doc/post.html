@@ -1,1 +1,13 @@
 </section>
+<script src="../plugin/jquery.js"></script>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+var next = $('pre').has('code.language-diffold').next().has('code.language-diffnew');
+var prev = next.prev();
+console.log(next);
+console.log(prev);
+next.css("margin-top", 0);
+next.css("padding-top", 0);
+prev.css("margin-bottom", 0);
+prev.css("padding-bottom", 0);
+</script>

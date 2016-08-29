@@ -14,8 +14,8 @@ The following syntax units used in dynasm syntax are defined by the [rust gramma
 Dynasm-rs defines the following base syntax units:
 
 - `prefix : "cs" | "ds" | "es" | "fs" | "gs" | "ss" | "lock" | "rep" | "repne" | "repe" | "repnz" | "repz" ;`
-- `static_reg` matches any valid register name as seen in table 3, or any previously defined alias
-- `dynamic_reg_family` matches any valid register family from table 3
+- `static_reg` matches any valid register name as seen in table 4, or any previously defined alias
+- `dynamic_reg_family` matches any valid register family from table 4
 - `size : "BYTE" | "WORD" | "DWORD" | "AWORD" | "QWORD" | "OWORD" | "HWORD"`
 
 ## Entry point
@@ -83,13 +83,43 @@ Name      | Argument format | Description
 
 Dynasm-rs allows the user to define aliases for registers using the `.alias name, register` directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are only usable after the end of the `dynasm!` block in which they were defined, and their scoping is crate-global. They are defined in lexical parsing order.
 
+## Macros
+
+While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal rust macros with dynasm-rs.
+
+First of all, it is not possible to have `dynasm!` parse the result of a rust macro. This is a limitation of rust itself. The proper way to use rust macros with dynasm-rs is to have macros expand to a `dynasm!` call as can be seen in the following example:
+
+```
+macro_rules! fma {
+    ($ops:ident, $accumulator:expr, $arg1:expr, $arg2:expr) => {dynasm!($ops
+        ; imul $arg1, $arg2
+        ; add $accumulator, $arg1
+    )};
+}
+```
+
+An important thing to notice here is which matchers are used for which parts of dynasm! syntax. The following table lists the correct matchers to be used for expanding to dynasm syntax elements. Note that `$a:expr` means that anything that parses to an expression like `$a:ident` and just raw token trees are allowed.
+
+Table 2: dynasm-rs macro expansion rules
+
+ Syntax element        | Matchers
+:----------------------|:------------------------
+Assembling buffer      | `$ops:ident`
+Register reference     | `$reg:expr`
+Memory reference       | `$mem:expr`
+Any element inside a memory reference | `$elem:expr, $reg:ident`
+Immediate              | `$imm:expr`
+Local or global label name | `$label:ident`
+Dynamic label          | `$label:expr`
+Type map               | `$reg:expr => $type:path[$reg:expr].$attr:ident`
+
 ## Labels
 
 In order to describe flow control effectively, dynasm-rs supports labels. However, since the assembly templates can be combined in a variety of ways at the mercy of the program using dynasm-rs, the semantics of these labels are somewhat different from how labels work in a static assembler.
 
 Dynasm-rs distinguishes between three different types of labels: global, local and dynamic labels. Their syntax is as follows:
 
-Table 2: dynasm-rs label types
+Table 3: dynasm-rs label types
 
 Type    | Definition   | Reference
 --------|--------------|-----------
@@ -113,7 +143,7 @@ Dynamic labels are similar to global labels in that they can be defined only onc
 
 The language used by dynasm-rs is a nasm-dialect. The largest difference is that instead of prefixing memory operands with segment registers, segment register overrides are prefixed to the entire instruction. Furthermore, it is currently not possible to override the size of the displacement used in memory operands.
 
-This results in the following syntax for instructions. First, zero or more prefixes can be listed (these prefixes can be found in table ???). The instruction mnemnonic is then mentioned, followed by zero or more comma seperated operands.
+This results in the following syntax for instructions. First, zero or more prefixes can be listed (these prefixes can be found in the base units section). The instruction mnemnonic is then mentioned, followed by zero or more comma seperated operands.
 
 ### Operands
 
@@ -123,7 +153,7 @@ There are two ways to reference registers in dynasm-rs, either via their static 
 
 The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically.
 
-Table 3: dynasm-rs registers
+Table 4: dynasm-rs registers
 
 Family              | 8-bit       | 8-bit high | 16-bit     | 32-bit      | 64-bit     | RIP   | Floating Point | MMX    | 128-bit   | 256-bit   | Segment | Control | Debug
 -------------------:|:------------|:-----------|:-----------|:------------|:-----------|:------|:---------------|:-------|:----------|:----------|:--------|:--------|:-----
@@ -155,7 +185,7 @@ Many x64 instructions can taken an indirect memory reference as operand. Such an
 
 The following are several examples of what can be encoded
 
-Table 4: dynasm-rs memory reference formats
+Table 5: dynasm-rs memory reference formats
 
 Syntax   | Explanation
 :--------|:-----------
@@ -173,7 +203,7 @@ To ease interoperation with rust structures, dynasm-rs supports the following sy
 
 The syntax for type maps is as follows
 
-Table 5: dynasm-rs type map formats
+Table 6: dynasm-rs type map formats
 
 Syntax | Equivalent expression
 :------|:-----------
