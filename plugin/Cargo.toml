@@ -3,6 +3,15 @@ name = "dynasm"
 version = "0.0.1"
 authors = ["CensoredUsername <cens.username@gmail.com>"]
 
+description = "A plugin for assembling code at runtime. Combined with the runtime crate dynasmrt it can be used to write JIT compilers easily."
+
+documentation = "https://censoredusername.github.io/dynasm-rs/plugin/dynasm/index.html"
+repository = "https://github.com/CensoredUsername/dynasm-rs"
+
+readme = "../README.md"
+keywords = ["jit", "dynasm", "dynasmrt", "dynasm-rs", "assembler"]
+license = "MPL-2.0"
+
 [lib]
 name = "dynasm"
 plugin = true
