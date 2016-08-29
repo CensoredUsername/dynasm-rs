@@ -196,8 +196,8 @@ Ops!(OPMAP;
   "cmovng"      = [ b"r*v*",     [0x0F, 0x4E      ], X, AUTO_SIZE;
 ] "cmovnle"     |
   "cmovg"       = [ b"r*v*",     [0x0F, 0x4F      ], X, AUTO_SIZE;
-] "cmp"         = [ b"A*i*",     [0x3C            ], X, AUTO_SIZE;
-                    b"Abib",     [0x3D            ], X;
+] "cmp"         = [ b"A*i*",     [0x3D            ], X, AUTO_SIZE;
+                    b"Abib",     [0x3C            ], X;
                     b"v*i*",     [0x81            ], 7, AUTO_SIZE;
                     b"v*ib",     [0x83            ], 7, AUTO_SIZE;
                     b"vbib",     [0x80            ], 7;
