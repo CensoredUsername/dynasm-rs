@@ -451,6 +451,7 @@ Looking at the state of the interpreter, it contains a lot of fields that the ji
 ## Compiler
 
 With the state defined, we can now start adapting the `Interpreter::run` method into `Program::compile`, starting with initalization code. We initialize an assembler and a `Vec` to hold the loops stack. As we will only parse through the code once, replace the slice indexing by an iterator that allows us to look ahead, courtesy of the `itertools` crate. We get the starting offset and emit the function prologue and finally we start iterating through the program:
+
 ```diffold
 - impl<'a> Interpreter<'a> {
 -     fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> Interpreter<'a> {
@@ -720,8 +721,8 @@ First, we add an initializer method to `State`:
 
 Then, we add a `run` method on `Program`. This method does the following:
 
-- Transmute a pointer to the start of our compiled data to a function. This is the one unsafe {} block always needed when using Dynasm-rs, but it is probably the most dangerous one you'll ever find.
-- Create the input arguments to the function from a `State`. Since the "win64" calling convention is used these arguments will end up in the wanted registers `rcx`, `rdx`, `r8` and `r9` as specified by the aliases from the beginning.
+- Transmute a pointer to the start of our compiled data to a function. This is the one `unsafe` block always needed when using Dynasm-rs, but it is probably the most dangerous one you'll ever find.
+- Create the input arguments to the function from a `State`. Since the `"win64"` calling convention is used these arguments will end up in the registers `rcx`, `rdx`, `r8` and `r9`.
 - Run the function.
 - Return a `Result` based on the error code returned by the function.
 
@@ -776,7 +777,7 @@ And finally, we can edit the `main` function to use the JIT:
 
 ## Result
 
-With these changes, adding the necessary `use` statements and removing unused functions, you should end up with the following code (you can also find this example [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-interpreter)):
+With these changes, adding the necessary `use` statements and removing unused functions, you should end up with the following code (you can also find this example [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-jit)):
 
 ```
 #![feature(plugin)]

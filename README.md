@@ -1,4 +1,4 @@
-# A [Dynasm](http://luajit.org/dynasm.html)-like tool written in Rust for Rust.
+# A Dynamic assembler written in Rust for Rust.
 
 The purpose of this tool is to ease the creation of programs that require run-time assembling.
 
@@ -7,26 +7,9 @@ It is currently in alpha, meaning that while everything should work, a lot of fe
 ## Features
 
 - Fully integrated in the rust toolchain, no other tools necessary.
-- The assembly is optimized into a series of Vec<u8>.push statements for high performance.
+- The assembly is optimized into a series of Vec.push and Vec.extend statements for high performance.
 - Errors are almost all diagnosed at compile time in a clear fashion.
 - Write the to be generated assembly inline in nasm-like syntax using a simple macro:
-
-```rust
-    let ops = dynasmrt::Assembler::new();
-    let d = 1;
-    let c = -5;
-    dynasm!(ops
-        ;     jmp >test
-        ;     mov DWORD [rax], 1
-        ;     mov rax, QWORD -1
-        ;     mov BYTE [rax + rax + rcx], 1
-        ; test:
-        ;     mov BYTE [9*r15], 1
-        ;     fs imul sp, WORD [r8 * 2 + rcx + 0x77], 0x77
-        ;     mov QWORD [rax * 2 + rbx + c + d], 1
-    );
-    ops.finalize().unwrap()
-```
 
 ## Documentation
 
@@ -35,6 +18,63 @@ Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/
 ## Limitations
 
 - Currently only supports x64 long mode (with several extensions)
+
+## Example
+
+```rust
+#![feature(plugin)]
+#![plugin(dynasm)]
+
+#[macro_use]
+extern crate dynasmrt;
+
+use dynasmrt::DynasmApi;
+
+use std::{io, slice, mem};
+use std::io::Write;
+
+fn main() {
+    let mut ops = dynasmrt::Assembler::new();
+    let string = "Hello World!";
+
+    dynasm!(ops
+        ; ->hello:
+        ; .bytes string.as_bytes()
+    );
+
+    let hello = ops.offset();
+    dynasm!(ops
+        ; lea rcx, [->hello]
+        ; xor edx, edx
+        ; mov dl, BYTE string.len() as _
+        ; mov rax, QWORD print as _
+        ; sub rsp, BYTE 0x28
+        ; call rax
+        ; add rsp, BYTE 0x28
+        ; ret
+    );
+
+    let buf = ops.finalize().unwrap();
+
+    let hello_fn: extern "win64" fn() -> bool = unsafe {
+        mem::transmute(buf.ptr(hello))
+    };
+
+    assert!(
+        hello_fn()
+    );
+}
+
+pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
+    io::stdout().write_all(unsafe {
+        slice::from_raw_parts(buffer, length as usize)
+    }).is_ok()
+}
+```
+
+## Background
+
+This project is heavily inspired by [Dynasm](http://luajit.org/dynasm.html)
 
 ## License
 

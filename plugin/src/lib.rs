@@ -30,6 +30,12 @@ pub mod x64data;
 pub mod serialize;
 pub mod debug;
 
+/// Welcome to the documentation of the dynasm plugin. This mostly exists to ease
+/// development and to show a glimpse of what is under the hood of dynasm. Please
+/// be aware that nothing in here should be counted on to be stable, the only
+/// guarantees are in the syntax the `dynasm!` macro parses and in the code it
+/// generates.
+
 #[plugin_registrar]
 pub fn registrar(reg: &mut Registry) {
     reg.register_syntax_extension(
