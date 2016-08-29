@@ -26,20 +26,10 @@ impl<'a> Interpreter<'a> {
     }
 
     fn run(&mut self, program: &[u8]) -> Result<(), &'static str> {
-        loop {
-            let code = if let Some(c) = program.get(self.pos) {
-                c
-            } else {
-                return if self.loops.len() != 0 {
-                    Err("[ without matching ]")
-                } else {
-                    Ok(())
-                };
-            };
-
+        while let Some(&c) = program.get(self.pos) {
             self.pos += 1;
 
-            match *code {
+            match c {
                 b'<' => {
                     let amount = count_leading_chars(&program[self.pos..], b'<');
                     self.pos += amount;
@@ -61,44 +51,65 @@ impl<'a> Interpreter<'a> {
                 b'+' => {
                     let amount = count_leading_chars(&program[self.pos..], b'+');
                     self.pos += amount;
-                    self.tape[self.tape_index] = self.tape[self.tape_index].checked_add(amount as u8 + 1).unwrap();
+                    if let Some(a) = self.tape[self.tape_index].checked_add(amount as u8 + 1) {
+                        self.tape[self.tape_index] = a;
+                    } else {
+                        return Err("An overflow occurred");
+                    }
                 },
                 b'-' => {
                     let amount = count_leading_chars(&program[self.pos..], b'-');
                     self.pos += amount;
-                    self.tape[self.tape_index] = self.tape[self.tape_index].checked_sub(amount as u8 + 1).unwrap();
+                    if let Some(a) = self.tape[self.tape_index].checked_sub(amount as u8 + 1) {
+                        self.tape[self.tape_index] = a;
+                    } else {
+                        return Err("An overflow occurred");
+                    }
                 },
                 b',' => {
-                    self.output.flush().unwrap();
-                    self.input.read_exact(&mut self.tape[self.tape_index..self.tape_index + 1]).unwrap();
+                    let err = self.output.flush().is_err();
+                    if self.input.read_exact(&mut self.tape[self.tape_index..self.tape_index + 1]).is_err() || err {
+                        return Err("IO error");
+                    }
                 },
                 b'.' => {
-                    self.output.write_all(&self.tape[self.tape_index..self.tape_index + 1]).unwrap();
-                },
-                b'[' => if self.tape[self.tape_index] == 0 {
-                    let mut nesting = 1;
-                    let amount = program[self.pos..].iter().take_while(|x| match **x {
-                        b'[' => {nesting += 1; true},
-                        b']' => {nesting -= 1; nesting != 0},
-                        _ => true
-                    }).count() + 1;
-                    if nesting != 0 {
-                        return Err("[ without matching ]");
+                    if self.output.write_all(&self.tape[self.tape_index..self.tape_index + 1]).is_err() {
+                        return Err("IO error");
                     }
-                    self.pos += amount;
-                } else {
-                    self.loops.push(self.pos);
                 },
-                b']' => if self.tape[self.tape_index] == 0 {
-                    self.loops.pop();
-                } else if let Some(&loc) = self.loops.last() {
-                    self.pos = loc;
-                } else {
-                    return Err("] without matching [");
+                b'[' => {
+                    if self.tape[self.tape_index] == 0 {
+                        let mut nesting = 1;
+                        let amount = program[self.pos..].iter().take_while(|x| match **x {
+                            b'[' => {nesting += 1; true},
+                            b']' => {nesting -= 1; nesting != 0},
+                            _ => true
+                        }).count() + 1;
+                        if nesting != 0 {
+                            return Err("[ without matching ]");
+                        }
+                        self.pos += amount;
+                    } else {
+                        self.loops.push(self.pos);
+                    }
+                },
+                b']' => {
+                    if self.tape[self.tape_index] == 0 {
+                        self.loops.pop();
+                    } else if let Some(&loc) = self.loops.last() {
+                        self.pos = loc;
+                    } else {
+                        return Err("] without matching [");
+                    }
                 },
                 _ => ()
             }
         }
+
+        if self.loops.len() != 0 {
+            return Err("[ without matching ]");
+        }
+        Ok(())
     }
 }
 
@@ -133,4 +144,3 @@ fn main() {
         println!("{}", e);
     }
 }
-

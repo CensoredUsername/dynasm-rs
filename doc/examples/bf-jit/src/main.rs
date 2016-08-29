@@ -13,9 +13,11 @@ use std::env;
 use std::fs::File;
 use std::slice;
 use std::mem;
+use std::u8;
 
 const TAPE_SIZE: usize = 30000;
 
+#[cfg(target_arch = "x86_64")]
 dynasm!(ops
     ; .alias a_state, rcx
     ; .alias a_current, rdx
@@ -46,14 +48,6 @@ macro_rules! epilogue {
 }
 
 macro_rules! call_extern {
-    ($ops:ident) => {dynasm!($ops
-        ; mov [rsp + 0x38], rdx
-        ; call rax
-        ; mov rcx, [rsp + 0x30]
-        ; mov rdx, [rsp + 0x38]
-        ; mov r8,  [rsp + 0x40]
-        ; mov r9,  [rsp + 0x48]
-    );};
     ($ops:ident, $addr:expr) => {dynasm!($ops
         ; mov [rsp + 0x38], rdx
         ; mov rax, QWORD $addr as _
@@ -63,55 +57,22 @@ macro_rules! call_extern {
         ; mov r8,  [rsp + 0x40]
         ; mov r9,  [rsp + 0x48]
     );};
-    ($ops:ident, $addr:expr, $a1:expr) => {dynasm!($ops
-        ; mov [rsp + 0x38], rdx
-        ; mov rax, QWORD $addr as _
-        ; mov rcx, $a1
-        ; call rax
-        ; mov rcx, [rsp + 0x30]
-        ; mov rdx, [rsp + 0x38]
-        ; mov r8,  [rsp + 0x40]
-        ; mov r9,  [rsp + 0x48]
-    );};
-    ($ops:ident, $addr:expr, $a1:expr, $a2:expr) => {dynasm!($ops
-        ; mov [rsp + 0x38], rdx
-        ; mov rax, QWORD $addr as _
-        ; mov rcx, $a1
-        ; mov rdx, $a2
-        ; call rax
-        ; mov rcx, [rsp + 0x30]
-        ; mov rdx, [rsp + 0x38]
-        ; mov r8,  [rsp + 0x40]
-        ; mov r9,  [rsp + 0x48]
-    );};
 }
 
-struct BfProgram {
-    code: dynasmrt::ExecutableBuffer,
-    start: dynasmrt::AssemblyOffset,
-}
-
-struct BfState<'a> {
+struct State<'a> {
     pub input: Box<BufRead + 'a>,
     pub output: Box<Write + 'a>,
     tape: [u8; TAPE_SIZE]
 }
 
-impl BfProgram {
-    fn run(self, state: &mut BfState) -> Result<(), ()> {
-        let f: extern "win64" fn(*mut BfState, *mut u8, *mut u8, *const u8) -> u8 = unsafe {
-            mem::transmute(self.code.ptr(self.start))
-        };
-        let start = state.tape.as_mut_ptr();
-        let end = unsafe { start.offset(TAPE_SIZE as isize) };
-        if f(state, start, start, end) == 0 {
-            Ok(())
-        } else {
-            Err(())
-        }
-    }
+struct Program {
+    code: dynasmrt::ExecutableBuffer,
+    start: dynasmrt::AssemblyOffset,
+}
 
-    fn compile(program: &[u8]) -> Result<BfProgram, &'static str> {
+
+impl Program {
+    fn compile(program: &[u8]) -> Result<Program, &'static str> {
         let mut ops = dynasmrt::Assembler::new();
         let mut loops = Vec::new();
         let mut code = program.iter().cloned().multipeek();
@@ -142,27 +103,43 @@ impl BfProgram {
                 },
                 b'+' => {
                     let amount = code.take_while_ref(|x| *x == b'+').count() + 1;
+                    if amount > u8::MAX as usize {
+                        return Err("An overflow occurred");
+                    }
                     dynasm!(ops
                         ; add BYTE [a_current], amount as _
-                        ; jo ->error
+                        ; jo ->overflow
                     );
                 },
                 b'-' => {
                     let amount = code.take_while_ref(|x| *x == b'-').count() + 1;
+                    if amount > u8::MAX as usize {
+                        return Err("An overflow occurred");
+                    }
                     dynasm!(ops
                         ; sub BYTE [a_current], amount as _
-                        ; jo ->error
+                        ; jo ->overflow
                     );
                 },
                 b',' => {
-                    call_extern!(ops, BfState::getchar); // we're actually passing arguments, it's just that they're already in the right regs
+                    call_extern!(ops, State::getchar);
+                    dynasm!(ops
+                        ; cmp al, 0
+                        ; jnz ->io_failure
+                    );
                 },
                 b'.' => {
-                    call_extern!(ops, BfState::putchar); // same here.
+                    call_extern!(ops, State::putchar);
+                    dynasm!(ops
+                        ; cmp al, 0
+                        ; jnz ->io_failure
+                    );
                 },
                 b'[' => {
                     let first = code.peek() == Some(&b'-');
                     if first && code.peek() == Some(&b']') {
+                        code.next();
+                        code.next();
                         dynasm!(ops
                             ; mov BYTE [a_current], 0
                         );
@@ -177,14 +154,16 @@ impl BfProgram {
                         );
                     }
                 },
-                b']' => if let Some((backward_label, forward_label)) = loops.pop() {
-                    dynasm!(ops
-                        ; cmp BYTE [a_current], 0
-                        ; jnz =>backward_label
-                        ;=>forward_label
-                    );
-                } else {
-                    return Err("] without matching [");
+                b']' => {
+                    if let Some((backward_label, forward_label)) = loops.pop() {
+                        dynasm!(ops
+                            ; cmp BYTE [a_current], 0
+                            ; jnz =>backward_label
+                            ;=>forward_label
+                        );
+                    } else {
+                        return Err("] without matching [");
+                    }
                 },
                 _ => ()
             }
@@ -196,38 +175,59 @@ impl BfProgram {
         epilogue!(ops, 0);
 
         dynasm!(ops
-            ;->error:
+            ;->overflow:
         );
         epilogue!(ops, 1);
 
+        dynasm!(ops
+            ;->io_failure:
+        );
+        epilogue!(ops, 2);
+
         let code = ops.finalize().unwrap();
-        Ok(BfProgram {
+        Ok(Program {
             code: code,
             start: start
         })
     }
+
+    fn run(self, state: &mut State) -> Result<(), &'static str> {
+        let f: extern "win64" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 = unsafe {
+            mem::transmute(self.code.ptr(self.start))
+        };
+        let start = state.tape.as_mut_ptr();
+        let end = unsafe { start.offset(TAPE_SIZE as isize) };
+        let res = f(state, start, start, end);
+        if res == 0 {
+            Ok(())
+        } else if res == 1 {
+            Err("An overflow occurred")
+        } else if res == 2 {
+            Err("IO error")
+        } else {
+            panic!("Unknown error code");
+        }
+    }   
 }
 
-impl<'a> BfState<'a> {
-    fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> BfState<'a> {
-        BfState {
+impl<'a> State<'a> {
+    unsafe extern "win64" fn getchar(state: *mut State, cell: *mut u8) -> u8 {
+        let state = &mut *state;
+        let err = state.output.flush().is_err();
+        (state.input.read_exact(slice::from_raw_parts_mut(cell, 1)).is_err() || err) as u8
+    }
+
+    unsafe extern "win64" fn putchar(state: *mut State, cell: *mut u8) -> u8 {
+        let state = &mut *state;
+        state.output.write_all(slice::from_raw_parts(cell, 1)).is_err() as u8
+    }
+
+    fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> State<'a> {
+        State {
             input: input,
             output: output,
             tape: [0; TAPE_SIZE]
         }
-    }
-
-    unsafe extern "win64" fn getchar(state: *mut BfState, cell: *mut u8) -> u8 {
-        let state = &mut *state;
-        if state.output.flush().is_err() {
-            return 1;
-        }
-        state.input.read_exact(slice::from_raw_parts_mut(cell, 1)).is_err() as u8
-    }
-
-    unsafe extern "win64" fn putchar(state: *mut BfState, cell: *mut u8) -> u8 {
-        let state = &mut *state;
-        state.output.write_all(slice::from_raw_parts(cell, 1)).is_err() as u8
     }
 }
 
@@ -251,11 +251,19 @@ fn main() {
         return;
     }
 
-    let mut state = BfState::new(
+    let mut state = State::new(
         Box::new(BufReader::new(stdin())), 
         Box::new(BufWriter::new(stdout()))
     );
-    let program = BfProgram::compile(&buf).expect("An overflow occurred");
-    program.run(&mut state).unwrap();
+    let program = match Program::compile(&buf) {
+        Ok(p) => p,
+        Err(e) => {
+            println!("{}", e);
+            return;
+        }
+    };
+    if let Err(e) = program.run(&mut state) {
+        println!("{}", e);
+        return;
+    }
 }
-
