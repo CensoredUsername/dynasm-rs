@@ -107,6 +107,18 @@ pub fn add_exprs<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut 
     })
 }
 
+pub fn size_of_scale_expr(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>) -> P<ast::Expr> {
+    let span = value.span;
+    ecx.expr_binary(span,
+        ast::BinOpKind::Mul,
+        ecx.expr_cast(span,
+            size_of(ecx, ty),
+            ecx.ty_ident(span, ast::Ident::with_empty_ctxt(intern("i32")))
+        ),
+        value
+    )
+}
+
 pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Expr>, mask: u64, shift: i8) -> P<ast::Expr> {
     let span = expr.span;
     // take expr and return !((expr & mask) << shift)
@@ -201,7 +213,7 @@ pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Exp
         ),
         // ::std::mem::forget(temp);
         ecx.stmt_semi(ecx.expr_call_global(span, forget, vec![ecx.expr_ident(span, temp)])),
-        // rv as u32
+        // rv as i32
         ecx.stmt_expr(ecx.expr_cast(span, ecx.expr_ident(span, rv), ecx.ty_ident(span, i32_id)))
     ]).map(|mut b| {
         b.rules = ast::BlockCheckMode::Unsafe(ast::UnsafeSource::CompilerGenerated);

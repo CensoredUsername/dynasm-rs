@@ -140,6 +140,8 @@ fn main() {
     dynasm!(ops
         ; mov rax, AWORD MutPointer!(test_array)
         ; mov ebx, 2
+        ; inc DWORD rax => Test[2].bar
+        ; inc DWORD rax => Test[2 + rbx].bar
         ; inc DWORD rax => Test[rbx].bar
         ; inc DWORD rax => Test[rbx]
         ; mov rax, AWORD MutPointer!(test_single)

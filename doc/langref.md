@@ -46,6 +46,8 @@ Directives are special commands given to the assembler that do not correspond to
 
 `arg : register | (size? ( memoryref | labelref | typemap | expr ));`
 
+`typemap : register "=>" expr_path ("." ident | "[" regrefitem "]" ("." ident)?) ;`
+
 `memoryref : "[" (regref | labelref) "]" ;`
 
 `regref : regrefitem ("+" regrefitem)* ;`
@@ -53,8 +55,6 @@ Directives are special commands given to the assembler that do not correspond to
 `regrefitem : (register "*" num_lit | num_lit "*" register | register | expr) ;`
 
 `labelref : (">" ident | "<" ident | "->" ident | "=>" expr) ;`
-
-`typemap : register "=>" expr_path ("." ident | "[" register "]" ("." ident)?) ;`
 
 `register = static_reg | dynamic_reg ;`
 
