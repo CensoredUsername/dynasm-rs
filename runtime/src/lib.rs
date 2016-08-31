@@ -270,6 +270,15 @@ impl Assembler {
         DynamicLabel(id)
     }
 
+    /// Allows previously assembled code to be overwritten. The first argument
+    /// is a range of `AssemblyOffset`s that determines the safe range of values
+    /// to overwrite. The second argument is a closure which will be passed a &mut
+    /// Assembler to do the actual overwriting. If the range is invalid (it should
+    /// only cover already assembled values and the end should be larger than the
+    /// start) it will panic. Additionally, if code within the closure assembles
+    /// to a total size larger than the given range, it will also panic.
+    /// aside from that you can do everything you can do normally within the
+    /// closure.
     pub fn alter<F>(&mut self, loc: Range<AssemblyOffset>, f: F) where F: FnOnce(&mut Self) -> () {
         // commit the assembling buffer to empty it so we can retarget it
         self.commit();
