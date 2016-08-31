@@ -2,7 +2,7 @@
 
 # Introduction
 
-Dynasm-rs is a library and sytnax extension for assembling code at runtime. For the first part of the tutorial we will be examining the following example program that assembles a simple function at runtime:
+Dynasm-rs is a library and syntax extension for assembling code at runtime. For the first part of the tutorial we will be examining the following example program that assembles a simple function at runtime:
 
 ```
 #![feature(plugin)]
