@@ -272,12 +272,14 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             } else if op_size != Size::OWORD {
                 panic!("bad formatting data");
             }
-        } else if op_size == Size::WORD {
-            pref_size = true;
-        } else if op_size == Size::QWORD {
-            rex_w = true;
-        } else if op_size != Size::DWORD {
-            panic!("bad formatting data");
+        } else {
+            if op_size == Size::WORD {
+                pref_size = true;
+            } else if op_size == Size::QWORD {
+                rex_w = true;
+            } else if op_size != Size::DWORD {
+                panic!("bad formatting data");
+            }
         }
     }
 
