@@ -5,10 +5,6 @@
 extern crate dynasmrt;
 use dynasmrt::DynasmApi;
 
-macro_rules! test {
-    () => (mov rax, rbx)
-}
-
 // aliases, and dynasm! in item position
 dynasm!(ops
     ; .alias test, rax
@@ -147,6 +143,12 @@ fn main() {
         ; mov rax, AWORD MutPointer!(test_single)
         ; inc DWORD rax => Test.bar
     );
+
+    // dynasm in expr position
+    match 1 {
+        0 => (),
+        _ => dynasm!(ops; inc rax)
+    }
 
     let index = ops.offset();
     dynasm!(ops

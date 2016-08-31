@@ -11,6 +11,7 @@ extern crate owning_ref;
 
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
+use syntax::ext::build::AstBuilder;
 use syntax::fold::Folder;
 use syntax::codemap::Span;
 use syntax::ast;
@@ -72,16 +73,23 @@ fn main<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
 
     let stmts = serialize::serialize(ecx, name, stmts);
 
-    Box::new(DynAsm {stmts: SmallVector::many(stmts)})
+    Box::new(DynAsm {
+        ecx: ecx,
+        stmts: stmts
+    })
 }
 
-struct DynAsm {
-    stmts: SmallVector<ast::Stmt>
+struct DynAsm<'cx, 'a: 'cx> {
+    ecx: &'cx ExtCtxt<'a>,
+    stmts: Vec<ast::Stmt>
 }
 
-impl MacResult for DynAsm {
+impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
+    fn make_expr(self: Box<Self>) -> Option<P<ast::Expr>> {
+        Some(self.ecx.expr_block(self.ecx.block(self.ecx.call_site(), self.stmts)))
+    }
     fn make_stmts(self: Box<Self>) -> Option<SmallVector<ast::Stmt>> {
-        Some(self.stmts)
+        Some(SmallVector::many(self.stmts))
     }
 
     fn make_items(self: Box<Self>) -> Option<SmallVector<P<ast::Item>>> {
