@@ -150,6 +150,16 @@ fn main() {
         _ => dynasm!(ops; inc rax)
     }
 
+    // fixups
+    let start = ops.offset();
+    dynasm!(ops
+        ; inc rbx
+    );
+    let end = ops.offset();
+    ops.alter(start..end, |ops| dynasm!(ops
+        ; inc r12
+    ));
+
     let index = ops.offset();
     dynasm!(ops
         ; mov eax, 10203040

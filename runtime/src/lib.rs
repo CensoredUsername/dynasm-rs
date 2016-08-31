@@ -6,6 +6,7 @@ use std::ops::Deref;
 use std::iter::Extend;
 use std::mem;
 use std::cmp;
+use std::ops::Range;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
 
 use memmap::{Mmap, Protection};
@@ -25,11 +26,11 @@ macro_rules! MutPointer {
 
 /// A struct representing an offset into the assembling buffer of a `DynasmApi` struct.
 /// The wrapped `usize` is the offset from the start of the assembling buffer in bytes.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AssemblyOffset(pub usize);
 
 /// A dynamic label
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DynamicLabel(usize);
 
 /// This trait represents the interface that must be implemented to allow
@@ -269,6 +270,30 @@ impl Assembler {
         DynamicLabel(id)
     }
 
+    pub fn alter<F>(&mut self, loc: Range<AssemblyOffset>, f: F) where F: FnOnce(&mut Self) -> () {
+        // commit the assembling buffer to empty it so we can retarget it
+        self.commit();
+        let actual_asmoffset = self.asmoffset;
+        if loc.start.0 > actual_asmoffset || loc.end.0 > actual_asmoffset || loc.start.0 > loc.end.0 {
+            panic!("Given alteration range lies outside the currently filled assembling buffer");
+        }
+        // for x86 support: invalidate all known relocs in this area here
+
+        // move the start index of the assembling buffer to the fixup location
+        self.commit();
+        self.asmoffset = loc.start.0;
+
+        // execute fixups
+        f(self);
+
+        if self.asmoffset > loc.end.0 {
+            panic!("Overran the given range");
+        }
+        // commit fixups and restore asmoffset to the end of the buffer
+        self.commit();
+        self.asmoffset = actual_asmoffset;
+    }
+
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
         let buf_loc = loc.0 - self.asmoffset;
@@ -315,30 +340,40 @@ impl Assembler {
     /// has to obtain a lock on the datastructure. When this method is called, all
     /// labels will be resolved, and the result can no longer be changed.
     pub fn commit(&mut self) {
+        // This is where the part overridden by the current assembling buffer starts.
+        // This is guaranteed to be in the actual backing buffer.
+        let buf_start = self.asmoffset;
+        // and this is where it ends. This is not guaranteed to be in the actual mmap
+        let buf_end = self.offset().0;
+        // is there any work to do?
+        if buf_start == buf_end {
+            return
+        }
         // finalize all relocs in the newest part.
         self.encode_relocs();
-        // length of the initialized part of the execbuffer before
-        let old_len = self.asmoffset;
-        // length of the initialized part of the execbuffer afterwards
-        let new_len = self.offset().0;
 
+        let same    =          ..buf_start;
+        let changed = buf_start..buf_end;
 
-        if new_len > self.map_len {
+        // The reason we don't have to copy the part after buf_end here is because we will only
+        // enter the resize branch if all data past buf_start has been overwritten if we're in an
+        // alter invocation
+        if buf_end > self.map_len {
             // create a new buffer of the necessary size max(current_buf_len * 2, wanted_len)
-            let map_len = cmp::max(new_len, self.map_len * 2);
+            let map_len = cmp::max(buf_end, self.map_len * 2);
             let mut new_buf = Mmap::anonymous(map_len, Protection::ReadWrite).unwrap();
             self.map_len = new_buf.len();
 
             // copy over from the old buffer and the asm buffer (unsafe is completely safe due to use of anonymous mappings)
             unsafe {
-                new_buf.as_mut_slice()[..old_len].copy_from_slice(&self.execbuffer.read().unwrap().buffer.as_slice()[..old_len]);
-                new_buf.as_mut_slice()[old_len..new_len].copy_from_slice(&self.ops[..]);
+                new_buf.as_mut_slice()[same].copy_from_slice(&self.execbuffer.read().unwrap().buffer.as_slice()[same]);
+                new_buf.as_mut_slice()[changed].copy_from_slice(&self.ops);
             }
             new_buf.set_protection(Protection::ReadExecute).unwrap();
 
             // swap the buffers and the initialized length
             let mut data = ExecutableBuffer {
-                length: new_len,
+                length: buf_end,
                 buffer: new_buf
             };
             mem::swap(&mut data, &mut self.execbuffer.write().unwrap());
@@ -348,15 +383,17 @@ impl Assembler {
             let mut data = self.execbuffer.write().unwrap();
             data.buffer.set_protection(Protection::ReadWrite).unwrap();
             unsafe {
-                data.buffer.as_mut_slice()[old_len..new_len].copy_from_slice(&self.ops[..]);
+                data.buffer.as_mut_slice()[changed].copy_from_slice(&self.ops);
             }
             data.buffer.set_protection(Protection::ReadExecute).unwrap();
-            // update the length of the initialized part of the buffer
-            data.length = new_len;
+            // update the length of the initialized part of the buffer, if this commit adds length
+            if buf_end > data.length {
+                data.length = buf_end;
+            }
         }
-        // empty the assemblng buffer and update the assembling offset
+        // empty the assembling buffer and update the assembling offset
         self.ops.clear();
-        self.asmoffset = new_len;
+        self.asmoffset = buf_end;
     }
 
     /// Consumes the assembler to return the internal ExecutableBuffer. This
@@ -384,7 +421,7 @@ impl Assembler {
     }
 }
 
-/// A read-only lockable refernce to the internal ExecutableBuffer of an Assembler.
+/// A read-only lockable reference to the internal `ExecutableBuffer` of an Assembler.
 /// To gain access to this buffer, it must be locked.
 impl Executor {
     /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
