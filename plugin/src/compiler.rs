@@ -87,7 +87,7 @@ const MOD_NOBASE: u8 = 0b00; // VSIB addressing
 const MOD_DISP8:  u8 = 0b01;
 const MOD_DISP32: u8 = 0b10;
 
-/* 
+/*
  * Implmementation
  */
 
@@ -143,26 +143,26 @@ fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut arg
         "bytes" => directive_iter(ecx, buffer, args),
         "align" => {
             if args.len() != 1 {
-                return Err(Some(format!("Invalid amount of arguments")));
+                return Err(Some("Invalid amount of arguments".into()));
             }
 
             match args.pop().unwrap() {
                 Arg::Immediate(expr, _) => {
                     buffer.push(Stmt::Align(expr));
                 },
-                _ => return Err(Some(format!("this directive only uses immediate arguments")))
+                _ => return Err(Some("this directive only uses immediate arguments".into()))
             }
             Ok(())
         },
         "alias" => {
             if args.len() != 2 {
-                return Err(Some(format!("Invalid amount of arguments")));
+                return Err(Some("Invalid amount of arguments".into()));
             }
 
             let reg = match args.pop().unwrap() {
                 Arg::Direct(Spanned {node: Register {kind: RegKind::Static(id), size}, ..}) => (id, size),
                 _ => {
-                    return Err(Some(format!("The second argument to alias should be a static register")));
+                    return Err(Some("The second argument to alias should be a static register".into()));
                 }
             };
 
@@ -174,7 +174,7 @@ fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut arg
             let alias = if let Some(alias) = alias {
                 alias.node.name
             } else {
-                return Err(Some(format!("The first argument to alias should be a non-keyword immediate")));
+                return Err(Some("The first argument to alias should be a non-keyword immediate".into()));
             };
 
             let global_data = super::crate_local_data(ecx);
@@ -193,8 +193,8 @@ fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut arg
 }
 
 fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size: Size) -> Result<(), Option<String>> {
-    if args.len() == 0 {
-        return Err(Some(format!("this directive requires at least one argument")));
+    if args.is_empty() {
+        return Err(Some("this directive requires at least one argument".into()));
     }
 
     for arg in args {
@@ -206,7 +206,7 @@ fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size:
                 }
                 buffer.push(Stmt::Var(expr, size));
             },
-            _ => return Err(Some(format!("this directive only uses immediate arguments")))
+            _ => return Err(Some("this directive only uses immediate arguments".into()))
         }
     }
 
@@ -215,13 +215,13 @@ fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size:
 
 fn directive_iter(_ecx: &ExtCtxt, buffer: &mut StmtBuffer, mut args: Vec<Arg>) -> Result<(), Option<String>> {
     if args.len() != 1 {
-        return Err(Some(format!("Wrong amount of arguments for this directive")))
+        return Err(Some("Wrong amount of arguments for this directive".into()))
     }
 
     if let Arg::Immediate(expr, None) = args.pop().unwrap() {
         buffer.push(Stmt::Extend(expr));
     } else {
-        return Err(Some(format!("wrong argument size")));
+        return Err(Some("wrong argument size".into()));
     }
     Ok(())
 }
@@ -272,14 +272,12 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
             } else if op_size != Size::OWORD {
                 panic!("bad formatting data");
             }
-        } else {
-            if op_size == Size::WORD {
-                pref_size = true;
-            } else if op_size == Size::QWORD {
-                rex_w = true;
-            } else if op_size != Size::DWORD {
-                panic!("bad formatting data");
-            }
+        } else if op_size == Size::WORD {
+            pref_size = true;
+        } else if op_size == Size::QWORD {
+            rex_w = true;
+        } else if op_size != Size::DWORD {
+            panic!("bad formatting data");
         }
     }
 
@@ -487,7 +485,7 @@ fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<I
         }
         // if immediates are present, the register argument will be merged into the
         // first immediate byte.
-        if args.len() != 0 {
+        if !args.is_empty() {
             if let Arg::Immediate(expr, Some(Size::BYTE)) = args.remove(0) {
                 byte = or_mask_shift_expr(ecx, byte, expr, 0xF, 0);
             } else {
@@ -555,7 +553,7 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
 
     let addr_size = addr_size.unwrap_or(Size::QWORD);
     if addr_size != Size::DWORD && addr_size != Size::QWORD {
-        return Err(Some(format!("Impossible address size")));
+        return Err(Some("Impossible address size".into()));
     }
     Ok(addr_size != Size::QWORD)
 }
@@ -671,9 +669,8 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     };
 
     for format in data {
-        match match_format_string(format.args, args) {
-            Ok(_) => return Ok(format),
-            Err(_) => ()
+        if let Ok(_) = match_format_string(format.args, args) {
+            return Ok(format)
         }
     }
 
@@ -721,8 +718,8 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
 
             let size = match (code, arg) {
                 // immediates
-                (b'i', &Arg::Immediate(_, size))  => size,
-                (b'o', &Arg::Immediate(_, size))  => size,
+                (b'i', &Arg::Immediate(_, size))  |
+                (b'o', &Arg::Immediate(_, size))  |
                 (b'o', &Arg::JumpTarget(_, size)) => size,
 
                 // specific legacy regs
@@ -835,7 +832,7 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
                     (b'p', _) => Some(Size::PWORD),
                     (b'o', _) => Some(Size::OWORD),
                     (b'h', _) => Some(Size::HWORD),
-                    (b'*', _) => None,
+                    (b'*', _) |
                     (b'!', _) => None,
                     _ => unreachable!()
                 },
@@ -931,7 +928,7 @@ fn get_operand_size(fmt: &'static Opdata, args: &[Arg]) -> Result<Size, Option<S
             Arg::Indirect(MemoryRef {mut size, ref index, ..}) => {
                 has_args = true;
                 // for vsib addressing we're interested in the size of the address vector
-                if let &Some(ref reg) = index {
+                if let Some(ref reg) = *index {
                     if reg.kind.family() == RegFamily::XMM {
                         size = Some(reg.size());
                     }
@@ -992,10 +989,10 @@ fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool
                     }
                 },
                 Arg::Indirect(MemoryRef {ref base, ref index, ..}) => {
-                    if let &Some(ref reg) = base {
+                    if let Some(ref reg) = *base {
                         requires_rex = requires_rex || reg.kind.is_extended();
                     }
-                    if let &Some(ref reg) = index {
+                    if let Some(ref reg) = *index {
                         requires_rex = requires_rex || reg.kind.is_extended();
                     }
                 },
@@ -1129,17 +1126,17 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, rex_w: bool, reg: &Option
     let mut index_k = RegKind::from_number(0);
     let mut base_k  = RegKind::from_number(0);
 
-    if let &Some(Arg::Direct(ref reg)) = reg {
+    if let Some(Arg::Direct(ref reg)) = *reg {
         reg_k = reg.node.kind.clone();
     }
-    if let &Some(Arg::Direct(ref rm)) = rm {
+    if let Some(Arg::Direct(ref rm)) = *rm {
         base_k = rm.node.kind.clone();
     }
-    if let &Some(Arg::Indirect(MemoryRef {ref base, ref index, ..} )) = rm {
-        if let &Some(ref base) = base {
+    if let Some(Arg::Indirect(MemoryRef {ref base, ref index, ..} )) = *rm {
+        if let Some(ref base) = *base {
             base_k = base.kind.clone();
         }
-        if let &Some(ref index) = index {
+        if let Some(ref index) = *index {
             index_k = index.kind.clone();
         }
     }
@@ -1174,21 +1171,21 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
     let mut base_k  = RegKind::from_number(0);
     let mut vvvv_k  = RegKind::from_number(0);
 
-    if let &Some(Arg::Direct(ref reg)) = reg {
+    if let Some(Arg::Direct(ref reg)) = *reg {
         reg_k = reg.node.kind.clone();
     }
-    if let &Some(Arg::Direct(ref rm)) = rm {
+    if let Some(Arg::Direct(ref rm)) = *rm {
         base_k = rm.node.kind.clone();
     }
-    if let &Some(Arg::Indirect(MemoryRef {ref base, ref index, ..} )) = rm {
-        if let &Some(ref base) = base {
+    if let Some(Arg::Indirect(MemoryRef {ref base, ref index, ..} )) = *rm {
+        if let Some(ref base) = *base {
             base_k = base.kind.clone();
         }
-        if let &Some(ref index) = index {
+        if let Some(ref index) = *index {
             index_k = index.kind.clone();
         }
     }
-    if let &Some(Arg::Direct(ref vvvv)) = vvvv {
+    if let Some(Arg::Direct(ref vvvv)) = *vvvv {
         vvvv_k = vvvv.node.kind.clone();
     }
 

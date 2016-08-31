@@ -109,7 +109,7 @@ pub struct Assembler {
     // label name -> target loc
     global_labels: HashMap<&'static str, usize>,
     // end of patch location -> name
-    global_relocs: Vec<(PatchLoc, &'static str)>, 
+    global_relocs: Vec<(PatchLoc, &'static str)>,
 
     // label id -> target loc
     dynamic_labels: Vec<Option<usize>>,
@@ -384,14 +384,14 @@ impl Assembler {
     }
 }
 
-/// A read-only lockable refernce to the internal ExecutableBuffer of an Assembler.
+/// A read-only lockable refernce to the internal `ExecutableBuffer` of an Assembler.
 /// To gain access to this buffer, it must be locked.
 impl Executor {
     /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
     /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
     /// Any pointers created to the `Executablebuffer` should no longer be used when
     /// the guard is dropped.
-    pub fn lock<'a>(&'a self) -> RwLockReadGuard<'a, ExecutableBuffer> {
+    pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
         self.execbuffer.read().unwrap()
     }
 }
@@ -403,9 +403,9 @@ impl ExecutableBuffer {
     /// will point to the start of the first instruction after the offset call,
     /// which can then be jumped or called to divert control flow into the executable
     /// buffer. Note that if this buffer is accessed through an Executor, these pointers
-    /// will only be valid as long as its lock is held. When no locks are held, 
+    /// will only be valid as long as its lock is held. When no locks are held,
     /// The assembler is free to relocate the executable buffer when it requires
-    /// more memory than available. 
+    /// more memory than available.
     pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
         &self[offset.0] as *const u8
     }
