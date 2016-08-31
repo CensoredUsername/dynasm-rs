@@ -13,7 +13,7 @@ macro_rules! OpInner {
 }
 
 macro_rules! Ops {
-    ( $bind:ident; $( $name:tt $(| $more:tt)* = [ $( $( $e:expr ),+ ; )+ ] )* ) => { 
+    ( $bind:ident; $( $name:tt $(| $more:tt)* = [ $( $( $e:expr ),+ ; )+ ] )* ) => {
         lazy_static! {
             static ref $bind: HashMap<&'static str, &'static [Opdata]> = {
                 let mut map = HashMap::new();
@@ -32,7 +32,7 @@ macro_rules! Ops {
 }
 
 pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
-    return OPMAP.get(&name).map(|x| *x);
+    OPMAP.get(&name).map(|x| *x)
 }
 #[macro_use]
 pub mod flags {
@@ -771,7 +771,7 @@ Ops!(OPMAP;
 ] "fyl2xp1"     = [ b"",         [0xD9, 0xF9      ], X;
 ]
 // MMX instruction (also vol.   5) (note that 3DNow! instructions aren't supported)
-        
+
   "cvtpd2pi"    = [ b"xqwo",     [0x0F, 0x2D      ], X, PREF_66;
 ] "cvtpi2pd"    = [ b"youq",     [0x0F, 0x2A      ], X, PREF_66;
 ] "cvtpi2ps"    = [ b"youq",     [0x0F, 0x2A      ], X;

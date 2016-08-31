@@ -56,7 +56,7 @@ pub enum LabelType {
 #[derive(Debug)]
 pub enum JumpType {
     // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
-    // in order to allow the full range of expressions to be used. the only currently existing ambiguity is 
+    // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
     // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
     Global(Ident),         // -> label
     Backward(Ident),       //  > label
@@ -285,7 +285,7 @@ impl RegId {
             _ => panic!("invalid register code")
         }
     }
-} 
+}
 
 impl Size {
     pub fn in_bytes(&self) -> u8 {
@@ -401,7 +401,7 @@ const SIZES:    [(&'static str, Size); 7] = [
     ("HWORD", Size::HWORD)
 ];
 fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
-    for &(kw, size) in SIZES.iter() {
+    for &(kw, size) in &SIZES {
         if eat_pseudo_keyword(parser, kw) {
             return Some(size);
         }
@@ -427,11 +427,11 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     let start = parser.span;
 
     let in_bracket = parser.check(&token::OpenDelim(token::Bracket));
-    if in_bracket && parser.look_ahead(1, |x| match x {
-            &token::RArrow |
-            &token::Gt     |
-            &token::Lt     |
-            &token::FatArrow => true,
+    if in_bracket && parser.look_ahead(1, |x| match *x {
+            token::RArrow |
+            token::Gt     |
+            token::Lt     |
+            token::FatArrow => true,
             _ => false
         }) {
         parser.bump();
@@ -611,8 +611,8 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
 }
 
 pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
-    let path = match expr {
-        &ast::Expr {node: ast::ExprKind::Path(None, ref path) , ..} => path,
+    let path = match *expr {
+        ast::Expr {node: ast::ExprKind::Path(None, ref path) , ..} => path,
         _ => return None
     };
 
@@ -691,7 +691,7 @@ fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
                 let global_data = super::crate_local_data(ecx);
                 let lock = global_data.read();
                 if let Some(x) = lock.aliases.get(&path.node.name) {
-                    x.clone()
+                    *x
                 } else {
                     return None;
                 }
@@ -703,7 +703,7 @@ fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
             span: path.span
         })
 
-    } else if let &ast::Expr {node: ast::ExprKind::Call(ref called, ref args), span, ..} = expr {
+    } else if let ast::Expr {node: ast::ExprKind::Call(ref called, ref args), span, ..} = *expr {
         // dynamically chosen registers
         if args.len() != 1 {
             return None;
@@ -720,7 +720,7 @@ fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
             "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
             "Rw" => (Size::WORD,  RegFamily::LEGACY),
             "Rd" => (Size::DWORD, RegFamily::LEGACY),
-            "Ra" => (Size::QWORD, RegFamily::LEGACY),
+            "Ra" |
             "Rq" => (Size::QWORD, RegFamily::LEGACY),
             "Rf" => (Size::PWORD, RegFamily::FP),
             "Rm" => (Size::QWORD, RegFamily::MMX),
@@ -799,7 +799,7 @@ fn parse_adds(ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, 
     // reconstruct immediates
     let immediate = add_exprs(ecx, span, immediates.drain(..));
 
-    return (regs, immediate);
+    (regs, immediate)
 }
 
 fn collect_adds(ecx: &ExtCtxt, node: P<ast::Expr>, collection: &mut Vec<P<ast::Expr>>) {

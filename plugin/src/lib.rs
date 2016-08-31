@@ -40,7 +40,7 @@ pub mod debug;
 #[plugin_registrar]
 pub fn registrar(reg: &mut Registry) {
     reg.register_syntax_extension(
-        intern("dynasm"), 
+        intern("dynasm"),
         SyntaxExtension::NormalTT(
             Box::new(main),
             None,
@@ -93,7 +93,7 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
     }
 
     fn make_items(self: Box<Self>) -> Option<SmallVector<P<ast::Item>>> {
-        if self.stmts.len() == 0 {
+        if self.stmts.is_empty() {
             Some(SmallVector::zero())
         } else {
             None

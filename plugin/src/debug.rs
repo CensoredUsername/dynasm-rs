@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use compiler::{Opdata, FormatStringIterator};
 use x64data::flags::*;
 
@@ -6,7 +8,7 @@ pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
     for data in data {
         forms.extend(format_opdata(name, data));
     }
-    return forms.join("\n");
+    forms.join("\n")
 }
 
 pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
@@ -36,11 +38,11 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
     forms
 }
 
-static REGS: [&'static str; 16] = ["a",  "d",  "c",   "b",   "bp",  "sp",  "si",  "di", 
+static REGS: [&'static str; 16] = ["a",  "d",  "c",   "b",   "bp",  "sp",  "si",  "di",
                                    "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
 static SEGREGS: [&'static str; 6] = ["es", "cs", "ss", "ds", "fs", "gs"];
 
-fn format_arg(ty: u8, mut size: u8, opsize: u8) -> String {
+fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
     if size == b'*' {
         size = if opsize == b'q' && (ty == b'i' || ty == b'o') {
             b'd'
@@ -63,42 +65,42 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> String {
     }
 
     match ty {
-        b'i' => format!("imm{}",      format_size(size)),
-        b'o' => format!("rel{}off",   format_size(size)),
-        b'm' => format!("mem{}",      format_size(size)),
-        b'k' => format!("vm32addr{}", format_size(size)),
-        b'l' => format!("vm64addr{}", format_size(size)),
-        b'r' => format!("reg{}",      format_size(size)),
-        b'f' => format!("st"),
-        b'x' => format!("mmx"),
-        b'y' => format!("{}mm", if size == b'h' {"y"} else {"x"}),
-        b's' => format!("segreg"),
-        b'c' => format!("creg"),
-        b'd' => format!("dreg"),
-        b'v' => format!("reg/mem{}", format_size(size)),
-        b'u' => format!("mmx/mem{}", format_size(size)),
-        b'w' => format!("{}mm/mem{}", if size == b'h' {"y"} else {"x"}, format_size(size)),
+        b'i' => format!("imm{}",      format_size(size)).into(),
+        b'o' => format!("rel{}off",   format_size(size)).into(),
+        b'm' => format!("mem{}",      format_size(size)).into(),
+        b'k' => format!("vm32addr{}", format_size(size)).into(),
+        b'l' => format!("vm64addr{}", format_size(size)).into(),
+        b'r' => format!("reg{}",      format_size(size)).into(),
+        b'f' => "st".into(),
+        b'x' => "mmx".into(),
+        b'y' => (if size == b'h' {"ymm"} else {"xmm"}).into(),
+        b's' => "segreg".into(),
+        b'c' => "creg".into(),
+        b'd' => "dreg".into(),
+        b'v' => format!("reg/mem{}", format_size(size)).into(),
+        b'u' => format!("mmx/mem{}", format_size(size)).into(),
+        b'w' => format!("{}mm/mem{}", if size == b'h' {"y"} else {"x"}, format_size(size)).into(),
         b'A'...b'P' => {
             let i = ty as usize - 'A' as usize;
             match size {
-                b'b' => if i < 4 { format!("{}l", REGS[i]) }
-                   else if i < 8 { format!("{}",  REGS[i]) }
-                   else          { format!("{}b", REGS[i]) },
-                b'w' => if i < 4 { format!("{}x", REGS[i]) }
-                   else if i < 8 { format!("{}",  REGS[i]) }
-                   else          { format!("{}w", REGS[i]) },
-                b'd' => if i < 4 { format!("e{}x",REGS[i]) }
-                   else if i < 8 { format!("e{}", REGS[i]) }
-                   else          { format!("{}d", REGS[i]) },
-                b'q' => if i < 4 { format!("r{}x",REGS[i]) }
-                   else if i < 8 { format!("r{}", REGS[i]) }
-                   else          { format!("r{}", REGS[i]) },
+                b'b' => if i < 4 { format!("{}l", REGS[i]).into() }
+                   else if i < 8 { REGS[i].into() }
+                   else          { format!("{}b", REGS[i]).into() },
+                b'w' => if i < 4 { format!("{}x", REGS[i]).into() }
+                   else if i < 8 { REGS[i].into() }
+                   else          { format!("{}w", REGS[i]).into() },
+                b'd' => if i < 4 { format!("e{}x",REGS[i]).into() }
+                   else if i < 8 { format!("e{}", REGS[i]).into() }
+                   else          { format!("{}d", REGS[i]).into() },
+                b'q' => if i < 4 { format!("r{}x",REGS[i]).into() }
+                   else if i < 8 { format!("r{}", REGS[i]).into() }
+                   else          { format!("r{}", REGS[i]).into() },
                 _ => panic!("invalid formatting data")
             }
         },
-        b'Q'...b'V' => SEGREGS[ty as usize - 'Q' as usize].to_string(),
-        b'W' => "cr8".to_string(),
-        b'X' => "st0".to_string(),
+        b'Q'...b'V' => SEGREGS[ty as usize - 'Q' as usize].into(),
+        b'W' => "cr8".into(),
+        b'X' => "st0".into(),
         _ => panic!("invalid formatting data")
     }
 }
