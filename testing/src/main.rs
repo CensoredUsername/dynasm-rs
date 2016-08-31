@@ -84,6 +84,7 @@ fn main() {
         ; inc QWORD [rax]
         // very odd memoryrefs
         ; mov rax, [rbx + rbx * 3 + 2 + c + rax + d]
+        ; mov rax, [rbx - 4]
         // labels
         ; a: // local
         ; -> b: // global

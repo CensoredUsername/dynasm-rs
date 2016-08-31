@@ -10,7 +10,7 @@ use syntax::codemap::{Spanned, Span};
 use std::collections::HashMap;
 use std::cmp::PartialEq;
 
-use serialize::{offset_of, size_of};
+use serialize::{offset_of, size_of, add_exprs};
 
 pub type Ident = Spanned<ast::Ident>;
 
@@ -477,162 +477,155 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     }
 
     // it's a normal (register/immediate/memoryref/typemapped) operand
-    let arg = try!(parser.parse_expr()).unwrap();
+    let arg = try!(parser.parse_expr());
 
-    // typemapped
-    if parser.eat(&token::FatArrow) {
-        let base = parse_reg(ecx, &arg);
-        if base.is_none() {
-            ecx.span_err(arg.span, "Expected register");
-            return Ok(Arg::Invalid);
-        }
-
-        let ty = try!(parser.parse_path(PathStyle::Type));
-
-        let mut attr = None;
-        let mut index = None;
-        if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
-            let idx_reg = try!(parser.parse_expr()).unwrap();
-            try!(parser.expect(&token::CloseDelim(token::DelimToken::Bracket)));
-
-            index = parse_reg(ecx, &idx_reg);
-            if index.is_none() {
-                ecx.span_err(idx_reg.span, "Expected register");
+    arg.and_then(|arg| {
+        // typemapped
+        if parser.eat(&token::FatArrow) {
+            let base = parse_reg(ecx, &arg);
+            if base.is_none() {
+                ecx.span_err(arg.span, "Expected register");
                 return Ok(Arg::Invalid);
             }
-        }
-        if parser.eat(&token::Dot) {
-            attr = Some(try!(parser.parse_ident()));
-        }
 
-        let scale = if index.is_some() { Some(size_of(ecx, ty.clone())) } else { None };
-        let disp = attr.map(|attr| offset_of(ecx, ty, attr));
+            let ty = try!(parser.parse_path(PathStyle::Type));
 
-        return Ok(Arg::Indirect(MemoryRef {
-            index:      index.map(|s| s.node),
-            scale:      8, // scale is set to 8 as to avoid optimizations by the compiler
-            scale_expr: scale,
-            base:       base.map(|s| s.node),
-            disp:       disp,
-            size:       size,
-            span:       Span {hi: parser.last_span.hi, ..start}
-        }));
-    }
+            let mut attr = None;
+            let mut index = None;
+            if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
+                let idx_reg = try!(parser.parse_expr()).unwrap();
+                try!(parser.expect(&token::CloseDelim(token::DelimToken::Bracket)));
 
-    // direct register reference
-    if let Some(reg) = parse_reg(ecx, &arg) {
-        if size.is_some() {
-            ecx.span_err(arg.span, "size hint with direct register");
-        }
-        return Ok(Arg::Direct(reg))
-    }
-
-    // memory location
-    if let ast::Expr {node: ExprKind::Vec(mut items), span, ..} = arg {
-        if items.len() != 1 {
-            ecx.span_err(span, "Comma in memory reference");
-            return Ok(Arg::Invalid);
-        }
-
-        let mut added = Vec::new();
-        parse_adds(items.pop().unwrap().unwrap(), &mut added);
-
-        // as dynamic regs aren't hashable (and we don't combine them), we count them separate at first
-        let mut regs: Vec<(Register, isize)> = Vec::new();
-        let mut static_regs: HashMap<(RegId, Size), isize> = HashMap::new();
-        let mut immediates = Vec::new();
-
-        // static reg combiner. we do not combine dynamic regs as the equation used to construct them might have side effects.
-        for node in added {
-            // simple reg
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &node) {
-                match reg.kind {
-                    RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
-                    RegKind::Dynamic(_, _) => regs.push((reg, 1))
-                }
-                continue;
-            }
-            if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = node {
-                // reg * const
-                if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &**left) {
-                    if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
-                        if let ast::LitKind::Int(value, _) = scale.node {
-                            match reg.kind {
-                                RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
-                                RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
-                            }
-                            continue;
-                        }
-                    }
-                // const * reg
-                } else if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &**right) {
-                    if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
-                        if let ast::LitKind::Int(value, _) = scale.node {
-                            match reg.kind {
-                                RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
-                                RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
-                            }
-                            continue;
-                        }
-                    }
+                index = parse_reg(ecx, &idx_reg);
+                if index.is_none() {
+                    ecx.span_err(idx_reg.span, "Expected register");
+                    return Ok(Arg::Invalid);
                 }
             }
-            immediates.push(node);
+            if parser.eat(&token::Dot) {
+                attr = Some(try!(parser.parse_ident()));
+            }
+
+            let scale = if index.is_some() { Some(size_of(ecx, ty.clone())) } else { None };
+            let disp = attr.map(|attr| offset_of(ecx, ty, attr));
+
+            return Ok(Arg::Indirect(MemoryRef {
+                index:      index.map(|s| s.node),
+                scale:      8, // scale is set to 8 as to avoid optimizations by the compiler
+                scale_expr: scale,
+                base:       base.map(|s| s.node),
+                disp:       disp,
+                size:       size,
+                span:       Span {hi: parser.last_span.hi, ..start}
+            }));
         }
 
-        // flush combined static regs
-        regs.extend(static_regs.drain().map(|x| {
-            let ((id, size), amount) = x;
-            (Register::new_static(size, id), amount)
-        }));
-
-        // can only have two regs at most
-        if regs.len() > 2 {
-            ecx.span_err(span, "Invalid memory reference: too many registers");
-            return Ok(Arg::Invalid);
+        // direct register reference
+        if let Some(reg) = parse_reg(ecx, &arg) {
+            if size.is_some() {
+                ecx.span_err(arg.span, "size hint with direct register");
+            }
+            return Ok(Arg::Direct(reg))
         }
 
-        let mut drain = regs.drain(..);
-        let (index, scale, base) = match (drain.next(), drain.next()) {
-            (None,                  None)                 => (None, 0, None),
-            (Some((index, scale)),  None)                 | 
-            (None,                  Some((index, scale))) | 
-            (Some((index, scale)),  Some((_, 0)))         | 
-            (Some((_, 0)),          Some((index, scale))) => if scale == 1 {(None, 0, Some(index))} else {(Some(index), scale, None)},
-            (Some((base, 1)),       Some((index, scale))) |
-            (Some((index, scale)),  Some((base, 1)))      => (Some(index), scale, Some(base)),
-            _ => {
-                ecx.span_err(span, "Invalid memory reference: only one register can be scaled");
+        // memory location
+        if let ast::Expr {node: ExprKind::Vec(mut items), span, ..} = arg {
+            if items.len() != 1 {
+                ecx.span_err(span, "Comma in memory reference");
                 return Ok(Arg::Invalid);
             }
-        };
 
-        // reconstruct immediates
-        let mut immediates = immediates.drain(..);
-        let disp = if let Some(disp) = immediates.next() {
-            let mut disp = P(disp);
-            for immediate in immediates {
-                disp = ecx.expr_binary(span, ast::BinOpKind::Add, disp, P(immediate));
+            let mut added = Vec::new();
+            parse_adds(ecx, items.pop().unwrap(), &mut added);
+
+            // as dynamic regs aren't hashable (and we don't combine them), we count them separate at first
+            let mut regs: Vec<(Register, isize)> = Vec::new();
+            let mut static_regs: HashMap<(RegId, Size), isize> = HashMap::new();
+            let mut immediates = Vec::new();
+
+            // static reg combiner. we do not combine dynamic regs as the equation used to construct them might have side effects.
+            for node in added {
+                // simple reg
+                if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &node) {
+                    match reg.kind {
+                        RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
+                        RegKind::Dynamic(_, _) => regs.push((reg, 1))
+                    }
+                    continue;
+                }
+                if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = *node {
+                    // reg * const
+                    if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, left) {
+                        if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
+                            if let ast::LitKind::Int(value, _) = scale.node {
+                                match reg.kind {
+                                    RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
+                                    RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
+                                }
+                                continue;
+                            }
+                        }
+                    // const * reg
+                    } else if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, right) {
+                        if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
+                            if let ast::LitKind::Int(value, _) = scale.node {
+                                match reg.kind {
+                                    RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
+                                    RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
+                                }
+                                continue;
+                            }
+                        }
+                    }
+                }
+                immediates.push(node);
             }
-            Some(disp)
-        } else {
-            None
-        };
 
-        // assemble the memory location
-        return Ok(Arg::Indirect(MemoryRef {
-            index:      index,
-            scale:      scale,
-            scale_expr: None,
-            base:       base,
-            disp:       disp,
-            size:       size,
-            span:       span
-        }));
-    }
+            // flush combined static regs
+            regs.extend(static_regs.drain().map(|x| {
+                let ((id, size), amount) = x;
+                (Register::new_static(size, id), amount)
+            }));
 
-    // immediate
-    Ok(Arg::Immediate(P(arg), size))
+            // can only have two regs at most
+            if regs.len() > 2 {
+                ecx.span_err(span, "Invalid memory reference: too many registers");
+                return Ok(Arg::Invalid);
+            }
+
+            let mut drain = regs.drain(..);
+            let (index, scale, base) = match (drain.next(), drain.next()) {
+                (None,                  None)                 => (None, 0, None),
+                (Some((index, scale)),  None)                 |
+                (None,                  Some((index, scale))) |
+                (Some((index, scale)),  Some((_, 0)))         |
+                (Some((_, 0)),          Some((index, scale))) => if scale == 1 {(None, 0, Some(index))} else {(Some(index), scale, None)},
+                (Some((base, 1)),       Some((index, scale))) |
+                (Some((index, scale)),  Some((base, 1)))      => (Some(index), scale, Some(base)),
+                _ => {
+                    ecx.span_err(span, "Invalid memory reference: only one register can be scaled");
+                    return Ok(Arg::Invalid);
+                }
+            };
+
+            // reconstruct immediates
+            let disp = add_exprs(ecx, span, immediates.drain(..));
+
+            // assemble the memory location
+            return Ok(Arg::Indirect(MemoryRef {
+                index:      index,
+                scale:      scale,
+                scale_expr: None,
+                base:       base,
+                disp:       disp,
+                size:       size,
+                span:       span
+            }));
+        }
+
+        // immediate
+        Ok(Arg::Immediate(P(arg), size))
+    })
 }
 
 pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
@@ -766,11 +759,17 @@ fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
     }
 }
 
-fn parse_adds(node: ast::Expr, collection: &mut Vec<ast::Expr>) {
-    if let ast::Expr{node: ast::ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Add, ..}, left, right), ..} = node {
-        parse_adds(left.unwrap(), collection);
-        parse_adds(right.unwrap(), collection);
-    } else {
-        collection.push(node);
-    }
+fn parse_adds(ecx: &ExtCtxt, node: P<ast::Expr>, collection: &mut Vec<P<ast::Expr>>) {
+    node.and_then(|node| {
+        if let ast::Expr {node: ast::ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Add, ..}, left, right), ..} = node {
+            parse_adds(ecx, left, collection);
+            parse_adds(ecx, right, collection);
+        } else if let ast::Expr {node: ast::ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Sub, ..}, left, right), ..} = node {
+            parse_adds(ecx, left, collection);
+            let span = right.span;
+            collection.push(ecx.expr_unary(span, ast::UnOp::Neg, right));
+        } else {
+            collection.push(P(node));
+        }
+    })
 }

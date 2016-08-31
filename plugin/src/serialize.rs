@@ -8,7 +8,7 @@ use syntax::ext::base::ExtCtxt;
 use syntax::ast;
 use syntax::ptr::P;
 use syntax::parse::token::intern;
-use syntax::codemap::Spanned;
+use syntax::codemap::{Span, Spanned};
 
 
 pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) -> Vec<ast::Stmt> {
@@ -96,6 +96,15 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
     }
 
     buffer
+}
+
+pub fn add_exprs<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut exprs: T) -> Option<P<ast::Expr>> {
+    exprs.next().map(|mut accum| {
+        for next in exprs {
+            accum = ecx.expr_binary(span, ast::BinOpKind::Add, accum, next);
+        }
+        accum
+    })
 }
 
 pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Expr>, mask: u64, shift: i8) -> P<ast::Expr> {
