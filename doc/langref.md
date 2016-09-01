@@ -201,15 +201,16 @@ Syntax   | Explanation
 
 To ease interoperation with rust structures, dynasm-rs supports the following syntax for accessing members of pointers to structs and struct arrays. In this syntax, the scale and displacement in a normal memory reference are derived from the size of the type and the offset of the member in the type. Due to the limitations of procedural macros, invalid scales will unfortunately only panic at runtime. Note that dynasm-rs is unable to infer the size of the attribute and it should therefore be determined by a size prefix.
 
-The syntax for type maps is as follows
+The syntax for type maps is as follows:
 
 Table 6: dynasm-rs type map formats
 
 Syntax | Equivalent expression
 :------|:-----------
-`rax => Type.attr`      | `(rax as *mut Type).attr`
-`rax => Type[rbx]`      | `(rax as *mut [Type])[rbx]`
-`rax => Type[rbx].attr` | `(rax as *mut [Type])[rbx].attr `
+`rax => Type.attr`             | `(rax as *mut Type).attr`
+`rax => Type[expr]`            | `(rax as *mut [Type])[expr]`
+`rax => Type[rbx + expr]`      | `(rax as *mut [Type])[rbx + expr]`
+`rax => Type[rbx + expr].attr` | `(rax as *mut [Type])[rbx + expr].attr `
 
 #### Immediates
 
