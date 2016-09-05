@@ -156,9 +156,13 @@ fn main() {
         ; inc rbx
     );
     let end = ops.offset();
-    ops.alter(start..end, |ops| dynasm!(ops
-        ; inc r12
-    ));
+    ops.alter(|ops| {
+        ops.goto(start);
+        dynasm!(ops
+            ; inc r12
+        );
+        ops.check(end);
+    });
 
     let index = ops.offset();
     dynasm!(ops

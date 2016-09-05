@@ -6,7 +6,7 @@ use std::ops::Deref;
 use std::iter::Extend;
 use std::mem;
 use std::cmp;
-use std::ops::Range;
+use std::ops::DerefMut;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
 
 use memmap::{Mmap, Protection};
@@ -32,6 +32,63 @@ pub struct AssemblyOffset(pub usize);
 /// A dynamic label
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DynamicLabel(usize);
+
+#[derive(Debug)]
+struct PatchLoc(usize, u8);
+
+/// A structure holding a buffer of executable memory
+#[derive(Debug)]
+pub struct ExecutableBuffer {
+    // length of the buffer that has actually been written to
+    length: usize,
+    // backing buffer
+    buffer: Mmap
+}
+
+/// A structure wrapping some executable memory. It dereferences into a &[u8] slice.
+impl ExecutableBuffer {
+    /// Obtain a pointer into the executable memory from an offset into it.
+    /// When an offset returned from `DynasmApi::offset` is used, the resulting pointer
+    /// will point to the start of the first instruction after the offset call,
+    /// which can then be jumped or called to divert control flow into the executable
+    /// buffer. Note that if this buffer is accessed through an Executor, these pointers
+    /// will only be valid as long as its lock is held. When no locks are held,
+    /// The assembler is free to relocate the executable buffer when it requires
+    /// more memory than available.
+    pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
+        &self[offset.0] as *const u8
+    }
+
+    fn as_mut_slice(&mut self) -> &mut[u8] {
+        unsafe {&mut self.buffer.as_mut_slice()[..self.length] }
+    }
+}
+
+impl Deref for ExecutableBuffer {
+    type Target = [u8];
+    fn deref(&self) -> &[u8] {
+        unsafe { &self.buffer.as_slice()[..self.length] }
+    }
+}
+
+/// A read-only shared reference to the executable buffer inside an Assembler. By
+/// locking it the internal `ExecutableBuffer` can be accessed and executed.
+#[derive(Debug, Clone)]
+pub struct Executor {
+    execbuffer: Arc<RwLock<ExecutableBuffer>>
+}
+
+/// A read-only lockable reference to the internal `ExecutableBuffer` of an Assembler.
+/// To gain access to this buffer, it must be locked.
+impl Executor {
+    /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
+    /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
+    /// Any pointers created to the `Executablebuffer` should no longer be used when
+    /// the guard is dropped.
+    pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
+        self.execbuffer.read().unwrap()
+    }
+}
 
 /// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
@@ -123,125 +180,6 @@ pub struct Assembler {
     local_relocs: HashMap<&'static str, Vec<PatchLoc>>
 }
 
-#[derive(Debug)]
-struct PatchLoc(usize, u8);
-
-/// A read-only shared reference to the executable buffer inside an Assembler. By
-/// locking it the internal `ExecutableBuffer` can be accessed and executed.
-#[derive(Debug, Clone)]
-pub struct Executor {
-    execbuffer: Arc<RwLock<ExecutableBuffer>>
-}
-
-/// A structure holding a buffer of executable memory
-#[derive(Debug)]
-pub struct ExecutableBuffer {
-    // length of the buffer that has actually been written to
-    length: usize,
-    // backing buffer
-    buffer: Mmap
-}
-
-impl Extend<u8> for Assembler {
-    #[inline]
-    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
-        self.ops.extend(iter)
-    }
-}
-
-impl<'a> Extend<&'a u8> for Assembler {
-    #[inline]
-    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
-        self.ops.extend(iter)
-    }
-}
-
-impl<'a> DynasmApi<'a> for Assembler {
-    #[inline]
-    fn offset(&self) -> AssemblyOffset {
-        AssemblyOffset(self.ops.len() + self.asmoffset)
-    }
-
-    #[inline]
-    fn push(&mut self, value: u8) {
-        self.ops.push(value);
-    }
-
-    #[inline]
-    fn align(&mut self, alignment: usize) {
-        let offset = self.offset().0 % alignment;
-        if offset != 0 {
-            for _ in 0..(alignment - offset) {
-                self.push(0x90);
-            }
-        }
-    }
-
-    #[inline]
-    fn global_label(&mut self, name: &'static str) {
-        let offset = self.offset().0;
-        if let Some(name) = self.global_labels.insert(name, offset) {
-            panic!("Duplicate global label '{}'", name);
-        }
-    }
-
-    #[inline]
-    fn global_reloc(&mut self, name: &'static str, size: u8) {
-        let offset = self.offset().0;
-        self.global_relocs.push((PatchLoc(offset, size), name));
-    }
-
-    #[inline]
-    fn dynamic_label(&mut self, id: DynamicLabel) {
-        let offset = self.offset().0;
-        let entry = &mut self.dynamic_labels[id.0];
-        if entry.is_some() {
-            panic!("Duplicate label '{}'", id.0);
-        }
-        *entry = Some(offset);
-    }
-
-    #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, size: u8) {
-        let offset = self.offset().0;
-        self.dynamic_relocs.push((PatchLoc(offset, size), id));
-    }
-
-    #[inline]
-    fn local_label(&mut self, name: &'static str) {
-        let offset = self.offset().0;
-        if let Some(relocs) = self.local_relocs.remove(&name) {
-            for loc in relocs {
-                self.patch_loc(loc, offset);
-            }
-        }
-        self.local_labels.insert(name, offset);
-    }
-
-    #[inline]
-    fn forward_reloc(&mut self, name: &'static str, size: u8) {
-        let offset = self.offset().0;
-        match self.local_relocs.entry(name) {
-            Occupied(mut o) => {
-                o.get_mut().push(PatchLoc(offset, size));
-            },
-            Vacant(v) => {
-                v.insert(vec![PatchLoc(offset, size)]);
-            }
-        }
-    }
-
-    #[inline]
-    fn backward_reloc(&mut self, name: &'static str, size: u8) {
-        if let Some(&target) = self.local_labels.get(&name) {
-            let len = self.offset().0;
-            self.patch_loc(PatchLoc(len, size), target)
-        } else {
-            panic!("Unknown local label '{}'", name);
-        }
-    }
-}
-
 impl Assembler {
     /// Create a new `Assembler` instance
     pub fn new() -> Assembler {
@@ -270,37 +208,35 @@ impl Assembler {
         DynamicLabel(id)
     }
 
-    /// Allows previously assembled code to be overwritten. The first argument
-    /// is a range of `AssemblyOffset`s that determines the safe range of values
-    /// to overwrite. The second argument is a closure which will be passed a &mut
-    /// Assembler to do the actual overwriting. If the range is invalid (it should
-    /// only cover already assembled values and the end should be larger than the
-    /// start) it will panic. Additionally, if code within the closure assembles
-    /// to a total size larger than the given range, it will also panic.
-    /// aside from that you can do everything you can do normally within the
-    /// closure.
-    pub fn alter<F>(&mut self, loc: Range<AssemblyOffset>, f: F) where F: FnOnce(&mut Self) -> () {
-        // commit the assembling buffer to empty it so we can retarget it
+    /// To allow already committed code to be altered, this method allows modification
+    /// of the internal ExecutableBuffer directly. When this method is called, all
+    /// data will be committed and access to the internal `ExecutableBuffer` will be locked.
+    /// The passed function will then be called with an `AssemblyModifier` as argument.
+    /// Using this `AssemblyModifier` changes can be made to the committed code.
+    /// After this function returns, any labels in these changes will be resolved
+    /// and the `ExecutableBuffer` will be unlocked again.
+    pub fn alter<F>(&mut self, f: F) where F: FnOnce(&mut AssemblyModifier) -> () {
         self.commit();
-        let actual_asmoffset = self.asmoffset;
-        if loc.start.0 > actual_asmoffset || loc.end.0 > actual_asmoffset || loc.start.0 > loc.end.0 {
-            panic!("Given alteration range lies outside the currently filled assembling buffer");
+        let asmoffset = self.asmoffset;
+        self.asmoffset = 0;
+
+        let lock = self.execbuffer.clone();
+        let mut lock = lock.write().unwrap();
+        let buf = lock.deref_mut();
+        buf.buffer.set_protection(Protection::ReadWrite).unwrap();
+
+        {
+            let mut m = AssemblyModifier {
+                assembler: self,
+                buffer: buf
+            };
+            f(&mut m);
+            m.encode_relocs();
         }
-        // for x86 support: invalidate all known relocs in this area here
 
-        // move the start index of the assembling buffer to the fixup location
-        self.commit();
-        self.asmoffset = loc.start.0;
-
-        // execute fixups
-        f(self);
-
-        if self.asmoffset > loc.end.0 {
-            panic!("Overran the given range");
-        }
-        // commit fixups and restore asmoffset to the end of the buffer
-        self.commit();
-        self.asmoffset = actual_asmoffset;
+        buf.buffer.set_protection(Protection::ReadExecute).unwrap();
+        self.asmoffset = asmoffset;
+        // no commit is required as we directly modified the buffer.
     }
 
     #[inline]
@@ -430,36 +366,251 @@ impl Assembler {
     }
 }
 
-/// A read-only lockable reference to the internal `ExecutableBuffer` of an Assembler.
-/// To gain access to this buffer, it must be locked.
-impl Executor {
-    /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
-    /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
-    /// Any pointers created to the `Executablebuffer` should no longer be used when
-    /// the guard is dropped.
-    pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
-        self.execbuffer.read().unwrap()
+impl<'a> DynasmApi<'a> for Assembler {
+    #[inline]
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.ops.len() + self.asmoffset)
+    }
+
+    #[inline]
+    fn push(&mut self, value: u8) {
+        self.ops.push(value);
+    }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        let offset = self.offset().0 % alignment;
+        if offset != 0 {
+            for _ in 0..(alignment - offset) {
+                self.push(0x90);
+            }
+        }
+    }
+
+    #[inline]
+    fn global_label(&mut self, name: &'static str) {
+        let offset = self.offset().0;
+        if let Some(name) = self.global_labels.insert(name, offset) {
+            panic!("Duplicate global label '{}'", name);
+        }
+    }
+
+    #[inline]
+    fn global_reloc(&mut self, name: &'static str, size: u8) {
+        let offset = self.offset().0;
+        self.global_relocs.push((PatchLoc(offset, size), name));
+    }
+
+    #[inline]
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        let offset = self.offset().0;
+        let entry = &mut self.dynamic_labels[id.0];
+        if entry.is_some() {
+            panic!("Duplicate label '{}'", id.0);
+        }
+        *entry = Some(offset);
+    }
+
+    #[inline]
+    fn dynamic_reloc(&mut self, id: DynamicLabel, size: u8) {
+        let offset = self.offset().0;
+        self.dynamic_relocs.push((PatchLoc(offset, size), id));
+    }
+
+    #[inline]
+    fn local_label(&mut self, name: &'static str) {
+        let offset = self.offset().0;
+        if let Some(relocs) = self.local_relocs.remove(&name) {
+            for loc in relocs {
+                self.patch_loc(loc, offset);
+            }
+        }
+        self.local_labels.insert(name, offset);
+    }
+
+    #[inline]
+    fn forward_reloc(&mut self, name: &'static str, size: u8) {
+        let offset = self.offset().0;
+        match self.local_relocs.entry(name) {
+            Occupied(mut o) => {
+                o.get_mut().push(PatchLoc(offset, size));
+            },
+            Vacant(v) => {
+                v.insert(vec![PatchLoc(offset, size)]);
+            }
+        }
+    }
+
+    #[inline]
+    fn backward_reloc(&mut self, name: &'static str, size: u8) {
+        if let Some(&target) = self.local_labels.get(&name) {
+            let len = self.offset().0;
+            self.patch_loc(PatchLoc(len, size), target)
+        } else {
+            panic!("Unknown local label '{}'", name);
+        }
     }
 }
 
-/// A structure wrapping some executable memory. It dereferences into a &[u8] slice.
-impl ExecutableBuffer {
-    /// Obtain a pointer into the executable memory from an offset into it.
-    /// When an offset returned from `DynasmApi::offset` is used, the resulting pointer
-    /// will point to the start of the first instruction after the offset call,
-    /// which can then be jumped or called to divert control flow into the executable
-    /// buffer. Note that if this buffer is accessed through an Executor, these pointers
-    /// will only be valid as long as its lock is held. When no locks are held,
-    /// The assembler is free to relocate the executable buffer when it requires
-    /// more memory than available.
-    pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
-        &self[offset.0] as *const u8
+impl Extend<u8> for Assembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        self.ops.extend(iter)
     }
 }
 
-impl Deref for ExecutableBuffer {
-    type Target = [u8];
-    fn deref(&self) -> &[u8] {
-        unsafe { &self.buffer.as_slice()[..self.length] }
+impl<'a> Extend<&'a u8> for Assembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
+        self.extend(iter.into_iter().cloned())
+    }
+}
+
+
+/// This struct is a wrapper around an `Assembler` normally created using the
+/// `Assembler.alter` method. Instead of writing to a temporary assembling buffer,
+/// this struct assembles directly into an executable buffer. The `goto` method can
+/// be used to set the assembling offset in the `ExecutableBuffer` of the assembler
+/// (this offset is initialized to 0) after which the data at this location can be
+/// overwritten by assembling into this struct.
+pub struct AssemblyModifier<'a: 'b, 'b> {
+    assembler: &'a mut Assembler,
+    buffer: &'b mut ExecutableBuffer
+}
+
+impl<'a, 'b> AssemblyModifier<'a, 'b> {
+    /// Sets the current modification offset to the given value
+    #[inline]
+    pub fn goto(&mut self, offset: AssemblyOffset) {
+        self.assembler.asmoffset = offset.0;
+    }
+
+    /// Checks that the current modification offset is not larger than the specified offset.
+    /// If this is violated, it panics.
+    #[inline]
+    pub fn check(&mut self, offset: AssemblyOffset) {
+        if self.assembler.asmoffset > offset.0 {
+            panic!("specified offset to check is smaller than the actual offset");
+        }
+    }
+
+    #[inline]
+    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+        let buf = &mut self.buffer.as_mut_slice()[loc.0 - loc.1 as usize .. loc.0];
+        let target = target as isize - loc.0 as isize;
+
+        unsafe { match loc.1 {
+            1 => buf.copy_from_slice(&mem::transmute::<_, [u8; 1]>( (target as i8 ).to_le() )),
+            2 => buf.copy_from_slice(&mem::transmute::<_, [u8; 2]>( (target as i16).to_le() )),
+            4 => buf.copy_from_slice(&mem::transmute::<_, [u8; 4]>( (target as i32).to_le() )),
+            8 => buf.copy_from_slice(&mem::transmute::<_, [u8; 8]>( (target as i64).to_le() )),
+            _ => panic!("invalid patch size")
+        } }
+    }
+
+    fn encode_relocs(&mut self) {
+        let mut relocs = Vec::new();
+        mem::swap(&mut relocs, &mut self.assembler.global_relocs);
+        for (loc, name) in relocs {
+            if let Some(&target) = self.assembler.global_labels.get(&name) {
+                self.patch_loc(loc, target)
+            } else {
+                panic!("Unkonwn global label '{}'", name);
+            }
+        }
+
+        let mut relocs = Vec::new();
+        mem::swap(&mut relocs, &mut self.assembler.dynamic_relocs);
+        for (loc, id) in relocs {
+            if let Some(&Some(target)) = self.assembler.dynamic_labels.get(id.0) {
+                self.patch_loc(loc, target)
+            } else {
+                panic!("Unkonwn dynamic label '{}'", id.0);
+            }
+        }
+
+        if let Some(name) = self.assembler.local_relocs.keys().next() {
+            panic!("Unknown local label '{}'", name);
+        }
+    }
+}
+
+impl<'a, 'b, 'c> DynasmApi<'c> for AssemblyModifier<'a, 'b> {
+    #[inline]
+    fn offset(&self) -> AssemblyOffset {
+        self.assembler.offset()
+    }
+
+    #[inline]
+    fn push(&mut self, value: u8) {
+        self.buffer.as_mut_slice()[self.assembler.asmoffset] = value;
+        self.assembler.asmoffset += 1;
+    }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        self.assembler.align(alignment);
+    }
+
+    #[inline]
+    fn global_label(&mut self, name: &'static str) {
+        self.assembler.global_label(name);
+    }
+
+    #[inline]
+    fn global_reloc(&mut self, name: &'static str, size: u8) {
+        self.assembler.global_reloc(name, size);
+    }
+
+    #[inline]
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        self.assembler.dynamic_label(id);
+    }
+
+    #[inline]
+    fn dynamic_reloc(&mut self, id: DynamicLabel, size: u8) {
+        self.assembler.dynamic_reloc(id, size);
+    }
+
+    #[inline]
+    fn local_label(&mut self, name: &'static str) {
+        let offset = self.offset().0;
+        if let Some(relocs) = self.assembler.local_relocs.remove(&name) {
+            for loc in relocs {
+                self.patch_loc(loc, offset);
+            }
+        }
+        self.assembler.local_labels.insert(name, offset);
+    }
+
+    #[inline]
+    fn forward_reloc(&mut self, name: &'static str, size: u8) {
+        self.assembler.forward_reloc(name, size);
+    }
+
+    #[inline]
+    fn backward_reloc(&mut self, name: &'static str, size: u8) {
+        if let Some(&target) = self.assembler.local_labels.get(&name) {
+            let len = self.offset().0;
+            self.patch_loc(PatchLoc(len, size), target)
+        } else {
+            panic!("Unknown local label '{}'", name);
+        }
+    }
+}
+
+impl<'a, 'b> Extend<u8> for AssemblyModifier<'a, 'b> {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        for i in iter {
+            self.push(i)
+        }
+    }
+}
+
+impl<'a, 'b, 'c> Extend<&'c u8> for AssemblyModifier<'a, 'b> {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'c u8> {
+        self.extend(iter.into_iter().cloned())
     }
 }
