@@ -24,7 +24,7 @@ macro_rules! MutPointer {
     ($e:expr) => {$e as *mut _ as _};
 }
 
-/// A struct representing an offset into the assembling buffer of a `DynasmApi` struct.
+/// A struct representing an offset into the assembling buffer of a `DynasmLabelApi` struct.
 /// The wrapped `usize` is the offset from the start of the assembling buffer in bytes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AssemblyOffset(pub usize);
@@ -48,7 +48,7 @@ pub struct ExecutableBuffer {
 /// A structure wrapping some executable memory. It dereferences into a &[u8] slice.
 impl ExecutableBuffer {
     /// Obtain a pointer into the executable memory from an offset into it.
-    /// When an offset returned from `DynasmApi::offset` is used, the resulting pointer
+    /// When an offset returned from `DynasmLabelApi::offset` is used, the resulting pointer
     /// will point to the start of the first instruction after the offset call,
     /// which can then be jumped or called to divert control flow into the executable
     /// buffer. Note that if this buffer is accessed through an Executor, these pointers
@@ -123,6 +123,15 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
             mem::transmute::<_, [u8; 8]>(value.to_le())
         }.iter().cloned());
     }
+    /// This function is called in when a runtime error has to be generated. It panics.
+    #[inline]
+    fn runtime_error(&self, msg: &'static str) -> ! {
+        panic!(msg);
+    }
+}
+
+/// This trait extends DynasmApi to not only allow assembling, but also labels and various directives
+pub trait DynasmLabelApi<'a> : DynasmApi<'a> {
     /// Push nops until the assembling target end is aligned to the given alignment
     fn align(&mut self, alignment: usize);
     /// Record the definition of a local label
@@ -140,12 +149,6 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     fn global_reloc(  &mut self, name: &'static str, size: u8);
     /// Record a relocation spot for a reference to a dynamic label
     fn dynamic_reloc( &mut self, id: DynamicLabel,   size: u8);
-
-    /// This function is called in when a runtime error has to be generated. It panics.
-    #[inline]
-    fn runtime_error(&self, msg: &'static str) -> ! {
-        panic!(msg);
-    }
 }
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
@@ -237,6 +240,13 @@ impl Assembler {
         buf.buffer.set_protection(Protection::ReadExecute).unwrap();
         self.asmoffset = asmoffset;
         // no commit is required as we directly modified the buffer.
+    }
+
+    pub fn alter_uncommitted<F>(&mut self, f: F) where F: FnOnce(&mut UncommittedModifier) -> () {
+        f(&mut UncommittedModifier {
+            offset: self.asmoffset,
+            assembler: self
+        });
     }
 
     #[inline]
@@ -376,7 +386,9 @@ impl<'a> DynasmApi<'a> for Assembler {
     fn push(&mut self, value: u8) {
         self.ops.push(value);
     }
+}
 
+impl<'a> DynasmLabelApi<'a> for Assembler {
     #[inline]
     fn align(&mut self, alignment: usize) {
         let offset = self.offset().0 % alignment;
@@ -494,6 +506,15 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         }
     }
 
+    /// Checks that the current modification offset is exactly the specified offset.
+    /// If this is violated, it panics.
+    #[inline]
+    pub fn check_exact(&mut self, offset: AssemblyOffset) {
+        if self.assembler.asmoffset != offset.0 {
+            panic!("specified offset to check is smaller than the actual offset");
+        }
+    }
+
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
         let buf = &mut self.buffer.as_mut_slice()[loc.0 - loc.1 as usize .. loc.0];
@@ -546,7 +567,9 @@ impl<'a, 'b, 'c> DynasmApi<'c> for AssemblyModifier<'a, 'b> {
         self.buffer.as_mut_slice()[self.assembler.asmoffset] = value;
         self.assembler.asmoffset += 1;
     }
+}
 
+impl<'a, 'b, 'c> DynasmLabelApi<'c> for AssemblyModifier<'a, 'b> {
     #[inline]
     fn align(&mut self, alignment: usize) {
         self.assembler.align(alignment);
@@ -611,6 +634,71 @@ impl<'a, 'b> Extend<u8> for AssemblyModifier<'a, 'b> {
 impl<'a, 'b, 'c> Extend<&'c u8> for AssemblyModifier<'a, 'b> {
     #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'c u8> {
+        self.extend(iter.into_iter().cloned())
+    }
+}
+
+/// This struct is a wrapper around an `Assembler` normally created using the
+/// `Assembler.alter_uncommitted` method. It allows the user to edit parts
+/// of the assembling buffer that cannot be determined easily or efficiently
+/// in advance. Due to limitations of the label resolution algorithms, this
+/// assembler does not allow labels to be used.
+pub struct UncommittedModifier<'a> {
+    assembler: &'a mut Assembler,
+    offset: usize
+}
+
+impl<'a> UncommittedModifier<'a> {
+    /// Sets the current modification offset to the given value
+    #[inline]
+    pub fn goto(&mut self, offset: AssemblyOffset) {
+        self.offset = offset.0;
+    }
+
+    /// Checks that the current modification offset is not larger than the specified offset.
+    /// If this is violated, it panics.
+    #[inline]
+    pub fn check(&mut self, offset: AssemblyOffset) {
+        if self.offset > offset.0 {
+            panic!("specified offset to check is smaller than the actual offset");
+        }
+    }
+
+    /// Checks that the current modification offset is exactly the specified offset.
+    /// If this is violated, it panics.
+    #[inline]
+    pub fn check_exact(&mut self, offset: AssemblyOffset) {
+        if self.offset != offset.0 {
+            panic!("specified offset to check is smaller than the actual offset");
+        }
+    }
+}
+
+impl<'a, 'b> DynasmApi<'b> for UncommittedModifier<'a> {
+    #[inline]
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.offset)
+    }
+
+    #[inline]
+    fn push(&mut self, value: u8) {
+        self.assembler.ops[self.offset - self.assembler.asmoffset] = value;
+        self.offset += 1;
+    }
+}
+
+impl<'a> Extend<u8> for UncommittedModifier<'a> {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        for i in iter {
+            self.push(i)
+        }
+    }
+}
+
+impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
         self.extend(iter.into_iter().cloned())
     }
 }

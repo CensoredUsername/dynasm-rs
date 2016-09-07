@@ -3,7 +3,7 @@
 
 #[macro_use]
 extern crate dynasmrt;
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 extern crate itertools;
 use itertools::Itertools;

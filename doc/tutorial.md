@@ -11,7 +11,7 @@ Dynasm-rs is a library and syntax extension for assembling code at runtime. For 
 #[macro_use]
 extern crate dynasmrt;
 
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
 use std::io::Write;
@@ -67,15 +67,15 @@ To use the `dynasm!` procedural macro, first the dynasm plugin has to be loaded.
 #[macro_use]
 extern crate dynasmrt;
 
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 ```
 We then link to the dynasm runtime crate. Although they are not used here, it also contains various utility macros which we load here.
-Furthermore, the `DynasmApi` trait is loaded. This trait defines the interface used by the `dynasm!` procedural macro to produce assembled code.
+Furthermore, the `DynasmApi` and `DynasmLabelApi` traits are loaded. These traits defines the interfaces used by the `dynasm!` procedural macro to produce assembled code.
 
 ```
 let mut ops = dynasmrt::Assembler::new();
 ```
-Of course, the machine code that will be generated will need to live somewhere. `dynasmrt::Assembler` is a struct that implements the `DynasmApi` trait, provides storage for the generated machine code, handles memory permissions and provides various utilities for dynamically assembling code. It even allows assembling code in one thread while several other threads execute said code. For this example though, we will use it in the most simple usecase, just assembling everything in advance and then executing it.
+Of course, the machine code that will be generated will need to live somewhere. `dynasmrt::Assembler` is a struct that implements the `DynasmApi` and `DynasmLabelApi` traits, provides storage for the generated machine code, handles memory permissions and provides various utilities for dynamically assembling code. It even allows assembling code in one thread while several other threads execute said code. For this example though, we will use it in the most simple use case, just assembling everything in advance and then executing it.
 
 ```
 dynasm!(ops
@@ -157,7 +157,7 @@ And for the people interested in the behind-the-scenes, here's what the `dynasm!
 #[macro_use]
 extern crate dynasmrt;
 
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
 use std::io::Write;
@@ -360,7 +360,7 @@ fn main() {
 
 ## Basics
 
-To kickstart this process, we'll first add the `dynasm` plugin and `dynasmrt` crate to our project, and `use` the `DynasmApi` trait:
+To kickstart this process, we'll first add the `dynasm` plugin and `dynasmrt` crate to our project, and `use` the `DynasmApi` and `DynasmLabelApi` traits:
 
 ```diffnew
 + #![feature(plugin)]
@@ -368,7 +368,7 @@ To kickstart this process, we'll first add the `dynasm` plugin and `dynasmrt` cr
 + 
 + #[macro_use]
 + extern crate dynasmrt;
-+ use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 ```
 
 Then, we'll define the following aliases to make the code more readable. As this code is specific to `x86_64` we'll add a `cfg` attribute here so the code will fail to compile on other architectures. Note that `ops` is purely a placeholder here for the parser, it isn't actually used.
@@ -785,7 +785,7 @@ With these changes, adding the necessary `use` statements and removing unused fu
 
 #[macro_use]
 extern crate dynasmrt;
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 extern crate itertools;
 use itertools::Itertools;

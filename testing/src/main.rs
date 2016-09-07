@@ -3,7 +3,7 @@
 
 #[macro_use]
 extern crate dynasmrt;
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 // aliases, and dynasm! in item position
 dynasm!(ops

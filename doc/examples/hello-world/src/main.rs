@@ -4,7 +4,7 @@
 #[macro_use]
 extern crate dynasmrt;
 
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
 use std::io::Write;
