@@ -1445,7 +1445,7 @@ Ops!(OPMAP;
 ] "vpsraw"      = [ b"y*y*wo",   [   1, 0xE1      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
                     b"y*y*ib",   [   1, 0x71      ], 4, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsrld"      = [ b"y*y*wo",   [   1, 0xD2      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
-                    b"y*y*ib",   [   1, 0x72      ], 2, PREF_66 | AUTO_VEXL | VEX_OP;
+                    b"y*y*ib",   [   1, 0x72      ], 2, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "psrldq"      = [ b"yoib",     [0x0F, 0x73      ], 3, PREF_66;
 ] "vpsrldq"     = [ b"y*y*ib",   [   1, 0x73      ], 3, PREF_66 | AUTO_VEXL | VEX_OP | ENC_VM;
 ] "vpsrlq"      = [ b"y*y*wo",   [   1, 0xD3      ], X, PREF_66 | AUTO_VEXL | VEX_OP;
