@@ -122,15 +122,15 @@ impl Program {
                     );
                 },
                 b',' => {
-                    call_extern!(ops, State::getchar);
                     dynasm!(ops
+                        ;; call_extern!(ops, State::getchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
                 },
                 b'.' => {
-                    call_extern!(ops, State::putchar);
                     dynasm!(ops
+                        ;; call_extern!(ops, State::putchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
@@ -172,17 +172,13 @@ impl Program {
             return Err("[ without matching ]");
         }
 
-        epilogue!(ops, 0);
-
         dynasm!(ops
+            ;; epilogue!(ops, 0)
             ;->overflow:
-        );
-        epilogue!(ops, 1);
-
-        dynasm!(ops
+            ;; epilogue!(ops, 1)
             ;->io_failure:
+            ;; epilogue!(ops, 2)
         );
-        epilogue!(ops, 2);
 
         let code = ops.finalize().unwrap();
         Ok(Program {

@@ -18,7 +18,7 @@ macro_rules! Pointer {
     ($e:expr) => {$e as *const _ as _};
 }
 
-/// Preforms the same action as the Pointer! macro, but casts to a *mut pointer.
+/// Preforms the same action as the `Pointer!` macro, but casts to a *mut pointer.
 #[macro_export]
 macro_rules! MutPointer {
     ($e:expr) => {$e as *mut _ as _};
@@ -191,7 +191,7 @@ impl Assembler {
         Assembler {
             execbuffer: Arc::new(RwLock::new(ExecutableBuffer {
                 length: 0,
-                buffer: Mmap::anonymous(MMAP_INIT_SIZE, Protection::ReadExecute).unwrap()
+                buffer: Mmap::anonymous(MMAP_INIT_SIZE, Protection::ReadExecute).expect("Failed to allocate executable memory")
             })),
             asmoffset: 0,
             map_len: MMAP_INIT_SIZE,
@@ -227,7 +227,7 @@ impl Assembler {
         let lock = self.execbuffer.clone();
         let mut lock = lock.write().unwrap();
         let buf = lock.deref_mut();
-        buf.buffer.set_protection(Protection::ReadWrite).unwrap();
+        buf.buffer.set_protection(Protection::ReadWrite).expect("Failed to change memory protection mode");
 
         {
             let mut m = AssemblyModifier {
@@ -238,11 +238,15 @@ impl Assembler {
             m.encode_relocs();
         }
 
-        buf.buffer.set_protection(Protection::ReadExecute).unwrap();
+        buf.buffer.set_protection(Protection::ReadExecute).expect("Failed to change memory protection mode");
         self.asmoffset = asmoffset;
         // no commit is required as we directly modified the buffer.
     }
 
+    /// Similar to `Assembler::alter`, this method allows modification of the yet to be
+    /// committed assembing buffer. Note that it is not possible to use labels in this
+    /// context, and overriding labels will cause corruption when the assembler tries to
+    /// resolve the labels at commit time.
     pub fn alter_uncommitted<F>(&mut self, f: F) where F: FnOnce(&mut UncommittedModifier) -> () {
         f(&mut UncommittedModifier {
             offset: self.asmoffset,
@@ -317,7 +321,7 @@ impl Assembler {
         if buf_end > self.map_len {
             // create a new buffer of the necessary size max(current_buf_len * 2, wanted_len)
             let map_len = cmp::max(buf_end, self.map_len * 2);
-            let mut new_buf = Mmap::anonymous(map_len, Protection::ReadWrite).unwrap();
+            let mut new_buf = Mmap::anonymous(map_len, Protection::ReadWrite).expect("Failed to change memory protection mode");
             self.map_len = new_buf.len();
 
             // copy over from the old buffer and the asm buffer (unsafe is completely safe due to use of anonymous mappings)
@@ -325,7 +329,7 @@ impl Assembler {
                 new_buf.as_mut_slice()[same].copy_from_slice(&self.execbuffer.read().unwrap().buffer.as_slice()[same]);
                 new_buf.as_mut_slice()[changed].copy_from_slice(&self.ops);
             }
-            new_buf.set_protection(Protection::ReadExecute).unwrap();
+            new_buf.set_protection(Protection::ReadExecute).expect("Failed to change memory protection mode");
 
             // swap the buffers and the initialized length
             let mut data = ExecutableBuffer {
@@ -337,11 +341,11 @@ impl Assembler {
         } else {
             // make the buffer writeable and copy things over.
             let mut data = self.execbuffer.write().unwrap();
-            data.buffer.set_protection(Protection::ReadWrite).unwrap();
+            data.buffer.set_protection(Protection::ReadWrite).expect("Failed to change memory protection mode");
             unsafe {
                 data.buffer.as_mut_slice()[changed].copy_from_slice(&self.ops);
             }
-            data.buffer.set_protection(Protection::ReadExecute).unwrap();
+            data.buffer.set_protection(Protection::ReadExecute).expect("Failed to change memory protection mode");
             // update the length of the initialized part of the buffer, if this commit adds length
             if buf_end > data.length {
                 data.length = buf_end;

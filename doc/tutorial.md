@@ -593,8 +593,8 @@ We can then simply call these methods directly from the compiled code. If the I/
 - }
 ```
 ```diffnew
-+ call_extern!(ops, State::getchar);
 + dynasm!(ops
++     ;; call_extern!(ops, State::getchar)
 +     ; cmp al, 0
 +     ; jnz ->io_failure
 + );
@@ -606,8 +606,8 @@ We can then simply call these methods directly from the compiled code. If the I/
 - }
 ```
 ```diffnew
-+ call_extern!(ops, State::putchar);
 + dynasm!(ops
++     ;; call_extern!(ops, State::putchar)
 +     ; cmp al, 0
 +     ; jnz ->io_failure
 + );
@@ -679,17 +679,13 @@ The `[` and `]` commands have the most complex implementation. When a `[` is enc
 With the end of the parsing reached, we must now handle the return and possible error conditions. This is done by returning 0 if the executionw as successful, or an error code when an error happened at runtime.
 
 ```diffnew
-+ epilogue!(ops, 0);
-+ 
 + dynasm!(ops
++     ;; epilogue!(ops, 0)
 +     ;->overflow:
-+ );
-+ epilogue!(ops, 1);
-+ 
-+ dynasm!(ops
++     ;; epilogue!(ops, 1)
 +     ;->io_failure:
++     ;; epilogue!(ops, 2)
 + );
-+ epilogue!(ops, 2);
 ```
 
 Now we can finalize the assembler and construct a Program from the resulting buffer:
@@ -904,15 +900,15 @@ impl Program {
                     );
                 },
                 b',' => {
-                    call_extern!(ops, State::getchar);
                     dynasm!(ops
+                        ;; call_extern!(ops, State::getchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
                 },
                 b'.' => {
-                    call_extern!(ops, State::putchar);
                     dynasm!(ops
+                        ;; call_extern!(ops, State::putchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
@@ -954,17 +950,13 @@ impl Program {
             return Err("[ without matching ]");
         }
 
-        epilogue!(ops, 0);
-
         dynasm!(ops
+            ;; epilogue!(ops, 0)
             ;->overflow:
-        );
-        epilogue!(ops, 1);
-
-        dynasm!(ops
+            ;; epilogue!(ops, 1)
             ;->io_failure:
+            ;; epilogue!(ops, 2)
         );
-        epilogue!(ops, 2);
 
         let code = ops.finalize().unwrap();
         Ok(Program {

@@ -18,7 +18,7 @@ mkdir ./build_docs/plugin
 mkdir ./build_docs/runtime
 
 # create instruction reference markdown file
-(cd doc/insref && cargo run > ../instructionref.md)
+(cd doc/insref && cargo update && cargo run > ../instructionref.md)
 
 # build plugin docs
 for f in ./doc/*.md; do

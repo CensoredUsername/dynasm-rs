@@ -10,6 +10,8 @@ The following syntax units used in dynasm syntax are defined by the [rust gramma
 - `ident`
 - `expr_path`
 - `expr`
+- `stmt`
+
 
 Dynasm-rs defines the following base syntax units:
 
@@ -26,7 +28,7 @@ The entry point of dynasm-rs is the dynasm! macro. It is structured as following
 
 Where line can be one of the following:
 
-`line : directive | label | instruction ;`
+`line : (";" stmt) | directive | label | instruction ;`
 
 ## Directives
 
@@ -98,13 +100,13 @@ macro_rules! fma {
 }
 ```
 
-An important thing to notice here is which matchers are used for which parts of dynasm! syntax. The following table lists the correct matchers to be used for expanding to dynasm syntax elements. Note that `$a:expr` means that anything that parses to an expression like `$a:ident` and just raw token trees are allowed.
+An important thing to notice here is which matchers are used for which parts of `dynasm!` syntax. The following table lists the correct matchers to be used for expanding to dynasm syntax elements. Note that `$a:expr` means that anything that parses to an expression like `$a:ident` and just raw token trees are allowed.
 
 Table 2: dynasm-rs macro expansion rules
 
  Syntax element        | Matchers
 :----------------------|:------------------------
-Assembling buffer      | `$ops:ident`
+Assembling buffer      | `$ops:expr`
 Register reference     | `$reg:expr`
 Memory reference       | `$mem:expr`
 Any element inside a memory reference | `$elem:expr, $reg:ident`
@@ -112,6 +114,26 @@ Immediate              | `$imm:expr`
 Local or global label name | `$label:ident`
 Dynamic label          | `$label:expr`
 Type map               | `$reg:expr => $type:path[$reg:expr].$attr:ident`
+
+## statements
+
+To make code that uses a lot of macros less verbose, dynasm-rs allows bare rust statements to be inserted inside `dynasm!` invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:
+
+```
+dynasm!(ops
+    ; mov rcx, rax
+);
+call_extern!(ops, extern_func);
+dynasm!(ops
+    ; mov rcx, rax
+);
+
+dynasm!(ops
+    ; mov rcx, rax
+    ;; call_extern!(ops, extern_func)
+    ; mov rcx, rax
+);
+```
 
 ## Labels
 
@@ -209,7 +231,7 @@ Syntax | Equivalent expression
 :------|:-----------
 `rax => Type.attr`             | `(rax as *mut Type).attr`
 `rax => Type[expr]`            | `(rax as *mut [Type])[expr]`
-`rax => Type[rbx + expr]`      | `(rax as *mut [Type])[rbx + expr]`
+`rax => Type[rbx]`             | `(rax as *mut [Type])[rbx]`
 `rax => Type[rbx + expr].attr` | `(rax as *mut [Type])[rbx + expr].attr `
 
 #### Immediates
