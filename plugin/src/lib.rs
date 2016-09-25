@@ -16,7 +16,7 @@ use syntax::fold::Folder;
 use syntax::codemap::Span;
 use syntax::ast;
 use syntax::util::small_vector::SmallVector;
-use syntax::parse::token::intern;
+use syntax::parse::token::{intern, str_to_ident};
 use syntax::tokenstream::TokenTree;
 use syntax::ptr::P;
 
@@ -125,7 +125,7 @@ impl CrateLocalData {
 }
 
 pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
-    let id = ecx.mod_path()[0];
+    let id = str_to_ident(&ecx.ecfg.crate_name);
 
     {
         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
