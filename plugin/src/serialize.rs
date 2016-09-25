@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use compiler;
-use parser::{Ident, Size};
+use parser::{Size};
 
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
@@ -11,7 +11,7 @@ use syntax::parse::token::intern;
 use syntax::codemap::{Span, Spanned};
 
 
-pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) -> Vec<ast::Stmt> {
+pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: compiler::StmtBuffer) -> Vec<ast::Stmt> {
     let mut buffer = Vec::new();
 
     // construction for `op.push(expr)` is as follows
@@ -54,7 +54,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
 
             DynScale(scale, rest)  => {
                 let temp = ast::Ident::with_empty_ctxt(intern("temp"));
-                buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size(ecx, name, scale)));
+                buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size(ecx, &name, scale)));
                 ("push", vec![or_mask_shift_expr(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)])
             },
 
@@ -85,10 +85,14 @@ pub fn serialize(ecx: &mut ExtCtxt, name: Ident, stmts: compiler::StmtBuffer) ->
             DynamicJumpTarget(expr, size) => {
                 let span = expr.span;
                 ("dynamic_reloc", vec![expr, ecx.expr_u8(span, size.in_bytes())])
+            },
+            Stmt(stmt) => {
+                buffer.push(stmt);
+                continue;
             }
         };
 
-        let op = ecx.expr_path(ast::Path::from_ident(name.span, name.node));
+        let op = name.clone();
         let method = ast::Ident::with_empty_ctxt(intern(method));
         let expr = ecx.expr_method_call(ecx.call_site(), op, method, args);
 
@@ -233,7 +237,7 @@ pub fn size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
     ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
 }
 
-pub fn encoded_size(ecx: &ExtCtxt, name: Ident, size: P<ast::Expr>) -> P<ast::Expr> {
+pub fn encoded_size(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P<ast::Expr> {
     let span = size.span;
 
     ecx.expr_match(span, size, vec![
@@ -242,7 +246,7 @@ pub fn encoded_size(ecx: &ExtCtxt, name: Ident, size: P<ast::Expr>) -> P<ast::Ex
         ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 2))], ecx.expr_u8(span, 1)),
         ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 1))], ecx.expr_u8(span, 0)),
         ecx.arm(span, vec![ecx.pat_wild(span)], ecx.expr_method_call(span,
-            ecx.expr_ident(name.span, name.node),
+            name.clone(),
             ast::Ident::with_empty_ctxt(intern("runtime_error")),
             vec![ecx.expr_str(span,
                 intern("Type size not representable as scale").as_str()

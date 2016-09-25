@@ -152,7 +152,7 @@ fn main() {
 
     // fixups
     let start = ops.offset();
-    dynasm!(ops
+    dynasm!( (ops)
         ; inc rbx
     );
     let end = ops.offset();

@@ -22,7 +22,8 @@ pub type Ident = Spanned<ast::Ident>;
 pub enum Item {
     Instruction(Vec<Ident>, Vec<Arg>, Span),
     Label(LabelType),
-    Directive(Ident, Vec<Arg>, Span)
+    Directive(Ident, Vec<Arg>, Span),
+    Stmt(ast::Stmt),
 }
 
 #[derive(Debug)]
@@ -301,9 +302,8 @@ impl Size {
 // this means we don't have to figure out nesting via []'s by ourselves.
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 
-pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Ident, Vec<Item>)> {
-    let span = parser.span;
-    let name = Spanned {node: try!(parser.parse_ident()), span: span};
+pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (P<ast::Expr>, Vec<Item>)> {
+    let name = try!(parser.parse_expr());
 
     let mut ins = Vec::new();
 
@@ -312,6 +312,14 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Ident, 
         try!(parser.expect(&token::Semi));
 
         let startspan = parser.span;
+
+        if parser.eat(&token::Semi) {
+            let stmt = try!(parser.parse_stmt());
+            if let Some(stmt) = stmt {
+                ins.push(Item::Stmt(stmt));
+            }
+            continue;
+        }
 
         // possible prefix symbols: => (dynamic label), -> (global label), . (directive)
 

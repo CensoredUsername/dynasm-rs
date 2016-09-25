@@ -40,7 +40,9 @@ pub enum Stmt {
     GlobalJumpTarget(Ident, Size),
     ForwardJumpTarget(Ident, Size),
     BackwardJumpTarget(Ident, Size),
-    DynamicJumpTarget(P<ast::Expr>, Size)
+    DynamicJumpTarget(P<ast::Expr>, Size),
+
+    Stmt(ast::Stmt),
 }
 
 /*
@@ -121,6 +123,9 @@ pub fn compile(ecx: &ExtCtxt, nodes: Vec<parser::Item>) -> Result<StmtBuffer, ()
                         }
                     }
                 }
+            },
+            Item::Stmt(stmt) => {
+                stmts.push(Stmt::Stmt(stmt));
             }
         }
     }

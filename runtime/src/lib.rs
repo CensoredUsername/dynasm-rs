@@ -59,7 +59,7 @@ impl ExecutableBuffer {
         &self[offset.0] as *const u8
     }
 
-    fn as_mut_slice(&mut self) -> &mut[u8] {
+    fn as_mut_slice(&mut self) -> &mut [u8] {
         unsafe {&mut self.buffer.as_mut_slice()[..self.length] }
     }
 }
@@ -85,6 +85,7 @@ impl Executor {
     /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
     /// Any pointers created to the `Executablebuffer` should no longer be used when
     /// the guard is dropped.
+    #[inline]
     pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
         self.execbuffer.read().unwrap()
     }
