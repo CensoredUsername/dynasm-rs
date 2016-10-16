@@ -191,7 +191,7 @@ pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Exp
         // let temp: path = ::std::mem::uninitialized();
         ecx.stmt_let_typed(span, false, temp, ecx.ty_path(path),
             ecx.expr_call_global(span, uninitialized, Vec::new())
-        ).unwrap(),
+        ),
         // let rv = &temp.attr as *const _ as usize - &temp as *const _ as usize;
         ecx.stmt_let(span,
             false,
