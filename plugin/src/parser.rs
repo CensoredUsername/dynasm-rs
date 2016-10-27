@@ -376,7 +376,7 @@ pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (P<ast::
             }
         }
 
-        let span = Span {hi: parser.last_span.hi, ..startspan};
+        let span = Span {hi: parser.prev_span.hi, ..startspan};
 
         if is_directive {
             ins.push(Item::Directive(op, args, span));
@@ -460,21 +460,21 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     if parser.eat(&token::RArrow) {
         let name = try!(parser.parse_ident());
         let jump = JumpType::Global(
-            Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
+            Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
         );
         label_return!(jump, size);
     // forward local label
     } else if parser.eat(&token::Gt) {
         let name = try!(parser.parse_ident());
         let jump = JumpType::Forward(
-            Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
+            Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
         );
         label_return!(jump, size);
     // forward global label
     } else if parser.eat(&token::Lt) {
         let name = try!(parser.parse_ident());
         let jump = JumpType::Backward(
-            Ident {node: name, span: Span {hi: parser.last_span.hi, ..start} }
+            Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
         );
         label_return!(jump, size);
     // dynamic label
@@ -559,7 +559,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
                 base:       base.map(|s| s.node),
                 disp:       disp,
                 size:       size,
-                span:       Span {hi: parser.last_span.hi, ..start}
+                span:       Span {hi: parser.prev_span.hi, ..start}
             }));
         }
 
