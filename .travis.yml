@@ -1,0 +1,5 @@
+language: rust
+rust:
+  - nightly
+script:
+  - cd testing && cargo update && cargo test
