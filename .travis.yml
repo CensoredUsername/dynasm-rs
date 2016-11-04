@@ -1,0 +1,9 @@
+language: rust
+rust:
+  - nightly
+script:
+  - |
+    (cd plugin && cargo build)
+    (cd runtime && cargo build)
+    cd testing
+    cargo update && cargo test
