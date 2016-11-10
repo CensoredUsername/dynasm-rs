@@ -11,7 +11,7 @@ dynasm!(ops
 );
 
 fn main() {
-    let mut ops = dynasmrt::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new();
     let d = 3;
     let c = 4;
 
