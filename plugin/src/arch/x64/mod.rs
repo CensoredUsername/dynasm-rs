@@ -4,7 +4,7 @@ use syntax::parse::PResult;
 
 mod parser;
 mod compiler;
-mod debug;
+pub mod debug;
 pub mod x64data;
 
 use ::State;

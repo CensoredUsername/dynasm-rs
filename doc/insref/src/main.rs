@@ -4,8 +4,8 @@ extern crate itertools;
 #[allow(plugin_as_library)]
 extern crate dynasm;
 
-use dynasm::debug;
-use dynasm::x64data;
+use dynasm::arch::x64::debug;
+use dynasm::arch::x64::x64data;
 
 use std::io::{self, Write};
 use itertools::Itertools;
