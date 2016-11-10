@@ -4,46 +4,17 @@ use syntax::ast;
 use syntax::ptr::P;
 use syntax::codemap::Spanned;
 
-use parser::{self, Item, Arg, Ident, MemoryRef, Register, RegKind, RegFamily, RegId, Size, LabelType, JumpType};
-use x64data::get_mnemnonic_data;
-use x64data::flags::*;
-use serialize::or_mask_shift_expr;
-use debug::format_opdata_list;
+use ::State;
+use serialize::{Stmt, Size, Ident, or_mask_shift_expr};
+use super::parser::{Arg, Instruction, MemoryRef, Register, RegKind, RegFamily, RegId, JumpType};
+use super::x64data::get_mnemnonic_data;
+use super::x64data::flags::*;
+use super::debug::format_opdata_list;
 
 use std::mem::swap;
 use std::slice;
 use std::iter;
-use std::collections::hash_map::Entry;
 
-/*
- * Compilation output
- */
-
-pub type StmtBuffer = Vec<Stmt>;
-
-#[derive(Clone, Debug)]
-pub enum Stmt {
-    Const(u8),
-    ExprConst(P<ast::Expr>),
-
-    Var(P<ast::Expr>, Size),
-    Extend(P<ast::Expr>),
-
-    DynScale(P<ast::Expr>, P<ast::Expr>),
-
-    Align(P<ast::Expr>),
-
-    GlobalLabel(Ident),
-    LocalLabel(Ident),
-    DynamicLabel(P<ast::Expr>),
-
-    GlobalJumpTarget(Ident, Size),
-    ForwardJumpTarget(Ident, Size),
-    BackwardJumpTarget(Ident, Size),
-    DynamicJumpTarget(P<ast::Expr>, Size),
-
-    Stmt(ast::Stmt),
-}
 
 /*
  * Instruction encoding data formats
@@ -90,156 +61,15 @@ const MOD_DISP8:  u8 = 0b01;
 const MOD_DISP32: u8 = 0b10;
 
 /*
- * Implmementation
+ * Implementation
  */
 
-pub fn compile(ecx: &ExtCtxt, nodes: Vec<parser::Item>) -> Result<StmtBuffer, ()>  {
-    let mut stmts = StmtBuffer::new();
+pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instruction) -> Result<(), Option<String>> {
+    let mut buffer = &mut state.stmts;
+    let Instruction(mut ops, mut args, _) = instruction;
+    let op = ops.pop().unwrap();
+    let prefixes = ops;
 
-    let mut successful = true;
-
-    for node in nodes {
-        match node {
-            Item::Instruction(mut ops, args, span) => {
-                let op = ops.pop().unwrap();
-                match compile_op(ecx, &mut stmts, op, ops, args) {
-                    Ok(_) => (),
-                    Err(e) => {
-                        successful = false;
-                        if let Some(e) = e {
-                            ecx.span_err(span, &e)
-                        }
-                    }
-                }
-            },
-            Item::Label(label) => compile_label(&mut stmts, label),
-            Item::Directive(op, args, span) => {
-                match compile_directive(ecx, &mut stmts, op, args) {
-                    Ok(_) => (),
-                    Err(e) => {
-                        successful = false;
-                        if let Some(e) = e {
-                            ecx.span_err(span, &e)
-                        }
-                    }
-                }
-            },
-            Item::Stmt(stmt) => {
-                stmts.push(Stmt::Stmt(stmt));
-            }
-        }
-    }
-
-    if successful {
-        Ok(stmts)
-    } else {
-        Err(())
-    }
-}
-
-fn compile_directive(ecx: &ExtCtxt, buffer: &mut StmtBuffer, dir: Ident, mut args: Vec<Arg>) -> Result<(), Option<String>> {
-    match &*dir.node.name.as_str() {
-        // TODO: oword, qword, float, double, long double
-        // TODO: iterators <- gives us strings and bytestrings for free
-        "byte"  => directive_const(ecx, buffer, args, Size::BYTE),
-        "word"  => directive_const(ecx, buffer, args, Size::WORD),
-        "dword" => directive_const(ecx, buffer, args, Size::DWORD),
-        "qword" => directive_const(ecx, buffer, args, Size::QWORD),
-        "bytes" => directive_iter(ecx, buffer, args),
-        "align" => {
-            if args.len() != 1 {
-                return Err(Some("Invalid amount of arguments".into()));
-            }
-
-            match args.pop().unwrap() {
-                Arg::Immediate(expr, _) => {
-                    buffer.push(Stmt::Align(expr));
-                },
-                _ => return Err(Some("this directive only uses immediate arguments".into()))
-            }
-            Ok(())
-        },
-        "alias" => {
-            if args.len() != 2 {
-                return Err(Some("Invalid amount of arguments".into()));
-            }
-
-            let reg = match args.pop().unwrap() {
-                Arg::Direct(Spanned {node: Register {kind: RegKind::Static(id), size}, ..}) => (id, size),
-                _ => {
-                    return Err(Some("The second argument to alias should be a static register".into()));
-                }
-            };
-
-            let alias = match args.pop().unwrap() {
-                Arg::Immediate(expr, _) => parser::as_simple_name(&*expr),
-                _ => None
-            };
-
-            let alias = if let Some(alias) = alias {
-                alias.node.name
-            } else {
-                return Err(Some("The first argument to alias should be a non-keyword immediate".into()));
-            };
-
-            let global_data = super::crate_local_data(ecx);
-            let mut lock = global_data.write();
-            match lock.aliases.entry(alias) {
-                Entry::Occupied(_) => return Err(Some(format!("Duplicate alias definition, alias '{}' was earlier defined", alias.as_str()))),
-                Entry::Vacant(v) => v.insert(reg)
-            };
-            Ok(())
-        },
-        d => {
-            ecx.span_err(dir.span, &format!("unknown directive '{}'", d));
-            Err(None)
-        }
-    }
-}
-
-fn directive_const(ecx: &ExtCtxt, buffer: &mut StmtBuffer, args: Vec<Arg>, size: Size) -> Result<(), Option<String>> {
-    if args.is_empty() {
-        return Err(Some("this directive requires at least one argument".into()));
-    }
-
-    for arg in args {
-        match arg {
-            Arg::Immediate(expr, s) => {
-                if s.is_some() && s != Some(size) {
-                    ecx.span_err(expr.span, "wrong argument size");
-                    return Err(None)
-                }
-                buffer.push(Stmt::Var(expr, size));
-            },
-            _ => return Err(Some("this directive only uses immediate arguments".into()))
-        }
-    }
-
-    Ok(())
-}
-
-fn directive_iter(_ecx: &ExtCtxt, buffer: &mut StmtBuffer, mut args: Vec<Arg>) -> Result<(), Option<String>> {
-    if args.len() != 1 {
-        return Err(Some("Wrong amount of arguments for this directive".into()))
-    }
-
-    if let Arg::Immediate(expr, None) = args.pop().unwrap() {
-        buffer.push(Stmt::Extend(expr));
-    } else {
-        return Err(Some("wrong argument size".into()));
-    }
-    Ok(())
-}
-
-fn compile_label(stmts: &mut StmtBuffer, label: LabelType) {
-    stmts.push(match label {
-        LabelType::Global(ident) => Stmt::GlobalLabel(ident),
-        LabelType::Local(ident)  => Stmt::LocalLabel(ident),
-        LabelType::Dynamic(expr) => Stmt::DynamicLabel(expr),
-    });
-}
-
-fn compile_op(ecx: &ExtCtxt, buffer: &mut StmtBuffer, op: Ident, prefixes: Vec<Ident>, mut args: Vec<Arg>) -> Result<(), Option<String>> {
     // sanitize memory references and determine address size
     let pref_addr = try!(sanitize_addresses(ecx, &mut args));
 
@@ -1128,7 +958,7 @@ fn extract_args(fmt: &'static Opdata, args: Vec<Arg>) -> (Option<Arg>, Option<Ar
     (m, r, v, i, immediates)
 }
 
-fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, rex_w: bool, reg: &Option<Arg>, rm: &Option<Arg>) {
+fn compile_rex(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<Arg>, rm: &Option<Arg>) {
     let mut reg_k   = RegKind::from_number(0);
     let mut index_k = RegKind::from_number(0);
     let mut base_k  = RegKind::from_number(0);
@@ -1171,7 +1001,7 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut StmtBuffer, rex_w: bool, reg: &Option
     buffer.push(Stmt::ExprConst(rex));
 }
 
-fn compile_vex_xop(ecx: &ExtCtxt, buffer: &mut StmtBuffer, data: &'static Opdata, reg: &Option<Arg>,
+fn compile_vex_xop(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<Arg>,
 rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, prefix: u8) {
     let mut reg_k   = RegKind::from_number(0);
     let mut index_k = RegKind::from_number(0);
@@ -1260,7 +1090,7 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
     }
 }
 
-fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut StmtBuffer, mode: u8, reg1: RegKind, reg2: RegKind) {
+fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegKind) {
     let byte = mode                << 6 |
               (reg1.encode()  & 7) << 3 |
               (reg2.encode()  & 7)     ;
@@ -1280,7 +1110,7 @@ fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut StmtBuffer, mode: u8, reg1: Reg
     buffer.push(Stmt::ExprConst(byte));
 }
 
-fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut StmtBuffer, scale: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
+fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, scale: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 

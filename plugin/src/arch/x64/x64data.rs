@@ -1,6 +1,6 @@
 use std::collections::{HashMap, hash_map};
 
-use compiler::Opdata;
+use super::compiler::Opdata;
 
 
 macro_rules! constify {

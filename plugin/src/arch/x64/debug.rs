@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
-use compiler::{Opdata, FormatStringIterator};
-use x64data::flags::*;
+use super::compiler::{Opdata, FormatStringIterator};
+use super::x64data::flags::*;
 
 pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
     let mut forms = Vec::new();

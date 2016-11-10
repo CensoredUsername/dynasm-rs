@@ -10,21 +10,15 @@ use syntax::codemap::{Spanned, Span};
 use std::collections::HashMap;
 use std::cmp::PartialEq;
 
-use serialize::{offset_of, size_of, add_exprs, size_of_scale_expr};
-
-pub type Ident = Spanned<ast::Ident>;
+use ::State;
+use serialize::{Size, Ident, offset_of, size_of, add_exprs, size_of_scale_expr};
 
 /**
  * collections
  */
 
 #[derive(Debug)]
-pub enum Item {
-    Instruction(Vec<Ident>, Vec<Arg>, Span),
-    Label(LabelType),
-    Directive(Ident, Vec<Arg>, Span),
-    Stmt(ast::Stmt),
-}
+pub struct Instruction(pub Vec<Ident>, pub Vec<Arg>, pub Span);
 
 #[derive(Debug)]
 pub enum Arg {
@@ -45,13 +39,6 @@ pub struct MemoryRef {
     pub disp:       Option<P<ast::Expr>>,
     pub size:       Option<Size>,
     pub span:       Span
-}
-
-#[derive(Debug)]
-pub enum LabelType {
-    Global(Ident),         // . label :
-    Local(Ident),          // label :
-    Dynamic(P<ast::Expr>), // => expr :
 }
 
 #[derive(Debug)]
@@ -139,17 +126,6 @@ pub enum RegFamily {
     SEGMENT = 6,
     CONTROL = 7,
     DEBUG = 8,
-}
-
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
-pub enum Size {
-    BYTE  = 1,
-    WORD  = 2,
-    DWORD = 4,
-    QWORD = 8,
-    PWORD = 10,
-    OWORD = 16,
-    HWORD = 32
 }
 
 /*
@@ -288,12 +264,6 @@ impl RegId {
     }
 }
 
-impl Size {
-    pub fn in_bytes(&self) -> u8 {
-        *self as u8
-    }
-}
-
 /*
  * Code
  */
@@ -302,91 +272,35 @@ impl Size {
 // this means we don't have to figure out nesting via []'s by ourselves.
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 
-pub fn parse<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (P<ast::Expr>, Vec<Item>)> {
-    let name = try!(parser.parse_expr());
+pub fn parse_instruction<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Instruction> {
+    let startspan = parser.span;
 
-    let mut ins = Vec::new();
+    let mut ops = Vec::new();
+    let mut span = parser.span;
+    let mut op = Spanned {node: try!(parser.parse_ident()), span: span};
 
-    while !parser.check(&token::Eof) {
+    // read prefixes
+    while is_prefix(op) {
+        ops.push(op);
+        span = parser.span;
+        op = Spanned {node: try!(parser.parse_ident()), span: span};
+    }
 
-        try!(parser.expect(&token::Semi));
+    // parse (sizehint? expr),*
+    let mut args = Vec::new();
 
-        let startspan = parser.span;
+    if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
+        args.push(try!(parse_arg(state, ecx, parser)));
 
-        if parser.eat(&token::Semi) {
-            let stmt = try!(parser.parse_stmt());
-            if let Some(stmt) = stmt {
-                ins.push(Item::Stmt(stmt));
-            }
-            continue;
-        }
-
-        // possible prefix symbols: => (dynamic label), -> (global label), . (directive)
-
-        if parser.eat(&token::FatArrow) {
-            // dynamic label branch
-            let expr = try!(parser.parse_expr());
-
-            ins.push(Item::Label(LabelType::Dynamic(expr)));
-            // note: we explicitly do not try to parse a : here as it is a valid symbol inside of an expression
-            continue;
-
-        } else if parser.eat(&token::RArrow) {
-            // global label branch
-            let name = Spanned {node: try!(parser.parse_ident()), span: startspan};
-
-            ins.push(Item::Label(LabelType::Global(name)));
-            try!(parser.expect(&token::Colon));
-            continue;
-
-        }
-
-        let is_directive = parser.eat(&token::Dot);
-        // parse the first part of an op or a label
-
-        let mut span = parser.span;
-        let mut op = Spanned {node: try!(parser.parse_ident()), span: span};
-
-        // parse a colon indicating we were in a label
-
-        if parser.eat(&token::Colon) {
-            ins.push(Item::Label(LabelType::Local(op)));
-            continue;
-        }
-
-        // if we're parsing an instruction, read prefixes
-
-        let mut ops = Vec::new();
-        if !is_directive {
-            while is_prefix(op) {
-                ops.push(op);
-                span = parser.span;
-                op = Spanned {node: try!(parser.parse_ident()), span: span};
-            }
-        }
-
-        // parse (sizehint? expr),*
-        let mut args = Vec::new();
-
-        if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-            args.push(try!(parse_arg(ecx, parser)));
-
-            while parser.eat(&token::Comma) {
-                args.push(try!(parse_arg(ecx, parser)));
-            }
-        }
-
-        let span = Span {hi: parser.prev_span.hi, ..startspan};
-
-        if is_directive {
-            ins.push(Item::Directive(op, args, span));
-        } else {
-            ops.push(op);
-            ins.push(Item::Instruction(ops, args, span));
+        while parser.eat(&token::Comma) {
+            args.push(try!(parse_arg(state, ecx, parser)));
         }
     }
 
-    Ok((name, ins))
+    let span = Span {hi: parser.prev_span.hi, ..startspan};
+
+    ops.push(op);
+    Ok(Instruction(ops, args, span))
 }
 
 const PREFIXES: [&'static str; 12] = [
@@ -426,7 +340,7 @@ fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
     true
 }
 
-fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
+fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     use syntax::ast::ExprKind;
 
     // sizehint
@@ -488,7 +402,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     try!(parser.parse_expr()).and_then(|arg| {
         // typemapped
         if parser.eat(&token::FatArrow) {
-            let base = parse_reg(ecx, &arg);
+            let base = parse_reg(state, &arg);
             if base.is_none() {
                 ecx.span_err(arg.span, "Expected register");
                 return Ok(Arg::Invalid);
@@ -507,7 +421,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
 
                 try!(parser.expect(&token::CloseDelim(token::DelimToken::Bracket)));
 
-                let (mut regs, disp) = parse_adds(ecx, span, index_expr);
+                let (mut regs, disp) = parse_adds(state, ecx, span, index_expr);
                 index_disp = disp;
 
                 if regs.len() > 1 {
@@ -564,7 +478,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
         }
 
         // direct register reference
-        if let Some(reg) = parse_reg(ecx, &arg) {
+        if let Some(reg) = parse_reg(state, &arg) {
             if size.is_some() {
                 ecx.span_err(arg.span, "size hint with direct register");
             }
@@ -578,7 +492,7 @@ fn parse_arg<'a>(ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
                 return Ok(Arg::Invalid);
             }
 
-            let (mut regs, disp) = parse_adds(ecx, span, items.pop().unwrap());
+            let (mut regs, disp) = parse_adds(state, ecx, span, items.pop().unwrap());
 
             // can only have two regs at most
             if regs.len() > 2 {
@@ -636,12 +550,18 @@ pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     Some(Ident {node: segment.identifier, span: path.span})
 }
 
-fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
+fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
     if let Some(path) = as_simple_name(expr) {
         // static register names
+
+        let mut name = path.node.name;
+        if let Some(&x) = state.crate_data.aliases.get(&name) {
+            name = x;
+        }
+
         use self::RegId::*;
-        use self::Size::*;
-        let (reg, size) = match &*path.node.name.as_str() {
+        use serialize::Size::*;
+        let (reg, size) = match &*name.as_str() {
             "rax"|"r0" => (RAX, QWORD), "rcx"|"r1" => (RCX, QWORD), "rdx"|"r2" => (RDX, QWORD), "rbx"|"r3" => (RBX, QWORD),
             "rsp"|"r4" => (RSP, QWORD), "rbp"|"r5" => (RBP, QWORD), "rsi"|"r6" => (RSI, QWORD), "rdi"|"r7" => (RDI, QWORD),
             "r8"       => (R8,  QWORD), "r9"       => (R9,  QWORD), "r10"      => (R10, QWORD), "r11"      => (R11, QWORD),
@@ -695,15 +615,7 @@ fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
             "dr8"  => (DR8 , QWORD), "dr9"  => (DR9 , QWORD), "dr10" => (DR10, QWORD), "dr11" => (DR11, QWORD),
             "dr12" => (DR12, QWORD), "dr13" => (DR13, QWORD), "dr14" => (DR14, QWORD), "dr15" => (DR15, QWORD),
 
-            _ => {
-                let global_data = super::crate_local_data(ecx);
-                let lock = global_data.read();
-                if let Some(x) = lock.aliases.get(&path.node.name) {
-                    *x
-                } else {
-                    return None;
-                }
-            }
+            _ => return None
         };
 
         Some(Spanned {
@@ -749,7 +661,7 @@ fn parse_reg(ecx: &ExtCtxt, expr: &ast::Expr) -> Option<Spanned<Register>> {
     }
 }
 
-fn parse_adds(ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, isize)>, Option<P<ast::Expr>>) {
+fn parse_adds(state: &State, ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, isize)>, Option<P<ast::Expr>>) {
     use syntax::ast::ExprKind;
 
     let mut exprs = Vec::new();
@@ -763,7 +675,7 @@ fn parse_adds(ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, 
     // static reg combiner. we do not combine dynamic regs as the equation used to construct them might have side effects.
     for node in exprs {
         // simple reg
-        if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, &node) {
+        if let Some(Spanned {node: reg, ..} ) = parse_reg(state, &node) {
             match reg.kind {
                 RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
                 RegKind::Dynamic(_, _) => regs.push((reg, 1))
@@ -772,7 +684,7 @@ fn parse_adds(ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, 
         }
         if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = *node {
             // reg * const
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, left) {
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, left) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
                     if let ast::LitKind::Int(value, _) = scale.node {
                         match reg.kind {
@@ -783,7 +695,7 @@ fn parse_adds(ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, 
                     }
                 }
             // const * reg
-            } else if let Some(Spanned {node: reg, ..} ) = parse_reg(ecx, right) {
+            } else if let Some(Spanned {node: reg, ..} ) = parse_reg(state, right) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
                     if let ast::LitKind::Int(value, _) = scale.node {
                         match reg.kind {

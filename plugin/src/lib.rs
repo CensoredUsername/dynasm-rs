@@ -13,23 +13,24 @@ use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
 use syntax::ext::build::AstBuilder;
 use syntax::fold::Folder;
-use syntax::codemap::Span;
+use syntax::codemap::{Span, Spanned};
 use syntax::ast;
 use syntax::util::small_vector::SmallVector;
-use syntax::parse::token::{intern, str_to_ident};
+use syntax::parse::parser::Parser;
+use syntax::parse::PResult;
+use syntax::parse::token::{self, intern, str_to_ident};
 use syntax::tokenstream::TokenTree;
 use syntax::ptr::P;
 
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{RwLock, RwLockReadGuard, Mutex, MutexGuard};
 use std::collections::HashMap;
 
 use owning_ref::{OwningRef, RwLockReadGuardRef};
 
-pub mod parser;
-pub mod compiler;
-pub mod x64data;
-pub mod serialize;
-pub mod debug;
+pub mod arch;
+mod directive;
+mod serialize;
+
 
 /// Welcome to the documentation of the dynasm plugin. This mostly exists to ease
 /// development and to show a glimpse of what is under the hood of dynasm. Please
@@ -42,43 +43,14 @@ pub fn registrar(reg: &mut Registry) {
     reg.register_syntax_extension(
         intern("dynasm"),
         SyntaxExtension::NormalTT(
-            Box::new(main),
+            Box::new(dynasm),
             None,
             false
         )
     );
 }
 
-fn main<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
--> Box<MacResult + 'cx> {
-    // expand all macros in our token tree first. This enables the use of rust macros
-    // within dynasm
-    let token_tree = ecx.expander().fold_tts(token_tree);
-
-    let mut parser = ecx.new_parser_from_tts(&token_tree);
-
-    // construct an ast of assembly nodes
-    let (name, ast) = match parser::parse(ecx, &mut parser) {
-        Ok(ast) => ast,
-        Err(mut e) => {e.emit(); return DummyResult::any(span)}
-    };
-
-    // println!("{:?}", ast);
-
-    let stmts = if let Ok(stmts) = compiler::compile(ecx, ast) {
-        stmts
-    } else {
-        return DummyResult::any(span)
-    };
-
-    let stmts = serialize::serialize(ecx, name, stmts);
-
-    Box::new(DynAsm {
-        ecx: ecx,
-        stmts: stmts
-    })
-}
-
+/// dynasm! macro expansion result type
 struct DynAsm<'cx, 'a: 'cx> {
     ecx: &'cx ExtCtxt<'a>,
     stmts: Vec<ast::Stmt>
@@ -88,6 +60,7 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
     fn make_expr(self: Box<Self>) -> Option<P<ast::Expr>> {
         Some(self.ecx.expr_block(self.ecx.block(self.ecx.call_site(), self.stmts)))
     }
+
     fn make_stmts(self: Box<Self>) -> Option<SmallVector<ast::Stmt>> {
         Some(SmallVector::many(self.stmts))
     }
@@ -101,28 +74,122 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
     }
 }
 
+/// The guts of the dynasm! macro start here.
+fn dynasm<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
+-> Box<MacResult + 'cx> {
+    // expand all macros in our token tree first. This enables the use of rust macros
+    // within dynasm (whenever this actually gets implemented within rustc)
+    let token_tree = ecx.expander().fold_tts(token_tree);
+
+    let mut parser = ecx.new_parser_from_tts(&token_tree);
+
+    // due to the structure of directives / assembly, we have to evaluate while parsing as
+    // things like aliases, arch choices, affect the way in which parsing works.
+
+    match compile(ecx, &mut parser) {
+        Ok(stmts) => Box::new(DynAsm {
+            ecx: ecx,
+            stmts: stmts
+        }),
+        Err(mut e) => {
+            e.emit();
+            DummyResult::any(span)
+        }
+    }
+}
+
+/// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
+pub struct State<'a> {
+    pub stmts: Vec<serialize::Stmt>,
+    pub target: P<ast::Expr>,
+    pub crate_data: MutexGuard<'a, DynasmData>
+}
+
+/// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
+/// when an assembly instruction is encountered. When parsing fails an Err() is returned, when
+/// non-parsing errors happen a local error message is generated but the function returns Ok().
+fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<ast::Stmt>> {
+    let target = try!(parser.parse_expr());
+
+    let crate_data = crate_local_data(ecx);
+
+    let mut state = State {
+        stmts: Vec::new(),
+        target: target,
+        crate_data: crate_data.lock().unwrap()
+    };
+
+    while !parser.check(&token::Eof) {
+        try!(parser.expect(&token::Semi));
+
+        // ;; stmt
+        if parser.eat(&token::Semi) {
+            if let Some(stmt) = try!(parser.parse_stmt()) {
+                state.stmts.push(serialize::Stmt::Stmt(stmt));
+            }
+            continue;
+        }
+
+        // ; . directive
+        if parser.eat(&token::Dot) {
+            try!(state.evaluate_directive(ecx, parser));
+            continue;
+        }
+
+        // ; -> label :
+        if parser.eat(&token::RArrow) {
+            let span = parser.span;
+            let name = try!(parser.parse_ident());
+            try!(parser.expect(&token::Colon));
+            state.stmts.push(serialize::Stmt::GlobalLabel(Spanned {span: span, node: name} ));
+            continue;
+        }
+
+        // ; => expr
+        if parser.eat(&token::FatArrow) {
+            let expr = try!(parser.parse_expr());
+            state.stmts.push(serialize::Stmt::DynamicLabel(expr));
+            continue;
+        }
+
+        // ; label :
+        if parser.token.is_ident() && parser.look_ahead(1, |t| t == &token::Colon) {
+            let span = parser.span;
+            let name = try!(parser.parse_ident());
+            try!(parser.expect(&token::Colon));
+            state.stmts.push(serialize::Stmt::LocalLabel(Spanned {span: span, node: name} ));
+            continue;
+        }
+
+        // anything else is an assembly instruction which should be in current_arch
+        try!(state.compile_instruction(ecx, parser));
+    }
+
+    Ok(serialize::serialize(ecx, state.target, state.stmts))
+}
+
 // Crate local data implementation.
 
+type DynasmStorage = HashMap<ast::Ident, Mutex<DynasmData>>;
+
 pub struct DynasmData {
-    aliases: HashMap<ast::Name, (parser::RegId, parser::Size)>
+    pub current_arch: arch::Arch,
+    pub aliases: HashMap<ast::Name, ast::Name>
 }
 
-pub struct CrateLocalData {
-    inner: OwningRef<
-        RwLockReadGuard<'static, DynasmStorage>,
-        RwLock<DynasmData>
-    >
-}
-
-impl CrateLocalData {
-    fn read(&self) ->RwLockReadGuard<DynasmData> {
-        self.inner.read().unwrap()
-    }
-
-    fn write(&self) -> RwLockWriteGuard<DynasmData> {
-        self.inner.write().unwrap()
+impl DynasmData {
+    fn new() -> DynasmData {
+        DynasmData {
+            current_arch: arch::CURRENT_ARCH,
+            aliases: HashMap::new()
+        }
     }
 }
+
+pub type CrateLocalData = OwningRef<
+    RwLockReadGuard<'static, DynasmStorage>,
+    Mutex<DynasmData>
+>;
 
 pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
     let id = str_to_ident(&ecx.ecfg.crate_name);
@@ -131,26 +198,20 @@ pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
 
         if data.get(&id).is_some() {
-            return CrateLocalData {
-                inner: data.map(|x| x.get(&id).unwrap())
-            }
+            return data.map(|x| x.get(&id).unwrap())
         }
     }
 
     {
         let mut lock = DYNASM_STORAGE.write().unwrap();
-        lock.insert(id, RwLock::new(DynasmData {
-            aliases: HashMap::new()
-        }));
+        lock.insert(id, Mutex::new(DynasmData::new()));
     }
-    CrateLocalData {
-        inner: RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&id).unwrap())
-    }
+    RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap())
+                       .map(|x| x.get(&id).unwrap())
 }
 
-// the root of all crate-local data
-type DynasmStorage = HashMap<ast::Ident, RwLock<DynasmData>>;
+// this is where the actual storage resides.
 
 lazy_static! {
-    pub static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
+    static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
 }

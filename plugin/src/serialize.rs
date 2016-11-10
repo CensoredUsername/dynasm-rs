@@ -1,8 +1,5 @@
 use std::rc::Rc;
 
-use compiler;
-use parser::{Size};
-
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
 use syntax::ast;
@@ -10,8 +7,50 @@ use syntax::ptr::P;
 use syntax::parse::token::intern;
 use syntax::codemap::{Span, Spanned};
 
+pub type Ident = Spanned<ast::Ident>;
 
-pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: compiler::StmtBuffer) -> Vec<ast::Stmt> {
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
+pub enum Size {
+    BYTE  = 1,
+    WORD  = 2,
+    DWORD = 4,
+    QWORD = 8,
+    PWORD = 10,
+    OWORD = 16,
+    HWORD = 32
+}
+
+impl Size {
+    pub fn in_bytes(&self) -> u8 {
+        *self as u8
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Stmt {
+    Const(u8),
+    ExprConst(P<ast::Expr>),
+
+    Var(P<ast::Expr>, Size),
+    Extend(P<ast::Expr>),
+
+    DynScale(P<ast::Expr>, P<ast::Expr>),
+
+    Align(P<ast::Expr>),
+
+    GlobalLabel(Ident),
+    LocalLabel(Ident),
+    DynamicLabel(P<ast::Expr>),
+
+    GlobalJumpTarget(Ident, Size),
+    ForwardJumpTarget(Ident, Size),
+    BackwardJumpTarget(Ident, Size),
+    DynamicJumpTarget(P<ast::Expr>, Size),
+
+    Stmt(ast::Stmt),
+}
+
+pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec<ast::Stmt> {
     let mut buffer = Vec::new();
 
     // construction for `op.push(expr)` is as follows
@@ -23,7 +62,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: compiler::StmtBuf
     let mut stmts = stmts.into_iter().peekable();
 
     while let Some(stmt) = stmts.next() {
-        use compiler::Stmt::*;
+        use self::Stmt::*;
 
         let (method, args) = match stmt {
             Const(byte)            => {
