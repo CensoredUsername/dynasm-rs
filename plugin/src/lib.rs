@@ -109,7 +109,7 @@ pub struct State<'a> {
 /// when an assembly instruction is encountered. When parsing fails an Err() is returned, when
 /// non-parsing errors happen a local error message is generated but the function returns Ok().
 fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<ast::Stmt>> {
-    let target = try!(parser.parse_expr());
+    let target = parser.parse_expr()?;
 
     let crate_data = crate_local_data(ecx);
 
@@ -120,11 +120,11 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
     };
 
     while !parser.check(&token::Eof) {
-        try!(parser.expect(&token::Semi));
+        parser.expect(&token::Semi)?;
 
         // ;; stmt
         if parser.eat(&token::Semi) {
-            if let Some(stmt) = try!(parser.parse_stmt()) {
+            if let Some(stmt) = parser.parse_stmt()? {
                 state.stmts.push(serialize::Stmt::Stmt(stmt));
             }
             continue;
@@ -132,22 +132,22 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
 
         // ; . directive
         if parser.eat(&token::Dot) {
-            try!(state.evaluate_directive(ecx, parser));
+            state.evaluate_directive(ecx, parser)?;
             continue;
         }
 
         // ; -> label :
         if parser.eat(&token::RArrow) {
             let span = parser.span;
-            let name = try!(parser.parse_ident());
-            try!(parser.expect(&token::Colon));
+            let name = parser.parse_ident()?;
+            parser.expect(&token::Colon)?;
             state.stmts.push(serialize::Stmt::GlobalLabel(Spanned {span: span, node: name} ));
             continue;
         }
 
         // ; => expr
         if parser.eat(&token::FatArrow) {
-            let expr = try!(parser.parse_expr());
+            let expr = parser.parse_expr()?;
             state.stmts.push(serialize::Stmt::DynamicLabel(expr));
             continue;
         }
@@ -155,14 +155,14 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
         // ; label :
         if parser.token.is_ident() && parser.look_ahead(1, |t| t == &token::Colon) {
             let span = parser.span;
-            let name = try!(parser.parse_ident());
-            try!(parser.expect(&token::Colon));
+            let name = parser.parse_ident()?;
+            parser.expect(&token::Colon)?;
             state.stmts.push(serialize::Stmt::LocalLabel(Spanned {span: span, node: name} ));
             continue;
         }
 
         // anything else is an assembly instruction which should be in current_arch
-        try!(state.compile_instruction(ecx, parser));
+        state.compile_instruction(ecx, parser)?;
     }
 
     Ok(serialize::serialize(ecx, state.target, state.stmts))

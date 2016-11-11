@@ -71,13 +71,13 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     let prefixes = ops;
 
     // sanitize memory references and determine address size
-    let pref_addr = try!(sanitize_addresses(ecx, &mut args));
+    let pref_addr = sanitize_addresses(ecx, &mut args)?;
 
     // this call also inserts more size information in the AST if applicable.
-    let data = try!(match_op_format(ecx, op, &mut args));
+    let data = match_op_format(ecx, op, &mut args)?;
 
     // determine legacy prefixes
-    let (mut pref_mod, pref_seg) = try!(get_legacy_prefixes(ecx, data, prefixes));
+    let (mut pref_mod, pref_seg) = get_legacy_prefixes(ecx, data, prefixes)?;
 
     let mut op_size = Size::BYTE; // unused value, just here to please the compiler
     let mut pref_size = false;
@@ -87,7 +87,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // determine if size prefixes are necessary
     if data.flags.intersects(AUTO_SIZE | AUTO_NO32 | AUTO_REXW | AUTO_VEXL) {
         // determine operand size
-        op_size = try!(get_operand_size(data, &args));
+        op_size = get_operand_size(data, &args)?;
 
         if data.flags.contains(AUTO_NO32) {
             if op_size == Size::WORD {
@@ -130,7 +130,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     }
 
     // check if this combination of args can actually be encoded and whether a rex prefix is necessary
-    let need_rex = try!(validate_args(data, &args, rex_w));
+    let need_rex = validate_args(data, &args, rex_w)?;
 
     // split args
     let (mut rm, reg, vvvv, ireg, mut args) = extract_args(data, args);
@@ -365,7 +365,7 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
     let mut addr_size = None;
     for arg in args {
         if let Arg::Indirect(ref mut mem) = *arg {
-            try!(sanitize_memoryref(ecx, mem));
+            sanitize_memoryref(ecx, mem)?;
 
             if let Some(ref reg) = mem.base {
                 if reg.kind.family() == RegFamily::LEGACY || reg.kind.family() == RegFamily::RIP {

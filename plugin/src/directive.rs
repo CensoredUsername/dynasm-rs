@@ -14,14 +14,14 @@ impl<'a> State<'a> {
     pub fn evaluate_directive<'b>(&mut self, ecx: &mut ExtCtxt, parser: &mut Parser<'b>) -> PResult<'b, ()> {
         let start = parser.span;
 
-        let directive = try!(parser.parse_ident());
+        let directive = parser.parse_ident()?;
 
         match &*directive.name.as_str() {
             // TODO: oword, qword, float, double, long double
 
             ".arch" => {
                 // ; .arch ident
-                let arch = try!(parser.parse_ident());
+                let arch = parser.parse_ident()?;
                 if let Some(a) = Arch::from_str(&*arch.name.as_str()) {
                     self.crate_data.current_arch = a;
                 } else {
@@ -29,27 +29,27 @@ impl<'a> State<'a> {
                 }
             }
             // ; .byte (expr ("," expr)*)?
-            "byte"  => try!(self.directive_const(parser, Size::BYTE)),
-            "word"  => try!(self.directive_const(parser, Size::WORD)),
-            "dword" => try!(self.directive_const(parser, Size::DWORD)),
-            "qword" => try!(self.directive_const(parser, Size::QWORD)),
+            "byte"  => self.directive_const(parser, Size::BYTE)?,
+            "word"  => self.directive_const(parser, Size::WORD)?,
+            "dword" => self.directive_const(parser, Size::DWORD)?,
+            "qword" => self.directive_const(parser, Size::QWORD)?,
             "bytes" => {
                 // ; .bytes expr
-                let iterator = try!(parser.parse_expr());
+                let iterator = parser.parse_expr()?;
                 self.stmts.push(Stmt::Extend(iterator));
             },
             "align" => {
                 // ; .align expr
                 // this might need to be architecture dependent
-                let value = try!(parser.parse_expr());
+                let value = parser.parse_expr()?;
                 self.stmts.push(Stmt::Align(value));
             },
             "alias" => {
                 // ; .alias ident, ident
                 // consider changing this to ; .alias ident = ident next breaking change
-                let alias = try!(parser.parse_ident()).name;
-                try!(parser.expect(&token::Comma));
-                let reg = try!(parser.parse_ident()).name;
+                let alias = parser.parse_ident()?.name;
+                parser.expect(&token::Comma)?;
+                let reg = parser.parse_ident()?.name;
 
                 match self.crate_data.aliases.entry(alias) {
                     Entry::Occupied(_) => {
@@ -75,10 +75,10 @@ impl<'a> State<'a> {
 
     fn directive_const<'b>(&mut self, parser: &mut Parser<'b>, size: Size) -> PResult<'b, ()> {
         if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-            self.stmts.push(Stmt::Var(try!(parser.parse_expr()), size));
+            self.stmts.push(Stmt::Var(parser.parse_expr()?, size));
 
             while parser.eat(&token::Comma) {
-                self.stmts.push(Stmt::Var(try!(parser.parse_expr()), size));
+                self.stmts.push(Stmt::Var(parser.parse_expr()?, size));
             }
         }
 

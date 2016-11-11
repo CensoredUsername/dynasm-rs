@@ -277,23 +277,23 @@ pub fn parse_instruction<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Pars
 
     let mut ops = Vec::new();
     let mut span = parser.span;
-    let mut op = Spanned {node: try!(parser.parse_ident()), span: span};
+    let mut op = Spanned {node: parser.parse_ident()?, span: span};
 
     // read prefixes
     while is_prefix(op) {
         ops.push(op);
         span = parser.span;
-        op = Spanned {node: try!(parser.parse_ident()), span: span};
+        op = Spanned {node: parser.parse_ident()?, span: span};
     }
 
     // parse (sizehint? expr),*
     let mut args = Vec::new();
 
     if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-        args.push(try!(parse_arg(state, ecx, parser)));
+        args.push(parse_arg(state, ecx, parser)?);
 
         while parser.eat(&token::Comma) {
-            args.push(try!(parse_arg(state, ecx, parser)));
+            args.push(parse_arg(state, ecx, parser)?);
         }
     }
 
@@ -362,7 +362,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
     macro_rules! label_return {
         ($jump:expr, $size:expr) => {
             return Ok(if in_bracket {
-                try!(parser.expect(&token::CloseDelim(token::Bracket)));
+                parser.expect(&token::CloseDelim(token::Bracket))?;
                 Arg::IndirectJumpTarget($jump, $size)
             } else {
                 Arg::JumpTarget($jump, $size)
@@ -372,34 +372,34 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
 
     // global label
     if parser.eat(&token::RArrow) {
-        let name = try!(parser.parse_ident());
+        let name = parser.parse_ident()?;
         let jump = JumpType::Global(
             Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
         );
         label_return!(jump, size);
     // forward local label
     } else if parser.eat(&token::Gt) {
-        let name = try!(parser.parse_ident());
+        let name = parser.parse_ident()?;
         let jump = JumpType::Forward(
             Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
         );
         label_return!(jump, size);
     // forward global label
     } else if parser.eat(&token::Lt) {
-        let name = try!(parser.parse_ident());
+        let name = parser.parse_ident()?;
         let jump = JumpType::Backward(
             Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
         );
         label_return!(jump, size);
     // dynamic label
     } else if parser.eat(&token::FatArrow) {
-        let id = try!(parser.parse_expr());
+        let id = parser.parse_expr()?;
         let jump = JumpType::Dynamic(id);
         label_return!(jump, size);
     }
 
     // it's a normal (register/immediate/memoryref/typemapped) operand
-    try!(parser.parse_expr()).and_then(|arg| {
+    parser.parse_expr()?.and_then(|arg| {
         // typemapped
         if parser.eat(&token::FatArrow) {
             let base = parse_reg(state, &arg);
@@ -408,7 +408,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 return Ok(Arg::Invalid);
             }
 
-            let ty = try!(parser.parse_path(PathStyle::Type));
+            let ty = parser.parse_path(PathStyle::Type)?;
 
             // any attribute, register as index and immediate in index
             let mut attr = None;
@@ -416,10 +416,10 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             let mut index_disp = None;
 
             if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
-                let index_expr = try!(parser.parse_expr());
+                let index_expr = parser.parse_expr()?;
                 let span = index_expr.span;
 
-                try!(parser.expect(&token::CloseDelim(token::DelimToken::Bracket)));
+                parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
 
                 let (mut regs, disp) = parse_adds(state, ecx, span, index_expr);
                 index_disp = disp;
@@ -438,7 +438,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 }
             }
             if parser.eat(&token::Dot) {
-                attr = Some(try!(parser.parse_ident()));
+                attr = Some(parser.parse_ident()?);
             }
 
             // attribute offset calculation
