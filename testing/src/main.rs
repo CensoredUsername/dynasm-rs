@@ -21,6 +21,8 @@ fn main() {
     dynasm!(ops
         // no args
         ; ret
+        // reserved keyword
+        ; loop 5
         // immediate
         ; ret 16
         // register
@@ -106,8 +108,8 @@ fn main() {
         ; mov rax, dr1
         ; pop fs
         ; movmskps eax, xmm7
-        ; movd mmx7, eax
-        ; movd eax, mmx7
+        ; movd mm7, eax
+        ; movd eax, mm7
         ; fcomp st0
         // VEX/XOP instructions
         ; andn rax, rcx, rdx
