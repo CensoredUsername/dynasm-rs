@@ -72,13 +72,13 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
         b'l' => format!("vm64addr{}", format_size(size)).into(),
         b'r' => format!("reg{}",      format_size(size)).into(),
         b'f' => "st".into(),
-        b'x' => "mmx".into(),
+        b'x' => "mm".into(),
         b'y' => (if size == b'h' {"ymm"} else {"xmm"}).into(),
         b's' => "segreg".into(),
         b'c' => "creg".into(),
         b'd' => "dreg".into(),
         b'v' => format!("reg/mem{}", format_size(size)).into(),
-        b'u' => format!("mmx/mem{}", format_size(size)).into(),
+        b'u' => format!("mm/mem{}", format_size(size)).into(),
         b'w' => format!("{}mm/mem{}", if size == b'h' {"y"} else {"x"}, format_size(size)).into(),
         b'A'...b'P' => {
             let i = ty as usize - 'A' as usize;

@@ -313,14 +313,15 @@ fn is_prefix(token: Ident) -> bool {
     PREFIXES.contains(&&*token.node.name.as_str())
 }
 
-const SIZES:    [(&'static str, Size); 7] = [
+const SIZES: [(&'static str, Size); 8] = [
     ("BYTE", Size::BYTE),
     ("WORD", Size::WORD),
     ("DWORD", Size::DWORD),
     ("AWORD", Size::QWORD),
     ("QWORD", Size::QWORD),
+    ("TWORD", Size::PWORD),
     ("OWORD", Size::OWORD),
-    ("HWORD", Size::HWORD)
+    ("YWORD", Size::HWORD)
 ];
 fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
     for &(kw, size) in &SIZES {
@@ -589,8 +590,8 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
             "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
             "st4" => (ST4, PWORD), "st5" => (ST5, PWORD), "st6" => (ST6, PWORD), "st7" => (ST7, PWORD),
 
-            "mmx0" => (MMX0, QWORD), "mmx1" => (MMX1, QWORD), "mmx2" => (MMX2, QWORD), "mmx3" => (MMX3, QWORD),
-            "mmx4" => (MMX4, QWORD), "mmx5" => (MMX5, QWORD), "mmx6" => (MMX6, QWORD), "mmx7" => (MMX7, QWORD),
+            "mm0" => (MMX0, QWORD), "mm1" => (MMX1, QWORD), "mm2" => (MMX2, QWORD), "mm3" => (MMX3, QWORD),
+            "mm4" => (MMX4, QWORD), "mm5" => (MMX5, QWORD), "mm6" => (MMX6, QWORD), "mm7" => (MMX7, QWORD),
 
             "xmm0"  => (XMM0 , OWORD), "xmm1"  => (XMM1 , OWORD), "xmm2"  => (XMM2 , OWORD), "xmm3"  => (XMM3 , OWORD),
             "xmm4"  => (XMM4 , OWORD), "xmm5"  => (XMM5 , OWORD), "xmm6"  => (XMM6 , OWORD), "xmm7"  => (XMM7 , OWORD),
