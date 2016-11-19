@@ -67,7 +67,7 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
 
     fn make_items(self: Box<Self>) -> Option<SmallVector<P<ast::Item>>> {
         if self.stmts.is_empty() {
-            Some(SmallVector::zero())
+            Some(SmallVector::new())
         } else {
             None
         }
