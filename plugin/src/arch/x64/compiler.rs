@@ -20,6 +20,7 @@ use std::iter;
  * Instruction encoding data formats
  */
 
+#[derive(Debug)]
 pub struct Opdata {
     pub args:  &'static [u8],  // format string of arg format
     pub ops:   &'static [u8],
@@ -79,7 +80,6 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // determine legacy prefixes
     let (mut pref_mod, pref_seg) = get_legacy_prefixes(ecx, data, prefixes)?;
 
-    let mut op_size = Size::BYTE; // unused value, just here to please the compiler
     let mut pref_size = false;
     let mut rex_w = false;
     let mut vex_l = false;
@@ -87,7 +87,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // determine if size prefixes are necessary
     if data.flags.intersects(AUTO_SIZE | AUTO_NO32 | AUTO_REXW | AUTO_VEXL) {
         // determine operand size
-        op_size = get_operand_size(data, &args)?;
+        let op_size = get_operand_size(data, &mut args)?;
 
         if data.flags.contains(AUTO_NO32) {
             if op_size == Size::WORD {
@@ -336,10 +336,8 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     for arg in args {
         let stmt = match arg {
             Arg::Immediate(expr, Some(size)) => Stmt::Var(expr, size),
-            Arg::Immediate(expr, None)       => Stmt::Var(expr, if op_size != Size::QWORD {op_size} else {Size::DWORD}),
-            Arg::JumpTarget(target, size)    => {
-                let size = size.unwrap_or(Size::DWORD);
-
+            Arg::Immediate(_, None) => panic!("Immediate with undetermined size, did get_operand_size not run?"),
+            Arg::JumpTarget(target, Some(size)) => {
                 // placeholder
                 for _ in 0..size.in_bytes() {
                     buffer.push(Stmt::Const(0));
@@ -351,7 +349,8 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
                     JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, size),
                     JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, size)
                 }
-            }
+            },
+            Arg::JumpTarget(_, None) => panic!("Jumptarget with undetermined size, did get_operand_size not run?"),
             _ => panic!("bad immediate data")
         };
         buffer.push(stmt);
@@ -506,7 +505,7 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     };
 
     for format in data {
-        if let Ok(_) = match_format_string(format.args, args) {
+        if let Ok(_) = match_format_string(format, args) {
             return Ok(format)
         }
     }
@@ -516,7 +515,9 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     ))
 }
 
-fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<(), &'static str> {
+fn match_format_string(fmt: &'static Opdata, mut args: &mut [Arg]) -> Result<(), &'static str> {
+    let fmtstr = &fmt.args;
+
     if fmtstr.len() != args.len() * 2 {
         return Err("argument length mismatch");
     }
@@ -545,7 +546,7 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
     // X: matches st0
 
     // b, w, d, q match a byte, word, doubleword and quadword.
-    // * matches all possible sizes for this operand (w/d for i/o, w/d/q for r/v, o/h for y/w and everything for m)
+    // * matches all possible sizes for this operand (w/d for i, w/d/q for r/v, o/h for y/w and everything for m)
     // ! matches a lack of size, only useful in combination of m and i
     // ? matches any size and doesn't participate in the operand size calculation
     {
@@ -622,6 +623,12 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
             // if size is none it always matches (and will later be coerced to a more specific type if the match is successful)
             if let Some(size) = size {
                 if !match (fsize, code) {
+                    // immediates can always fit in larger slots
+                    (b'w', b'i') => size <= Size::WORD,
+                    (b'd', b'i') => size <= Size::DWORD,
+                    (b'q', b'i') => size <= Size::QWORD,
+                    (b'*', b'i') => size <= Size::DWORD,
+                    // normal size matches
                     (b'b', _)    => size == Size::BYTE,
                     (b'w', _)    => size == Size::WORD,
                     (b'd', _)    => size == Size::DWORD,
@@ -629,8 +636,7 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
                     (b'p', _)    => size == Size::PWORD,
                     (b'o', _)    => size == Size::OWORD,
                     (b'h', _)    => size == Size::HWORD,
-                    (b'*', b'i') |
-                    (b'*', b'o') => size == Size::WORD || size == Size::DWORD,
+                    // what is allowed for wildcards
                     (b'*', b'k') |
                     (b'*', b'l') |
                     (b'*', b'y') |
@@ -646,6 +652,11 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
                 } {
                     return Err("argument size mismatch");
                 }
+            } else if fsize != b'*' && fmt.flags.contains(EXACT_SIZE) {
+                // Basically, this format is a more specific version of an instruction
+                // that also has more general versions. This should only be picked
+                // if the size constraints are met, not if the size is unspecified
+                return Err("alternate variant exists");
             }
         }
     }
@@ -657,20 +668,20 @@ fn match_format_string(fmtstr: &'static [u8], mut args: &mut [Arg]) -> Result<()
             let arg: &mut Arg = args.next().unwrap();
 
             match *arg {
-                Arg::Immediate(_, ref mut size @ None) |
-                Arg::JumpTarget(_, ref mut size @ None) |
-                Arg::Indirect(MemoryRef {size: ref mut size @ None, ..} ) => *size = match (fsize, code) {
-                    (b'b', _) => Some(Size::BYTE),
-                    (b'w', _) => Some(Size::WORD),
+                Arg::Immediate(_, ref mut size) |
+                Arg::JumpTarget(_, ref mut size) |
+                Arg::Indirect(MemoryRef {ref mut size, ..} ) => match (fsize, code) {
+                    (b'b', _) => *size = Some(Size::BYTE),
+                    (b'w', _) => *size = Some(Size::WORD),
                     (_, b'k') |
-                    (b'd', _) => Some(Size::DWORD),
+                    (b'd', _) => *size = Some(Size::DWORD),
                     (_, b'l') |
-                    (b'q', _) => Some(Size::QWORD),
-                    (b'p', _) => Some(Size::PWORD),
-                    (b'o', _) => Some(Size::OWORD),
-                    (b'h', _) => Some(Size::HWORD),
+                    (b'q', _) => *size = Some(Size::QWORD),
+                    (b'p', _) => *size = Some(Size::PWORD),
+                    (b'o', _) => *size = Some(Size::OWORD),
+                    (b'h', _) => *size = Some(Size::HWORD),
                     (b'*', _) |
-                    (b'!', _) => None,
+                    (b'!', _) => (),
                     _ => unreachable!()
                 },
                 _ => ()
@@ -732,7 +743,7 @@ fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>) 
     Ok((group1, group2))
 }
 
-fn get_operand_size(fmt: &'static Opdata, args: &[Arg]) -> Result<Size, Option<String>> {
+fn get_operand_size(fmt: &'static Opdata, args: &mut [Arg]) -> Result<Size, Option<String>> {
     // determine operand size to automatically determine appropriate prefixes
     // ensures that all operands have the same size, and that the immediate size is smaller or equal.
 
@@ -741,7 +752,7 @@ fn get_operand_size(fmt: &'static Opdata, args: &[Arg]) -> Result<Size, Option<S
     let mut im_size = None;
 
     // only scan args which have wildcarded size
-    for (arg, (_, size)) in args.iter().zip(FormatStringIterator::new(fmt.args)) {
+    for (arg, (_, size)) in args.iter_mut().zip(FormatStringIterator::new(fmt.args)) {
         if size != b'*' {
             continue
         }
@@ -777,30 +788,39 @@ fn get_operand_size(fmt: &'static Opdata, args: &[Arg]) -> Result<Size, Option<S
                     op_size = Some(size);
                 }
             },
-            Arg::Immediate(_, size)  |
-            Arg::JumpTarget(_, size) => {
-                if let Some(size) = size { if im_size.is_none() || im_size.unwrap() < size {
-                    im_size = Some(size);
-                } }
+            Arg::Immediate(_, ref mut size)  |
+            Arg::JumpTarget(_, ref mut size) => {
+                if im_size.is_some() {
+                    return Err(Some("Multiple immediates with indetermined size".to_string()))
+                }
+                im_size = Some(size);
             },
             Arg::Invalid => unreachable!()
         }
     }
 
-    if has_args {
-        if let Some(op_size) = op_size {
-            if let Some(im_size) = im_size {
-                if im_size != op_size && !(im_size == Size::DWORD && op_size == Size::QWORD) {
+    if !has_args {
+        panic!("get_operand_size was invoked without wildcard size arguments");
+    }
+    if let Some(op_size) = op_size {
+        // was an immediate provided
+        if let Some(im_size) = im_size {
+            // did said immediate have a set size
+            if let Some(size) = *im_size {
+                if size > op_size || size == Size::QWORD {
                     return Err(Some("Immediate size mismatch".to_string()));
                 }
             }
-            Ok(op_size)
-        } else {
-            Err(Some("Unknown operand size".to_string()))
+            // upgrade the immediate size to the necessary size
+            if op_size == Size::QWORD {
+                *im_size = Some(Size::DWORD);
+            } else {
+                *im_size = Some(op_size);
+            }
         }
+        Ok(op_size)
     } else {
-        // largest usual immediate size is assumed
-        Ok(im_size.unwrap_or(Size::DWORD))
+        Err(Some("Unknown operand size".to_string()))
     }
 }
 

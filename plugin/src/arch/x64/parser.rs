@@ -541,6 +541,46 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         }
 
         // immediate
+        let mut size = size;
+        if size.is_none() {
+            match arg.node {
+                ExprKind::Lit(ref lit) => match lit.node {
+                    ast::LitKind::Byte(_) => size = Some(Size::BYTE),
+                    ast::LitKind::Int(i, _) => {
+                        if i < 0x80 {
+                            size = Some(Size::BYTE);
+                        } else if i < 0x8000 {
+                            size = Some(Size::WORD);
+                        } else if i < 0x8000_0000 {
+                            size = Some(Size::DWORD);
+                        } else {
+                            size = Some(Size::QWORD);
+                        }
+                    },
+                        _ => ()
+                },
+                ExprKind::Unary(ast::UnOp::Neg, ref expr) => match expr.node {
+                    ExprKind::Lit(ref lit) => match lit.node {
+                        ast::LitKind::Byte(_) => size = Some(Size::BYTE),
+                        ast::LitKind::Int(i, _) => {
+                            if i >= 0x80 {
+                                size = Some(Size::BYTE);
+                            } else if i >= 0x8000 {
+                                size = Some(Size::WORD);
+                            } else if i >= 0x8000_0000 {
+                                size = Some(Size::DWORD);
+                            } else {
+                                size = Some(Size::QWORD);
+                            }
+                        },
+                        _ => ()
+                    },
+                    _ => ()
+                },
+                _ => ()
+            }
+
+        }
         Ok(Arg::Immediate(P(arg), size))
     })
 }

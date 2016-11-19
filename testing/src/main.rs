@@ -62,7 +62,7 @@ fn main() {
         ; mov rax, [rbx]
         ; mov [rbx], rax
         ; mov rax, 1
-        ; mov [rax], BYTE 1
+        ; mov BYTE [rax], 1
         ; imul rax, rbx, 1
         ; imul rax, [rbx], 1
         // prefixes

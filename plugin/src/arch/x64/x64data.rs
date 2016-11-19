@@ -49,6 +49,7 @@ pub mod flags {
             const WORD_SIZE = 0x0000_0040, // implies opsize prefix
             const WITH_REXW = 0x0000_0080, // implies REX.W/VEX.W/XOP.W
             const WITH_VEXL = 0x0000_0100, // implies VEX.L/XOP.L
+            const EXACT_SIZE= 0x0010_0000, // operands with unknown sizes cannot be assumed to match 
 
             const PREF_66   = WORD_SIZE.bits,// mandatory prefix (same as WORD_SIZE)
             const PREF_67   = 0x0000_0200, // mandatory prefix (same as SMALL_ADDRESS)
@@ -79,51 +80,52 @@ pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> 
 }
 
 // workaround until bitflags can be used in const
-const VEX_OP   : u32 = flags::flag_bits(flags::VEX_OP);
-const XOP_OP   : u32 = flags::flag_bits(flags::XOP_OP);
-const SHORT_ARG: u32 = flags::flag_bits(flags::SHORT_ARG);
-const AUTO_SIZE: u32 = flags::flag_bits(flags::AUTO_SIZE);
-const AUTO_NO32: u32 = flags::flag_bits(flags::AUTO_NO32);
-const AUTO_REXW: u32 = flags::flag_bits(flags::AUTO_REXW);
-const AUTO_VEXL: u32 = flags::flag_bits(flags::AUTO_VEXL);
-const WORD_SIZE: u32 = flags::flag_bits(flags::WORD_SIZE);
-const WITH_REXW: u32 = flags::flag_bits(flags::WITH_REXW);
-const WITH_VEXL: u32 = flags::flag_bits(flags::WITH_VEXL);
-const PREF_66  : u32 = flags::flag_bits(flags::PREF_66);
-const PREF_67  : u32 = flags::flag_bits(flags::PREF_67);
-const PREF_F0  : u32 = flags::flag_bits(flags::PREF_F0);
-const PREF_F2  : u32 = flags::flag_bits(flags::PREF_F2);
-const PREF_F3  : u32 = flags::flag_bits(flags::PREF_F3);
-const LOCK     : u32 = flags::flag_bits(flags::LOCK);
-const REP      : u32 = flags::flag_bits(flags::REP);
-const REPE     : u32 = flags::flag_bits(flags::REPE);
-const ENC_MR   : u32 = flags::flag_bits(flags::ENC_MR);
-const ENC_VM   : u32 = flags::flag_bits(flags::ENC_VM);
+const VEX_OP    : u32 = flags::flag_bits(flags::VEX_OP);
+const XOP_OP    : u32 = flags::flag_bits(flags::XOP_OP);
+const SHORT_ARG : u32 = flags::flag_bits(flags::SHORT_ARG);
+const AUTO_SIZE : u32 = flags::flag_bits(flags::AUTO_SIZE);
+const AUTO_NO32 : u32 = flags::flag_bits(flags::AUTO_NO32);
+const AUTO_REXW : u32 = flags::flag_bits(flags::AUTO_REXW);
+const AUTO_VEXL : u32 = flags::flag_bits(flags::AUTO_VEXL);
+const WORD_SIZE : u32 = flags::flag_bits(flags::WORD_SIZE);
+const WITH_REXW : u32 = flags::flag_bits(flags::WITH_REXW);
+const WITH_VEXL : u32 = flags::flag_bits(flags::WITH_VEXL);
+const EXACT_SIZE: u32 = flags::flag_bits(flags::EXACT_SIZE);
+const PREF_66   : u32 = flags::flag_bits(flags::PREF_66);
+const PREF_67   : u32 = flags::flag_bits(flags::PREF_67);
+const PREF_F0   : u32 = flags::flag_bits(flags::PREF_F0);
+const PREF_F2   : u32 = flags::flag_bits(flags::PREF_F2);
+const PREF_F3   : u32 = flags::flag_bits(flags::PREF_F3);
+const LOCK      : u32 = flags::flag_bits(flags::LOCK);
+const REP       : u32 = flags::flag_bits(flags::REP);
+const REPE      : u32 = flags::flag_bits(flags::REPE);
+const ENC_MR    : u32 = flags::flag_bits(flags::ENC_MR);
+const ENC_VM    : u32 = flags::flag_bits(flags::ENC_VM);
 
 Ops!(OPMAP;
 // general purpose instructions according to AMD's AMD64 Arch Programmer's Manual Vol. 3
-  "adc"         = [ b"A*i*",     [0x15            ], X, AUTO_SIZE;
-                    b"Abib",     [0x14            ], X;
+  "adc"         = [ b"Abib",     [0x14            ], X;
+                    b"v*ib",     [0x83            ], 2, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x15            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 2, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 2, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 2,             LOCK;
                     b"v*r*",     [0x11            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x10            ], X,             LOCK;
                     b"r*v*",     [0x13            ], X, AUTO_SIZE;
                     b"rbvb",     [0x12            ], X;
-] "add"         = [ b"A*i*",     [0x05            ], X, AUTO_SIZE;
-                    b"Abib",     [0x04            ], X;
+] "add"         = [ b"Abib",     [0x04            ], X;
+                    b"v*ib",     [0x83            ], 0, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x05            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 0, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 0, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 0,             LOCK;
                     b"v*r*",     [0x01            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x00            ], X,             LOCK;
                     b"r*v*",     [0x03            ], X, AUTO_SIZE;
                     b"rbvb",     [0x02            ], X;
-] "and"         = [ b"A*i*",     [0x25            ], X, AUTO_SIZE;
-                    b"Abib",     [0x24            ], X;
+] "and"         = [ b"Abib",     [0x24            ], X;
+                    b"v*ib",     [0x83            ], 4, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x25            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 4, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 4, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 4,             LOCK;
                     b"v*r*",     [0x21            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x20            ], X,             LOCK;
@@ -154,7 +156,7 @@ Ops!(OPMAP;
 ] "bts"         = [ b"v*r*",     [0x0F, 0xAB      ], X, AUTO_SIZE | LOCK;
                     b"v*ib",     [0x0F, 0xBA      ], 5, AUTO_SIZE | LOCK;
 ] "bzhi"        = [ b"r*v*r*",   [   2, 0xF5      ], X, AUTO_REXW | VEX_OP;
-] "call"        = [ b"o*",       [0xE8            ], X, AUTO_SIZE;
+] "call"        = [ b"od",       [0xE8            ], X;
                     b"r*",       [0xFF            ], 2, AUTO_NO32;
 ] "cbw"         = [ b"",         [0x98            ], X, WORD_SIZE;
 ] "cwde"        = [ b"",         [0x98            ], X;
@@ -196,10 +198,10 @@ Ops!(OPMAP;
   "cmovng"      = [ b"r*v*",     [0x0F, 0x4E      ], X, AUTO_SIZE;
 ] "cmovnle"     |
   "cmovg"       = [ b"r*v*",     [0x0F, 0x4F      ], X, AUTO_SIZE;
-] "cmp"         = [ b"A*i*",     [0x3D            ], X, AUTO_SIZE;
-                    b"Abib",     [0x3C            ], X;
+] "cmp"         = [ b"Abib",     [0x3C            ], X;
+                    b"v*ib",     [0x83            ], 7, AUTO_SIZE | EXACT_SIZE;
+                    b"A*i*",     [0x3D            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 7, AUTO_SIZE;
-                    b"v*ib",     [0x83            ], 7, AUTO_SIZE;
                     b"vbib",     [0x80            ], 7;
                     b"v*r*",     [0x39            ], X, AUTO_SIZE;
                     b"vbrb",     [0x38            ], X;
@@ -215,9 +217,9 @@ Ops!(OPMAP;
 ] "cmpxchg8b"   = [ b"mq",       [0x0F, 0xC7      ], 1,             LOCK;
 ] "cmpxchg16b"  = [ b"mo",       [0x0F, 0xC7      ], 1, WITH_REXW | LOCK;
 ] "cpuid"       = [ b"",         [0x0F, 0xA2      ], X;
-] "crc32"       = [ b"r*vb",     [0x0F, 0x38, 0xF0], X, AUTO_REXW | PREF_F2; // unique size encoding scheme
-                    b"rdvw",     [0x0F, 0x38, 0xF1], X, WORD_SIZE | PREF_F2; // also odd default
-                    b"r*v*",     [0x0F, 0x38, 0xF1], X, AUTO_REXW | PREF_F2;
+] "crc32"       = [ b"r*vb",     [0x0F, 0x38, 0xF0], X, AUTO_REXW | PREF_F2 | EXACT_SIZE; // unique size encoding scheme
+                    b"rdvw",     [0x0F, 0x38, 0xF1], X, WORD_SIZE | PREF_F2 | EXACT_SIZE;
+                    b"r*v*",     [0x0F, 0x38, 0xF1], X, AUTO_REXW | PREF_F2 | EXACT_SIZE;
 ] "dec"         = [ b"v*",       [0xFF            ], 1, AUTO_SIZE | LOCK;
                     b"vb",       [0xFE            ], 1,             LOCK;
 ] "div"         = [ b"v*",       [0xF7            ], 6, AUTO_SIZE;
@@ -228,8 +230,8 @@ Ops!(OPMAP;
 ] "imul"        = [ b"v*",       [0xF7            ], 5, AUTO_SIZE;
                     b"vb",       [0xF6            ], 5;
                     b"r*v*",     [0x0F, 0xAF      ], X, AUTO_SIZE;
+                    b"r*v*ib",   [0x6B            ], X, AUTO_SIZE | EXACT_SIZE;
                     b"r*v*i*",   [0x69            ], X, AUTO_SIZE;
-                    b"r*v*ib",   [0x68            ], X, AUTO_SIZE;
 ] "in"          = [ b"Abib",     [0xE4            ], X;
                     b"Awib",     [0xE5            ], X, WORD_SIZE;
                     b"Adib",     [0xE5            ], X;
@@ -242,56 +244,56 @@ Ops!(OPMAP;
 ] "insw"        = [ b"",         [0x6D            ], X, WORD_SIZE;
 ] "insd"        = [ b"",         [0x6D            ], X;
 ] "int"         = [ b"ib",       [0xCD            ], X;
-] "jo"          = [ b"o*",       [0x0F, 0x80      ], X, AUTO_SIZE;
-                    b"ob",       [0x70            ], X;
-] "jno"         = [ b"o*",       [0x0F, 0x81      ], X, AUTO_SIZE;
-                    b"ob",       [0x71            ], X;
+] "jo"          = [ b"ob",       [0x70            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x80      ], X;
+] "jno"         = [ b"ob",       [0x71            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x81      ], X;
 ] "jb"          |
   "jc"          |
-  "jnae"        = [ b"o*",       [0x0F, 0x82      ], X, AUTO_SIZE;
-                    b"ob",       [0x72            ], X;
+  "jnae"        = [ b"ob",       [0x72            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x82      ], X;
 ] "jnb"         |
   "jnc"         |
-  "jae"         = [ b"o*",       [0x0F, 0x83      ], X, AUTO_SIZE;
-                    b"ob",       [0x73            ], X;
+  "jae"         = [ b"ob",       [0x73            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x83      ], X;
 ] "jz"          |
-  "je"          = [ b"o*",       [0x0F, 0x84      ], X, AUTO_SIZE;
-                    b"ob",       [0x74            ], X;
+  "je"          = [ b"ob",       [0x74            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x84      ], X;
 ] "jnz"         |
-  "jne"         = [ b"o*",       [0x0F, 0x85      ], X, AUTO_SIZE;
-                    b"ob",       [0x75            ], X;
+  "jne"         = [ b"ob",       [0x75            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x85      ], X;
 ] "jbe"         |
-  "jna"         = [ b"o*",       [0x0F, 0x86      ], X, AUTO_SIZE;
-                    b"ob",       [0x76            ], X;
+  "jna"         = [ b"ob",       [0x76            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x86      ], X;
 ] "jnbe"        |
-  "ja"          = [ b"o*",       [0x0F, 0x87      ], X, AUTO_SIZE;
-                    b"ob",       [0x77            ], X;
-] "js"          = [ b"o*",       [0x0F, 0x88      ], X, AUTO_SIZE;
-                    b"ob",       [0x78            ], X;
-] "jns"         = [ b"o*",       [0x0F, 0x89      ], X, AUTO_SIZE;
-                    b"ob",       [0x79            ], X;
+  "ja"          = [ b"ob",       [0x77            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x87      ], X;
+] "js"          = [ b"ob",       [0x78            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x88      ], X;
+] "jns"         = [ b"ob",       [0x79            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x89      ], X;
 ] "jp"          |
-  "jpe"         = [ b"o*",       [0x0F, 0x8A      ], X, AUTO_SIZE;
-                    b"ob",       [0x7A            ], X;
+  "jpe"         = [ b"ob",       [0x7A            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x8A      ], X;
 ] "jnp"         |
-  "jpo"         = [ b"o*",       [0x0F, 0x8B      ], X, AUTO_SIZE;
-                    b"ob",       [0x7B            ], X;
+  "jpo"         = [ b"ob",       [0x7B            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x8B      ], X;
 ] "jl"          |
-  "jnge"        = [ b"o*",       [0x0F, 0x8C      ], X, AUTO_SIZE;
-                    b"ob",       [0x7C            ], X;
+  "jnge"        = [ b"ob",       [0x7C            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x8C      ], X;
 ] "jnl"         |
-  "jge"         = [ b"o*",       [0x0F, 0x8D      ], X, AUTO_SIZE;
-                    b"ob",       [0x7D            ], X;
+  "jge"         = [ b"ob",       [0x7D            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x8D      ], X;
 ] "jle"         |
-  "jng"         = [ b"o*",       [0x0F, 0x8E      ], X, AUTO_SIZE;
-                    b"ob",       [0x7E            ], X;
+  "jng"         = [ b"ob",       [0x7E            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x8E      ], X;
 ] "jnle"        |
-  "jg"          = [ b"o*",       [0x0F, 0x8F      ], X, AUTO_SIZE;
-                    b"ob",       [0x7F            ], X;
+  "jg"          = [ b"ob",       [0x7F            ], X, EXACT_SIZE;
+                    b"od",       [0x0F, 0x8F      ], X;
 ] "jecxz"       = [ b"ob",       [0xE3            ], X, PREF_67;
 ] "jrcxz"       = [ b"ob",       [0xE3            ], X;
-] "jmp"         = [ b"o*",       [0xE9            ], X, AUTO_SIZE;
-                    b"ob",       [0xEB            ], X;
+] "jmp"         = [ b"ob",       [0xEB            ], X, EXACT_SIZE;
+                    b"od",       [0xE9            ], X;
                     b"v*",       [0xFF            ], 4, AUTO_NO32 ;
 ] "lahf"        = [ b"",         [0x9F            ], X;
 ] "lfs"         = [ b"r*m!",     [0x0F, 0xB4      ], X, AUTO_SIZE;
@@ -326,8 +328,8 @@ Ops!(OPMAP;
                     b"rwiw",     [0xB8            ], X, WORD_SIZE | SHORT_ARG;
                     b"rdid",     [0xB8            ], X,             SHORT_ARG;
                     b"v*i*",     [0xC7            ], 0, AUTO_SIZE;
-                    b"rqiq",     [0xB8            ], X, WITH_REXW | SHORT_ARG;
                     b"vbib",     [0xC6            ], 0;
+                    b"rqiq",     [0xB8            ], X, WITH_REXW | SHORT_ARG;
                     b"cdrd",     [0x0F, 0x22      ], X; // can only match in 32 bit mode due to "cd"
                     b"cqrq",     [0x0F, 0x22      ], X; // doesn't need a prefix to be encoded, as it's 64 bit natural in 64 bit mode
                     b"rdcd",     [0x0F, 0x20      ], X;
@@ -364,11 +366,11 @@ Ops!(OPMAP;
                     b"yomq",     [0x0F, 0x10      ], X, PREF_F2;
                     b"mqyo",     [0x0F, 0x11      ], X, PREF_F2;
 ] "movsq"       = [ b"",         [0xA5            ], X, WITH_REXW;
-] "movsx"       = [ b"r*vw",     [0x0F, 0xBF      ], X, AUTO_REXW; // currently this defaults to a certain memory size
-                    b"r*vb",     [0x0F, 0xBE      ], X, AUTO_SIZE;
+] "movsx"       = [ b"r*vw",     [0x0F, 0xBF      ], X, AUTO_REXW | EXACT_SIZE;
+                    b"r*vb",     [0x0F, 0xBE      ], X, AUTO_SIZE | EXACT_SIZE;
 ] "movsxd"      = [ b"rqvd",     [0x63            ], X, WITH_REXW;
-] "movzx"       = [ b"r*vw",     [0x0F, 0xB7      ], X, AUTO_REXW; // currently this defaults to a certain memory size
-                    b"r*vb",     [0x0F, 0xB6      ], X, AUTO_SIZE;
+] "movzx"       = [ b"r*vw",     [0x0F, 0xB7      ], X, AUTO_REXW | EXACT_SIZE;
+                    b"r*vb",     [0x0F, 0xB6      ], X, AUTO_SIZE | EXACT_SIZE;
 ] "mul"         = [ b"v*",       [0xF7            ], 4, AUTO_SIZE;
                     b"vb",       [0xF6            ], 4;
 ] "mulx"        = [ b"r*r*v*",   [   2, 0xF6      ], X, AUTO_REXW | VEX_OP | PREF_F2;
@@ -378,10 +380,10 @@ Ops!(OPMAP;
                     b"v*",       [0x0F, 0x1F      ], 0, AUTO_SIZE;
 ] "not"         = [ b"v*",       [0xF7            ], 2, AUTO_SIZE | LOCK;
                     b"vb",       [0xF6            ], 2,             LOCK;
-] "or"          = [ b"A*i*",     [0x0D            ], X, AUTO_SIZE;
-                    b"Abib",     [0x0C            ], X;
+] "or"          = [ b"Abib",     [0x0C            ], X;
+                    b"v*ib",     [0x83            ], 1, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x0D            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 1, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 1, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 1,             LOCK;
                     b"v*r*",     [0x09            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x08            ], X,             LOCK;
@@ -414,15 +416,15 @@ Ops!(OPMAP;
 ] "prefetcht2"  = [ b"mb",       [0x0F, 0x18      ], 3;
 ] "push"        = [ b"r*",       [0x50            ], X, AUTO_NO32 | SHORT_ARG;
                     b"v*",       [0xFF            ], 6, AUTO_NO32 ;
+                    b"ib",       [0x6A            ], X, EXACT_SIZE;
+                    b"iw",       [0x68            ], X, EXACT_SIZE | WORD_SIZE;
                     b"iq",       [0x68            ], X;
-                    b"iw",       [0x68            ], X, WORD_SIZE;
-                    b"ib",       [0x6A            ], X;
                     b"Uw",       [0x0F, 0xA0      ], X;
                     b"Vw",       [0x0F, 0xA8      ], X;
 ] "pushf"       = [ b"",         [0x9C            ], X, PREF_66;
 ] "pushfq"      = [ b"",         [0x9C            ], X;
 ] "rcl"         = [ b"v*Bb",     [0xD3            ], 2, AUTO_SIZE; // shift by one forms not supported as immediates are only resolved at runtime
-                    b"vbBb",     [0xD2            ], 2;
+                    b"vbBb",     [0xD2            ], 2;            // these could be implemented as single-arg forms though... TODO
                     b"v*ib",     [0xC1            ], 2, AUTO_SIZE;
                     b"vbib",     [0xC0            ], 2;
 ] "rcr"         = [ b"v*Bb",     [0xD3            ], 3, AUTO_SIZE;
@@ -454,10 +456,10 @@ Ops!(OPMAP;
                     b"v*ib",     [0xC1            ], 7, AUTO_SIZE;
                     b"vbib",     [0xC0            ], 7;
 ] "sarx"        = [ b"r*v*r*",   [   2, 0xF7      ], X, AUTO_REXW | VEX_OP | PREF_F3;
-] "sbb"         = [ b"A*i*",     [0x1D            ], X, AUTO_SIZE;
-                    b"Abib",     [0x1C            ], X;
+] "sbb"         = [ b"Abib",     [0x1C            ], X;
+                    b"v*ib",     [0x83            ], 3, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x1D            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 3, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 3, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 3,             LOCK;
                     b"v*r*",     [0x19            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x18            ], X,             LOCK;
@@ -515,10 +517,10 @@ Ops!(OPMAP;
 ] "stosw"       = [ b"",         [0xAB            ], X, WORD_SIZE | REP;
 ] "stosd"       = [ b"",         [0xAB            ], X,             REP;
 ] "stosq"       = [ b"",         [0xAB            ], X, WITH_REXW | REP;
-] "sub"         = [ b"A*i*",     [0x2D            ], X, AUTO_SIZE;
-                    b"Abib",     [0x2C            ], X;
+] "sub"         = [ b"Abib",     [0x2C            ], X;
+                    b"v*ib",     [0x83            ], 5, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x2D            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 5, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 5, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 5,             LOCK;
                     b"v*r*",     [0x29            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x28            ], X,             LOCK;
@@ -544,10 +546,10 @@ Ops!(OPMAP;
                     b"vbrb",     [0x86            ], X,             LOCK;
                     b"rbvb",     [0x86            ], X,             LOCK;
 ] "xlatb"       = [ b"",         [0xD7            ], X;
-] "xor"         = [ b"A*i*",     [0x35            ], X, AUTO_SIZE;
-                    b"Abib",     [0x34            ], X;
+] "xor"         = [ b"Abib",     [0x34            ], X;
+                    b"v*ib",     [0x83            ], 6, AUTO_SIZE | LOCK | EXACT_SIZE;
+                    b"A*i*",     [0x35            ], X, AUTO_SIZE;
                     b"v*i*",     [0x81            ], 6, AUTO_SIZE | LOCK;
-                    b"v*ib",     [0x83            ], 6, AUTO_SIZE | LOCK;
                     b"vbib",     [0x80            ], 6,             LOCK;
                     b"v*r*",     [0x31            ], X, AUTO_SIZE | LOCK;
                     b"vbrb",     [0x30            ], X,             LOCK;
