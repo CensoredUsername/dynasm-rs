@@ -277,13 +277,13 @@ pub fn parse_instruction<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Pars
 
     let mut ops = Vec::new();
     let mut span = parser.span;
-    let mut op = Spanned {node: parser.parse_ident()?, span: span};
+    let mut op = Spanned {node: parse_ident_or_rust_keyword(parser)?, span: span};
 
     // read prefixes
     while is_prefix(op) {
         ops.push(op);
         span = parser.span;
-        op = Spanned {node: parser.parse_ident()?, span: span};
+        op = Spanned {node: parse_ident_or_rust_keyword(parser)?, span: span};
     }
 
     // parse (sizehint? expr),*
@@ -334,11 +334,23 @@ fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
 
 fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
     match parser.token {
-        token::Token::Ident(ast::Ident {ref name, ..}) if &*name.as_str() == kw => (),
+        token::Ident(ast::Ident {ref name, ..}) if &*name.as_str() == kw => (),
         _ => return false
     }
     parser.bump();
     true
+}
+
+fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::Ident> {
+    if let token::Ident(i) = parser.token {
+        parser.bump();
+        Ok(i)
+    } else {
+        // technically we could generate the error here directly, but
+        // that way this error branch could diverge in behaviour from
+        // the normal parse_ident.
+        parser.parse_ident()
+    }
 }
 
 fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
