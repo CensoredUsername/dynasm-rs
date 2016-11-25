@@ -49,7 +49,7 @@ pub mod flags {
             const WORD_SIZE = 0x0000_0040, // implies opsize prefix
             const WITH_REXW = 0x0000_0080, // implies REX.W/VEX.W/XOP.W
             const WITH_VEXL = 0x0000_0100, // implies VEX.L/XOP.L
-            const EXACT_SIZE= 0x0010_0000, // operands with unknown sizes cannot be assumed to match 
+            const EXACT_SIZE= 0x0010_0000, // operands with unknown sizes cannot be assumed to match
 
             const PREF_66   = WORD_SIZE.bits,// mandatory prefix (same as WORD_SIZE)
             const PREF_67   = 0x0000_0200, // mandatory prefix (same as SMALL_ADDRESS)
@@ -157,7 +157,7 @@ Ops!(OPMAP;
                     b"v*ib",     [0x0F, 0xBA      ], 5, AUTO_SIZE | LOCK;
 ] "bzhi"        = [ b"r*v*r*",   [   2, 0xF5      ], X, AUTO_REXW | VEX_OP;
 ] "call"        = [ b"od",       [0xE8            ], X;
-                    b"r*",       [0xFF            ], 2, AUTO_NO32;
+                    b"v*",       [0xFF            ], 2, AUTO_NO32;
 ] "cbw"         = [ b"",         [0x98            ], X, WORD_SIZE;
 ] "cwde"        = [ b"",         [0x98            ], X;
 ] "cdqe"        = [ b"",         [0x98            ], X, WITH_REXW;
