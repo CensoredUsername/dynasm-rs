@@ -80,6 +80,8 @@ fn main() {
         ; inc WORD [rax]
         ; inc DWORD [rax]
         ; inc QWORD [rax]
+        ; inc QWORD [BYTE rax + 0]
+        ; inc QWORD [DWORD rax + 0]
         // very odd memoryrefs
         ; mov rax, [rbx + rbx * 3 + 2 + c + rax + d]
         ; mov rax, [rbx - 4]

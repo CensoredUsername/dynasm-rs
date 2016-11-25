@@ -37,6 +37,7 @@ pub struct MemoryRef {
     pub scale_expr: Option<P<ast::Expr>>,
     pub base:       Option<Register>,
     pub disp:       Option<P<ast::Expr>>,
+    pub disp_size:  Option<Size>,
     pub size:       Option<Size>,
     pub span:       Span
 }
@@ -354,8 +355,6 @@ fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::
 }
 
 fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
-    use syntax::ast::ExprKind;
-
     // sizehint
     let size = eat_size_hint(parser);
 
@@ -409,6 +408,50 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         let id = parser.parse_expr()?;
         let jump = JumpType::Dynamic(id);
         label_return!(jump, size);
+    }
+
+    // memory location
+    if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
+        let span = parser.span;
+        let size_hint = eat_size_hint(parser);
+        let expr = parser.parse_expr()?;
+        let span = Span {lo: span.lo, ..expr.span};
+        parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
+
+        let (mut regs, disp) = parse_adds(state, ecx, span, expr);
+
+        // can only have two regs at most
+        if regs.len() > 2 {
+            ecx.span_err(span, "Invalid memory reference: too many registers");
+            return Ok(Arg::Invalid);
+        }
+
+        let mut drain = regs.drain(..);
+        let (index, scale, base) = match (drain.next(), drain.next()) {
+            (None,                  None)                 => (None, 0, None),
+            (Some((index, scale)),  None)                 |
+            (None,                  Some((index, scale))) |
+            (Some((index, scale)),  Some((_, 0)))         |
+            (Some((_, 0)),          Some((index, scale))) => if scale == 1 {(None, 0, Some(index))} else {(Some(index), scale, None)},
+            (Some((base, 1)),       Some((index, scale))) |
+            (Some((index, scale)),  Some((base, 1)))      => (Some(index), scale, Some(base)),
+            _ => {
+                ecx.span_err(span, "Invalid memory reference: only one register can be scaled");
+                return Ok(Arg::Invalid);
+            }
+        };
+
+        // assemble the memory location
+        return Ok(Arg::Indirect(MemoryRef {
+            index:      index,
+            scale:      scale,
+            scale_expr: None,
+            base:       base,
+            disp:       disp,
+            disp_size:  size_hint,
+            size:       size,
+            span:       span
+        }));
     }
 
     // it's a normal (register/immediate/memoryref/typemapped) operand
@@ -485,6 +528,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 scale_expr: scale,
                 base:       base.map(|s| s.node),
                 disp:       disp,
+                disp_size:  None,
                 size:       size,
                 span:       Span {hi: parser.prev_span.hi, ..start}
             }));
@@ -498,89 +542,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             return Ok(Arg::Direct(reg))
         }
 
-        // memory location
-        if let ast::Expr {node: ExprKind::Vec(mut items), span, ..} = arg {
-            if items.len() != 1 {
-                ecx.span_err(span, "Comma in memory reference");
-                return Ok(Arg::Invalid);
-            }
-
-            let (mut regs, disp) = parse_adds(state, ecx, span, items.pop().unwrap());
-
-            // can only have two regs at most
-            if regs.len() > 2 {
-                ecx.span_err(span, "Invalid memory reference: too many registers");
-                return Ok(Arg::Invalid);
-            }
-
-            let mut drain = regs.drain(..);
-            let (index, scale, base) = match (drain.next(), drain.next()) {
-                (None,                  None)                 => (None, 0, None),
-                (Some((index, scale)),  None)                 |
-                (None,                  Some((index, scale))) |
-                (Some((index, scale)),  Some((_, 0)))         |
-                (Some((_, 0)),          Some((index, scale))) => if scale == 1 {(None, 0, Some(index))} else {(Some(index), scale, None)},
-                (Some((base, 1)),       Some((index, scale))) |
-                (Some((index, scale)),  Some((base, 1)))      => (Some(index), scale, Some(base)),
-                _ => {
-                    ecx.span_err(span, "Invalid memory reference: only one register can be scaled");
-                    return Ok(Arg::Invalid);
-                }
-            };
-
-            // assemble the memory location
-            return Ok(Arg::Indirect(MemoryRef {
-                index:      index,
-                scale:      scale,
-                scale_expr: None,
-                base:       base,
-                disp:       disp,
-                size:       size,
-                span:       span
-            }));
-        }
-
         // immediate
-        let mut size = size;
-        if size.is_none() {
-            match arg.node {
-                ExprKind::Lit(ref lit) => match lit.node {
-                    ast::LitKind::Byte(_) => size = Some(Size::BYTE),
-                    ast::LitKind::Int(i, _) => {
-                        if i < 0x80 {
-                            size = Some(Size::BYTE);
-                        } else if i < 0x8000 {
-                            size = Some(Size::WORD);
-                        } else if i < 0x8000_0000 {
-                            size = Some(Size::DWORD);
-                        } else {
-                            size = Some(Size::QWORD);
-                        }
-                    },
-                        _ => ()
-                },
-                ExprKind::Unary(ast::UnOp::Neg, ref expr) => match expr.node {
-                    ExprKind::Lit(ref lit) => match lit.node {
-                        ast::LitKind::Byte(_) => size = Some(Size::BYTE),
-                        ast::LitKind::Int(i, _) => {
-                            if i >= 0x80 {
-                                size = Some(Size::BYTE);
-                            } else if i >= 0x8000 {
-                                size = Some(Size::WORD);
-                            } else if i >= 0x8000_0000 {
-                                size = Some(Size::DWORD);
-                            } else {
-                                size = Some(Size::QWORD);
-                            }
-                        },
-                        _ => ()
-                    },
-                    _ => ()
-                },
-                _ => ()
-            }
-
-        }
         Ok(Arg::Immediate(P(arg), size))
     })
 }

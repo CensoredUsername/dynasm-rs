@@ -74,6 +74,9 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // sanitize memory references and determine address size
     let pref_addr = sanitize_addresses(ecx, &mut args)?;
 
+    // figure out immediate sizes where the immediates are constants
+    size_immediates(&mut args);
+
     // this call also inserts more size information in the AST if applicable.
     let data = match_op_format(ecx, op, &mut args)?;
 
@@ -211,23 +214,32 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         // VSIB has different mode rules
         if mem.index.as_ref().map_or(false, |x| x.kind.family() == RegFamily::XMM) {
             let index = mem.index.unwrap().kind;
+
             let (base, mode) = if let Some(base) = mem.base {
-                (base.kind, if mem.disp.is_some() {MOD_DISP32} else {MOD_DISP8})
+                (base.kind, match (&mem.disp, mem.disp_size) {
+                    (&Some(_), Some(Size::BYTE)) => MOD_DISP8,
+                    (&Some(_), _) => MOD_DISP32,
+                    (&None, _) => MOD_DISP8
+                })
             } else {
                 (RegKind::Static(RegId::RBP), MOD_NOBASE)
             };
+
             compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+
             if let Some(expr) = mem.scale_expr {
                 compile_sib_dynscale(ecx, buffer, expr, index, base);
             } else {
                 compile_modrm_sib(ecx, buffer, mem.scale as u8, index, base);
             }
 
-            if mode == MOD_DISP8 {
+            if let Some(disp) = mem.disp {
+                buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+            } else if mode == MOD_DISP8 {
+                // no displacement was asked for, but we have to encode one as there's a base
                 buffer.push(Stmt::Const(0));
-            } else  if let Some(disp) = mem.disp {
-                buffer.push(Stmt::Var(disp, Size::DWORD));
             } else {
+                // MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
                 for _ in 0..4 {
                     buffer.push(Stmt::Const(0));
                 }
@@ -247,6 +259,8 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
             // mode_nodisp has to be selected if RIP is encoded, or if no base is to be encoded. note that in these scenarions the disp should actually be encoded
             } else if mem.disp.is_none() || rip_relative || no_base {
                 MOD_NODISP
+            } else if let Some(Size::BYTE) = mem.disp_size {
+                MOD_DISP8
             } else {
                 MOD_DISP32
             };
@@ -279,7 +293,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
             // Disp
             if let Some(disp) = mem.disp {
-                buffer.push(Stmt::Var(disp, Size::DWORD));
+                buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
             } else if no_base || rip_relative {
                 for _ in 0..4 {
                     buffer.push(Stmt::Const(0));
@@ -384,6 +398,26 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
                     addr_size = Some(reg.size());
                 }
             }
+
+            if let Some(size) = mem.disp_size {
+                if mem.disp.is_none() {
+                    ecx.span_err(mem.span, "Displacement size without displacement");
+                }
+
+                if size != Size::BYTE && size != Size::DWORD {
+                    ecx.span_err(mem.span, "Invalid displacement size, only BYTE or DWORD are possible");
+                }
+            }
+
+            if mem.disp_size.is_none() {
+                if let Some(ref disp) = mem.disp {
+                    match derive_size(&*disp) {
+                        Some(Size::BYTE) => mem.disp_size = Some(Size::BYTE),
+                        Some(_) => mem.disp_size = Some(Size::DWORD), // QWORD size should generate a compiler warning naturally
+                        None => ()
+                    }
+                }
+            }
         }
     }
 
@@ -392,6 +426,51 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
         return Err(Some("Impossible address size".into()));
     }
     Ok(addr_size != Size::QWORD)
+}
+
+fn size_immediates(args: &mut [Arg]) {
+    for arg in args {
+        if let Arg::Immediate(ref expr, ref mut size @ None) = *arg {
+            *size = derive_size(&*expr);
+        }
+    }
+}
+
+fn derive_size(expr: &ast::Expr) -> Option<Size> {
+    use syntax::ast::ExprKind;
+
+    match expr.node {
+        ExprKind::Lit(ref lit) => match lit.node {
+            ast::LitKind::Byte(_) => Some(Size::BYTE),
+            ast::LitKind::Int(i, _) => if i < 0x80 {
+                Some(Size::BYTE)
+            } else if i < 0x8000 {
+                Some(Size::WORD)
+            } else if i < 0x8000_0000 {
+                Some(Size::DWORD)
+            } else {
+                Some(Size::QWORD)
+            },
+            _ => None
+        },
+        ExprKind::Unary(ast::UnOp::Neg, ref expr) => match expr.node {
+            ExprKind::Lit(ref lit) => match lit.node {
+                ast::LitKind::Byte(_) => Some(Size::BYTE),
+                ast::LitKind::Int(i, _) => if i >= 0x80 {
+                    Some(Size::BYTE)
+                } else if i >= 0x8000 {
+                    Some(Size::WORD)
+                } else if i >= 0x8000_0000 {
+                    Some(Size::DWORD)
+                } else {
+                    Some(Size::QWORD)
+                },
+                _ => None
+            },
+            _ => None
+        },
+        _ => None
+    }
 }
 
 fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<String>> {
