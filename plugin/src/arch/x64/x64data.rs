@@ -40,31 +40,31 @@ pub mod flags {
         pub flags Flags: u32 {
             const VEX_OP    = 0x0000_0001, // this instruction requires a VEX prefix to be encoded
             const XOP_OP    = 0x0000_0002, // this instruction requires a XOP prefix to be encoded
-            const TDNOW_OP  = 0x0002_0000, // this instruction is a 3DNow! op. The opcode bytes go after the operands.
+            const TDNOW_OP  = 0x0000_0004, // this instruction is a 3DNow! op. The opcode bytes go after the operands.
 
             // note: the first 4 in this block are mutually exclusive
-            const AUTO_SIZE = 0x0000_0004, // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
-            const AUTO_NO32 = 0x0000_0008, // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
-            const AUTO_REXW = 0x0000_0010, // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
-            const AUTO_VEXL = 0x0000_0020, // 128bit -> None   , 256bit -> VEX.L
-            const WORD_SIZE = 0x0000_0040, // implies opsize prefix
-            const WITH_REXW = 0x0000_0080, // implies REX.W/VEX.W/XOP.W
-            const WITH_VEXL = 0x0000_0100, // implies VEX.L/XOP.L
-            const EXACT_SIZE= 0x0010_0000, // operands with unknown sizes cannot be assumed to match
+            const AUTO_SIZE = 0x0000_0008, // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+            const AUTO_NO32 = 0x0000_0010, // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
+            const AUTO_REXW = 0x0000_0020, // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+            const AUTO_VEXL = 0x0000_0040, // 128bit -> None   , 256bit -> VEX.L
+            const WORD_SIZE = 0x0000_0080, // implies opsize prefix
+            const WITH_REXW = 0x0000_0100, // implies REX.W/VEX.W/XOP.W
+            const WITH_VEXL = 0x0000_0200, // implies VEX.L/XOP.L
+            const EXACT_SIZE= 0x0000_0400, // operands with unknown sizes cannot be assumed to match
 
             const PREF_66   = WORD_SIZE.bits,// mandatory prefix (same as WORD_SIZE)
-            const PREF_67   = 0x0000_0200, // mandatory prefix (same as SMALL_ADDRESS)
-            const PREF_F0   = 0x0000_0400, // mandatory prefix (same as LOCK)
-            const PREF_F2   = 0x0000_0800, // mandatory prefix (REPNE)
-            const PREF_F3   = 0x0000_1000, // mandatory prefix (REP)
+            const PREF_67   = 0x0000_0800, // mandatory prefix (same as SMALL_ADDRESS)
+            const PREF_F0   = 0x0000_1000, // mandatory prefix (same as LOCK)
+            const PREF_F2   = 0x0000_2000, // mandatory prefix (REPNE)
+            const PREF_F3   = 0x0000_4000, // mandatory prefix (REP)
 
-            const LOCK      = 0x0000_2000, // user lock prefix is valid with this instruction
-            const REP       = 0x0000_4000, // user rep prefix is valid with this instruction
-            const REPE      = 0x0000_8000,
+            const LOCK      = 0x0000_8000, // user lock prefix is valid with this instruction
+            const REP       = 0x0001_0000, // user rep prefix is valid with this instruction
+            const REPE      = 0x0002_0000,
 
-            const SHORT_ARG = 0x0001_0000, // a register argument is encoded in the last byte of the opcode
-            const ENC_MR    = 0x0002_0000, //  select alternate arg encoding
-            const ENC_VM    = 0x0004_0000, //  select alternate arg encoding
+            const SHORT_ARG = 0x0004_0000, // a register argument is encoded in the last byte of the opcode
+            const ENC_MR    = 0x0008_0000, //  select alternate arg encoding
+            const ENC_VM    = 0x0010_0000, //  select alternate arg encoding
         }
     }
     // workaround until bitflags can be used in const
