@@ -51,13 +51,13 @@ impl<'a> State<'a> {
                 parser.expect(&token::Comma)?;
                 let reg = parser.parse_ident()?.name;
 
-                match self.crate_data.aliases.entry(alias) {
+                match self.crate_data.aliases.entry(alias.as_str().to_string()) {
                     Entry::Occupied(_) => {
                         ecx.span_err(Span {hi: parser.prev_span.hi, ..start},
                                      &format!("Duplicate alias definition, alias '{}' was already defined", alias.as_str()));
                     },
                     Entry::Vacant(v) => {
-                        v.insert(reg);
+                        v.insert(reg.as_str().to_string());
                     }
                 }
             },

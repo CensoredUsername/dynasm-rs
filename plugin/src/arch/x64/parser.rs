@@ -470,10 +470,13 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             let mut attr = None;
             let mut index_reg = None;
             let mut index_disp = None;
+            let mut disp_size = None;
 
             if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
+                let span = parser.span;
+                disp_size = eat_size_hint(parser);
                 let index_expr = parser.parse_expr()?;
-                let span = index_expr.span;
+                let span = Span {lo: span.lo, ..index_expr.span};
 
                 parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
 
@@ -528,7 +531,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 scale_expr: scale,
                 base:       base.map(|s| s.node),
                 disp:       disp,
-                disp_size:  None,
+                disp_size:  disp_size,
                 size:       size,
                 span:       Span {hi: parser.prev_span.hi, ..start}
             }));
@@ -553,12 +556,12 @@ pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
         _ => return None
     };
 
-    if path.global || path.segments.len() != 1 {
+    if path.is_global() || path.segments.len() != 1 {
         return None;
     }
 
     let segment = &path.segments[0];
-    if !segment.parameters.is_empty() {
+    if !segment.parameters.is_none() {
         return None;
     }
 
@@ -569,14 +572,14 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
     if let Some(path) = as_simple_name(expr) {
         // static register names
 
-        let mut name = path.node.name;
-        if let Some(&x) = state.crate_data.aliases.get(&name) {
+        let mut name = &*path.node.name.as_str();
+        if let Some(x) = state.crate_data.aliases.get(name) {
             name = x;
         }
 
         use self::RegId::*;
         use serialize::Size::*;
-        let (reg, size) = match &*name.as_str() {
+        let (reg, size) = match name {
             "rax"|"r0" => (RAX, QWORD), "rcx"|"r1" => (RCX, QWORD), "rdx"|"r2" => (RDX, QWORD), "rbx"|"r3" => (RBX, QWORD),
             "rsp"|"r4" => (RSP, QWORD), "rbp"|"r5" => (RBP, QWORD), "rsi"|"r6" => (RSI, QWORD), "rdi"|"r7" => (RDI, QWORD),
             "r8"       => (R8,  QWORD), "r9"       => (R9,  QWORD), "r10"      => (R10, QWORD), "r11"      => (R11, QWORD),

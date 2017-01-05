@@ -1,5 +1,6 @@
 #![feature(plugin_registrar, rustc_private)]
 #![feature(const_fn)]
+#![feature(i128_type)]
 
 extern crate syntax;
 extern crate rustc_plugin;
@@ -18,7 +19,8 @@ use syntax::ast;
 use syntax::util::small_vector::SmallVector;
 use syntax::parse::parser::Parser;
 use syntax::parse::PResult;
-use syntax::parse::token::{self, intern, str_to_ident};
+use syntax::symbol::Symbol;
+use syntax::parse::token;
 use syntax::tokenstream::TokenTree;
 use syntax::ptr::P;
 
@@ -41,7 +43,7 @@ mod serialize;
 #[plugin_registrar]
 pub fn registrar(reg: &mut Registry) {
     reg.register_syntax_extension(
-        intern("dynasm"),
+        Symbol::intern("dynasm"),
         SyntaxExtension::NormalTT(
             Box::new(dynasm),
             None,
@@ -170,11 +172,11 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
 
 // Crate local data implementation.
 
-type DynasmStorage = HashMap<ast::Ident, Mutex<DynasmData>>;
+type DynasmStorage = HashMap<String, Mutex<DynasmData>>;
 
 pub struct DynasmData {
     pub current_arch: arch::Arch,
-    pub aliases: HashMap<ast::Name, ast::Name>
+    pub aliases: HashMap<String, String>
 }
 
 impl DynasmData {
@@ -192,22 +194,22 @@ pub type CrateLocalData = OwningRef<
 >;
 
 pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
-    let id = str_to_ident(&ecx.ecfg.crate_name);
+    let id = &ecx.ecfg.crate_name;
 
     {
         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
 
-        if data.get(&id).is_some() {
-            return data.map(|x| x.get(&id).unwrap())
+        if data.get(id).is_some() {
+            return data.map(|x| x.get(id).unwrap())
         }
     }
 
     {
         let mut lock = DYNASM_STORAGE.write().unwrap();
-        lock.insert(id, Mutex::new(DynasmData::new()));
+        lock.insert(id.clone(), Mutex::new(DynasmData::new()));
     }
     RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap())
-                       .map(|x| x.get(&id).unwrap())
+                       .map(|x| x.get(id).unwrap())
 }
 
 // this is where the actual storage resides.

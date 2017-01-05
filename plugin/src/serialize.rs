@@ -4,7 +4,7 @@ use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
 use syntax::ast;
 use syntax::ptr::P;
-use syntax::parse::token::intern;
+use syntax::symbol::Symbol;
 use syntax::codemap::{Span, Spanned};
 
 pub type Ident = Spanned<ast::Ident>;
@@ -55,7 +55,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
 
     // construction for `op.push(expr)` is as follows
     // op = Path::from_ident(name)
-    // push = Ident::with_empty_ctxt(intern("push"))
+    // push = Ident::from_str("push")
     // expr = expr_lit(span, LitKind::Byte)
     // expr_method_call(span, op, Vec![expr])
 
@@ -92,7 +92,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
             Extend(expr)           => ("extend", vec![expr]),
 
             DynScale(scale, rest)  => {
-                let temp = ast::Ident::with_empty_ctxt(intern("temp"));
+                let temp = ast::Ident::from_str("temp");
                 buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size(ecx, &name, scale)));
                 ("push", vec![or_mask_shift_expr(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)])
             },
@@ -101,25 +101,25 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
 
             GlobalLabel(ident)     => ("global_label", vec![ecx.expr_lit(
                 ident.span,
-                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
             )]),
             LocalLabel(ident)      => ("local_label", vec![ecx.expr_lit(
                 ident.span,
-                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
             )]),
             DynamicLabel(expr)     => ("dynamic_label", vec![expr]),
 
             GlobalJumpTarget(ident, size) => ("global_reloc", vec![ecx.expr_lit(
                 ident.span,
-                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
             ), ecx.expr_u8(ident.span, size.in_bytes())]),
             ForwardJumpTarget(ident, size) => ("forward_reloc", vec![ecx.expr_lit(
                 ident.span,
-                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
             ), ecx.expr_u8(ident.span, size.in_bytes())]),
             BackwardJumpTarget(ident, size) => ("backward_reloc", vec![ecx.expr_lit(
                 ident.span,
-                ast::LitKind::Str(ident.node.name.as_str(), ast::StrStyle::Cooked)
+                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
             ), ecx.expr_u8(ident.span, size.in_bytes())]),
             DynamicJumpTarget(expr, size) => {
                 let span = expr.span;
@@ -132,7 +132,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
         };
 
         let op = name.clone();
-        let method = ast::Ident::with_empty_ctxt(intern(method));
+        let method = ast::Ident::from_str(method);
         let expr = ecx.expr_method_call(ecx.call_site(), op, method, args);
 
         buffer.push(ecx.stmt_semi(expr));
@@ -156,7 +156,7 @@ pub fn size_of_scale_expr(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>) -> 
         ast::BinOpKind::Mul,
         ecx.expr_cast(span,
             size_of(ecx, ty),
-            ecx.ty_ident(span, ast::Ident::with_empty_ctxt(intern("i32")))
+            ecx.ty_ident(span, ast::Ident::from_str("i32"))
         ),
         value
     )
@@ -167,16 +167,16 @@ pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Ex
     // take expr and return !((expr & mask) << shift)
 
     expr = ecx.expr_binary(span, ast::BinOpKind::BitAnd, expr, ecx.expr_lit(
-        span, ast::LitKind::Int(mask as u64, ast::LitIntType::Unsuffixed)
+        span, ast::LitKind::Int(mask as u128, ast::LitIntType::Unsuffixed)
     ));
 
     if shift < 0 {
         expr = ecx.expr_binary(span, ast::BinOpKind::Shr, expr, ecx.expr_lit(
-            span, ast::LitKind::Int((-shift) as u64, ast::LitIntType::Unsuffixed)
+            span, ast::LitKind::Int((-shift) as u128, ast::LitIntType::Unsuffixed)
         ));
     } else if shift > 0 {
         expr = ecx.expr_binary(span, ast::BinOpKind::Shl, expr, ecx.expr_lit(
-            span, ast::LitKind::Int(shift as u64, ast::LitIntType::Unsuffixed)
+            span, ast::LitKind::Int(shift as u128, ast::LitIntType::Unsuffixed)
         ));
     }
 
@@ -216,12 +216,12 @@ pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Exp
         }))
     };
 
-    let temp     = ast::Ident::with_empty_ctxt(intern("temp"));
-    let rv       = ast::Ident::with_empty_ctxt(intern("rv"));
-    let usize_id = ast::Ident::with_empty_ctxt(intern("usize"));
-    let i32_id   = ast::Ident::with_empty_ctxt(intern("i32"));
-    let uninitialized = ["std", "mem", "uninitialized"].iter().cloned().map(intern).map(ast::Ident::with_empty_ctxt).collect();
-    let forget        = ["std", "mem", "forget"       ].iter().cloned().map(intern).map(ast::Ident::with_empty_ctxt).collect();
+    let temp     = ast::Ident::from_str("temp");
+    let rv       = ast::Ident::from_str("rv");
+    let usize_id = ast::Ident::from_str("usize");
+    let i32_id   = ast::Ident::from_str("i32");
+    let uninitialized = ["std", "mem", "uninitialized"].iter().cloned().map(ast::Ident::from_str).collect();
+    let forget        = ["std", "mem", "forget"       ].iter().cloned().map(ast::Ident::from_str).collect();
 
     // unsafe {
     let block = ecx.block(span, vec![
@@ -271,7 +271,7 @@ pub fn size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
     let span = path.span;
 
     let ty = ecx.ty_path(path);
-    let idents = ["std", "mem", "size_of"].iter().cloned().map(intern).map(ast::Ident::with_empty_ctxt).collect();
+    let idents = ["std", "mem", "size_of"].iter().cloned().map(ast::Ident::from_str).collect();
     let size_of = ecx.path_all(span, true, idents, Vec::new(), vec![ty], Vec::new());
     ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
 }
@@ -286,9 +286,9 @@ pub fn encoded_size(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P
         ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 1))], ecx.expr_u8(span, 0)),
         ecx.arm(span, vec![ecx.pat_wild(span)], ecx.expr_method_call(span,
             name.clone(),
-            ast::Ident::with_empty_ctxt(intern("runtime_error")),
+            ast::Ident::from_str("runtime_error"),
             vec![ecx.expr_str(span,
-                intern("Type size not representable as scale").as_str()
+                Symbol::intern("Type size not representable as scale")
             )]
         ))
     ])
