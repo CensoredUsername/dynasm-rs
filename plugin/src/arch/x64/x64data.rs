@@ -40,6 +40,7 @@ pub mod flags {
         pub flags Flags: u32 {
             const VEX_OP    = 0x0000_0001, // this instruction requires a VEX prefix to be encoded
             const XOP_OP    = 0x0000_0002, // this instruction requires a XOP prefix to be encoded
+            const TDNOW_OP  = 0x0002_0000, // this instruction is a 3DNow! op. The opcode bytes go after the operands.
 
             // note: the first 4 in this block are mutually exclusive
             const AUTO_SIZE = 0x0000_0004, // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W

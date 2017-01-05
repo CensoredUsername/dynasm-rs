@@ -190,6 +190,10 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         } else {
             buffer.push(Stmt::Const(last + (rm_k.encode() & 7)));
         }
+    // this is a 3DNow! opcode, escape
+    } else if data.flags.contains(TDNOW_OP) {
+        buffer.push(Stmt::Const(0x0F));
+        buffer.push(Stmt::Const(0x0F));
     // just push the opcode
     } else {
         buffer.extend(ops.iter().cloned().map(Stmt::Const))
@@ -325,6 +329,11 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         });
     }
 
+    // 3DNow! opcode
+    if data.flags.contains(TDNOW_OP) {
+        buffer.extend(ops.iter().cloned().map(Stmt::Const));
+    }
+
     // register in immediate argument
     if let Some(Arg::Direct(ireg)) = ireg {
         let ireg = ireg.node.kind;
@@ -343,7 +352,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
                 panic!("bad formatting data")
             }
         }
-        buffer.push(Stmt::ExprConst(byte))
+        buffer.push(Stmt::ExprConst(byte));
     }
 
     // immediates
