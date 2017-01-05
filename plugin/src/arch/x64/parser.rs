@@ -674,6 +674,7 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
             "Rs" => (Size::WORD,  RegFamily::SEGMENT),
             "RC" => (Size::QWORD, RegFamily::CONTROL),
             "RD" => (Size::QWORD, RegFamily::DEBUG),
+            "RB" => (Size::OWORD, RegFamily::BOUND),
             _ => return None
         };
 
