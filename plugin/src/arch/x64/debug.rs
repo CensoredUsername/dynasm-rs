@@ -77,6 +77,7 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
         b's' => "segreg".into(),
         b'c' => "creg".into(),
         b'd' => "dreg".into(),
+        b'b' => "bndreg".into(),
         b'v' => format!("reg/mem{}", format_size(size)).into(),
         b'u' => format!("mm/mem{}", format_size(size)).into(),
         b'w' => format!("{}mm/mem{}", if size == b'h' {"y"} else {"x"}, format_size(size)).into(),

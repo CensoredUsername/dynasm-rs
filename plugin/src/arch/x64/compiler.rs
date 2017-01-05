@@ -623,6 +623,7 @@ fn match_format_string(fmt: &'static Opdata, mut args: &mut [Arg]) -> Result<(),
     // s : segment reg
     // c : control reg
     // d : debug reg
+    // b : bound reg
 
     // v : r and m
     // u : x and m
@@ -689,6 +690,8 @@ fn match_format_string(fmt: &'static Opdata, mut args: &mut [Arg]) -> Result<(),
                     reg.kind.family() == RegFamily::CONTROL => Some(reg.size()),
                 (b'd', &Arg::Direct(Spanned {node: ref reg, ..} )) if
                     reg.kind.family() == RegFamily::DEBUG => Some(reg.size()),
+                (b'b', &Arg::Direct(Spanned {node: ref reg, ..} )) if
+                    reg.kind.family() == RegFamily::BOUND => Some(reg.size()),
 
                 // memory offsets
                 (b'm',          &Arg::Indirect(MemoryRef {size, ref index, ..} )) |

@@ -114,6 +114,9 @@ pub enum RegId {
     DR4  = 0x84, DR5  = 0x85, DR6  = 0x86, DR7  = 0x87,
     DR8  = 0x88, DR9  = 0x89, DR10 = 0x8A, DR11 = 0x8B,
     DR12 = 0x8C, DR13 = 0x8D, DR14 = 0x8E, DR15 = 0x8F,
+
+    // Bound registers.
+    BND0 = 0x90, BND1 = 0x91, BND2 = 0x92, BND3 = 0x93
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
@@ -127,6 +130,7 @@ pub enum RegFamily {
     SEGMENT = 6,
     CONTROL = 7,
     DEBUG = 8,
+    BOUND = 9
 }
 
 /*
@@ -238,6 +242,7 @@ impl RegId {
             6 => RegFamily::SEGMENT,
             7 => RegFamily::CONTROL,
             8 => RegFamily::DEBUG,
+            9 => RegFamily::BOUND,
             _ => unreachable!()
         }
     }
@@ -632,6 +637,8 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
             "dr4"  => (DR4 , QWORD), "dr5"  => (DR5 , QWORD), "dr6"  => (DR6 , QWORD), "dr7"  => (DR7 , QWORD),
             "dr8"  => (DR8 , QWORD), "dr9"  => (DR9 , QWORD), "dr10" => (DR10, QWORD), "dr11" => (DR11, QWORD),
             "dr12" => (DR12, QWORD), "dr13" => (DR13, QWORD), "dr14" => (DR14, QWORD), "dr15" => (DR15, QWORD),
+
+            "bnd0" => (BND0, OWORD), "bnd1" => (BND1, OWORD), "bnd2" => (BND2, OWORD), "bnd3" => (BND3, OWORD),
 
             _ => return None
         };
