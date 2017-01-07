@@ -82,7 +82,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
                 while let Some(&Const(byte)) = stmts.peek() {
                     bytes.push(byte);
                     stmts.next();
-                    if stmts.len() == 32 {
+                    if bytes.len() == 32 {
                         break;
                     }
                 }
