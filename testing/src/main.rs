@@ -52,6 +52,9 @@ fn main() {
         ; inc DWORD [rbp*8]
         ; inc DWORD [rip]
         ; inc DWORD [rip + 16]
+        ; inc DWORD [1*r15]
+        ; inc DWORD [1*r15 + r14]
+        ; inc DWORD [rax + rax + rax + rax + rbx]
         // weird registers
         ; xchg al, ah
         ; xchg al, dil
@@ -133,6 +136,11 @@ fn main() {
         foo: i32,
         bar: u32
     }
+    #[allow(dead_code)]
+    struct SmallTest {
+        foo: i8,
+        bar: u8
+    }
     let mut test_array = [Test {foo: 1, bar: 2}, Test {foo: 3, bar: 4}, Test {foo: 5, bar: 6}];
     let mut test_array = &mut test_array;
     let mut test_single = Test {foo: 7, bar: 8};
@@ -141,9 +149,14 @@ fn main() {
         ; mov rax, AWORD MutPointer!(test_array)
         ; mov ebx, 2
         ; inc DWORD rax => Test[2].bar
+        ; inc DWORD rax => Test[BYTE 2]
+        ; inc DWORD rax => Test[BYTE 0].bar
         ; inc DWORD rax => Test[2 + rbx].bar
         ; inc DWORD rax => Test[rbx].bar
         ; inc DWORD rax => Test[rbx]
+        ; inc DWORD rax => Test[rbx + 2]
+        ; inc DWORD rax => SmallTest[4*rbx + 2].bar
+        ; inc DWORD rax => SmallTest[BYTE 2*rbx + 2].bar
         ; mov rax, AWORD MutPointer!(test_single)
         ; inc DWORD rax => Test.bar
     );

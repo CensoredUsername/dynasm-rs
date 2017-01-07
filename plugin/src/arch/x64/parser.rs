@@ -7,11 +7,10 @@ use syntax::ast;
 use syntax::ptr::P;
 use syntax::codemap::{Spanned, Span};
 
-use std::collections::HashMap;
 use std::cmp::PartialEq;
 
 use ::State;
-use serialize::{Size, Ident, offset_of, size_of, add_exprs, size_of_scale_expr};
+use serialize::{Size, Ident};
 
 /**
  * collections
@@ -22,6 +21,23 @@ pub struct Instruction(pub Vec<Ident>, pub Vec<Arg>, pub Span);
 
 #[derive(Debug)]
 pub enum Arg {
+    // unprocessed typemapped argument
+    TypeMappedRaw {
+        span: Span,
+        base_reg: Register,
+        scale: ast::Path,
+        value_size: Option<Size>,
+        disp_size: Option<Size>,
+        scaled_items: Vec<MemoryRefItem>,
+        attribute: Option<ast::Ident>,
+    },
+    // unprocessed memory reference argument
+    IndirectRaw {
+        span: Span,
+        value_size: Option<Size>,
+        disp_size: Option<Size>,
+        items: Vec<MemoryRefItem>,
+    },
     Indirect(MemoryRef), // indirect memory reference supporting scale, index, base and displacement.
     Direct(Spanned<Register>), // a bare register (rax, ...)
     JumpTarget(JumpType, Option<Size>), // jump target.
@@ -31,15 +47,20 @@ pub enum Arg {
 }
 
 #[derive(Debug)]
+pub enum MemoryRefItem {
+    ScaledRegister(Register, isize),
+    Register(Register),
+    Displacement(P<ast::Expr>)
+}
+
+#[derive(Debug)]
 pub struct MemoryRef {
-    pub index:      Option<Register>,
-    pub scale:      isize,
-    pub scale_expr: Option<P<ast::Expr>>,
-    pub base:       Option<Register>,
-    pub disp:       Option<P<ast::Expr>>,
-    pub disp_size:  Option<Size>,
+    pub span:       Span,
     pub size:       Option<Size>,
-    pub span:       Span
+    pub disp_size:  Option<Size>,
+    pub base:       Option<Register>,
+    pub index:      Option<(Register, isize, Option<P<ast::Expr>>)>,
+    pub disp:       Option<P<ast::Expr>>
 }
 
 #[derive(Debug)]
@@ -115,7 +136,7 @@ pub enum RegId {
     DR8  = 0x88, DR9  = 0x89, DR10 = 0x8A, DR11 = 0x8B,
     DR12 = 0x8C, DR13 = 0x8D, DR14 = 0x8E, DR15 = 0x8F,
 
-    // Bound registers.
+    // size: 16 bytes
     BND0 = 0x90, BND1 = 0x91, BND2 = 0x92, BND3 = 0x93
 }
 
@@ -189,6 +210,19 @@ impl RegKind {
 
     pub fn from_number(id: u8) -> RegKind {
         RegKind::Static(RegId::from_number(id))
+    }
+}
+
+impl PartialEq<Register> for Register {
+    fn eq(&self, other: &Register) -> bool {
+        if self.size == other.size {
+            if let RegKind::Static(code) = self.kind {
+                if let RegKind::Static(other_code) = other.kind {
+                    return code == other_code
+                }
+            }
+        }
+        return false;
     }
 }
 
@@ -418,128 +452,63 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
     // memory location
     if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
         let span = parser.span;
-        let size_hint = eat_size_hint(parser);
+        let disp_size = eat_size_hint(parser);
         let expr = parser.parse_expr()?;
         let span = Span {lo: span.lo, ..expr.span};
         parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
 
-        let (mut regs, disp) = parse_adds(state, ecx, span, expr);
-
-        // can only have two regs at most
-        if regs.len() > 2 {
-            ecx.span_err(span, "Invalid memory reference: too many registers");
-            return Ok(Arg::Invalid);
-        }
-
-        let mut drain = regs.drain(..);
-        let (index, scale, base) = match (drain.next(), drain.next()) {
-            (None,                  None)                 => (None, 0, None),
-            (Some((index, scale)),  None)                 |
-            (None,                  Some((index, scale))) |
-            (Some((index, scale)),  Some((_, 0)))         |
-            (Some((_, 0)),          Some((index, scale))) => if scale == 1 {(None, 0, Some(index))} else {(Some(index), scale, None)},
-            (Some((base, 1)),       Some((index, scale))) |
-            (Some((index, scale)),  Some((base, 1)))      => (Some(index), scale, Some(base)),
-            _ => {
-                ecx.span_err(span, "Invalid memory reference: only one register can be scaled");
-                return Ok(Arg::Invalid);
-            }
-        };
+        let items = parse_adds(state, ecx, expr);
 
         // assemble the memory location
-        return Ok(Arg::Indirect(MemoryRef {
-            index:      index,
-            scale:      scale,
-            scale_expr: None,
-            base:       base,
-            disp:       disp,
-            disp_size:  size_hint,
-            size:       size,
-            span:       span
-        }));
+        return Ok(Arg::IndirectRaw {
+            span: span,
+            value_size: size,
+            disp_size: disp_size,
+            items: items
+        });
     }
 
-    // it's a normal (register/immediate/memoryref/typemapped) operand
+    // it's a normal (register/immediate/typemapped) operand
     parser.parse_expr()?.and_then(|arg| {
         // typemapped
         if parser.eat(&token::FatArrow) {
             let base = parse_reg(state, &arg);
-            if base.is_none() {
+            let base = if let Some(base) = base { base } else {
                 ecx.span_err(arg.span, "Expected register");
                 return Ok(Arg::Invalid);
-            }
+            };
 
             let ty = parser.parse_path(PathStyle::Type)?;
 
             // any attribute, register as index and immediate in index
-            let mut attr = None;
-            let mut index_reg = None;
-            let mut index_disp = None;
             let mut disp_size = None;
+            let items;
 
             if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
-                let span = parser.span;
                 disp_size = eat_size_hint(parser);
                 let index_expr = parser.parse_expr()?;
-                let span = Span {lo: span.lo, ..index_expr.span};
 
                 parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
-
-                let (mut regs, disp) = parse_adds(state, ecx, span, index_expr);
-                index_disp = disp;
-
-                if regs.len() > 1 {
-                    ecx.span_err(span, "Invalid typemap index: too many registers");
-                    return Ok(Arg::Invalid);
-                }
-
-                if let Some((reg, scale)) = regs.pop() {
-                    if scale != 1 {
-                        ecx.span_err(span, "Cannot use scaled registers in typemap index");
-                        return Ok(Arg::Invalid);
-                    }
-                    index_reg = Some(reg)
-                }
-            }
-            if parser.eat(&token::Dot) {
-                attr = Some(parser.parse_ident()?);
+                items = parse_adds(state, ecx, index_expr);
+            } else {
+                items = Vec::new();
             }
 
-            // attribute offset calculation
-            let attr_disp = attr.map(|attr| offset_of(ecx, ty.clone(), attr));
-            // scale calculation
-            let scale = if index_reg.is_some() {
-                Some(size_of(ecx, ty.clone()))
+            let attr = if parser.eat(&token::Dot) {
+                Some(parser.parse_ident()?)
             } else {
                 None
             };
-            // joining index_disp and attr_disp into disp (attr_disp + (sizeof<ty>() as i32) * index_disp)
-            let disp = if let Some(index_disp) = index_disp {
-                let span = index_disp.span;
-                let index_disp = size_of_scale_expr(ecx, ty, index_disp);
-                Some(if let Some(attr_disp) = attr_disp {
-                    ecx.expr_binary(span,
-                        ast::BinOpKind::Add,
-                        attr_disp,
-                        index_disp
-                    )
-                } else {
-                    index_disp
-                })
-            } else {
-                attr_disp
-            };
 
-            return Ok(Arg::Indirect(MemoryRef {
-                index:      index_reg,
-                scale:      8, // scale is set to 8 as to avoid optimizations by the compiler
-                scale_expr: scale,
-                base:       base.map(|s| s.node),
-                disp:       disp,
-                disp_size:  disp_size,
-                size:       size,
-                span:       Span {hi: parser.prev_span.hi, ..start}
-            }));
+            return Ok(Arg::TypeMappedRaw {
+                span: Span {hi: parser.prev_span.hi, ..start},
+                base_reg: base.node,
+                scale: ty,
+                value_size: size,
+                disp_size: disp_size,
+                scaled_items: items,
+                attribute: attr,
+            });
         }
 
         // direct register reference
@@ -687,25 +656,19 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
     }
 }
 
-fn parse_adds(state: &State, ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (Vec<(Register, isize)>, Option<P<ast::Expr>>) {
+fn parse_adds(state: &State, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRefItem> {
     use syntax::ast::ExprKind;
 
-    let mut exprs = Vec::new();
-    collect_adds(ecx, expr, &mut exprs);
+    let mut adds = Vec::new();
+    collect_adds(ecx, expr, &mut adds);
 
-    // as dynamic regs aren't hashable, we count them separate
-    let mut regs: Vec<(Register, isize)> = Vec::new();
-    let mut static_regs: HashMap<(RegId, Size), isize> = HashMap::new();
-    let mut immediates = Vec::new();
+    let mut items = Vec::new();
 
-    // static reg combiner. we do not combine dynamic regs as the equation used to construct them might have side effects.
-    for node in exprs {
+    // detect what kind of equation we're dealing with
+    for node in adds {
         // simple reg
         if let Some(Spanned {node: reg, ..} ) = parse_reg(state, &node) {
-            match reg.kind {
-                RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += 1 as isize,
-                RegKind::Dynamic(_, _) => regs.push((reg, 1))
-            }
+            items.push(MemoryRefItem::Register(reg));
             continue;
         }
         if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = *node {
@@ -713,39 +676,24 @@ fn parse_adds(state: &State, ecx: &ExtCtxt, span: Span, expr: P<ast::Expr>) -> (
             if let Some(Spanned {node: reg, ..} ) = parse_reg(state, left) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
                     if let ast::LitKind::Int(value, _) = scale.node {
-                        match reg.kind {
-                            RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
-                            RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
-                        }
+                        items.push(MemoryRefItem::ScaledRegister(reg, value as isize));
                         continue;
                     }
                 }
-            // const * reg
-            } else if let Some(Spanned {node: reg, ..} ) = parse_reg(state, right) {
+            } // const * reg
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, right) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
                     if let ast::LitKind::Int(value, _) = scale.node {
-                        match reg.kind {
-                            RegKind::Static(id) => *static_regs.entry((id, reg.size)).or_insert(0) += value as isize,
-                            RegKind::Dynamic(_, _) => regs.push((reg, value as isize))
-                        }
+                        items.push(MemoryRefItem::ScaledRegister(reg, value as isize));
                         continue;
                     }
                 }
             }
         }
-        immediates.push(node);
+        items.push(MemoryRefItem::Displacement(node));
     }
 
-    // flush combined static regs
-    regs.extend(static_regs.drain().map(|x| {
-        let ((id, size), amount) = x;
-        (Register::new_static(size, id), amount)
-    }));
-
-    // reconstruct immediates
-    let immediate = add_exprs(ecx, span, immediates.drain(..));
-
-    (regs, immediate)
+    items
 }
 
 fn collect_adds(ecx: &ExtCtxt, node: P<ast::Expr>, collection: &mut Vec<P<ast::Expr>>) {

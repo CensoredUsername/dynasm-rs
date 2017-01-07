@@ -24,6 +24,18 @@ impl Size {
     pub fn in_bytes(&self) -> u8 {
         *self as u8
     }
+
+    pub fn as_literal(&self) -> ast::Ident {
+        ast::Ident::from_str(match *self {
+            Size::BYTE  => "i8",
+            Size::WORD  => "i16",
+            Size::DWORD => "i32",
+            Size::QWORD => "i64",
+            Size::PWORD => "i80",
+            Size::OWORD => "i128",
+            Size::HWORD => "i256"
+        })
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -93,7 +105,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
 
             DynScale(scale, rest)  => {
                 let temp = ast::Ident::from_str("temp");
-                buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size(ecx, &name, scale)));
+                buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size_expr(ecx, &name, scale)));
                 ("push", vec![or_mask_shift_expr(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)])
             },
 
@@ -150,13 +162,13 @@ pub fn add_exprs<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut 
     })
 }
 
-pub fn size_of_scale_expr(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>) -> P<ast::Expr> {
+pub fn size_of_scale_expr(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>, size: Size) -> P<ast::Expr> {
     let span = value.span;
     ecx.expr_binary(span,
         ast::BinOpKind::Mul,
         ecx.expr_cast(span,
-            size_of(ecx, ty),
-            ecx.ty_ident(span, ast::Ident::from_str("i32"))
+            size_of_expr(ecx, ty),
+            ecx.ty_ident(span, size.as_literal())
         ),
         value
     )
@@ -183,7 +195,7 @@ pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Ex
     ecx.expr_binary(span, ast::BinOpKind::BitOr, orig, expr)
 }
 
-pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Expr> {
+pub fn offset_of_expr(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Size) -> P<ast::Expr> {
     // generate a P<Expr> that resolves into the offset of an attribute to a type.
     // this is somewhat ridiculously complex because we can't expand macros here
 
@@ -219,7 +231,6 @@ pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Exp
     let temp     = ast::Ident::from_str("temp");
     let rv       = ast::Ident::from_str("rv");
     let usize_id = ast::Ident::from_str("usize");
-    let i32_id   = ast::Ident::from_str("i32");
     let uninitialized = ["std", "mem", "uninitialized"].iter().cloned().map(ast::Ident::from_str).collect();
     let forget        = ["std", "mem", "forget"       ].iter().cloned().map(ast::Ident::from_str).collect();
 
@@ -257,7 +268,7 @@ pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Exp
         // ::std::mem::forget(temp);
         ecx.stmt_semi(ecx.expr_call_global(span, forget, vec![ecx.expr_ident(span, temp)])),
         // rv as i32
-        ecx.stmt_expr(ecx.expr_cast(span, ecx.expr_ident(span, rv), ecx.ty_ident(span, i32_id)))
+        ecx.stmt_expr(ecx.expr_cast(span, ecx.expr_ident(span, rv), ecx.ty_ident(span, size.as_literal())))
     ]).map(|mut b| {
         b.rules = ast::BlockCheckMode::Unsafe(ast::UnsafeSource::CompilerGenerated);
         b
@@ -266,7 +277,7 @@ pub fn offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident) -> P<ast::Exp
     ecx.expr_block(block)
 }
 
-pub fn size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
+pub fn size_of_expr(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
     // generate a P<Expr> that returns the size of type at path
     let span = path.span;
 
@@ -276,7 +287,7 @@ pub fn size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
     ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
 }
 
-pub fn encoded_size(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P<ast::Expr> {
+pub fn encoded_size_expr(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P<ast::Expr> {
     let span = size.span;
 
     ecx.expr_match(span, size, vec![

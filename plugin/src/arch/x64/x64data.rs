@@ -2,7 +2,6 @@ use std::collections::{HashMap, hash_map};
 
 use super::compiler::Opdata;
 
-
 macro_rules! constify {
     ($t:ty, $e:expr) => { {const C: &'static $t = &$e; C} }
 }
@@ -63,8 +62,9 @@ pub mod flags {
             const REPE      = 0x0002_0000,
 
             const SHORT_ARG = 0x0004_0000, // a register argument is encoded in the last byte of the opcode
-            const ENC_MR    = 0x0008_0000, //  select alternate arg encoding
-            const ENC_VM    = 0x0010_0000, //  select alternate arg encoding
+            const ENC_MR    = 0x0008_0000, // select alternate arg encoding
+            const ENC_VM    = 0x0010_0000, // select alternate arg encoding
+            const ENC_MIB   = 0x0020_0000, // A special encoding using the SIB to specify an immediate and two registers
         }
     }
     // workaround until bitflags can be used in const

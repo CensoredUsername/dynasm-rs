@@ -5,13 +5,13 @@ use syntax::ptr::P;
 use syntax::codemap::Spanned;
 
 use ::State;
-use serialize::{Stmt, Size, Ident, or_mask_shift_expr};
-use super::parser::{Arg, Instruction, MemoryRef, Register, RegKind, RegFamily, RegId, JumpType};
+use serialize::{Stmt, Size, Ident, or_mask_shift_expr, size_of_expr, size_of_scale_expr, offset_of_expr, add_exprs};
+use super::parser::{Arg, Instruction, MemoryRef, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;
 use super::x64data::flags::*;
 use super::debug::format_opdata_list;
 
-use std::mem::swap;
+use std::mem::{swap, replace};
 use std::slice;
 use std::iter;
 
@@ -215,95 +215,97 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         } else {
             RegKind::from_number(data.reg)
         };
-        // VSIB has different mode rules
-        if mem.index.as_ref().map_or(false, |x| x.kind.family() == RegFamily::XMM) {
-            let index = mem.index.unwrap().kind;
+        match mem.index {
+            // VSIB has different mode rules
+            Some(_) if mem.index.as_ref().unwrap().0.kind.family() == RegFamily::XMM => {
+                let (index, scale, scale_expr) = mem.index.unwrap();
+                let index = index.kind;
 
-            let (base, mode) = if let Some(base) = mem.base {
-                (base.kind, match (&mem.disp, mem.disp_size) {
-                    (&Some(_), Some(Size::BYTE)) => MOD_DISP8,
-                    (&Some(_), _) => MOD_DISP32,
-                    (&None, _) => MOD_DISP8
-                })
-            } else {
-                (RegKind::Static(RegId::RBP), MOD_NOBASE)
-            };
-
-            compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-
-            if let Some(expr) = mem.scale_expr {
-                compile_sib_dynscale(ecx, buffer, expr, index, base);
-            } else {
-                compile_modrm_sib(ecx, buffer, mem.scale as u8, index, base);
-            }
-
-            if let Some(disp) = mem.disp {
-                buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
-            } else if mode == MOD_DISP8 {
-                // no displacement was asked for, but we have to encode one as there's a base
-                buffer.push(Stmt::Const(0));
-            } else {
-                // MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
-                for _ in 0..4 {
-                    buffer.push(Stmt::Const(0));
-                }
-            }
-        // normal indirect addressing
-        } else {
-
-            // TODO: if the arg is constant we should be able to optimize to MOD_DISP8.
-            // encoding special cases
-            let rip_relative = mem.base == RegId::RIP;
-            let rbp_relative = mem.base == RegId::RBP || mem.base == RegId::R13;
-            let no_base      = mem.base.is_none();
-
-            // RBP can only be encoded as base if a displacement is present.
-            let mode = if rbp_relative && mem.disp.is_none() {
-                MOD_DISP8
-            // mode_nodisp has to be selected if RIP is encoded, or if no base is to be encoded. note that in these scenarions the disp should actually be encoded
-            } else if mem.disp.is_none() || rip_relative || no_base {
-                MOD_NODISP
-            } else if let Some(Size::BYTE) = mem.disp_size {
-                MOD_DISP8
-            } else {
-                MOD_DISP32
-            };
-
-            // if there's an index we need to escape into the SIB byte
-            if let Some(index) = mem.index {
-                // to encode the lack of a base we encode RBP
-                let base = if let Some(base) = mem.base {
-                    base.kind
+                let (base, mode) = if let Some(base) = mem.base {
+                    (base.kind, match (&mem.disp, mem.disp_size) {
+                        (&Some(_), Some(Size::BYTE)) => MOD_DISP8,
+                        (&Some(_), _) => MOD_DISP32,
+                        (&None, _) => MOD_DISP8
+                    })
                 } else {
-                    RegKind::Static(RegId::RBP)
+                    (RegKind::Static(RegId::RBP), MOD_NOBASE)
                 };
 
                 compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-                if let Some(expr) = mem.scale_expr {
-                    compile_sib_dynscale(ecx, buffer, expr, index.kind, base);
+
+                if let Some(expr) = scale_expr {
+                    compile_sib_dynscale(ecx, buffer, scale, expr, index, base);
                 } else {
-                    compile_modrm_sib(ecx, buffer, mem.scale as u8, index.kind, base);
+                    compile_modrm_sib(ecx, buffer, scale as u8, index, base);
                 }
 
-            // no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled
-            } else if let Some(base) = mem.base {
-                compile_modrm_sib(ecx, buffer, mode, reg_k, base.kind);
+                if let Some(disp) = mem.disp {
+                    buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                } else if mode == MOD_DISP8 {
+                    // no displacement was asked for, but we have to encode one as there's a base
+                    buffer.push(Stmt::Const(0));
+                } else {
+                    // MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
+                    for _ in 0..4 {
+                        buffer.push(Stmt::Const(0));
+                    }
+                }
+            },
+            // normal indirect addressing
+            index => {
+                // encoding special cases
+                let rip_relative = mem.base == RegId::RIP;
+                let rbp_relative = mem.base == RegId::RBP || mem.base == RegId::R13;
+                let no_base      = mem.base.is_none();
 
-            // no base, no index. only disp. escape, use RBP as base and RSP as index
-            } else {
-                compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-                compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
-            }
+                // RBP can only be encoded as base if a displacement is present.
+                let mode = if rbp_relative && mem.disp.is_none() {
+                    MOD_DISP8
+                // mode_nodisp has to be selected if RIP is encoded, or if no base is to be encoded. note that in these scenarions the disp should actually be encoded
+                } else if mem.disp.is_none() || rip_relative || no_base {
+                    MOD_NODISP
+                } else if let Some(Size::BYTE) = mem.disp_size {
+                    MOD_DISP8
+                } else {
+                    MOD_DISP32
+                };
 
-            // Disp
-            if let Some(disp) = mem.disp {
-                buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
-            } else if no_base || rip_relative {
-                for _ in 0..4 {
+                // if there's an index we need to escape into the SIB byte
+                if let Some((index, scale, scale_expr)) = index {
+                    // to encode the lack of a base we encode RBP
+                    let base = if let Some(base) = mem.base {
+                        base.kind
+                    } else {
+                        RegKind::Static(RegId::RBP)
+                    };
+
+                    compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+                    if let Some(expr) = scale_expr {
+                        compile_sib_dynscale(ecx, buffer, scale, expr, index.kind, base);
+                    } else {
+                        compile_modrm_sib(ecx, buffer, scale as u8, index.kind, base);
+                    }
+
+                // no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled
+                } else if let Some(base) = mem.base {
+                    compile_modrm_sib(ecx, buffer, mode, reg_k, base.kind);
+
+                // no base, no index. only disp. escape, use RBP as base and RSP as index
+                } else {
+                    compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+                    compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
+                }
+
+                // Disp
+                if let Some(disp) = mem.disp {
+                    buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                } else if no_base || rip_relative {
+                    for _ in 0..4 {
+                        buffer.push(Stmt::Const(0));
+                    }
+                } else if rbp_relative {
                     buffer.push(Stmt::Const(0));
                 }
-            } else if rbp_relative {
-                buffer.push(Stmt::Const(0));
             }
         }
     // jump-target relative addressing
@@ -385,7 +387,10 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<String>> {
     // determine if an address size prefix is necessary, and sanitize the register choice for memoryrefs
     let mut addr_size = None;
-    for arg in args {
+
+    process_raw_memoryrefs(ecx, args)?;
+
+    for arg in args.iter_mut() {
         if let Arg::Indirect(ref mut mem) = *arg {
             sanitize_memoryref(ecx, mem)?;
 
@@ -398,7 +403,7 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
                     addr_size = Some(reg.size());
                 }
             }
-            if let Some(ref reg) = mem.index {
+            if let Some((ref reg, _, _)) = mem.index {
                 if reg.kind.family() == RegFamily::LEGACY || reg.kind.family() == RegFamily::RIP {
                     if addr_size.is_some() && addr_size != Some(reg.size()) {
                         ecx.span_err(mem.span, "Conflicting address sizes");
@@ -435,6 +440,165 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
         return Err(Some("Impossible address size".into()));
     }
     Ok(addr_size != Size::QWORD)
+}
+
+fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<String>> {
+    // process raw memoryref forms
+    for arg in args {
+        // temporarily swap the arg out so we can get the owned data
+        let temparg = replace(arg, Arg::Invalid);
+        *arg = match temparg {
+            Arg::IndirectRaw {span, value_size, disp_size, items} => {
+                // split the ast on the memoryrefitem types
+                let mut scaled = Vec::new();
+                let mut regs = Vec::new();
+                let mut disps = Vec::new();
+                for item in items {
+                    match item {
+                        MemoryRefItem::Register(reg) => regs.push(reg),
+                        MemoryRefItem::ScaledRegister(reg, value) => scaled.push((reg, value)),
+                        MemoryRefItem::Displacement(expr) => disps.push(expr)
+                    }
+                }
+
+                // figure out the base register if possible
+                let mut base_reg_index = None;
+                for (i, reg) in regs.iter().enumerate() {
+                    if !(regs.iter().any(|other| reg as *const _ != reg as *const _ && reg == other) ||
+                         scaled.iter().any(|&(ref other, _)| reg == other)) {
+                        base_reg_index = Some(i);
+                    }
+                }
+                let mut base = base_reg_index.map(|i| regs.remove(i));
+
+                // join all registers
+                scaled.extend(regs.into_iter().map(|r| (r, 1)));
+                let mut joined_regs = Vec::new();
+                for (reg, s) in scaled {
+                    // does this register already have a spot?
+                    if let Some(i) = joined_regs.iter().position(|&(ref other, _)| &reg == other) {
+                        joined_regs[i].1 += s;
+                    } else {
+                        joined_regs.push((reg, s));
+                    }
+                }
+
+                // identify an index candidate (and a base if one wasn't found yet)
+                let index = if base.is_none() {
+                    // we have to look for a base candidate first as not all index candidates
+                    // are viable base candidates
+                    base_reg_index = joined_regs.iter().position(|&(_, s)| s == 1);
+                    base = base_reg_index.map(|i| joined_regs.remove(i).0);
+                    // get the index
+                    let index = joined_regs.pop();
+                    // if we did find a base candidate here but no index candidate, swap them
+                    // as there was only one register and this register was scaled.
+                    if index.is_none() && base.is_some() {
+                        base.take().map(|reg| (reg, 1))
+                    } else {
+                        index
+                    }
+                } else {
+                    joined_regs.pop()
+                };
+
+
+                if !joined_regs.is_empty() {
+                    ecx.span_err(span, "Impossible memory argument");
+                    return Err(None);
+                }
+
+                // merge disps
+                let disp = add_exprs(ecx, span, disps.into_iter());
+
+                // finalize the memoryref
+                Arg::Indirect(MemoryRef {
+                    span: span,
+                    size: value_size,
+                    disp_size: disp_size,
+                    base: base,
+                    index: index.map(|(r, s)| (r, s, None)),
+                    disp: disp,
+                })
+            },
+            Arg::TypeMappedRaw {span, base_reg, scale, value_size, disp_size, scaled_items, attribute} => {
+                let base = base_reg;
+
+                // collect registers / displacements
+                let mut scaled = Vec::new();
+                let mut disps = Vec::new();
+                for item in scaled_items {
+                    match item {
+                        MemoryRefItem::Register(reg) => scaled.push((reg, 1)),
+                        MemoryRefItem::ScaledRegister(reg, scale) => scaled.push((reg, scale)),
+                        MemoryRefItem::Displacement(expr) => disps.push(expr)
+                    }
+                }
+
+                // join all registers
+                let mut joined_regs = Vec::new();
+                for (reg, s) in scaled {
+                    // does this register already have a spot?
+                    if let Some(i) = joined_regs.iter().position(|&(ref other, _)| &reg == other) {
+                        joined_regs[i].1 += s;
+                    } else {
+                        joined_regs.push((reg, s));
+                    }
+                }
+
+                // identify an index register
+                let index = joined_regs.pop();
+
+                if !joined_regs.is_empty() {
+                    ecx.span_err(span, "Impossible memory argument");
+                    return Err(None);
+                }
+
+                // index = scale * index_scale * index
+                // disp = scale * disps + attribute
+
+                // Displacement size calculation intermezzo:
+                // in typemaps, the following equations are the relations for the scale and displacement.
+                // Now as we can't figure these out at compile time (this'd be nice), by default we'll
+                // always generate a 32-bit displacement if disp_size isn't set. This means we know
+                // the size of disp at this point already.
+                // as for the index calculation: that doesn't change size.
+                let true_disp_size = disp_size.unwrap_or(Size::DWORD);
+
+                // merge disps [a, b, c] into (a + b + c)
+                let scaled_disp = add_exprs(ecx, span, disps.into_iter());
+
+                // scale disps (a + b + c) * size_of<scale> as disp_size
+                let scaled_disp = scaled_disp.map(|disp| size_of_scale_expr(ecx, scale.clone(), disp, true_disp_size));
+
+                // attribute displacement offset_of(scale, attr) as disp_size
+                let attr_disp = attribute.map(|attr| offset_of_expr(ecx, scale.clone(), attr, true_disp_size));
+
+                // add displacement sources together
+                let disp = if let Some(scaled_disp) = scaled_disp {
+                    if let Some(attr_disp) = attr_disp {
+                        Some(ecx.expr_binary(span, ast::BinOpKind::Add, attr_disp, scaled_disp))
+                    } else {
+                        Some(scaled_disp)
+                    }
+                } else {
+                    attr_disp
+                };
+
+                // finalize the memoryref
+                Arg::Indirect(MemoryRef {
+                    span: span,
+                    size: value_size,
+                    disp_size: disp_size,
+                    base: Some(base),
+                    index: index.map(|(r, s)| (r, s, Some(size_of_expr(ecx, scale)))),
+                    disp: disp,
+                })
+            },
+            a => a
+        }
+    }
+    Ok(())
 }
 
 fn size_immediates(args: &mut [Arg]) {
@@ -484,27 +648,27 @@ fn derive_size(expr: &ast::Expr) -> Option<Size> {
 
 fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<String>> {
     // sort out impossible scales
-    if let Some(ref index) = mem.index {
-        mem.scale = match (mem.scale, mem.base.is_none()) {
+    if let Some((ref index, ref mut scale, None)) = mem.index {
+        *scale = match (*scale, mem.base.is_none()) {
             (1, _   ) => 0,
             (2, true) if index.kind.family() == RegFamily::LEGACY => {
                  // size optimization. splits up [index * 2] into [index + index]
-                mem.base = mem.index.clone();
+                mem.base = Some(index.clone());
                 0
             },
             (2, _   ) => 1,
             (4, _   ) => 2,
             (8, _   ) => 3,
             (3, true) if index.kind.family() == RegFamily::LEGACY => {
-                mem.base = mem.index.clone();
+                mem.base = Some(index.clone());
                 1
             },
             (5, true) if index.kind.family() == RegFamily::LEGACY => {
-                mem.base = mem.index.clone();
+                mem.base = Some(index.clone());
                 2
             },
             (9, true) if index.kind.family() == RegFamily::LEGACY => {
-                mem.base = mem.index.clone();
+                mem.base = Some(index.clone());
                 3
             },
             (scale, _) => {
@@ -518,12 +682,13 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     match mem.base {
         ref mut base @ Some(_) if base.as_ref().unwrap().kind.family() == RegFamily::XMM => match mem.index {
             ref mut index @ None => {
-                swap(base, index);
-                mem.scale = 0;
+                // move base to index
+                *index = base.take().map(|reg| (reg, 0, None));
                 return Ok(());
             },
-            ref mut index @ Some(_) if index.as_ref().unwrap().kind.family() == RegFamily::LEGACY && mem.scale == 0 => {
-                swap(base, index);
+            Some((ref mut index, 0, None)) if index.kind.family() == RegFamily::LEGACY => {
+                // swap base and index.
+                swap(base.as_mut().unwrap(), index);
                 return Ok(());
             },
             _ => {
@@ -532,7 +697,7 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
             }
         },
         ref base => match mem.index {
-            Some(ref index) if index.kind.family() == RegFamily::XMM => {
+            Some((ref index, _, _)) if index.kind.family() == RegFamily::XMM => {
                 if base.as_ref().map_or(true, |x| x.kind.family() == RegFamily::LEGACY) {
                     return Ok(());
                 } else {
@@ -545,10 +710,10 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     }
 
     // check that only legacy regs / rip are used:
-    if mem.base.as_ref().map_or(false, |x| x.kind.family() != RegFamily::LEGACY && x.kind != RegId::RIP) {
+    if mem.base.as_ref().map_or(false, |base| base.kind.family() != RegFamily::LEGACY && base.kind != RegId::RIP) {
         ecx.span_err(mem.span, "bad register type as base");
         return Err(None);
-    } else if mem.index.as_ref().map_or(false, |x| x.kind.family() != RegFamily::LEGACY) {
+    } else if mem.index.as_ref().map_or(false, |&(ref index, _, _)| index.kind.family() != RegFamily::LEGACY) {
         ecx.span_err(mem.span, "bad register type as index");
         return Err(None);
     }
@@ -559,22 +724,26 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
         return Err(None);
     }
 
-    // RSP as index field can not be represented.
-    if mem.index == RegId::RSP {
-        if mem.scale == 0 && mem.base != RegId::RSP {
-            // swap index and base to make it encodable
-            swap(&mut mem.base, &mut mem.index);
+    // RSP as index field can not be represented. Check if we can swap it with base
+    if let Some((index, scale, scale_expr)) = mem.index.take() {
+        if index == RegId::RSP {
+            if scale == 0 && scale_expr.is_none() && mem.base != RegId::RSP {
+                // swap index and base
+                mem.index = mem.base.take().map(|b| (b, 0, None));
+                mem.base = Some(index);
+            } else {
+                // as we always fill the base field first this is impossible to satisfy
+                ecx.span_err(mem.span, "'rsp' cannot be used as index field");
+                return Err(None);
+            }
         } else {
-            // as we always fill the base field first this is impossible to satisfy
-            ecx.span_err(mem.span, "'rsp' cannot be used as index field");
-            return Err(None);
+            mem.index = Some((index, scale, scale_expr));
         }
     }
 
     // RSP or R12 as base without index (add an index so we escape into SIB)
     if (mem.base == RegId::RSP || mem.base == RegId::R12) && mem.index.is_none() {
-        mem.index = Some(Register::new_static(Size::QWORD, RegId::RSP));
-        mem.scale = 0;
+        mem.index = Some((Register::new_static(Size::QWORD, RegId::RSP), 0, None));
     }
 
     // RBP as base field just requires a mandatory MOD_DISP8. we don't sort that out here.
@@ -696,16 +865,16 @@ fn match_format_string(fmt: &'static Opdata, mut args: &mut [Arg]) -> Result<(),
                 // memory offsets
                 (b'm',          &Arg::Indirect(MemoryRef {size, ref index, ..} )) |
                 (b'u' ... b'w', &Arg::Indirect(MemoryRef {size, ref index, ..} )) if
-                    index.is_none() || index.as_ref().unwrap().kind.family() != RegFamily::XMM => size,
+                    index.is_none() || index.as_ref().unwrap().0.kind.family() != RegFamily::XMM => size,
 
                 (b'm',          &Arg::IndirectJumpTarget(_, size)) |
                 (b'u' ... b'w', &Arg::IndirectJumpTarget(_, size)) => size,
 
                 // vsib addressing. as they have two sizes that must be checked they check one of the sizes here
-                (b'k', &Arg::Indirect(MemoryRef {size, index: Some(ref index), ..} )) if
+                (b'k', &Arg::Indirect(MemoryRef {size, index: Some((ref index, _, _)), ..} )) if
                     (size.is_none() || size == Some(Size::DWORD)) &&
                     index.kind.family() == RegFamily::XMM => Some(index.size()),
-                (b'l', &Arg::Indirect(MemoryRef {size, index: Some(ref index), ..} )) if
+                (b'l', &Arg::Indirect(MemoryRef {size, index: Some((ref index, _, _)), ..} )) if
                     (size.is_none() ||  size == Some(Size::QWORD)) &&
                     index.kind.family() == RegFamily::XMM => Some(index.size()),
                 _ => return Err("argument type mismatch")
@@ -867,7 +1036,7 @@ fn get_operand_size(fmt: &'static Opdata, args: &mut [Arg]) -> Result<Size, Opti
             Arg::Indirect(MemoryRef {mut size, ref index, ..}) => {
                 has_args = true;
                 // for vsib addressing we're interested in the size of the address vector
-                if let Some(ref reg) = *index {
+                if let Some((ref reg, _, _)) = *index {
                     if reg.kind.family() == RegFamily::XMM {
                         size = Some(reg.size());
                     }
@@ -886,6 +1055,8 @@ fn get_operand_size(fmt: &'static Opdata, args: &mut [Arg]) -> Result<Size, Opti
                 }
                 im_size = Some(size);
             },
+            Arg::TypeMappedRaw {..} |
+            Arg::IndirectRaw {..} |
             Arg::Invalid => unreachable!()
         }
     }
@@ -940,7 +1111,7 @@ fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool
                     if let Some(ref reg) = *base {
                         requires_rex = requires_rex || reg.kind.is_extended();
                     }
-                    if let Some(ref reg) = *index {
+                    if let Some((ref reg, _, _)) = *index {
                         requires_rex = requires_rex || reg.kind.is_extended();
                     }
                 },
@@ -954,6 +1125,8 @@ fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool
                     }
                     has_jumptarget = true;
                 },
+                Arg::TypeMappedRaw {..} |
+                Arg::IndirectRaw {..} |
                 Arg::Invalid => unreachable!()
             }
         }
@@ -1084,7 +1257,7 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<
         if let Some(ref base) = *base {
             base_k = base.kind.clone();
         }
-        if let Some(ref index) = *index {
+        if let Some((ref index, _, _)) = *index {
             index_k = index.kind.clone();
         }
     }
@@ -1129,7 +1302,7 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
         if let Some(ref base) = *base {
             base_k = base.kind.clone();
         }
-        if let Some(ref index) = *index {
+        if let Some((ref index, _, _)) = *index {
             index_k = index.kind.clone();
         }
     }
@@ -1221,7 +1394,7 @@ fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, mode: u8, reg1: RegK
     buffer.push(Stmt::ExprConst(byte));
 }
 
-fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, scale: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
+fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, scale: isize, scale_expr: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 
@@ -1233,5 +1406,13 @@ fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, scale: P<ast::Exp
     if let RegKind::Dynamic(_, expr) = reg2 {
         byte = or_mask_shift_expr(ecx, byte, expr, 7, 0);
     }
-    buffer.push(Stmt::DynScale(scale, byte));
+    let span = scale_expr.span;
+    buffer.push(Stmt::DynScale(
+        ecx.expr_binary(span,
+            ast::BinOpKind::Mul,
+            scale_expr,
+            ecx.expr_lit(span, ast::LitKind::Int(scale as u128, ast::LitIntType::Unsuffixed)),
+        ),
+        byte
+    ));
 }
