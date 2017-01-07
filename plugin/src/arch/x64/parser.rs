@@ -27,6 +27,7 @@ pub enum Arg {
         base_reg: Register,
         scale: ast::Path,
         value_size: Option<Size>,
+        nosplit: bool,
         disp_size: Option<Size>,
         scaled_items: Vec<MemoryRefItem>,
         attribute: Option<ast::Ident>,
@@ -35,6 +36,7 @@ pub enum Arg {
     IndirectRaw {
         span: Span,
         value_size: Option<Size>,
+        nosplit: bool,
         disp_size: Option<Size>,
         items: Vec<MemoryRefItem>,
     },
@@ -57,6 +59,7 @@ pub enum MemoryRefItem {
 pub struct MemoryRef {
     pub span:       Span,
     pub size:       Option<Size>,
+    pub nosplit:    bool,
     pub disp_size:  Option<Size>,
     pub base:       Option<Register>,
     pub index:      Option<(Register, isize, Option<P<ast::Expr>>)>,
@@ -452,6 +455,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
     // memory location
     if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
         let span = parser.span;
+        let nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
         let disp_size = eat_size_hint(parser);
         let expr = parser.parse_expr()?;
         let span = Span {lo: span.lo, ..expr.span};
@@ -463,6 +467,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         return Ok(Arg::IndirectRaw {
             span: span,
             value_size: size,
+            nosplit: nosplit,
             disp_size: disp_size,
             items: items
         });
@@ -481,10 +486,12 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             let ty = parser.parse_path(PathStyle::Type)?;
 
             // any attribute, register as index and immediate in index
+            let mut nosplit = false;
             let mut disp_size = None;
             let items;
 
             if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
+                nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
                 disp_size = eat_size_hint(parser);
                 let index_expr = parser.parse_expr()?;
 
@@ -505,6 +512,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 base_reg: base.node,
                 scale: ty,
                 value_size: size,
+                nosplit: nosplit,
                 disp_size: disp_size,
                 scaled_items: items,
                 attribute: attr,

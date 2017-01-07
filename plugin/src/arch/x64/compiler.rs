@@ -448,7 +448,7 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
         // temporarily swap the arg out so we can get the owned data
         let temparg = replace(arg, Arg::Invalid);
         *arg = match temparg {
-            Arg::IndirectRaw {span, value_size, disp_size, items} => {
+            Arg::IndirectRaw {span, value_size, nosplit, disp_size, items} => {
                 // split the ast on the memoryrefitem types
                 let mut scaled = Vec::new();
                 let mut regs = Vec::new();
@@ -491,9 +491,9 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                     base = base_reg_index.map(|i| joined_regs.remove(i).0);
                     // get the index
                     let index = joined_regs.pop();
-                    // if we did find a base candidate here but no index candidate, swap them
+                    // if nosplit was used, a scaled base was found but not an index, swap them
                     // as there was only one register and this register was scaled.
-                    if index.is_none() && base.is_some() {
+                    if nosplit && index.is_none() && base.is_some() {
                         base.take().map(|reg| (reg, 1))
                     } else {
                         index
@@ -515,13 +515,14 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                 Arg::Indirect(MemoryRef {
                     span: span,
                     size: value_size,
+                    nosplit: nosplit,
                     disp_size: disp_size,
                     base: base,
                     index: index.map(|(r, s)| (r, s, None)),
                     disp: disp,
                 })
             },
-            Arg::TypeMappedRaw {span, base_reg, scale, value_size, disp_size, scaled_items, attribute} => {
+            Arg::TypeMappedRaw {span, base_reg, scale, value_size, nosplit, disp_size, scaled_items, attribute} => {
                 let base = base_reg;
 
                 // collect registers / displacements
@@ -589,6 +590,7 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                 Arg::Indirect(MemoryRef {
                     span: span,
                     size: value_size,
+                    nosplit: nosplit,
                     disp_size: disp_size,
                     base: Some(base),
                     index: index.map(|(r, s)| (r, s, Some(size_of_expr(ecx, scale)))),
@@ -651,7 +653,7 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     if let Some((ref index, ref mut scale, None)) = mem.index {
         *scale = match (*scale, mem.base.is_none()) {
             (1, _   ) => 0,
-            (2, true) if index.kind.family() == RegFamily::LEGACY => {
+            (2, true) if !mem.nosplit && index.kind.family() == RegFamily::LEGACY => {
                  // size optimization. splits up [index * 2] into [index + index]
                 mem.base = Some(index.clone());
                 0
@@ -659,15 +661,15 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
             (2, _   ) => 1,
             (4, _   ) => 2,
             (8, _   ) => 3,
-            (3, true) if index.kind.family() == RegFamily::LEGACY => {
+            (3, true) if !mem.nosplit && index.kind.family() == RegFamily::LEGACY => {
                 mem.base = Some(index.clone());
                 1
             },
-            (5, true) if index.kind.family() == RegFamily::LEGACY => {
+            (5, true) if !mem.nosplit && index.kind.family() == RegFamily::LEGACY => {
                 mem.base = Some(index.clone());
                 2
             },
-            (9, true) if index.kind.family() == RegFamily::LEGACY => {
+            (9, true) if !mem.nosplit && index.kind.family() == RegFamily::LEGACY => {
                 mem.base = Some(index.clone());
                 3
             },

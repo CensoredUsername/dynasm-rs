@@ -53,6 +53,9 @@ fn main() {
         ; inc DWORD [rip]
         ; inc DWORD [rip + 16]
         ; inc DWORD [1*r15]
+        ; inc DWORD [NOSPLIT 1*r15]
+        ; inc DWORD [2*r15]
+        ; inc DWORD [NOSPLIT 2*r15]
         ; inc DWORD [1*r15 + r14]
         ; inc DWORD [rax + rax + rax + rax + rbx]
         // weird registers
