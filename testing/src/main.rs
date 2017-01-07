@@ -125,6 +125,8 @@ fn main() {
         ; bextr rax, rbx, 1
         ; vaddpd xmm0, xmm1, [rax]
         // VSIB addressing
+        ; vgatherqpd ymm1, QWORD [ymm15 + rsi + 0x11112222], ymm8
+        ; vgatherqpd ymm1, QWORD [NOSPLIT rsi + ymm15 + 0x11112222], ymm8
         ; vgatherqpd ymm1, QWORD [ymm15*8 + rsi + 0x11112222], ymm8
         // 4 argument instructions
         ; vfmaddss xmm0, xmm1, xmm2, xmm3
@@ -151,6 +153,7 @@ fn main() {
     dynasm!(ops
         ; mov rax, AWORD MutPointer!(test_array)
         ; mov ebx, 2
+        ; vgatherqpd ymm13, QWORD rax => f64[ymm15], ymm14
         ; inc DWORD rax => Test[2].bar
         ; inc DWORD rax => Test[BYTE 2]
         ; inc DWORD rax => Test[BYTE 0].bar

@@ -464,9 +464,10 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                 // figure out the base register if possible
                 let mut base_reg_index = None;
                 for (i, reg) in regs.iter().enumerate() {
-                    if !(regs.iter().any(|other| reg as *const _ != reg as *const _ && reg == other) ||
+                    if !(regs.iter().enumerate().any(|(j, other)| i != j && reg == other) ||
                          scaled.iter().any(|&(ref other, _)| reg == other)) {
                         base_reg_index = Some(i);
+                        break;
                     }
                 }
                 let mut base = base_reg_index.map(|i| regs.remove(i));
@@ -683,12 +684,12 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     // VSIB addressing has simpler encoding rules, so detect it and return if it's used here.
     match mem.base {
         ref mut base @ Some(_) if base.as_ref().unwrap().kind.family() == RegFamily::XMM => match mem.index {
-            ref mut index @ None => {
+            ref mut index @ None if !mem.nosplit => {
                 // move base to index
                 *index = base.take().map(|reg| (reg, 0, None));
                 return Ok(());
             },
-            Some((ref mut index, 0, None)) if index.kind.family() == RegFamily::LEGACY => {
+            Some((ref mut index, 0, None)) if !mem.nosplit && index.kind.family() == RegFamily::LEGACY => {
                 // swap base and index.
                 swap(base.as_mut().unwrap(), index);
                 return Ok(());
@@ -729,7 +730,7 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     // RSP as index field can not be represented. Check if we can swap it with base
     if let Some((index, scale, scale_expr)) = mem.index.take() {
         if index == RegId::RSP {
-            if scale == 0 && scale_expr.is_none() && mem.base != RegId::RSP {
+            if !mem.nosplit && scale == 0 && scale_expr.is_none() && mem.base != RegId::RSP {
                 // swap index and base
                 mem.index = mem.base.take().map(|b| (b, 0, None));
                 mem.base = Some(index);
