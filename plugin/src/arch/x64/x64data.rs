@@ -33,7 +33,7 @@ macro_rules! Ops {
 pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
     OPMAP.get(&name).map(|x| *x)
 }
-#[macro_use]
+
 pub mod flags {
     bitflags! {
         pub flags Flags: u32 {
@@ -67,12 +67,22 @@ pub mod flags {
             const ENC_MIB   = 0x0020_0000, // A special encoding using the SIB to specify an immediate and two registers
         }
     }
+
     // workaround until bitflags can be used in const
     pub const fn flag_bits(flag: Flags) -> u32 {
         flag.bits
     }
     pub const fn make_flag(bits: u32) -> Flags {
         Flags {bits: bits}
+    }
+}
+
+pub mod features {
+    bitflags! {
+        pub flags Features: u32 {
+            const X64_IMPLICIT = 0x0000_0000,
+            // feature flags go here
+        }
     }
 }
 

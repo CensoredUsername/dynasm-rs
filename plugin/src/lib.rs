@@ -24,7 +24,7 @@ use syntax::parse::token;
 use syntax::tokenstream::TokenTree;
 use syntax::ptr::P;
 
-use std::sync::{RwLock, RwLockReadGuard, Mutex, MutexGuard};
+use std::sync::{RwLock, RwLockReadGuard, Mutex};
 use std::collections::HashMap;
 
 use owning_ref::{OwningRef, RwLockReadGuardRef};
@@ -102,9 +102,9 @@ fn dynasm<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
 
 /// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
 pub struct State<'a> {
-    pub stmts: Vec<serialize::Stmt>,
-    pub target: P<ast::Expr>,
-    pub crate_data: MutexGuard<'a, DynasmData>
+    pub stmts: &'a mut Vec<serialize::Stmt>,
+    pub target: &'a P<ast::Expr>,
+    pub crate_data: &'a DynasmData
 }
 
 /// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
@@ -114,12 +114,9 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
     let target = parser.parse_expr()?;
 
     let crate_data = crate_local_data(ecx);
+    let mut crate_data = crate_data.lock().unwrap();
 
-    let mut state = State {
-        stmts: Vec::new(),
-        target: target,
-        crate_data: crate_data.lock().unwrap()
-    };
+    let mut stmts = Vec::new();
 
     while !parser.check(&token::Eof) {
         parser.expect(&token::Semi)?;
@@ -127,14 +124,14 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
         // ;; stmt
         if parser.eat(&token::Semi) {
             if let Some(stmt) = parser.parse_stmt()? {
-                state.stmts.push(serialize::Stmt::Stmt(stmt));
+                stmts.push(serialize::Stmt::Stmt(stmt));
             }
             continue;
         }
 
         // ; . directive
         if parser.eat(&token::Dot) {
-            state.evaluate_directive(ecx, parser)?;
+            crate_data.evaluate_directive(&mut stmts, ecx, parser)?;
             continue;
         }
 
@@ -143,14 +140,14 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
             let span = parser.span;
             let name = parser.parse_ident()?;
             parser.expect(&token::Colon)?;
-            state.stmts.push(serialize::Stmt::GlobalLabel(Spanned {span: span, node: name} ));
+            stmts.push(serialize::Stmt::GlobalLabel(Spanned {span: span, node: name} ));
             continue;
         }
 
         // ; => expr
         if parser.eat(&token::FatArrow) {
             let expr = parser.parse_expr()?;
-            state.stmts.push(serialize::Stmt::DynamicLabel(expr));
+            stmts.push(serialize::Stmt::DynamicLabel(expr));
             continue;
         }
 
@@ -159,15 +156,20 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
             let span = parser.span;
             let name = parser.parse_ident()?;
             parser.expect(&token::Colon)?;
-            state.stmts.push(serialize::Stmt::LocalLabel(Spanned {span: span, node: name} ));
+            stmts.push(serialize::Stmt::LocalLabel(Spanned {span: span, node: name} ));
             continue;
         }
 
         // anything else is an assembly instruction which should be in current_arch
-        state.compile_instruction(ecx, parser)?;
+        let mut state = State {
+            stmts: &mut stmts,
+            target: &target,
+            crate_data: &*crate_data
+        };
+        crate_data.current_arch.compile_instruction(&mut state, ecx, parser)?;
     }
 
-    Ok(serialize::serialize(ecx, state.target, state.stmts))
+    Ok(serialize::serialize(ecx, target, stmts))
 }
 
 // Crate local data implementation.
@@ -175,14 +177,14 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
 type DynasmStorage = HashMap<String, Mutex<DynasmData>>;
 
 pub struct DynasmData {
-    pub current_arch: arch::Arch,
+    pub current_arch: Box<arch::Arch>,
     pub aliases: HashMap<String, String>
 }
 
 impl DynasmData {
     fn new() -> DynasmData {
         DynasmData {
-            current_arch: arch::CURRENT_ARCH,
+            current_arch: arch::from_str(arch::CURRENT_ARCH).expect("Default architecture is invalid"),
             aliases: HashMap::new()
         }
     }

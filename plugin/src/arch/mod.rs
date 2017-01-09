@@ -2,44 +2,63 @@ use syntax::ext::base::ExtCtxt;
 use syntax::parse::parser::Parser;
 use syntax::parse::PResult;
 
+use std::fmt::Debug;
+
+use serialize::Ident;
 use ::State;
 
 pub mod x64;
 
-#[derive(Debug, Clone, Copy)]
-pub enum Arch {
-    X64,
-    X86,
-    Unknown
+pub trait Arch : Debug + Send {
+    fn name(&self) -> &str;
+    fn set_features(&mut self, ecx: &ExtCtxt, features: &[Ident]);
+    fn compile_instruction<'a>(&self, state: &mut State, ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, ()>;
 }
 
-impl Arch {
-    pub fn from_str(s: &str) -> Option<Arch> {
-        match s {
-            "x64" => Some(Arch::X64),
-            "x86" => Some(Arch::X86),
-            _ => None
-        }
+#[derive(Clone, Debug)]
+pub struct DummyArch {
+    name: &'static str
+}
+
+impl DummyArch {
+    fn new(name: &'static str) -> DummyArch {
+        DummyArch { name: name }
     }
 }
 
-impl<'a> State<'a> {
-    pub fn compile_instruction<'b>(&mut self, ecx: &mut ExtCtxt, parser: &mut Parser<'b>) -> PResult<'b, ()> {
-        match self.crate_data.current_arch {
-            Arch::X64 => x64::compile_instruction(self, ecx, parser),
-            _ => {
-                ecx.span_err(ecx.call_site(),
-                             "Current assembling architecture is undefined. Define it using a .arch directive"
-                );
-                Ok(())
-            }
+impl Arch for DummyArch {
+    fn name(&self) -> &str {
+        self.name
+    }
+
+    fn set_features(&mut self, ecx: &ExtCtxt, features: &[Ident]) {
+        if let Some(feature) = features.first() {
+            ecx.span_err(feature.span,
+                "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive"
+            );
         }
+    }
+
+    fn compile_instruction<'a>(&self, _state: &mut State, ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, ()> {
+        ecx.span_err(parser.span,
+            "Current assembling architecture is undefined. Define it using a .arch directive"
+        );
+        Ok(())
+    }
+}
+
+pub fn from_str(s: &str) -> Option<Box<Arch>> {
+    match s {
+        "x64" => Some(Box::new(x64::Archx64::default())),
+        "x86" => Some(Box::new(DummyArch::new("x86"))),
+        "unknown" => Some(Box::new(DummyArch::new("unknown"))),
+        _ => None
     }
 }
 
 #[cfg(target_arch="x86_64")]
-pub const CURRENT_ARCH: Arch = Arch::X64;
+pub const CURRENT_ARCH: &'static str = "x64";
 #[cfg(target_arch="x86")]
-pub const CURRENT_ARCH: Arch = Arch::X86;
+pub const CURRENT_ARCH: &'static str = "x86";
 #[cfg(not(any(target_arch="x86", target_arch="x86_64")))]
-pub const CURRENT_ARCH: Arch = Arch::Unknown;
+pub const CURRENT_ARCH: &'static str = "unknown";

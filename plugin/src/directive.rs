@@ -6,12 +6,12 @@ use syntax::parse::token;
 use syntax::parse::PResult;
 use syntax::codemap::Span;
 
-use super::State;
-use serialize::{Stmt, Size};
-use arch::Arch;
+use super::DynasmData;
+use serialize::{Stmt, Size, Ident};
+use arch;
 
-impl<'a> State<'a> {
-    pub fn evaluate_directive<'b>(&mut self, ecx: &mut ExtCtxt, parser: &mut Parser<'b>) -> PResult<'b, ()> {
+impl DynasmData {
+    pub fn evaluate_directive<'b>(&mut self, stmts: &mut Vec<Stmt>, ecx: &mut ExtCtxt, parser: &mut Parser<'b>) -> PResult<'b, ()> {
         let start = parser.span;
 
         let directive = parser.parse_ident()?;
@@ -19,30 +19,42 @@ impl<'a> State<'a> {
         match &*directive.name.as_str() {
             // TODO: oword, qword, float, double, long double
 
-            ".arch" => {
+            "arch" => {
                 // ; .arch ident
                 let arch = parser.parse_ident()?;
-                if let Some(a) = Arch::from_str(&*arch.name.as_str()) {
-                    self.crate_data.current_arch = a;
+                if let Some(a) = arch::from_str(&*arch.name.as_str()) {
+                    self.current_arch = a;
                 } else {
                     ecx.span_err(parser.prev_span, &format!("Unknown architecture '{}'", &*arch.name.as_str()));
                 }
-            }
+            },
+            "feature" => {
+                // ; .feature ident ("," ident) *
+                let mut features = Vec::new();
+                let ident = parser.parse_ident()?;
+                features.push(Ident {span: parser.prev_span, node: ident});
+
+                while parser.eat(&token::Token::Comma) {
+                    let ident = parser.parse_ident()?;
+                    features.push(Ident {span: parser.prev_span, node: ident});
+                }
+                self.current_arch.set_features(ecx, &features);
+            },
             // ; .byte (expr ("," expr)*)?
-            "byte"  => self.directive_const(parser, Size::BYTE)?,
-            "word"  => self.directive_const(parser, Size::WORD)?,
-            "dword" => self.directive_const(parser, Size::DWORD)?,
-            "qword" => self.directive_const(parser, Size::QWORD)?,
+            "byte"  => Self::directive_const(stmts, parser, Size::BYTE)?,
+            "word"  => Self::directive_const(stmts, parser, Size::WORD)?,
+            "dword" => Self::directive_const(stmts, parser, Size::DWORD)?,
+            "qword" => Self::directive_const(stmts, parser, Size::QWORD)?,
             "bytes" => {
                 // ; .bytes expr
                 let iterator = parser.parse_expr()?;
-                self.stmts.push(Stmt::Extend(iterator));
+                stmts.push(Stmt::Extend(iterator));
             },
             "align" => {
                 // ; .align expr
                 // this might need to be architecture dependent
                 let value = parser.parse_expr()?;
-                self.stmts.push(Stmt::Align(value));
+                stmts.push(Stmt::Align(value));
             },
             "alias" => {
                 // ; .alias ident, ident
@@ -51,7 +63,7 @@ impl<'a> State<'a> {
                 parser.expect(&token::Comma)?;
                 let reg = parser.parse_ident()?.name;
 
-                match self.crate_data.aliases.entry(alias.as_str().to_string()) {
+                match self.aliases.entry(alias.as_str().to_string()) {
                     Entry::Occupied(_) => {
                         ecx.span_err(Span {hi: parser.prev_span.hi, ..start},
                                      &format!("Duplicate alias definition, alias '{}' was already defined", alias.as_str()));
@@ -73,12 +85,12 @@ impl<'a> State<'a> {
         Ok(())
     }
 
-    fn directive_const<'b>(&mut self, parser: &mut Parser<'b>, size: Size) -> PResult<'b, ()> {
+    fn directive_const<'b>(stmts: &mut Vec<Stmt>, parser: &mut Parser<'b>, size: Size) -> PResult<'b, ()> {
         if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-            self.stmts.push(Stmt::Var(parser.parse_expr()?, size));
+            stmts.push(Stmt::Var(parser.parse_expr()?, size));
 
             while parser.eat(&token::Comma) {
-                self.stmts.push(Stmt::Var(parser.parse_expr()?, size));
+                stmts.push(Stmt::Var(parser.parse_expr()?, size));
             }
         }
 
