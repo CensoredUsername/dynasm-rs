@@ -3,6 +3,7 @@
 *.sublime-*
 *.exe
 *.pdb
+*.swp
 
 target/
 build_docs/
