@@ -302,7 +302,7 @@ impl RegId {
             13 => RegId::R13,
             14 => RegId::R14,
             15 => RegId::R15,
-            _ => panic!("invalid register code")
+            _ => panic!("invalid register code {:?}", id)
         }
     }
 }

@@ -1,11 +1,12 @@
 [package]
 name = "testing"
-version = "0.1.0"
-authors = ["Alexander Stocko <as@coder.gg>"]
+version = "0.0.1"
+authors = ["CensoredUsername <cens.username@gmail.com>"]
+
+[dependencies]
 
 [dependencies.dynasm]
 path = "../plugin"
 
 [dependencies.dynasmrt]
 path = "../runtime"
-

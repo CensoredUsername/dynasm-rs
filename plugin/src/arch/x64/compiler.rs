@@ -1065,7 +1065,7 @@ fn get_operand_size(fmt: &'static Opdata, args: &mut [Arg]) -> Result<Size, Opti
     }
 
     if !has_args {
-        panic!("get_operand_size was invoked without wildcard size arguments");
+        panic!("get_operand_size was invoked without wildcard size arguments {:?}", fmt);
     }
     if let Some(op_size) = op_size {
         // was an immediate provided
