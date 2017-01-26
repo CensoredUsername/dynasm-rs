@@ -140,6 +140,15 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
     let mut ops = data.ops;
 
+    // deal with ops that encode the final byte in an immediate
+    let immediate_opcode = if data.flags.intersects(IMM_OP) {
+        let (&imm, rest) = ops.split_last().expect("bad formatting data");
+        ops = rest;
+        Some(imm)
+    } else {
+        None
+    };
+
     // legacy-only prefixes
     if let Some(pref) = pref_seg {
         buffer.push(Stmt::Const(pref));
@@ -156,9 +165,9 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         } else                           { 0
         };
         // map_sel is stored in the first byte of the opcode
-        let (map_sel, tail) = ops.split_first().expect("bad formatting data");
+        let (&map_sel, tail) = ops.split_first().expect("bad formatting data");
         ops = tail;
-        compile_vex_xop(ecx, buffer, data, &reg, &rm, *map_sel, rex_w, &vvvv, vex_l, prefix);
+        compile_vex_xop(ecx, buffer, data, &reg, &rm, map_sel, rex_w, &vvvv, vex_l, prefix);
     // otherwise, the size/mod prefixes have to be pushed and check if a rex prefix has to be generated.
     } else {
         if let Some(pref) = pref_mod {
@@ -190,10 +199,6 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         } else {
             buffer.push(Stmt::Const(last + (rm_k.encode() & 7)));
         }
-    // this is a 3DNow! opcode, escape
-    } else if data.flags.contains(TDNOW_OP) {
-        buffer.push(Stmt::Const(0x0F));
-        buffer.push(Stmt::Const(0x0F));
     // just push the opcode
     } else {
         buffer.extend(ops.iter().cloned().map(Stmt::Const))
@@ -331,9 +336,9 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         });
     }
 
-    // 3DNow! opcode
-    if data.flags.contains(TDNOW_OP) {
-        buffer.extend(ops.iter().cloned().map(Stmt::Const));
+    // opcode encoded after the displacement
+    if let Some(code) = immediate_opcode {
+        buffer.push(Stmt::Const(code));
     }
 
     // register in immediate argument

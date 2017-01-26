@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use syntax::util::ThinVec;
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
 use syntax::ast;
@@ -203,6 +204,7 @@ pub fn offset_of_expr(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Si
 
     let structpat = ecx.pat_struct(span, path.clone(), vec![
         Spanned {span: span, node: ast::FieldPat {
+            attrs: ThinVec::new(),
             ident: attr,
             pat: ecx.pat_wild(span),
             is_shorthand: false
