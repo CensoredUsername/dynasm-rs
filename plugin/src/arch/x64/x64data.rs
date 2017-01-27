@@ -126,6 +126,7 @@ pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> 
 // workaround until bitflags can be used in const
 const VEX_OP    : u32 = flags::flag_bits(flags::VEX_OP);
 const XOP_OP    : u32 = flags::flag_bits(flags::XOP_OP);
+const IMM_OP    : u32 = flags::flag_bits(flags::IMM_OP);
 const SHORT_ARG : u32 = flags::flag_bits(flags::SHORT_ARG);
 const AUTO_SIZE : u32 = flags::flag_bits(flags::AUTO_SIZE);
 const AUTO_NO32 : u32 = flags::flag_bits(flags::AUTO_NO32);

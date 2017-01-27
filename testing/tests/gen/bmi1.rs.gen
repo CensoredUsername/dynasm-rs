@@ -1,0 +1,56 @@
+
+#[test]
+fn enc_tzcnt3746() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; tzcnt rcx, rcx
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0xC9", "tzcnt rcx, rcx");
+}
+
+
+
+#[test]
+fn enc_tzcnt3747() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; tzcnt rax, rcx
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0xC1", "tzcnt rax, rcx");
+}
+
+
+
+#[test]
+fn enc_tzcnt3748() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; tzcnt rdx, QWORD [rax]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0x10", "tzcnt rdx, QWORD [rax]");
+}
+
+
+
+#[test]
+fn enc_tzcnt3749() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; tzcnt rax, QWORD [rax]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0x00", "tzcnt rax, QWORD [rax]");
+}
+
+

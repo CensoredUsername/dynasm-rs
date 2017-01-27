@@ -5,6 +5,9 @@
 *.pdb
 *.swp
 
+.python-version
+*.prv
+
 target/
 build_docs/
 Cargo.lock
