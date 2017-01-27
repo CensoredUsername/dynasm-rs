@@ -1175,7 +1175,7 @@ fn extract_args(fmt: &'static Opdata, args: Vec<Arg>) -> (Option<Arg>, Option<Ar
                 memarg = Some(regs.len());
                 regs.push(arg)
             },
-            b'f' | b'x' | b'r' | b'y' => regs.push(arg),
+            b'f' | b'x' | b'r' | b'y' | b'b' => regs.push(arg),
             b'c' | b'd' | b's'        => if regarg.is_some() {
                 panic!("multiple segment, debug or control registers in format string");
             } else {
