@@ -1,76 +1,62 @@
 
 #[test]
-fn enc_rtm_xabort7448() {
+fn enc_rtm_xabort5792() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 104
+             ; xabort 5
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x68", "xabort 104");
+     assert_eq!(hex, "0xC6, 0xF8, 0x05", "xabort 5");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort7449() {
+fn enc_rtm_xabort5793() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 65
+             ; xabort 36
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x41", "xabort 65");
+     assert_eq!(hex, "0xC6, 0xF8, 0x24", "xabort 36");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort7450() {
+fn enc_rtm_xabort5794() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 56
+             ; xabort 35
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x38", "xabort 56");
+     assert_eq!(hex, "0xC6, 0xF8, 0x23", "xabort 35");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort7451() {
+fn enc_rtm_xabort5795() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 83
+             ; xabort 88
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x53", "xabort 83");
+     assert_eq!(hex, "0xC6, 0xF8, 0x58", "xabort 88");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort7452() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; xabort 41
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x29", "xabort 41");
-}
-
-
-
-#[test]
-fn enc_rtm_xend7453() {
+fn enc_rtm_xend5796() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xend
@@ -84,7 +70,7 @@ fn enc_rtm_xend7453() {
 
 
 #[test]
-fn enc_rtm_xtest7454() {
+fn enc_rtm_xtest5797() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xtest

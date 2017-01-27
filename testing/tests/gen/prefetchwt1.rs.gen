@@ -1,20 +1,6 @@
 
 #[test]
-fn enc_prefetchwt1_prefetchwt14483() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; prefetchwt1 BYTE [rax * 2 + rdx]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x0D, 0x14, 0x42", "prefetchwt1 BYTE [rax * 2 + rdx]");
-}
-
-
-
-#[test]
-fn enc_prefetchwt1_prefetchwt14484() {
+fn enc_prefetchwt1_prefetchwt13176() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; prefetchwt1 BYTE [rax]
@@ -28,7 +14,21 @@ fn enc_prefetchwt1_prefetchwt14484() {
 
 
 #[test]
-fn enc_prefetchwt1_prefetchwt14485() {
+fn enc_prefetchwt1_prefetchwt13177() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; prefetchwt1 BYTE [rax * 2 + rdx]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x0D, 0x14, 0x42", "prefetchwt1 BYTE [rax * 2 + rdx]");
+}
+
+
+
+#[test]
+fn enc_prefetchwt1_prefetchwt13178() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; prefetchwt1 BYTE [rax + 16]
