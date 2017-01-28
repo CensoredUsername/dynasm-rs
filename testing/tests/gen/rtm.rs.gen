@@ -1,48 +1,48 @@
 
 #[test]
-fn enc_rtm_xabort5792() {
+fn enc_rtm_xabort5918() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 5
+             ; xabort 75
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x05", "xabort 5");
+     assert_eq!(hex, "0xC6, 0xF8, 0x4B", "xabort 75");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort5793() {
+fn enc_rtm_xabort5919() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 36
+             ; xabort 55
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x24", "xabort 36");
+     assert_eq!(hex, "0xC6, 0xF8, 0x37", "xabort 55");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort5794() {
+fn enc_rtm_xabort5920() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; xabort 35
+             ; xabort 79
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xC6, 0xF8, 0x23", "xabort 35");
+     assert_eq!(hex, "0xC6, 0xF8, 0x4F", "xabort 79");
 }
 
 
 
 #[test]
-fn enc_rtm_xabort5795() {
+fn enc_rtm_xabort5921() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xabort 88
@@ -56,7 +56,21 @@ fn enc_rtm_xabort5795() {
 
 
 #[test]
-fn enc_rtm_xend5796() {
+fn enc_rtm_xabort5922() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; xabort 69
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0xC6, 0xF8, 0x45", "xabort 69");
+}
+
+
+
+#[test]
+fn enc_rtm_xend5923() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xend
@@ -70,7 +84,7 @@ fn enc_rtm_xend5796() {
 
 
 #[test]
-fn enc_rtm_xtest5797() {
+fn enc_rtm_xtest5924() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xtest

@@ -7,12 +7,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 2;
     b"rbrb"       , [0x10              ], X, ENC_MR;
     b"rbvb"       , [0x12              ], X;
-    b"r*ib"       , [0x83              ], 2, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 2, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x15              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 2, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 2, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x11              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 2, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 2, AUTO_SIZE ;
     b"r*r*"       , [0x11              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x13              ], X, AUTO_SIZE;
 ]
@@ -26,12 +26,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 0;
     b"rbrb"       , [0x00              ], X, ENC_MR;
     b"rbvb"       , [0x02              ], X;
-    b"r*ib"       , [0x83              ], 0, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 0, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x05              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 0, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 0, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x01              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 0, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 0, AUTO_SIZE ;
     b"r*r*"       , [0x01              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x03              ], X, AUTO_SIZE;
 ]
@@ -83,12 +83,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 4;
     b"rbrb"       , [0x20              ], X, ENC_MR;
     b"rbvb"       , [0x22              ], X;
-    b"r*ib"       , [0x83              ], 4, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 4, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x25              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 4, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 4, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x21              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 4, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 4, AUTO_SIZE ;
     b"r*r*"       , [0x21              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x23              ], X, AUTO_SIZE;
 ]
@@ -198,19 +198,19 @@ Ops!(OPMAP;
     b"v*r*"       , [0x0F, 0xA3        ], X, AUTO_SIZE | ENC_MR;
 ]
 "btc" = [
-    b"r*ib"       , [0x0F, 0xBA        ], 7, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x0F, 0xBA        ], 7, AUTO_SIZE  | EXACT_SIZE;
     b"m*ib"       , [0x0F, 0xBA        ], 7, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x0F, 0xBB        ], X, AUTO_SIZE | LOCK | ENC_MR;
     b"r*r*"       , [0x0F, 0xBB        ], X, AUTO_SIZE | ENC_MR;
 ]
 "btr" = [
-    b"r*ib"       , [0x0F, 0xBA        ], 6, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x0F, 0xBA        ], 6, AUTO_SIZE  | EXACT_SIZE;
     b"m*ib"       , [0x0F, 0xBA        ], 6, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x0F, 0xB3        ], X, AUTO_SIZE | LOCK | ENC_MR;
     b"r*r*"       , [0x0F, 0xB3        ], X, AUTO_SIZE | ENC_MR;
 ]
 "bts" = [
-    b"r*ib"       , [0x0F, 0xBA        ], 5, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x0F, 0xBA        ], 5, AUTO_SIZE  | EXACT_SIZE;
     b"m*ib"       , [0x0F, 0xBA        ], 5, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x0F, 0xAB        ], X, AUTO_SIZE | LOCK | ENC_MR;
     b"r*r*"       , [0x0F, 0xAB        ], X, AUTO_SIZE | ENC_MR;
@@ -240,7 +240,7 @@ Ops!(OPMAP;
     b"mb"         , [0x0F, 0xAE        ], 7, SSE2;
 ]
 "clgi" = [
-    b""           , [0x0F, 0x01, 0xDD  ], X, AMD | VMX;
+    b""           , [0x0F, 0x01, 0xDD  ], X, VMX | AMD;
 ]
 "cli" = [
     b""           , [0xFA              ], X;
@@ -266,7 +266,7 @@ Ops!(OPMAP;
     b"v*r*"       , [0x39              ], X, AUTO_SIZE | ENC_MR;
 ]
 "cmpeqpd" = [
-    b"yowo"       , [0x0F, 0xC2, 0x00  ], X, PREF_66 | IMM_OP | SSE2;
+    b"yowo"       , [0x0F, 0xC2, 0x00  ], X, IMM_OP | PREF_66 | SSE2;
 ]
 "cmpeqps" = [
     b"yowo"       , [0x0F, 0xC2, 0x00  ], X, IMM_OP | SSE;
@@ -280,7 +280,7 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0xC2, 0x00  ], X, IMM_OP | PREF_F3 | SSE;
 ]
 "cmplepd" = [
-    b"yowo"       , [0x0F, 0xC2, 0x02  ], X, PREF_66 | IMM_OP | SSE2;
+    b"yowo"       , [0x0F, 0xC2, 0x02  ], X, IMM_OP | PREF_66 | SSE2;
 ]
 "cmpleps" = [
     b"yowo"       , [0x0F, 0xC2, 0x02  ], X, IMM_OP | SSE;
@@ -290,8 +290,8 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0xC2, 0x02  ], X, PREF_F2 | IMM_OP | SSE2;
 ]
 "cmpless" = [
-    b"yomd"       , [0x0F, 0xC2, 0x02  ], X, PREF_F3 | IMM_OP | SSE;
-    b"yoyo"       , [0x0F, 0xC2, 0x02  ], X, PREF_F3 | IMM_OP | SSE;
+    b"yomd"       , [0x0F, 0xC2, 0x02  ], X, IMM_OP | PREF_F3 | SSE;
+    b"yoyo"       , [0x0F, 0xC2, 0x02  ], X, IMM_OP | PREF_F3 | SSE;
 ]
 "cmpltpd" = [
     b"yowo"       , [0x0F, 0xC2, 0x01  ], X, PREF_66 | IMM_OP | SSE2;
@@ -304,8 +304,8 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0xC2, 0x01  ], X, PREF_F2 | IMM_OP | SSE2;
 ]
 "cmpltss" = [
-    b"yomd"       , [0x0F, 0xC2, 0x01  ], X, IMM_OP | PREF_F3 | SSE;
-    b"yoyo"       , [0x0F, 0xC2, 0x01  ], X, IMM_OP | PREF_F3 | SSE;
+    b"yomd"       , [0x0F, 0xC2, 0x01  ], X, PREF_F3 | IMM_OP | SSE;
+    b"yoyo"       , [0x0F, 0xC2, 0x01  ], X, PREF_F3 | IMM_OP | SSE;
 ]
 "cmpneqpd" = [
     b"yowo"       , [0x0F, 0xC2, 0x04  ], X, IMM_OP | PREF_66 | SSE2;
@@ -318,22 +318,22 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0xC2, 0x04  ], X, PREF_F2 | IMM_OP | SSE2;
 ]
 "cmpneqss" = [
-    b"yomd"       , [0x0F, 0xC2, 0x04  ], X, PREF_F3 | IMM_OP | SSE;
-    b"yoyo"       , [0x0F, 0xC2, 0x04  ], X, PREF_F3 | IMM_OP | SSE;
+    b"yomd"       , [0x0F, 0xC2, 0x04  ], X, IMM_OP | PREF_F3 | SSE;
+    b"yoyo"       , [0x0F, 0xC2, 0x04  ], X, IMM_OP | PREF_F3 | SSE;
 ]
 "cmpnlepd" = [
-    b"yowo"       , [0x0F, 0xC2, 0x06  ], X, PREF_66 | IMM_OP | SSE2;
+    b"yowo"       , [0x0F, 0xC2, 0x06  ], X, IMM_OP | PREF_66 | SSE2;
 ]
 "cmpnleps" = [
     b"yowo"       , [0x0F, 0xC2, 0x06  ], X, IMM_OP | SSE;
 ]
 "cmpnlesd" = [
-    b"yomq"       , [0x0F, 0xC2, 0x06  ], X, PREF_F2 | IMM_OP | SSE2;
-    b"yoyo"       , [0x0F, 0xC2, 0x06  ], X, PREF_F2 | IMM_OP | SSE2;
+    b"yomq"       , [0x0F, 0xC2, 0x06  ], X, IMM_OP | PREF_F2 | SSE2;
+    b"yoyo"       , [0x0F, 0xC2, 0x06  ], X, IMM_OP | PREF_F2 | SSE2;
 ]
 "cmpnless" = [
-    b"yomd"       , [0x0F, 0xC2, 0x06  ], X, PREF_F3 | IMM_OP | SSE;
-    b"yoyo"       , [0x0F, 0xC2, 0x06  ], X, PREF_F3 | IMM_OP | SSE;
+    b"yomd"       , [0x0F, 0xC2, 0x06  ], X, IMM_OP | PREF_F3 | SSE;
+    b"yoyo"       , [0x0F, 0xC2, 0x06  ], X, IMM_OP | PREF_F3 | SSE;
 ]
 "cmpnltpd" = [
     b"yowo"       , [0x0F, 0xC2, 0x05  ], X, PREF_66 | IMM_OP | SSE2;
@@ -346,11 +346,11 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0xC2, 0x05  ], X, PREF_F2 | IMM_OP | SSE2;
 ]
 "cmpnltss" = [
-    b"yomd"       , [0x0F, 0xC2, 0x05  ], X, PREF_F3 | IMM_OP | SSE;
-    b"yoyo"       , [0x0F, 0xC2, 0x05  ], X, PREF_F3 | IMM_OP | SSE;
+    b"yomd"       , [0x0F, 0xC2, 0x05  ], X, IMM_OP | PREF_F3 | SSE;
+    b"yoyo"       , [0x0F, 0xC2, 0x05  ], X, IMM_OP | PREF_F3 | SSE;
 ]
 "cmpordpd" = [
-    b"yowo"       , [0x0F, 0xC2, 0x07  ], X, PREF_66 | IMM_OP | SSE2;
+    b"yowo"       , [0x0F, 0xC2, 0x07  ], X, IMM_OP | PREF_66 | SSE2;
 ]
 "cmpordps" = [
     b"yowo"       , [0x0F, 0xC2, 0x07  ], X, IMM_OP | SSE;
@@ -388,18 +388,18 @@ Ops!(OPMAP;
     b""           , [0xA7              ], X, REPE | WORD_SIZE;
 ]
 "cmpunordpd" = [
-    b"yowo"       , [0x0F, 0xC2, 0x03  ], X, IMM_OP | PREF_66 | SSE2;
+    b"yowo"       , [0x0F, 0xC2, 0x03  ], X, PREF_66 | IMM_OP | SSE2;
 ]
 "cmpunordps" = [
     b"yowo"       , [0x0F, 0xC2, 0x03  ], X, IMM_OP | SSE;
 ]
 "cmpunordsd" = [
-    b"yomq"       , [0x0F, 0xC2, 0x03  ], X, PREF_F2 | IMM_OP | SSE2;
-    b"yoyo"       , [0x0F, 0xC2, 0x03  ], X, PREF_F2 | IMM_OP | SSE2;
+    b"yomq"       , [0x0F, 0xC2, 0x03  ], X, IMM_OP | PREF_F2 | SSE2;
+    b"yoyo"       , [0x0F, 0xC2, 0x03  ], X, IMM_OP | PREF_F2 | SSE2;
 ]
 "cmpunordss" = [
-    b"yomd"       , [0x0F, 0xC2, 0x03  ], X, PREF_F3 | IMM_OP | SSE;
-    b"yoyo"       , [0x0F, 0xC2, 0x03  ], X, PREF_F3 | IMM_OP | SSE;
+    b"yomd"       , [0x0F, 0xC2, 0x03  ], X, IMM_OP | PREF_F3 | SSE;
+    b"yoyo"       , [0x0F, 0xC2, 0x03  ], X, IMM_OP | PREF_F3 | SSE;
 ]
 "cmpxchg" = [
     b"mbrb"       , [0x0F, 0xB0        ], X, LOCK | ENC_MR;
@@ -463,8 +463,8 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0x5A        ], X, SSE2;
 ]
 "cvtps2pi" = [
-    b"xqmq"       , [0x0F, 0x2D        ], X, SSE | MMX;
-    b"xqyo"       , [0x0F, 0x2D        ], X, SSE | MMX;
+    b"xqmq"       , [0x0F, 0x2D        ], X, MMX | SSE;
+    b"xqyo"       , [0x0F, 0x2D        ], X, MMX | SSE;
 ]
 "cvtsd2si" = [
     b"rdmq"       , [0x0F, 0x2D        ], X, PREF_F2 | SSE2;
@@ -529,7 +529,7 @@ Ops!(OPMAP;
     b"mb"         , [0xFE              ], 1, LOCK;
     b"rb"         , [0xFE              ], 1;
     b"m*"         , [0xFF              ], 1, AUTO_SIZE | LOCK;
-    b"r*"         , [0xFF              ], 1, AUTO_SIZE | LOCK;
+    b"r*"         , [0xFF              ], 1, AUTO_SIZE ;
 ]
 "div" = [
     b"vb"         , [0xF6              ], 6;
@@ -979,13 +979,13 @@ Ops!(OPMAP;
     b"fpXp"       , [0xD9, 0xC8        ], X, SHORT_ARG | FPU;
 ]
 "fxrstor" = [
-    b"m!"         , [0x0F, 0xAE        ], 1, SSE | FPU;
+    b"m!"         , [0x0F, 0xAE        ], 1, FPU | SSE;
 ]
 "fxrstor64" = [
     b"m!"         , [0x0F, 0xAE        ], 1, WITH_REXW | SSE | FPU;
 ]
 "fxsave" = [
-    b"m!"         , [0x0F, 0xAE        ], 0, SSE | FPU;
+    b"m!"         , [0x0F, 0xAE        ], 0, FPU | SSE;
 ]
 "fxsave64" = [
     b"m!"         , [0x0F, 0xAE        ], 0, WITH_REXW | FPU | SSE;
@@ -1028,24 +1028,24 @@ Ops!(OPMAP;
     b"mb"         , [0xFE              ], 0, LOCK;
     b"rb"         , [0xFE              ], 0;
     b"m*"         , [0xFF              ], 0, AUTO_SIZE | LOCK;
-    b"r*"         , [0xFF              ], 0, AUTO_SIZE | LOCK;
+    b"r*"         , [0xFF              ], 0, AUTO_SIZE ;
 ]
 "insb" = [
-    b""           , [0x6C              ], X;
+    b""           , [0x6C              ], X, REP;
 ]
 "insd" = [
-    b""           , [0x6D              ], X;
+    b""           , [0x6D              ], X, REP;
 ]
 "insertps" = [
     b"yomdib"     , [0x0F, 0x3A, 0x21  ], X, PREF_66 | SSE41;
     b"yoyoib"     , [0x0F, 0x3A, 0x21  ], X, PREF_66 | SSE41;
 ]
 "insertq" = [
-    b"yoyo"       , [0x0F, 0x79        ], X, PREF_F2 | AMD | SSE4A;
+    b"yoyo"       , [0x0F, 0x79        ], X, PREF_F2 | SSE4A | AMD;
     b"yoyoibib"   , [0x0F, 0x78        ], X, PREF_F2 | SSE4A | AMD;
 ]
 "insw" = [
-    b""           , [0x6D              ], X, WORD_SIZE;
+    b""           , [0x6D              ], X, WORD_SIZE | REP;
 ]
 "int" = [
     b"ib"         , [0xCD              ], X;
@@ -1145,16 +1145,16 @@ Ops!(OPMAP;
     b"rw"         , [0x0F, 0x01        ], 6;
 ]
 "lodsb" = [
-    b""           , [0xAC              ], X;
+    b""           , [0xAC              ], X, REP;
 ]
 "lodsd" = [
-    b""           , [0xAD              ], X;
+    b""           , [0xAD              ], X, REP;
 ]
 "lodsq" = [
-    b""           , [0xAD              ], X, WITH_REXW;
+    b""           , [0xAD              ], X, WITH_REXW | REP;
 ]
 "lodsw" = [
-    b""           , [0xAD              ], X, WORD_SIZE;
+    b""           , [0xAD              ], X, WORD_SIZE | REP;
 ]
 "loop" = [
     b"ob"         , [0xE2              ], X;
@@ -1335,7 +1335,7 @@ Ops!(OPMAP;
     b"mqyo"       , [0x0F, 0x2B        ], X, ENC_MR | PREF_F2 | AMD | SSE4A;
 ]
 "movntss" = [
-    b"mdyo"       , [0x0F, 0x2B        ], X, ENC_MR | PREF_F3 | AMD | SSE4A;
+    b"mdyo"       , [0x0F, 0x2B        ], X, ENC_MR | PREF_F3 | SSE4A | AMD;
 ]
 "movq" = [
     b"mqyo"       , [0x0F, 0xD6        ], X, ENC_MR | PREF_66 | SSE2;
@@ -1353,10 +1353,10 @@ Ops!(OPMAP;
     b"yoxq"       , [0x0F, 0xD6        ], X, PREF_F3 | SSE2;
 ]
 "movsb" = [
-    b""           , [0xA4              ], X;
+    b""           , [0xA4              ], X, REP;
 ]
 "movsd" = [
-    b""           , [0xA5              ], X;
+    b""           , [0xA5              ], X, REP;
     b"mqyo"       , [0x0F, 0x11        ], X, ENC_MR | PREF_F2 | SSE2;
     b"yomq"       , [0x0F, 0x10        ], X, PREF_F2 | SSE2;
     b"yoyo"       , [0x0F, 0x10        ], X, PREF_F2 | SSE2;
@@ -1371,7 +1371,7 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0x12        ], X, PREF_F3 | SSE3;
 ]
 "movsq" = [
-    b""           , [0xA5              ], X, WITH_REXW;
+    b""           , [0xA5              ], X, WITH_REXW | REP;
 ]
 "movss" = [
     b"mdyo"       , [0x0F, 0x11        ], X, ENC_MR | PREF_F3 | SSE;
@@ -1379,7 +1379,7 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0x10        ], X, PREF_F3 | SSE;
 ]
 "movsw" = [
-    b""           , [0xA5              ], X, WORD_SIZE;
+    b""           , [0xA5              ], X, WORD_SIZE | REP;
 ]
 "movsx" = [
     b"rqvd"       , [0x63              ], X, WITH_REXW;
@@ -1442,7 +1442,7 @@ Ops!(OPMAP;
     b"mb"         , [0xF6              ], 3, LOCK;
     b"rb"         , [0xF6              ], 3;
     b"m*"         , [0xF7              ], 3, AUTO_SIZE | LOCK;
-    b"r*"         , [0xF7              ], 3, AUTO_SIZE | LOCK;
+    b"r*"         , [0xF7              ], 3, AUTO_SIZE ;
 ]
 "nop" = [
     b""           , [0x90              ], X;
@@ -1452,7 +1452,7 @@ Ops!(OPMAP;
     b"mb"         , [0xF6              ], 2, LOCK;
     b"rb"         , [0xF6              ], 2;
     b"m*"         , [0xF7              ], 2, AUTO_SIZE | LOCK;
-    b"r*"         , [0xF7              ], 2, AUTO_SIZE | LOCK;
+    b"r*"         , [0xF7              ], 2, AUTO_SIZE ;
 ]
 "or" = [
     b"Abib"       , [0x0C              ], X;
@@ -1461,12 +1461,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 1;
     b"rbrb"       , [0x08              ], X, ENC_MR;
     b"rbvb"       , [0x0A              ], X;
-    b"r*ib"       , [0x83              ], 1, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 1, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x0D              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 1, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 1, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x09              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 1, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 1, AUTO_SIZE ;
     b"r*r*"       , [0x09              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x0B              ], X, AUTO_SIZE;
 ]
@@ -1477,13 +1477,13 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0x56        ], X, SSE;
 ]
 "outsb" = [
-    b""           , [0x6E              ], X;
+    b""           , [0x6E              ], X, REP;
 ]
 "outsd" = [
-    b""           , [0x6F              ], X;
+    b""           , [0x6F              ], X, REP;
 ]
 "outsw" = [
-    b""           , [0x6F              ], X, WORD_SIZE;
+    b""           , [0x6F              ], X, WORD_SIZE | REP;
 ]
 "pabsb" = [
     b"xquq"       , [0x0F, 0x38, 0x1C  ], X, MMX | SSSE3;
@@ -1533,7 +1533,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0xEC        ], X, PREF_66 | SSE2;
 ]
 "paddsiw" = [
-    b"xquq"       , [0x0F, 0x51        ], X, CYRIX | MMX;
+    b"xquq"       , [0x0F, 0x51        ], X, MMX | CYRIX;
 ]
 "paddsw" = [
     b"xquq"       , [0x0F, 0xED        ], X, MMX;
@@ -1552,7 +1552,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0xFD        ], X, PREF_66 | SSE2;
 ]
 "palignr" = [
-    b"xquqib"     , [0x0F, 0x3A, 0x0F  ], X, SSSE3 | MMX;
+    b"xquqib"     , [0x0F, 0x3A, 0x0F  ], X, MMX | SSSE3;
     b"yomqib"     , [0x0F, 0x3A, 0x0F  ], X, PREF_66 | SSSE3;
     b"yoyoib"     , [0x0F, 0x3A, 0x0F  ], X, PREF_66 | SSSE3;
 ]
@@ -1568,7 +1568,7 @@ Ops!(OPMAP;
     b""           , [0x90              ], X, PREF_F3;
 ]
 "paveb" = [
-    b"xquq"       , [0x0F, 0x50        ], X, MMX | CYRIX;
+    b"xquq"       , [0x0F, 0x50        ], X, CYRIX | MMX;
 ]
 "pavgb" = [
     b"xquq"       , [0x0F, 0xE0        ], X, MMX;
@@ -1596,7 +1596,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0x3A, 0x44, 0x01], X, PREF_66 | IMM_OP | SSE;
 ]
 "pclmullqhqdq" = [
-    b"yowo"       , [0x0F, 0x3A, 0x44, 0x10], X, PREF_66 | IMM_OP | SSE;
+    b"yowo"       , [0x0F, 0x3A, 0x44, 0x10], X, IMM_OP | PREF_66 | SSE;
 ]
 "pclmullqlqdq" = [
     b"yowo"       , [0x0F, 0x3A, 0x44, 0x00], X, IMM_OP | PREF_66 | SSE;
@@ -1656,7 +1656,7 @@ Ops!(OPMAP;
     b"r*r*v*"     , [0x02, 0xF5        ], X, VEX_OP | AUTO_REXW | PREF_F2 | BMI2;
 ]
 "pdistib" = [
-    b"xqmq"       , [0x0F, 0x54        ], X, CYRIX | MMX;
+    b"xqmq"       , [0x0F, 0x54        ], X, MMX | CYRIX;
 ]
 "pext" = [
     b"r*r*v*"     , [0x02, 0xF5        ], X, VEX_OP | AUTO_REXW | PREF_F3 | BMI2;
@@ -1734,7 +1734,7 @@ Ops!(OPMAP;
     b"xquq"       , [0x0F, 0x0F, 0x97  ], X, IMM_OP | TDNOW;
 ]
 "pfrsqrtv" = [
-    b"xquq"       , [0x0F, 0x0F, 0x87  ], X, IMM_OP | CYRIX | TDNOW;
+    b"xquq"       , [0x0F, 0x0F, 0x87  ], X, IMM_OP | TDNOW | CYRIX;
 ]
 "pfsub" = [
     b"xquq"       , [0x0F, 0x0F, 0x9A  ], X, IMM_OP | TDNOW;
@@ -1743,7 +1743,7 @@ Ops!(OPMAP;
     b"xquq"       , [0x0F, 0x0F, 0xAA  ], X, IMM_OP | TDNOW;
 ]
 "phaddd" = [
-    b"xquq"       , [0x0F, 0x38, 0x02  ], X, MMX | SSSE3;
+    b"xquq"       , [0x0F, 0x38, 0x02  ], X, SSSE3 | MMX;
     b"yomq"       , [0x0F, 0x38, 0x02  ], X, PREF_66 | SSSE3;
     b"yoyo"       , [0x0F, 0x38, 0x02  ], X, PREF_66 | SSSE3;
 ]
@@ -1762,12 +1762,12 @@ Ops!(OPMAP;
     b"yoyo"       , [0x0F, 0x38, 0x41  ], X, PREF_66 | SSE41;
 ]
 "phsubd" = [
-    b"xquq"       , [0x0F, 0x38, 0x06  ], X, SSSE3 | MMX;
+    b"xquq"       , [0x0F, 0x38, 0x06  ], X, MMX | SSSE3;
     b"yomq"       , [0x0F, 0x38, 0x06  ], X, PREF_66 | SSSE3;
     b"yoyo"       , [0x0F, 0x38, 0x06  ], X, PREF_66 | SSSE3;
 ]
 "phsubsw" = [
-    b"xquq"       , [0x0F, 0x38, 0x07  ], X, MMX | SSSE3;
+    b"xquq"       , [0x0F, 0x38, 0x07  ], X, SSSE3 | MMX;
     b"yomq"       , [0x0F, 0x38, 0x07  ], X, PREF_66 | SSSE3;
     b"yoyo"       , [0x0F, 0x38, 0x07  ], X, PREF_66 | SSSE3;
 ]
@@ -1817,7 +1817,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0xF5        ], X, PREF_66 | SSE2;
 ]
 "pmagw" = [
-    b"xquq"       , [0x0F, 0x52        ], X, MMX | CYRIX;
+    b"xquq"       , [0x0F, 0x52        ], X, CYRIX | MMX;
 ]
 "pmaxsb" = [
     b"yomq"       , [0x0F, 0x38, 0x3C  ], X, PREF_66 | SSE41;
@@ -1958,7 +1958,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0xF4        ], X, PREF_66 | SSE2;
 ]
 "pmvgezb" = [
-    b"xqmq"       , [0x0F, 0x5C        ], X, CYRIX | MMX;
+    b"xqmq"       , [0x0F, 0x5C        ], X, MMX | CYRIX;
 ]
 "pmvlzb" = [
     b"xqmq"       , [0x0F, 0x5B        ], X, MMX | CYRIX;
@@ -2017,7 +2017,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0xF6        ], X, PREF_66 | SSE2;
 ]
 "pshufb" = [
-    b"xquq"       , [0x0F, 0x38, 0x00  ], X, SSSE3 | MMX;
+    b"xquq"       , [0x0F, 0x38, 0x00  ], X, MMX | SSSE3;
     b"yomq"       , [0x0F, 0x38, 0x00  ], X, PREF_66 | SSSE3;
     b"yoyo"       , [0x0F, 0x38, 0x00  ], X, PREF_66 | SSSE3;
 ]
@@ -2034,7 +2034,7 @@ Ops!(OPMAP;
     b"xquqib"     , [0x0F, 0x70        ], X, MMX;
 ]
 "psignb" = [
-    b"xquq"       , [0x0F, 0x38, 0x08  ], X, SSSE3 | MMX;
+    b"xquq"       , [0x0F, 0x38, 0x08  ], X, MMX | SSSE3;
     b"yomq"       , [0x0F, 0x38, 0x08  ], X, PREF_66 | SSSE3;
     b"yoyo"       , [0x0F, 0x38, 0x08  ], X, PREF_66 | SSSE3;
 ]
@@ -2119,7 +2119,7 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0xE8        ], X, PREF_66 | SSE2;
 ]
 "psubsiw" = [
-    b"xquq"       , [0x0F, 0x55        ], X, MMX | CYRIX;
+    b"xquq"       , [0x0F, 0x55        ], X, CYRIX | MMX;
 ]
 "psubsw" = [
     b"xquq"       , [0x0F, 0xE9        ], X, MMX;
@@ -2339,12 +2339,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 3;
     b"rbrb"       , [0x18              ], X, ENC_MR;
     b"rbvb"       , [0x1A              ], X;
-    b"r*ib"       , [0x83              ], 3, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 3, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x1D              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 3, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 3, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x19              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 3, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 3, AUTO_SIZE ;
     b"r*r*"       , [0x19              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x1B              ], X, AUTO_SIZE;
 ]
@@ -2463,7 +2463,7 @@ Ops!(OPMAP;
     b""           , [0xFD              ], X;
 ]
 "stgi" = [
-    b""           , [0x0F, 0x01, 0xDC  ], X, AMD | VMX;
+    b""           , [0x0F, 0x01, 0xDC  ], X, VMX | AMD;
 ]
 "sti" = [
     b""           , [0xFB              ], X;
@@ -2472,16 +2472,16 @@ Ops!(OPMAP;
     b"md"         , [0x0F, 0xAE        ], 3, SSE;
 ]
 "stosb" = [
-    b""           , [0xAA              ], X;
+    b""           , [0xAA              ], X, REP;
 ]
 "stosd" = [
-    b""           , [0xAB              ], X;
+    b""           , [0xAB              ], X, REP;
 ]
 "stosq" = [
-    b""           , [0xAB              ], X, WITH_REXW;
+    b""           , [0xAB              ], X, WITH_REXW | REP;
 ]
 "stosw" = [
-    b""           , [0xAB              ], X, WORD_SIZE;
+    b""           , [0xAB              ], X, WORD_SIZE | REP;
 ]
 "str" = [
     b"m!"         , [0x0F, 0x00        ], 1;
@@ -2494,12 +2494,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 5;
     b"rbrb"       , [0x28              ], X, ENC_MR;
     b"rbvb"       , [0x2A              ], X;
-    b"r*ib"       , [0x83              ], 5, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 5, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x2D              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 5, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 5, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x29              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 5, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 5, AUTO_SIZE ;
     b"r*r*"       , [0x29              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x2B              ], X, AUTO_SIZE;
 ]
@@ -2663,38 +2663,37 @@ Ops!(OPMAP;
     b"y*yo"       , [0x02, 0x18        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
 ]
 "vcmpeq_ospd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpeq_osps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpeq_ossd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
     b"yoyomq"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpeq_osss" = [
     b"yoyomq"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x10  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpeq_uqpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpeq_uqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpeq_uqsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpeq_uqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x08  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpeq_uspd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x18  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x18  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x18  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpeq_usps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x18  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2708,19 +2707,18 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x18  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpeqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x00  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpeqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpeqsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpeqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x00  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpfalse_oqpd" = [
     b"yhyhwh"     , [0x01, 0xC2, 0x0B  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
@@ -2730,26 +2728,27 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpfalse_oqsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpfalse_oqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpfalse_ospd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x1B  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpfalse_osps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpfalse_ossd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpfalse_osss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1B  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpfalsepd" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
@@ -2758,15 +2757,15 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpfalsesd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpfalsess" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0B  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpge_oqpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpge_oqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2776,41 +2775,40 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpge_oqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1D  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpge_ospd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x0D  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x0D  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpge_osps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpge_ossd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpge_osss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpgepd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpgeps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpgesd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpgess" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0D  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpgt_oqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x1E  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpgt_oqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2820,8 +2818,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpgt_oqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1E  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpgt_ospd" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
@@ -2830,15 +2828,16 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpgt_ossd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpgt_osss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpgtpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x0E  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpgtps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2848,8 +2847,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpgtss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0E  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmple_oqpd" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x12  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
@@ -2862,41 +2861,40 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x12  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmple_oqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x12  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x12  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x12  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x12  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmple_ospd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x02  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
 ]
 "vcmple_osps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmple_ossd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmple_osss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmplepd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x02  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpleps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmplesd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpless" = [
     b"yoyomq"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x02  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmplt_oqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x11  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmplt_oqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2906,12 +2904,12 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmplt_oqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x11  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmplt_ospd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x01  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x01  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmplt_osps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2921,11 +2919,11 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmplt_osss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpltpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpltps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2939,18 +2937,19 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x01  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpneq_oqpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x0C  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpneq_oqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpneq_oqsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpneq_oqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0C  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpneq_ospd" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x1C  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
@@ -2967,8 +2966,7 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x1C  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpneq_uqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x04  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpneq_uqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -2978,8 +2976,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpneq_uqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpneq_uspd" = [
     b"yhyhwh"     , [0x01, 0xC2, 0x14  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
@@ -2989,16 +2987,16 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpneq_ussd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpneq_usss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x14  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpneqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x04  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x04  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpneqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3008,8 +3006,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpneqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x04  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpnge_uqpd" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x19  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
@@ -3026,8 +3024,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x19  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpnge_uspd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x09  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x09  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpnge_usps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3037,56 +3035,54 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpnge_usss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpngepd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x09  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x09  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpngeps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpngesd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpngess" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x09  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpngt_uqpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpngt_uqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpngt_uqsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpngt_uqss" = [
     b"yoyomq"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x1A  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpngt_uspd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x0A  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpngt_usps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpngt_ussd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpngt_usss" = [
     b"yoyomq"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpngtpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x0A  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpngtps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3096,57 +3092,55 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpngtss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0A  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpnle_uqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x16  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x16  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpnle_uqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpnle_uqsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpnle_uqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x16  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpnle_uspd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x06  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpnle_usps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpnle_ussd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmpnle_usss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpnlepd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x06  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x06  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpnleps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpnlesd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpnless" = [
     b"yoyomq"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x06  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpnlt_uqpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x15  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x15  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x15  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpnlt_uqps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x15  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3160,14 +3154,15 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x15  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpnlt_uspd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x05  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpnlt_usps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpnlt_ussd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpnlt_usss" = [
     b"yoyomq"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
@@ -3180,30 +3175,31 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpnltsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpnltss" = [
     b"yoyomq"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
     b"yoyoyo"     , [0x01, 0xC2, 0x05  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmpord_qpd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x07  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpord_qps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmpord_qsd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpord_qss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpord_spd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x17  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x17  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x17  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x17  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpord_sps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x17  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3217,8 +3213,7 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x17  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpordpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x07  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpordps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3228,8 +3223,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpordss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x07  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmppd" = [
     b"y*y*w*ib"   , [0x01, 0xC2        ], X, VEX_OP | AUTO_VEXL | ENC_MR | PREF_66 | AVX;
@@ -3257,25 +3252,26 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmptrue_uqss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
 ]
 "vcmptrue_uspd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x1F  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmptrue_usps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
 ]
 "vcmptrue_ussd" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmptrue_usss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x1F  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmptruepd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmptrueps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3285,12 +3281,11 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | IMM_OP | PREF_F2 | AVX;
 ]
 "vcmptruess" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x0F  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpunord_qpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x03  ], X, WITH_VEXL | VEX_OP | IMM_OP | PREF_66 | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpunord_qps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3304,7 +3299,8 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpunord_spd" = [
-    b"y*y*w*"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | AUTO_VEXL | IMM_OP | PREF_66 | AVX;
+    b"yhyhwh"     , [0x01, 0xC2, 0x13  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
+    b"yoyowo"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vcmpunord_sps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3314,12 +3310,11 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | PREF_F2 | IMM_OP | AVX;
 ]
 "vcmpunord_sss" = [
-    b"yoyomq"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
-    b"yoyoyo"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | PREF_F3 | IMM_OP | AVX;
+    b"yoyomq"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
+    b"yoyoyo"     , [0x01, 0xC2, 0x13  ], X, VEX_OP | IMM_OP | PREF_F3 | AVX;
 ]
 "vcmpunordpd" = [
-    b"yhyhwh"     , [0x01, 0xC2, 0x03  ], X, WITH_VEXL | VEX_OP | PREF_66 | IMM_OP | AVX;
-    b"yoyowo"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"y*y*w*"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | AUTO_VEXL | PREF_66 | IMM_OP | AVX;
 ]
 "vcmpunordps" = [
     b"y*y*w*"     , [0x01, 0xC2, 0x03  ], X, VEX_OP | AUTO_VEXL | IMM_OP | AVX;
@@ -3530,21 +3525,21 @@ Ops!(OPMAP;
 ]
 "vfmaddpd" = [
     b"y*y*y*w*"   , [0x03, 0x69        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
-    b"y*y*w*y*"   , [0x03, 0x69        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
+    b"y*y*w*y*"   , [0x03, 0x69        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
 ]
 "vfmaddps" = [
-    b"y*y*y*w*"   , [0x03, 0x68        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
-    b"y*y*w*y*"   , [0x03, 0x68        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
+    b"y*y*y*w*"   , [0x03, 0x68        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
+    b"y*y*w*y*"   , [0x03, 0x68        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
 ]
 "vfmaddsd" = [
-    b"yoyomqyo"   , [0x03, 0x6B        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
-    b"yoyoyomq"   , [0x03, 0x6B        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
-    b"yoyoyoyo"   , [0x03, 0x6B        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyomqyo"   , [0x03, 0x6B        ], X, VEX_OP | PREF_66 | AMD | SSE5;
+    b"yoyoyomq"   , [0x03, 0x6B        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyoyo"   , [0x03, 0x6B        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
 ]
 "vfmaddss" = [
-    b"yoyomdyo"   , [0x03, 0x6A        ], X, VEX_OP | PREF_66 | AMD | SSE5;
-    b"yoyoyomd"   , [0x03, 0x6A        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
-    b"yoyoyoyo"   , [0x03, 0x6A        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyomdyo"   , [0x03, 0x6A        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
+    b"yoyoyomd"   , [0x03, 0x6A        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyoyo"   , [0x03, 0x6A        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
 ]
 "vfmaddsub123pd" = [
     b"y*y*w*"     , [0x02, 0xA6        ], X, VEX_OP | AUTO_VEXL | PREF_66 | FMA;
@@ -3587,8 +3582,8 @@ Ops!(OPMAP;
     b"y*y*w*y*"   , [0x03, 0x5D        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
 ]
 "vfmaddsubps" = [
-    b"y*y*y*w*"   , [0x03, 0x5C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
-    b"y*y*w*y*"   , [0x03, 0x5C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
+    b"y*y*y*w*"   , [0x03, 0x5C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
+    b"y*y*w*y*"   , [0x03, 0x5C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
 ]
 "vfmsub123pd" = [
     b"y*y*w*"     , [0x02, 0xAA        ], X, VEX_OP | AUTO_VEXL | PREF_66 | FMA;
@@ -3711,12 +3706,12 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x02, 0xB7        ], X, VEX_OP | AUTO_VEXL | PREF_66 | FMA;
 ]
 "vfmsubaddpd" = [
-    b"y*y*y*w*"   , [0x03, 0x5F        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
-    b"y*y*w*y*"   , [0x03, 0x5F        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
+    b"y*y*y*w*"   , [0x03, 0x5F        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
+    b"y*y*w*y*"   , [0x03, 0x5F        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
 ]
 "vfmsubaddps" = [
     b"y*y*y*w*"   , [0x03, 0x5E        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
-    b"y*y*w*y*"   , [0x03, 0x5E        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
+    b"y*y*w*y*"   , [0x03, 0x5E        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
 ]
 "vfmsubpd" = [
     b"y*y*y*w*"   , [0x03, 0x6D        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
@@ -3728,13 +3723,13 @@ Ops!(OPMAP;
 ]
 "vfmsubsd" = [
     b"yoyomqyo"   , [0x03, 0x6F        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
-    b"yoyoyomq"   , [0x03, 0x6F        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
-    b"yoyoyoyo"   , [0x03, 0x6F        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyomq"   , [0x03, 0x6F        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyoyoyo"   , [0x03, 0x6F        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
 ]
 "vfmsubss" = [
     b"yoyomdyo"   , [0x03, 0x6E        ], X, VEX_OP | PREF_66 | AMD | SSE5;
-    b"yoyoyomd"   , [0x03, 0x6E        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
-    b"yoyoyoyo"   , [0x03, 0x6E        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyomd"   , [0x03, 0x6E        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyoyoyo"   , [0x03, 0x6E        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
 ]
 "vfnmadd123pd" = [
     b"y*y*w*"     , [0x02, 0xAC        ], X, VEX_OP | AUTO_VEXL | PREF_66 | FMA;
@@ -3825,18 +3820,18 @@ Ops!(OPMAP;
     b"y*y*w*y*"   , [0x03, 0x79        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
 ]
 "vfnmaddps" = [
-    b"y*y*y*w*"   , [0x03, 0x78        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
+    b"y*y*y*w*"   , [0x03, 0x78        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
     b"y*y*w*y*"   , [0x03, 0x78        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
 ]
 "vfnmaddsd" = [
-    b"yoyomqyo"   , [0x03, 0x7B        ], X, VEX_OP | PREF_66 | AMD | SSE5;
-    b"yoyoyomq"   , [0x03, 0x7B        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
-    b"yoyoyoyo"   , [0x03, 0x7B        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyomqyo"   , [0x03, 0x7B        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
+    b"yoyoyomq"   , [0x03, 0x7B        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyoyoyo"   , [0x03, 0x7B        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
 ]
 "vfnmaddss" = [
-    b"yoyomdyo"   , [0x03, 0x7A        ], X, VEX_OP | PREF_66 | AMD | SSE5;
-    b"yoyoyomd"   , [0x03, 0x7A        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
-    b"yoyoyoyo"   , [0x03, 0x7A        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyomdyo"   , [0x03, 0x7A        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
+    b"yoyoyomd"   , [0x03, 0x7A        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyoyo"   , [0x03, 0x7A        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
 ]
 "vfnmsub123pd" = [
     b"y*y*w*"     , [0x02, 0xAE        ], X, VEX_OP | AUTO_VEXL | PREF_66 | FMA;
@@ -3923,36 +3918,36 @@ Ops!(OPMAP;
     b"yoyoyo"     , [0x02, 0xBF        ], X, VEX_OP | PREF_66 | FMA;
 ]
 "vfnmsubpd" = [
-    b"y*y*y*w*"   , [0x03, 0x7D        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
+    b"y*y*y*w*"   , [0x03, 0x7D        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
     b"y*y*w*y*"   , [0x03, 0x7D        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
 ]
 "vfnmsubps" = [
     b"y*y*y*w*"   , [0x03, 0x7C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
-    b"y*y*w*y*"   , [0x03, 0x7C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AMD | SSE5;
+    b"y*y*w*y*"   , [0x03, 0x7C        ], X, VEX_OP | AUTO_VEXL | PREF_66 | SSE5 | AMD;
 ]
 "vfnmsubsd" = [
-    b"yoyomqyo"   , [0x03, 0x7F        ], X, VEX_OP | PREF_66 | AMD | SSE5;
-    b"yoyoyomq"   , [0x03, 0x7F        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
-    b"yoyoyoyo"   , [0x03, 0x7F        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyomqyo"   , [0x03, 0x7F        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
+    b"yoyoyomq"   , [0x03, 0x7F        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyoyo"   , [0x03, 0x7F        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
 ]
 "vfnmsubss" = [
-    b"yoyomdyo"   , [0x03, 0x7E        ], X, VEX_OP | PREF_66 | SSE5 | AMD;
-    b"yoyoyomd"   , [0x03, 0x7E        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
-    b"yoyoyoyo"   , [0x03, 0x7E        ], X, VEX_OP | WITH_REXW | PREF_66 | SSE5 | AMD;
+    b"yoyomdyo"   , [0x03, 0x7E        ], X, VEX_OP | PREF_66 | AMD | SSE5;
+    b"yoyoyomd"   , [0x03, 0x7E        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
+    b"yoyoyoyo"   , [0x03, 0x7E        ], X, VEX_OP | WITH_REXW | PREF_66 | AMD | SSE5;
 ]
 "vfrczpd" = [
     b"y*w*"       , [0x09, 0x81        ], X, XOP_OP | AUTO_VEXL | SSE5 | AMD;
 ]
 "vfrczps" = [
-    b"y*w*"       , [0x09, 0x80        ], X, XOP_OP | AUTO_VEXL | AMD | SSE5;
+    b"y*w*"       , [0x09, 0x80        ], X, XOP_OP | AUTO_VEXL | SSE5 | AMD;
 ]
 "vfrczsd" = [
-    b"yomq"       , [0x09, 0x83        ], X, XOP_OP | SSE5 | AMD;
-    b"yoyo"       , [0x09, 0x83        ], X, XOP_OP | SSE5 | AMD;
+    b"yomq"       , [0x09, 0x83        ], X, XOP_OP | AMD | SSE5;
+    b"yoyo"       , [0x09, 0x83        ], X, XOP_OP | AMD | SSE5;
 ]
 "vfrczss" = [
-    b"yomd"       , [0x09, 0x82        ], X, XOP_OP | SSE5 | AMD;
-    b"yoyo"       , [0x09, 0x82        ], X, XOP_OP | SSE5 | AMD;
+    b"yomd"       , [0x09, 0x82        ], X, XOP_OP | AMD | SSE5;
+    b"yoyo"       , [0x09, 0x82        ], X, XOP_OP | AMD | SSE5;
 ]
 "vgatherdpd" = [
     b"y*loy*"     , [0x02, 0x92        ], X, VEX_OP | AUTO_VEXL | ENC_MR | PREF_66 | AVX2;
@@ -4052,7 +4047,7 @@ Ops!(OPMAP;
     b""           , [0x0F, 0x01, 0xDA  ], X, AMD | VMX;
 ]
 "vmmcall" = [
-    b""           , [0x0F, 0x01, 0xD9  ], X, VMX | AMD;
+    b""           , [0x0F, 0x01, 0xD9  ], X, AMD | VMX;
 ]
 "vmovapd" = [
     b"y*w*"       , [0x01, 0x28        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
@@ -4315,7 +4310,7 @@ Ops!(OPMAP;
     b"yoyowo"     , [0x03, 0x44, 0x10  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
 ]
 "vpclmullqlqdq" = [
-    b"yoyowo"     , [0x03, 0x44, 0x00  ], X, VEX_OP | IMM_OP | PREF_66 | AVX;
+    b"yoyowo"     , [0x03, 0x44, 0x00  ], X, VEX_OP | PREF_66 | IMM_OP | AVX;
 ]
 "vpclmulqdq" = [
     b"yoyowoib"   , [0x03, 0x44        ], X, VEX_OP | PREF_66 | AVX;
@@ -4373,16 +4368,16 @@ Ops!(OPMAP;
     b"yoyowoib"   , [0x08, 0xEC        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vpcomud" = [
-    b"yoyowoib"   , [0x08, 0xEE        ], X, XOP_OP | SSE5 | AMD;
+    b"yoyowoib"   , [0x08, 0xEE        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpcomuq" = [
-    b"yoyowoib"   , [0x08, 0xEF        ], X, XOP_OP | SSE5 | AMD;
+    b"yoyowoib"   , [0x08, 0xEF        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpcomuw" = [
     b"yoyowoib"   , [0x08, 0xED        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vpcomw" = [
-    b"yoyowoib"   , [0x08, 0xCD        ], X, XOP_OP | AMD | SSE5;
+    b"yoyowoib"   , [0x08, 0xCD        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vperm2f128" = [
     b"yhyhwhib"   , [0x03, 0x06        ], X, WITH_VEXL | VEX_OP | PREF_66 | AVX;
@@ -4442,13 +4437,13 @@ Ops!(OPMAP;
     b"y*l*y*"     , [0x02, 0x91        ], X, VEX_OP | AUTO_VEXL | ENC_MR | PREF_66 | AVX2;
 ]
 "vphaddbd" = [
-    b"yowo"       , [0x09, 0xC2        ], X, XOP_OP | SSE5 | AMD;
+    b"yowo"       , [0x09, 0xC2        ], X, XOP_OP | AMD | SSE5;
 ]
 "vphaddbq" = [
-    b"yowo"       , [0x09, 0xC3        ], X, XOP_OP | AMD | SSE5;
+    b"yowo"       , [0x09, 0xC3        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vphaddbw" = [
-    b"yowo"       , [0x09, 0xC1        ], X, XOP_OP | SSE5 | AMD;
+    b"yowo"       , [0x09, 0xC1        ], X, XOP_OP | AMD | SSE5;
 ]
 "vphaddd" = [
     b"y*y*w*"     , [0x02, 0x02        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
@@ -4460,10 +4455,10 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x02, 0x03        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
 ]
 "vphaddubd" = [
-    b"yowo"       , [0x09, 0xD2        ], X, XOP_OP | SSE5 | AMD;
+    b"yowo"       , [0x09, 0xD2        ], X, XOP_OP | AMD | SSE5;
 ]
 "vphaddubq" = [
-    b"yowo"       , [0x09, 0xD3        ], X, XOP_OP | SSE5 | AMD;
+    b"yowo"       , [0x09, 0xD3        ], X, XOP_OP | AMD | SSE5;
 ]
 "vphaddubw" = [
     b"yowo"       , [0x09, 0xD1        ], X, XOP_OP | AMD | SSE5;
@@ -4472,19 +4467,19 @@ Ops!(OPMAP;
     b"yowo"       , [0x09, 0xDB        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vphadduwd" = [
-    b"yowo"       , [0x09, 0xD6        ], X, XOP_OP | AMD | SSE5;
+    b"yowo"       , [0x09, 0xD6        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vphadduwq" = [
-    b"yowo"       , [0x09, 0xD7        ], X, XOP_OP | SSE5 | AMD;
+    b"yowo"       , [0x09, 0xD7        ], X, XOP_OP | AMD | SSE5;
 ]
 "vphaddw" = [
     b"y*y*w*"     , [0x02, 0x01        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
 ]
 "vphaddwd" = [
-    b"yowo"       , [0x09, 0xC6        ], X, XOP_OP | SSE5 | AMD;
+    b"yowo"       , [0x09, 0xC6        ], X, XOP_OP | AMD | SSE5;
 ]
 "vphaddwq" = [
-    b"yowo"       , [0x09, 0xC7        ], X, XOP_OP | AMD | SSE5;
+    b"yowo"       , [0x09, 0xC7        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vphminposuw" = [
     b"yowo"       , [0x02, 0x41        ], X, VEX_OP | PREF_66 | AVX;
@@ -4496,7 +4491,7 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x02, 0x06        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
 ]
 "vphsubdq" = [
-    b"yowo"       , [0x09, 0xE3        ], X, XOP_OP | AMD | SSE5;
+    b"yowo"       , [0x09, 0xE3        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vphsubsw" = [
     b"y*y*w*"     , [0x02, 0x07        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
@@ -4525,7 +4520,7 @@ Ops!(OPMAP;
     b"yoyowoyo"   , [0x08, 0x9E        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacsdqh" = [
-    b"yoyowoyo"   , [0x08, 0x9F        ], X, XOP_OP | SSE5 | AMD;
+    b"yoyowoyo"   , [0x08, 0x9F        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacsdql" = [
     b"yoyowoyo"   , [0x08, 0x97        ], X, XOP_OP | SSE5 | AMD;
@@ -4534,22 +4529,22 @@ Ops!(OPMAP;
     b"yoyowoyo"   , [0x08, 0x8E        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacssdqh" = [
-    b"yoyowoyo"   , [0x08, 0x8F        ], X, XOP_OP | SSE5 | AMD;
+    b"yoyowoyo"   , [0x08, 0x8F        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacssdql" = [
-    b"yoyowoyo"   , [0x08, 0x87        ], X, XOP_OP | SSE5 | AMD;
+    b"yoyowoyo"   , [0x08, 0x87        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacsswd" = [
     b"yoyowoyo"   , [0x08, 0x86        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacssww" = [
-    b"yoyowoyo"   , [0x08, 0x85        ], X, XOP_OP | SSE5 | AMD;
+    b"yoyowoyo"   , [0x08, 0x85        ], X, XOP_OP | AMD | SSE5;
 ]
 "vpmacswd" = [
     b"yoyowoyo"   , [0x08, 0x96        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vpmacsww" = [
-    b"yoyowoyo"   , [0x08, 0x95        ], X, XOP_OP | AMD | SSE5;
+    b"yoyowoyo"   , [0x08, 0x95        ], X, XOP_OP | SSE5 | AMD;
 ]
 "vpmadcsswd" = [
     b"yoyowoyo"   , [0x08, 0xA6        ], X, XOP_OP | SSE5 | AMD;
@@ -4683,8 +4678,8 @@ Ops!(OPMAP;
     b"y*y*w*"     , [0x01, 0xEB        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
 ]
 "vpperm" = [
-    b"yoyowoyo"   , [0x08, 0xA3        ], X, XOP_OP | SSE5 | AMD;
-    b"yoyoyowo"   , [0x08, 0xA3        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
+    b"yoyowoyo"   , [0x08, 0xA3        ], X, XOP_OP | AMD | SSE5;
+    b"yoyoyowo"   , [0x08, 0xA3        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vprotb" = [
     b"yowoib"     , [0x08, 0xC0        ], X, XOP_OP | AMD | SSE5;
@@ -4692,19 +4687,19 @@ Ops!(OPMAP;
     b"yoyowo"     , [0x09, 0x90        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vprotd" = [
-    b"yowoib"     , [0x08, 0xC2        ], X, XOP_OP | SSE5 | AMD;
+    b"yowoib"     , [0x08, 0xC2        ], X, XOP_OP | AMD | SSE5;
     b"yowoyo"     , [0x09, 0x92        ], X, XOP_OP | ENC_MR | AMD | SSE5;
     b"yoyowo"     , [0x09, 0x92        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vprotq" = [
-    b"yowoib"     , [0x08, 0xC3        ], X, XOP_OP | AMD | SSE5;
+    b"yowoib"     , [0x08, 0xC3        ], X, XOP_OP | SSE5 | AMD;
     b"yowoyo"     , [0x09, 0x93        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
-    b"yoyowo"     , [0x09, 0x93        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
+    b"yoyowo"     , [0x09, 0x93        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vprotw" = [
     b"yowoib"     , [0x08, 0xC1        ], X, XOP_OP | SSE5 | AMD;
     b"yowoyo"     , [0x09, 0x91        ], X, XOP_OP | ENC_MR | AMD | SSE5;
-    b"yoyowo"     , [0x09, 0x91        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
+    b"yoyowo"     , [0x09, 0x91        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vpsadbw" = [
     b"y*y*w*"     , [0x01, 0xF6        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
@@ -4714,12 +4709,12 @@ Ops!(OPMAP;
     b"yoyowo"     , [0x09, 0x98        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
 ]
 "vpshad" = [
-    b"yowoyo"     , [0x09, 0x9A        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
+    b"yowoyo"     , [0x09, 0x9A        ], X, XOP_OP | ENC_MR | AMD | SSE5;
     b"yoyowo"     , [0x09, 0x9A        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vpshaq" = [
     b"yowoyo"     , [0x09, 0x9B        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
-    b"yoyowo"     , [0x09, 0x9B        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
+    b"yoyowo"     , [0x09, 0x9B        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
 ]
 "vpshaw" = [
     b"yowoyo"     , [0x09, 0x99        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
@@ -4727,19 +4722,19 @@ Ops!(OPMAP;
 ]
 "vpshlb" = [
     b"yowoyo"     , [0x09, 0x94        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
-    b"yoyowo"     , [0x09, 0x94        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
+    b"yoyowo"     , [0x09, 0x94        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vpshld" = [
     b"yowoyo"     , [0x09, 0x96        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
-    b"yoyowo"     , [0x09, 0x96        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
+    b"yoyowo"     , [0x09, 0x96        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
 ]
 "vpshlq" = [
-    b"yowoyo"     , [0x09, 0x97        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
+    b"yowoyo"     , [0x09, 0x97        ], X, XOP_OP | ENC_MR | AMD | SSE5;
     b"yoyowo"     , [0x09, 0x97        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
 ]
 "vpshlw" = [
-    b"yowoyo"     , [0x09, 0x95        ], X, XOP_OP | ENC_MR | AMD | SSE5;
-    b"yoyowo"     , [0x09, 0x95        ], X, WITH_REXW | XOP_OP | AMD | SSE5;
+    b"yowoyo"     , [0x09, 0x95        ], X, XOP_OP | ENC_MR | SSE5 | AMD;
+    b"yoyowo"     , [0x09, 0x95        ], X, WITH_REXW | XOP_OP | SSE5 | AMD;
 ]
 "vpshufb" = [
     b"y*y*w*"     , [0x02, 0x00        ], X, VEX_OP | AUTO_VEXL | PREF_66 | AVX;
@@ -5050,12 +5045,12 @@ Ops!(OPMAP;
     b"rbib"       , [0x80              ], 6;
     b"rbrb"       , [0x30              ], X, ENC_MR;
     b"rbvb"       , [0x32              ], X;
-    b"r*ib"       , [0x83              ], 6, AUTO_SIZE | LOCK | EXACT_SIZE;
+    b"r*ib"       , [0x83              ], 6, AUTO_SIZE  | EXACT_SIZE;
     b"A*i*"       , [0x35              ], X, AUTO_SIZE;
     b"m*i*"       , [0x81              ], 6, AUTO_SIZE | LOCK;
     b"m*ib"       , [0x83              ], 6, AUTO_SIZE | LOCK;
     b"m*r*"       , [0x31              ], X, AUTO_SIZE | LOCK | ENC_MR;
-    b"r*i*"       , [0x81              ], 6, AUTO_SIZE | LOCK;
+    b"r*i*"       , [0x81              ], 6, AUTO_SIZE ;
     b"r*r*"       , [0x31              ], X, AUTO_SIZE | ENC_MR;
     b"r*v*"       , [0x33              ], X, AUTO_SIZE;
 ]

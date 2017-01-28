@@ -1,34 +1,48 @@
 
 #[test]
-fn enc_sha_sha1msg15254() {
+fn enc_sha_sha1msg15383() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg1 xmm2, xmm15
+             ; sha1msg1 xmm0, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xC9, 0xD7", "sha1msg1 xmm2, xmm15");
+     assert_eq!(hex, "0x0F, 0x38, 0xC9, 0x02", "sha1msg1 xmm0, OWORD [rdx]");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg15255() {
+fn enc_sha_sha1msg15384() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg1 xmm15, xmm12
+             ; sha1msg1 xmm11, xmm15
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xC9, 0xFC", "sha1msg1 xmm15, xmm12");
+     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xC9, 0xDF", "sha1msg1 xmm11, xmm15");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg15256() {
+fn enc_sha_sha1msg15385() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; sha1msg1 xmm4, xmm1
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x38, 0xC9, 0xE1", "sha1msg1 xmm4, xmm1");
+}
+
+
+
+#[test]
+fn enc_sha_sha1msg15386() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; sha1msg1 xmm15, xmm3
@@ -42,119 +56,119 @@ fn enc_sha_sha1msg15256() {
 
 
 #[test]
-fn enc_sha_sha1msg15257() {
+fn enc_sha_sha1msg15387() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg1 xmm2, xmm3
+             ; sha1msg1 xmm12, xmm11
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xC9, 0xD3", "sha1msg1 xmm2, xmm3");
+     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xC9, 0xE3", "sha1msg1 xmm12, xmm11");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg15258() {
+fn enc_sha_sha1msg25388() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg1 xmm15, xmm15
+             ; sha1msg2 xmm2, xmm15
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xC9, 0xFF", "sha1msg1 xmm15, xmm15");
+     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xCA, 0xD7", "sha1msg2 xmm2, xmm15");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg25259() {
+fn enc_sha_sha1msg25389() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg2 xmm2, xmm12
+             ; sha1msg2 xmm15, xmm4
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xCA, 0xD4", "sha1msg2 xmm2, xmm12");
+     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCA, 0xFC", "sha1msg2 xmm15, xmm4");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg25260() {
+fn enc_sha_sha1msg25390() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg2 xmm4, OWORD [rdx]
+             ; sha1msg2 xmm2, xmm0
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCA, 0x22", "sha1msg2 xmm4, OWORD [rdx]");
+     assert_eq!(hex, "0x0F, 0x38, 0xCA, 0xD0", "sha1msg2 xmm2, xmm0");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg25261() {
+fn enc_sha_sha1msg25391() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg2 xmm12, xmm3
+             ; sha1msg2 xmm2, xmm1
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCA, 0xE3", "sha1msg2 xmm12, xmm3");
+     assert_eq!(hex, "0x0F, 0x38, 0xCA, 0xD1", "sha1msg2 xmm2, xmm1");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg25262() {
+fn enc_sha_sha1msg25392() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg2 xmm15, OWORD [rdx]
+             ; sha1msg2 xmm3, xmm4
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCA, 0x3A", "sha1msg2 xmm15, OWORD [rdx]");
+     assert_eq!(hex, "0x0F, 0x38, 0xCA, 0xDC", "sha1msg2 xmm3, xmm4");
 }
 
 
 
 #[test]
-fn enc_sha_sha1msg25263() {
+fn enc_sha_sha1nexte5393() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1msg2 xmm12, xmm0
+             ; sha1nexte xmm0, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCA, 0xE0", "sha1msg2 xmm12, xmm0");
+     assert_eq!(hex, "0x0F, 0x38, 0xC8, 0x02", "sha1nexte xmm0, OWORD [rdx]");
 }
 
 
 
 #[test]
-fn enc_sha_sha1nexte5264() {
+fn enc_sha_sha1nexte5394() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1nexte xmm2, xmm12
+             ; sha1nexte xmm2, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xC8, 0xD4", "sha1nexte xmm2, xmm12");
+     assert_eq!(hex, "0x0F, 0x38, 0xC8, 0x12", "sha1nexte xmm2, OWORD [rdx]");
 }
 
 
 
 #[test]
-fn enc_sha_sha1nexte5265() {
+fn enc_sha_sha1nexte5395() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; sha1nexte xmm2, OWORD [rax * 2 + rdx]
@@ -168,301 +182,273 @@ fn enc_sha_sha1nexte5265() {
 
 
 #[test]
-fn enc_sha_sha1nexte5266() {
+fn enc_sha_sha1nexte5396() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1nexte xmm11, xmm12
+             ; sha1nexte xmm0, xmm2
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xC8, 0xDC", "sha1nexte xmm11, xmm12");
+     assert_eq!(hex, "0x0F, 0x38, 0xC8, 0xC2", "sha1nexte xmm0, xmm2");
 }
 
 
 
 #[test]
-fn enc_sha_sha1nexte5267() {
+fn enc_sha_sha1nexte5397() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1nexte xmm15, xmm11
+             ; sha1nexte xmm3, xmm2
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xC8, 0xFB", "sha1nexte xmm15, xmm11");
+     assert_eq!(hex, "0x0F, 0x38, 0xC8, 0xDA", "sha1nexte xmm3, xmm2");
 }
 
 
 
 #[test]
-fn enc_sha_sha1nexte5268() {
+fn enc_sha_sha1rnds45398() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1nexte xmm1, OWORD [rax * 2 + rdx]
+             ; sha1rnds4 xmm2, xmm15, 114
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xC8, 0x0C, 0x42", "sha1nexte xmm1, OWORD [rax * 2 + rdx]");
+     assert_eq!(hex, "0x41, 0x0F, 0x3A, 0xCC, 0xD7, 0x72", "sha1rnds4 xmm2, xmm15, 114");
 }
 
 
 
 #[test]
-fn enc_sha_sha1rnds45269() {
+fn enc_sha_sha1rnds45399() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1rnds4 xmm11, xmm4, 43
+             ; sha1rnds4 xmm12, xmm4, 72
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x3A, 0xCC, 0xDC, 0x2B", "sha1rnds4 xmm11, xmm4, 43");
+     assert_eq!(hex, "0x44, 0x0F, 0x3A, 0xCC, 0xE4, 0x48", "sha1rnds4 xmm12, xmm4, 72");
 }
 
 
 
 #[test]
-fn enc_sha_sha1rnds45270() {
+fn enc_sha_sha1rnds45400() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1rnds4 xmm1, xmm0, 35
+             ; sha1rnds4 xmm0, xmm1, 124
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x3A, 0xCC, 0xC8, 0x23", "sha1rnds4 xmm1, xmm0, 35");
+     assert_eq!(hex, "0x0F, 0x3A, 0xCC, 0xC1, 0x7C", "sha1rnds4 xmm0, xmm1, 124");
 }
 
 
 
 #[test]
-fn enc_sha_sha1rnds45271() {
+fn enc_sha_sha1rnds45401() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1rnds4 xmm1, xmm12, 39
+             ; sha1rnds4 xmm1, xmm15, 15
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x3A, 0xCC, 0xCC, 0x27", "sha1rnds4 xmm1, xmm12, 39");
+     assert_eq!(hex, "0x41, 0x0F, 0x3A, 0xCC, 0xCF, 0x0F", "sha1rnds4 xmm1, xmm15, 15");
 }
 
 
 
 #[test]
-fn enc_sha_sha1rnds45272() {
+fn enc_sha_sha1rnds45402() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1rnds4 xmm12, xmm15, 11
+             ; sha1rnds4 xmm3, OWORD [rdx], 29
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x45, 0x0F, 0x3A, 0xCC, 0xE7, 0x0B", "sha1rnds4 xmm12, xmm15, 11");
+     assert_eq!(hex, "0x0F, 0x3A, 0xCC, 0x1A, 0x1D", "sha1rnds4 xmm3, OWORD [rdx], 29");
 }
 
 
 
 #[test]
-fn enc_sha_sha1rnds45273() {
+fn enc_sha_sha256msg15403() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha1rnds4 xmm0, xmm1, 118
+             ; sha256msg1 xmm0, xmm11
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x3A, 0xCC, 0xC1, 0x76", "sha1rnds4 xmm0, xmm1, 118");
+     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xCC, 0xC3", "sha256msg1 xmm0, xmm11");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg15274() {
+fn enc_sha_sha256msg15404() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg1 xmm4, OWORD [rdx]
+             ; sha256msg1 xmm0, xmm0
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCC, 0x22", "sha256msg1 xmm4, OWORD [rdx]");
+     assert_eq!(hex, "0x0F, 0x38, 0xCC, 0xC0", "sha256msg1 xmm0, xmm0");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg15275() {
+fn enc_sha_sha256msg15405() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg1 xmm12, xmm2
+             ; sha256msg1 xmm15, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCC, 0xE2", "sha256msg1 xmm12, xmm2");
+     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCC, 0x38", "sha256msg1 xmm15, OWORD [rax]");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg15276() {
+fn enc_sha_sha256msg15406() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg1 xmm0, xmm2
+             ; sha256msg1 xmm15, xmm0
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCC, 0xC2", "sha256msg1 xmm0, xmm2");
+     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCC, 0xF8", "sha256msg1 xmm15, xmm0");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg15277() {
+fn enc_sha_sha256msg15407() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg1 xmm2, OWORD [rax * 2 + rdx]
+             ; sha256msg1 xmm3, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCC, 0x14, 0x42", "sha256msg1 xmm2, OWORD [rax * 2 + rdx]");
+     assert_eq!(hex, "0x0F, 0x38, 0xCC, 0x1A", "sha256msg1 xmm3, OWORD [rdx]");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg15278() {
+fn enc_sha_sha256msg25408() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg1 xmm3, xmm0
+             ; sha256msg2 xmm11, xmm15
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCC, 0xD8", "sha256msg1 xmm3, xmm0");
+     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xCD, 0xDF", "sha256msg2 xmm11, xmm15");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg25279() {
+fn enc_sha_sha256msg25409() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg2 xmm1, xmm15
+             ; sha256msg2 xmm12, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xCD, 0xCF", "sha256msg2 xmm1, xmm15");
+     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCD, 0x22", "sha256msg2 xmm12, OWORD [rdx]");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg25280() {
+fn enc_sha_sha256msg25410() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg2 xmm4, xmm4
+             ; sha256msg2 xmm1, xmm4
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCD, 0xE4", "sha256msg2 xmm4, xmm4");
+     assert_eq!(hex, "0x0F, 0x38, 0xCD, 0xCC", "sha256msg2 xmm1, xmm4");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg25281() {
+fn enc_sha_sha256msg25411() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg2 xmm1, xmm11
+             ; sha256msg2 xmm3, xmm1
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xCD, 0xCB", "sha256msg2 xmm1, xmm11");
+     assert_eq!(hex, "0x0F, 0x38, 0xCD, 0xD9", "sha256msg2 xmm3, xmm1");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg25282() {
+fn enc_sha_sha256rnds25412() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg2 xmm15, xmm12
+             ; sha256rnds2 xmm2, xmm4
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x45, 0x0F, 0x38, 0xCD, 0xFC", "sha256msg2 xmm15, xmm12");
+     assert_eq!(hex, "0x0F, 0x38, 0xCB, 0xD4", "sha256rnds2 xmm2, xmm4");
 }
 
 
 
 #[test]
-fn enc_sha_sha256msg25283() {
+fn enc_sha_sha256rnds25413() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256msg2 xmm15, xmm0
+             ; sha256rnds2 xmm15, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCD, 0xF8", "sha256msg2 xmm15, xmm0");
+     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCB, 0x3A", "sha256rnds2 xmm15, OWORD [rdx]");
 }
 
 
 
 #[test]
-fn enc_sha_sha256rnds25284() {
+fn enc_sha_sha256rnds25414() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; sha256rnds2 xmm4, xmm2
+             ; sha256rnds2 xmm15, xmm3
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x38, 0xCB, 0xE2", "sha256rnds2 xmm4, xmm2");
+     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCB, 0xFB", "sha256rnds2 xmm15, xmm3");
 }
 
 
 
 #[test]
-fn enc_sha_sha256rnds25285() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; sha256rnds2 xmm1, xmm15
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x41, 0x0F, 0x38, 0xCB, 0xCF", "sha256rnds2 xmm1, xmm15");
-}
-
-
-
-#[test]
-fn enc_sha_sha256rnds25286() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; sha256rnds2 xmm15, OWORD [rax * 2 + rdx]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCB, 0x3C, 0x42", "sha256rnds2 xmm15, OWORD [rax * 2 + rdx]");
-}
-
-
-
-#[test]
-fn enc_sha_sha256rnds25287() {
+fn enc_sha_sha256rnds25415() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; sha256rnds2 xmm15, xmm11
@@ -471,20 +457,6 @@ fn enc_sha_sha256rnds25287() {
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x45, 0x0F, 0x38, 0xCB, 0xFB", "sha256rnds2 xmm15, xmm11");
-}
-
-
-
-#[test]
-fn enc_sha_sha256rnds25288() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; sha256rnds2 xmm12, xmm2
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x44, 0x0F, 0x38, 0xCB, 0xE2", "sha256rnds2 xmm12, xmm2");
 }
 
 
