@@ -1,6 +1,6 @@
 
 #[test]
-fn enc_amd_clzero4118() {
+fn enc_amd_clzero4137() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; clzero
@@ -14,21 +14,7 @@ fn enc_amd_clzero4118() {
 
 
 #[test]
-fn enc_amd_invlpga4119() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; invlpga rax, ecx
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x01, 0xDF", "invlpga rax, ecx");
-}
-
-
-
-#[test]
-fn enc_amd_invlpga4120() {
+fn enc_amd_invlpga4138() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; invlpga
@@ -42,7 +28,21 @@ fn enc_amd_invlpga4120() {
 
 
 #[test]
-fn enc_amd_lfence4121() {
+fn enc_amd_invlpga4139() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; invlpga rax, ecx
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x01, 0xDF", "invlpga rax, ecx");
+}
+
+
+
+#[test]
+fn enc_amd_lfence4140() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; lfence
@@ -56,7 +56,21 @@ fn enc_amd_lfence4121() {
 
 
 #[test]
-fn enc_amd_llwpcb4122() {
+fn enc_amd_llwpcb4141() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; llwpcb rax
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x8F, 0xE9, 0xF8, 0x12, 0xC0", "llwpcb rax");
+}
+
+
+
+#[test]
+fn enc_amd_llwpcb4142() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; llwpcb rbx
@@ -70,7 +84,7 @@ fn enc_amd_llwpcb4122() {
 
 
 #[test]
-fn enc_amd_llwpcb4123() {
+fn enc_amd_llwpcb4143() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; llwpcb rcx
@@ -84,21 +98,7 @@ fn enc_amd_llwpcb4123() {
 
 
 #[test]
-fn enc_amd_llwpcb4124() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; llwpcb rdx
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x8F, 0xE9, 0xF8, 0x12, 0xC2", "llwpcb rdx");
-}
-
-
-
-#[test]
-fn enc_amd_lzcnt4125() {
+fn enc_amd_lzcnt4144() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; lzcnt rdx, QWORD [rax * 2 + rdx]
@@ -112,49 +112,35 @@ fn enc_amd_lzcnt4125() {
 
 
 #[test]
-fn enc_amd_lzcnt4126() {
+fn enc_amd_lzcnt4145() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; lzcnt rax, QWORD [rax * 2 + rdx]
+             ; lzcnt rcx, rcx
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBD, 0x04, 0x42", "lzcnt rax, QWORD [rax * 2 + rdx]");
+     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBD, 0xC9", "lzcnt rcx, rcx");
 }
 
 
 
 #[test]
-fn enc_amd_lzcnt4127() {
+fn enc_amd_lzcnt4146() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; lzcnt rbx, QWORD [rax]
+             ; lzcnt rdx, rcx
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBD, 0x18", "lzcnt rbx, QWORD [rax]");
+     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBD, 0xD1", "lzcnt rdx, rcx");
 }
 
 
 
 #[test]
-fn enc_amd_lzcnt4128() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; lzcnt rdx, QWORD [rax]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBD, 0x10", "lzcnt rdx, QWORD [rax]");
-}
-
-
-
-#[test]
-fn enc_amd_lzcnt4129() {
+fn enc_amd_lzcnt4147() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; lzcnt rax, rcx
@@ -168,7 +154,7 @@ fn enc_amd_lzcnt4129() {
 
 
 #[test]
-fn enc_amd_mfence4130() {
+fn enc_amd_mfence4148() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; mfence
@@ -182,7 +168,7 @@ fn enc_amd_mfence4130() {
 
 
 #[test]
-fn enc_amd_monitorx4131() {
+fn enc_amd_monitorx4149() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; monitorx rax, ecx, edx
@@ -196,7 +182,7 @@ fn enc_amd_monitorx4131() {
 
 
 #[test]
-fn enc_amd_monitorx4132() {
+fn enc_amd_monitorx4150() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; monitorx ax, ecx, edx
@@ -210,7 +196,7 @@ fn enc_amd_monitorx4132() {
 
 
 #[test]
-fn enc_amd_monitorx4133() {
+fn enc_amd_monitorx4151() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; monitorx
@@ -224,7 +210,7 @@ fn enc_amd_monitorx4133() {
 
 
 #[test]
-fn enc_amd_mwaitx4134() {
+fn enc_amd_mwaitx4152() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; mwaitx
@@ -238,7 +224,7 @@ fn enc_amd_mwaitx4134() {
 
 
 #[test]
-fn enc_amd_mwaitx4135() {
+fn enc_amd_mwaitx4153() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; mwaitx eax, ecx
@@ -252,7 +238,7 @@ fn enc_amd_mwaitx4135() {
 
 
 #[test]
-fn enc_amd_sfence4136() {
+fn enc_amd_sfence4154() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; sfence
@@ -266,7 +252,7 @@ fn enc_amd_sfence4136() {
 
 
 #[test]
-fn enc_amd_slwpcb4137() {
+fn enc_amd_slwpcb4155() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; slwpcb rdx
@@ -280,7 +266,21 @@ fn enc_amd_slwpcb4137() {
 
 
 #[test]
-fn enc_amd_slwpcb4138() {
+fn enc_amd_slwpcb4156() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; slwpcb rbx
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x8F, 0xE9, 0xF8, 0x12, 0xCB", "slwpcb rbx");
+}
+
+
+
+#[test]
+fn enc_amd_slwpcb4157() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; slwpcb rcx
@@ -294,7 +294,21 @@ fn enc_amd_slwpcb4138() {
 
 
 #[test]
-fn enc_amd_syscall4139() {
+fn enc_amd_slwpcb4158() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; slwpcb rax
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x8F, 0xE9, 0xF8, 0x12, 0xC8", "slwpcb rax");
+}
+
+
+
+#[test]
+fn enc_amd_syscall4159() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; syscall
@@ -308,7 +322,7 @@ fn enc_amd_syscall4139() {
 
 
 #[test]
-fn enc_amd_sysret4140() {
+fn enc_amd_sysret4160() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; sysret

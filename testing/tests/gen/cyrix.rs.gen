@@ -1,6 +1,6 @@
 
 #[test]
-fn enc_cyrix_cpu_read1795() {
+fn enc_cyrix_cpu_read1788() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; cpu_read
@@ -14,7 +14,7 @@ fn enc_cyrix_cpu_read1795() {
 
 
 #[test]
-fn enc_cyrix_cpu_write1796() {
+fn enc_cyrix_cpu_write1789() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; cpu_write
@@ -28,7 +28,7 @@ fn enc_cyrix_cpu_write1796() {
 
 
 #[test]
-fn enc_cyrix_dmint1797() {
+fn enc_cyrix_dmint1790() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; dmint
@@ -42,7 +42,7 @@ fn enc_cyrix_dmint1797() {
 
 
 #[test]
-fn enc_cyrix_montmul1798() {
+fn enc_cyrix_montmul1791() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; montmul
@@ -56,7 +56,7 @@ fn enc_cyrix_montmul1798() {
 
 
 #[test]
-fn enc_cyrix_rdm1799() {
+fn enc_cyrix_rdm1792() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; rdm
@@ -70,21 +70,7 @@ fn enc_cyrix_rdm1799() {
 
 
 #[test]
-fn enc_cyrix_rdshr1800() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; rdshr DWORD [rax]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x36, 0x00", "rdshr DWORD [rax]");
-}
-
-
-
-#[test]
-fn enc_cyrix_rdshr1801() {
+fn enc_cyrix_rdshr1793() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; rdshr eax
@@ -98,35 +84,21 @@ fn enc_cyrix_rdshr1801() {
 
 
 #[test]
-fn enc_cyrix_rsldt1802() {
+fn enc_cyrix_rdshr1794() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; rsldt TWORD [rax * 2 + rdx]
+             ; rdshr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x7B, 0x04, 0x42", "rsldt TWORD [rax * 2 + rdx]");
+     assert_eq!(hex, "0x0F, 0x36, 0x00", "rdshr DWORD [rax]");
 }
 
 
 
 #[test]
-fn enc_cyrix_rsldt1803() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; rsldt TWORD [rax]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x7B, 0x00", "rsldt TWORD [rax]");
-}
-
-
-
-#[test]
-fn enc_cyrix_rsldt1804() {
+fn enc_cyrix_rsldt1795() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; rsldt TWORD [rax + 16]
@@ -140,35 +112,21 @@ fn enc_cyrix_rsldt1804() {
 
 
 #[test]
-fn enc_cyrix_rsts1805() {
+fn enc_cyrix_rsldt1796() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; rsts TWORD [rax * 2 + rdx]
+             ; rsldt TWORD [rax]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x7D, 0x04, 0x42", "rsts TWORD [rax * 2 + rdx]");
+     assert_eq!(hex, "0x0F, 0x7B, 0x00", "rsldt TWORD [rax]");
 }
 
 
 
 #[test]
-fn enc_cyrix_rsts1806() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; rsts TWORD [rax + 16]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x7D, 0x40, 0x10", "rsts TWORD [rax + 16]");
-}
-
-
-
-#[test]
-fn enc_cyrix_rsts1807() {
+fn enc_cyrix_rsts1797() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; rsts TWORD [rax]
@@ -182,7 +140,35 @@ fn enc_cyrix_rsts1807() {
 
 
 #[test]
-fn enc_cyrix_smint1808() {
+fn enc_cyrix_rsts1798() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; rsts TWORD [rax * 2 + rdx]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x7D, 0x04, 0x42", "rsts TWORD [rax * 2 + rdx]");
+}
+
+
+
+#[test]
+fn enc_cyrix_rsts1799() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; rsts TWORD [rax + 16]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x7D, 0x40, 0x10", "rsts TWORD [rax + 16]");
+}
+
+
+
+#[test]
+fn enc_cyrix_smint1800() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; smint
@@ -196,7 +182,7 @@ fn enc_cyrix_smint1808() {
 
 
 #[test]
-fn enc_cyrix_svldt1809() {
+fn enc_cyrix_svldt1801() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; svldt TWORD [rax * 2 + rdx]
@@ -210,7 +196,7 @@ fn enc_cyrix_svldt1809() {
 
 
 #[test]
-fn enc_cyrix_svldt1810() {
+fn enc_cyrix_svldt1802() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; svldt TWORD [rax + 16]
@@ -224,7 +210,21 @@ fn enc_cyrix_svldt1810() {
 
 
 #[test]
-fn enc_cyrix_svts1811() {
+fn enc_cyrix_svts1803() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; svts TWORD [rax + 16]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x7C, 0x40, 0x10", "svts TWORD [rax + 16]");
+}
+
+
+
+#[test]
+fn enc_cyrix_svts1804() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; svts TWORD [rax * 2 + rdx]
@@ -238,35 +238,7 @@ fn enc_cyrix_svts1811() {
 
 
 #[test]
-fn enc_cyrix_svts1812() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; svts TWORD [rax]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x7C, 0x00", "svts TWORD [rax]");
-}
-
-
-
-#[test]
-fn enc_cyrix_wrshr1813() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; wrshr DWORD [rax]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x37, 0x00", "wrshr DWORD [rax]");
-}
-
-
-
-#[test]
-fn enc_cyrix_wrshr1814() {
+fn enc_cyrix_wrshr1805() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; wrshr eax
@@ -280,7 +252,21 @@ fn enc_cyrix_wrshr1814() {
 
 
 #[test]
-fn enc_cyrix_xcryptcbc1815() {
+fn enc_cyrix_wrshr1806() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; wrshr DWORD [rax]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x37, 0x00", "wrshr DWORD [rax]");
+}
+
+
+
+#[test]
+fn enc_cyrix_xcryptcbc1807() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xcryptcbc
@@ -294,7 +280,7 @@ fn enc_cyrix_xcryptcbc1815() {
 
 
 #[test]
-fn enc_cyrix_xcryptcfb1816() {
+fn enc_cyrix_xcryptcfb1808() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xcryptcfb
@@ -308,7 +294,7 @@ fn enc_cyrix_xcryptcfb1816() {
 
 
 #[test]
-fn enc_cyrix_xcryptctr1817() {
+fn enc_cyrix_xcryptctr1809() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xcryptctr
@@ -322,7 +308,7 @@ fn enc_cyrix_xcryptctr1817() {
 
 
 #[test]
-fn enc_cyrix_xcryptecb1818() {
+fn enc_cyrix_xcryptecb1810() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xcryptecb
@@ -336,7 +322,7 @@ fn enc_cyrix_xcryptecb1818() {
 
 
 #[test]
-fn enc_cyrix_xcryptofb1819() {
+fn enc_cyrix_xcryptofb1811() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xcryptofb
@@ -350,7 +336,7 @@ fn enc_cyrix_xcryptofb1819() {
 
 
 #[test]
-fn enc_cyrix_xsha11820() {
+fn enc_cyrix_xsha11812() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xsha1
@@ -364,7 +350,7 @@ fn enc_cyrix_xsha11820() {
 
 
 #[test]
-fn enc_cyrix_xsha2561821() {
+fn enc_cyrix_xsha2561813() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xsha256
@@ -378,7 +364,7 @@ fn enc_cyrix_xsha2561821() {
 
 
 #[test]
-fn enc_cyrix_xstore1822() {
+fn enc_cyrix_xstore1814() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; xstore

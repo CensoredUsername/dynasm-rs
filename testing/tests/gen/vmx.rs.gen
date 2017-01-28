@@ -1,6 +1,6 @@
 
 #[test]
-fn enc_vmx_clgi4776() {
+fn enc_vmx_clgi4770() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; clgi
@@ -14,35 +14,21 @@ fn enc_vmx_clgi4776() {
 
 
 #[test]
-fn enc_vmx_invept4777() {
+fn enc_vmx_invept4771() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; invept rdx, OWORD [rax]
+             ; invept rdx, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x80, 0x10", "invept rdx, OWORD [rax]");
+     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x80, 0x14, 0x42", "invept rdx, OWORD [rax * 2 + rdx]");
 }
 
 
 
 #[test]
-fn enc_vmx_invept4778() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; invept rax, OWORD [rax * 2 + rdx]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x80, 0x04, 0x42", "invept rax, OWORD [rax * 2 + rdx]");
-}
-
-
-
-#[test]
-fn enc_vmx_invept4779() {
+fn enc_vmx_invept4772() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; invept rdx, OWORD [rax + 16]
@@ -56,7 +42,7 @@ fn enc_vmx_invept4779() {
 
 
 #[test]
-fn enc_vmx_invept4780() {
+fn enc_vmx_invept4773() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; invept rcx, OWORD [rax]
@@ -70,21 +56,7 @@ fn enc_vmx_invept4780() {
 
 
 #[test]
-fn enc_vmx_invept4781() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; invept rcx, OWORD [rax + 16]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x80, 0x48, 0x10", "invept rcx, OWORD [rax + 16]");
-}
-
-
-
-#[test]
-fn enc_vmx_invvpid4782() {
+fn enc_vmx_invvpid4774() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; invvpid rdx, OWORD [rax + 16]
@@ -98,21 +70,7 @@ fn enc_vmx_invvpid4782() {
 
 
 #[test]
-fn enc_vmx_invvpid4783() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; invvpid rcx, OWORD [rax * 2 + rdx]
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x81, 0x0C, 0x42", "invvpid rcx, OWORD [rax * 2 + rdx]");
-}
-
-
-
-#[test]
-fn enc_vmx_invvpid4784() {
+fn enc_vmx_invvpid4775() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; invvpid rax, OWORD [rax * 2 + rdx]
@@ -126,21 +84,35 @@ fn enc_vmx_invvpid4784() {
 
 
 #[test]
-fn enc_vmx_invvpid4785() {
+fn enc_vmx_invvpid4776() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; invvpid rcx, OWORD [rax]
+             ; invvpid rdx, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x81, 0x08", "invvpid rcx, OWORD [rax]");
+     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x81, 0x14, 0x42", "invvpid rdx, OWORD [rax * 2 + rdx]");
 }
 
 
 
 #[test]
-fn enc_vmx_stgi4786() {
+fn enc_vmx_invvpid4777() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; invvpid rax, OWORD [rax + 16]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x66, 0x0F, 0x38, 0x81, 0x40, 0x10", "invvpid rax, OWORD [rax + 16]");
+}
+
+
+
+#[test]
+fn enc_vmx_stgi4778() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; stgi
@@ -154,7 +126,7 @@ fn enc_vmx_stgi4786() {
 
 
 #[test]
-fn enc_vmx_vmcall4787() {
+fn enc_vmx_vmcall4779() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmcall
@@ -168,7 +140,7 @@ fn enc_vmx_vmcall4787() {
 
 
 #[test]
-fn enc_vmx_vmclear4788() {
+fn enc_vmx_vmclear4780() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmclear [rax]
@@ -182,7 +154,7 @@ fn enc_vmx_vmclear4788() {
 
 
 #[test]
-fn enc_vmx_vmfunc4789() {
+fn enc_vmx_vmfunc4781() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmfunc
@@ -196,7 +168,7 @@ fn enc_vmx_vmfunc4789() {
 
 
 #[test]
-fn enc_vmx_vmlaunch4790() {
+fn enc_vmx_vmlaunch4782() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmlaunch
@@ -210,7 +182,7 @@ fn enc_vmx_vmlaunch4790() {
 
 
 #[test]
-fn enc_vmx_vmload4791() {
+fn enc_vmx_vmload4783() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmload
@@ -224,7 +196,7 @@ fn enc_vmx_vmload4791() {
 
 
 #[test]
-fn enc_vmx_vmmcall4792() {
+fn enc_vmx_vmmcall4784() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmmcall
@@ -238,7 +210,7 @@ fn enc_vmx_vmmcall4792() {
 
 
 #[test]
-fn enc_vmx_vmptrld4793() {
+fn enc_vmx_vmptrld4785() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmptrld [rax]
@@ -252,7 +224,7 @@ fn enc_vmx_vmptrld4793() {
 
 
 #[test]
-fn enc_vmx_vmptrst4794() {
+fn enc_vmx_vmptrst4786() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmptrst [rax]
@@ -266,7 +238,7 @@ fn enc_vmx_vmptrst4794() {
 
 
 #[test]
-fn enc_vmx_vmread4795() {
+fn enc_vmx_vmread4787() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmread [rax], rcx
@@ -280,7 +252,7 @@ fn enc_vmx_vmread4795() {
 
 
 #[test]
-fn enc_vmx_vmread4796() {
+fn enc_vmx_vmread4788() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmread rax, rdx
@@ -294,21 +266,35 @@ fn enc_vmx_vmread4796() {
 
 
 #[test]
-fn enc_vmx_vmread4797() {
+fn enc_vmx_vmread4789() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
-             ; vmread [rax], rax
+             ; vmread [rax], rdx
      );
      let buf = ops.finalize().unwrap();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x78, 0x00", "vmread [rax], rax");
+     assert_eq!(hex, "0x0F, 0x78, 0x10", "vmread [rax], rdx");
 }
 
 
 
 #[test]
-fn enc_vmx_vmresume4798() {
+fn enc_vmx_vmread4790() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; vmread rax, rcx
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x78, 0xC8", "vmread rax, rcx");
+}
+
+
+
+#[test]
+fn enc_vmx_vmresume4791() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmresume
@@ -322,7 +308,7 @@ fn enc_vmx_vmresume4798() {
 
 
 #[test]
-fn enc_vmx_vmrun4799() {
+fn enc_vmx_vmrun4792() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmrun
@@ -336,7 +322,7 @@ fn enc_vmx_vmrun4799() {
 
 
 #[test]
-fn enc_vmx_vmsave4800() {
+fn enc_vmx_vmsave4793() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmsave
@@ -350,7 +336,35 @@ fn enc_vmx_vmsave4800() {
 
 
 #[test]
-fn enc_vmx_vmwrite4801() {
+fn enc_vmx_vmwrite4794() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; vmwrite rdx, rax
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x79, 0xD0", "vmwrite rdx, rax");
+}
+
+
+
+#[test]
+fn enc_vmx_vmwrite4795() {
+     let mut ops = dynasmrt::x64::Assembler::new();
+     dynasm!(ops
+             ; vmwrite rdx, [rax]
+     );
+     let buf = ops.finalize().unwrap();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x79, 0x10", "vmwrite rdx, [rax]");
+}
+
+
+
+#[test]
+fn enc_vmx_vmwrite4796() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmwrite rax, [rax]
@@ -364,21 +378,7 @@ fn enc_vmx_vmwrite4801() {
 
 
 #[test]
-fn enc_vmx_vmwrite4802() {
-     let mut ops = dynasmrt::x64::Assembler::new();
-     dynasm!(ops
-             ; vmwrite rcx, rax
-     );
-     let buf = ops.finalize().unwrap();
-     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
-     let hex: String = hex.join(", ");
-     assert_eq!(hex, "0x0F, 0x79, 0xC8", "vmwrite rcx, rax");
-}
-
-
-
-#[test]
-fn enc_vmx_vmxoff4803() {
+fn enc_vmx_vmxoff4797() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmxoff
@@ -392,7 +392,7 @@ fn enc_vmx_vmxoff4803() {
 
 
 #[test]
-fn enc_vmx_vmxon4804() {
+fn enc_vmx_vmxon4798() {
      let mut ops = dynasmrt::x64::Assembler::new();
      dynasm!(ops
              ; vmxon [rax]

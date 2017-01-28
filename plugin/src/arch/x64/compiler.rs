@@ -9,6 +9,7 @@ use serialize::{Stmt, Size, Ident, or_mask_shift_expr, size_of_expr, size_of_sca
 use super::parser::{Arg, Instruction, MemoryRef, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;
 use super::x64data::flags::*;
+use super::x64data::features::*;
 use super::debug::format_opdata_list;
 
 use std::mem::{swap, replace};
@@ -25,7 +26,8 @@ pub struct Opdata {
     pub args:  &'static [u8],  // format string of arg format
     pub ops:   &'static [u8],
     pub reg:   u8,
-    pub flags: Flags
+    pub flags: Flags,
+    pub features: Features
 }
 
 pub struct FormatStringIterator<'a> {

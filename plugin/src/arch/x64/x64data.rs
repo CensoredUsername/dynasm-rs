@@ -7,8 +7,10 @@ macro_rules! constify {
 }
 
 macro_rules! OpInner {
-    ($fmt:expr, $ops:expr, $reg:expr)          => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag( 0) }  };
-    ($fmt:expr, $ops:expr, $reg:expr, $f:expr) => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag($f) }  };
+    ($fmt:expr, $ops:expr, $reg:expr)          => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag(0),  features: features::make_flag(0) }  };
+    ($fmt:expr, $ops:expr, $reg:expr, $f:expr) => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag($f), features: features::make_flag(0)}  };
+    ($fmt:expr, $ops:expr, $reg:expr, $f:expr, $ft:expr) => { Opdata {args: $fmt, ops: constify!([u8], $ops), reg: $reg, flags: flags::make_flag($f), features: features::make_flag($ft)}  };
+
 }
 
 macro_rules! Ops {
@@ -37,6 +39,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 pub mod flags {
     bitflags! {
         pub flags Flags: u32 {
+            const DEFAULT   = 0x0000_0000, // this instruction has default encoding
             const VEX_OP    = 0x0000_0001, // this instruction requires a VEX prefix to be encoded
             const XOP_OP    = 0x0000_0002, // this instruction requires a XOP prefix to be encoded
             const IMM_OP    = 0x0000_0004, // this instruction encodes the final opcode byte in the immediate position, like 3DNow! ops.
@@ -81,31 +84,31 @@ pub mod features {
     bitflags! {
         pub flags Features: u32 {
             const X64_IMPLICIT = 0x0000_0000,
-            const FPU          = 0x0000_0000,
-	          const MMX          = 0x0000_0000,
-            const TDNOW        = 0x0000_0000,
-            const SSE          = 0x0000_0000,
-            const SSE2         = 0x0000_0000,
-            const SSE3         = 0x0000_0000,
-            const VMX          = 0x0000_0000,
-            const SSSE3        = 0x0000_0000,
-            const SSE4A        = 0x0000_0000,
-            const SSE41        = 0x0000_0000,
-            const SSE42        = 0x0000_0000,
-            const SSE5         = 0x0000_0000,
-            const AVX          = 0x0000_0000,
-            const AVX2         = 0x0000_0000,
-            const FMA          = 0x0000_0000,
-            const BMI1         = 0x0000_0000,
-            const BMI2         = 0x0000_0000,
-            const TBM          = 0x0000_0000,
-            const RTM          = 0x0000_0000,
-            const INVPCID      = 0x0000_0000,
-            const MPX          = 0x0000_0000,
-            const SHA          = 0x0000_0000,
-            const PREFETCHWT1  = 0x0000_0000,
-            const CYRIX        = 0x0000_0000,
-            const AMD          = 0x0000_0000,
+            const FPU          = 0x0000_0001,
+	          const MMX          = 0x0000_0002,
+            const TDNOW        = 0x0000_0004,
+            const SSE          = 0x0000_0008,
+            const SSE2         = 0x0000_0010,
+            const SSE3         = 0x0000_0020,
+            const VMX          = 0x0000_0040,
+            const SSSE3        = 0x0000_0080,
+            const SSE4A        = 0x0000_0100,
+            const SSE41        = 0x0000_0200,
+            const SSE42        = 0x0000_0400,
+            const SSE5         = 0x0000_0800,
+            const AVX          = 0x0000_1000,
+            const AVX2         = 0x0000_2000,
+            const FMA          = 0x0000_4000,
+            const BMI1         = 0x0000_8000,
+            const BMI2         = 0x0001_0000,
+            const TBM          = 0x0002_0000,
+            const RTM          = 0x0004_0000,
+            const INVPCID      = 0x0008_0000,
+            const MPX          = 0x0010_0000,
+            const SHA          = 0x0020_0000,
+            const PREFETCHWT1  = 0x0040_0000,
+            const CYRIX        = 0x0080_0000,
+            const AMD          = 0x0100_0000,
         }
     }
 
@@ -124,6 +127,7 @@ pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> 
 }
 
 // workaround until bitflags can be used in const
+const DEFAULT    : u32 = flags::flag_bits(flags::DEFAULT);
 const VEX_OP    : u32 = flags::flag_bits(flags::VEX_OP);
 const XOP_OP    : u32 = flags::flag_bits(flags::XOP_OP);
 const IMM_OP    : u32 = flags::flag_bits(flags::IMM_OP);
