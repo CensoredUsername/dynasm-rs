@@ -10,9 +10,9 @@ It is currently in alpha, meaning that while everything should work, a lot of fe
 ## Features
 
 - Fully integrated in the rust toolchain, no other tools necessary.
-- The assembly is optimized into a series of Vec.push and Vec.extend statements for high performance.
+- The assembly is optimized into a series of `Vec.push` and `Vec.extend` statements for high performance.
 - Errors are almost all diagnosed at compile time in a clear fashion.
-- Write the to be generated assembly inline in nasm-like syntax using a simple macro:
+- Write the to be generated assembly inline in nasm-like syntax using a simple macro.
 
 ## Documentation
 
@@ -20,7 +20,7 @@ Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/
 
 ## Limitations
 
-- Currently only supports x64 long mode (with several extensions)
+- Currently only supports x64 long mode with every AMD/Intel extension except for AVX-512.
 
 ## Example
 
@@ -31,7 +31,7 @@ Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/
 #[macro_use]
 extern crate dynasmrt;
 
-use dynasmrt::DynasmApi;
+use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
 use std::io::Write;

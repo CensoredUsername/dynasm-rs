@@ -41,5 +41,5 @@ mnemnonic with a 64-bit immediate parameter to encode this.
 in dynasm-rs it is `reg => Type.attr`.
 - LuaJIT dynasm uses a special preprocessor which detects lines starting with pipes (`|`) as dynasm
 instructions, dynasm-rs uses the `dynasm!` procedural macro with lines starting with semicolons (`;`).
-- LuaJIT has macros in its invocations, dynasm-rs uses macros that expand to `dynasm!` invocations.
-- DYnasm-rs doesn't have typed aliases
+- LuaJIT has macros in its invocations, dynasm-rs uses rust macros that expand to `dynasm!` invocations.
+- Dynasm-rs doesn't have typed aliases
