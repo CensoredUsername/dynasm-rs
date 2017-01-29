@@ -3,6 +3,9 @@ name = "testing"
 version = "0.1.0"
 authors = ["Alexander Stocko <as@coder.gg>"]
 
+[dependencies]
+itertools = "0.5.*"
+
 [dependencies.dynasm]
 path = "../plugin"
 
