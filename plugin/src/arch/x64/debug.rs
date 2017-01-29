@@ -16,6 +16,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
              else if data.flags.contains(AUTO_NO32) {&b"qw"[..]}
              else if data.flags.contains(AUTO_REXW) {&b"qd"[..]}
              else if data.flags.contains(AUTO_VEXL) {&b"ho"[..]}
+             else if name == "monitorx"             {&b"qwd"[..]}
              else                                   {&b"!"[..]};
 
     let mut forms = Vec::new();

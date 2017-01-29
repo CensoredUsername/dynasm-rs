@@ -3,6 +3,7 @@
 
 #[macro_use]
 extern crate dynasmrt;
+
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 // aliases, and dynasm! in item position
@@ -10,7 +11,7 @@ dynasm!(ops
     ; .alias test, rax
 );
 
-fn main() {
+fn complex1() {
     let mut ops = dynasmrt::x64::Assembler::new();
     let d = 3;
     let c = 4;
@@ -203,4 +204,9 @@ fn main() {
 
     let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(buf.ptr(index)) };
     println!("assembled function result: {}", func() );
+}
+
+#[test]
+fn complex_complex1() {
+    complex1();
 }

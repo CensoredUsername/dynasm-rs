@@ -10,7 +10,7 @@ use std::{io, slice, mem};
 use std::io::Write;
 
 fn main() {
-    let mut ops = dynasmrt::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new();
     let string = "Hello World!";
 
     dynasm!(ops
@@ -32,17 +32,13 @@ fn main() {
 
     let buf = ops.finalize().unwrap();
 
-    let hello_fn: extern "win64" fn() -> bool = unsafe {
-        mem::transmute(buf.ptr(hello))
-    };
+    let hello_fn: extern "win64" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 
-    assert!(
-        hello_fn()
-    );
+    assert!(hello_fn());
 }
 
 pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
-    io::stdout().write_all(unsafe {
-        slice::from_raw_parts(buffer, length as usize)
-    }).is_ok()
+    io::stdout()
+        .write_all(unsafe { slice::from_raw_parts(buffer, length as usize) })
+        .is_ok()
 }

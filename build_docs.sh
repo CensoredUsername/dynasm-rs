@@ -34,6 +34,16 @@ cp -r ./runtime/target/doc/* ./build_docs/runtime
 cat ./doc/hack.js >> ./build_docs/plugin/search-index.js
 cat ./doc/hack.js >> ./build_docs/runtime/search-index.js
 
+# copy docs examples to tests
+declare -a examples=("bf-interpreter" "bf-jit" "hello-world")
+for EX in "${examples[@]}"
+do
+    TARGET=$(echo $EX | tr - _)
+    cp "./doc/examples/${EX}/src/main.rs" "./testing/tests/${TARGET}.rs"
+    echo -n -e "#[test]\nfn ex_${EX}()\n{\n    main();\n}\n" >> \
+         "./testing/tests/${TARGET}.rs"
+done
+
 if [ "$1" == "commit" ]; then
     git clone --branch gh-pages --depth 1 "git@github.com:CensoredUsername/dynasm-rs.git" deploy_docs
     cd deploy_docs
