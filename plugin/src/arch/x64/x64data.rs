@@ -83,6 +83,7 @@ pub mod flags {
 pub mod features {
     bitflags! {
         pub flags Features: u32 {
+            #[allow(dead_code)]
             const X64_IMPLICIT = 0x0000_0000,
             const FPU          = 0x0000_0001,
 	          const MMX          = 0x0000_0002,

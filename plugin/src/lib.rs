@@ -50,6 +50,16 @@ pub fn registrar(reg: &mut Registry) {
             false
         )
     );
+
+    #[cfg(feature = "dynasm_opmap")]
+    reg.register_syntax_extension(
+        Symbol::intern("dynasm_opmap"),
+        SyntaxExtension::NormalTT(
+            Box::new(dynasm_opmap),
+            None,
+            false
+        )
+    );
 }
 
 /// dynasm! macro expansion result type
@@ -98,6 +108,59 @@ fn dynasm<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
             DummyResult::any(span)
         }
     }
+}
+
+// this is a macro internal to dynasm's documentation
+#[cfg(feature = "dynasm_opmap")]
+struct DynAsmDoc<'cx, 'a: 'cx> {
+    ecx: &'cx ExtCtxt<'a>,
+    data: String
+}
+
+#[cfg(feature = "dynasm_opmap")]
+impl<'cx, 'a> MacResult for DynAsmDoc<'cx, 'a> {
+    fn make_expr(self: Box<Self>) -> Option<P<ast::Expr>> {
+        Some(self.ecx.expr_str(self.ecx.call_site(), Symbol::intern(&self.data)))
+    }
+}
+
+#[cfg(feature = "dynasm_opmap")]
+fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
+-> Box<MacResult + 'cx> {
+    if token_tree.len() > 0 {
+        ecx.span_err(span, "dynasm_opmap does not take any arguments");
+    }
+
+    let mut s = String::new();
+    s.push_str("% Instruction Reference\n\n");
+
+    let mut mnemnonics: Vec<_> = arch::x64::x64data::mnemnonics().cloned().collect();
+    mnemnonics.sort();
+    for mnemnonic in mnemnonics {
+        // get the data for this mnemnonic
+        let data = arch::x64::x64data::get_mnemnonic_data(mnemnonic).unwrap();
+        // format the data for the opmap docs
+        let mut formats = data.into_iter()
+                              .map(|x| arch::x64::debug::format_opdata(mnemnonic, x))
+                              .flat_map(|x| x)
+                              .map(|x| x.replace(">>> ", ""))
+                              .collect::<Vec<_>>();
+        formats.sort();
+
+        // push mnemnonic name as title
+        s.push_str("### ");
+        s.push_str(mnemnonic);
+        s.push_str("\n```\n");
+
+        // push the formats
+        s.push_str(&formats.join("\n"));
+        s.push_str("\n```\n");
+    }
+
+    Box::new(DynAsmDoc {
+        ecx: ecx,
+        data: s
+    })
 }
 
 /// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
