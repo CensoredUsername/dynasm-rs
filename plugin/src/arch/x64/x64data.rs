@@ -83,7 +83,6 @@ pub mod flags {
 pub mod features {
     bitflags! {
         pub flags Features: u32 {
-            #[allow(dead_code)]
             const X64_IMPLICIT = 0x0000_0000,
             const FPU          = 0x0000_0001,
 	          const MMX          = 0x0000_0002,
@@ -153,6 +152,7 @@ const ENC_MR    : u32 = flags::flag_bits(flags::ENC_MR);
 const ENC_VM    : u32 = flags::flag_bits(flags::ENC_VM);
 const ENC_MIB   : u32 = flags::flag_bits(flags::ENC_MIB);
 
+#[allow(dead_code)]
 const X64_IMPLICIT : u32 = features::flag_bits(features::X64_IMPLICIT);
 const FPU          : u32 = features::flag_bits(features::FPU);
 const MMX          : u32 = features::flag_bits(features::MMX);
