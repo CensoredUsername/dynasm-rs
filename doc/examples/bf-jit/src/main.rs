@@ -7,6 +7,7 @@ use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 extern crate itertools;
 use itertools::Itertools;
+use itertools::multipeek;
 
 use std::io::{Read, BufRead, Write, stdin, stdout, BufReader, BufWriter};
 use std::env;
@@ -62,7 +63,7 @@ macro_rules! call_extern {
 struct State<'a> {
     pub input: Box<BufRead + 'a>,
     pub output: Box<Write + 'a>,
-    tape: [u8; TAPE_SIZE]
+    tape: [u8; TAPE_SIZE],
 }
 
 struct Program {
@@ -73,9 +74,9 @@ struct Program {
 
 impl Program {
     fn compile(program: &[u8]) -> Result<Program, &'static str> {
-        let mut ops = dynasmrt::Assembler::new();
+        let mut ops = dynasmrt::x64::Assembler::new();
         let mut loops = Vec::new();
-        let mut code = program.iter().cloned().multipeek();
+        let mut code = multipeek(program.iter().cloned());
 
         let start = prologue!(ops);
 
@@ -90,7 +91,7 @@ impl Program {
                         ; add a_current, TAPE_SIZE as _
                         ;wrap:
                     );
-                },
+                }
                 b'>' => {
                     let amount = code.take_while_ref(|x| *x == b'>').count() + 1;
                     dynasm!(ops
@@ -100,7 +101,7 @@ impl Program {
                         ; sub a_current, TAPE_SIZE as _
                         ;wrap:
                     );
-                },
+                }
                 b'+' => {
                     let amount = code.take_while_ref(|x| *x == b'+').count() + 1;
                     if amount > u8::MAX as usize {
@@ -110,7 +111,7 @@ impl Program {
                         ; add BYTE [a_current], amount as _
                         ; jo ->overflow
                     );
-                },
+                }
                 b'-' => {
                     let amount = code.take_while_ref(|x| *x == b'-').count() + 1;
                     if amount > u8::MAX as usize {
@@ -120,21 +121,21 @@ impl Program {
                         ; sub BYTE [a_current], amount as _
                         ; jo ->overflow
                     );
-                },
+                }
                 b',' => {
                     dynasm!(ops
                         ;; call_extern!(ops, State::getchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
-                },
+                }
                 b'.' => {
                     dynasm!(ops
                         ;; call_extern!(ops, State::putchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
-                },
+                }
                 b'[' => {
                     let first = code.peek() == Some(&b'-');
                     if first && code.peek() == Some(&b']') {
@@ -145,7 +146,7 @@ impl Program {
                         );
                     } else {
                         let backward_label = ops.new_dynamic_label();
-                        let forward_label  = ops.new_dynamic_label();
+                        let forward_label = ops.new_dynamic_label();
                         loops.push((backward_label, forward_label));
                         dynasm!(ops
                             ; cmp BYTE [a_current], 0
@@ -153,7 +154,7 @@ impl Program {
                             ;=>backward_label
                         );
                     }
-                },
+                }
                 b']' => {
                     if let Some((backward_label, forward_label)) = loops.pop() {
                         dynasm!(ops
@@ -164,8 +165,8 @@ impl Program {
                     } else {
                         return Err("] without matching [");
                     }
-                },
-                _ => ()
+                }
+                _ => (),
             }
         }
         if loops.len() != 0 {
@@ -183,14 +184,13 @@ impl Program {
         let code = ops.finalize().unwrap();
         Ok(Program {
             code: code,
-            start: start
+            start: start,
         })
     }
 
     fn run(self, state: &mut State) -> Result<(), &'static str> {
-        let f: extern "win64" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 = unsafe {
-            mem::transmute(self.code.ptr(self.start))
-        };
+        let f: extern "win64" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 =
+            unsafe { mem::transmute(self.code.ptr(self.start)) };
         let start = state.tape.as_mut_ptr();
         let end = unsafe { start.offset(TAPE_SIZE as isize) };
         let res = f(state, start, start, end);
@@ -203,7 +203,7 @@ impl Program {
         } else {
             panic!("Unknown error code");
         }
-    }   
+    }
 }
 
 impl<'a> State<'a> {
@@ -222,7 +222,7 @@ impl<'a> State<'a> {
         State {
             input: input,
             output: output,
-            tape: [0; TAPE_SIZE]
+            tape: [0; TAPE_SIZE],
         }
     }
 }
@@ -236,7 +236,9 @@ fn main() {
     }
     let path = args.pop().unwrap();
 
-    let mut f = if let Ok(f) = File::open(&path) { f } else {
+    let mut f = if let Ok(f) = File::open(&path) {
+        f
+    } else {
         println!("Could not open file {}", path);
         return;
     };
@@ -247,10 +249,8 @@ fn main() {
         return;
     }
 
-    let mut state = State::new(
-        Box::new(BufReader::new(stdin())), 
-        Box::new(BufWriter::new(stdout()))
-    );
+    let mut state = State::new(Box::new(BufReader::new(stdin())),
+                               Box::new(BufWriter::new(stdout())));
     let program = match Program::compile(&buf) {
         Ok(p) => p,
         Err(e) => {

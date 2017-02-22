@@ -1,9 +1,10 @@
 [package]
 name = "testing"
-version = "0.0.1"
-authors = ["CensoredUsername <cens.username@gmail.com>"]
+version = "0.1.0"
+authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
 
 [dependencies]
+itertools = "0.5.*"
 
 [dependencies.dynasm]
 path = "../plugin"

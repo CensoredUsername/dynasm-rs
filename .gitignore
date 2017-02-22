@@ -3,6 +3,10 @@
 *.sublime-*
 *.exe
 *.pdb
+*.swp
+
+.python-version
+*.prv
 
 target/
 build_docs/
