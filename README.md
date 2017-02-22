@@ -7,6 +7,8 @@ It is currently in alpha, meaning that while everything should work, a lot of fe
 [![Build Status](https://travis-ci.org/CensoredUsername/dynasm-rs.svg?branch=master)](https://travis-ci.org/CensoredUsername/dynasm-rs)
 [![](https://img.shields.io/crates/v/dynasm.svg)](https://crates.io/crates/dynasm)
 
+`#dynasm-rs` on irc.mozilla.org
+
 ## Features
 
 - Fully integrated in the rust toolchain, no other tools necessary.
