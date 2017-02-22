@@ -20,7 +20,7 @@ Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/
 
 ## Limitations
 
-- Currently only supports x64 long mode with every AMD/Intel extension except for AVX-512.
+- Currently only supports x64 long mode with every AMD/Intel/VIA extension except for AVX-512.
 
 ## Example
 
