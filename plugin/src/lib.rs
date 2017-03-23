@@ -13,7 +13,6 @@ extern crate owning_ref;
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
 use syntax::ext::build::AstBuilder;
-use syntax::fold::Folder;
 use syntax::codemap::{Span, Spanned};
 use syntax::ast;
 use syntax::util::small_vector::SmallVector;
@@ -39,33 +38,20 @@ mod serialize;
 /// be aware that nothing in here should be counted on to be stable, the only
 /// guarantees are in the syntax the `dynasm!` macro parses and in the code it
 /// generates.
-
 #[plugin_registrar]
 pub fn registrar(reg: &mut Registry) {
-    reg.register_syntax_extension(
-        Symbol::intern("dynasm"),
-        SyntaxExtension::NormalTT(
-            Box::new(dynasm),
-            None,
-            false
-        )
-    );
+    reg.register_syntax_extension(Symbol::intern("dynasm"),
+                                  SyntaxExtension::NormalTT(Box::new(dynasm), None, false));
 
     #[cfg(feature = "dynasm_opmap")]
-    reg.register_syntax_extension(
-        Symbol::intern("dynasm_opmap"),
-        SyntaxExtension::NormalTT(
-            Box::new(dynasm_opmap),
-            None,
-            false
-        )
-    );
+    reg.register_syntax_extension(Symbol::intern("dynasm_opmap"),
+                                  SyntaxExtension::NormalTT(Box::new(dynasm_opmap), None, false));
 }
 
 /// dynasm! macro expansion result type
 struct DynAsm<'cx, 'a: 'cx> {
     ecx: &'cx ExtCtxt<'a>,
-    stmts: Vec<ast::Stmt>
+    stmts: Vec<ast::Stmt>,
 }
 
 impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
@@ -87,22 +73,24 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
 }
 
 /// The guts of the dynasm! macro start here.
-fn dynasm<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
--> Box<MacResult + 'cx> {
+fn dynasm<'cx>(ecx: &'cx mut ExtCtxt,
+               span: Span,
+               token_tree: &[TokenTree])
+               -> Box<MacResult + 'cx> {
     // expand all macros in our token tree first. This enables the use of rust macros
     // within dynasm (whenever this actually gets implemented within rustc)
-    let token_tree = ecx.expander().fold_tts(token_tree);
-
-    let mut parser = ecx.new_parser_from_tts(&token_tree);
+    let mut parser = ecx.new_parser_from_tts(token_tree);
 
     // due to the structure of directives / assembly, we have to evaluate while parsing as
     // things like aliases, arch choices, affect the way in which parsing works.
 
     match compile(ecx, &mut parser) {
-        Ok(stmts) => Box::new(DynAsm {
-            ecx: ecx,
-            stmts: stmts
-        }),
+        Ok(stmts) => {
+            Box::new(DynAsm {
+                         ecx: ecx,
+                         stmts: stmts,
+                     })
+        }
         Err(mut e) => {
             e.emit();
             DummyResult::any(span)
@@ -114,7 +102,7 @@ fn dynasm<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
 #[cfg(feature = "dynasm_opmap")]
 struct DynAsmDoc<'cx, 'a: 'cx> {
     ecx: &'cx ExtCtxt<'a>,
-    data: String
+    data: String,
 }
 
 #[cfg(feature = "dynasm_opmap")]
@@ -125,8 +113,10 @@ impl<'cx, 'a> MacResult for DynAsmDoc<'cx, 'a> {
 }
 
 #[cfg(feature = "dynasm_opmap")]
-fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
--> Box<MacResult + 'cx> {
+fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt,
+                     span: Span,
+                     token_tree: &[TokenTree])
+                     -> Box<MacResult + 'cx> {
     if token_tree.len() > 0 {
         ecx.span_err(span, "dynasm_opmap does not take any arguments");
     }
@@ -141,10 +131,10 @@ fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree]
         let data = arch::x64::x64data::get_mnemnonic_data(mnemnonic).unwrap();
         // format the data for the opmap docs
         let mut formats = data.into_iter()
-                              .map(|x| arch::x64::debug::format_opdata(mnemnonic, x))
-                              .flat_map(|x| x)
-                              .map(|x| x.replace(">>> ", ""))
-                              .collect::<Vec<_>>();
+            .map(|x| arch::x64::debug::format_opdata(mnemnonic, x))
+            .flat_map(|x| x)
+            .map(|x| x.replace(">>> ", ""))
+            .collect::<Vec<_>>();
         formats.sort();
 
         // push mnemnonic name as title
@@ -158,16 +148,16 @@ fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree]
     }
 
     Box::new(DynAsmDoc {
-        ecx: ecx,
-        data: s
-    })
+                 ecx: ecx,
+                 data: s,
+             })
 }
 
 /// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
 pub struct State<'a> {
     pub stmts: &'a mut Vec<serialize::Stmt>,
     pub target: &'a P<ast::Expr>,
-    pub crate_data: &'a DynasmData
+    pub crate_data: &'a DynasmData,
 }
 
 /// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
@@ -203,7 +193,10 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
             let span = parser.span;
             let name = parser.parse_ident()?;
             parser.expect(&token::Colon)?;
-            stmts.push(serialize::Stmt::GlobalLabel(Spanned {span: span, node: name} ));
+            stmts.push(serialize::Stmt::GlobalLabel(Spanned {
+                                                        span: span,
+                                                        node: name,
+                                                    }));
             continue;
         }
 
@@ -219,7 +212,10 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
             let span = parser.span;
             let name = parser.parse_ident()?;
             parser.expect(&token::Colon)?;
-            stmts.push(serialize::Stmt::LocalLabel(Spanned {span: span, node: name} ));
+            stmts.push(serialize::Stmt::LocalLabel(Spanned {
+                                                       span: span,
+                                                       node: name,
+                                                   }));
             continue;
         }
 
@@ -227,7 +223,7 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
         let mut state = State {
             stmts: &mut stmts,
             target: &target,
-            crate_data: &*crate_data
+            crate_data: &*crate_data,
         };
         crate_data.current_arch.compile_instruction(&mut state, ecx, parser)?;
     }
@@ -241,22 +237,20 @@ type DynasmStorage = HashMap<String, Mutex<DynasmData>>;
 
 pub struct DynasmData {
     pub current_arch: Box<arch::Arch>,
-    pub aliases: HashMap<String, String>
+    pub aliases: HashMap<String, String>,
 }
 
 impl DynasmData {
     fn new() -> DynasmData {
         DynasmData {
-            current_arch: arch::from_str(arch::CURRENT_ARCH).expect("Default architecture is invalid"),
-            aliases: HashMap::new()
+            current_arch:
+                arch::from_str(arch::CURRENT_ARCH).expect("Default architecture is invalid"),
+            aliases: HashMap::new(),
         }
     }
 }
 
-pub type CrateLocalData = OwningRef<
-    RwLockReadGuard<'static, DynasmStorage>,
-    Mutex<DynasmData>
->;
+pub type CrateLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
 
 pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
     let id = &ecx.ecfg.crate_name;
@@ -265,7 +259,7 @@ pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
 
         if data.get(id).is_some() {
-            return data.map(|x| x.get(id).unwrap())
+            return data.map(|x| x.get(id).unwrap());
         }
     }
 
@@ -273,8 +267,7 @@ pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
         let mut lock = DYNASM_STORAGE.write().unwrap();
         lock.insert(id.clone(), Mutex::new(DynasmData::new()));
     }
-    RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap())
-                       .map(|x| x.get(id).unwrap())
+    RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(id).unwrap())
 }
 
 // this is where the actual storage resides.
