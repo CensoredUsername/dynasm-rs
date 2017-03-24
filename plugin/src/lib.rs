@@ -13,7 +13,6 @@ extern crate owning_ref;
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
 use syntax::ext::build::AstBuilder;
-use syntax::fold::Folder;
 use syntax::codemap::{Span, Spanned};
 use syntax::ast;
 use syntax::util::small_vector::SmallVector;
@@ -91,7 +90,6 @@ fn dynasm<'cx>(ecx: &'cx mut ExtCtxt, span: Span, token_tree: &[TokenTree])
 -> Box<MacResult + 'cx> {
     // expand all macros in our token tree first. This enables the use of rust macros
     // within dynasm (whenever this actually gets implemented within rustc)
-    let token_tree = ecx.expander().fold_tts(token_tree);
 
     let mut parser = ecx.new_parser_from_tts(&token_tree);
 
