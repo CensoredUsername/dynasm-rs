@@ -5,9 +5,6 @@ if (path) {
 } else {
     nest_count = 1;
 }
-if (window.location.pathname.endsWith("index.html")) {
-  nest_count += 1;
-}
 
 var base_path = "";
 for (i = 0; i < nest_count; i++) {
