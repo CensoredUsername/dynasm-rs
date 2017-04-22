@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>Dynasm-rs</title>
+
+    <link rel="stylesheet" type="text/css" href="./formatting.css">
+
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <nav class="sidebar">
+  <p class="location">
+      <a href="./index.html">dynasm-rs</a>
+  </p>
+  <div class = "block modules">
+  <h3>Components</h3>
+    <ul>
+      <li>
+        <a href="../language/index.html">Syntax</a>
+      </li>
+      <li>
+        <a href="../plugin/dynasm/index.html">Plugin (dynasm)</a>
+      </li>
+      <li>
+        <a href="../runtime/dynasmrt/index.html">Runtime (dynasmrt)</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+  <h3>Syntax</h3>
+    <ul>
+      <li>
+        <a href="./index.html">Home</a>
+      </li>
+      <li>
+        <a href="./tutorial.html">Tutorial</a>
+      </li>
+      <li>
+        <a href="./langref.html">Language reference</a>
+      </li>
+      <li>
+        <a href="./instructionref.html">Instruction reference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section id="main" class="content mod docblock">
+
+    <h1 class="title">Dynasm-rs</h1>
+    <p>In the search for faster interpreters, Just-In-Time compilation is often a useful tool.
+This compiler extension attempts to make the writing of such programs easier and faster.</p>
+<p>At its core, dynasm-rs is an assembler compiler. It reads assembly templates which it then
+compiles into code that when executed will result in the proper machine code being emitted.</p>
+<p>Dynasm is split up into two parts. The first is the compiler extension that performs the
+translation of assembly templates into rust code, the second part is a
+<a href="../runtime/dynasmrt/index.html">small runtime</a> that handles the generation of the wanted
+machine code.</p>
+<p>For now dynasm-rs only supports the x64 instruction set.</p>
+<p>Dynasm-rs is inspired by the LuaJIT DynASM project for C and C++.</p>
+<h1 id="documentation" class="section-header"><a href="#documentation">Documentation</a></h1>
+<p>The documentation of dynasm-rs is split up into several parts. To get started, you're advised
+to read through the <a href="./tutorial.html">tutorial</a>. After this, you can read through the
+<a href="./langref.html">language reference</a> to learn about the syntax used by dynasm-rs. You can
+also read through the <a href="../runtime/dynasmrt/index.html">runtime documentation</a> to learn about the
+runtime API. The <a href="./instructionref.html">instruction reference</a> lists all assembly mnemnonics
+and formats supported by dynasm-rs. Finally, documentation on the
+<a href="../plugin/dynasm/index.html">internals on dynasm-rs</a> can be browsed here.</p>
+<h1 id="differences-from-luajit-dynasm" class="section-header"><a href="#differences-from-luajit-dynasm">Differences from LuaJit Dynasm</a></h1>
+<p>The following list summarizes some of the larger differences between LuaJIT dynasm and dynasm-rs.</p>
+<ul>
+<li>LuaJIT dynasm uses full program analysis, allowing it to compile local and global labels down to
+enums. Dynasm-rs however uses Hashmaps keyed by static strings, meaning label resolution in dynasm-rs
+can be a bit slower.</li>
+<li>LuaJIT uses the <code>mov64</code> mnemnonic to encode 64-bit displacement mov. Dynasm-rs uses the <code>movabs</code>
+mnemnonic with a 64-bit immediate parameter to encode this.</li>
+<li>Dynasm-rs does not (directly) support stand-alone files.</li>
+<li>Dynasm-rs is not sensitive to the order of parameters inside a memory reference.</li>
+<li>LuaJIT local labels are integer literals. Dynasm-rs local labels are identifiers.</li>
+<li>The syntax used for type maps is significantly different. In LuaJit dynasm it is <code>Type:reg-&gt;attr</code>
+in dynasm-rs it is <code>reg =&gt; Type.attr</code>.</li>
+<li>LuaJIT dynasm uses a special preprocessor which detects lines starting with pipes (<code>|</code>) as dynasm
+instructions, dynasm-rs uses the <code>dynasm!</code> procedural macro with lines starting with semicolons (<code>;</code>).</li>
+<li>LuaJIT has macros in its invocations, dynasm-rs uses rust macros that expand to <code>dynasm!</code> invocations.</li>
+<li>Dynasm-rs doesn't have typed aliases</li>
+</ul>
+
+    </section>
+<script src="../plugin/jquery.js"></script>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+var next = $('pre').has('code.language-diffold').next().has('code.language-diffnew');
+var prev = next.prev();
+console.log(next);
+console.log(prev);
+next.css("margin-top", 0);
+next.css("padding-top", 0);
+prev.css("margin-bottom", 0);
+prev.css("padding-bottom", 0);
+</script>
+
+</body>
+</html>

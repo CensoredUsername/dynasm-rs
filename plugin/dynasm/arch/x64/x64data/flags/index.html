@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `flags` mod in crate `dynasm`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, flags">
+
+    <title>dynasm::arch::x64::x64data::flags - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc mod">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Module flags</p><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#constants">Constants</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../index.html'>dynasm</a>::<wbr><a href='../../../index.html'>arch</a>::<wbr><a href='../../index.html'>x64</a>::<wbr><a href='../index.html'>x64data</a></p><script>window.sidebarCurrent = {name: 'flags', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../../../../index.html'>dynasm</a>::<wbr><a href='../../../index.html'>arch</a>::<wbr><a href='../../index.html'>x64</a>::<wbr><a href='../index.html'>x64data</a>::<wbr><a class="mod" href=''>flags</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../../../../src/dynasm/arch/x64/x64data.rs.html#39-81' title='goto source code'>[src]</a></span></h1>
+<h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Flags.html"
+                                  title='struct dynasm::arch::x64::x64data::flags::Flags'>Flags</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.AUTO_NO32.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::AUTO_NO32'>AUTO_NO32</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.AUTO_REXW.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::AUTO_REXW'>AUTO_REXW</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.AUTO_SIZE.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::AUTO_SIZE'>AUTO_SIZE</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.AUTO_VEXL.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::AUTO_VEXL'>AUTO_VEXL</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DEFAULT.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::DEFAULT'>DEFAULT</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ENC_MIB.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::ENC_MIB'>ENC_MIB</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ENC_MR.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::ENC_MR'>ENC_MR</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.ENC_VM.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::ENC_VM'>ENC_VM</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.EXACT_SIZE.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::EXACT_SIZE'>EXACT_SIZE</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.IMM_OP.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::IMM_OP'>IMM_OP</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.LOCK.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::LOCK'>LOCK</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PREF_66.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::PREF_66'>PREF_66</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PREF_67.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::PREF_67'>PREF_67</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PREF_F0.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::PREF_F0'>PREF_F0</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PREF_F2.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::PREF_F2'>PREF_F2</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.PREF_F3.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::PREF_F3'>PREF_F3</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.REP.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::REP'>REP</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.REPE.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::REPE'>REPE</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.SHORT_ARG.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::SHORT_ARG'>SHORT_ARG</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.VEX_OP.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::VEX_OP'>VEX_OP</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.WITH_REXW.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::WITH_REXW'>WITH_REXW</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.WITH_VEXL.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::WITH_VEXL'>WITH_VEXL</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.WORD_SIZE.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::WORD_SIZE'>WORD_SIZE</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.XOP_OP.html"
+                                  title='constant dynasm::arch::x64::x64data::flags::XOP_OP'>XOP_OP</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.flag_bits.html"
+                                  title='fn dynasm::arch::x64::x64data::flags::flag_bits'>flag_bits</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="fn" href="fn.make_flag.html"
+                                  title='fn dynasm::arch::x64::x64data::flags::make_flag'>make_flag</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../../";
+        window.currentCrate = "dynasm";
+    </script>
+    <script src="../../../../../jquery.js"></script>
+    <script src="../../../../../main.js"></script>
+    <script defer src="../../../../../search-index.js"></script>
+</body>
+</html>

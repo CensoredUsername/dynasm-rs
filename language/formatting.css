@@ -1,0 +1,10 @@
+@import url('../plugin/rustdoc.css');
+@import url('../plugin/main.css');
+
+code.language-diffnew {
+    background-color: rgb(203, 255, 203);
+}
+
+code.language-diffold {
+    background-color: rgb(255, 203, 203);
+}
