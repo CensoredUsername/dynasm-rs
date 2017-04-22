@@ -5,8 +5,8 @@ set -o errexit
 shopt -s globstar
 
 echo "build individual documentation"
-(cd plugin && cargo doc)
-(cd runtime && cargo doc)
+(cd plugin && cargo doc --no-deps)
+(cd runtime && cargo doc --no-deps)
 
 echo "remove old docs build"
 rm -rf build_docs
@@ -47,7 +47,7 @@ done
 if [ "$1" == "commit" ]; then
     echo "cloning gh-pages into a temporary directory"
     git clone --branch gh-pages --depth 1 "git@github.com:CensoredUsername/dynasm-rs.git" deploy_docs
-
+    git gc
     cd deploy_docs
     git config user.name "CensoredUsername"
     git config user.email "cens.username@gmail.com"
