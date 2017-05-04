@@ -17,9 +17,9 @@ name = "dynasm"
 plugin = true
 
 [dependencies]
-lazy_static = "0.2.*"
-bitflags = "0.7.*"
-owning_ref = "0.2.*"
+lazy_static = "^0.2.8"
+bitflags = "^0.8.2"
+owning_ref = "^0.3.3"
 
 [features]
 dynasm_opmap = []
