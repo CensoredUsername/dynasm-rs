@@ -17,7 +17,7 @@ use std::{io, slice, mem};
 use std::io::Write;
 
 fn main() {
-    let mut ops = dynasmrt::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new();
     let string = "Hello World!";
 
     dynasm!(ops
@@ -73,9 +73,9 @@ We then link to the dynasm runtime crate. Although they are not used here, it al
 Furthermore, the `DynasmApi` and `DynasmLabelApi` traits are loaded. These traits defines the interfaces used by the `dynasm!` procedural macro to produce assembled code.
 
 ```
-let mut ops = dynasmrt::Assembler::new();
+let mut ops = dynasmrt::x64::Assembler::new();
 ```
-Of course, the machine code that will be generated will need to live somewhere. `dynasmrt::Assembler` is a struct that implements the `DynasmApi` and `DynasmLabelApi` traits, provides storage for the generated machine code, handles memory permissions and provides various utilities for dynamically assembling code. It even allows assembling code in one thread while several other threads execute said code. For this example though, we will use it in the most simple use case, just assembling everything in advance and then executing it.
+Of course, the machine code that will be generated will need to live somewhere. `dynasmrt::x64::Assembler` is a struct that implements the `DynasmApi` and `DynasmLabelApi` traits, provides storage for the generated machine code, handles memory permissions and provides various utilities for dynamically assembling code. It even allows assembling code in one thread while several other threads execute said code. For this example though, we will use it in the most simple use case, just assembling everything in advance and then executing it.
 
 ```
 dynasm!(ops
@@ -132,7 +132,7 @@ And finally the assembled function returns, returning the return value from the 
 ```
 let buf = ops.finalize().unwrap();
 ```
-With the assembly completed, we now finalize the `dynasmrt::Assembler`, which will resolve all labels previously used and move the data into a `dynasmrt::ExecutableBuffer`. This struct, which dereferences to a `&[u8]`, wraps a buffer of readable and executable memory.
+With the assembly completed, we now finalize the `dynasmrt::x64::Assembler`, which will resolve all labels previously used and move the data into a `dynasmrt::ExecutableBuffer`. This struct, which dereferences to a `&[u8]`, wraps a buffer of readable and executable memory.
 
 ```
 let hello_fn: extern "win64" fn() -> bool = unsafe {
@@ -163,7 +163,7 @@ use std::{io, slice, mem};
 use std::io::Write;
 
 fn main() {
-    let mut ops = dynasmrt::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new();
     let string = "Hello World!";
 
 // dynasm!(
@@ -472,7 +472,7 @@ With the state defined, we can now start adapting the `Interpreter::run` method 
 ```diffnew
 + impl Program {
 +     fn compile(program: &[u8]) -> Result<Program, &'static str> {
-+         let mut ops = dynasmrt::Assembler::new();
++         let mut ops = dynasmrt::x64::Assembler::new();
 +         let mut loops = Vec::new();
 +         let mut code = program.iter().cloned().multipeek();
 + 
@@ -851,7 +851,7 @@ struct Program {
 
 impl Program {
     fn compile(program: &[u8]) -> Result<Program, &'static str> {
-        let mut ops = dynasmrt::Assembler::new();
+        let mut ops = dynasmrt::x64::Assembler::new();
         let mut loops = Vec::new();
         let mut code = program.iter().cloned().multipeek();
 
