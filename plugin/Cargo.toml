@@ -18,7 +18,7 @@ plugin = true
 
 [dependencies]
 lazy_static = "^0.2.8"
-bitflags = "^0.8.2"
+bitflags = "^0.9.1"
 owning_ref = "^0.3.3"
 
 [features]
