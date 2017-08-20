@@ -68,7 +68,7 @@ const MOD_DISP32: u8 = 0b10;
  */
 
 pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instruction) -> Result<(), Option<String>> {
-    let mut buffer = &mut state.stmts;
+    let buffer = &mut state.stmts;
     let Instruction(mut ops, mut args, _) = instruction;
     let op = ops.pop().unwrap();
     let prefixes = ops;
@@ -782,7 +782,7 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     ))
 }
 
-fn match_format_string(fmt: &'static Opdata, mut args: &mut [Arg]) -> Result<(), &'static str> {
+fn match_format_string(fmt: &'static Opdata, args: &mut [Arg]) -> Result<(), &'static str> {
     let fmtstr = &fmt.args;
 
     if fmtstr.len() != args.len() * 2 {

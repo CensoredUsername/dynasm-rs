@@ -41,11 +41,21 @@ mod serialize;
 #[plugin_registrar]
 pub fn registrar(reg: &mut Registry) {
     reg.register_syntax_extension(Symbol::intern("dynasm"),
-                                  SyntaxExtension::NormalTT(Box::new(dynasm), None, false));
+                                  SyntaxExtension::NormalTT {
+                                      expander: Box::new(dynasm),
+                                      def_info: None,
+                                      allow_internal_unstable: false,
+                                      allow_internal_unsafe: false
+                                  });
 
     #[cfg(feature = "dynasm_opmap")]
     reg.register_syntax_extension(Symbol::intern("dynasm_opmap"),
-                                  SyntaxExtension::NormalTT(Box::new(dynasm_opmap), None, false));
+                                  SyntaxExtension::NormalTT {
+                                      expander: Box::new(dynasm_opmap),
+                                      def_info: None,
+                                      allow_internal_unstable: false,
+                                      allow_internal_unsafe: false
+                                  });
 }
 
 /// dynasm! macro expansion result type
