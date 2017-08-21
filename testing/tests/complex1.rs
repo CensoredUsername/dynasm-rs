@@ -150,9 +150,9 @@ fn complex1() {
         bar: u8
     }
     let mut test_array = [Test {foo: 1, bar: 2}, Test {foo: 3, bar: 4}, Test {foo: 5, bar: 6}];
-    let mut test_array = &mut test_array;
+    let test_array = &mut test_array;
     let mut test_single = Test {foo: 7, bar: 8};
-    let mut test_single = &mut test_single;
+    let test_single = &mut test_single;
     dynasm!(ops
         ; mov rax, AWORD MutPointer!(test_array)
         ; mov ebx, 2
