@@ -4,7 +4,6 @@ use syntax::ext::base::ExtCtxt;
 use syntax::parse::parser::Parser;
 use syntax::parse::token;
 use syntax::parse::PResult;
-use syntax::codemap::Span;
 
 use super::DynasmData;
 use serialize::{Stmt, Size, Ident};
@@ -65,7 +64,7 @@ impl DynasmData {
 
                 match self.aliases.entry(alias.as_str().to_string()) {
                     Entry::Occupied(_) => {
-                        ecx.span_err(Span {hi: parser.prev_span.hi, ..start},
+                        ecx.span_err(start.with_hi(parser.prev_span.hi()),
                                      &format!("Duplicate alias definition, alias '{}' was already defined", alias.as_str()));
                     },
                     Entry::Vacant(v) => {

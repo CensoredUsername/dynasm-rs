@@ -340,7 +340,7 @@ pub fn parse_instruction<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Pars
         }
     }
 
-    let span = Span {hi: parser.prev_span.hi, ..startspan};
+    let span = startspan.with_hi(parser.prev_span.hi());
 
     ops.push(op);
     Ok(Instruction(ops, args, span))
@@ -428,21 +428,21 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
     if parser.eat(&token::RArrow) {
         let name = parser.parse_ident()?;
         let jump = JumpType::Global(
-            Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
+            Ident {node: name, span: start.with_hi(parser.prev_span.hi()) }
         );
         label_return!(jump, size);
     // forward local label
     } else if parser.eat(&token::Gt) {
         let name = parser.parse_ident()?;
         let jump = JumpType::Forward(
-            Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
+            Ident {node: name, span: start.with_hi(parser.prev_span.hi()) }
         );
         label_return!(jump, size);
     // forward global label
     } else if parser.eat(&token::Lt) {
         let name = parser.parse_ident()?;
         let jump = JumpType::Backward(
-            Ident {node: name, span: Span {hi: parser.prev_span.hi, ..start} }
+            Ident {node: name, span: start.with_hi(parser.prev_span.hi()) }
         );
         label_return!(jump, size);
     // dynamic label
@@ -458,7 +458,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         let nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
         let disp_size = eat_size_hint(parser);
         let expr = parser.parse_expr()?;
-        let span = Span {lo: span.lo, ..expr.span};
+        let span = expr.span.with_lo(span.lo());
         parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
 
         let items = parse_adds(state, ecx, expr);
@@ -508,7 +508,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             };
 
             return Ok(Arg::TypeMappedRaw {
-                span: Span {hi: parser.prev_span.hi, ..start},
+                span: start.with_hi(parser.prev_span.hi()),
                 base_reg: base.node,
                 scale: ty,
                 value_size: size,
