@@ -1,6 +1,6 @@
 [package]
 name = "dynasmrt"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
 
 description = "A simple runtime for assembling code at runtime. Combined with the plugin crate dynasm it can be used to write JIT compilers easily."
