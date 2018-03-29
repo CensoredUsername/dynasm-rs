@@ -377,7 +377,7 @@ fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
 
 fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
     match parser.token {
-        token::Ident(ast::Ident {ref name, ..}) if &*name.as_str() == kw => (),
+        token::Ident(ast::Ident {ref name, ..}, _) if &*name.as_str() == kw => (),
         _ => return false
     }
     parser.bump();
@@ -385,7 +385,7 @@ fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
 }
 
 fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::Ident> {
-    if let token::Ident(i) = parser.token {
+    if let token::Ident(i, _) = parser.token {
         parser.bump();
         Ok(i)
     } else {
