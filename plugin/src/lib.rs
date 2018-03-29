@@ -1,6 +1,5 @@
 #![feature(plugin_registrar, rustc_private)]
 #![feature(const_fn)]
-#![feature(i128_type)]
 
 extern crate syntax;
 extern crate rustc_plugin;
