@@ -1,13 +1,16 @@
 extern crate memmap;
+extern crate byteorder;
+extern crate take_mut;
 
 pub mod x64;
 
-use std::ops::Deref;
+use std::ops::{Deref, DerefMut};
 use std::iter::Extend;
-use std::mem;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
+use std::io;
 
-use memmap::Mmap;
+use memmap::{Mmap, MmapMut};
+use byteorder::{ByteOrder, LittleEndian};
 
 /// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
@@ -40,6 +43,15 @@ pub struct ExecutableBuffer {
     buffer: Mmap
 }
 
+/// ExecutableBuffer equivalent that contains an MmapMut instead of an MMap
+#[derive(Debug)]
+struct MutableBuffer {
+    // length of the buffer that has actually been written to
+    length: usize,
+    // backing buffer
+    buffer: MmapMut
+}
+
 /// A structure wrapping some executable memory. It dereferences into a &[u8] slice.
 impl ExecutableBuffer {
     /// Obtain a pointer into the executable memory from an offset into it.
@@ -54,17 +66,57 @@ impl ExecutableBuffer {
         &self[offset.0] as *const u8
     }
 
-    fn as_mut_slice(&mut self) -> &mut [u8] {
-        unsafe {&mut self.buffer.as_mut_slice()[..self.length] }
+    fn new(length: usize, size: usize) -> io::Result<ExecutableBuffer> {
+        Ok(ExecutableBuffer {
+            length: length,
+            buffer: MmapMut::map_anon(size)?.make_exec()?
+        })
+    }
+
+    fn make_mut(self) -> io::Result<MutableBuffer> {
+        Ok(MutableBuffer {
+            length: self.length,
+            buffer: self.buffer.make_mut()?
+        })
+    }
+}
+
+impl MutableBuffer {
+    fn new(length: usize, size: usize) -> io::Result<MutableBuffer> {
+        Ok(MutableBuffer {
+            length: length,
+            buffer: MmapMut::map_anon(size)?
+        })
+    }
+
+    fn make_exec(self) -> io::Result<ExecutableBuffer> {
+        Ok(ExecutableBuffer {
+            length: self.length,
+            buffer: self.buffer.make_exec()?
+        })
     }
 }
 
 impl Deref for ExecutableBuffer {
     type Target = [u8];
     fn deref(&self) -> &[u8] {
-        unsafe { &self.buffer.as_slice()[..self.length] }
+        &self.buffer[..self.length]
     }
 }
+
+impl Deref for MutableBuffer {
+    type Target = [u8];
+    fn deref(&self) -> &[u8] {
+        &self.buffer[..self.length]
+    }
+}
+
+impl DerefMut for MutableBuffer {
+    fn deref_mut(&mut self) -> &mut [u8] {
+        &mut self.buffer[..self.length]
+    }
+}
+
 
 /// A read-only shared reference to the executable buffer inside an Assembler. By
 /// locking it the internal `ExecutableBuffer` can be accessed and executed.
@@ -88,7 +140,7 @@ impl Executor {
 
 /// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
-pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
+pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     /// Report the current offset into the assembling target
     fn offset(&self) -> AssemblyOffset;
     /// Push a byte into the assembling target
@@ -101,23 +153,23 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
     /// Push a signed word into the assembling target
     #[inline]
     fn push_i16(&mut self, value: i16) {
-        self.extend(unsafe {
-            mem::transmute::<_, [u8; 2]>(value.to_le())
-        }.iter().cloned());
+        let mut buf = [0u8; 2];
+        LittleEndian::write_i16(&mut buf, value);
+        self.extend(&buf);
     }
     /// Push a signed doubleword into the assembling target
     #[inline]
     fn push_i32(&mut self, value: i32) {
-        self.extend(unsafe {
-            mem::transmute::<_, [u8; 4]>(value.to_le())
-        }.iter().cloned());
+        let mut buf = [0u8; 4];
+        LittleEndian::write_i32(&mut buf, value);
+        self.extend(&buf);
     }
     /// Push a signed quadword into the assembling target
     #[inline]
     fn push_i64(&mut self, value: i64) {
-        self.extend(unsafe {
-            mem::transmute::<_, [u8; 8]>(value.to_le())
-        }.iter().cloned());
+        let mut buf = [0u8; 8];
+        LittleEndian::write_i64(&mut buf, value);
+        self.extend(&buf);
     }
     /// This function is called in when a runtime error has to be generated. It panics.
     #[inline]
@@ -127,7 +179,7 @@ pub trait DynasmApi<'a> : Extend<u8> + Extend<&'a u8> {
 }
 
 /// This trait extends DynasmApi to not only allow assembling, but also labels and various directives
-pub trait DynasmLabelApi<'a> : DynasmApi<'a> {
+pub trait DynasmLabelApi : DynasmApi {
     /// Push nops until the assembling target end is aligned to the given alignment
     fn align(&mut self, alignment: usize);
     /// Record the definition of a local label

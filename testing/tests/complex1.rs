@@ -14,7 +14,7 @@ dynasm!(ops
 );
 
 fn complex1() {
-    let mut ops = dynasmrt::x64::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     let d = 3;
     let c = 4;
 

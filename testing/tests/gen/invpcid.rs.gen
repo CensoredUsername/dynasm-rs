@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_invpcid_invpcid5908() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; invpcid rcx, OWORD [rax]
      );
@@ -15,7 +15,7 @@ fn enc_invpcid_invpcid5908() {
 
 #[test]
 fn enc_invpcid_invpcid5909() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; invpcid rcx, OWORD [rax]
      );
@@ -29,7 +29,7 @@ fn enc_invpcid_invpcid5909() {
 
 #[test]
 fn enc_invpcid_invpcid5910() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; invpcid rcx, OWORD [rax]
      );
@@ -43,7 +43,7 @@ fn enc_invpcid_invpcid5910() {
 
 #[test]
 fn enc_invpcid_invpcid5911() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; invpcid rax, OWORD [rax]
      );

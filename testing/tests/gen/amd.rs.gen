@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_amd_clzero4137() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; clzero
      );
@@ -15,7 +15,7 @@ fn enc_amd_clzero4137() {
 
 #[test]
 fn enc_amd_invlpga4138() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; invlpga
      );
@@ -29,7 +29,7 @@ fn enc_amd_invlpga4138() {
 
 #[test]
 fn enc_amd_invlpga4139() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; invlpga rax, ecx
      );
@@ -43,7 +43,7 @@ fn enc_amd_invlpga4139() {
 
 #[test]
 fn enc_amd_lfence4140() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; lfence
      );
@@ -57,7 +57,7 @@ fn enc_amd_lfence4140() {
 
 #[test]
 fn enc_amd_llwpcb4141() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; llwpcb rax
      );
@@ -71,7 +71,7 @@ fn enc_amd_llwpcb4141() {
 
 #[test]
 fn enc_amd_llwpcb4142() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; llwpcb rbx
      );
@@ -85,7 +85,7 @@ fn enc_amd_llwpcb4142() {
 
 #[test]
 fn enc_amd_llwpcb4143() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; llwpcb rcx
      );
@@ -99,7 +99,7 @@ fn enc_amd_llwpcb4143() {
 
 #[test]
 fn enc_amd_lzcnt4144() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; lzcnt rdx, QWORD [rax * 2 + rdx]
      );
@@ -113,7 +113,7 @@ fn enc_amd_lzcnt4144() {
 
 #[test]
 fn enc_amd_lzcnt4145() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; lzcnt rcx, rcx
      );
@@ -127,7 +127,7 @@ fn enc_amd_lzcnt4145() {
 
 #[test]
 fn enc_amd_lzcnt4146() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; lzcnt rdx, rcx
      );
@@ -141,7 +141,7 @@ fn enc_amd_lzcnt4146() {
 
 #[test]
 fn enc_amd_lzcnt4147() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; lzcnt rax, rcx
      );
@@ -155,7 +155,7 @@ fn enc_amd_lzcnt4147() {
 
 #[test]
 fn enc_amd_mfence4148() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mfence
      );
@@ -169,7 +169,7 @@ fn enc_amd_mfence4148() {
 
 #[test]
 fn enc_amd_monitorx4149() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; monitorx rax, ecx, edx
      );
@@ -183,7 +183,7 @@ fn enc_amd_monitorx4149() {
 
 #[test]
 fn enc_amd_monitorx4150() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; monitorx ax, ecx, edx
      );
@@ -197,7 +197,7 @@ fn enc_amd_monitorx4150() {
 
 #[test]
 fn enc_amd_monitorx4151() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; monitorx
      );
@@ -211,7 +211,7 @@ fn enc_amd_monitorx4151() {
 
 #[test]
 fn enc_amd_mwaitx4152() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mwaitx
      );
@@ -225,7 +225,7 @@ fn enc_amd_mwaitx4152() {
 
 #[test]
 fn enc_amd_mwaitx4153() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mwaitx eax, ecx
      );
@@ -239,7 +239,7 @@ fn enc_amd_mwaitx4153() {
 
 #[test]
 fn enc_amd_sfence4154() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sfence
      );
@@ -253,7 +253,7 @@ fn enc_amd_sfence4154() {
 
 #[test]
 fn enc_amd_slwpcb4155() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; slwpcb rdx
      );
@@ -267,7 +267,7 @@ fn enc_amd_slwpcb4155() {
 
 #[test]
 fn enc_amd_slwpcb4156() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; slwpcb rbx
      );
@@ -281,7 +281,7 @@ fn enc_amd_slwpcb4156() {
 
 #[test]
 fn enc_amd_slwpcb4157() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; slwpcb rcx
      );
@@ -295,7 +295,7 @@ fn enc_amd_slwpcb4157() {
 
 #[test]
 fn enc_amd_slwpcb4158() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; slwpcb rax
      );
@@ -309,7 +309,7 @@ fn enc_amd_slwpcb4158() {
 
 #[test]
 fn enc_amd_syscall4159() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; syscall
      );
@@ -323,7 +323,7 @@ fn enc_amd_syscall4159() {
 
 #[test]
 fn enc_amd_sysret4160() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sysret
      );

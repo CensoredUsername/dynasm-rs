@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_tdnow_femms4161() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; femms
      );
@@ -15,7 +15,7 @@ fn enc_tdnow_femms4161() {
 
 #[test]
 fn enc_tdnow_pavgusb4162() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pavgusb mm4, [rdx]
      );
@@ -29,7 +29,7 @@ fn enc_tdnow_pavgusb4162() {
 
 #[test]
 fn enc_tdnow_pavgusb4163() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pavgusb mm2, mm0
      );
@@ -43,7 +43,7 @@ fn enc_tdnow_pavgusb4163() {
 
 #[test]
 fn enc_tdnow_pavgusb4164() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pavgusb mm1, [rax]
      );
@@ -57,7 +57,7 @@ fn enc_tdnow_pavgusb4164() {
 
 #[test]
 fn enc_tdnow_pavgusb4165() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pavgusb mm0, [rax]
      );
@@ -71,7 +71,7 @@ fn enc_tdnow_pavgusb4165() {
 
 #[test]
 fn enc_tdnow_pavgusb4166() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pavgusb mm2, [rax]
      );
@@ -85,7 +85,7 @@ fn enc_tdnow_pavgusb4166() {
 
 #[test]
 fn enc_tdnow_pf2id4167() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2id mm0, mm0
      );
@@ -99,7 +99,7 @@ fn enc_tdnow_pf2id4167() {
 
 #[test]
 fn enc_tdnow_pf2id4168() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2id mm2, mm0
      );
@@ -113,7 +113,7 @@ fn enc_tdnow_pf2id4168() {
 
 #[test]
 fn enc_tdnow_pf2id4169() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2id mm4, mm0
      );
@@ -127,7 +127,7 @@ fn enc_tdnow_pf2id4169() {
 
 #[test]
 fn enc_tdnow_pf2id4170() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2id mm3, [rax]
      );
@@ -141,7 +141,7 @@ fn enc_tdnow_pf2id4170() {
 
 #[test]
 fn enc_tdnow_pf2iw4171() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2iw mm5, [rax]
      );
@@ -155,7 +155,7 @@ fn enc_tdnow_pf2iw4171() {
 
 #[test]
 fn enc_tdnow_pf2iw4172() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2iw mm2, mm0
      );
@@ -169,7 +169,7 @@ fn enc_tdnow_pf2iw4172() {
 
 #[test]
 fn enc_tdnow_pf2iw4173() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2iw mm2, [rdx]
      );
@@ -183,7 +183,7 @@ fn enc_tdnow_pf2iw4173() {
 
 #[test]
 fn enc_tdnow_pf2iw4174() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2iw mm3, [rdx]
      );
@@ -197,7 +197,7 @@ fn enc_tdnow_pf2iw4174() {
 
 #[test]
 fn enc_tdnow_pf2iw4175() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pf2iw mm0, [rdx]
      );
@@ -211,7 +211,7 @@ fn enc_tdnow_pf2iw4175() {
 
 #[test]
 fn enc_tdnow_pfacc4176() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfacc mm5, mm0
      );
@@ -225,7 +225,7 @@ fn enc_tdnow_pfacc4176() {
 
 #[test]
 fn enc_tdnow_pfacc4177() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfacc mm4, mm0
      );
@@ -239,7 +239,7 @@ fn enc_tdnow_pfacc4177() {
 
 #[test]
 fn enc_tdnow_pfacc4178() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfacc mm3, [rax]
      );
@@ -253,7 +253,7 @@ fn enc_tdnow_pfacc4178() {
 
 #[test]
 fn enc_tdnow_pfacc4179() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfacc mm5, [rdx]
      );
@@ -267,7 +267,7 @@ fn enc_tdnow_pfacc4179() {
 
 #[test]
 fn enc_tdnow_pfacc4180() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfacc mm1, [rdx]
      );
@@ -281,7 +281,7 @@ fn enc_tdnow_pfacc4180() {
 
 #[test]
 fn enc_tdnow_pfadd4181() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfadd mm4, [rdx]
      );
@@ -295,7 +295,7 @@ fn enc_tdnow_pfadd4181() {
 
 #[test]
 fn enc_tdnow_pfadd4182() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfadd mm5, [rdx]
      );
@@ -309,7 +309,7 @@ fn enc_tdnow_pfadd4182() {
 
 #[test]
 fn enc_tdnow_pfadd4183() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfadd mm3, [rax]
      );
@@ -323,7 +323,7 @@ fn enc_tdnow_pfadd4183() {
 
 #[test]
 fn enc_tdnow_pfadd4184() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfadd mm0, [rdx]
      );
@@ -337,7 +337,7 @@ fn enc_tdnow_pfadd4184() {
 
 #[test]
 fn enc_tdnow_pfadd4185() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfadd mm4, mm0
      );
@@ -351,7 +351,7 @@ fn enc_tdnow_pfadd4185() {
 
 #[test]
 fn enc_tdnow_pfmax4186() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmax mm1, [rdx]
      );
@@ -365,7 +365,7 @@ fn enc_tdnow_pfmax4186() {
 
 #[test]
 fn enc_tdnow_pfmax4187() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmax mm2, [rax]
      );
@@ -379,7 +379,7 @@ fn enc_tdnow_pfmax4187() {
 
 #[test]
 fn enc_tdnow_pfmax4188() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmax mm3, [rdx]
      );
@@ -393,7 +393,7 @@ fn enc_tdnow_pfmax4188() {
 
 #[test]
 fn enc_tdnow_pfmax4189() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmax mm5, [rdx]
      );
@@ -407,7 +407,7 @@ fn enc_tdnow_pfmax4189() {
 
 #[test]
 fn enc_tdnow_pfmax4190() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmax mm0, [rdx]
      );
@@ -421,7 +421,7 @@ fn enc_tdnow_pfmax4190() {
 
 #[test]
 fn enc_tdnow_pfmin4191() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmin mm0, [rdx]
      );
@@ -435,7 +435,7 @@ fn enc_tdnow_pfmin4191() {
 
 #[test]
 fn enc_tdnow_pfmin4192() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmin mm1, [rax]
      );
@@ -449,7 +449,7 @@ fn enc_tdnow_pfmin4192() {
 
 #[test]
 fn enc_tdnow_pfmin4193() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmin mm4, [rdx]
      );
@@ -463,7 +463,7 @@ fn enc_tdnow_pfmin4193() {
 
 #[test]
 fn enc_tdnow_pfmin4194() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmin mm3, [rdx]
      );
@@ -477,7 +477,7 @@ fn enc_tdnow_pfmin4194() {
 
 #[test]
 fn enc_tdnow_pfmul4195() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmul mm3, [rax]
      );
@@ -491,7 +491,7 @@ fn enc_tdnow_pfmul4195() {
 
 #[test]
 fn enc_tdnow_pfmul4196() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmul mm5, [rdx]
      );
@@ -505,7 +505,7 @@ fn enc_tdnow_pfmul4196() {
 
 #[test]
 fn enc_tdnow_pfmul4197() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmul mm4, [rax]
      );
@@ -519,7 +519,7 @@ fn enc_tdnow_pfmul4197() {
 
 #[test]
 fn enc_tdnow_pfmul4198() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfmul mm2, mm0
      );
@@ -533,7 +533,7 @@ fn enc_tdnow_pfmul4198() {
 
 #[test]
 fn enc_tdnow_pfnacc4199() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfnacc mm2, [rax]
      );
@@ -547,7 +547,7 @@ fn enc_tdnow_pfnacc4199() {
 
 #[test]
 fn enc_tdnow_pfnacc4200() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfnacc mm0, mm0
      );
@@ -561,7 +561,7 @@ fn enc_tdnow_pfnacc4200() {
 
 #[test]
 fn enc_tdnow_pfnacc4201() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfnacc mm3, mm0
      );
@@ -575,7 +575,7 @@ fn enc_tdnow_pfnacc4201() {
 
 #[test]
 fn enc_tdnow_pfnacc4202() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfnacc mm5, mm0
      );
@@ -589,7 +589,7 @@ fn enc_tdnow_pfnacc4202() {
 
 #[test]
 fn enc_tdnow_pfnacc4203() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfnacc mm1, [rdx]
      );
@@ -603,7 +603,7 @@ fn enc_tdnow_pfnacc4203() {
 
 #[test]
 fn enc_tdnow_pfpnacc4204() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfpnacc mm1, mm0
      );
@@ -617,7 +617,7 @@ fn enc_tdnow_pfpnacc4204() {
 
 #[test]
 fn enc_tdnow_pfpnacc4205() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfpnacc mm3, mm0
      );
@@ -631,7 +631,7 @@ fn enc_tdnow_pfpnacc4205() {
 
 #[test]
 fn enc_tdnow_pfpnacc4206() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfpnacc mm1, [rdx]
      );
@@ -645,7 +645,7 @@ fn enc_tdnow_pfpnacc4206() {
 
 #[test]
 fn enc_tdnow_pfrcp4207() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcp mm3, [rax]
      );
@@ -659,7 +659,7 @@ fn enc_tdnow_pfrcp4207() {
 
 #[test]
 fn enc_tdnow_pfrcp4208() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcp mm3, mm0
      );
@@ -673,7 +673,7 @@ fn enc_tdnow_pfrcp4208() {
 
 #[test]
 fn enc_tdnow_pfrcp4209() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcp mm2, [rax]
      );
@@ -687,7 +687,7 @@ fn enc_tdnow_pfrcp4209() {
 
 #[test]
 fn enc_tdnow_pfrcpit14210() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit1 mm4, [rdx]
      );
@@ -701,7 +701,7 @@ fn enc_tdnow_pfrcpit14210() {
 
 #[test]
 fn enc_tdnow_pfrcpit14211() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit1 mm3, [rdx]
      );
@@ -715,7 +715,7 @@ fn enc_tdnow_pfrcpit14211() {
 
 #[test]
 fn enc_tdnow_pfrcpit14212() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit1 mm0, mm0
      );
@@ -729,7 +729,7 @@ fn enc_tdnow_pfrcpit14212() {
 
 #[test]
 fn enc_tdnow_pfrcpit14213() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit1 mm2, [rdx]
      );
@@ -743,7 +743,7 @@ fn enc_tdnow_pfrcpit14213() {
 
 #[test]
 fn enc_tdnow_pfrcpit14214() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit1 mm1, [rax]
      );
@@ -757,7 +757,7 @@ fn enc_tdnow_pfrcpit14214() {
 
 #[test]
 fn enc_tdnow_pfrcpit24215() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit2 mm1, [rax]
      );
@@ -771,7 +771,7 @@ fn enc_tdnow_pfrcpit24215() {
 
 #[test]
 fn enc_tdnow_pfrcpit24216() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit2 mm4, mm0
      );
@@ -785,7 +785,7 @@ fn enc_tdnow_pfrcpit24216() {
 
 #[test]
 fn enc_tdnow_pfrcpit24217() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit2 mm2, [rdx]
      );
@@ -799,7 +799,7 @@ fn enc_tdnow_pfrcpit24217() {
 
 #[test]
 fn enc_tdnow_pfrcpit24218() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit2 mm5, [rdx]
      );
@@ -813,7 +813,7 @@ fn enc_tdnow_pfrcpit24218() {
 
 #[test]
 fn enc_tdnow_pfrcpit24219() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpit2 mm2, [rax]
      );
@@ -827,7 +827,7 @@ fn enc_tdnow_pfrcpit24219() {
 
 #[test]
 fn enc_tdnow_pfrcpv4220() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpv mm5, [rax]
      );
@@ -841,7 +841,7 @@ fn enc_tdnow_pfrcpv4220() {
 
 #[test]
 fn enc_tdnow_pfrcpv4221() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpv mm1, mm0
      );
@@ -855,7 +855,7 @@ fn enc_tdnow_pfrcpv4221() {
 
 #[test]
 fn enc_tdnow_pfrcpv4222() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpv mm3, mm0
      );
@@ -869,7 +869,7 @@ fn enc_tdnow_pfrcpv4222() {
 
 #[test]
 fn enc_tdnow_pfrcpv4223() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpv mm2, [rdx]
      );
@@ -883,7 +883,7 @@ fn enc_tdnow_pfrcpv4223() {
 
 #[test]
 fn enc_tdnow_pfrcpv4224() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrcpv mm2, [rax]
      );
@@ -897,7 +897,7 @@ fn enc_tdnow_pfrcpv4224() {
 
 #[test]
 fn enc_tdnow_pfrsqit14225() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqit1 mm3, [rdx]
      );
@@ -911,7 +911,7 @@ fn enc_tdnow_pfrsqit14225() {
 
 #[test]
 fn enc_tdnow_pfrsqit14226() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqit1 mm0, mm0
      );
@@ -925,7 +925,7 @@ fn enc_tdnow_pfrsqit14226() {
 
 #[test]
 fn enc_tdnow_pfrsqit14227() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqit1 mm1, mm0
      );
@@ -939,7 +939,7 @@ fn enc_tdnow_pfrsqit14227() {
 
 #[test]
 fn enc_tdnow_pfrsqit14228() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqit1 mm4, [rdx]
      );
@@ -953,7 +953,7 @@ fn enc_tdnow_pfrsqit14228() {
 
 #[test]
 fn enc_tdnow_pfrsqrt4229() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrt mm2, mm0
      );
@@ -967,7 +967,7 @@ fn enc_tdnow_pfrsqrt4229() {
 
 #[test]
 fn enc_tdnow_pfrsqrt4230() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrt mm1, [rax]
      );
@@ -981,7 +981,7 @@ fn enc_tdnow_pfrsqrt4230() {
 
 #[test]
 fn enc_tdnow_pfrsqrt4231() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrt mm2, [rax]
      );
@@ -995,7 +995,7 @@ fn enc_tdnow_pfrsqrt4231() {
 
 #[test]
 fn enc_tdnow_pfrsqrt4232() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrt mm1, mm0
      );
@@ -1009,7 +1009,7 @@ fn enc_tdnow_pfrsqrt4232() {
 
 #[test]
 fn enc_tdnow_pfrsqrt4233() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrt mm3, [rax]
      );
@@ -1023,7 +1023,7 @@ fn enc_tdnow_pfrsqrt4233() {
 
 #[test]
 fn enc_tdnow_pfrsqrtv4234() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrtv mm1, [rdx]
      );
@@ -1037,7 +1037,7 @@ fn enc_tdnow_pfrsqrtv4234() {
 
 #[test]
 fn enc_tdnow_pfrsqrtv4235() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrtv mm1, [rax]
      );
@@ -1051,7 +1051,7 @@ fn enc_tdnow_pfrsqrtv4235() {
 
 #[test]
 fn enc_tdnow_pfrsqrtv4236() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrtv mm1, mm0
      );
@@ -1065,7 +1065,7 @@ fn enc_tdnow_pfrsqrtv4236() {
 
 #[test]
 fn enc_tdnow_pfrsqrtv4237() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfrsqrtv mm0, [rdx]
      );
@@ -1079,7 +1079,7 @@ fn enc_tdnow_pfrsqrtv4237() {
 
 #[test]
 fn enc_tdnow_pfsub4238() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsub mm5, [rdx]
      );
@@ -1093,7 +1093,7 @@ fn enc_tdnow_pfsub4238() {
 
 #[test]
 fn enc_tdnow_pfsub4239() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsub mm5, mm0
      );
@@ -1107,7 +1107,7 @@ fn enc_tdnow_pfsub4239() {
 
 #[test]
 fn enc_tdnow_pfsub4240() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsub mm0, mm0
      );
@@ -1121,7 +1121,7 @@ fn enc_tdnow_pfsub4240() {
 
 #[test]
 fn enc_tdnow_pfsub4241() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsub mm3, mm0
      );
@@ -1135,7 +1135,7 @@ fn enc_tdnow_pfsub4241() {
 
 #[test]
 fn enc_tdnow_pfsubr4242() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsubr mm1, [rdx]
      );
@@ -1149,7 +1149,7 @@ fn enc_tdnow_pfsubr4242() {
 
 #[test]
 fn enc_tdnow_pfsubr4243() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsubr mm5, mm0
      );
@@ -1163,7 +1163,7 @@ fn enc_tdnow_pfsubr4243() {
 
 #[test]
 fn enc_tdnow_pfsubr4244() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsubr mm3, [rdx]
      );
@@ -1177,7 +1177,7 @@ fn enc_tdnow_pfsubr4244() {
 
 #[test]
 fn enc_tdnow_pfsubr4245() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pfsubr mm2, [rdx]
      );
@@ -1191,7 +1191,7 @@ fn enc_tdnow_pfsubr4245() {
 
 #[test]
 fn enc_tdnow_pi2fd4246() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fd mm2, [rdx]
      );
@@ -1205,7 +1205,7 @@ fn enc_tdnow_pi2fd4246() {
 
 #[test]
 fn enc_tdnow_pi2fd4247() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fd mm0, [rdx]
      );
@@ -1219,7 +1219,7 @@ fn enc_tdnow_pi2fd4247() {
 
 #[test]
 fn enc_tdnow_pi2fd4248() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fd mm2, [rax]
      );
@@ -1233,7 +1233,7 @@ fn enc_tdnow_pi2fd4248() {
 
 #[test]
 fn enc_tdnow_pi2fd4249() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fd mm5, [rdx]
      );
@@ -1247,7 +1247,7 @@ fn enc_tdnow_pi2fd4249() {
 
 #[test]
 fn enc_tdnow_pi2fw4250() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fw mm2, [rdx]
      );
@@ -1261,7 +1261,7 @@ fn enc_tdnow_pi2fw4250() {
 
 #[test]
 fn enc_tdnow_pi2fw4251() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fw mm1, [rdx]
      );
@@ -1275,7 +1275,7 @@ fn enc_tdnow_pi2fw4251() {
 
 #[test]
 fn enc_tdnow_pi2fw4252() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fw mm4, [rax]
      );
@@ -1289,7 +1289,7 @@ fn enc_tdnow_pi2fw4252() {
 
 #[test]
 fn enc_tdnow_pi2fw4253() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fw mm2, [rax]
      );
@@ -1303,7 +1303,7 @@ fn enc_tdnow_pi2fw4253() {
 
 #[test]
 fn enc_tdnow_pi2fw4254() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pi2fw mm4, [rdx]
      );
@@ -1317,7 +1317,7 @@ fn enc_tdnow_pi2fw4254() {
 
 #[test]
 fn enc_tdnow_pmulhrwa4255() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pmulhrwa mm5, [rdx]
      );
@@ -1331,7 +1331,7 @@ fn enc_tdnow_pmulhrwa4255() {
 
 #[test]
 fn enc_tdnow_pmulhrwa4256() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pmulhrwa mm1, mm0
      );
@@ -1345,7 +1345,7 @@ fn enc_tdnow_pmulhrwa4256() {
 
 #[test]
 fn enc_tdnow_pmulhrwa4257() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pmulhrwa mm0, [rdx]
      );
@@ -1359,7 +1359,7 @@ fn enc_tdnow_pmulhrwa4257() {
 
 #[test]
 fn enc_tdnow_prefetch4258() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; prefetch QWORD [rax]
      );
@@ -1373,7 +1373,7 @@ fn enc_tdnow_prefetch4258() {
 
 #[test]
 fn enc_tdnow_prefetchw4259() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; prefetchw QWORD [rax * 2 + rdx]
      );
@@ -1387,7 +1387,7 @@ fn enc_tdnow_prefetchw4259() {
 
 #[test]
 fn enc_tdnow_prefetchw4260() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; prefetchw QWORD [rax + 16]
      );
@@ -1401,7 +1401,7 @@ fn enc_tdnow_prefetchw4260() {
 
 #[test]
 fn enc_tdnow_prefetchw4261() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; prefetchw QWORD [rax]
      );
@@ -1415,7 +1415,7 @@ fn enc_tdnow_prefetchw4261() {
 
 #[test]
 fn enc_tdnow_pswapd4262() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pswapd mm0, [rdx]
      );
@@ -1429,7 +1429,7 @@ fn enc_tdnow_pswapd4262() {
 
 #[test]
 fn enc_tdnow_pswapd4263() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pswapd mm4, mm0
      );
@@ -1443,7 +1443,7 @@ fn enc_tdnow_pswapd4263() {
 
 #[test]
 fn enc_tdnow_pswapd4264() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pswapd mm2, [rdx]
      );
@@ -1457,7 +1457,7 @@ fn enc_tdnow_pswapd4264() {
 
 #[test]
 fn enc_tdnow_pswapd4265() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pswapd mm1, [rax]
      );

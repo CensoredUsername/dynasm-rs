@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_bmi2_bzhi5861() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bzhi rcx, QWORD [rax * 2 + rdx], rcx
      );
@@ -15,7 +15,7 @@ fn enc_bmi2_bzhi5861() {
 
 #[test]
 fn enc_bmi2_bzhi5862() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bzhi rax, QWORD [rax * 2 + rdx], rdx
      );
@@ -29,7 +29,7 @@ fn enc_bmi2_bzhi5862() {
 
 #[test]
 fn enc_bmi2_bzhi5863() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bzhi rdx, QWORD [rax * 2 + rdx], rcx
      );
@@ -43,7 +43,7 @@ fn enc_bmi2_bzhi5863() {
 
 #[test]
 fn enc_bmi2_bzhi5864() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bzhi rdx, QWORD [rax * 2 + rdx], rax
      );
@@ -57,7 +57,7 @@ fn enc_bmi2_bzhi5864() {
 
 #[test]
 fn enc_bmi2_bzhi5865() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bzhi rbx, QWORD [rax], rax
      );
@@ -71,7 +71,7 @@ fn enc_bmi2_bzhi5865() {
 
 #[test]
 fn enc_bmi2_mulx5866() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulx rcx, rcx, QWORD [rax * 2 + rdx]
      );
@@ -85,7 +85,7 @@ fn enc_bmi2_mulx5866() {
 
 #[test]
 fn enc_bmi2_mulx5867() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulx rcx, rdx, QWORD [rax * 2 + rdx]
      );
@@ -99,7 +99,7 @@ fn enc_bmi2_mulx5867() {
 
 #[test]
 fn enc_bmi2_mulx5868() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulx rax, rbx, QWORD [rax * 2 + rdx]
      );
@@ -113,7 +113,7 @@ fn enc_bmi2_mulx5868() {
 
 #[test]
 fn enc_bmi2_mulx5869() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulx rax, rdx, QWORD [rax * 2 + rdx]
      );
@@ -127,7 +127,7 @@ fn enc_bmi2_mulx5869() {
 
 #[test]
 fn enc_bmi2_mulx5870() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulx rcx, rax, rcx
      );
@@ -141,7 +141,7 @@ fn enc_bmi2_mulx5870() {
 
 #[test]
 fn enc_bmi2_pdep5871() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pdep rcx, rdx, rcx
      );
@@ -155,7 +155,7 @@ fn enc_bmi2_pdep5871() {
 
 #[test]
 fn enc_bmi2_pdep5872() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pdep rdx, rdx, rcx
      );
@@ -169,7 +169,7 @@ fn enc_bmi2_pdep5872() {
 
 #[test]
 fn enc_bmi2_pdep5873() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pdep rbx, rbx, QWORD [rax]
      );
@@ -183,7 +183,7 @@ fn enc_bmi2_pdep5873() {
 
 #[test]
 fn enc_bmi2_pdep5874() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pdep rax, rax, QWORD [rax]
      );
@@ -197,7 +197,7 @@ fn enc_bmi2_pdep5874() {
 
 #[test]
 fn enc_bmi2_pdep5875() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pdep rdx, rdx, QWORD [rax * 2 + rdx]
      );
@@ -211,7 +211,7 @@ fn enc_bmi2_pdep5875() {
 
 #[test]
 fn enc_bmi2_pext5876() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pext rcx, rax, QWORD [rax * 2 + rdx]
      );
@@ -225,7 +225,7 @@ fn enc_bmi2_pext5876() {
 
 #[test]
 fn enc_bmi2_pext5877() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pext rcx, rax, QWORD [rax]
      );
@@ -239,7 +239,7 @@ fn enc_bmi2_pext5877() {
 
 #[test]
 fn enc_bmi2_pext5878() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pext rbx, rbx, QWORD [rax]
      );
@@ -253,7 +253,7 @@ fn enc_bmi2_pext5878() {
 
 #[test]
 fn enc_bmi2_pext5879() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pext rdx, rdx, QWORD [rax * 2 + rdx]
      );
@@ -267,7 +267,7 @@ fn enc_bmi2_pext5879() {
 
 #[test]
 fn enc_bmi2_pext5880() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pext rdx, rdx, rcx
      );
@@ -281,7 +281,7 @@ fn enc_bmi2_pext5880() {
 
 #[test]
 fn enc_bmi2_rorx5881() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rorx rdx, QWORD [rax * 2 + rdx], 36
      );
@@ -295,7 +295,7 @@ fn enc_bmi2_rorx5881() {
 
 #[test]
 fn enc_bmi2_rorx5882() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rorx rax, QWORD [rax * 2 + rdx], 27
      );
@@ -309,7 +309,7 @@ fn enc_bmi2_rorx5882() {
 
 #[test]
 fn enc_bmi2_rorx5883() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rorx rcx, rcx, 58
      );
@@ -323,7 +323,7 @@ fn enc_bmi2_rorx5883() {
 
 #[test]
 fn enc_bmi2_rorx5884() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rorx rax, QWORD [rax], 107
      );
@@ -337,7 +337,7 @@ fn enc_bmi2_rorx5884() {
 
 #[test]
 fn enc_bmi2_rorx5885() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rorx rax, QWORD [rax * 2 + rdx], 84
      );
@@ -351,7 +351,7 @@ fn enc_bmi2_rorx5885() {
 
 #[test]
 fn enc_bmi2_sarx5886() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sarx rdx, rcx, rbx
      );
@@ -365,7 +365,7 @@ fn enc_bmi2_sarx5886() {
 
 #[test]
 fn enc_bmi2_sarx5887() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sarx rbx, QWORD [rax * 2 + rdx], rax
      );
@@ -379,7 +379,7 @@ fn enc_bmi2_sarx5887() {
 
 #[test]
 fn enc_bmi2_sarx5888() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sarx rax, rcx, rcx
      );
@@ -393,7 +393,7 @@ fn enc_bmi2_sarx5888() {
 
 #[test]
 fn enc_bmi2_sarx5889() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sarx rcx, QWORD [rax], rax
      );
@@ -407,7 +407,7 @@ fn enc_bmi2_sarx5889() {
 
 #[test]
 fn enc_bmi2_sarx5890() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sarx rcx, rcx, rbx
      );
@@ -421,7 +421,7 @@ fn enc_bmi2_sarx5890() {
 
 #[test]
 fn enc_bmi2_shlx5891() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shlx rbx, rcx, rcx
      );
@@ -435,7 +435,7 @@ fn enc_bmi2_shlx5891() {
 
 #[test]
 fn enc_bmi2_shlx5892() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shlx rcx, rcx, rdx
      );
@@ -449,7 +449,7 @@ fn enc_bmi2_shlx5892() {
 
 #[test]
 fn enc_bmi2_shlx5893() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shlx rdx, QWORD [rax * 2 + rdx], rax
      );
@@ -463,7 +463,7 @@ fn enc_bmi2_shlx5893() {
 
 #[test]
 fn enc_bmi2_shlx5894() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shlx rcx, QWORD [rax], rbx
      );
@@ -477,7 +477,7 @@ fn enc_bmi2_shlx5894() {
 
 #[test]
 fn enc_bmi2_shlx5895() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shlx rbx, QWORD [rax * 2 + rdx], rbx
      );
@@ -491,7 +491,7 @@ fn enc_bmi2_shlx5895() {
 
 #[test]
 fn enc_bmi2_shrx5896() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shrx rcx, QWORD [rax * 2 + rdx], rdx
      );
@@ -505,7 +505,7 @@ fn enc_bmi2_shrx5896() {
 
 #[test]
 fn enc_bmi2_shrx5897() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shrx rdx, QWORD [rax], rax
      );
@@ -519,7 +519,7 @@ fn enc_bmi2_shrx5897() {
 
 #[test]
 fn enc_bmi2_shrx5898() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shrx rdx, QWORD [rax], rcx
      );
@@ -533,7 +533,7 @@ fn enc_bmi2_shrx5898() {
 
 #[test]
 fn enc_bmi2_shrx5899() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shrx rbx, QWORD [rax * 2 + rdx], rcx
      );
@@ -547,7 +547,7 @@ fn enc_bmi2_shrx5899() {
 
 #[test]
 fn enc_bmi2_shrx5900() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shrx rax, rcx, rax
      );

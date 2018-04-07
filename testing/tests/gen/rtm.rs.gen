@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_rtm_xabort5901() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xabort 30
      );
@@ -15,7 +15,7 @@ fn enc_rtm_xabort5901() {
 
 #[test]
 fn enc_rtm_xabort5902() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xabort 118
      );
@@ -29,7 +29,7 @@ fn enc_rtm_xabort5902() {
 
 #[test]
 fn enc_rtm_xabort5903() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xabort 114
      );
@@ -43,7 +43,7 @@ fn enc_rtm_xabort5903() {
 
 #[test]
 fn enc_rtm_xabort5904() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xabort 29
      );
@@ -57,7 +57,7 @@ fn enc_rtm_xabort5904() {
 
 #[test]
 fn enc_rtm_xabort5905() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xabort 48
      );
@@ -71,7 +71,7 @@ fn enc_rtm_xabort5905() {
 
 #[test]
 fn enc_rtm_xend5906() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xend
      );
@@ -85,7 +85,7 @@ fn enc_rtm_xend5906() {
 
 #[test]
 fn enc_rtm_xtest5907() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xtest
      );

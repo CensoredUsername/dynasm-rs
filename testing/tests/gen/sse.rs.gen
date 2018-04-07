@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_sse_addps4266() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addps xmm1, OWORD [rax * 2 + rdx]
      );
@@ -15,7 +15,7 @@ fn enc_sse_addps4266() {
 
 #[test]
 fn enc_sse_addps4267() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addps xmm0, OWORD [rdx]
      );
@@ -29,7 +29,7 @@ fn enc_sse_addps4267() {
 
 #[test]
 fn enc_sse_addps4268() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addps xmm1, xmm12
      );
@@ -43,7 +43,7 @@ fn enc_sse_addps4268() {
 
 #[test]
 fn enc_sse_addps4269() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addps xmm1, xmm2
      );
@@ -57,7 +57,7 @@ fn enc_sse_addps4269() {
 
 #[test]
 fn enc_sse_addps4270() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addps xmm3, xmm3
      );
@@ -71,7 +71,7 @@ fn enc_sse_addps4270() {
 
 #[test]
 fn enc_sse_addss4271() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm2, xmm1
      );
@@ -85,7 +85,7 @@ fn enc_sse_addss4271() {
 
 #[test]
 fn enc_sse_addss4272() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm3, xmm4
      );
@@ -99,7 +99,7 @@ fn enc_sse_addss4272() {
 
 #[test]
 fn enc_sse_addss4273() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm11, xmm2
      );
@@ -113,7 +113,7 @@ fn enc_sse_addss4273() {
 
 #[test]
 fn enc_sse_addss4274() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm15, xmm0
      );
@@ -127,7 +127,7 @@ fn enc_sse_addss4274() {
 
 #[test]
 fn enc_sse_addss4275() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm3, xmm12
      );
@@ -141,7 +141,7 @@ fn enc_sse_addss4275() {
 
 #[test]
 fn enc_sse_addss4276() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm3, DWORD [rax]
      );
@@ -155,7 +155,7 @@ fn enc_sse_addss4276() {
 
 #[test]
 fn enc_sse_addss4277() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm15, DWORD [rax * 2 + rdx]
      );
@@ -169,7 +169,7 @@ fn enc_sse_addss4277() {
 
 #[test]
 fn enc_sse_addss4278() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm1, DWORD [rax + 16]
      );
@@ -183,7 +183,7 @@ fn enc_sse_addss4278() {
 
 #[test]
 fn enc_sse_addss4279() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm11, DWORD [rax + 16]
      );
@@ -197,7 +197,7 @@ fn enc_sse_addss4279() {
 
 #[test]
 fn enc_sse_addss4280() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; addss xmm1, DWORD [rax]
      );
@@ -211,7 +211,7 @@ fn enc_sse_addss4280() {
 
 #[test]
 fn enc_sse_aesdec4281() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdec xmm0, xmm15
      );
@@ -225,7 +225,7 @@ fn enc_sse_aesdec4281() {
 
 #[test]
 fn enc_sse_aesdec4282() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdec xmm0, xmm11
      );
@@ -239,7 +239,7 @@ fn enc_sse_aesdec4282() {
 
 #[test]
 fn enc_sse_aesdec4283() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdec xmm0, OWORD [rdx]
      );
@@ -253,7 +253,7 @@ fn enc_sse_aesdec4283() {
 
 #[test]
 fn enc_sse_aesdec4284() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdec xmm3, OWORD [rax]
      );
@@ -267,7 +267,7 @@ fn enc_sse_aesdec4284() {
 
 #[test]
 fn enc_sse_aesdec4285() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdec xmm15, xmm15
      );
@@ -281,7 +281,7 @@ fn enc_sse_aesdec4285() {
 
 #[test]
 fn enc_sse_aesdeclast4286() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdeclast xmm3, xmm2
      );
@@ -295,7 +295,7 @@ fn enc_sse_aesdeclast4286() {
 
 #[test]
 fn enc_sse_aesdeclast4287() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdeclast xmm12, xmm4
      );
@@ -309,7 +309,7 @@ fn enc_sse_aesdeclast4287() {
 
 #[test]
 fn enc_sse_aesdeclast4288() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdeclast xmm11, xmm2
      );
@@ -323,7 +323,7 @@ fn enc_sse_aesdeclast4288() {
 
 #[test]
 fn enc_sse_aesdeclast4289() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdeclast xmm1, xmm11
      );
@@ -337,7 +337,7 @@ fn enc_sse_aesdeclast4289() {
 
 #[test]
 fn enc_sse_aesdeclast4290() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesdeclast xmm15, xmm15
      );
@@ -351,7 +351,7 @@ fn enc_sse_aesdeclast4290() {
 
 #[test]
 fn enc_sse_aesenc4291() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenc xmm4, xmm3
      );
@@ -365,7 +365,7 @@ fn enc_sse_aesenc4291() {
 
 #[test]
 fn enc_sse_aesenc4292() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenc xmm11, xmm15
      );
@@ -379,7 +379,7 @@ fn enc_sse_aesenc4292() {
 
 #[test]
 fn enc_sse_aesenc4293() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenc xmm0, xmm3
      );
@@ -393,7 +393,7 @@ fn enc_sse_aesenc4293() {
 
 #[test]
 fn enc_sse_aesenc4294() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenc xmm12, xmm12
      );
@@ -407,7 +407,7 @@ fn enc_sse_aesenc4294() {
 
 #[test]
 fn enc_sse_aesenc4295() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenc xmm2, OWORD [rax * 2 + rdx]
      );
@@ -421,7 +421,7 @@ fn enc_sse_aesenc4295() {
 
 #[test]
 fn enc_sse_aesenclast4296() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenclast xmm15, xmm3
      );
@@ -435,7 +435,7 @@ fn enc_sse_aesenclast4296() {
 
 #[test]
 fn enc_sse_aesenclast4297() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenclast xmm4, xmm11
      );
@@ -449,7 +449,7 @@ fn enc_sse_aesenclast4297() {
 
 #[test]
 fn enc_sse_aesenclast4298() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenclast xmm2, xmm12
      );
@@ -463,7 +463,7 @@ fn enc_sse_aesenclast4298() {
 
 #[test]
 fn enc_sse_aesenclast4299() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenclast xmm15, xmm11
      );
@@ -477,7 +477,7 @@ fn enc_sse_aesenclast4299() {
 
 #[test]
 fn enc_sse_aesenclast4300() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesenclast xmm3, OWORD [rax * 2 + rdx]
      );
@@ -491,7 +491,7 @@ fn enc_sse_aesenclast4300() {
 
 #[test]
 fn enc_sse_aesimc4301() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesimc xmm15, xmm0
      );
@@ -505,7 +505,7 @@ fn enc_sse_aesimc4301() {
 
 #[test]
 fn enc_sse_aesimc4302() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesimc xmm11, OWORD [rdx]
      );
@@ -519,7 +519,7 @@ fn enc_sse_aesimc4302() {
 
 #[test]
 fn enc_sse_aesimc4303() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesimc xmm2, xmm0
      );
@@ -533,7 +533,7 @@ fn enc_sse_aesimc4303() {
 
 #[test]
 fn enc_sse_aesimc4304() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesimc xmm11, xmm12
      );
@@ -547,7 +547,7 @@ fn enc_sse_aesimc4304() {
 
 #[test]
 fn enc_sse_aesimc4305() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aesimc xmm2, xmm1
      );
@@ -561,7 +561,7 @@ fn enc_sse_aesimc4305() {
 
 #[test]
 fn enc_sse_aeskeygenassist4306() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aeskeygenassist xmm2, xmm12, 6
      );
@@ -575,7 +575,7 @@ fn enc_sse_aeskeygenassist4306() {
 
 #[test]
 fn enc_sse_aeskeygenassist4307() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aeskeygenassist xmm0, xmm12, 63
      );
@@ -589,7 +589,7 @@ fn enc_sse_aeskeygenassist4307() {
 
 #[test]
 fn enc_sse_aeskeygenassist4308() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aeskeygenassist xmm3, OWORD [rax], 53
      );
@@ -603,7 +603,7 @@ fn enc_sse_aeskeygenassist4308() {
 
 #[test]
 fn enc_sse_aeskeygenassist4309() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aeskeygenassist xmm0, xmm2, 7
      );
@@ -617,7 +617,7 @@ fn enc_sse_aeskeygenassist4309() {
 
 #[test]
 fn enc_sse_aeskeygenassist4310() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; aeskeygenassist xmm2, xmm12, 33
      );
@@ -631,7 +631,7 @@ fn enc_sse_aeskeygenassist4310() {
 
 #[test]
 fn enc_sse_andnps4311() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andnps xmm1, xmm1
      );
@@ -645,7 +645,7 @@ fn enc_sse_andnps4311() {
 
 #[test]
 fn enc_sse_andnps4312() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andnps xmm1, xmm11
      );
@@ -659,7 +659,7 @@ fn enc_sse_andnps4312() {
 
 #[test]
 fn enc_sse_andnps4313() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andnps xmm0, xmm3
      );
@@ -673,7 +673,7 @@ fn enc_sse_andnps4313() {
 
 #[test]
 fn enc_sse_andnps4314() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andnps xmm2, xmm0
      );
@@ -687,7 +687,7 @@ fn enc_sse_andnps4314() {
 
 #[test]
 fn enc_sse_andnps4315() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andnps xmm2, xmm3
      );
@@ -701,7 +701,7 @@ fn enc_sse_andnps4315() {
 
 #[test]
 fn enc_sse_andps4316() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andps xmm12, xmm11
      );
@@ -715,7 +715,7 @@ fn enc_sse_andps4316() {
 
 #[test]
 fn enc_sse_andps4317() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andps xmm11, xmm3
      );
@@ -729,7 +729,7 @@ fn enc_sse_andps4317() {
 
 #[test]
 fn enc_sse_andps4318() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andps xmm12, xmm2
      );
@@ -743,7 +743,7 @@ fn enc_sse_andps4318() {
 
 #[test]
 fn enc_sse_andps4319() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andps xmm15, xmm12
      );
@@ -757,7 +757,7 @@ fn enc_sse_andps4319() {
 
 #[test]
 fn enc_sse_andps4320() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; andps xmm3, xmm3
      );
@@ -771,7 +771,7 @@ fn enc_sse_andps4320() {
 
 #[test]
 fn enc_sse_comiss4321() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm11, xmm2
      );
@@ -785,7 +785,7 @@ fn enc_sse_comiss4321() {
 
 #[test]
 fn enc_sse_comiss4322() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm0, xmm0
      );
@@ -799,7 +799,7 @@ fn enc_sse_comiss4322() {
 
 #[test]
 fn enc_sse_comiss4323() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm3, xmm1
      );
@@ -813,7 +813,7 @@ fn enc_sse_comiss4323() {
 
 #[test]
 fn enc_sse_comiss4324() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm2, xmm11
      );
@@ -827,7 +827,7 @@ fn enc_sse_comiss4324() {
 
 #[test]
 fn enc_sse_comiss4325() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm1, DWORD [rax]
      );
@@ -841,7 +841,7 @@ fn enc_sse_comiss4325() {
 
 #[test]
 fn enc_sse_comiss4326() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm2, DWORD [rax]
      );
@@ -855,7 +855,7 @@ fn enc_sse_comiss4326() {
 
 #[test]
 fn enc_sse_comiss4327() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm3, DWORD [rax]
      );
@@ -869,7 +869,7 @@ fn enc_sse_comiss4327() {
 
 #[test]
 fn enc_sse_comiss4328() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm15, DWORD [rax * 2 + rdx]
      );
@@ -883,7 +883,7 @@ fn enc_sse_comiss4328() {
 
 #[test]
 fn enc_sse_comiss4329() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; comiss xmm2, DWORD [rax * 2 + rdx]
      );
@@ -897,7 +897,7 @@ fn enc_sse_comiss4329() {
 
 #[test]
 fn enc_sse_cvtsi2ss4330() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm2, [rax]
      );
@@ -911,7 +911,7 @@ fn enc_sse_cvtsi2ss4330() {
 
 #[test]
 fn enc_sse_cvtsi2ss4331() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm15, rax
      );
@@ -925,7 +925,7 @@ fn enc_sse_cvtsi2ss4331() {
 
 #[test]
 fn enc_sse_cvtsi2ss4332() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm12, [rax]
      );
@@ -939,7 +939,7 @@ fn enc_sse_cvtsi2ss4332() {
 
 #[test]
 fn enc_sse_cvtsi2ss4333() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm2, rax
      );
@@ -953,7 +953,7 @@ fn enc_sse_cvtsi2ss4333() {
 
 #[test]
 fn enc_sse_cvtsi2ss4334() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm11, eax
      );
@@ -967,7 +967,7 @@ fn enc_sse_cvtsi2ss4334() {
 
 #[test]
 fn enc_sse_cvtsi2ss4335() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm1, eax
      );
@@ -981,7 +981,7 @@ fn enc_sse_cvtsi2ss4335() {
 
 #[test]
 fn enc_sse_cvtsi2ss4336() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm3, DWORD [rax]
      );
@@ -995,7 +995,7 @@ fn enc_sse_cvtsi2ss4336() {
 
 #[test]
 fn enc_sse_cvtsi2ss4337() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtsi2ss xmm15, DWORD [rax]
      );
@@ -1009,7 +1009,7 @@ fn enc_sse_cvtsi2ss4337() {
 
 #[test]
 fn enc_sse_cvtss2si4338() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rdx, xmm11
      );
@@ -1023,7 +1023,7 @@ fn enc_sse_cvtss2si4338() {
 
 #[test]
 fn enc_sse_cvtss2si4339() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rdx, xmm15
      );
@@ -1037,7 +1037,7 @@ fn enc_sse_cvtss2si4339() {
 
 #[test]
 fn enc_sse_cvtss2si4340() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rcx, xmm0
      );
@@ -1051,7 +1051,7 @@ fn enc_sse_cvtss2si4340() {
 
 #[test]
 fn enc_sse_cvtss2si4341() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rax, xmm3
      );
@@ -1065,7 +1065,7 @@ fn enc_sse_cvtss2si4341() {
 
 #[test]
 fn enc_sse_cvtss2si4342() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rdx, DWORD [rax + 16]
      );
@@ -1079,7 +1079,7 @@ fn enc_sse_cvtss2si4342() {
 
 #[test]
 fn enc_sse_cvtss2si4343() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rcx, DWORD [rax]
      );
@@ -1093,7 +1093,7 @@ fn enc_sse_cvtss2si4343() {
 
 #[test]
 fn enc_sse_cvtss2si4344() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rdx, DWORD [rax]
      );
@@ -1107,7 +1107,7 @@ fn enc_sse_cvtss2si4344() {
 
 #[test]
 fn enc_sse_cvtss2si4345() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si rax, DWORD [rax * 2 + rdx]
      );
@@ -1121,7 +1121,7 @@ fn enc_sse_cvtss2si4345() {
 
 #[test]
 fn enc_sse_cvtss2si4346() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si edx, xmm0
      );
@@ -1135,7 +1135,7 @@ fn enc_sse_cvtss2si4346() {
 
 #[test]
 fn enc_sse_cvtss2si4347() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si eax, xmm3
      );
@@ -1149,7 +1149,7 @@ fn enc_sse_cvtss2si4347() {
 
 #[test]
 fn enc_sse_cvtss2si4348() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si ecx, xmm11
      );
@@ -1163,7 +1163,7 @@ fn enc_sse_cvtss2si4348() {
 
 #[test]
 fn enc_sse_cvtss2si4349() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si ecx, xmm3
      );
@@ -1177,7 +1177,7 @@ fn enc_sse_cvtss2si4349() {
 
 #[test]
 fn enc_sse_cvtss2si4350() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si ecx, xmm2
      );
@@ -1191,7 +1191,7 @@ fn enc_sse_cvtss2si4350() {
 
 #[test]
 fn enc_sse_cvtss2si4351() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si eax, DWORD [rax + 16]
      );
@@ -1205,7 +1205,7 @@ fn enc_sse_cvtss2si4351() {
 
 #[test]
 fn enc_sse_cvtss2si4352() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si ecx, DWORD [rax * 2 + rdx]
      );
@@ -1219,7 +1219,7 @@ fn enc_sse_cvtss2si4352() {
 
 #[test]
 fn enc_sse_cvtss2si4353() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si edx, DWORD [rax + 16]
      );
@@ -1233,7 +1233,7 @@ fn enc_sse_cvtss2si4353() {
 
 #[test]
 fn enc_sse_cvtss2si4354() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvtss2si edx, DWORD [rax]
      );
@@ -1247,7 +1247,7 @@ fn enc_sse_cvtss2si4354() {
 
 #[test]
 fn enc_sse_cvttss2si4355() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rax, xmm12
      );
@@ -1261,7 +1261,7 @@ fn enc_sse_cvttss2si4355() {
 
 #[test]
 fn enc_sse_cvttss2si4356() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rcx, xmm11
      );
@@ -1275,7 +1275,7 @@ fn enc_sse_cvttss2si4356() {
 
 #[test]
 fn enc_sse_cvttss2si4357() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rax, xmm4
      );
@@ -1289,7 +1289,7 @@ fn enc_sse_cvttss2si4357() {
 
 #[test]
 fn enc_sse_cvttss2si4358() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rax, xmm1
      );
@@ -1303,7 +1303,7 @@ fn enc_sse_cvttss2si4358() {
 
 #[test]
 fn enc_sse_cvttss2si4359() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rdx, xmm4
      );
@@ -1317,7 +1317,7 @@ fn enc_sse_cvttss2si4359() {
 
 #[test]
 fn enc_sse_cvttss2si4360() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rcx, DWORD [rax * 2 + rdx]
      );
@@ -1331,7 +1331,7 @@ fn enc_sse_cvttss2si4360() {
 
 #[test]
 fn enc_sse_cvttss2si4361() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rcx, DWORD [rax + 16]
      );
@@ -1345,7 +1345,7 @@ fn enc_sse_cvttss2si4361() {
 
 #[test]
 fn enc_sse_cvttss2si4362() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si rcx, DWORD [rax]
      );
@@ -1359,7 +1359,7 @@ fn enc_sse_cvttss2si4362() {
 
 #[test]
 fn enc_sse_cvttss2si4363() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si eax, xmm1
      );
@@ -1373,7 +1373,7 @@ fn enc_sse_cvttss2si4363() {
 
 #[test]
 fn enc_sse_cvttss2si4364() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si edx, xmm0
      );
@@ -1387,7 +1387,7 @@ fn enc_sse_cvttss2si4364() {
 
 #[test]
 fn enc_sse_cvttss2si4365() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si edx, xmm4
      );
@@ -1401,7 +1401,7 @@ fn enc_sse_cvttss2si4365() {
 
 #[test]
 fn enc_sse_cvttss2si4366() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si edx, xmm2
      );
@@ -1415,7 +1415,7 @@ fn enc_sse_cvttss2si4366() {
 
 #[test]
 fn enc_sse_cvttss2si4367() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si ecx, xmm15
      );
@@ -1429,7 +1429,7 @@ fn enc_sse_cvttss2si4367() {
 
 #[test]
 fn enc_sse_cvttss2si4368() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si edx, DWORD [rax]
      );
@@ -1443,7 +1443,7 @@ fn enc_sse_cvttss2si4368() {
 
 #[test]
 fn enc_sse_cvttss2si4369() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si edx, DWORD [rax + 16]
      );
@@ -1457,7 +1457,7 @@ fn enc_sse_cvttss2si4369() {
 
 #[test]
 fn enc_sse_cvttss2si4370() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; cvttss2si ecx, DWORD [rax * 2 + rdx]
      );
@@ -1471,7 +1471,7 @@ fn enc_sse_cvttss2si4370() {
 
 #[test]
 fn enc_sse_divps4371() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divps xmm12, xmm3
      );
@@ -1485,7 +1485,7 @@ fn enc_sse_divps4371() {
 
 #[test]
 fn enc_sse_divps4372() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divps xmm3, OWORD [rax]
      );
@@ -1499,7 +1499,7 @@ fn enc_sse_divps4372() {
 
 #[test]
 fn enc_sse_divps4373() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divps xmm12, OWORD [rax * 2 + rdx]
      );
@@ -1513,7 +1513,7 @@ fn enc_sse_divps4373() {
 
 #[test]
 fn enc_sse_divps4374() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divps xmm4, xmm3
      );
@@ -1527,7 +1527,7 @@ fn enc_sse_divps4374() {
 
 #[test]
 fn enc_sse_divps4375() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divps xmm11, OWORD [rax]
      );
@@ -1541,7 +1541,7 @@ fn enc_sse_divps4375() {
 
 #[test]
 fn enc_sse_divss4376() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm0, xmm4
      );
@@ -1555,7 +1555,7 @@ fn enc_sse_divss4376() {
 
 #[test]
 fn enc_sse_divss4377() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm2, xmm12
      );
@@ -1569,7 +1569,7 @@ fn enc_sse_divss4377() {
 
 #[test]
 fn enc_sse_divss4378() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm11, xmm1
      );
@@ -1583,7 +1583,7 @@ fn enc_sse_divss4378() {
 
 #[test]
 fn enc_sse_divss4379() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm3, xmm2
      );
@@ -1597,7 +1597,7 @@ fn enc_sse_divss4379() {
 
 #[test]
 fn enc_sse_divss4380() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm0, xmm12
      );
@@ -1611,7 +1611,7 @@ fn enc_sse_divss4380() {
 
 #[test]
 fn enc_sse_divss4381() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm4, DWORD [rax * 2 + rdx]
      );
@@ -1625,7 +1625,7 @@ fn enc_sse_divss4381() {
 
 #[test]
 fn enc_sse_divss4382() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm3, DWORD [rax * 2 + rdx]
      );
@@ -1639,7 +1639,7 @@ fn enc_sse_divss4382() {
 
 #[test]
 fn enc_sse_divss4383() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm2, DWORD [rax]
      );
@@ -1653,7 +1653,7 @@ fn enc_sse_divss4383() {
 
 #[test]
 fn enc_sse_divss4384() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm11, DWORD [rax]
      );
@@ -1667,7 +1667,7 @@ fn enc_sse_divss4384() {
 
 #[test]
 fn enc_sse_divss4385() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; divss xmm12, DWORD [rax + 16]
      );
@@ -1681,7 +1681,7 @@ fn enc_sse_divss4385() {
 
 #[test]
 fn enc_sse_ldmxcsr4386() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ldmxcsr DWORD [rax + 16]
      );
@@ -1695,7 +1695,7 @@ fn enc_sse_ldmxcsr4386() {
 
 #[test]
 fn enc_sse_ldmxcsr4387() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ldmxcsr DWORD [rax]
      );
@@ -1709,7 +1709,7 @@ fn enc_sse_ldmxcsr4387() {
 
 #[test]
 fn enc_sse_maxps4388() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxps xmm0, xmm12
      );
@@ -1723,7 +1723,7 @@ fn enc_sse_maxps4388() {
 
 #[test]
 fn enc_sse_maxps4389() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxps xmm15, xmm15
      );
@@ -1737,7 +1737,7 @@ fn enc_sse_maxps4389() {
 
 #[test]
 fn enc_sse_maxps4390() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxps xmm11, xmm1
      );
@@ -1751,7 +1751,7 @@ fn enc_sse_maxps4390() {
 
 #[test]
 fn enc_sse_maxps4391() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxps xmm15, OWORD [rax]
      );
@@ -1765,7 +1765,7 @@ fn enc_sse_maxps4391() {
 
 #[test]
 fn enc_sse_maxps4392() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxps xmm11, xmm11
      );
@@ -1779,7 +1779,7 @@ fn enc_sse_maxps4392() {
 
 #[test]
 fn enc_sse_maxss4393() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm11, xmm2
      );
@@ -1793,7 +1793,7 @@ fn enc_sse_maxss4393() {
 
 #[test]
 fn enc_sse_maxss4394() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm15, xmm1
      );
@@ -1807,7 +1807,7 @@ fn enc_sse_maxss4394() {
 
 #[test]
 fn enc_sse_maxss4395() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm12, xmm15
      );
@@ -1821,7 +1821,7 @@ fn enc_sse_maxss4395() {
 
 #[test]
 fn enc_sse_maxss4396() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm4, xmm12
      );
@@ -1835,7 +1835,7 @@ fn enc_sse_maxss4396() {
 
 #[test]
 fn enc_sse_maxss4397() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm12, xmm11
      );
@@ -1849,7 +1849,7 @@ fn enc_sse_maxss4397() {
 
 #[test]
 fn enc_sse_maxss4398() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm1, DWORD [rax]
      );
@@ -1863,7 +1863,7 @@ fn enc_sse_maxss4398() {
 
 #[test]
 fn enc_sse_maxss4399() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm0, DWORD [rax * 2 + rdx]
      );
@@ -1877,7 +1877,7 @@ fn enc_sse_maxss4399() {
 
 #[test]
 fn enc_sse_maxss4400() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm11, DWORD [rax]
      );
@@ -1891,7 +1891,7 @@ fn enc_sse_maxss4400() {
 
 #[test]
 fn enc_sse_maxss4401() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm15, DWORD [rax * 2 + rdx]
      );
@@ -1905,7 +1905,7 @@ fn enc_sse_maxss4401() {
 
 #[test]
 fn enc_sse_maxss4402() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; maxss xmm11, DWORD [rax + 16]
      );
@@ -1919,7 +1919,7 @@ fn enc_sse_maxss4402() {
 
 #[test]
 fn enc_sse_minps4403() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minps xmm12, xmm15
      );
@@ -1933,7 +1933,7 @@ fn enc_sse_minps4403() {
 
 #[test]
 fn enc_sse_minps4404() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minps xmm15, xmm1
      );
@@ -1947,7 +1947,7 @@ fn enc_sse_minps4404() {
 
 #[test]
 fn enc_sse_minps4405() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minps xmm2, xmm3
      );
@@ -1961,7 +1961,7 @@ fn enc_sse_minps4405() {
 
 #[test]
 fn enc_sse_minps4406() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minps xmm11, xmm0
      );
@@ -1975,7 +1975,7 @@ fn enc_sse_minps4406() {
 
 #[test]
 fn enc_sse_minps4407() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minps xmm0, OWORD [rdx]
      );
@@ -1989,7 +1989,7 @@ fn enc_sse_minps4407() {
 
 #[test]
 fn enc_sse_minss4408() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm2, xmm15
      );
@@ -2003,7 +2003,7 @@ fn enc_sse_minss4408() {
 
 #[test]
 fn enc_sse_minss4409() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm11, xmm0
      );
@@ -2017,7 +2017,7 @@ fn enc_sse_minss4409() {
 
 #[test]
 fn enc_sse_minss4410() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm12, xmm3
      );
@@ -2031,7 +2031,7 @@ fn enc_sse_minss4410() {
 
 #[test]
 fn enc_sse_minss4411() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm12, xmm1
      );
@@ -2045,7 +2045,7 @@ fn enc_sse_minss4411() {
 
 #[test]
 fn enc_sse_minss4412() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm15, xmm1
      );
@@ -2059,7 +2059,7 @@ fn enc_sse_minss4412() {
 
 #[test]
 fn enc_sse_minss4413() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm3, DWORD [rax]
      );
@@ -2073,7 +2073,7 @@ fn enc_sse_minss4413() {
 
 #[test]
 fn enc_sse_minss4414() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm11, DWORD [rax + 16]
      );
@@ -2087,7 +2087,7 @@ fn enc_sse_minss4414() {
 
 #[test]
 fn enc_sse_minss4415() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm11, DWORD [rax * 2 + rdx]
      );
@@ -2101,7 +2101,7 @@ fn enc_sse_minss4415() {
 
 #[test]
 fn enc_sse_minss4416() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm0, DWORD [rax * 2 + rdx]
      );
@@ -2115,7 +2115,7 @@ fn enc_sse_minss4416() {
 
 #[test]
 fn enc_sse_minss4417() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; minss xmm12, DWORD [rax]
      );
@@ -2129,7 +2129,7 @@ fn enc_sse_minss4417() {
 
 #[test]
 fn enc_sse_movaps4418() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm15, xmm11
      );
@@ -2143,7 +2143,7 @@ fn enc_sse_movaps4418() {
 
 #[test]
 fn enc_sse_movaps4419() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm15, xmm12
      );
@@ -2157,7 +2157,7 @@ fn enc_sse_movaps4419() {
 
 #[test]
 fn enc_sse_movaps4420() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm11, OWORD [rdx]
      );
@@ -2171,7 +2171,7 @@ fn enc_sse_movaps4420() {
 
 #[test]
 fn enc_sse_movaps4421() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm12, xmm15
      );
@@ -2185,7 +2185,7 @@ fn enc_sse_movaps4421() {
 
 #[test]
 fn enc_sse_movaps4422() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm12, OWORD [rax * 2 + rdx]
      );
@@ -2199,7 +2199,7 @@ fn enc_sse_movaps4422() {
 
 #[test]
 fn enc_sse_movaps4423() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm3, xmm3
      );
@@ -2213,7 +2213,7 @@ fn enc_sse_movaps4423() {
 
 #[test]
 fn enc_sse_movaps4424() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm2, xmm2
      );
@@ -2227,7 +2227,7 @@ fn enc_sse_movaps4424() {
 
 #[test]
 fn enc_sse_movaps4425() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm1, xmm3
      );
@@ -2241,7 +2241,7 @@ fn enc_sse_movaps4425() {
 
 #[test]
 fn enc_sse_movaps4426() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps xmm12, xmm1
      );
@@ -2255,7 +2255,7 @@ fn enc_sse_movaps4426() {
 
 #[test]
 fn enc_sse_movaps4427() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movaps OWORD [rax], xmm12
      );
@@ -2269,7 +2269,7 @@ fn enc_sse_movaps4427() {
 
 #[test]
 fn enc_sse_movhlps4428() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhlps xmm3, xmm15
      );
@@ -2283,7 +2283,7 @@ fn enc_sse_movhlps4428() {
 
 #[test]
 fn enc_sse_movhlps4429() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhlps xmm1, xmm1
      );
@@ -2297,7 +2297,7 @@ fn enc_sse_movhlps4429() {
 
 #[test]
 fn enc_sse_movhlps4430() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhlps xmm15, xmm3
      );
@@ -2311,7 +2311,7 @@ fn enc_sse_movhlps4430() {
 
 #[test]
 fn enc_sse_movhlps4431() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhlps xmm4, xmm3
      );
@@ -2325,7 +2325,7 @@ fn enc_sse_movhlps4431() {
 
 #[test]
 fn enc_sse_movhlps4432() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhlps xmm0, xmm1
      );
@@ -2339,7 +2339,7 @@ fn enc_sse_movhlps4432() {
 
 #[test]
 fn enc_sse_movhps4433() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps xmm12, QWORD [rax + 16]
      );
@@ -2353,7 +2353,7 @@ fn enc_sse_movhps4433() {
 
 #[test]
 fn enc_sse_movhps4434() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps xmm4, QWORD [rax + 16]
      );
@@ -2367,7 +2367,7 @@ fn enc_sse_movhps4434() {
 
 #[test]
 fn enc_sse_movhps4435() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps xmm15, QWORD [rax * 2 + rdx]
      );
@@ -2381,7 +2381,7 @@ fn enc_sse_movhps4435() {
 
 #[test]
 fn enc_sse_movhps4436() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps xmm4, QWORD [rax]
      );
@@ -2395,7 +2395,7 @@ fn enc_sse_movhps4436() {
 
 #[test]
 fn enc_sse_movhps4437() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps xmm3, QWORD [rax]
      );
@@ -2409,7 +2409,7 @@ fn enc_sse_movhps4437() {
 
 #[test]
 fn enc_sse_movhps4438() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps QWORD [rax], xmm4
      );
@@ -2423,7 +2423,7 @@ fn enc_sse_movhps4438() {
 
 #[test]
 fn enc_sse_movhps4439() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps QWORD [rax + 16], xmm2
      );
@@ -2437,7 +2437,7 @@ fn enc_sse_movhps4439() {
 
 #[test]
 fn enc_sse_movhps4440() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps QWORD [rax + 16], xmm12
      );
@@ -2451,7 +2451,7 @@ fn enc_sse_movhps4440() {
 
 #[test]
 fn enc_sse_movhps4441() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movhps QWORD [rax * 2 + rdx], xmm3
      );
@@ -2465,7 +2465,7 @@ fn enc_sse_movhps4441() {
 
 #[test]
 fn enc_sse_movlhps4442() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlhps xmm3, xmm4
      );
@@ -2479,7 +2479,7 @@ fn enc_sse_movlhps4442() {
 
 #[test]
 fn enc_sse_movlhps4443() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlhps xmm2, xmm3
      );
@@ -2493,7 +2493,7 @@ fn enc_sse_movlhps4443() {
 
 #[test]
 fn enc_sse_movlhps4444() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlhps xmm4, xmm15
      );
@@ -2507,7 +2507,7 @@ fn enc_sse_movlhps4444() {
 
 #[test]
 fn enc_sse_movlhps4445() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlhps xmm2, xmm12
      );
@@ -2521,7 +2521,7 @@ fn enc_sse_movlhps4445() {
 
 #[test]
 fn enc_sse_movlhps4446() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlhps xmm15, xmm11
      );
@@ -2535,7 +2535,7 @@ fn enc_sse_movlhps4446() {
 
 #[test]
 fn enc_sse_movlps4447() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps xmm2, QWORD [rax * 2 + rdx]
      );
@@ -2549,7 +2549,7 @@ fn enc_sse_movlps4447() {
 
 #[test]
 fn enc_sse_movlps4448() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps xmm12, QWORD [rax * 2 + rdx]
      );
@@ -2563,7 +2563,7 @@ fn enc_sse_movlps4448() {
 
 #[test]
 fn enc_sse_movlps4449() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps xmm0, QWORD [rax]
      );
@@ -2577,7 +2577,7 @@ fn enc_sse_movlps4449() {
 
 #[test]
 fn enc_sse_movlps4450() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps xmm3, QWORD [rax]
      );
@@ -2591,7 +2591,7 @@ fn enc_sse_movlps4450() {
 
 #[test]
 fn enc_sse_movlps4451() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps QWORD [rax * 2 + rdx], xmm11
      );
@@ -2605,7 +2605,7 @@ fn enc_sse_movlps4451() {
 
 #[test]
 fn enc_sse_movlps4452() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps QWORD [rax + 16], xmm0
      );
@@ -2619,7 +2619,7 @@ fn enc_sse_movlps4452() {
 
 #[test]
 fn enc_sse_movlps4453() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps QWORD [rax + 16], xmm2
      );
@@ -2633,7 +2633,7 @@ fn enc_sse_movlps4453() {
 
 #[test]
 fn enc_sse_movlps4454() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps QWORD [rax * 2 + rdx], xmm1
      );
@@ -2647,7 +2647,7 @@ fn enc_sse_movlps4454() {
 
 #[test]
 fn enc_sse_movlps4455() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movlps QWORD [rax], xmm2
      );
@@ -2661,7 +2661,7 @@ fn enc_sse_movlps4455() {
 
 #[test]
 fn enc_sse_movmskps4456() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps rcx, xmm1
      );
@@ -2675,7 +2675,7 @@ fn enc_sse_movmskps4456() {
 
 #[test]
 fn enc_sse_movmskps4457() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps rdx, xmm11
      );
@@ -2689,7 +2689,7 @@ fn enc_sse_movmskps4457() {
 
 #[test]
 fn enc_sse_movmskps4458() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps rcx, xmm3
      );
@@ -2703,7 +2703,7 @@ fn enc_sse_movmskps4458() {
 
 #[test]
 fn enc_sse_movmskps4459() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps rdx, xmm15
      );
@@ -2717,7 +2717,7 @@ fn enc_sse_movmskps4459() {
 
 #[test]
 fn enc_sse_movmskps4460() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps eax, xmm3
      );
@@ -2731,7 +2731,7 @@ fn enc_sse_movmskps4460() {
 
 #[test]
 fn enc_sse_movmskps4461() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps edx, xmm4
      );
@@ -2745,7 +2745,7 @@ fn enc_sse_movmskps4461() {
 
 #[test]
 fn enc_sse_movmskps4462() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps edx, xmm0
      );
@@ -2759,7 +2759,7 @@ fn enc_sse_movmskps4462() {
 
 #[test]
 fn enc_sse_movmskps4463() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps edx, xmm15
      );
@@ -2773,7 +2773,7 @@ fn enc_sse_movmskps4463() {
 
 #[test]
 fn enc_sse_movmskps4464() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movmskps ecx, xmm11
      );
@@ -2787,7 +2787,7 @@ fn enc_sse_movmskps4464() {
 
 #[test]
 fn enc_sse_movntps4465() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movntps OWORD [rax * 2 + rdx], xmm12
      );
@@ -2801,7 +2801,7 @@ fn enc_sse_movntps4465() {
 
 #[test]
 fn enc_sse_movntps4466() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movntps OWORD [rax], xmm11
      );
@@ -2815,7 +2815,7 @@ fn enc_sse_movntps4466() {
 
 #[test]
 fn enc_sse_movntps4467() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movntps OWORD [rax + 16], xmm3
      );
@@ -2829,7 +2829,7 @@ fn enc_sse_movntps4467() {
 
 #[test]
 fn enc_sse_movntps4468() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movntps OWORD [rax], xmm0
      );
@@ -2843,7 +2843,7 @@ fn enc_sse_movntps4468() {
 
 #[test]
 fn enc_sse_movntps4469() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movntps OWORD [rax + 16], xmm12
      );
@@ -2857,7 +2857,7 @@ fn enc_sse_movntps4469() {
 
 #[test]
 fn enc_sse_movss4470() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss DWORD [rax + 16], xmm1
      );
@@ -2871,7 +2871,7 @@ fn enc_sse_movss4470() {
 
 #[test]
 fn enc_sse_movss4471() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss DWORD [rax], xmm15
      );
@@ -2885,7 +2885,7 @@ fn enc_sse_movss4471() {
 
 #[test]
 fn enc_sse_movss4472() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss DWORD [rax * 2 + rdx], xmm0
      );
@@ -2899,7 +2899,7 @@ fn enc_sse_movss4472() {
 
 #[test]
 fn enc_sse_movss4473() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss DWORD [rax + 16], xmm11
      );
@@ -2913,7 +2913,7 @@ fn enc_sse_movss4473() {
 
 #[test]
 fn enc_sse_movss4474() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm0, xmm0
      );
@@ -2927,7 +2927,7 @@ fn enc_sse_movss4474() {
 
 #[test]
 fn enc_sse_movss4475() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm4, xmm3
      );
@@ -2941,7 +2941,7 @@ fn enc_sse_movss4475() {
 
 #[test]
 fn enc_sse_movss4476() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm11, xmm15
      );
@@ -2955,7 +2955,7 @@ fn enc_sse_movss4476() {
 
 #[test]
 fn enc_sse_movss4477() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm2, xmm2
      );
@@ -2969,7 +2969,7 @@ fn enc_sse_movss4477() {
 
 #[test]
 fn enc_sse_movss4478() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm4, xmm1
      );
@@ -2983,7 +2983,7 @@ fn enc_sse_movss4478() {
 
 #[test]
 fn enc_sse_movss4479() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm11, DWORD [rax]
      );
@@ -2997,7 +2997,7 @@ fn enc_sse_movss4479() {
 
 #[test]
 fn enc_sse_movss4480() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm12, DWORD [rax + 16]
      );
@@ -3011,7 +3011,7 @@ fn enc_sse_movss4480() {
 
 #[test]
 fn enc_sse_movss4481() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm15, DWORD [rax + 16]
      );
@@ -3025,7 +3025,7 @@ fn enc_sse_movss4481() {
 
 #[test]
 fn enc_sse_movss4482() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movss xmm3, DWORD [rax * 2 + rdx]
      );
@@ -3039,7 +3039,7 @@ fn enc_sse_movss4482() {
 
 #[test]
 fn enc_sse_movups4483() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm0, xmm4
      );
@@ -3053,7 +3053,7 @@ fn enc_sse_movups4483() {
 
 #[test]
 fn enc_sse_movups4484() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm12, xmm3
      );
@@ -3067,7 +3067,7 @@ fn enc_sse_movups4484() {
 
 #[test]
 fn enc_sse_movups4485() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm0, xmm12
      );
@@ -3081,7 +3081,7 @@ fn enc_sse_movups4485() {
 
 #[test]
 fn enc_sse_movups4486() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm12, xmm2
      );
@@ -3095,7 +3095,7 @@ fn enc_sse_movups4486() {
 
 #[test]
 fn enc_sse_movups4487() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm12, xmm12
      );
@@ -3109,7 +3109,7 @@ fn enc_sse_movups4487() {
 
 #[test]
 fn enc_sse_movups4488() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm0, xmm0
      );
@@ -3123,7 +3123,7 @@ fn enc_sse_movups4488() {
 
 #[test]
 fn enc_sse_movups4489() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm2, xmm12
      );
@@ -3137,7 +3137,7 @@ fn enc_sse_movups4489() {
 
 #[test]
 fn enc_sse_movups4490() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm0, xmm2
      );
@@ -3151,7 +3151,7 @@ fn enc_sse_movups4490() {
 
 #[test]
 fn enc_sse_movups4491() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups OWORD [rax], xmm4
      );
@@ -3165,7 +3165,7 @@ fn enc_sse_movups4491() {
 
 #[test]
 fn enc_sse_movups4492() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; movups xmm4, xmm11
      );
@@ -3179,7 +3179,7 @@ fn enc_sse_movups4492() {
 
 #[test]
 fn enc_sse_mulps4493() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulps xmm2, OWORD [rax * 2 + rdx]
      );
@@ -3193,7 +3193,7 @@ fn enc_sse_mulps4493() {
 
 #[test]
 fn enc_sse_mulps4494() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulps xmm15, xmm4
      );
@@ -3207,7 +3207,7 @@ fn enc_sse_mulps4494() {
 
 #[test]
 fn enc_sse_mulps4495() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulps xmm0, xmm15
      );
@@ -3221,7 +3221,7 @@ fn enc_sse_mulps4495() {
 
 #[test]
 fn enc_sse_mulps4496() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulps xmm15, xmm15
      );
@@ -3235,7 +3235,7 @@ fn enc_sse_mulps4496() {
 
 #[test]
 fn enc_sse_mulps4497() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulps xmm0, xmm0
      );
@@ -3249,7 +3249,7 @@ fn enc_sse_mulps4497() {
 
 #[test]
 fn enc_sse_mulss4498() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm3, xmm15
      );
@@ -3263,7 +3263,7 @@ fn enc_sse_mulss4498() {
 
 #[test]
 fn enc_sse_mulss4499() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm0, xmm0
      );
@@ -3277,7 +3277,7 @@ fn enc_sse_mulss4499() {
 
 #[test]
 fn enc_sse_mulss4500() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm12, xmm3
      );
@@ -3291,7 +3291,7 @@ fn enc_sse_mulss4500() {
 
 #[test]
 fn enc_sse_mulss4501() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm4, xmm11
      );
@@ -3305,7 +3305,7 @@ fn enc_sse_mulss4501() {
 
 #[test]
 fn enc_sse_mulss4502() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm15, xmm3
      );
@@ -3319,7 +3319,7 @@ fn enc_sse_mulss4502() {
 
 #[test]
 fn enc_sse_mulss4503() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm1, DWORD [rax * 2 + rdx]
      );
@@ -3333,7 +3333,7 @@ fn enc_sse_mulss4503() {
 
 #[test]
 fn enc_sse_mulss4504() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm12, DWORD [rax]
      );
@@ -3347,7 +3347,7 @@ fn enc_sse_mulss4504() {
 
 #[test]
 fn enc_sse_mulss4505() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm1, DWORD [rax]
      );
@@ -3361,7 +3361,7 @@ fn enc_sse_mulss4505() {
 
 #[test]
 fn enc_sse_mulss4506() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm11, DWORD [rax + 16]
      );
@@ -3375,7 +3375,7 @@ fn enc_sse_mulss4506() {
 
 #[test]
 fn enc_sse_mulss4507() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; mulss xmm3, DWORD [rax]
      );
@@ -3389,7 +3389,7 @@ fn enc_sse_mulss4507() {
 
 #[test]
 fn enc_sse_orps4508() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; orps xmm12, xmm15
      );
@@ -3403,7 +3403,7 @@ fn enc_sse_orps4508() {
 
 #[test]
 fn enc_sse_orps4509() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; orps xmm3, OWORD [rax]
      );
@@ -3417,7 +3417,7 @@ fn enc_sse_orps4509() {
 
 #[test]
 fn enc_sse_orps4510() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; orps xmm15, xmm12
      );
@@ -3431,7 +3431,7 @@ fn enc_sse_orps4510() {
 
 #[test]
 fn enc_sse_orps4511() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; orps xmm1, OWORD [rdx]
      );
@@ -3445,7 +3445,7 @@ fn enc_sse_orps4511() {
 
 #[test]
 fn enc_sse_orps4512() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; orps xmm4, xmm11
      );
@@ -3459,7 +3459,7 @@ fn enc_sse_orps4512() {
 
 #[test]
 fn enc_sse_pclmulhqhqdq4513() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqhqdq xmm0, xmm2
      );
@@ -3473,7 +3473,7 @@ fn enc_sse_pclmulhqhqdq4513() {
 
 #[test]
 fn enc_sse_pclmulhqhqdq4514() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqhqdq xmm1, xmm1
      );
@@ -3487,7 +3487,7 @@ fn enc_sse_pclmulhqhqdq4514() {
 
 #[test]
 fn enc_sse_pclmulhqhqdq4515() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqhqdq xmm2, xmm0
      );
@@ -3501,7 +3501,7 @@ fn enc_sse_pclmulhqhqdq4515() {
 
 #[test]
 fn enc_sse_pclmulhqhqdq4516() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqhqdq xmm4, xmm12
      );
@@ -3515,7 +3515,7 @@ fn enc_sse_pclmulhqhqdq4516() {
 
 #[test]
 fn enc_sse_pclmulhqhqdq4517() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqhqdq xmm4, xmm2
      );
@@ -3529,7 +3529,7 @@ fn enc_sse_pclmulhqhqdq4517() {
 
 #[test]
 fn enc_sse_pclmulhqlqdq4518() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqlqdq xmm12, xmm15
      );
@@ -3543,7 +3543,7 @@ fn enc_sse_pclmulhqlqdq4518() {
 
 #[test]
 fn enc_sse_pclmulhqlqdq4519() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqlqdq xmm12, xmm0
      );
@@ -3557,7 +3557,7 @@ fn enc_sse_pclmulhqlqdq4519() {
 
 #[test]
 fn enc_sse_pclmulhqlqdq4520() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqlqdq xmm3, xmm1
      );
@@ -3571,7 +3571,7 @@ fn enc_sse_pclmulhqlqdq4520() {
 
 #[test]
 fn enc_sse_pclmulhqlqdq4521() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqlqdq xmm2, xmm0
      );
@@ -3585,7 +3585,7 @@ fn enc_sse_pclmulhqlqdq4521() {
 
 #[test]
 fn enc_sse_pclmulhqlqdq4522() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulhqlqdq xmm1, OWORD [rax]
      );
@@ -3599,7 +3599,7 @@ fn enc_sse_pclmulhqlqdq4522() {
 
 #[test]
 fn enc_sse_pclmullqhqdq4523() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqhqdq xmm11, xmm12
      );
@@ -3613,7 +3613,7 @@ fn enc_sse_pclmullqhqdq4523() {
 
 #[test]
 fn enc_sse_pclmullqhqdq4524() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqhqdq xmm2, OWORD [rax]
      );
@@ -3627,7 +3627,7 @@ fn enc_sse_pclmullqhqdq4524() {
 
 #[test]
 fn enc_sse_pclmullqhqdq4525() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqhqdq xmm12, OWORD [rax * 2 + rdx]
      );
@@ -3641,7 +3641,7 @@ fn enc_sse_pclmullqhqdq4525() {
 
 #[test]
 fn enc_sse_pclmullqhqdq4526() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqhqdq xmm12, OWORD [rdx]
      );
@@ -3655,7 +3655,7 @@ fn enc_sse_pclmullqhqdq4526() {
 
 #[test]
 fn enc_sse_pclmullqlqdq4527() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqlqdq xmm15, xmm12
      );
@@ -3669,7 +3669,7 @@ fn enc_sse_pclmullqlqdq4527() {
 
 #[test]
 fn enc_sse_pclmullqlqdq4528() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqlqdq xmm3, xmm2
      );
@@ -3683,7 +3683,7 @@ fn enc_sse_pclmullqlqdq4528() {
 
 #[test]
 fn enc_sse_pclmullqlqdq4529() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqlqdq xmm1, OWORD [rax * 2 + rdx]
      );
@@ -3697,7 +3697,7 @@ fn enc_sse_pclmullqlqdq4529() {
 
 #[test]
 fn enc_sse_pclmullqlqdq4530() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqlqdq xmm4, OWORD [rax]
      );
@@ -3711,7 +3711,7 @@ fn enc_sse_pclmullqlqdq4530() {
 
 #[test]
 fn enc_sse_pclmullqlqdq4531() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmullqlqdq xmm0, xmm1
      );
@@ -3725,7 +3725,7 @@ fn enc_sse_pclmullqlqdq4531() {
 
 #[test]
 fn enc_sse_pclmulqdq4532() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulqdq xmm1, xmm2, 56
      );
@@ -3739,7 +3739,7 @@ fn enc_sse_pclmulqdq4532() {
 
 #[test]
 fn enc_sse_pclmulqdq4533() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulqdq xmm3, xmm4, 75
      );
@@ -3753,7 +3753,7 @@ fn enc_sse_pclmulqdq4533() {
 
 #[test]
 fn enc_sse_pclmulqdq4534() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulqdq xmm3, xmm4, 56
      );
@@ -3767,7 +3767,7 @@ fn enc_sse_pclmulqdq4534() {
 
 #[test]
 fn enc_sse_pclmulqdq4535() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulqdq xmm3, OWORD [rax * 2 + rdx], 56
      );
@@ -3781,7 +3781,7 @@ fn enc_sse_pclmulqdq4535() {
 
 #[test]
 fn enc_sse_pclmulqdq4536() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; pclmulqdq xmm15, xmm4, 40
      );
@@ -3795,7 +3795,7 @@ fn enc_sse_pclmulqdq4536() {
 
 #[test]
 fn enc_sse_rcpps4537() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpps xmm15, OWORD [rax]
      );
@@ -3809,7 +3809,7 @@ fn enc_sse_rcpps4537() {
 
 #[test]
 fn enc_sse_rcpps4538() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpps xmm3, xmm1
      );
@@ -3823,7 +3823,7 @@ fn enc_sse_rcpps4538() {
 
 #[test]
 fn enc_sse_rcpps4539() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpps xmm4, xmm3
      );
@@ -3837,7 +3837,7 @@ fn enc_sse_rcpps4539() {
 
 #[test]
 fn enc_sse_rcpps4540() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpps xmm12, xmm12
      );
@@ -3851,7 +3851,7 @@ fn enc_sse_rcpps4540() {
 
 #[test]
 fn enc_sse_rcpps4541() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpps xmm3, OWORD [rax * 2 + rdx]
      );
@@ -3865,7 +3865,7 @@ fn enc_sse_rcpps4541() {
 
 #[test]
 fn enc_sse_rcpss4542() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm2, xmm11
      );
@@ -3879,7 +3879,7 @@ fn enc_sse_rcpss4542() {
 
 #[test]
 fn enc_sse_rcpss4543() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm3, xmm3
      );
@@ -3893,7 +3893,7 @@ fn enc_sse_rcpss4543() {
 
 #[test]
 fn enc_sse_rcpss4544() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm3, xmm2
      );
@@ -3907,7 +3907,7 @@ fn enc_sse_rcpss4544() {
 
 #[test]
 fn enc_sse_rcpss4545() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm1, xmm0
      );
@@ -3921,7 +3921,7 @@ fn enc_sse_rcpss4545() {
 
 #[test]
 fn enc_sse_rcpss4546() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm0, DWORD [rax]
      );
@@ -3935,7 +3935,7 @@ fn enc_sse_rcpss4546() {
 
 #[test]
 fn enc_sse_rcpss4547() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm11, DWORD [rax]
      );
@@ -3949,7 +3949,7 @@ fn enc_sse_rcpss4547() {
 
 #[test]
 fn enc_sse_rcpss4548() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rcpss xmm11, DWORD [rax + 16]
      );
@@ -3963,7 +3963,7 @@ fn enc_sse_rcpss4548() {
 
 #[test]
 fn enc_sse_rsqrtps4549() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtps xmm4, xmm11
      );
@@ -3977,7 +3977,7 @@ fn enc_sse_rsqrtps4549() {
 
 #[test]
 fn enc_sse_rsqrtps4550() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtps xmm2, xmm12
      );
@@ -3991,7 +3991,7 @@ fn enc_sse_rsqrtps4550() {
 
 #[test]
 fn enc_sse_rsqrtps4551() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtps xmm1, xmm15
      );
@@ -4005,7 +4005,7 @@ fn enc_sse_rsqrtps4551() {
 
 #[test]
 fn enc_sse_rsqrtps4552() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtps xmm3, xmm2
      );
@@ -4019,7 +4019,7 @@ fn enc_sse_rsqrtps4552() {
 
 #[test]
 fn enc_sse_rsqrtps4553() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtps xmm11, xmm3
      );
@@ -4033,7 +4033,7 @@ fn enc_sse_rsqrtps4553() {
 
 #[test]
 fn enc_sse_rsqrtss4554() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm11, xmm0
      );
@@ -4047,7 +4047,7 @@ fn enc_sse_rsqrtss4554() {
 
 #[test]
 fn enc_sse_rsqrtss4555() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm3, xmm0
      );
@@ -4061,7 +4061,7 @@ fn enc_sse_rsqrtss4555() {
 
 #[test]
 fn enc_sse_rsqrtss4556() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm11, xmm3
      );
@@ -4075,7 +4075,7 @@ fn enc_sse_rsqrtss4556() {
 
 #[test]
 fn enc_sse_rsqrtss4557() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm12, xmm12
      );
@@ -4089,7 +4089,7 @@ fn enc_sse_rsqrtss4557() {
 
 #[test]
 fn enc_sse_rsqrtss4558() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm11, xmm1
      );
@@ -4103,7 +4103,7 @@ fn enc_sse_rsqrtss4558() {
 
 #[test]
 fn enc_sse_rsqrtss4559() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm4, DWORD [rax * 2 + rdx]
      );
@@ -4117,7 +4117,7 @@ fn enc_sse_rsqrtss4559() {
 
 #[test]
 fn enc_sse_rsqrtss4560() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm1, DWORD [rax]
      );
@@ -4131,7 +4131,7 @@ fn enc_sse_rsqrtss4560() {
 
 #[test]
 fn enc_sse_rsqrtss4561() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm3, DWORD [rax]
      );
@@ -4145,7 +4145,7 @@ fn enc_sse_rsqrtss4561() {
 
 #[test]
 fn enc_sse_rsqrtss4562() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm2, DWORD [rax]
      );
@@ -4159,7 +4159,7 @@ fn enc_sse_rsqrtss4562() {
 
 #[test]
 fn enc_sse_rsqrtss4563() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; rsqrtss xmm0, DWORD [rax + 16]
      );
@@ -4173,7 +4173,7 @@ fn enc_sse_rsqrtss4563() {
 
 #[test]
 fn enc_sse_shufps4564() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shufps xmm11, xmm2, 79
      );
@@ -4187,7 +4187,7 @@ fn enc_sse_shufps4564() {
 
 #[test]
 fn enc_sse_shufps4565() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shufps xmm3, xmm15, 29
      );
@@ -4201,7 +4201,7 @@ fn enc_sse_shufps4565() {
 
 #[test]
 fn enc_sse_shufps4566() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shufps xmm4, OWORD [rax], 63
      );
@@ -4215,7 +4215,7 @@ fn enc_sse_shufps4566() {
 
 #[test]
 fn enc_sse_shufps4567() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shufps xmm3, xmm3, 54
      );
@@ -4229,7 +4229,7 @@ fn enc_sse_shufps4567() {
 
 #[test]
 fn enc_sse_shufps4568() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; shufps xmm1, xmm0, 89
      );
@@ -4243,7 +4243,7 @@ fn enc_sse_shufps4568() {
 
 #[test]
 fn enc_sse_sqrtps4569() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtps xmm15, OWORD [rax * 2 + rdx]
      );
@@ -4257,7 +4257,7 @@ fn enc_sse_sqrtps4569() {
 
 #[test]
 fn enc_sse_sqrtps4570() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtps xmm3, OWORD [rax * 2 + rdx]
      );
@@ -4271,7 +4271,7 @@ fn enc_sse_sqrtps4570() {
 
 #[test]
 fn enc_sse_sqrtps4571() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtps xmm3, OWORD [rdx]
      );
@@ -4285,7 +4285,7 @@ fn enc_sse_sqrtps4571() {
 
 #[test]
 fn enc_sse_sqrtps4572() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtps xmm11, OWORD [rdx]
      );
@@ -4299,7 +4299,7 @@ fn enc_sse_sqrtps4572() {
 
 #[test]
 fn enc_sse_sqrtps4573() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtps xmm4, xmm3
      );
@@ -4313,7 +4313,7 @@ fn enc_sse_sqrtps4573() {
 
 #[test]
 fn enc_sse_sqrtss4574() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm11, xmm2
      );
@@ -4327,7 +4327,7 @@ fn enc_sse_sqrtss4574() {
 
 #[test]
 fn enc_sse_sqrtss4575() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm12, xmm15
      );
@@ -4341,7 +4341,7 @@ fn enc_sse_sqrtss4575() {
 
 #[test]
 fn enc_sse_sqrtss4576() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm0, xmm1
      );
@@ -4355,7 +4355,7 @@ fn enc_sse_sqrtss4576() {
 
 #[test]
 fn enc_sse_sqrtss4577() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm2, xmm15
      );
@@ -4369,7 +4369,7 @@ fn enc_sse_sqrtss4577() {
 
 #[test]
 fn enc_sse_sqrtss4578() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm1, xmm11
      );
@@ -4383,7 +4383,7 @@ fn enc_sse_sqrtss4578() {
 
 #[test]
 fn enc_sse_sqrtss4579() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm1, DWORD [rax]
      );
@@ -4397,7 +4397,7 @@ fn enc_sse_sqrtss4579() {
 
 #[test]
 fn enc_sse_sqrtss4580() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm15, DWORD [rax]
      );
@@ -4411,7 +4411,7 @@ fn enc_sse_sqrtss4580() {
 
 #[test]
 fn enc_sse_sqrtss4581() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm11, DWORD [rax]
      );
@@ -4425,7 +4425,7 @@ fn enc_sse_sqrtss4581() {
 
 #[test]
 fn enc_sse_sqrtss4582() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm1, DWORD [rax + 16]
      );
@@ -4439,7 +4439,7 @@ fn enc_sse_sqrtss4582() {
 
 #[test]
 fn enc_sse_sqrtss4583() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sqrtss xmm4, DWORD [rax * 2 + rdx]
      );
@@ -4453,7 +4453,7 @@ fn enc_sse_sqrtss4583() {
 
 #[test]
 fn enc_sse_stmxcsr4584() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; stmxcsr DWORD [rax + 16]
      );
@@ -4467,7 +4467,7 @@ fn enc_sse_stmxcsr4584() {
 
 #[test]
 fn enc_sse_stmxcsr4585() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; stmxcsr DWORD [rax * 2 + rdx]
      );
@@ -4481,7 +4481,7 @@ fn enc_sse_stmxcsr4585() {
 
 #[test]
 fn enc_sse_subps4586() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subps xmm12, xmm15
      );
@@ -4495,7 +4495,7 @@ fn enc_sse_subps4586() {
 
 #[test]
 fn enc_sse_subps4587() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subps xmm15, xmm12
      );
@@ -4509,7 +4509,7 @@ fn enc_sse_subps4587() {
 
 #[test]
 fn enc_sse_subps4588() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subps xmm1, xmm2
      );
@@ -4523,7 +4523,7 @@ fn enc_sse_subps4588() {
 
 #[test]
 fn enc_sse_subps4589() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subps xmm1, xmm0
      );
@@ -4537,7 +4537,7 @@ fn enc_sse_subps4589() {
 
 #[test]
 fn enc_sse_subps4590() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subps xmm15, OWORD [rax]
      );
@@ -4551,7 +4551,7 @@ fn enc_sse_subps4590() {
 
 #[test]
 fn enc_sse_subss4591() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm12, xmm4
      );
@@ -4565,7 +4565,7 @@ fn enc_sse_subss4591() {
 
 #[test]
 fn enc_sse_subss4592() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm4, xmm2
      );
@@ -4579,7 +4579,7 @@ fn enc_sse_subss4592() {
 
 #[test]
 fn enc_sse_subss4593() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm1, xmm0
      );
@@ -4593,7 +4593,7 @@ fn enc_sse_subss4593() {
 
 #[test]
 fn enc_sse_subss4594() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm0, xmm0
      );
@@ -4607,7 +4607,7 @@ fn enc_sse_subss4594() {
 
 #[test]
 fn enc_sse_subss4595() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm3, DWORD [rax]
      );
@@ -4621,7 +4621,7 @@ fn enc_sse_subss4595() {
 
 #[test]
 fn enc_sse_subss4596() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm1, DWORD [rax + 16]
      );
@@ -4635,7 +4635,7 @@ fn enc_sse_subss4596() {
 
 #[test]
 fn enc_sse_subss4597() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm4, DWORD [rax + 16]
      );
@@ -4649,7 +4649,7 @@ fn enc_sse_subss4597() {
 
 #[test]
 fn enc_sse_subss4598() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; subss xmm12, DWORD [rax + 16]
      );
@@ -4663,7 +4663,7 @@ fn enc_sse_subss4598() {
 
 #[test]
 fn enc_sse_ucomiss4599() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm2, xmm12
      );
@@ -4677,7 +4677,7 @@ fn enc_sse_ucomiss4599() {
 
 #[test]
 fn enc_sse_ucomiss4600() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm12, xmm15
      );
@@ -4691,7 +4691,7 @@ fn enc_sse_ucomiss4600() {
 
 #[test]
 fn enc_sse_ucomiss4601() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm11, xmm0
      );
@@ -4705,7 +4705,7 @@ fn enc_sse_ucomiss4601() {
 
 #[test]
 fn enc_sse_ucomiss4602() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm15, xmm0
      );
@@ -4719,7 +4719,7 @@ fn enc_sse_ucomiss4602() {
 
 #[test]
 fn enc_sse_ucomiss4603() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm0, xmm0
      );
@@ -4733,7 +4733,7 @@ fn enc_sse_ucomiss4603() {
 
 #[test]
 fn enc_sse_ucomiss4604() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm1, DWORD [rax * 2 + rdx]
      );
@@ -4747,7 +4747,7 @@ fn enc_sse_ucomiss4604() {
 
 #[test]
 fn enc_sse_ucomiss4605() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm1, DWORD [rax + 16]
      );
@@ -4761,7 +4761,7 @@ fn enc_sse_ucomiss4605() {
 
 #[test]
 fn enc_sse_ucomiss4606() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm12, DWORD [rax]
      );
@@ -4775,7 +4775,7 @@ fn enc_sse_ucomiss4606() {
 
 #[test]
 fn enc_sse_ucomiss4607() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm2, DWORD [rax + 16]
      );
@@ -4789,7 +4789,7 @@ fn enc_sse_ucomiss4607() {
 
 #[test]
 fn enc_sse_ucomiss4608() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; ucomiss xmm4, DWORD [rax]
      );
@@ -4803,7 +4803,7 @@ fn enc_sse_ucomiss4608() {
 
 #[test]
 fn enc_sse_unpckhps4609() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpckhps xmm0, OWORD [rax]
      );
@@ -4817,7 +4817,7 @@ fn enc_sse_unpckhps4609() {
 
 #[test]
 fn enc_sse_unpckhps4610() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpckhps xmm15, xmm2
      );
@@ -4831,7 +4831,7 @@ fn enc_sse_unpckhps4610() {
 
 #[test]
 fn enc_sse_unpckhps4611() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpckhps xmm1, xmm2
      );
@@ -4845,7 +4845,7 @@ fn enc_sse_unpckhps4611() {
 
 #[test]
 fn enc_sse_unpckhps4612() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpckhps xmm1, xmm11
      );
@@ -4859,7 +4859,7 @@ fn enc_sse_unpckhps4612() {
 
 #[test]
 fn enc_sse_unpckhps4613() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpckhps xmm3, OWORD [rax]
      );
@@ -4873,7 +4873,7 @@ fn enc_sse_unpckhps4613() {
 
 #[test]
 fn enc_sse_unpcklps4614() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpcklps xmm15, xmm11
      );
@@ -4887,7 +4887,7 @@ fn enc_sse_unpcklps4614() {
 
 #[test]
 fn enc_sse_unpcklps4615() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpcklps xmm12, xmm0
      );
@@ -4901,7 +4901,7 @@ fn enc_sse_unpcklps4615() {
 
 #[test]
 fn enc_sse_unpcklps4616() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpcklps xmm3, xmm15
      );
@@ -4915,7 +4915,7 @@ fn enc_sse_unpcklps4616() {
 
 #[test]
 fn enc_sse_unpcklps4617() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpcklps xmm0, xmm12
      );
@@ -4929,7 +4929,7 @@ fn enc_sse_unpcklps4617() {
 
 #[test]
 fn enc_sse_unpcklps4618() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; unpcklps xmm1, xmm4
      );
@@ -4943,7 +4943,7 @@ fn enc_sse_unpcklps4618() {
 
 #[test]
 fn enc_sse_xorps4619() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xorps xmm1, xmm4
      );
@@ -4957,7 +4957,7 @@ fn enc_sse_xorps4619() {
 
 #[test]
 fn enc_sse_xorps4620() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xorps xmm4, xmm12
      );
@@ -4971,7 +4971,7 @@ fn enc_sse_xorps4620() {
 
 #[test]
 fn enc_sse_xorps4621() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xorps xmm2, xmm0
      );
@@ -4985,7 +4985,7 @@ fn enc_sse_xorps4621() {
 
 #[test]
 fn enc_sse_xorps4622() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xorps xmm15, xmm3
      );
@@ -4999,7 +4999,7 @@ fn enc_sse_xorps4622() {
 
 #[test]
 fn enc_sse_xorps4623() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; xorps xmm2, xmm15
      );

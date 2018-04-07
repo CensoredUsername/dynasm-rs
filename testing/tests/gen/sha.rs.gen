@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_sha_sha1msg15366() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg1 xmm0, OWORD [rax * 2 + rdx]
      );
@@ -15,7 +15,7 @@ fn enc_sha_sha1msg15366() {
 
 #[test]
 fn enc_sha_sha1msg15367() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg1 xmm0, OWORD [rdx]
      );
@@ -29,7 +29,7 @@ fn enc_sha_sha1msg15367() {
 
 #[test]
 fn enc_sha_sha1msg15368() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg1 xmm12, xmm3
      );
@@ -43,7 +43,7 @@ fn enc_sha_sha1msg15368() {
 
 #[test]
 fn enc_sha_sha1msg15369() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg1 xmm4, OWORD [rax]
      );
@@ -57,7 +57,7 @@ fn enc_sha_sha1msg15369() {
 
 #[test]
 fn enc_sha_sha1msg15370() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg1 xmm1, xmm12
      );
@@ -71,7 +71,7 @@ fn enc_sha_sha1msg15370() {
 
 #[test]
 fn enc_sha_sha1msg25371() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg2 xmm3, OWORD [rdx]
      );
@@ -85,7 +85,7 @@ fn enc_sha_sha1msg25371() {
 
 #[test]
 fn enc_sha_sha1msg25372() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg2 xmm3, xmm2
      );
@@ -99,7 +99,7 @@ fn enc_sha_sha1msg25372() {
 
 #[test]
 fn enc_sha_sha1msg25373() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg2 xmm1, OWORD [rax]
      );
@@ -113,7 +113,7 @@ fn enc_sha_sha1msg25373() {
 
 #[test]
 fn enc_sha_sha1msg25374() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg2 xmm2, xmm12
      );
@@ -127,7 +127,7 @@ fn enc_sha_sha1msg25374() {
 
 #[test]
 fn enc_sha_sha1msg25375() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1msg2 xmm12, xmm1
      );
@@ -141,7 +141,7 @@ fn enc_sha_sha1msg25375() {
 
 #[test]
 fn enc_sha_sha1nexte5376() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1nexte xmm3, xmm2
      );
@@ -155,7 +155,7 @@ fn enc_sha_sha1nexte5376() {
 
 #[test]
 fn enc_sha_sha1nexte5377() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1nexte xmm2, OWORD [rdx]
      );
@@ -169,7 +169,7 @@ fn enc_sha_sha1nexte5377() {
 
 #[test]
 fn enc_sha_sha1nexte5378() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1nexte xmm12, OWORD [rax]
      );
@@ -183,7 +183,7 @@ fn enc_sha_sha1nexte5378() {
 
 #[test]
 fn enc_sha_sha1nexte5379() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1nexte xmm11, xmm15
      );
@@ -197,7 +197,7 @@ fn enc_sha_sha1nexte5379() {
 
 #[test]
 fn enc_sha_sha1nexte5380() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1nexte xmm4, xmm11
      );
@@ -211,7 +211,7 @@ fn enc_sha_sha1nexte5380() {
 
 #[test]
 fn enc_sha_sha1rnds45381() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1rnds4 xmm15, xmm15, 50
      );
@@ -225,7 +225,7 @@ fn enc_sha_sha1rnds45381() {
 
 #[test]
 fn enc_sha_sha1rnds45382() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1rnds4 xmm2, xmm2, 92
      );
@@ -239,7 +239,7 @@ fn enc_sha_sha1rnds45382() {
 
 #[test]
 fn enc_sha_sha1rnds45383() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1rnds4 xmm15, xmm2, 71
      );
@@ -253,7 +253,7 @@ fn enc_sha_sha1rnds45383() {
 
 #[test]
 fn enc_sha_sha1rnds45384() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1rnds4 xmm0, xmm2, 25
      );
@@ -267,7 +267,7 @@ fn enc_sha_sha1rnds45384() {
 
 #[test]
 fn enc_sha_sha1rnds45385() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha1rnds4 xmm15, xmm15, 119
      );
@@ -281,7 +281,7 @@ fn enc_sha_sha1rnds45385() {
 
 #[test]
 fn enc_sha_sha256msg15386() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg1 xmm1, OWORD [rdx]
      );
@@ -295,7 +295,7 @@ fn enc_sha_sha256msg15386() {
 
 #[test]
 fn enc_sha_sha256msg15387() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg1 xmm12, OWORD [rdx]
      );
@@ -309,7 +309,7 @@ fn enc_sha_sha256msg15387() {
 
 #[test]
 fn enc_sha_sha256msg15388() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg1 xmm3, xmm0
      );
@@ -323,7 +323,7 @@ fn enc_sha_sha256msg15388() {
 
 #[test]
 fn enc_sha_sha256msg15389() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg1 xmm1, xmm12
      );
@@ -337,7 +337,7 @@ fn enc_sha_sha256msg15389() {
 
 #[test]
 fn enc_sha_sha256msg15390() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg1 xmm1, xmm11
      );
@@ -351,7 +351,7 @@ fn enc_sha_sha256msg15390() {
 
 #[test]
 fn enc_sha_sha256msg25391() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg2 xmm1, xmm11
      );
@@ -365,7 +365,7 @@ fn enc_sha_sha256msg25391() {
 
 #[test]
 fn enc_sha_sha256msg25392() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg2 xmm0, xmm12
      );
@@ -379,7 +379,7 @@ fn enc_sha_sha256msg25392() {
 
 #[test]
 fn enc_sha_sha256msg25393() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg2 xmm4, OWORD [rdx]
      );
@@ -393,7 +393,7 @@ fn enc_sha_sha256msg25393() {
 
 #[test]
 fn enc_sha_sha256msg25394() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg2 xmm1, xmm12
      );
@@ -407,7 +407,7 @@ fn enc_sha_sha256msg25394() {
 
 #[test]
 fn enc_sha_sha256msg25395() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256msg2 xmm4, xmm0
      );
@@ -421,7 +421,7 @@ fn enc_sha_sha256msg25395() {
 
 #[test]
 fn enc_sha_sha256rnds25396() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256rnds2 xmm4, xmm12
      );
@@ -435,7 +435,7 @@ fn enc_sha_sha256rnds25396() {
 
 #[test]
 fn enc_sha_sha256rnds25397() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256rnds2 xmm1, xmm11
      );
@@ -449,7 +449,7 @@ fn enc_sha_sha256rnds25397() {
 
 #[test]
 fn enc_sha_sha256rnds25398() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256rnds2 xmm3, OWORD [rax * 2 + rdx]
      );
@@ -463,7 +463,7 @@ fn enc_sha_sha256rnds25398() {
 
 #[test]
 fn enc_sha_sha256rnds25399() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256rnds2 xmm12, OWORD [rax * 2 + rdx]
      );
@@ -477,7 +477,7 @@ fn enc_sha_sha256rnds25399() {
 
 #[test]
 fn enc_sha_sha256rnds25400() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; sha256rnds2 xmm4, xmm0
      );

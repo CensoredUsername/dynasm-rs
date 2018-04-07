@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_mpx_bndcl5937() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcl bnd3, rcx
      );
@@ -15,7 +15,7 @@ fn enc_mpx_bndcl5937() {
 
 #[test]
 fn enc_mpx_bndcl5938() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcl bnd2, rdx
      );
@@ -29,7 +29,7 @@ fn enc_mpx_bndcl5938() {
 
 #[test]
 fn enc_mpx_bndcl5939() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcl bnd2, rax
      );
@@ -43,7 +43,7 @@ fn enc_mpx_bndcl5939() {
 
 #[test]
 fn enc_mpx_bndcl5940() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcl bnd2, [rax]
      );
@@ -57,7 +57,7 @@ fn enc_mpx_bndcl5940() {
 
 #[test]
 fn enc_mpx_bndcl5941() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcl bnd3, [rax]
      );
@@ -71,7 +71,7 @@ fn enc_mpx_bndcl5941() {
 
 #[test]
 fn enc_mpx_bndcl5942() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcl bnd1, [rax]
      );
@@ -85,7 +85,7 @@ fn enc_mpx_bndcl5942() {
 
 #[test]
 fn enc_mpx_bndcn5943() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd1, rax
      );
@@ -99,7 +99,7 @@ fn enc_mpx_bndcn5943() {
 
 #[test]
 fn enc_mpx_bndcn5944() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd3, rcx
      );
@@ -113,7 +113,7 @@ fn enc_mpx_bndcn5944() {
 
 #[test]
 fn enc_mpx_bndcn5945() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd3, rax
      );
@@ -127,7 +127,7 @@ fn enc_mpx_bndcn5945() {
 
 #[test]
 fn enc_mpx_bndcn5946() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd2, rcx
      );
@@ -141,7 +141,7 @@ fn enc_mpx_bndcn5946() {
 
 #[test]
 fn enc_mpx_bndcn5947() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd3, rdx
      );
@@ -155,7 +155,7 @@ fn enc_mpx_bndcn5947() {
 
 #[test]
 fn enc_mpx_bndcn5948() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd1, [rax]
      );
@@ -169,7 +169,7 @@ fn enc_mpx_bndcn5948() {
 
 #[test]
 fn enc_mpx_bndcn5949() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd3, [rax]
      );
@@ -183,7 +183,7 @@ fn enc_mpx_bndcn5949() {
 
 #[test]
 fn enc_mpx_bndcn5950() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcn bnd2, [rax]
      );
@@ -197,7 +197,7 @@ fn enc_mpx_bndcn5950() {
 
 #[test]
 fn enc_mpx_bndcu5951() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd3, rcx
      );
@@ -211,7 +211,7 @@ fn enc_mpx_bndcu5951() {
 
 #[test]
 fn enc_mpx_bndcu5952() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd3, rax
      );
@@ -225,7 +225,7 @@ fn enc_mpx_bndcu5952() {
 
 #[test]
 fn enc_mpx_bndcu5953() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd2, rax
      );
@@ -239,7 +239,7 @@ fn enc_mpx_bndcu5953() {
 
 #[test]
 fn enc_mpx_bndcu5954() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd1, rdx
      );
@@ -253,7 +253,7 @@ fn enc_mpx_bndcu5954() {
 
 #[test]
 fn enc_mpx_bndcu5955() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd3, [rax]
      );
@@ -267,7 +267,7 @@ fn enc_mpx_bndcu5955() {
 
 #[test]
 fn enc_mpx_bndcu5956() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd1, [rax]
      );
@@ -281,7 +281,7 @@ fn enc_mpx_bndcu5956() {
 
 #[test]
 fn enc_mpx_bndcu5957() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndcu bnd2, [rax]
      );
@@ -295,7 +295,7 @@ fn enc_mpx_bndcu5957() {
 
 #[test]
 fn enc_mpx_bndldx5958() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndldx bnd3, [rax]
      );
@@ -309,7 +309,7 @@ fn enc_mpx_bndldx5958() {
 
 #[test]
 fn enc_mpx_bndldx5959() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndldx bnd1, [rax]
      );
@@ -323,7 +323,7 @@ fn enc_mpx_bndldx5959() {
 
 #[test]
 fn enc_mpx_bndldx5960() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndldx bnd2, [rax]
      );
@@ -337,7 +337,7 @@ fn enc_mpx_bndldx5960() {
 
 #[test]
 fn enc_mpx_bndmk5961() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmk bnd2, [rax]
      );
@@ -351,7 +351,7 @@ fn enc_mpx_bndmk5961() {
 
 #[test]
 fn enc_mpx_bndmk5962() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmk bnd3, [rax]
      );
@@ -365,7 +365,7 @@ fn enc_mpx_bndmk5962() {
 
 #[test]
 fn enc_mpx_bndmk5963() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmk bnd1, [rax]
      );
@@ -379,7 +379,7 @@ fn enc_mpx_bndmk5963() {
 
 #[test]
 fn enc_mpx_bndmov5964() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd2, bnd1
      );
@@ -393,7 +393,7 @@ fn enc_mpx_bndmov5964() {
 
 #[test]
 fn enc_mpx_bndmov5965() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd3, bnd1
      );
@@ -407,7 +407,7 @@ fn enc_mpx_bndmov5965() {
 
 #[test]
 fn enc_mpx_bndmov5966() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd1, bnd3
      );
@@ -421,7 +421,7 @@ fn enc_mpx_bndmov5966() {
 
 #[test]
 fn enc_mpx_bndmov5967() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd3, bnd3
      );
@@ -435,7 +435,7 @@ fn enc_mpx_bndmov5967() {
 
 #[test]
 fn enc_mpx_bndmov5968() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov [rax], bnd2
      );
@@ -449,7 +449,7 @@ fn enc_mpx_bndmov5968() {
 
 #[test]
 fn enc_mpx_bndmov5969() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov [rax], bnd1
      );
@@ -463,7 +463,7 @@ fn enc_mpx_bndmov5969() {
 
 #[test]
 fn enc_mpx_bndmov5970() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd1, bnd3
      );
@@ -477,7 +477,7 @@ fn enc_mpx_bndmov5970() {
 
 #[test]
 fn enc_mpx_bndmov5971() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd2, bnd1
      );
@@ -491,7 +491,7 @@ fn enc_mpx_bndmov5971() {
 
 #[test]
 fn enc_mpx_bndmov5972() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd3, bnd1
      );
@@ -505,7 +505,7 @@ fn enc_mpx_bndmov5972() {
 
 #[test]
 fn enc_mpx_bndmov5973() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd3, [rax]
      );
@@ -519,7 +519,7 @@ fn enc_mpx_bndmov5973() {
 
 #[test]
 fn enc_mpx_bndmov5974() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd1, [rax]
      );
@@ -533,7 +533,7 @@ fn enc_mpx_bndmov5974() {
 
 #[test]
 fn enc_mpx_bndmov5975() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndmov bnd2, [rax]
      );
@@ -547,7 +547,7 @@ fn enc_mpx_bndmov5975() {
 
 #[test]
 fn enc_mpx_bndstx5976() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndstx [rax], bnd1
      );
@@ -561,7 +561,7 @@ fn enc_mpx_bndstx5976() {
 
 #[test]
 fn enc_mpx_bndstx5977() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndstx [rax], bnd3
      );
@@ -575,7 +575,7 @@ fn enc_mpx_bndstx5977() {
 
 #[test]
 fn enc_mpx_bndstx5978() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; bndstx [rax], bnd2
      );

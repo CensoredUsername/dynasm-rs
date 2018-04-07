@@ -1,16 +1,16 @@
-
 use std::collections::HashMap;
 use std::collections::hash_map::Entry::*;
 use std::iter::Extend;
 use std::mem;
 use std::cmp;
-use std::ops::DerefMut;
+use std::io;
 use std::sync::{Arc, RwLock};
 
-use memmap::{Mmap, Protection};
-use ::{DynasmApi, DynasmLabelApi};
+use byteorder::{ByteOrder, LittleEndian};
+use take_mut;
 
-pub use ::{ExecutableBuffer, Executor, DynamicLabel, AssemblyOffset};
+use ::{DynasmApi, DynasmLabelApi};
+use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
 #[derive(Debug)]
 struct PatchLoc(usize, u8);
@@ -22,6 +22,7 @@ struct PatchLoc(usize, u8);
 #[derive(Debug)]
 pub struct Assembler {
     // buffer where the end result is copied into
+    // note: the Option is always present. It is just used to safely move out of the RWLock
     execbuffer: Arc<RwLock<ExecutableBuffer>>,
     // length of the allocated mmap (so we don't have to go through RwLock to get it)
     map_len: usize,
@@ -49,13 +50,18 @@ pub struct Assembler {
 
 impl Assembler {
     /// Create a new `Assembler` instance
-    pub fn new() -> Assembler {
-        const MMAP_INIT_SIZE: usize = 1024 * 256;
-        Assembler {
-            execbuffer: Arc::new(RwLock::new(ExecutableBuffer {
-                length: 0,
-                buffer: Mmap::anonymous(MMAP_INIT_SIZE, Protection::ReadExecute).expect("Failed to allocate executable memory")
-            })),
+    /// This function will return an error if it was not
+    /// able to map the required executable memory. However, further methods
+    /// on the `Assembler` will simply panic if an error occurs during memory
+    /// remapping as otherwise it would violate the invariants of the assembler.
+    /// This behaviour could be improved but currently the underlying memmap crate
+    /// does not return the original mappings if a call to mprotect/VirtualProtect
+    /// fails so there is no reliable way to error out if a call fails while leaving
+    /// the logic of the `Assembler` intact.
+    pub fn new() -> io::Result<Assembler> {
+        const MMAP_INIT_SIZE: usize = 4096;
+        Ok(Assembler {
+            execbuffer: Arc::new(RwLock::new(ExecutableBuffer::new(0, MMAP_INIT_SIZE)?)),
             asmoffset: 0,
             map_len: MMAP_INIT_SIZE,
             ops: Vec::new(),
@@ -65,7 +71,7 @@ impl Assembler {
             global_relocs: Vec::new(),
             dynamic_relocs: Vec::new(),
             local_relocs: HashMap::new()
-        }
+        })
     }
 
     /// Create a new dynamic label that can be referenced and defined.
@@ -87,22 +93,28 @@ impl Assembler {
         let asmoffset = self.asmoffset;
         self.asmoffset = 0;
 
-        let lock = self.execbuffer.clone();
-        let mut lock = lock.write().unwrap();
-        let buf = lock.deref_mut();
-        buf.buffer.set_protection(Protection::ReadWrite).expect("Failed to change memory protection mode");
+        let cloned = self.execbuffer.clone();
+        let mut lock = cloned.write().unwrap();
 
-        {
-            let mut m = AssemblyModifier {
-                assembler: self,
-                buffer: buf
-            };
-            f(&mut m);
-            m.encode_relocs();
-        }
+        // move the buffer out of the assembler for a bit
+        take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, 0).unwrap(), |buf| {
+            let mut buf = buf.make_mut().unwrap();
 
-        buf.buffer.set_protection(Protection::ReadExecute).expect("Failed to change memory protection mode");
+            {
+                let mut m = AssemblyModifier {
+                    assembler: self,
+                    buffer: &mut buf
+                };
+                f(&mut m);
+                m.encode_relocs();
+            }
+
+            // and stuff it back in
+            buf.make_exec().unwrap()
+        });
+
         self.asmoffset = asmoffset;
+
         // no commit is required as we directly modified the buffer.
     }
 
@@ -123,13 +135,13 @@ impl Assembler {
         let buf = &mut self.ops[buf_loc - loc.1 as usize .. buf_loc];
         let target = target as isize - loc.0 as isize;
 
-        unsafe { match loc.1 {
-            1 => buf.copy_from_slice(&mem::transmute::<_, [u8; 1]>( (target as i8 ).to_le() )),
-            2 => buf.copy_from_slice(&mem::transmute::<_, [u8; 2]>( (target as i16).to_le() )),
-            4 => buf.copy_from_slice(&mem::transmute::<_, [u8; 4]>( (target as i32).to_le() )),
-            8 => buf.copy_from_slice(&mem::transmute::<_, [u8; 8]>( (target as i64).to_le() )),
+        match loc.1 {
+            1 => buf[0] = target as i8 as u8,
+            2 => LittleEndian::write_i16(buf, target as i16),
+            4 => LittleEndian::write_i32(buf, target as i32),
+            8 => LittleEndian::write_i64(buf, target as i64),
             _ => panic!("invalid patch size")
-        } }
+        }
     }
 
     fn encode_relocs(&mut self) {
@@ -170,7 +182,7 @@ impl Assembler {
         let buf_end = self.offset().0;
         // is there any work to do?
         if buf_start == buf_end {
-            return
+            return;
         }
         // finalize all relocs in the newest part.
         self.encode_relocs();
@@ -184,35 +196,30 @@ impl Assembler {
         if buf_end > self.map_len {
             // create a new buffer of the necessary size max(current_buf_len * 2, wanted_len)
             let map_len = cmp::max(buf_end, self.map_len * 2);
-            let mut new_buf = Mmap::anonymous(map_len, Protection::ReadWrite).expect("Failed to change memory protection mode");
-            self.map_len = new_buf.len();
+            let mut new_buf = MutableBuffer::new(buf_end, map_len).unwrap();
+            self.map_len = new_buf.buffer.len();
 
-            // copy over from the old buffer and the asm buffer (unsafe is completely safe due to use of anonymous mappings)
-            unsafe {
-                new_buf.as_mut_slice()[same].copy_from_slice(&self.execbuffer.read().unwrap().buffer.as_slice()[same]);
-                new_buf.as_mut_slice()[changed].copy_from_slice(&self.ops);
-            }
-            new_buf.set_protection(Protection::ReadExecute).expect("Failed to change memory protection mode");
+            // copy over from the old buffer and the asm buffer
+            new_buf[same].copy_from_slice(&self.execbuffer.read().unwrap().buffer[same]);
+            new_buf[changed].copy_from_slice(&self.ops);
 
-            // swap the buffers and the initialized length
-            let mut data = ExecutableBuffer {
-                length: buf_end,
-                buffer: new_buf
-            };
-            mem::swap(&mut data, &mut self.execbuffer.write().unwrap());
+            // swap the buffers
+            *self.execbuffer.write().unwrap() = new_buf.make_exec().unwrap();
             // and the old buffer is dropped.
+
         } else {
-            // make the buffer writeable and copy things over.
-            let mut data = self.execbuffer.write().unwrap();
-            data.buffer.set_protection(Protection::ReadWrite).expect("Failed to change memory protection mode");
-            unsafe {
-                data.buffer.as_mut_slice()[changed].copy_from_slice(&self.ops);
-            }
-            data.buffer.set_protection(Protection::ReadExecute).expect("Failed to change memory protection mode");
-            // update the length of the initialized part of the buffer, if this commit adds length
-            if buf_end > data.length {
-                data.length = buf_end;
-            }
+            // temporarily move out the buffer
+            let mut lock = self.execbuffer.write().unwrap();
+            take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, 0).unwrap(), |buf| {
+                let mut buf = buf.make_mut().unwrap();
+
+                // update buffer and length
+                buf.buffer[changed].copy_from_slice(&self.ops);
+                buf.length = cmp::max(buf_end, buf.length);
+
+                // and pack everything back
+                buf.make_exec().unwrap()
+            });
         }
         // empty the assembling buffer and update the assembling offset
         self.ops.clear();
@@ -244,7 +251,7 @@ impl Assembler {
     }
 }
 
-impl<'a> DynasmApi<'a> for Assembler {
+impl DynasmApi for Assembler {
     #[inline]
     fn offset(&self) -> AssemblyOffset {
         AssemblyOffset(self.ops.len() + self.asmoffset)
@@ -256,7 +263,7 @@ impl<'a> DynasmApi<'a> for Assembler {
     }
 }
 
-impl<'a> DynasmLabelApi<'a> for Assembler {
+impl DynasmLabelApi for Assembler {
     #[inline]
     fn align(&mut self, alignment: usize) {
         let offset = self.offset().0 % alignment;
@@ -355,7 +362,7 @@ impl<'a> Extend<&'a u8> for Assembler {
 /// overwritten by assembling into this struct.
 pub struct AssemblyModifier<'a: 'b, 'b> {
     assembler: &'a mut Assembler,
-    buffer: &'b mut ExecutableBuffer
+    buffer: &'b mut MutableBuffer
 }
 
 impl<'a, 'b> AssemblyModifier<'a, 'b> {
@@ -379,22 +386,22 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     #[inline]
     pub fn check_exact(&mut self, offset: AssemblyOffset) {
         if self.assembler.asmoffset != offset.0 {
-            panic!("specified offset to check is smaller than the actual offset");
+            panic!("specified offset to check is not the actual offset");
         }
     }
 
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
-        let buf = &mut self.buffer.as_mut_slice()[loc.0 - loc.1 as usize .. loc.0];
+        let buf = &mut self.buffer[loc.0 - loc.1 as usize .. loc.0];
         let target = target as isize - loc.0 as isize;
 
-        unsafe { match loc.1 {
-            1 => buf.copy_from_slice(&mem::transmute::<_, [u8; 1]>( (target as i8 ).to_le() )),
-            2 => buf.copy_from_slice(&mem::transmute::<_, [u8; 2]>( (target as i16).to_le() )),
-            4 => buf.copy_from_slice(&mem::transmute::<_, [u8; 4]>( (target as i32).to_le() )),
-            8 => buf.copy_from_slice(&mem::transmute::<_, [u8; 8]>( (target as i64).to_le() )),
+        match loc.1 {
+            1 => buf[0] = target as i8 as u8,
+            2 => LittleEndian::write_i16(buf, target as i16),
+            4 => LittleEndian::write_i32(buf, target as i32),
+            8 => LittleEndian::write_i64(buf, target as i64),
             _ => panic!("invalid patch size")
-        } }
+        }
     }
 
     fn encode_relocs(&mut self) {
@@ -424,7 +431,7 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     }
 }
 
-impl<'a, 'b, 'c> DynasmApi<'c> for AssemblyModifier<'a, 'b> {
+impl<'a, 'b> DynasmApi for AssemblyModifier<'a, 'b> {
     #[inline]
     fn offset(&self) -> AssemblyOffset {
         self.assembler.offset()
@@ -432,12 +439,12 @@ impl<'a, 'b, 'c> DynasmApi<'c> for AssemblyModifier<'a, 'b> {
 
     #[inline]
     fn push(&mut self, value: u8) {
-        self.buffer.as_mut_slice()[self.assembler.asmoffset] = value;
+        self.buffer[self.assembler.asmoffset] = value;
         self.assembler.asmoffset += 1;
     }
 }
 
-impl<'a, 'b, 'c> DynasmLabelApi<'c> for AssemblyModifier<'a, 'b> {
+impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     #[inline]
     fn align(&mut self, alignment: usize) {
         self.assembler.align(alignment);
@@ -542,7 +549,7 @@ impl<'a> UncommittedModifier<'a> {
     }
 }
 
-impl<'a, 'b> DynasmApi<'b> for UncommittedModifier<'a> {
+impl<'a> DynasmApi for UncommittedModifier<'a> {
     #[inline]
     fn offset(&self) -> AssemblyOffset {
         AssemblyOffset(self.offset)

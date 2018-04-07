@@ -1,7 +1,7 @@
 
 #[test]
 fn enc_prefetchwt1_prefetchwt13299() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; prefetchwt1 BYTE [rax * 2 + rdx]
      );
@@ -15,7 +15,7 @@ fn enc_prefetchwt1_prefetchwt13299() {
 
 #[test]
 fn enc_prefetchwt1_prefetchwt13300() {
-     let mut ops = dynasmrt::x64::Assembler::new();
+     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
              ; prefetchwt1 BYTE [rax + 16]
      );
