@@ -547,7 +547,7 @@ pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
         return None;
     }
 
-    Some(Ident {node: segment.identifier, span: path.span})
+    Some(Ident {node: segment.ident, span: path.span})
 }
 
 fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
