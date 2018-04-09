@@ -12,8 +12,39 @@ use take_mut;
 use ::{DynasmApi, DynasmLabelApi};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
+// the argument to each relocation is the amount of bytes between the end
+// of the actual relocation and the moment the relocation got emitted
+// This has to be this way due to the insanity that is x64 encoding
+#[derive(Debug, Clone, Copy)]
+pub enum Relocation {
+    Byte(u8),
+    Word(u8),
+    DWord(u8),
+    QWord(u8)
+}
+
+impl Relocation {
+    fn size(&self) -> usize {
+        match *self {
+            Relocation::Byte(_) => 1,
+            Relocation::Word(_)  => 2,
+            Relocation::DWord(_) => 4,
+            Relocation::QWord(_) => 8,
+        }
+    }
+
+    fn offset(&self) -> usize {
+        (match *self {
+            Relocation::Byte(o)  => o,
+            Relocation::Word(o)  => o,
+            Relocation::DWord(o) => o,
+            Relocation::QWord(o) => o
+        }) as usize
+    }
+}
+
 #[derive(Debug)]
-struct PatchLoc(usize, u8);
+struct PatchLoc(usize, Relocation);
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
 /// compilation as well as multithreaded execution with simultaneous compilation.
@@ -22,7 +53,6 @@ struct PatchLoc(usize, u8);
 #[derive(Debug)]
 pub struct Assembler {
     // buffer where the end result is copied into
-    // note: the Option is always present. It is just used to safely move out of the RWLock
     execbuffer: Arc<RwLock<ExecutableBuffer>>,
     // length of the allocated mmap (so we don't have to go through RwLock to get it)
     map_len: usize,
@@ -48,6 +78,10 @@ pub struct Assembler {
     local_relocs: HashMap<&'static str, Vec<PatchLoc>>
 }
 
+/// the default starting size for an allocation by this assembler.
+/// This is the page size on x64 platforms.
+const MMAP_INIT_SIZE: usize = 4096;
+
 impl Assembler {
     /// Create a new `Assembler` instance
     /// This function will return an error if it was not
@@ -59,7 +93,6 @@ impl Assembler {
     /// fails so there is no reliable way to error out if a call fails while leaving
     /// the logic of the `Assembler` intact.
     pub fn new() -> io::Result<Assembler> {
-        const MMAP_INIT_SIZE: usize = 4096;
         Ok(Assembler {
             execbuffer: Arc::new(RwLock::new(ExecutableBuffer::new(0, MMAP_INIT_SIZE)?)),
             asmoffset: 0,
@@ -97,7 +130,7 @@ impl Assembler {
         let mut lock = cloned.write().unwrap();
 
         // move the buffer out of the assembler for a bit
-        take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, 0).unwrap(), |buf| {
+        take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, MMAP_INIT_SIZE).unwrap(), |buf| {
             let mut buf = buf.make_mut().unwrap();
 
             {
@@ -131,16 +164,18 @@ impl Assembler {
 
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
-        let buf_loc = loc.0 - self.asmoffset;
-        let buf = &mut self.ops[buf_loc - loc.1 as usize .. buf_loc];
+        // the value that the relocation will have
         let target = target as isize - loc.0 as isize;
 
+        // slice out the part of the buffer to be overwritten with said value
+        let offset = loc.0 - self.asmoffset - loc.1.offset();
+        let buf = &mut self.ops[offset - loc.1.size() .. offset];
+
         match loc.1 {
-            1 => buf[0] = target as i8 as u8,
-            2 => LittleEndian::write_i16(buf, target as i16),
-            4 => LittleEndian::write_i32(buf, target as i32),
-            8 => LittleEndian::write_i64(buf, target as i64),
-            _ => panic!("invalid patch size")
+            Relocation::Byte(_)  => buf[0] = target as i8 as u8,
+            Relocation::Word(_)  => LittleEndian::write_i16(buf, target as i16),
+            Relocation::DWord(_) => LittleEndian::write_i32(buf, target as i32),
+            Relocation::QWord(_) => LittleEndian::write_i64(buf, target as i64)
         }
     }
 
@@ -151,7 +186,7 @@ impl Assembler {
             if let Some(&target) = self.global_labels.get(&name) {
                 self.patch_loc(loc, target)
             } else {
-                panic!("Unkonwn global label '{}'", name);
+                panic!("Unknown global label '{}'", name);
             }
         }
 
@@ -161,7 +196,7 @@ impl Assembler {
             if let Some(&Some(target)) = self.dynamic_labels.get(id.0) {
                 self.patch_loc(loc, target)
             } else {
-                panic!("Unkonwn dynamic label '{}'", id.0);
+                panic!("Unknown dynamic label '{}'", id.0);
             }
         }
 
@@ -210,7 +245,7 @@ impl Assembler {
         } else {
             // temporarily move out the buffer
             let mut lock = self.execbuffer.write().unwrap();
-            take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, 0).unwrap(), |buf| {
+            take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, MMAP_INIT_SIZE).unwrap(), |buf| {
                 let mut buf = buf.make_mut().unwrap();
 
                 // update buffer and length
@@ -264,6 +299,8 @@ impl DynasmApi for Assembler {
 }
 
 impl DynasmLabelApi for Assembler {
+    type Relocation = Relocation;
+
     #[inline]
     fn align(&mut self, alignment: usize) {
         let offset = self.offset().0 % alignment;
@@ -283,9 +320,9 @@ impl DynasmLabelApi for Assembler {
     }
 
     #[inline]
-    fn global_reloc(&mut self, name: &'static str, size: u8) {
+    fn global_reloc(&mut self, name: &'static str, kind: Relocation) {
         let offset = self.offset().0;
-        self.global_relocs.push((PatchLoc(offset, size), name));
+        self.global_relocs.push((PatchLoc(offset, kind), name));
     }
 
     #[inline]
@@ -299,9 +336,9 @@ impl DynasmLabelApi for Assembler {
     }
 
     #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, size: u8) {
+    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Relocation) {
         let offset = self.offset().0;
-        self.dynamic_relocs.push((PatchLoc(offset, size), id));
+        self.dynamic_relocs.push((PatchLoc(offset, kind), id));
     }
 
     #[inline]
@@ -316,23 +353,23 @@ impl DynasmLabelApi for Assembler {
     }
 
     #[inline]
-    fn forward_reloc(&mut self, name: &'static str, size: u8) {
+    fn forward_reloc(&mut self, name: &'static str, kind: Relocation) {
         let offset = self.offset().0;
         match self.local_relocs.entry(name) {
             Occupied(mut o) => {
-                o.get_mut().push(PatchLoc(offset, size));
+                o.get_mut().push(PatchLoc(offset, kind));
             },
             Vacant(v) => {
-                v.insert(vec![PatchLoc(offset, size)]);
+                v.insert(vec![PatchLoc(offset, kind)]);
             }
         }
     }
 
     #[inline]
-    fn backward_reloc(&mut self, name: &'static str, size: u8) {
+    fn backward_reloc(&mut self, name: &'static str, kind: Relocation) {
         if let Some(&target) = self.local_labels.get(&name) {
             let len = self.offset().0;
-            self.patch_loc(PatchLoc(len, size), target)
+            self.patch_loc(PatchLoc(len, kind), target)
         } else {
             panic!("Unknown local label '{}'", name);
         }
@@ -392,15 +429,18 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
 
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
-        let buf = &mut self.buffer[loc.0 - loc.1 as usize .. loc.0];
+        // the value that the relocation will have
         let target = target as isize - loc.0 as isize;
 
+        // slice out the part of the buffer to be overwritten with said value
+        let offset = loc.0 - loc.1.offset();
+        let buf = &mut self.buffer[offset - loc.1.size() .. offset];
+
         match loc.1 {
-            1 => buf[0] = target as i8 as u8,
-            2 => LittleEndian::write_i16(buf, target as i16),
-            4 => LittleEndian::write_i32(buf, target as i32),
-            8 => LittleEndian::write_i64(buf, target as i64),
-            _ => panic!("invalid patch size")
+            Relocation::Byte(_)  => buf[0] = target as i8 as u8,
+            Relocation::Word(_)  => LittleEndian::write_i16(buf, target as i16),
+            Relocation::DWord(_) => LittleEndian::write_i32(buf, target as i32),
+            Relocation::QWord(_) => LittleEndian::write_i64(buf, target as i64)
         }
     }
 
@@ -445,6 +485,8 @@ impl<'a, 'b> DynasmApi for AssemblyModifier<'a, 'b> {
 }
 
 impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
+    type Relocation = Relocation;
+
     #[inline]
     fn align(&mut self, alignment: usize) {
         self.assembler.align(alignment);
@@ -456,8 +498,8 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn global_reloc(&mut self, name: &'static str, size: u8) {
-        self.assembler.global_reloc(name, size);
+    fn global_reloc(&mut self, name: &'static str, kind: Relocation) {
+        self.assembler.global_reloc(name, kind);
     }
 
     #[inline]
@@ -466,8 +508,8 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, size: u8) {
-        self.assembler.dynamic_reloc(id, size);
+    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Relocation) {
+        self.assembler.dynamic_reloc(id, kind);
     }
 
     #[inline]
@@ -482,15 +524,15 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn forward_reloc(&mut self, name: &'static str, size: u8) {
-        self.assembler.forward_reloc(name, size);
+    fn forward_reloc(&mut self, name: &'static str, kind: Relocation) {
+        self.assembler.forward_reloc(name, kind);
     }
 
     #[inline]
-    fn backward_reloc(&mut self, name: &'static str, size: u8) {
+    fn backward_reloc(&mut self, name: &'static str, kind: Relocation) {
         if let Some(&target) = self.assembler.local_labels.get(&name) {
             let len = self.offset().0;
-            self.patch_loc(PatchLoc(len, size), target)
+            self.patch_loc(PatchLoc(len, kind), target)
         } else {
             panic!("Unknown local label '{}'", name);
         }

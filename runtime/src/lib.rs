@@ -2,6 +2,7 @@ extern crate memmap;
 extern crate byteorder;
 extern crate take_mut;
 
+mod common;
 pub mod x64;
 
 use std::ops::{Deref, DerefMut};
@@ -175,11 +176,14 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     #[inline]
     fn runtime_error(&self, msg: &'static str) -> ! {
         panic!(msg);
+
     }
 }
 
 /// This trait extends DynasmApi to not only allow assembling, but also labels and various directives
 pub trait DynasmLabelApi : DynasmApi {
+    type Relocation;
+
     /// Push nops until the assembling target end is aligned to the given alignment
     fn align(&mut self, alignment: usize);
     /// Record the definition of a local label
@@ -190,11 +194,22 @@ pub trait DynasmLabelApi : DynasmApi {
     fn dynamic_label(&mut self, id: DynamicLabel);
 
     /// Record a relocation spot for a forward reference to a local label
-    fn forward_reloc( &mut self, name: &'static str, size: u8);
+    fn forward_reloc( &mut self, name: &'static str, kind: Self::Relocation);
     /// Record a relocation spot for a backward reference to a local label
-    fn backward_reloc(&mut self, name: &'static str, size: u8);
+    fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation);
     /// Record a relocation spot for a reference to a global label
-    fn global_reloc(  &mut self, name: &'static str, size: u8);
+    fn global_reloc(  &mut self, name: &'static str, kind: Self::Relocation);
     /// Record a relocation spot for a reference to a dynamic label
-    fn dynamic_reloc( &mut self, id: DynamicLabel,   size: u8);
+    fn dynamic_reloc( &mut self, id: DynamicLabel,   kind: Self::Relocation);
+}
+
+/// A basic implementation of DynasmApi onto a simple Vec<u8> to assist debugging
+impl DynasmApi for Vec<u8> {
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.len())
+    }
+
+    fn push(&mut self, byte: u8) {
+        Vec::push(self, byte);
+    }
 }
