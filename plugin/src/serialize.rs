@@ -64,7 +64,6 @@ pub enum Stmt {
 }
 
 pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec<ast::Stmt> {
-    println!("{:#?}", stmts);
     let mut buffer = Vec::new();
 
     // construction for `op.push(expr)` is as follows
