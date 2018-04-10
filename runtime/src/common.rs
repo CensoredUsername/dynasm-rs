@@ -3,17 +3,20 @@
 
 use std::io;
 use std::sync::{Arc, RwLock};
+use std::iter::Extend;
 
 use take_mut;
 
-use ::{ExecutableBuffer, MutableBuffer, DynamicLabel};
+use ::{ExecutableBuffer, MutableBuffer, AssemblyOffset};
+use ::{DynasmApi};
 
 /// This struct implements a protection-swapping assembling buffer
+#[derive(Debug)]
 pub struct BaseAssembler {
     // buffer where the end result is copied into
     execbuffer: Arc<RwLock<ExecutableBuffer>>,
     // instruction buffer while building the assembly
-    ops: Vec<u8>,
+    pub ops: Vec<u8>,
 
     // size of the allocated mmap (so we don't have to go through RwLock to get it)
     execbuffer_size: usize,
@@ -29,6 +32,10 @@ impl BaseAssembler {
             execbuffer_size: initial_mmap_size,
             asmoffset: 0,
         })
+    }
+
+    pub fn asmoffset(&self) -> usize {
+        self.asmoffset
     }
 
     pub fn offset(&self) -> usize {
@@ -105,5 +112,99 @@ impl BaseAssembler {
 
     pub fn reader(&self) -> Arc<RwLock<ExecutableBuffer>> {
         self.execbuffer.clone()
+    }
+
+    pub fn alter_uncommitted(&mut self) -> UncommittedModifier {
+        UncommittedModifier::new(&mut self.ops, AssemblyOffset(self.asmoffset))
+    }
+}
+
+impl Extend<u8> for BaseAssembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        self.ops.extend(iter)
+    }
+}
+
+impl<'a> Extend<&'a u8> for BaseAssembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
+        self.ops.extend(iter.into_iter().cloned())
+    }
+}
+
+
+/// This struct is a wrapper around an `Assembler` normally created using the
+/// `Assembler.alter_uncommitted` method. It allows the user to edit parts
+/// of the assembling buffer that cannot be determined easily or efficiently
+/// in advance. Due to limitations of the label resolution algorithms, this
+/// assembler does not allow labels to be used.
+pub struct UncommittedModifier<'a> {
+    buffer: &'a mut Vec<u8>,
+    base_offset: usize,
+    offset: usize
+}
+
+impl<'a> UncommittedModifier<'a> {
+    /// create a new uncommittedmodifier
+    pub fn new(buffer: &mut Vec<u8>, base_offset: AssemblyOffset) -> UncommittedModifier {
+        UncommittedModifier {
+            buffer: buffer,
+            base_offset: base_offset.0,
+            offset: base_offset.0
+        }
+    }
+
+    /// Sets the current modification offset to the given value
+    #[inline]
+    pub fn goto(&mut self, offset: AssemblyOffset) {
+        self.offset = offset.0;
+    }
+
+    /// Checks that the current modification offset is not larger than the specified offset.
+    /// If this is violated, it panics.
+    #[inline]
+    pub fn check(&mut self, offset: AssemblyOffset) {
+        if self.offset > offset.0 {
+            panic!("specified offset to check is smaller than the actual offset");
+        }
+    }
+
+    /// Checks that the current modification offset is exactly the specified offset.
+    /// If this is violated, it panics.
+    #[inline]
+    pub fn check_exact(&mut self, offset: AssemblyOffset) {
+        if self.offset != offset.0 {
+            panic!("specified offset to check is not the actual offset");
+        }
+    }
+}
+
+impl<'a> DynasmApi for UncommittedModifier<'a> {
+    #[inline]
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.offset)
+    }
+
+    #[inline]
+    fn push(&mut self, value: u8) {
+        self.buffer[self.offset - self.base_offset] = value;
+        self.offset += 1;
+    }
+}
+
+impl<'a> Extend<u8> for UncommittedModifier<'a> {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        for i in iter {
+            self.push(i)
+        }
+    }
+}
+
+impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
+        self.extend(iter.into_iter().cloned())
     }
 }

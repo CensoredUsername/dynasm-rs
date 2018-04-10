@@ -2,14 +2,13 @@ use std::collections::HashMap;
 use std::collections::hash_map::Entry::*;
 use std::iter::Extend;
 use std::mem;
-use std::cmp;
 use std::io;
-use std::sync::{Arc, RwLock};
 
 use byteorder::{ByteOrder, LittleEndian};
 use take_mut;
 
 use ::{DynasmApi, DynasmLabelApi};
+use ::common::{BaseAssembler, UncommittedModifier};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
 // the argument to each relocation is the amount of bytes between the end
@@ -52,15 +51,8 @@ struct PatchLoc(usize, Relocation);
 /// same time.
 #[derive(Debug)]
 pub struct Assembler {
-    // buffer where the end result is copied into
-    execbuffer: Arc<RwLock<ExecutableBuffer>>,
-    // length of the allocated mmap (so we don't have to go through RwLock to get it)
-    map_len: usize,
-
-    // offset of the buffer that's being assembled into to the start of the execbuffer
-    asmoffset: usize,
-    // instruction buffer while building the assembly
-    ops: Vec<u8>,
+    // protection swapping executable buffer
+    base: BaseAssembler,
 
     // label name -> target loc
     global_labels: HashMap<&'static str, usize>,
@@ -94,10 +86,7 @@ impl Assembler {
     /// the logic of the `Assembler` intact.
     pub fn new() -> io::Result<Assembler> {
         Ok(Assembler {
-            execbuffer: Arc::new(RwLock::new(ExecutableBuffer::new(0, MMAP_INIT_SIZE)?)),
-            asmoffset: 0,
-            map_len: MMAP_INIT_SIZE,
-            ops: Vec::new(),
+            base: BaseAssembler::new(MMAP_INIT_SIZE)?,
             global_labels: HashMap::new(),
             dynamic_labels: Vec::new(),
             local_labels: HashMap::new(),
@@ -123,10 +112,8 @@ impl Assembler {
     /// and the `ExecutableBuffer` will be unlocked again.
     pub fn alter<F>(&mut self, f: F) where F: FnOnce(&mut AssemblyModifier) -> () {
         self.commit();
-        let asmoffset = self.asmoffset;
-        self.asmoffset = 0;
 
-        let cloned = self.execbuffer.clone();
+        let cloned = self.base.reader();
         let mut lock = cloned.write().unwrap();
 
         // move the buffer out of the assembler for a bit
@@ -135,6 +122,7 @@ impl Assembler {
 
             {
                 let mut m = AssemblyModifier {
+                    asmoffset: 0,
                     assembler: self,
                     buffer: &mut buf
                 };
@@ -146,8 +134,6 @@ impl Assembler {
             buf.make_exec().unwrap()
         });
 
-        self.asmoffset = asmoffset;
-
         // no commit is required as we directly modified the buffer.
     }
 
@@ -155,11 +141,8 @@ impl Assembler {
     /// committed assembing buffer. Note that it is not possible to use labels in this
     /// context, and overriding labels will cause corruption when the assembler tries to
     /// resolve the labels at commit time.
-    pub fn alter_uncommitted<F>(&mut self, f: F) where F: FnOnce(&mut UncommittedModifier) -> () {
-        f(&mut UncommittedModifier {
-            offset: self.asmoffset,
-            assembler: self
-        });
+    pub fn alter_uncommitted(&mut self) -> UncommittedModifier {
+        self.base.alter_uncommitted()
     }
 
     #[inline]
@@ -168,8 +151,8 @@ impl Assembler {
         let target = target as isize - loc.0 as isize;
 
         // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - self.asmoffset - loc.1.offset();
-        let buf = &mut self.ops[offset - loc.1.size() .. offset];
+        let offset = loc.0 - self.base.asmoffset() - loc.1.offset();
+        let buf = &mut self.base.ops[offset - loc.1.size() .. offset];
 
         match loc.1 {
             Relocation::Byte(_)  => buf[0] = target as i8 as u8,
@@ -210,55 +193,11 @@ impl Assembler {
     /// has to obtain a lock on the datastructure. When this method is called, all
     /// labels will be resolved, and the result can no longer be changed.
     pub fn commit(&mut self) {
-        // This is where the part overridden by the current assembling buffer starts.
-        // This is guaranteed to be in the actual backing buffer.
-        let buf_start = self.asmoffset;
-        // and this is where it ends. This is not guaranteed to be in the actual mmap
-        let buf_end = self.offset().0;
-        // is there any work to do?
-        if buf_start == buf_end {
-            return;
-        }
         // finalize all relocs in the newest part.
         self.encode_relocs();
 
-        let same    =          ..buf_start;
-        let changed = buf_start..buf_end;
-
-        // The reason we don't have to copy the part after buf_end here is because we will only
-        // enter the resize branch if all data past buf_start has been overwritten if we're in an
-        // alter invocation
-        if buf_end > self.map_len {
-            // create a new buffer of the necessary size max(current_buf_len * 2, wanted_len)
-            let map_len = cmp::max(buf_end, self.map_len * 2);
-            let mut new_buf = MutableBuffer::new(buf_end, map_len).unwrap();
-            self.map_len = new_buf.buffer.len();
-
-            // copy over from the old buffer and the asm buffer
-            new_buf[same].copy_from_slice(&self.execbuffer.read().unwrap().buffer[same]);
-            new_buf[changed].copy_from_slice(&self.ops);
-
-            // swap the buffers
-            *self.execbuffer.write().unwrap() = new_buf.make_exec().unwrap();
-            // and the old buffer is dropped.
-
-        } else {
-            // temporarily move out the buffer
-            let mut lock = self.execbuffer.write().unwrap();
-            take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, MMAP_INIT_SIZE).unwrap(), |buf| {
-                let mut buf = buf.make_mut().unwrap();
-
-                // update buffer and length
-                buf.buffer[changed].copy_from_slice(&self.ops);
-                buf.length = cmp::max(buf_end, buf.length);
-
-                // and pack everything back
-                buf.make_exec().unwrap()
-            });
-        }
-        // empty the assembling buffer and update the assembling offset
-        self.ops.clear();
-        self.asmoffset = buf_end;
+        // update the executable buffer
+        self.base.commit();
     }
 
     /// Consumes the assembler to return the internal ExecutableBuffer. This
@@ -266,10 +205,10 @@ impl Assembler {
     /// in which case it will return itself.
     pub fn finalize(mut self) -> Result<ExecutableBuffer, Assembler> {
         self.commit();
-        match Arc::try_unwrap(self.execbuffer) {
-            Ok(execbuffer) => Ok(execbuffer.into_inner().unwrap()),
-            Err(arc) => Err(Assembler {
-                execbuffer: arc,
+        match self.base.finalize() {
+            Ok(execbuffer) => Ok(execbuffer),
+            Err(base) => Err(Assembler {
+                base: base,
                 ..self
             })
         }
@@ -281,7 +220,7 @@ impl Assembler {
     /// calls.
     pub fn reader(&self) -> Executor {
         Executor {
-            execbuffer: self.execbuffer.clone()
+            execbuffer: self.base.reader()
         }
     }
 }
@@ -289,12 +228,12 @@ impl Assembler {
 impl DynasmApi for Assembler {
     #[inline]
     fn offset(&self) -> AssemblyOffset {
-        AssemblyOffset(self.ops.len() + self.asmoffset)
+        AssemblyOffset(self.base.offset())
     }
 
     #[inline]
     fn push(&mut self, value: u8) {
-        self.ops.push(value);
+        self.base.push(value);
     }
 }
 
@@ -303,12 +242,7 @@ impl DynasmLabelApi for Assembler {
 
     #[inline]
     fn align(&mut self, alignment: usize) {
-        let offset = self.offset().0 % alignment;
-        if offset != 0 {
-            for _ in 0..(alignment - offset) {
-                self.push(0x90);
-            }
-        }
+        self.base.align(alignment, 0x90);
     }
 
     #[inline]
@@ -379,14 +313,14 @@ impl DynasmLabelApi for Assembler {
 impl Extend<u8> for Assembler {
     #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
-        self.ops.extend(iter)
+        self.base.extend(iter)
     }
 }
 
 impl<'a> Extend<&'a u8> for Assembler {
     #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
-        self.extend(iter.into_iter().cloned())
+        self.base.extend(iter)
     }
 }
 
@@ -399,21 +333,22 @@ impl<'a> Extend<&'a u8> for Assembler {
 /// overwritten by assembling into this struct.
 pub struct AssemblyModifier<'a: 'b, 'b> {
     assembler: &'a mut Assembler,
-    buffer: &'b mut MutableBuffer
+    buffer: &'b mut MutableBuffer,
+    asmoffset: usize
 }
 
 impl<'a, 'b> AssemblyModifier<'a, 'b> {
     /// Sets the current modification offset to the given value
     #[inline]
     pub fn goto(&mut self, offset: AssemblyOffset) {
-        self.assembler.asmoffset = offset.0;
+        self.asmoffset = offset.0;
     }
 
     /// Checks that the current modification offset is not larger than the specified offset.
     /// If this is violated, it panics.
     #[inline]
     pub fn check(&mut self, offset: AssemblyOffset) {
-        if self.assembler.asmoffset > offset.0 {
+        if self.asmoffset > offset.0 {
             panic!("specified offset to check is smaller than the actual offset");
         }
     }
@@ -422,7 +357,7 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     /// If this is violated, it panics.
     #[inline]
     pub fn check_exact(&mut self, offset: AssemblyOffset) {
-        if self.assembler.asmoffset != offset.0 {
+        if self.asmoffset != offset.0 {
             panic!("specified offset to check is not the actual offset");
         }
     }
@@ -474,13 +409,13 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
 impl<'a, 'b> DynasmApi for AssemblyModifier<'a, 'b> {
     #[inline]
     fn offset(&self) -> AssemblyOffset {
-        self.assembler.offset()
+        AssemblyOffset(self.asmoffset)
     }
 
     #[inline]
     fn push(&mut self, value: u8) {
-        self.buffer[self.assembler.asmoffset] = value;
-        self.assembler.asmoffset += 1;
+        self.buffer[self.asmoffset] = value;
+        self.asmoffset += 1;
     }
 }
 
@@ -551,71 +486,6 @@ impl<'a, 'b> Extend<u8> for AssemblyModifier<'a, 'b> {
 impl<'a, 'b, 'c> Extend<&'c u8> for AssemblyModifier<'a, 'b> {
     #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'c u8> {
-        self.extend(iter.into_iter().cloned())
-    }
-}
-
-/// This struct is a wrapper around an `Assembler` normally created using the
-/// `Assembler.alter_uncommitted` method. It allows the user to edit parts
-/// of the assembling buffer that cannot be determined easily or efficiently
-/// in advance. Due to limitations of the label resolution algorithms, this
-/// assembler does not allow labels to be used.
-pub struct UncommittedModifier<'a> {
-    assembler: &'a mut Assembler,
-    offset: usize
-}
-
-impl<'a> UncommittedModifier<'a> {
-    /// Sets the current modification offset to the given value
-    #[inline]
-    pub fn goto(&mut self, offset: AssemblyOffset) {
-        self.offset = offset.0;
-    }
-
-    /// Checks that the current modification offset is not larger than the specified offset.
-    /// If this is violated, it panics.
-    #[inline]
-    pub fn check(&mut self, offset: AssemblyOffset) {
-        if self.offset > offset.0 {
-            panic!("specified offset to check is smaller than the actual offset");
-        }
-    }
-
-    /// Checks that the current modification offset is exactly the specified offset.
-    /// If this is violated, it panics.
-    #[inline]
-    pub fn check_exact(&mut self, offset: AssemblyOffset) {
-        if self.offset != offset.0 {
-            panic!("specified offset to check is smaller than the actual offset");
-        }
-    }
-}
-
-impl<'a> DynasmApi for UncommittedModifier<'a> {
-    #[inline]
-    fn offset(&self) -> AssemblyOffset {
-        AssemblyOffset(self.offset)
-    }
-
-    #[inline]
-    fn push(&mut self, value: u8) {
-        self.assembler.ops[self.offset - self.assembler.asmoffset] = value;
-        self.offset += 1;
-    }
-}
-
-impl<'a> Extend<u8> for UncommittedModifier<'a> {
-    #[inline]
-    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
-        for i in iter {
-            self.push(i)
-        }
-    }
-}
-
-impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
-    #[inline]
-    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
         self.extend(iter.into_iter().cloned())
     }
 }
