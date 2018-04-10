@@ -4,6 +4,7 @@ extern crate take_mut;
 
 pub mod common;
 pub mod x64;
+pub mod x86;
 
 use std::ops::{Deref, DerefMut};
 use std::iter::Extend;

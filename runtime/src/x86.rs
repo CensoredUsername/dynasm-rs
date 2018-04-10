@@ -16,7 +16,12 @@ enum RelocationType {
     Byte,
     Word,
     DWord,
-    QWord
+    // this one is a bit special. In order to encode lookups into
+    // the instruction stream this one does not do a relative offset
+    // calculation but instead resolves to the absolute memory
+    // address of the target. This also means it needs to be kept
+    // track of for when a buffer swap happens
+    Absolute
 }
 
 impl RelocationType {
@@ -25,7 +30,7 @@ impl RelocationType {
             RelocationType::Byte  => 1,
             RelocationType::Word  => 2,
             RelocationType::DWord => 4,
-            RelocationType::QWord => 8,
+            RelocationType::Absolute => 4,
         }
     }
 
@@ -34,7 +39,7 @@ impl RelocationType {
             1 => RelocationType::Byte,
             2 => RelocationType::Word,
             4 => RelocationType::DWord,
-            8 => RelocationType::QWord,
+            0 => RelocationType::Absolute,
             x => panic!("Unsupported relocation size: {}", x)
         }
     }
@@ -60,11 +65,15 @@ pub struct Assembler {
     // location to be resolved, loc, label id
     dynamic_relocs: Vec<(PatchLoc, DynamicLabel)>,
     // locations to be patched once this label gets seen. name -> Vec<locs>
-    local_relocs: HashMap<&'static str, Vec<PatchLoc>>
+    local_relocs: HashMap<&'static str, Vec<PatchLoc>>,
+
+    // here we keep track of previously made absolute relocations
+    // as they all need to be fixed up when we resize the backing buffers
+    previous_absolute_relocs: Vec<usize>
 }
 
 /// the default starting size for an allocation by this assembler.
-/// This is the page size on x64 platforms.
+/// This is the page size on x86 platforms.
 const MMAP_INIT_SIZE: usize = 4096;
 
 impl Assembler {
@@ -83,7 +92,8 @@ impl Assembler {
             labels: LabelRegistry::new(),
             global_relocs: Vec::new(),
             dynamic_relocs: Vec::new(),
-            local_relocs: HashMap::new()
+            local_relocs: HashMap::new(),
+            previous_absolute_relocs: Vec::new()
         })
     }
 
@@ -137,17 +147,24 @@ impl Assembler {
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
         // the value that the relocation will have
-        let target = target.0 as isize - loc.0 as isize;
+        let t = target.0 as isize - loc.0 as isize;
+        let execbuffer_addr = self.base.execbuffer_addr();
 
         // slice out the part of the buffer to be overwritten with said value
         let offset = loc.0 - self.base.asmoffset() - loc.1 as usize;
         let buf = &mut self.base.ops[offset - loc.2.size() .. offset];
 
         match loc.2 {
-            RelocationType::Byte  => buf[0] = target as i8 as u8,
-            RelocationType::Word  => LittleEndian::write_i16(buf, target as i16),
-            RelocationType::DWord => LittleEndian::write_i32(buf, target as i32),
-            RelocationType::QWord => LittleEndian::write_i64(buf, target as i64)
+            RelocationType::Byte  => buf[0] = t as i8 as u8,
+            RelocationType::Word  => LittleEndian::write_i16(buf, t as i16),
+            RelocationType::DWord => LittleEndian::write_i32(buf, t as i32),
+            RelocationType::Absolute => {
+                // register it so it will be relocated when the buffer is moved
+                self.previous_absolute_relocs.push(offset);
+                // calculate the absolute address to refer to and write it into the buffer
+                let t = execbuffer_addr + target.0;
+                LittleEndian::write_u32(buf, t as u32);
+            }
         }
     }
 
@@ -179,8 +196,24 @@ impl Assembler {
         // finalize all relocs in the newest part.
         self.encode_relocs();
 
+        let absolute_relocs = &self.previous_absolute_relocs;
+
         // update the executable buffer
-        self.base.commit(|_,_,_|());
+        self.base.commit(|buffer, old_addr, new_addr| {
+            // deal with absolute relocations
+            let change: u32 = new_addr.wrapping_sub(old_addr) as u32;
+
+            for &relocation in absolute_relocs {
+                // slice the part that needs to be relocated
+                let mut slice = &mut buffer[relocation - 4 .. relocation];
+
+                // add the change to the current 
+                let mut val = LittleEndian::read_u32(slice);
+                val = val.wrapping_add(change);
+                LittleEndian::write_u32(slice, val);
+            }
+
+        });
     }
 
     /// Consumes the assembler to return the internal ExecutableBuffer. This
@@ -349,17 +382,23 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
         // the value that the relocation will have
-        let target = target.0 as isize - loc.0 as isize;
+        let t = target.0 as isize - loc.0 as isize;
 
         // slice out the part of the buffer to be overwritten with said value
         let offset = loc.0 - loc.1 as usize;
         let buf = &mut self.buffer[offset - loc.2.size() .. offset];
 
         match loc.2 {
-            RelocationType::Byte  => buf[0] = target as i8 as u8,
-            RelocationType::Word  => LittleEndian::write_i16(buf, target as i16),
-            RelocationType::DWord => LittleEndian::write_i32(buf, target as i32),
-            RelocationType::QWord => LittleEndian::write_i64(buf, target as i64)
+            RelocationType::Byte  => buf[0] = t as i8 as u8,
+            RelocationType::Word  => LittleEndian::write_i16(buf, t as i16),
+            RelocationType::DWord => LittleEndian::write_i32(buf, t as i32),
+            RelocationType::Absolute => {
+                // register it so it will be relocated when the buffer is moved
+                self.assembler.previous_absolute_relocs.push(offset);
+                // calculate the absolute address to refer to and write it into the buffer
+                let t = self.assembler.base.execbuffer_addr() + target.0;
+                LittleEndian::write_u32(buf, t as u32);
+            }
         }
     }
 

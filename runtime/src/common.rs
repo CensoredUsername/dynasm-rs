@@ -23,20 +23,31 @@ pub(crate) struct BaseAssembler {
     execbuffer_size: usize,
     // length of the allocated mmap that has been written into
     asmoffset: usize,
+
+    // the address that the current execbuffer starts at
+    execbuffer_addr: usize
 }
 
 impl BaseAssembler {
     pub fn new(initial_mmap_size: usize) -> io::Result<BaseAssembler> {
+        let execbuffer = ExecutableBuffer::new(0, initial_mmap_size)?;
+        let execbuffer_addr = execbuffer.as_ptr() as usize;
+
         Ok(BaseAssembler {
-            execbuffer: Arc::new(RwLock::new(ExecutableBuffer::new(0, initial_mmap_size)?)),
+            execbuffer: Arc::new(RwLock::new(execbuffer)),
             ops: Vec::new(),
             execbuffer_size: initial_mmap_size,
             asmoffset: 0,
+            execbuffer_addr: execbuffer_addr
         })
     }
 
     pub fn asmoffset(&self) -> usize {
         self.asmoffset
+    }
+
+    pub fn execbuffer_addr(&self) -> usize {
+        self.execbuffer_addr
     }
 
     pub fn offset(&self) -> usize {
@@ -56,7 +67,7 @@ impl BaseAssembler {
         }
     }
 
-    pub fn commit(&mut self) {
+    pub fn commit<F>(&mut self, f: F) where F: FnOnce(&mut [u8], usize, usize) {
         let old_asmoffset = self.asmoffset;
         let new_asmoffset = self.offset();
 
@@ -76,8 +87,13 @@ impl BaseAssembler {
             // copy over the data
             new_buffer[.. old_asmoffset].copy_from_slice(&self.execbuffer.read().unwrap());
             new_buffer[old_asmoffset..].copy_from_slice(&self.ops);
+            let new_buffer_addr = new_buffer.as_ptr() as usize;
+
+            // allow modifications to be made
+            f(&mut new_buffer, self.execbuffer_addr, new_buffer_addr);
 
             // swap the buffers
+            self.execbuffer_addr = new_buffer_addr;
             *self.execbuffer.write().unwrap() = new_buffer.make_exec().expect("Could not swap buffer protection modes")
 
         } else {
