@@ -7,7 +7,7 @@ use std::io;
 use byteorder::{ByteOrder, LittleEndian};
 use take_mut;
 
-use ::{DynasmApi, DynasmLabelApi};
+use ::{DynasmApi, DynasmLabelApi, DynasmError};
 use ::common::{BaseAssembler, LabelRegistry, UncommittedModifier};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
@@ -330,20 +330,22 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     }
 
     /// Checks that the current modification offset is not larger than the specified offset.
-    /// If this is violated, it panics.
     #[inline]
-    pub fn check(&mut self, offset: AssemblyOffset) {
+    pub fn check(&mut self, offset: AssemblyOffset) -> Result<(), DynasmError> {
         if self.asmoffset > offset.0 {
-            panic!("specified offset to check is smaller than the actual offset");
+            Err(DynasmError::CheckFailed)
+        } else {
+            Ok(())
         }
     }
 
     /// Checks that the current modification offset is exactly the specified offset.
-    /// If this is violated, it panics.
     #[inline]
-    pub fn check_exact(&mut self, offset: AssemblyOffset) {
+    pub fn check_exact(&mut self, offset: AssemblyOffset) -> Result<(), DynasmError> {
         if self.asmoffset != offset.0 {
-            panic!("specified offset to check is not the actual offset");
+            Err(DynasmError::CheckFailed)
+        } else {
+            Ok(())
         }
     }
 

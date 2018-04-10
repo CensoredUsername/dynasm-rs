@@ -9,6 +9,8 @@ use std::ops::{Deref, DerefMut};
 use std::iter::Extend;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
 use std::io;
+use std::error;
+use std::fmt;
 
 use memmap::{Mmap, MmapMut};
 use byteorder::{ByteOrder, LittleEndian};
@@ -211,5 +213,26 @@ impl DynasmApi for Vec<u8> {
 
     fn push(&mut self, byte: u8) {
         Vec::push(self, byte);
+    }
+}
+
+/// An error type that is returned from various check and check_exact methods
+
+#[derive(Debug, Clone)]
+pub enum DynasmError {
+    CheckFailed
+}
+
+impl fmt::Display for DynasmError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "An assembly modification check failed")
+    }
+}
+
+impl error::Error for DynasmError {
+    fn description(&self) -> &str {
+        match *self {
+            DynasmError::CheckFailed => "An assembly modification offset check failed"
+        }
     }
 }
