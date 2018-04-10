@@ -4,15 +4,16 @@
 use std::io;
 use std::sync::{Arc, RwLock};
 use std::iter::Extend;
+use std::collections::HashMap;
 
 use take_mut;
 
-use ::{ExecutableBuffer, MutableBuffer, AssemblyOffset};
+use ::{ExecutableBuffer, MutableBuffer, AssemblyOffset, DynamicLabel};
 use ::{DynasmApi};
 
 /// This struct implements a protection-swapping assembling buffer
 #[derive(Debug)]
-pub struct BaseAssembler {
+pub(crate) struct BaseAssembler {
     // buffer where the end result is copied into
     execbuffer: Arc<RwLock<ExecutableBuffer>>,
     // instruction buffer while building the assembly
@@ -206,5 +207,76 @@ impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
     #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
         self.extend(iter.into_iter().cloned())
+    }
+}
+
+
+/// This struct contains implementations for common parts of label handling between
+/// Assemblers
+#[derive(Debug, Clone)]
+pub(crate) struct LabelRegistry {
+    // mapping of global labels to offsets
+    global_labels: HashMap<&'static str, AssemblyOffset>,
+    // mapping of local labels to offsets
+    local_labels: HashMap<&'static str, AssemblyOffset>,
+    // mapping of dynamic label ids to offsets
+    dynamic_labels: Vec<Option<AssemblyOffset>>,
+}
+
+impl LabelRegistry {
+    pub fn new() -> LabelRegistry {
+        LabelRegistry {
+            global_labels: HashMap::new(),
+            local_labels: HashMap::new(),
+            dynamic_labels: Vec::new(),
+        }
+    }
+
+    pub fn new_dynamic_label(&mut self) -> DynamicLabel {
+        let id = self.dynamic_labels.len();
+        self.dynamic_labels.push(None);
+        DynamicLabel(id)
+    }
+
+    pub fn dynamic_label(&mut self, id: DynamicLabel, offset: AssemblyOffset)  {
+        let entry = &mut self.dynamic_labels[id.0];
+        if entry.is_some() {
+            panic!("Duplicate dynamic label '{}'", id.0);
+        }
+        *entry = Some(offset);
+    }
+
+    pub fn global_label(&mut self, name: &'static str, offset: AssemblyOffset) {
+        if let Some(_) = self.global_labels.insert(name, offset) {
+            panic!("Duplicate global label '{}'", name);
+        }
+    }
+
+    pub fn local_label(&mut self, name: &'static str, offset: AssemblyOffset) {
+        self.local_labels.insert(name, offset);
+    }
+
+    pub fn resolve_dynamic_label(&self, id: DynamicLabel) -> AssemblyOffset {
+        if let Some(&Some(target)) = self.dynamic_labels.get(id.0) {
+            target
+        } else {
+            panic!("Unknown dynamic label '{}'", id.0);
+        }
+    }
+
+    pub fn resolve_global_label(&self, name: &'static str) -> AssemblyOffset {
+        if let Some(&target) = self.global_labels.get(&name) {
+            target
+        } else {
+            panic!("Unknown global label '{}'", name);
+        }
+    }
+
+    pub fn resolve_local_label(&self, name: &'static str) -> AssemblyOffset {
+        if let Some(&target) = self.local_labels.get(&name) {
+            target
+        } else {
+            panic!("Unknown local label '{}'", name);
+        }
     }
 }

@@ -8,7 +8,7 @@ use byteorder::{ByteOrder, LittleEndian};
 use take_mut;
 
 use ::{DynasmApi, DynasmLabelApi};
-use ::common::{BaseAssembler, UncommittedModifier};
+use ::common::{BaseAssembler, LabelRegistry, UncommittedModifier};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
 // the argument to each relocation is the amount of bytes between the end
@@ -55,18 +55,13 @@ pub struct Assembler {
     // protection swapping executable buffer
     base: BaseAssembler,
 
-    // label name -> target loc
-    global_labels: HashMap<&'static str, usize>,
+    // label data storage
+    labels: LabelRegistry,
+
     // end of patch location -> name
     global_relocs: Vec<(PatchLoc, &'static str)>,
-
-    // label id -> target loc
-    dynamic_labels: Vec<Option<usize>>,
     // location to be resolved, loc, label id
     dynamic_relocs: Vec<(PatchLoc, DynamicLabel)>,
-
-    // labelname -> most recent patch location
-    local_labels: HashMap<&'static str, usize>,
     // locations to be patched once this label gets seen. name -> Vec<locs>
     local_relocs: HashMap<&'static str, Vec<PatchLoc>>
 }
@@ -88,9 +83,7 @@ impl Assembler {
     pub fn new() -> io::Result<Assembler> {
         Ok(Assembler {
             base: BaseAssembler::new(MMAP_INIT_SIZE)?,
-            global_labels: HashMap::new(),
-            dynamic_labels: Vec::new(),
-            local_labels: HashMap::new(),
+            labels: LabelRegistry::new(),
             global_relocs: Vec::new(),
             dynamic_relocs: Vec::new(),
             local_relocs: HashMap::new()
@@ -99,9 +92,7 @@ impl Assembler {
 
     /// Create a new dynamic label that can be referenced and defined.
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
-        let id = self.dynamic_labels.len();
-        self.dynamic_labels.push(None);
-        DynamicLabel(id)
+        self.labels.new_dynamic_label()
     }
 
     /// To allow already committed code to be altered, this method allows modification
@@ -147,9 +138,9 @@ impl Assembler {
     }
 
     #[inline]
-    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+    fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
         // the value that the relocation will have
-        let target = target as isize - loc.0 as isize;
+        let target = target.0 as isize - loc.0 as isize;
 
         // slice out the part of the buffer to be overwritten with said value
         let offset = loc.0 - self.base.asmoffset() - loc.1 as usize;
@@ -167,21 +158,15 @@ impl Assembler {
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.global_relocs);
         for (loc, name) in relocs {
-            if let Some(&target) = self.global_labels.get(&name) {
-                self.patch_loc(loc, target)
-            } else {
-                panic!("Unknown global label '{}'", name);
-            }
+            let target = self.labels.resolve_global_label(name);
+            self.patch_loc(loc, target);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.dynamic_relocs);
         for (loc, id) in relocs {
-            if let Some(&Some(target)) = self.dynamic_labels.get(id.0) {
-                self.patch_loc(loc, target)
-            } else {
-                panic!("Unknown dynamic label '{}'", id.0);
-            }
+            let target = self.labels.resolve_dynamic_label(id);
+            self.patch_loc(loc, target);
         }
 
         if let Some(name) = self.local_relocs.keys().next() {
@@ -252,10 +237,8 @@ impl DynasmLabelApi for Assembler {
 
     #[inline]
     fn global_label(&mut self, name: &'static str) {
-        let offset = self.offset().0;
-        if let Some(name) = self.global_labels.insert(name, offset) {
-            panic!("Duplicate global label '{}'", name);
-        }
+        let offset = self.offset();
+        self.labels.global_label(name, offset);
     }
 
     #[inline]
@@ -266,12 +249,8 @@ impl DynasmLabelApi for Assembler {
 
     #[inline]
     fn dynamic_label(&mut self, id: DynamicLabel) {
-        let offset = self.offset().0;
-        let entry = &mut self.dynamic_labels[id.0];
-        if entry.is_some() {
-            panic!("Duplicate label '{}'", id.0);
-        }
-        *entry = Some(offset);
+        let offset = self.offset();
+        self.labels.dynamic_label(id, offset)
     }
 
     #[inline]
@@ -282,13 +261,13 @@ impl DynasmLabelApi for Assembler {
 
     #[inline]
     fn local_label(&mut self, name: &'static str) {
-        let offset = self.offset().0;
+        let offset = self.offset();
         if let Some(relocs) = self.local_relocs.remove(&name) {
             for loc in relocs {
                 self.patch_loc(loc, offset);
             }
         }
-        self.local_labels.insert(name, offset);
+        self.labels.local_label(name, offset);
     }
 
     #[inline]
@@ -306,12 +285,13 @@ impl DynasmLabelApi for Assembler {
 
     #[inline]
     fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
-        if let Some(&target) = self.local_labels.get(&name) {
-            let offset = self.offset().0;
-            self.patch_loc(PatchLoc(offset, kind.0, RelocationType::from_size(kind.1)), target)
-        } else {
-            panic!("Unknown local label '{}'", name);
-        }
+        let target = self.labels.resolve_local_label(name);
+        let offset = self.offset().0;
+        self.patch_loc(PatchLoc(
+            offset,
+            kind.0,
+            RelocationType::from_size(kind.1)
+        ), target)
     }
 }
 
@@ -368,9 +348,9 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+    fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
         // the value that the relocation will have
-        let target = target as isize - loc.0 as isize;
+        let target = target.0 as isize - loc.0 as isize;
 
         // slice out the part of the buffer to be overwritten with said value
         let offset = loc.0 - loc.1 as usize;
@@ -388,21 +368,15 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.global_relocs);
         for (loc, name) in relocs {
-            if let Some(&target) = self.assembler.global_labels.get(&name) {
-                self.patch_loc(loc, target)
-            } else {
-                panic!("Unkonwn global label '{}'", name);
-            }
+            let target = self.assembler.labels.resolve_global_label(name);
+            self.patch_loc(loc, target);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.dynamic_relocs);
         for (loc, id) in relocs {
-            if let Some(&Some(target)) = self.assembler.dynamic_labels.get(id.0) {
-                self.patch_loc(loc, target)
-            } else {
-                panic!("Unkonwn dynamic label '{}'", id.0);
-            }
+            let target = self.assembler.labels.resolve_dynamic_label(id);
+            self.patch_loc(loc, target);
         }
 
         if let Some(name) = self.assembler.local_relocs.keys().next() {
@@ -454,13 +428,13 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
 
     #[inline]
     fn local_label(&mut self, name: &'static str) {
-        let offset = self.offset().0;
+        let offset = self.offset();
         if let Some(relocs) = self.assembler.local_relocs.remove(&name) {
             for loc in relocs {
                 self.patch_loc(loc, offset);
             }
         }
-        self.assembler.local_labels.insert(name, offset);
+        self.assembler.labels.local_label(name, offset);
     }
 
     #[inline]
@@ -470,12 +444,13 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
 
     #[inline]
     fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
-        if let Some(&target) = self.assembler.local_labels.get(&name) {
-            let len = self.offset().0;
-            self.patch_loc(PatchLoc(len, kind.0, RelocationType::from_size(kind.1)), target)
-        } else {
-            panic!("Unknown local label '{}'", name);
-        }
+        let target = self.assembler.labels.resolve_local_label(name);
+        let offset = self.offset();
+        self.patch_loc(PatchLoc(
+            offset.0,
+            kind.0,
+            RelocationType::from_size(kind.1)
+        ), target)
     }
 }
 

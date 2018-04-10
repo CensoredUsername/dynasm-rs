@@ -2,7 +2,7 @@ extern crate memmap;
 extern crate byteorder;
 extern crate take_mut;
 
-mod common;
+pub mod common;
 pub mod x64;
 
 use std::ops::{Deref, DerefMut};
