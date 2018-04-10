@@ -55,15 +55,16 @@ pub enum Stmt {
     LocalLabel(Ident),
     DynamicLabel(P<ast::Expr>),
 
-    GlobalJumpTarget(Ident, Size),
-    ForwardJumpTarget(Ident, Size),
-    BackwardJumpTarget(Ident, Size),
-    DynamicJumpTarget(P<ast::Expr>, Size),
+    GlobalJumpTarget(Ident, Size, u8),
+    ForwardJumpTarget(Ident, Size, u8),
+    BackwardJumpTarget(Ident, Size, u8),
+    DynamicJumpTarget(P<ast::Expr>, Size, u8),
 
     Stmt(ast::Stmt),
 }
 
 pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec<ast::Stmt> {
+    println!("{:#?}", stmts);
     let mut buffer = Vec::new();
 
     // construction for `op.push(expr)` is as follows
@@ -122,21 +123,42 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
             )]),
             DynamicLabel(expr)     => ("dynamic_label", vec![expr]),
 
-            GlobalJumpTarget(ident, size) => ("global_reloc", vec![ecx.expr_lit(
+            GlobalJumpTarget(ident, size, offset) => ("global_reloc", vec![ecx.expr_lit(
+                    ident.span,
+                    ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
+                ),
+                ecx.expr_tuple(
+                    ident.span,
+                    vec![ecx.expr_u8(ident.span, offset), ecx.expr_u8(ident.span, size.in_bytes())]
+                )
+            ]),
+            ForwardJumpTarget(ident, size, offset) => ("forward_reloc", vec![ecx.expr_lit(
                 ident.span,
                 ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-            ), ecx.expr_u8(ident.span, size.in_bytes())]),
-            ForwardJumpTarget(ident, size) => ("forward_reloc", vec![ecx.expr_lit(
+                ),
+                ecx.expr_tuple(
+                    ident.span,
+                    vec![ecx.expr_u8(ident.span, offset), ecx.expr_u8(ident.span, size.in_bytes())]
+                )
+            ]),
+            BackwardJumpTarget(ident, size, offset) => ("backward_reloc", vec![ecx.expr_lit(
                 ident.span,
-                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-            ), ecx.expr_u8(ident.span, size.in_bytes())]),
-            BackwardJumpTarget(ident, size) => ("backward_reloc", vec![ecx.expr_lit(
-                ident.span,
-                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-            ), ecx.expr_u8(ident.span, size.in_bytes())]),
-            DynamicJumpTarget(expr, size) => {
+                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked),
+                ),
+                ecx.expr_tuple(
+                    ident.span,
+                    vec![ecx.expr_u8(ident.span, offset), ecx.expr_u8(ident.span, size.in_bytes())]
+                )
+            ]),
+            DynamicJumpTarget(expr, size, offset) => {
                 let span = expr.span;
-                ("dynamic_reloc", vec![expr, ecx.expr_u8(span, size.in_bytes())])
+                ("dynamic_reloc", vec![
+                    expr, 
+                    ecx.expr_tuple(
+                        span,
+                        vec![ecx.expr_u8(span, offset), ecx.expr_u8(span, size.in_bytes())]
+                    )
+                ])
             },
             Stmt(stmt) => {
                 buffer.push(stmt);

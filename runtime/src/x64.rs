@@ -15,35 +15,36 @@ use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 // of the actual relocation and the moment the relocation got emitted
 // This has to be this way due to the insanity that is x64 encoding
 #[derive(Debug, Clone, Copy)]
-pub enum Relocation {
-    Byte(u8),
-    Word(u8),
-    DWord(u8),
-    QWord(u8)
+pub enum RelocationType {
+    Byte,
+    Word,
+    DWord,
+    QWord
 }
 
-impl Relocation {
+impl RelocationType {
     fn size(&self) -> usize {
         match *self {
-            Relocation::Byte(_) => 1,
-            Relocation::Word(_)  => 2,
-            Relocation::DWord(_) => 4,
-            Relocation::QWord(_) => 8,
+            RelocationType::Byte  => 1,
+            RelocationType::Word  => 2,
+            RelocationType::DWord => 4,
+            RelocationType::QWord => 8,
         }
     }
 
-    fn offset(&self) -> usize {
-        (match *self {
-            Relocation::Byte(o)  => o,
-            Relocation::Word(o)  => o,
-            Relocation::DWord(o) => o,
-            Relocation::QWord(o) => o
-        }) as usize
+    fn from_size(size: u8) -> Self {
+        match size {
+            1 => RelocationType::Byte,
+            2 => RelocationType::Word,
+            4 => RelocationType::DWord,
+            8 => RelocationType::QWord,
+            x => panic!("Unsupported relocation size: {}", x)
+        }
     }
 }
 
 #[derive(Debug)]
-struct PatchLoc(usize, Relocation);
+struct PatchLoc(usize, u8, RelocationType);
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
 /// compilation as well as multithreaded execution with simultaneous compilation.
@@ -151,14 +152,14 @@ impl Assembler {
         let target = target as isize - loc.0 as isize;
 
         // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - self.base.asmoffset() - loc.1.offset();
-        let buf = &mut self.base.ops[offset - loc.1.size() .. offset];
+        let offset = loc.0 - self.base.asmoffset() - loc.1 as usize;
+        let buf = &mut self.base.ops[offset - loc.2.size() .. offset];
 
-        match loc.1 {
-            Relocation::Byte(_)  => buf[0] = target as i8 as u8,
-            Relocation::Word(_)  => LittleEndian::write_i16(buf, target as i16),
-            Relocation::DWord(_) => LittleEndian::write_i32(buf, target as i32),
-            Relocation::QWord(_) => LittleEndian::write_i64(buf, target as i64)
+        match loc.2 {
+            RelocationType::Byte  => buf[0] = target as i8 as u8,
+            RelocationType::Word  => LittleEndian::write_i16(buf, target as i16),
+            RelocationType::DWord => LittleEndian::write_i32(buf, target as i32),
+            RelocationType::QWord => LittleEndian::write_i64(buf, target as i64)
         }
     }
 
@@ -238,7 +239,11 @@ impl DynasmApi for Assembler {
 }
 
 impl DynasmLabelApi for Assembler {
-    type Relocation = Relocation;
+    // would really like to have a stronger typed one here, but
+    // currently it is impossible to construct an associated type just
+    // from the instance name and we can't find out what assembler
+    // is used in generated code.
+    type Relocation = (u8, u8);
 
     #[inline]
     fn align(&mut self, alignment: usize) {
@@ -254,9 +259,9 @@ impl DynasmLabelApi for Assembler {
     }
 
     #[inline]
-    fn global_reloc(&mut self, name: &'static str, kind: Relocation) {
+    fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         let offset = self.offset().0;
-        self.global_relocs.push((PatchLoc(offset, kind), name));
+        self.global_relocs.push((PatchLoc(offset, kind.0, RelocationType::from_size(kind.1)), name));
     }
 
     #[inline]
@@ -270,9 +275,9 @@ impl DynasmLabelApi for Assembler {
     }
 
     #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Relocation) {
+    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
         let offset = self.offset().0;
-        self.dynamic_relocs.push((PatchLoc(offset, kind), id));
+        self.dynamic_relocs.push((PatchLoc(offset, kind.0, RelocationType::from_size(kind.1)), id));
     }
 
     #[inline]
@@ -287,23 +292,23 @@ impl DynasmLabelApi for Assembler {
     }
 
     #[inline]
-    fn forward_reloc(&mut self, name: &'static str, kind: Relocation) {
+    fn forward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         let offset = self.offset().0;
         match self.local_relocs.entry(name) {
             Occupied(mut o) => {
-                o.get_mut().push(PatchLoc(offset, kind));
+                o.get_mut().push(PatchLoc(offset, kind.0, RelocationType::from_size(kind.1)));
             },
             Vacant(v) => {
-                v.insert(vec![PatchLoc(offset, kind)]);
+                v.insert(vec![PatchLoc(offset, kind.0, RelocationType::from_size(kind.1))]);
             }
         }
     }
 
     #[inline]
-    fn backward_reloc(&mut self, name: &'static str, kind: Relocation) {
+    fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         if let Some(&target) = self.local_labels.get(&name) {
-            let len = self.offset().0;
-            self.patch_loc(PatchLoc(len, kind), target)
+            let offset = self.offset().0;
+            self.patch_loc(PatchLoc(offset, kind.0, RelocationType::from_size(kind.1)), target)
         } else {
             panic!("Unknown local label '{}'", name);
         }
@@ -368,14 +373,14 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         let target = target as isize - loc.0 as isize;
 
         // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - loc.1.offset();
-        let buf = &mut self.buffer[offset - loc.1.size() .. offset];
+        let offset = loc.0 - loc.1 as usize;
+        let buf = &mut self.buffer[offset - loc.2.size() .. offset];
 
-        match loc.1 {
-            Relocation::Byte(_)  => buf[0] = target as i8 as u8,
-            Relocation::Word(_)  => LittleEndian::write_i16(buf, target as i16),
-            Relocation::DWord(_) => LittleEndian::write_i32(buf, target as i32),
-            Relocation::QWord(_) => LittleEndian::write_i64(buf, target as i64)
+        match loc.2 {
+            RelocationType::Byte  => buf[0] = target as i8 as u8,
+            RelocationType::Word  => LittleEndian::write_i16(buf, target as i16),
+            RelocationType::DWord => LittleEndian::write_i32(buf, target as i32),
+            RelocationType::QWord => LittleEndian::write_i64(buf, target as i64)
         }
     }
 
@@ -420,7 +425,7 @@ impl<'a, 'b> DynasmApi for AssemblyModifier<'a, 'b> {
 }
 
 impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
-    type Relocation = Relocation;
+    type Relocation = (u8, u8);
 
     #[inline]
     fn align(&mut self, alignment: usize) {
@@ -433,7 +438,7 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn global_reloc(&mut self, name: &'static str, kind: Relocation) {
+    fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         self.assembler.global_reloc(name, kind);
     }
 
@@ -443,7 +448,7 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Relocation) {
+    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
         self.assembler.dynamic_reloc(id, kind);
     }
 
@@ -459,15 +464,15 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn forward_reloc(&mut self, name: &'static str, kind: Relocation) {
+    fn forward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         self.assembler.forward_reloc(name, kind);
     }
 
     #[inline]
-    fn backward_reloc(&mut self, name: &'static str, kind: Relocation) {
+    fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         if let Some(&target) = self.assembler.local_labels.get(&name) {
             let len = self.offset().0;
-            self.patch_loc(PatchLoc(len, kind), target)
+            self.patch_loc(PatchLoc(len, kind.0, RelocationType::from_size(kind.1)), target)
         } else {
             panic!("Unknown local label '{}'", name);
         }

@@ -140,6 +140,9 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // split args
     let (mut rm, reg, vvvv, ireg, mut args) = extract_args(data, args);
 
+    // we'll need this to keep track of where relocations need to be made
+    let mut relocations = Vec::new();
+
     let mut ops = data.ops;
 
     // deal with ops that encode the final byte in an immediate
@@ -324,23 +327,19 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         };
         compile_modrm_sib(ecx, buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
 
-        // note: validate_args ensures that no immediates are encoded afterwards.
-        // they potentially could be, but currently the runtime doens't support it
         for _ in 0..Size::DWORD.in_bytes() {
             buffer.push(Stmt::Const(0));
         }
 
-        buffer.push(match target {
-            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(ident, Size::DWORD),
-            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget(ident, Size::DWORD),
-            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, Size::DWORD),
-            JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, Size::DWORD)
-        });
+        relocations.push((target, Size::DWORD, 0));
     }
 
     // opcode encoded after the displacement
     if let Some(code) = immediate_opcode {
         buffer.push(Stmt::Const(code));
+
+        // bump relocations
+        relocations.iter_mut().for_each(|r| r.2 += 1);
     }
 
     // register in immediate argument
@@ -362,30 +361,46 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
             }
         }
         buffer.push(Stmt::ExprConst(byte));
+
+        // bump relocations
+        relocations.iter_mut().for_each(|r| r.2 += 1);
     }
 
     // immediates
     for arg in args {
-        let stmt = match arg {
-            Arg::Immediate(expr, Some(size)) => Stmt::Var(expr, size),
-            Arg::Immediate(_, None) => panic!("Immediate with undetermined size, did get_operand_size not run?"),
+        match arg {
+            Arg::Immediate(expr, Some(size)) => {
+                buffer.push(Stmt::Var(expr, size));
+
+                // bump relocations
+                relocations.iter_mut().for_each(|r| r.2 += size.in_bytes());
+            },
             Arg::JumpTarget(target, Some(size)) => {
                 // placeholder
                 for _ in 0..size.in_bytes() {
                     buffer.push(Stmt::Const(0));
                 }
 
-                match target {
-                    JumpType::Global(ident)   => Stmt::GlobalJumpTarget(ident, size),
-                    JumpType::Forward(ident)  => Stmt::ForwardJumpTarget(ident, size),
-                    JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, size),
-                    JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, size)
-                }
+                // bump relocations
+                relocations.iter_mut().for_each(|r| r.2 += size.in_bytes());
+
+                // add the new relocation
+                relocations.push((target, size, 0));
             },
+            Arg::Immediate(_, None) => panic!("Immediate with undetermined size, did get_operand_size not run?"),
             Arg::JumpTarget(_, None) => panic!("Jumptarget with undetermined size, did get_operand_size not run?"),
             _ => panic!("bad immediate data")
         };
-        buffer.push(stmt);
+    }
+
+    // push relocations
+    for (target, size, offset) in relocations.drain(..) {
+        buffer.push(match target {
+            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(ident, size, offset),
+            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget(ident, size, offset),
+            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, size, offset),
+            JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, size, offset)
+        })
     }
 
     Ok(())
@@ -1097,16 +1112,14 @@ fn get_operand_size(fmt: &'static Opdata, args: &mut [Arg]) -> Result<Size, Opti
 }
 
 fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool, Option<String>> {
-    // performs checks for (currently) not encodable arg combinations
+    // performs checks for not encodable arg combinations
     // output arg indicates if a rex prefix can be encoded
-    let mut has_immediate   = false;
-    let mut has_jumptarget  = false;
     let mut requires_rex    = rex_w;
     let mut requires_no_rex = false;
 
     for (arg, (c, _)) in args.iter().zip(FormatStringIterator::new(fmt.args)) {
         // only scan args that are actually encoded
-        if let b'a' ... b'z' = c {
+        if let b'a' ..= b'z' = c {
             match *arg {
                 Arg::Direct(Spanned {node: ref reg, ..}) => {
                     if reg.kind.family() == RegFamily::HIGHBYTE {
@@ -1125,16 +1138,9 @@ fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool
                         requires_rex = requires_rex || reg.kind.is_extended();
                     }
                 },
-                Arg::Immediate(_, _) => {
-                    has_immediate = true;
-                },
+                Arg::Immediate(_, _)          |
                 Arg::JumpTarget(_, _)         |
-                Arg::IndirectJumpTarget(_, _) => {
-                    if has_jumptarget {
-                        panic!("bad encoding data: multiple jump targets in the same instruction");
-                    }
-                    has_jumptarget = true;
-                },
+                Arg::IndirectJumpTarget(_, _) => (),
                 Arg::TypeMappedRaw {..} |
                 Arg::IndirectRaw {..} |
                 Arg::Invalid => unreachable!()
@@ -1142,10 +1148,7 @@ fn validate_args(fmt: &'static Opdata, args: &[Arg], rex_w: bool) -> Result<bool
         }
     }
 
-    if has_jumptarget && has_immediate {
-        // note: this is a limitation in the encoding runtime, not in x64 itself
-        Err(Some("Cannot encode jump target and immediate in the same instruction".to_string()))
-    } else if requires_rex && requires_no_rex {
+    if requires_rex && requires_no_rex {
         Err(Some("High byte register combined with extended registers or 64-bit operand size".to_string()))
     } else {
         Ok(requires_rex)
