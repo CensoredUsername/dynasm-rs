@@ -8,6 +8,7 @@ use serialize::Ident;
 use ::State;
 
 pub mod x64;
+pub mod x86;
 
 pub trait Arch : Debug + Send {
     fn name(&self) -> &str;
@@ -50,7 +51,7 @@ impl Arch for DummyArch {
 pub fn from_str(s: &str) -> Option<Box<Arch>> {
     match s {
         "x64" => Some(Box::new(x64::Archx64::default())),
-        "x86" => Some(Box::new(DummyArch::new("x86"))),
+        "x86" => Some(Box::new(x86::Archx86::default())),
         "unknown" => Some(Box::new(DummyArch::new("unknown"))),
         _ => None
     }

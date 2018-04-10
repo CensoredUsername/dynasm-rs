@@ -157,6 +157,12 @@ pub enum RegFamily {
     BOUND = 9
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct ParserOptions {
+    // if true: only valid x86 registers will be parsed
+    pub x86mode: bool
+}
+
 /*
  * impls
  */
@@ -315,7 +321,7 @@ impl RegId {
 // this means we don't have to figure out nesting via []'s by ourselves.
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 
-pub fn parse_instruction<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Instruction> {
+pub fn parse_instruction<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Instruction> {
     let startspan = parser.span;
 
     let mut ops = Vec::new();
@@ -333,10 +339,10 @@ pub fn parse_instruction<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Pars
     let mut args = Vec::new();
 
     if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-        args.push(parse_arg(state, ecx, parser)?);
+        args.push(parse_arg(state, options, ecx, parser)?);
 
         while parser.eat(&token::Comma) {
-            args.push(parse_arg(state, ecx, parser)?);
+            args.push(parse_arg(state, options, ecx, parser)?);
         }
     }
 
@@ -396,7 +402,7 @@ fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::
     }
 }
 
-fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
+fn parse_arg<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     // sizehint
     let size = eat_size_hint(parser);
 
@@ -461,7 +467,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         let span = expr.span.with_lo(span.lo());
         parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
 
-        let items = parse_adds(state, ecx, expr);
+        let items = parse_adds(state, options, ecx, expr);
 
         // assemble the memory location
         return Ok(Arg::IndirectRaw {
@@ -477,7 +483,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
     parser.parse_expr()?.and_then(|arg| {
         // typemapped
         if parser.eat(&token::FatArrow) {
-            let base = parse_reg(state, &arg);
+            let base = parse_reg(state, options, &arg);
             let base = if let Some(base) = base { base } else {
                 ecx.span_err(arg.span, "Expected register");
                 return Ok(Arg::Invalid);
@@ -496,7 +502,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 let index_expr = parser.parse_expr()?;
 
                 parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
-                items = parse_adds(state, ecx, index_expr);
+                items = parse_adds(state, options, ecx, index_expr);
             } else {
                 items = Vec::new();
             }
@@ -520,7 +526,7 @@ fn parse_arg<'a>(state: &mut State, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         }
 
         // direct register reference
-        if let Some(reg) = parse_reg(state, &arg) {
+        if let Some(reg) = parse_reg(state, options, &arg) {
             if size.is_some() {
                 ecx.span_err(arg.span, "size hint with direct register");
             }
@@ -550,7 +556,7 @@ pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     Some(Ident {node: segment.ident, span: path.span})
 }
 
-fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
+fn parse_reg(state: &State, options: &ParserOptions, expr: &ast::Expr) -> Option<Spanned<Register>> {
     if let Some(path) = as_simple_name(expr) {
         // static register names
 
@@ -561,63 +567,105 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
 
         use self::RegId::*;
         use serialize::Size::*;
-        let (reg, size) = match name {
-            "rax"|"r0" => (RAX, QWORD), "rcx"|"r1" => (RCX, QWORD), "rdx"|"r2" => (RDX, QWORD), "rbx"|"r3" => (RBX, QWORD),
-            "rsp"|"r4" => (RSP, QWORD), "rbp"|"r5" => (RBP, QWORD), "rsi"|"r6" => (RSI, QWORD), "rdi"|"r7" => (RDI, QWORD),
-            "r8"       => (R8,  QWORD), "r9"       => (R9,  QWORD), "r10"      => (R10, QWORD), "r11"      => (R11, QWORD),
-            "r12"      => (R12, QWORD), "r13"      => (R13, QWORD), "r14"      => (R14, QWORD), "r15"      => (R15, QWORD),
+        let (reg, size) = if !options.x86mode {
+            // TODO: I wouldn't be surprised if this is a performance bottleneck currently. Maybe factor this out into a hashmap at one point
+            match name {
+                "rax"|"r0" => (RAX, QWORD), "rcx"|"r1" => (RCX, QWORD), "rdx"|"r2" => (RDX, QWORD), "rbx"|"r3" => (RBX, QWORD),
+                "rsp"|"r4" => (RSP, QWORD), "rbp"|"r5" => (RBP, QWORD), "rsi"|"r6" => (RSI, QWORD), "rdi"|"r7" => (RDI, QWORD),
+                "r8"       => (R8,  QWORD), "r9"       => (R9,  QWORD), "r10"      => (R10, QWORD), "r11"      => (R11, QWORD),
+                "r12"      => (R12, QWORD), "r13"      => (R13, QWORD), "r14"      => (R14, QWORD), "r15"      => (R15, QWORD),
 
-            "eax"|"r0d" => (RAX, DWORD), "ecx"|"r1d" => (RCX, DWORD), "edx"|"r2d" => (RDX, DWORD), "ebx"|"r3d" => (RBX, DWORD),
-            "esp"|"r4d" => (RSP, DWORD), "ebp"|"r5d" => (RBP, DWORD), "esi"|"r6d" => (RSI, DWORD), "edi"|"r7d" => (RDI, DWORD),
-            "r8d"       => (R8,  DWORD), "r9d"       => (R9,  DWORD), "r10d"      => (R10, DWORD), "r11d"      => (R11, DWORD),
-            "r12d"      => (R12, DWORD), "r13d"      => (R13, DWORD), "r14d"      => (R14, DWORD), "r15d"      => (R15, DWORD),
+                "eax"|"r0d" => (RAX, DWORD), "ecx"|"r1d" => (RCX, DWORD), "edx"|"r2d" => (RDX, DWORD), "ebx"|"r3d" => (RBX, DWORD),
+                "esp"|"r4d" => (RSP, DWORD), "ebp"|"r5d" => (RBP, DWORD), "esi"|"r6d" => (RSI, DWORD), "edi"|"r7d" => (RDI, DWORD),
+                "r8d"       => (R8,  DWORD), "r9d"       => (R9,  DWORD), "r10d"      => (R10, DWORD), "r11d"      => (R11, DWORD),
+                "r12d"      => (R12, DWORD), "r13d"      => (R13, DWORD), "r14d"      => (R14, DWORD), "r15d"      => (R15, DWORD),
 
-            "ax"|"r0w" => (RAX, WORD), "cx"|"r1w" => (RCX, WORD), "dx"|"r2w" => (RDX, WORD), "bx"|"r3w" => (RBX, WORD),
-            "sp"|"r4w" => (RSP, WORD), "bp"|"r5w" => (RBP, WORD), "si"|"r6w" => (RSI, WORD), "di"|"r7w" => (RDI, WORD),
-            "r8w"      => (R8,  WORD), "r9w"      => (R9,  WORD), "r10w"     => (R10, WORD), "r11w"     => (R11, WORD),
-            "r12w"     => (R12, WORD), "r13w"     => (R13, WORD), "r14w"     => (R14, WORD), "r15w"     => (R15, WORD),
+                "ax"|"r0w" => (RAX, WORD), "cx"|"r1w" => (RCX, WORD), "dx"|"r2w" => (RDX, WORD), "bx"|"r3w" => (RBX, WORD),
+                "sp"|"r4w" => (RSP, WORD), "bp"|"r5w" => (RBP, WORD), "si"|"r6w" => (RSI, WORD), "di"|"r7w" => (RDI, WORD),
+                "r8w"      => (R8,  WORD), "r9w"      => (R9,  WORD), "r10w"     => (R10, WORD), "r11w"     => (R11, WORD),
+                "r12w"     => (R12, WORD), "r13w"     => (R13, WORD), "r14w"     => (R14, WORD), "r15w"     => (R15, WORD),
 
-            "al"|"r0b" => (RAX, BYTE), "cl"|"r1b" => (RCX, BYTE), "dl"|"r2b" => (RDX, BYTE), "bl"|"r3b" => (RBX, BYTE),
-            "spl"      => (RSP, BYTE), "bpl"      => (RBP, BYTE), "sil"      => (RSI, BYTE), "dil"      => (RDI, BYTE),
-            "r8b"      => (R8,  BYTE), "r9b"      => (R9,  BYTE), "r10b"     => (R10, BYTE), "r11b"     => (R11, BYTE),
-            "r12b"     => (R12, BYTE), "r13b"     => (R13, BYTE), "r14b"     => (R14, BYTE), "r15b"     => (R15, BYTE),
+                "al"|"r0b" => (RAX, BYTE), "cl"|"r1b" => (RCX, BYTE), "dl"|"r2b" => (RDX, BYTE), "bl"|"r3b" => (RBX, BYTE),
+                "spl"      => (RSP, BYTE), "bpl"      => (RBP, BYTE), "sil"      => (RSI, BYTE), "dil"      => (RDI, BYTE),
+                "r8b"      => (R8,  BYTE), "r9b"      => (R9,  BYTE), "r10b"     => (R10, BYTE), "r11b"     => (R11, BYTE),
+                "r12b"     => (R12, BYTE), "r13b"     => (R13, BYTE), "r14b"     => (R14, BYTE), "r15b"     => (R15, BYTE),
 
-            "rip"  => (RIP, QWORD),
+                "rip"  => (RIP, QWORD),
 
-            "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
+                "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
 
-            "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
-            "st4" => (ST4, PWORD), "st5" => (ST5, PWORD), "st6" => (ST6, PWORD), "st7" => (ST7, PWORD),
+                "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
+                "st4" => (ST4, PWORD), "st5" => (ST5, PWORD), "st6" => (ST6, PWORD), "st7" => (ST7, PWORD),
 
-            "mm0" => (MMX0, QWORD), "mm1" => (MMX1, QWORD), "mm2" => (MMX2, QWORD), "mm3" => (MMX3, QWORD),
-            "mm4" => (MMX4, QWORD), "mm5" => (MMX5, QWORD), "mm6" => (MMX6, QWORD), "mm7" => (MMX7, QWORD),
+                "mm0" => (MMX0, QWORD), "mm1" => (MMX1, QWORD), "mm2" => (MMX2, QWORD), "mm3" => (MMX3, QWORD),
+                "mm4" => (MMX4, QWORD), "mm5" => (MMX5, QWORD), "mm6" => (MMX6, QWORD), "mm7" => (MMX7, QWORD),
 
-            "xmm0"  => (XMM0 , OWORD), "xmm1"  => (XMM1 , OWORD), "xmm2"  => (XMM2 , OWORD), "xmm3"  => (XMM3 , OWORD),
-            "xmm4"  => (XMM4 , OWORD), "xmm5"  => (XMM5 , OWORD), "xmm6"  => (XMM6 , OWORD), "xmm7"  => (XMM7 , OWORD),
-            "xmm8"  => (XMM8 , OWORD), "xmm9"  => (XMM9 , OWORD), "xmm10" => (XMM10, OWORD), "xmm11" => (XMM11, OWORD),
-            "xmm12" => (XMM12, OWORD), "xmm13" => (XMM13, OWORD), "xmm14" => (XMM14, OWORD), "xmm15" => (XMM15, OWORD),
+                "xmm0"  => (XMM0 , OWORD), "xmm1"  => (XMM1 , OWORD), "xmm2"  => (XMM2 , OWORD), "xmm3"  => (XMM3 , OWORD),
+                "xmm4"  => (XMM4 , OWORD), "xmm5"  => (XMM5 , OWORD), "xmm6"  => (XMM6 , OWORD), "xmm7"  => (XMM7 , OWORD),
+                "xmm8"  => (XMM8 , OWORD), "xmm9"  => (XMM9 , OWORD), "xmm10" => (XMM10, OWORD), "xmm11" => (XMM11, OWORD),
+                "xmm12" => (XMM12, OWORD), "xmm13" => (XMM13, OWORD), "xmm14" => (XMM14, OWORD), "xmm15" => (XMM15, OWORD),
 
-            "ymm0"  => (XMM0 , HWORD), "ymm1"  => (XMM1 , HWORD), "ymm2"  => (XMM2 , HWORD), "ymm3"  => (XMM3 , HWORD),
-            "ymm4"  => (XMM4 , HWORD), "ymm5"  => (XMM5 , HWORD), "ymm6"  => (XMM6 , HWORD), "ymm7"  => (XMM7 , HWORD),
-            "ymm8"  => (XMM8 , HWORD), "ymm9"  => (XMM9 , HWORD), "ymm10" => (XMM10, HWORD), "ymm11" => (XMM11, HWORD),
-            "ymm12" => (XMM12, HWORD), "ymm13" => (XMM13, HWORD), "ymm14" => (XMM14, HWORD), "ymm15" => (XMM15, HWORD),
+                "ymm0"  => (XMM0 , HWORD), "ymm1"  => (XMM1 , HWORD), "ymm2"  => (XMM2 , HWORD), "ymm3"  => (XMM3 , HWORD),
+                "ymm4"  => (XMM4 , HWORD), "ymm5"  => (XMM5 , HWORD), "ymm6"  => (XMM6 , HWORD), "ymm7"  => (XMM7 , HWORD),
+                "ymm8"  => (XMM8 , HWORD), "ymm9"  => (XMM9 , HWORD), "ymm10" => (XMM10, HWORD), "ymm11" => (XMM11, HWORD),
+                "ymm12" => (XMM12, HWORD), "ymm13" => (XMM13, HWORD), "ymm14" => (XMM14, HWORD), "ymm15" => (XMM15, HWORD),
 
-            "es" => (ES, WORD), "cs" => (CS, WORD), "ss" => (SS, WORD), "ds" => (DS, WORD),
-            "fs" => (FS, WORD), "gs" => (GS, WORD),
+                "es" => (ES, WORD), "cs" => (CS, WORD), "ss" => (SS, WORD), "ds" => (DS, WORD),
+                "fs" => (FS, WORD), "gs" => (GS, WORD),
 
-            "cr0"  => (CR0 , QWORD), "cr1"  => (CR1 , QWORD), "cr2"  => (CR2 , QWORD), "cr3"  => (CR3 , QWORD),
-            "cr4"  => (CR4 , QWORD), "cr5"  => (CR5 , QWORD), "cr6"  => (CR6 , QWORD), "cr7"  => (CR7 , QWORD),
-            "cr8"  => (CR8 , QWORD), "cr9"  => (CR9 , QWORD), "cr10" => (CR10, QWORD), "cr11" => (CR11, QWORD),
-            "cr12" => (CR12, QWORD), "cr13" => (CR13, QWORD), "cr14" => (CR14, QWORD), "cr15" => (CR15, QWORD),
+                "cr0"  => (CR0 , QWORD), "cr1"  => (CR1 , QWORD), "cr2"  => (CR2 , QWORD), "cr3"  => (CR3 , QWORD),
+                "cr4"  => (CR4 , QWORD), "cr5"  => (CR5 , QWORD), "cr6"  => (CR6 , QWORD), "cr7"  => (CR7 , QWORD),
+                "cr8"  => (CR8 , QWORD), "cr9"  => (CR9 , QWORD), "cr10" => (CR10, QWORD), "cr11" => (CR11, QWORD),
+                "cr12" => (CR12, QWORD), "cr13" => (CR13, QWORD), "cr14" => (CR14, QWORD), "cr15" => (CR15, QWORD),
 
-            "dr0"  => (DR0 , QWORD), "dr1"  => (DR1 , QWORD), "dr2"  => (DR2 , QWORD), "dr3"  => (DR3 , QWORD),
-            "dr4"  => (DR4 , QWORD), "dr5"  => (DR5 , QWORD), "dr6"  => (DR6 , QWORD), "dr7"  => (DR7 , QWORD),
-            "dr8"  => (DR8 , QWORD), "dr9"  => (DR9 , QWORD), "dr10" => (DR10, QWORD), "dr11" => (DR11, QWORD),
-            "dr12" => (DR12, QWORD), "dr13" => (DR13, QWORD), "dr14" => (DR14, QWORD), "dr15" => (DR15, QWORD),
+                "dr0"  => (DR0 , QWORD), "dr1"  => (DR1 , QWORD), "dr2"  => (DR2 , QWORD), "dr3"  => (DR3 , QWORD),
+                "dr4"  => (DR4 , QWORD), "dr5"  => (DR5 , QWORD), "dr6"  => (DR6 , QWORD), "dr7"  => (DR7 , QWORD),
+                "dr8"  => (DR8 , QWORD), "dr9"  => (DR9 , QWORD), "dr10" => (DR10, QWORD), "dr11" => (DR11, QWORD),
+                "dr12" => (DR12, QWORD), "dr13" => (DR13, QWORD), "dr14" => (DR14, QWORD), "dr15" => (DR15, QWORD),
 
-            "bnd0" => (BND0, OWORD), "bnd1" => (BND1, OWORD), "bnd2" => (BND2, OWORD), "bnd3" => (BND3, OWORD),
+                "bnd0" => (BND0, OWORD), "bnd1" => (BND1, OWORD), "bnd2" => (BND2, OWORD), "bnd3" => (BND3, OWORD),
 
-            _ => return None
+                _ => return None
+            }
+        } else {
+            match name {
+                "eax" => (RAX, DWORD), "ecx" => (RCX, DWORD), "edx" => (RDX, DWORD), "ebx" => (RBX, DWORD),
+                "esp" => (RSP, DWORD), "ebp" => (RBP, DWORD), "esi" => (RSI, DWORD), "edi" => (RDI, DWORD),
+
+                "ax" => (RAX, WORD), "cx" => (RCX, WORD), "dx" => (RDX, WORD), "bx" => (RBX, WORD),
+                "sp" => (RSP, WORD), "bp" => (RBP, WORD), "si" => (RSI, WORD), "di" => (RDI, WORD),
+
+                "al" => (RAX, BYTE), "cl" => (RCX, BYTE), "dl" => (RDX, BYTE), "bl" => (RBX, BYTE),
+
+                "eip"  => (RIP, DWORD), // not actually encodable. Faked at runtime through absolute displacements
+
+                "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
+
+                "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
+                "st4" => (ST4, PWORD), "st5" => (ST5, PWORD), "st6" => (ST6, PWORD), "st7" => (ST7, PWORD),
+
+                "mm0" => (MMX0, QWORD), "mm1" => (MMX1, QWORD), "mm2" => (MMX2, QWORD), "mm3" => (MMX3, QWORD),
+                "mm4" => (MMX4, QWORD), "mm5" => (MMX5, QWORD), "mm6" => (MMX6, QWORD), "mm7" => (MMX7, QWORD),
+
+                "xmm0"  => (XMM0 , OWORD), "xmm1"  => (XMM1 , OWORD), "xmm2"  => (XMM2 , OWORD), "xmm3"  => (XMM3 , OWORD),
+                "xmm4"  => (XMM4 , OWORD), "xmm5"  => (XMM5 , OWORD), "xmm6"  => (XMM6 , OWORD), "xmm7"  => (XMM7 , OWORD),
+
+                "ymm0"  => (XMM0 , HWORD), "ymm1"  => (XMM1 , HWORD), "ymm2"  => (XMM2 , HWORD), "ymm3"  => (XMM3 , HWORD),
+                "ymm4"  => (XMM4 , HWORD), "ymm5"  => (XMM5 , HWORD), "ymm6"  => (XMM6 , HWORD), "ymm7"  => (XMM7 , HWORD),
+
+                "es" => (ES, WORD), "cs" => (CS, WORD), "ss" => (SS, WORD), "ds" => (DS, WORD),
+                "fs" => (FS, WORD), "gs" => (GS, WORD),
+
+                "cr0"  => (CR0 , DWORD), "cr1"  => (CR1 , DWORD), "cr2"  => (CR2 , DWORD), "cr3"  => (CR3 , DWORD),
+                "cr4"  => (CR4 , DWORD), "cr5"  => (CR5 , DWORD), "cr6"  => (CR6 , DWORD), "cr7"  => (CR7 , DWORD),
+
+                "dr0"  => (DR0 , DWORD), "dr1"  => (DR1 , DWORD), "dr2"  => (DR2 , DWORD), "dr3"  => (DR3 , DWORD),
+                "dr4"  => (DR4 , DWORD), "dr5"  => (DR5 , DWORD), "dr6"  => (DR6 , DWORD), "dr7"  => (DR7 , DWORD),
+
+                "bnd0" => (BND0, OWORD), "bnd1" => (BND1, OWORD), "bnd2" => (BND2, OWORD), "bnd3" => (BND3, OWORD),
+
+                _ => return None
+            }
         };
 
         Some(Spanned {
@@ -637,22 +685,41 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
             return None;
         };
 
-        let (size, family) = match &*called.node.name.as_str() {
-            "Rb" => (Size::BYTE,  RegFamily::LEGACY),
-            "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
-            "Rw" => (Size::WORD,  RegFamily::LEGACY),
-            "Rd" => (Size::DWORD, RegFamily::LEGACY),
-            "Ra" |
-            "Rq" => (Size::QWORD, RegFamily::LEGACY),
-            "Rf" => (Size::PWORD, RegFamily::FP),
-            "Rm" => (Size::QWORD, RegFamily::MMX),
-            "Rx" => (Size::OWORD, RegFamily::XMM),
-            "Ry" => (Size::HWORD, RegFamily::XMM),
-            "Rs" => (Size::WORD,  RegFamily::SEGMENT),
-            "RC" => (Size::QWORD, RegFamily::CONTROL),
-            "RD" => (Size::QWORD, RegFamily::DEBUG),
-            "RB" => (Size::OWORD, RegFamily::BOUND),
-            _ => return None
+        let (size, family) = if !options.x86mode {
+            match &*called.node.name.as_str() {
+                "Rb" => (Size::BYTE,  RegFamily::LEGACY),
+                "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
+                "Rw" => (Size::WORD,  RegFamily::LEGACY),
+                "Rd" => (Size::DWORD, RegFamily::LEGACY),
+                "Ra" |
+                "Rq" => (Size::QWORD, RegFamily::LEGACY),
+                "Rf" => (Size::PWORD, RegFamily::FP),
+                "Rm" => (Size::QWORD, RegFamily::MMX),
+                "Rx" => (Size::OWORD, RegFamily::XMM),
+                "Ry" => (Size::HWORD, RegFamily::XMM),
+                "Rs" => (Size::WORD,  RegFamily::SEGMENT),
+                "RC" => (Size::QWORD, RegFamily::CONTROL),
+                "RD" => (Size::QWORD, RegFamily::DEBUG),
+                "RB" => (Size::OWORD, RegFamily::BOUND),
+                _ => return None
+            }
+        } else {
+            match &*called.node.name.as_str() {
+                "Rb" => (Size::BYTE,  RegFamily::LEGACY),
+                "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
+                "Rw" => (Size::WORD,  RegFamily::LEGACY),
+                "Ra" |
+                "Rd" => (Size::DWORD, RegFamily::LEGACY),
+                "Rf" => (Size::PWORD, RegFamily::FP),
+                "Rm" => (Size::QWORD, RegFamily::MMX),
+                "Rx" => (Size::OWORD, RegFamily::XMM),
+                "Ry" => (Size::HWORD, RegFamily::XMM),
+                "Rs" => (Size::WORD,  RegFamily::SEGMENT),
+                "RC" => (Size::DWORD, RegFamily::CONTROL),
+                "RD" => (Size::DWORD, RegFamily::DEBUG),
+                "RB" => (Size::OWORD, RegFamily::BOUND),
+                _ => return None
+            }
         };
 
         Some(Spanned {
@@ -664,7 +731,7 @@ fn parse_reg(state: &State, expr: &ast::Expr) -> Option<Spanned<Register>> {
     }
 }
 
-fn parse_adds(state: &State, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRefItem> {
+fn parse_adds(state: &State, options: &ParserOptions, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRefItem> {
     use syntax::ast::ExprKind;
 
     let mut adds = Vec::new();
@@ -675,13 +742,13 @@ fn parse_adds(state: &State, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRef
     // detect what kind of equation we're dealing with
     for node in adds {
         // simple reg
-        if let Some(Spanned {node: reg, ..} ) = parse_reg(state, &node) {
+        if let Some(Spanned {node: reg, ..} ) = parse_reg(state, options, &node) {
             items.push(MemoryRefItem::Register(reg));
             continue;
         }
         if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = *node {
             // reg * const
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, left) {
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, options, left) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
                     if let ast::LitKind::Int(value, _) = scale.node {
                         items.push(MemoryRefItem::ScaledRegister(reg, value as isize));
@@ -689,7 +756,7 @@ fn parse_adds(state: &State, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRef
                     }
                 }
             } // const * reg
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, right) {
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, options, right) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
                     if let ast::LitKind::Int(value, _) = scale.node {
                         items.push(MemoryRefItem::ScaledRegister(reg, value as isize));

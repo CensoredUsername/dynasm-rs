@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use super::compiler::{Opdata, FormatStringIterator};
-use super::x64data::flags::*;
+use super::x64data::Flags;
 
 pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
     let mut forms = Vec::new();
@@ -12,12 +12,12 @@ pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
 }
 
 pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
-    let opsizes = if data.flags.contains(AUTO_SIZE) {&b"qwd"[..]}
-             else if data.flags.contains(AUTO_NO32) {&b"qw"[..]}
-             else if data.flags.contains(AUTO_REXW) {&b"qd"[..]}
-             else if data.flags.contains(AUTO_VEXL) {&b"ho"[..]}
-             else if name == "monitorx"             {&b"qwd"[..]}
-             else                                   {&b"!"[..]};
+    let opsizes = if data.flags.contains(Flags::AUTO_SIZE) {&b"qwd"[..]}
+             else if data.flags.contains(Flags::AUTO_NO32) {&b"qw"[..]}
+             else if data.flags.contains(Flags::AUTO_REXW) {&b"qd"[..]}
+             else if data.flags.contains(Flags::AUTO_VEXL) {&b"ho"[..]}
+             else if name == "monitorx"                    {&b"qwd"[..]}
+             else                                          {&b"!"[..]};
 
     let mut forms = Vec::new();
     for opsize in opsizes.iter().cloned() {

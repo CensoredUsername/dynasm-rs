@@ -8,8 +8,8 @@ use ::State;
 use serialize::{Stmt, Size, Ident, or_mask_shift_expr, size_of_expr, size_of_scale_expr, offset_of_expr, add_exprs};
 use super::parser::{Arg, Instruction, MemoryRef, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;
-use super::x64data::flags::*;
-use super::x64data::features::*;
+use super::x64data::Flags;
+use super::x64data::Features;
 use super::debug::format_opdata_list;
 
 use std::mem::{swap, replace};
@@ -90,23 +90,23 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     let mut vex_l = false;
 
     // determine if size prefixes are necessary
-    if data.flags.intersects(AUTO_SIZE | AUTO_NO32 | AUTO_REXW | AUTO_VEXL) {
+    if data.flags.intersects(Flags::AUTO_SIZE | Flags::AUTO_NO32 | Flags::AUTO_REXW | Flags::AUTO_VEXL) {
         // determine operand size
         let op_size = get_operand_size(data, &mut args)?;
 
-        if data.flags.contains(AUTO_NO32) {
+        if data.flags.contains(Flags::AUTO_NO32) {
             if op_size == Size::WORD {
                 pref_size = true;
             } else if op_size != Size::QWORD {
                 return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", &*op.node.name.as_str())));
             }
-        } else if data.flags.contains(AUTO_REXW) {
+        } else if data.flags.contains(Flags::AUTO_REXW) {
             if op_size == Size::QWORD {
                 rex_w = true;
             } else if op_size != Size::DWORD {
                 return Err(Some(format!("'{}': Does not support 16-bit operands", &*op.node.name.as_str())));
             }
-        } else if data.flags.contains(AUTO_VEXL) {
+        } else if data.flags.contains(Flags::AUTO_VEXL) {
             if op_size == Size::HWORD {
                 vex_l = true;
             } else if op_size != Size::OWORD {
@@ -124,14 +124,14 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     }
 
     // mandatory prefixes
-    let pref_size = pref_size || data.flags.contains(WORD_SIZE);
-    let rex_w     = rex_w     || data.flags.contains(WITH_REXW);
-    let vex_l     = vex_l     || data.flags.contains(WITH_VEXL);
-    let pref_addr = pref_addr || data.flags.contains(PREF_67);
+    let pref_size = pref_size || data.flags.contains(Flags::WORD_SIZE);
+    let rex_w     = rex_w     || data.flags.contains(Flags::WITH_REXW);
+    let vex_l     = vex_l     || data.flags.contains(Flags::WITH_VEXL);
+    let pref_addr = pref_addr || data.flags.contains(Flags::PREF_67);
 
-    if        data.flags.contains(PREF_F0) { pref_mod = Some(0xF0);
-    } else if data.flags.contains(PREF_F2) { pref_mod = Some(0xF2);
-    } else if data.flags.contains(PREF_F3) { pref_mod = Some(0xF3);
+    if        data.flags.contains(Flags::PREF_F0) { pref_mod = Some(0xF0);
+    } else if data.flags.contains(Flags::PREF_F2) { pref_mod = Some(0xF2);
+    } else if data.flags.contains(Flags::PREF_F3) { pref_mod = Some(0xF3);
     }
 
     // check if this combination of args can actually be encoded and whether a rex prefix is necessary
@@ -146,7 +146,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     let mut ops = data.ops;
 
     // deal with ops that encode the final byte in an immediate
-    let immediate_opcode = if data.flags.intersects(IMM_OP) {
+    let immediate_opcode = if data.flags.intersects(Flags::IMM_OP) {
         let (&imm, rest) = ops.split_last().expect("bad formatting data");
         ops = rest;
         Some(imm)
@@ -163,7 +163,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     }
 
     // VEX/XOP prefixes embed the operand size prefix / modification prefixes in them.
-    if data.flags.intersects(VEX_OP | XOP_OP) {
+    if data.flags.intersects(Flags::VEX_OP | Flags::XOP_OP) {
         let prefix = if pref_size        { 0b01
         } else if pref_mod == Some(0xF3) { 0b10
         } else if pref_mod == Some(0xF2) { 0b11
@@ -187,7 +187,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     }
 
     // if rm is embedded in the last opcode byte, push it here
-    if data.flags.contains(SHORT_ARG) {
+    if data.flags.contains(Flags::SHORT_ARG) {
         let (last, head) = ops.split_last().expect("bad formatting data");
         ops = head;
         buffer.extend(ops.iter().cloned().map(Stmt::Const));
@@ -937,7 +937,7 @@ fn match_format_string(fmt: &'static Opdata, args: &mut [Arg]) -> Result<(), &'s
                 } {
                     return Err("argument size mismatch");
                 }
-            } else if fsize != b'*' && fmt.flags.contains(EXACT_SIZE) {
+            } else if fsize != b'*' && fmt.flags.contains(Flags::EXACT_SIZE) {
                 // Basically, this format is a more specific version of an instruction
                 // that also has more general versions. This should only be picked
                 // if the size constraints are met, not if the size is unspecified
@@ -984,27 +984,27 @@ fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>) 
     for prefix in idents {
         let name = &*prefix.node.name.as_str();
         let (group, value) = match name {
-            "rep"   => if fmt.flags.contains(REP) {
+            "rep"   => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF3)
             } else {
                 ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "repe"  |
-            "repz"  => if fmt.flags.contains(REPE) {
+            "repz"  => if fmt.flags.contains(Flags::REPE) {
                 (&mut group1, 0xF3)
             } else {
                 ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "repnz" |
-            "repne" => if fmt.flags.contains(REP) {
+            "repne" => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF2)
             } else {
                 ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
-            "lock"  => if fmt.flags.contains(LOCK) {
+            "lock"  => if fmt.flags.contains(Flags::LOCK) {
                 (&mut group1, 0xF0)
             } else {
                 ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
@@ -1214,10 +1214,10 @@ fn extract_args(fmt: &'static Opdata, args: Vec<Arg>) -> (Option<Arg>, Option<Ar
     } else if len == 1 {
         m = regs.next();
     } else if len == 2 {
-        if fmt.flags.contains(ENC_MR) || memarg == Some(0) {
+        if fmt.flags.contains(Flags::ENC_MR) || memarg == Some(0) {
             m = regs.next();
             r = regs.next();
-        } else if fmt.flags.contains(ENC_VM) {
+        } else if fmt.flags.contains(Flags::ENC_VM) {
             v = regs.next();
             m = regs.next();
         } else {
@@ -1225,11 +1225,11 @@ fn extract_args(fmt: &'static Opdata, args: Vec<Arg>) -> (Option<Arg>, Option<Ar
             m = regs.next();
         }
     } else if len == 3 {
-        if fmt.flags.contains(ENC_MR) || memarg == Some(1) {
+        if fmt.flags.contains(Flags::ENC_MR) || memarg == Some(1) {
             r = regs.next();
             m = regs.next();
             v = regs.next();
-        } else if fmt.flags.contains(ENC_VM) || memarg == Some(0) {
+        } else if fmt.flags.contains(Flags::ENC_VM) || memarg == Some(0) {
             m = regs.next();
             v = regs.next();
             r = regs.next();
@@ -1239,7 +1239,7 @@ fn extract_args(fmt: &'static Opdata, args: Vec<Arg>) -> (Option<Arg>, Option<Ar
             m = regs.next();
         }
     } else if len == 4 {
-        if fmt.flags.contains(ENC_MR) || memarg == Some(2) {
+        if fmt.flags.contains(Flags::ENC_MR) || memarg == Some(2) {
             r = regs.next();
             v = regs.next();
             m = regs.next();
@@ -1333,7 +1333,7 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
                 (!vvvv_k.encode() & 0xF) << 3 |
                 (vex_l            as u8) << 2 ;
 
-    if data.flags.contains(VEX_OP) && (byte1 & 0x7F) == 0x61 && (byte2 & 0x80) == 0 && !index_k.is_dynamic() && !base_k.is_dynamic() {
+    if data.flags.contains(Flags::VEX_OP) && (byte1 & 0x7F) == 0x61 && (byte2 & 0x80) == 0 && !index_k.is_dynamic() && !base_k.is_dynamic() {
         // 2-byte vex
         buffer.push(Stmt::Const(0xC5));
 
@@ -1352,7 +1352,7 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
         return;
     }
 
-    buffer.push(Stmt::Const(if data.flags.contains(VEX_OP) {0xC4} else {0x8F}));
+    buffer.push(Stmt::Const(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
 
     if reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic() {
         let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));

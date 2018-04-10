@@ -586,8 +586,8 @@ Ops!(OPMAP;
     b"fp"         , [0xD8, 0xC0        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xC0        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xC0        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 0, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 0, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 0, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 0, EXACT_SIZE, FPU;
 ]
 "faddp" = [
     b""           , [0xDE, 0xC1        ], X, DEFAULT, FPU;
@@ -650,8 +650,8 @@ Ops!(OPMAP;
     b""           , [0xD8, 0xD1        ], X, DEFAULT, FPU;
     b"Xpfp"       , [0xD8, 0xD0        ], X, SHORT_ARG, FPU;
     b"fp"         , [0xD8, 0xD0        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 2, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 2, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 2, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 2, EXACT_SIZE, FPU;
 ]
 "fcomi" = [
     b""           , [0xDB, 0xF1        ], X, DEFAULT, FPU;
@@ -667,8 +667,8 @@ Ops!(OPMAP;
     b""           , [0xD8, 0xD9        ], X, DEFAULT, FPU;
     b"Xpfp"       , [0xD8, 0xD8        ], X, SHORT_ARG, FPU;
     b"fp"         , [0xD8, 0xD8        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 3, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 3, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 3, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 3, EXACT_SIZE, FPU;
 ]
 "fcompp" = [
     b""           , [0xDE, 0xD9        ], X, DEFAULT, FPU;
@@ -688,8 +688,8 @@ Ops!(OPMAP;
     b"fp"         , [0xD8, 0xF0        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xF8        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xF8        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 6, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 6, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 6, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 6, EXACT_SIZE, FPU;
 ]
 "fdivp" = [
     b""           , [0xDE, 0xF9        ], X, DEFAULT, FPU;
@@ -702,8 +702,8 @@ Ops!(OPMAP;
     b"fp"         , [0xD8, 0xF8        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xF0        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xF0        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 7, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 7, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 7, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 7, EXACT_SIZE, FPU;
 ]
 "fdivrp" = [
     b""           , [0xDE, 0xF1        ], X, DEFAULT, FPU;
@@ -721,32 +721,32 @@ Ops!(OPMAP;
     b"fp"         , [0xDD, 0xC0        ], X, SHORT_ARG, FPU;
 ]
 "fiadd" = [
-    b"md"         , [0xDA              ], 0, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 0, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 0, DEFAULT, FPU;
 ]
 "ficom" = [
-    b"md"         , [0xDA              ], 2, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 2, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 2, DEFAULT, FPU;
 ]
 "ficomp" = [
-    b"md"         , [0xDA              ], 3, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 3, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 3, DEFAULT, FPU;
 ]
 "fidiv" = [
-    b"md"         , [0xDA              ], 6, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 6, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 6, DEFAULT, FPU;
 ]
 "fidivr" = [
-    b"md"         , [0xDA              ], 7, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 7, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 7, DEFAULT, FPU;
 ]
 "fild" = [
-    b"md"         , [0xDB              ], 0, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDF              ], 5, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDB              ], 0, EXACT_SIZE, FPU;
+    b"mq"         , [0xDF              ], 5, EXACT_SIZE, FPU;
     b"mw"         , [0xDF              ], 0, DEFAULT, FPU;
 ]
 "fimul" = [
-    b"md"         , [0xDA              ], 1, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 1, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 1, DEFAULT, FPU;
 ]
 "fincstp" = [
@@ -756,33 +756,33 @@ Ops!(OPMAP;
     b""           , [0x9B, 0xDB, 0xE3  ], X, DEFAULT, FPU;
 ]
 "fist" = [
-    b"md"         , [0xDB              ], 2, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDB              ], 2, EXACT_SIZE, FPU;
     b"mw"         , [0xDF              ], 2, DEFAULT, FPU;
 ]
 "fistp" = [
-    b"md"         , [0xDB              ], 3, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDF              ], 7, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDB              ], 3, EXACT_SIZE, FPU;
+    b"mq"         , [0xDF              ], 7, EXACT_SIZE, FPU;
     b"mw"         , [0xDF              ], 3, DEFAULT, FPU;
 ]
 "fisttp" = [
-    b"md"         , [0xDB              ], 1, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDD              ], 1, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDB              ], 1, EXACT_SIZE, FPU;
+    b"mq"         , [0xDD              ], 1, EXACT_SIZE, FPU;
     b"mw"         , [0xDF              ], 1, DEFAULT, FPU;
 ]
 "fisub" = [
-    b"md"         , [0xDA              ], 4, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 4, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 4, DEFAULT, FPU;
 ]
 "fisubr" = [
-    b"md"         , [0xDA              ], 5, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xDA              ], 5, EXACT_SIZE, FPU;
     b"mw"         , [0xDE              ], 5, DEFAULT, FPU;
 ]
 "fld" = [
     b""           , [0xD9, 0xC1        ], X, DEFAULT, FPU;
     b"fp"         , [0xD9, 0xC0        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD9              ], 0, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD9              ], 0, EXACT_SIZE, FPU;
     b"mp"         , [0xDB              ], 5, EXACT_SIZE, FPU;
-    b"mq"         , [0xDD              ], 0, DEFAULT, FPU | EXACT_SIZE;
+    b"mq"         , [0xDD              ], 0, EXACT_SIZE, FPU;
 ]
 "fld1" = [
     b""           , [0xD9, 0xE8        ], X, DEFAULT, FPU;
@@ -817,8 +817,8 @@ Ops!(OPMAP;
     b"fp"         , [0xD8, 0xC8        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xC8        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xC8        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 1, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 1, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 1, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 1, EXACT_SIZE, FPU;
 ]
 "fmulp" = [
     b""           , [0xDE, 0xC9        ], X, DEFAULT, FPU;
@@ -892,8 +892,8 @@ Ops!(OPMAP;
 "fst" = [
     b""           , [0xDD, 0xD1        ], X, DEFAULT, FPU;
     b"fp"         , [0xDD, 0xD0        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD9              ], 2, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDD              ], 2, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD9              ], 2, EXACT_SIZE, FPU;
+    b"mq"         , [0xDD              ], 2, EXACT_SIZE, FPU;
 ]
 "fstcw" = [
     b"mw"         , [0x9B, 0xD9        ], 7, DEFAULT, FPU;
@@ -904,9 +904,9 @@ Ops!(OPMAP;
 "fstp" = [
     b""           , [0xDD, 0xD9        ], X, DEFAULT, FPU;
     b"fp"         , [0xDD, 0xD8        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD9              ], 3, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD9              ], 3, EXACT_SIZE, FPU;
     b"mp"         , [0xDB              ], 7, EXACT_SIZE, FPU;
-    b"mq"         , [0xDD              ], 3, DEFAULT, FPU | EXACT_SIZE;
+    b"mq"         , [0xDD              ], 3, EXACT_SIZE, FPU;
 ]
 "fstsw" = [
     b"Aw"         , [0x9B, 0xDF, 0xE0  ], X, DEFAULT, FPU;
@@ -918,8 +918,8 @@ Ops!(OPMAP;
     b"fp"         , [0xD8, 0xE0        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xE8        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xE8        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 4, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 4, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 4, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 4, EXACT_SIZE, FPU;
 ]
 "fsubp" = [
     b""           , [0xDE, 0xE9        ], X, DEFAULT, FPU;
@@ -932,8 +932,8 @@ Ops!(OPMAP;
     b"fp"         , [0xD8, 0xE8        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xE0        ], X, SHORT_ARG, FPU;
     b"fpXp"       , [0xDC, 0xE0        ], X, SHORT_ARG, FPU;
-    b"md"         , [0xD8              ], 5, DEFAULT, FPU | EXACT_SIZE;
-    b"mq"         , [0xDC              ], 5, DEFAULT, FPU | EXACT_SIZE;
+    b"md"         , [0xD8              ], 5, EXACT_SIZE, FPU;
+    b"mq"         , [0xDC              ], 5, EXACT_SIZE, FPU;
 ]
 "fsubrp" = [
     b""           , [0xDE, 0xE1        ], X, DEFAULT, FPU;
