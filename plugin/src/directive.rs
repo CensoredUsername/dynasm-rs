@@ -47,7 +47,7 @@ impl DynasmData {
             "bytes" => {
                 // ; .bytes expr
                 let iterator = parser.parse_expr()?;
-                stmts.push(Stmt::Extend(iterator));
+                stmts.push(Stmt::ExprExtend(iterator));
             },
             "align" => {
                 // ; .align expr
@@ -86,10 +86,10 @@ impl DynasmData {
 
     fn directive_const<'b>(stmts: &mut Vec<Stmt>, parser: &mut Parser<'b>, size: Size) -> PResult<'b, ()> {
         if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-            stmts.push(Stmt::Var(parser.parse_expr()?, size));
+            stmts.push(Stmt::ExprSigned(parser.parse_expr()?, size));
 
             while parser.eat(&token::Comma) {
-                stmts.push(Stmt::Var(parser.parse_expr()?, size));
+                stmts.push(Stmt::ExprSigned(parser.parse_expr()?, size));
             }
         }
 

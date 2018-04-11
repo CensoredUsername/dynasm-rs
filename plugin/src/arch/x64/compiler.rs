@@ -5,7 +5,7 @@ use syntax::ptr::P;
 use syntax::codemap::Spanned;
 
 use ::State;
-use serialize::{Stmt, Size, Ident, or_mask_shift_expr, size_of_expr, size_of_scale_expr, offset_of_expr, add_exprs};
+use serialize::{self, Stmt, Size, Ident};
 use super::parser::{Arg, Instruction, MemoryRef, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;
 use super::x64data::Flags;
@@ -156,10 +156,10 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
     // legacy-only prefixes
     if let Some(pref) = pref_seg {
-        buffer.push(Stmt::Const(pref));
+        buffer.push(Stmt::u8(pref));
     }
     if pref_addr {
-        buffer.push(Stmt::Const(0x67));
+        buffer.push(Stmt::u8(0x67));
     }
 
     // VEX/XOP prefixes embed the operand size prefix / modification prefixes in them.
@@ -176,10 +176,10 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // otherwise, the size/mod prefixes have to be pushed and check if a rex prefix has to be generated.
     } else {
         if let Some(pref) = pref_mod {
-            buffer.push(Stmt::Const(pref));
+            buffer.push(Stmt::u8(pref));
         }
         if pref_size {
-            buffer.push(Stmt::Const(0x66));
+            buffer.push(Stmt::u8(0x66));
         }
         if need_rex {
             compile_rex(ecx, buffer, rex_w, &reg, &rm);
@@ -190,7 +190,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     if data.flags.contains(Flags::SHORT_ARG) {
         let (last, head) = ops.split_last().expect("bad formatting data");
         ops = head;
-        buffer.extend(ops.iter().cloned().map(Stmt::Const));
+        buffer.push(Stmt::Extend(Vec::from(ops)));
 
         let rm_k = if let Some(Arg::Direct(rm)) = rm.take() {
             rm.node.kind
@@ -200,13 +200,13 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
         if let RegKind::Dynamic(_, expr) = rm_k {
             let last = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(*last));
-            buffer.push(Stmt::ExprConst(or_mask_shift_expr(ecx, last, expr, 7, 0)));
+            buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(ecx, last, expr, 7, 0), Size::BYTE));
         } else {
-            buffer.push(Stmt::Const(last + (rm_k.encode() & 7)));
+            buffer.push(Stmt::u8(last + (rm_k.encode() & 7)));
         }
     // just push the opcode
     } else {
-        buffer.extend(ops.iter().cloned().map(Stmt::Const))
+        buffer.push(Stmt::Extend(Vec::from(ops)));
     }
 
     // Direct ModRM addressing
@@ -244,21 +244,19 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
                 compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
                 if let Some(expr) = scale_expr {
-                    compile_sib_dynscale(ecx, buffer, scale, expr, index, base);
+                    compile_sib_dynscale(ecx, buffer, &state.target, scale, expr, index, base);
                 } else {
                     compile_modrm_sib(ecx, buffer, scale as u8, index, base);
                 }
 
                 if let Some(disp) = mem.disp {
-                    buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                    buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
                 } else if mode == MOD_DISP8 {
                     // no displacement was asked for, but we have to encode one as there's a base
-                    buffer.push(Stmt::Const(0));
+                    buffer.push(Stmt::u8(0));
                 } else {
                     // MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
-                    for _ in 0..4 {
-                        buffer.push(Stmt::Const(0));
-                    }
+                    buffer.push(Stmt::u32(0));
                 }
             },
             // normal indirect addressing
@@ -291,7 +289,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
                     compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
                     if let Some(expr) = scale_expr {
-                        compile_sib_dynscale(ecx, buffer, scale, expr, index.kind, base);
+                        compile_sib_dynscale(ecx, buffer, &state.target, scale, expr, index.kind, base);
                     } else {
                         compile_modrm_sib(ecx, buffer, scale as u8, index.kind, base);
                     }
@@ -308,13 +306,11 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
                 // Disp
                 if let Some(disp) = mem.disp {
-                    buffer.push(Stmt::Var(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                    buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
                 } else if no_base || rip_relative {
-                    for _ in 0..4 {
-                        buffer.push(Stmt::Const(0));
-                    }
+                    buffer.push(Stmt::u32(0));
                 } else if rbp_relative {
-                    buffer.push(Stmt::Const(0));
+                    buffer.push(Stmt::u8(0));
                 }
             }
         }
@@ -327,16 +323,13 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         };
         compile_modrm_sib(ecx, buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
 
-        for _ in 0..Size::DWORD.in_bytes() {
-            buffer.push(Stmt::Const(0));
-        }
-
+        buffer.push(Stmt::u32(0));
         relocations.push((target, Size::DWORD, 0));
     }
 
     // opcode encoded after the displacement
     if let Some(code) = immediate_opcode {
-        buffer.push(Stmt::Const(code));
+        buffer.push(Stmt::u8(code));
 
         // bump relocations
         relocations.iter_mut().for_each(|r| r.2 += 1);
@@ -349,18 +342,18 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
         let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
         if let RegKind::Dynamic(_, expr) = ireg {
-            byte = or_mask_shift_expr(ecx, byte, expr, 0xF, 4);
+            byte = serialize::expr_mask_shift_or(ecx, byte, expr, 0xF, 4);
         }
         // if immediates are present, the register argument will be merged into the
         // first immediate byte.
         if !args.is_empty() {
             if let Arg::Immediate(expr, Some(Size::BYTE)) = args.remove(0) {
-                byte = or_mask_shift_expr(ecx, byte, expr, 0xF, 0);
+                byte = serialize::expr_mask_shift_or(ecx, byte, expr, 0xF, 0);
             } else {
                 panic!("bad formatting data")
             }
         }
-        buffer.push(Stmt::ExprConst(byte));
+        buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
 
         // bump relocations
         relocations.iter_mut().for_each(|r| r.2 += 1);
@@ -370,16 +363,14 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     for arg in args {
         match arg {
             Arg::Immediate(expr, Some(size)) => {
-                buffer.push(Stmt::Var(expr, size));
+                buffer.push(Stmt::ExprSigned(expr, size));
 
                 // bump relocations
                 relocations.iter_mut().for_each(|r| r.2 += size.in_bytes());
             },
             Arg::JumpTarget(target, Some(size)) => {
                 // placeholder
-                for _ in 0..size.in_bytes() {
-                    buffer.push(Stmt::Const(0));
-                }
+                buffer.push(Stmt::Const(0, size));
 
                 // bump relocations
                 relocations.iter_mut().for_each(|r| r.2 += size.in_bytes());
@@ -396,10 +387,13 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     // push relocations
     for (target, size, offset) in relocations.drain(..) {
         buffer.push(match target {
-            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(ident, size, offset),
-            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget(ident, size, offset),
-            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, size, offset),
-            JumpType::Dynamic(expr)   => Stmt::DynamicJumpTarget(expr, size, offset)
+            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(  ident, serialize::expr_tuple_of_2_u8s(ecx, ident.span, offset, size.in_bytes())),
+            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_2_u8s(ecx, ident.span, offset, size.in_bytes())),
+            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_2_u8s(ecx, ident.span, offset, size.in_bytes())),
+            JumpType::Dynamic(expr)   => {
+                let span = expr.span;
+                Stmt::DynamicJumpTarget(expr, serialize::expr_tuple_of_2_u8s(ecx, span, offset, size.in_bytes()))
+            },
         })
     }
 
@@ -532,7 +526,7 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                 }
 
                 // merge disps
-                let disp = add_exprs(ecx, span, disps.into_iter());
+                let disp = serialize::expr_add_many(ecx, span, disps.into_iter());
 
                 // finalize the memoryref
                 Arg::Indirect(MemoryRef {
@@ -590,13 +584,13 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                 let true_disp_size = disp_size.unwrap_or(Size::DWORD);
 
                 // merge disps [a, b, c] into (a + b + c)
-                let scaled_disp = add_exprs(ecx, span, disps.into_iter());
+                let scaled_disp = serialize::expr_add_many(ecx, span, disps.into_iter());
 
                 // scale disps (a + b + c) * size_of<scale> as disp_size
-                let scaled_disp = scaled_disp.map(|disp| size_of_scale_expr(ecx, scale.clone(), disp, true_disp_size));
+                let scaled_disp = scaled_disp.map(|disp| serialize::expr_size_of_scale(ecx, scale.clone(), disp, true_disp_size));
 
                 // attribute displacement offset_of(scale, attr) as disp_size
-                let attr_disp = attribute.map(|attr| offset_of_expr(ecx, scale.clone(), attr, true_disp_size));
+                let attr_disp = attribute.map(|attr| serialize::expr_offset_of(ecx, scale.clone(), attr, true_disp_size));
 
                 // add displacement sources together
                 let disp = if let Some(scaled_disp) = scaled_disp {
@@ -616,7 +610,7 @@ fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<
                     nosplit: nosplit,
                     disp_size: disp_size,
                     base: Some(base),
-                    index: index.map(|(r, s)| (r, s, Some(size_of_expr(ecx, scale)))),
+                    index: index.map(|(r, s)| (r, s, Some(serialize::expr_size_of(ecx, scale)))),
                     disp: disp,
                 })
             },
@@ -1280,22 +1274,22 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<
                      (index_k.encode() & 8) >> 2 |
                      (base_k.encode()  & 8) >> 3 ;
     if !reg_k.is_dynamic() && !index_k.is_dynamic() && !base_k.is_dynamic() {
-        buffer.push(Stmt::Const(rex));
+        buffer.push(Stmt::u8(rex));
         return;
     }
 
     let mut rex = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(rex));
 
     if let RegKind::Dynamic(_, expr) = reg_k {
-        rex = or_mask_shift_expr(ecx, rex, expr, 8, -1);
+        rex = serialize::expr_mask_shift_or(ecx, rex, expr, 8, -1);
     }
     if let RegKind::Dynamic(_, expr) = index_k {
-        rex = or_mask_shift_expr(ecx, rex, expr, 8, -2);
+        rex = serialize::expr_mask_shift_or(ecx, rex, expr, 8, -2);
     }
     if let RegKind::Dynamic(_, expr) = base_k {
-        rex = or_mask_shift_expr(ecx, rex, expr, 8, -3);
+        rex = serialize::expr_mask_shift_or(ecx, rex, expr, 8, -3);
     }
-    buffer.push(Stmt::ExprConst(rex));
+    buffer.push(Stmt::ExprUnsigned(rex, Size::BYTE));
 }
 
 fn compile_vex_xop(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<Arg>,
@@ -1335,43 +1329,43 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
 
     if data.flags.contains(Flags::VEX_OP) && (byte1 & 0x7F) == 0x61 && (byte2 & 0x80) == 0 && !index_k.is_dynamic() && !base_k.is_dynamic() {
         // 2-byte vex
-        buffer.push(Stmt::Const(0xC5));
+        buffer.push(Stmt::u8(0xC5));
 
         let byte1 = (byte1 & 0x80) | (byte2 & 0x7F);
         if !reg_k.is_dynamic() {
-            buffer.push(Stmt::Const(byte1));
+            buffer.push(Stmt::u8(byte1));
             return;
         }
 
         let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
         if let RegKind::Dynamic(_, expr) = reg_k {
             let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 4)
+            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 4)
         }
-        buffer.push(Stmt::ExprConst(byte1));
+        buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
         return;
     }
 
-    buffer.push(Stmt::Const(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
+    buffer.push(Stmt::u8(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
 
     if reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic() {
         let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
 
         if let RegKind::Dynamic(_, expr) = reg_k {
             let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 4);
+            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 4);
         }
         if let RegKind::Dynamic(_, expr) = index_k {
             let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 3);
+            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 3);
         }
         if let RegKind::Dynamic(_, expr) = base_k {
             let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = or_mask_shift_expr(ecx, byte1, expr, 8, 2);
+            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 2);
         }
-        buffer.push(Stmt::ExprConst(byte1));
+        buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
     } else {
-        buffer.push(Stmt::Const(byte1));
+        buffer.push(Stmt::u8(byte1));
     }
 
     if vvvv_k.is_dynamic() {
@@ -1379,11 +1373,11 @@ rm: &Option<Arg>, map_sel: u8, rex_w: bool, vvvv: &Option<Arg>, vex_l: bool, pre
 
         if let RegKind::Dynamic(_, expr) = vvvv_k {
             let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte2 = or_mask_shift_expr(ecx, byte2, expr, 0xF, 3)
+            byte2 = serialize::expr_mask_shift_or(ecx, byte2, expr, 0xF, 3)
         }
-        buffer.push(Stmt::ExprConst(byte2));
+        buffer.push(Stmt::ExprUnsigned(byte2, Size::BYTE));
     } else {
-        buffer.push(Stmt::Const(byte2));
+        buffer.push(Stmt::u8(byte2));
     }
 }
 
@@ -1393,39 +1387,44 @@ fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, mode: u8, reg1: RegK
               (reg2.encode()  & 7)     ;
 
     if !reg1.is_dynamic() && !reg2.is_dynamic() {
-        buffer.push(Stmt::Const(byte));
+        buffer.push(Stmt::u8(byte));
         return;
     }
 
     let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = or_mask_shift_expr(ecx, byte, expr, 7, 3);
+        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 3);
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = or_mask_shift_expr(ecx, byte, expr, 7, 0);
+        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 0);
     }
-    buffer.push(Stmt::ExprConst(byte));
+    buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
 }
 
-fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, scale: isize, scale_expr: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
+fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, target: &P<ast::Expr>, scale: isize, scale_expr: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 
     let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = or_mask_shift_expr(ecx, byte, expr, 7, 3);
+        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 3);
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = or_mask_shift_expr(ecx, byte, expr, 7, 0);
+        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 0);
     }
     let span = scale_expr.span;
-    buffer.push(Stmt::DynScale(
-        ecx.expr_binary(span,
+    let (stmt, expr) = serialize::expr_dynscale(
+        ecx, 
+        target,
+        ecx.expr_binary(
+            span,
             ast::BinOpKind::Mul,
             scale_expr,
             ecx.expr_lit(span, ast::LitKind::Int(scale as u128, ast::LitIntType::Unsuffixed)),
         ),
         byte
-    ));
+    );
+    buffer.push(Stmt::Stmt(stmt));
+    buffer.push(Stmt::ExprUnsigned(expr, Size::BYTE));
 }

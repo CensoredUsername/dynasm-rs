@@ -8,6 +8,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
 extern crate owning_ref;
+extern crate byteorder;
 
 use rustc_plugin::registry::Registry;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};

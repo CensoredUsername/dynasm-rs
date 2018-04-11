@@ -1,5 +1,7 @@
 use std::rc::Rc;
 
+use byteorder::{ByteOrder, LittleEndian};
+
 use syntax::util::ThinVec;
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
@@ -39,143 +41,176 @@ impl Size {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub enum Stmt {
-    Const(u8),
-    ExprConst(P<ast::Expr>),
+    // simply push data into the instruction stream. unsigned
+    Const(u64, Size),
+    // push data that is stored inside of an expression. unsigned
+    ExprUnsigned(P<ast::Expr>, Size),
+    // push signed data into the instruction stream. signed
+    ExprSigned(P<ast::Expr>, Size),
 
-    Var(P<ast::Expr>, Size),
-    Extend(P<ast::Expr>),
-
-    DynScale(P<ast::Expr>, P<ast::Expr>),
-
+    // extend the instruction stream with unsigned bytes
+    Extend(Vec<u8>),
+    // extend the instruction stream with unsigned bytes
+    ExprExtend(P<ast::Expr>),
+    // align the instruction stream to some alignment
     Align(P<ast::Expr>),
 
+    // label declarations
     GlobalLabel(Ident),
     LocalLabel(Ident),
     DynamicLabel(P<ast::Expr>),
 
-    GlobalJumpTarget(Ident, Size, u8),
-    ForwardJumpTarget(Ident, Size, u8),
-    BackwardJumpTarget(Ident, Size, u8),
-    DynamicJumpTarget(P<ast::Expr>, Size, u8),
+    // and their respective relocations (as expressions as they differ per assembler)
+    GlobalJumpTarget(Ident,         P<ast::Expr>),
+    ForwardJumpTarget(Ident,        P<ast::Expr>),
+    BackwardJumpTarget(Ident,       P<ast::Expr>),
+    DynamicJumpTarget(P<ast::Expr>, P<ast::Expr>),
 
-    Stmt(ast::Stmt),
+    // a random statement that has to be inserted between assembly hunks
+    Stmt(ast::Stmt)
+}
+
+// convenience methods
+impl Stmt {
+    pub fn u8(value: u8) -> Stmt {
+        Stmt::Const(value as u64, Size::BYTE)
+    }
+
+    pub fn u16(value: u16) -> Stmt {
+        Stmt::Const(value as u64, Size::WORD)
+    }
+
+    pub fn u32(value: u32) -> Stmt {
+        Stmt::Const(value as u64, Size::DWORD)
+    }
+
+    pub fn u64(value: u64) -> Stmt {
+        Stmt::Const(value, Size::QWORD)
+    }
 }
 
 pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec<ast::Stmt> {
-    let mut buffer = Vec::new();
+    // first, try to fold constants into a byte stream
+    let mut folded_stmts = Vec::new();
+    let mut const_buffer = Vec::new();
+    for stmt in stmts {
+        match stmt {
+            Stmt::Const(value, size) => {
+                match size {
+                    Size::BYTE => const_buffer.push(value as u8),
+                    Size::WORD => {
+                        let mut buffer = [0u8; 2];
+                        LittleEndian::write_u16(&mut buffer, value as u16);
+                        const_buffer.extend(&buffer);
+                    },
+                    Size::DWORD => {
+                        let mut buffer = [0u8; 4];
+                        LittleEndian::write_u32(&mut buffer, value as u32);
+                        const_buffer.extend(&buffer);
+                    },
+                    Size::QWORD => {
+                        let mut buffer = [0u8; 8];
+                        LittleEndian::write_u64(&mut buffer, value as u64);
+                        const_buffer.extend(&buffer);
+                    },
+                    _ => unimplemented!()
+                }
+            },
+            Stmt::Extend(data) => {
+                const_buffer.extend(data);
+            },
+            s => {
+                // empty the const buffer
+                if !const_buffer.is_empty() {
+                    folded_stmts.push(Stmt::Extend(const_buffer));
+                    const_buffer = Vec::new();
+                }
+                folded_stmts.push(s);
+            }
+        }
+        while const_buffer.len() > 32 {
+            let new_buffer = const_buffer.split_off(32);
+            folded_stmts.push(Stmt::Extend(const_buffer));
+            const_buffer = new_buffer;
+        }
+    }
+    if !const_buffer.is_empty() {
+        folded_stmts.push(Stmt::Extend(const_buffer));
+    }
 
-    // construction for `op.push(expr)` is as follows
-    // op = Path::from_ident(name)
-    // push = Ident::from_str("push")
-    // expr = expr_lit(span, LitKind::Byte)
-    // expr_method_call(span, op, Vec![expr])
+    // and now do the final output pass in one go
+    let mut output = Vec::new();
 
-    let mut stmts = stmts.into_iter().peekable();
-
-    while let Some(stmt) = stmts.next() {
-        use self::Stmt::*;
-
+    for stmt in folded_stmts {
         let (method, args) = match stmt {
-            Const(byte)            => {
-                let mut bytes = vec![byte];
-                while let Some(&Const(byte)) = stmts.peek() {
-                    bytes.push(byte);
-                    stmts.next();
-                    if bytes.len() == 32 {
-                        break;
-                    }
-                }
-
-                if bytes.len() == 1 {
-                    ("push",   vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(bytes[0]))])
-                } else {
-                    ("extend", vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::ByteStr(Rc::new(bytes)))])
-                }
-            },
-            ExprConst(expr)        => ("push",    vec![expr]),
-
-            Var(expr, Size::BYTE)  => ("push_i8",  vec![expr]),
-            Var(expr, Size::WORD)  => ("push_i16", vec![expr]),
-            Var(expr, Size::DWORD) => ("push_i32", vec![expr]),
-            Var(expr, Size::QWORD) => ("push_i64", vec![expr]),
-            Var(_, _)           => panic!("immediate serializaiton of this size is not supported yet"),
-
-            Extend(expr)           => ("extend", vec![expr]),
-
-            DynScale(scale, rest)  => {
-                let temp = ast::Ident::from_str("temp");
-                buffer.push(ecx.stmt_let(ecx.call_site(), false, temp, encoded_size_expr(ecx, &name, scale)));
-                ("push", vec![or_mask_shift_expr(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)])
-            },
-
-            Align(expr)            => ("align",   vec![expr]),
-
-            GlobalLabel(ident)     => ("global_label", vec![ecx.expr_lit(
-                ident.span,
-                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-            )]),
-            LocalLabel(ident)      => ("local_label", vec![ecx.expr_lit(
-                ident.span,
-                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-            )]),
-            DynamicLabel(expr)     => ("dynamic_label", vec![expr]),
-
-            GlobalJumpTarget(ident, size, offset) => ("global_reloc", vec![ecx.expr_lit(
-                    ident.span,
-                    ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-                ),
-                ecx.expr_tuple(
-                    ident.span,
-                    vec![ecx.expr_u8(ident.span, offset), ecx.expr_u8(ident.span, size.in_bytes())]
-                )
-            ]),
-            ForwardJumpTarget(ident, size, offset) => ("forward_reloc", vec![ecx.expr_lit(
-                ident.span,
-                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked)
-                ),
-                ecx.expr_tuple(
-                    ident.span,
-                    vec![ecx.expr_u8(ident.span, offset), ecx.expr_u8(ident.span, size.in_bytes())]
-                )
-            ]),
-            BackwardJumpTarget(ident, size, offset) => ("backward_reloc", vec![ecx.expr_lit(
-                ident.span,
-                ast::LitKind::Str(ident.node.name, ast::StrStyle::Cooked),
-                ),
-                ecx.expr_tuple(
-                    ident.span,
-                    vec![ecx.expr_u8(ident.span, offset), ecx.expr_u8(ident.span, size.in_bytes())]
-                )
-            ]),
-            DynamicJumpTarget(expr, size, offset) => {
-                let span = expr.span;
-                ("dynamic_reloc", vec![
-                    expr, 
-                    ecx.expr_tuple(
-                        span,
-                        vec![ecx.expr_u8(span, offset), ecx.expr_u8(span, size.in_bytes())]
-                    )
-                ])
-            },
-            Stmt(stmt) => {
-                buffer.push(stmt);
+            Stmt::Const(_, _) => unreachable!(),
+            Stmt::ExprUnsigned(expr, Size::BYTE)  => ("push",     vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::WORD)  => ("push_u16", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::DWORD) => ("push_u32", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::QWORD) => ("push_u64", vec![expr]),
+            Stmt::ExprUnsigned(_, _) => unimplemented!(),
+            Stmt::ExprSigned(  expr, Size::BYTE)  => ("push_i8",  vec![expr]),
+            Stmt::ExprSigned(  expr, Size::WORD)  => ("push_i16", vec![expr]),
+            Stmt::ExprSigned(  expr, Size::DWORD) => ("push_i32", vec![expr]),
+            Stmt::ExprSigned(  expr, Size::QWORD) => ("push_i64", vec![expr]),
+            Stmt::ExprSigned(_, _) => unimplemented!(),
+            Stmt::Extend(data)     => ("extend", vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::ByteStr(Rc::new(data)))]),
+            Stmt::ExprExtend(expr) => ("extend", vec![expr]),
+            Stmt::Align(expr)      => ("align", vec![expr]),
+            Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(ecx, n)]),
+            Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(ecx, n)]),
+            Stmt::DynamicLabel(expr) => ("dynamic_label", vec![expr]),
+            Stmt::GlobalJumpTarget(n,     reloc) => ("global_reloc"  , vec![expr_string_from_ident(ecx, n), reloc]),
+            Stmt::ForwardJumpTarget(n,    reloc) => ("forward_reloc" , vec![expr_string_from_ident(ecx, n), reloc]),
+            Stmt::BackwardJumpTarget(n,   reloc) => ("backward_reloc", vec![expr_string_from_ident(ecx, n), reloc]),
+            Stmt::DynamicJumpTarget(expr, reloc) => ("dynamic_reloc" , vec![expr, reloc]),
+            Stmt::Stmt(s) => {
+                output.push(s);
                 continue;
             }
+
         };
 
+        // and construct the appropriate method call
         let op = name.clone();
         let method = ast::Ident::from_str(method);
         let expr = ecx.expr_method_call(ecx.call_site(), op, method, args);
-
-        buffer.push(ecx.stmt_semi(expr));
+        output.push(ecx.stmt_semi(expr));
     }
 
-    buffer
+    output
 }
 
-pub fn add_exprs<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut exprs: T) -> Option<P<ast::Expr>> {
+// below here are all kinds of utility functions to quickly generate ast constructs
+// this collection is very arbitrary, purely what's needed in codegen, trying to keep
+// most expression building logic in this file.
+
+// given an ident, makes it into a "string"
+pub fn expr_string_from_ident(ecx: &ExtCtxt, i: Ident) -> P<ast::Expr> {
+    ecx.expr_lit(i.span, ast::LitKind::Str(i.node.name, ast::StrStyle::Cooked))
+}
+
+// 
+pub fn expr_dynscale(ecx: &ExtCtxt, name: &P<ast::Expr>, scale: P<ast::Expr>, rest: P<ast::Expr>) -> (ast::Stmt, P<ast::Expr>) {
+    let temp = ast::Ident::from_str("temp");
+    (
+        ecx.stmt_let(ecx.call_site(), false, temp, expr_encode_x64_sib_scale(ecx, &name, scale)),
+        expr_mask_shift_or(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)
+    )
+}
+
+// makes (a, b)
+pub fn expr_tuple_of_2_u8s(ecx: &ExtCtxt, span: Span, a: u8, b: u8) -> P<ast::Expr> {
+    ecx.expr_tuple(
+        span,
+        vec![ecx.expr_u8(span, a), ecx.expr_u8(span, b)]
+    )
+}
+
+// makes sum(exprs)
+pub fn expr_add_many<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut exprs: T) -> Option<P<ast::Expr>> {
     exprs.next().map(|mut accum| {
         for next in exprs {
             accum = ecx.expr_binary(span, ast::BinOpKind::Add, accum, next);
@@ -184,21 +219,22 @@ pub fn add_exprs<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut 
     })
 }
 
-pub fn size_of_scale_expr(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>, size: Size) -> P<ast::Expr> {
+// makes (size_of<ty>() * value)
+pub fn expr_size_of_scale(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>, size: Size) -> P<ast::Expr> {
     let span = value.span;
     ecx.expr_binary(span,
         ast::BinOpKind::Mul,
         ecx.expr_cast(span,
-            size_of_expr(ecx, ty),
+            expr_size_of(ecx, ty),
             ecx.ty_ident(span, size.as_literal())
         ),
         value
     )
 }
 
-pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Expr>, mask: u64, shift: i8) -> P<ast::Expr> {
+/// returns orig | ((expr & mask) << shift)
+pub fn expr_mask_shift_or(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Expr>, mask: u64, shift: i8) -> P<ast::Expr> {
     let span = expr.span;
-    // take expr and return !((expr & mask) << shift)
 
     expr = ecx.expr_binary(span, ast::BinOpKind::BitAnd, expr, ecx.expr_lit(
         span, ast::LitKind::Int(mask as u128, ast::LitIntType::Unsuffixed)
@@ -217,7 +253,8 @@ pub fn or_mask_shift_expr(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Ex
     ecx.expr_binary(span, ast::BinOpKind::BitOr, orig, expr)
 }
 
-pub fn offset_of_expr(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Size) -> P<ast::Expr> {
+/// returns (offset_of!(path, attr) as size)
+pub fn expr_offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Size) -> P<ast::Expr> {
     // generate a P<Expr> that resolves into the offset of an attribute to a type.
     // this is somewhat ridiculously complex because we can't expand macros here
 
@@ -300,7 +337,8 @@ pub fn offset_of_expr(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Si
     ecx.expr_block(block)
 }
 
-pub fn size_of_expr(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
+// returns std::mem::size_of<path>()
+pub fn expr_size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
     // generate a P<Expr> that returns the size of type at path
     let span = path.span;
 
@@ -310,7 +348,15 @@ pub fn size_of_expr(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
     ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
 }
 
-pub fn encoded_size_expr(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P<ast::Expr> {
+// makes the following
+// match size {
+//    8 => 3,
+//    4 => 2,
+//    2 => 1,
+//    1 => 0,
+//  _ => name.runtime_error("Type size not representable as scale")
+//}
+pub fn expr_encode_x64_sib_scale(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P<ast::Expr> {
     let span = size.span;
 
     ecx.expr_match(span, size, vec![
