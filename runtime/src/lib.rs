@@ -175,6 +175,27 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
         LittleEndian::write_i64(&mut buf, value);
         self.extend(&buf);
     }
+    /// Push an usigned word into the assembling target
+    #[inline]
+    fn push_u16(&mut self, value: u16) {
+        let mut buf = [0u8; 2];
+        LittleEndian::write_u16(&mut buf, value);
+        self.extend(&buf);
+    }
+    /// Push an usigned doubleword into the assembling target
+    #[inline]
+    fn push_u32(&mut self, value: u32) {
+        let mut buf = [0u8; 4];
+        LittleEndian::write_u32(&mut buf, value);
+        self.extend(&buf);
+    }
+    /// Push an usigned quadword into the assembling target
+    #[inline]
+    fn push_u64(&mut self, value: u64) {
+        let mut buf = [0u8; 8];
+        LittleEndian::write_u64(&mut buf, value);
+        self.extend(&buf);
+    }
     /// This function is called in when a runtime error has to be generated. It panics.
     #[inline]
     fn runtime_error(&self, msg: &'static str) -> ! {
