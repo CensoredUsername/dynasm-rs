@@ -9,7 +9,7 @@ use syntax::codemap::{Spanned, Span};
 
 use std::cmp::PartialEq;
 
-use ::State;
+use super::{Context, X86Mode};
 use serialize::{Size, Ident};
 
 /**
@@ -75,6 +75,7 @@ pub enum JumpType {
     Backward(Ident),       //  > label
     Forward(Ident),        //  < label
     Dynamic(P<ast::Expr>), // => expr
+    Bare(P<ast::Expr>)   // just an immediate in a displacement field
 }
 
 // encoding of this:
@@ -321,7 +322,7 @@ impl RegId {
 // this means we don't have to figure out nesting via []'s by ourselves.
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 
-pub fn parse_instruction<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Instruction> {
+pub fn parse_instruction<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Instruction> {
     let startspan = parser.span;
 
     let mut ops = Vec::new();
@@ -339,10 +340,10 @@ pub fn parse_instruction<'a>(state: &mut State, options: &ParserOptions, ecx: &E
     let mut args = Vec::new();
 
     if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
-        args.push(parse_arg(state, options, ecx, parser)?);
+        args.push(parse_arg(ctx, ecx, parser)?);
 
         while parser.eat(&token::Comma) {
-            args.push(parse_arg(state, options, ecx, parser)?);
+            args.push(parse_arg(ctx, ecx, parser)?);
         }
     }
 
@@ -402,7 +403,7 @@ fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::
     }
 }
 
-fn parse_arg<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
+fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
     // sizehint
     let size = eat_size_hint(parser);
 
@@ -467,7 +468,7 @@ fn parse_arg<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, pars
         let span = expr.span.with_lo(span.lo());
         parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
 
-        let items = parse_adds(state, options, ecx, expr);
+        let items = parse_adds(ctx, ecx, expr);
 
         // assemble the memory location
         return Ok(Arg::IndirectRaw {
@@ -483,7 +484,7 @@ fn parse_arg<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, pars
     parser.parse_expr()?.and_then(|arg| {
         // typemapped
         if parser.eat(&token::FatArrow) {
-            let base = parse_reg(state, options, &arg);
+            let base = parse_reg(ctx, &arg);
             let base = if let Some(base) = base { base } else {
                 ecx.span_err(arg.span, "Expected register");
                 return Ok(Arg::Invalid);
@@ -502,7 +503,7 @@ fn parse_arg<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, pars
                 let index_expr = parser.parse_expr()?;
 
                 parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
-                items = parse_adds(state, options, ecx, index_expr);
+                items = parse_adds(ctx, ecx, index_expr);
             } else {
                 items = Vec::new();
             }
@@ -526,7 +527,7 @@ fn parse_arg<'a>(state: &mut State, options: &ParserOptions, ecx: &ExtCtxt, pars
         }
 
         // direct register reference
-        if let Some(reg) = parse_reg(state, options, &arg) {
+        if let Some(reg) = parse_reg(ctx, &arg) {
             if size.is_some() {
                 ecx.span_err(arg.span, "size hint with direct register");
             }
@@ -556,18 +557,18 @@ pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     Some(Ident {node: segment.ident, span: path.span})
 }
 
-fn parse_reg(state: &State, options: &ParserOptions, expr: &ast::Expr) -> Option<Spanned<Register>> {
+fn parse_reg(ctx: &Context, expr: &ast::Expr) -> Option<Spanned<Register>> {
     if let Some(path) = as_simple_name(expr) {
         // static register names
 
         let mut name = &*path.node.name.as_str();
-        if let Some(x) = state.crate_data.aliases.get(name) {
+        if let Some(x) = ctx.state.crate_data.aliases.get(name) {
             name = x;
         }
 
         use self::RegId::*;
         use serialize::Size::*;
-        let (reg, size) = if !options.x86mode {
+        let (reg, size) = if let X86Mode::Long = ctx.mode {
             // TODO: I wouldn't be surprised if this is a performance bottleneck currently. Maybe factor this out into a hashmap at one point
             match name {
                 "rax"|"r0" => (RAX, QWORD), "rcx"|"r1" => (RCX, QWORD), "rdx"|"r2" => (RDX, QWORD), "rbx"|"r3" => (RBX, QWORD),
@@ -637,8 +638,6 @@ fn parse_reg(state: &State, options: &ParserOptions, expr: &ast::Expr) -> Option
 
                 "al" => (RAX, BYTE), "cl" => (RCX, BYTE), "dl" => (RDX, BYTE), "bl" => (RBX, BYTE),
 
-                "eip"  => (RIP, DWORD), // not actually encodable. Faked at runtime through absolute displacements
-
                 "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
 
                 "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
@@ -685,7 +684,7 @@ fn parse_reg(state: &State, options: &ParserOptions, expr: &ast::Expr) -> Option
             return None;
         };
 
-        let (size, family) = if !options.x86mode {
+        let (size, family) = if let X86Mode::Long = ctx.mode {
             match &*called.node.name.as_str() {
                 "Rb" => (Size::BYTE,  RegFamily::LEGACY),
                 "Rh" => (Size::BYTE,  RegFamily::HIGHBYTE),
@@ -731,7 +730,7 @@ fn parse_reg(state: &State, options: &ParserOptions, expr: &ast::Expr) -> Option
     }
 }
 
-fn parse_adds(state: &State, options: &ParserOptions, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRefItem> {
+fn parse_adds(ctx: &Context, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRefItem> {
     use syntax::ast::ExprKind;
 
     let mut adds = Vec::new();
@@ -742,13 +741,13 @@ fn parse_adds(state: &State, options: &ParserOptions, ecx: &ExtCtxt, expr: P<ast
     // detect what kind of equation we're dealing with
     for node in adds {
         // simple reg
-        if let Some(Spanned {node: reg, ..} ) = parse_reg(state, options, &node) {
+        if let Some(Spanned {node: reg, ..} ) = parse_reg(ctx, &node) {
             items.push(MemoryRefItem::Register(reg));
             continue;
         }
         if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = *node {
             // reg * const
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, options, left) {
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(ctx, left) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
                     if let ast::LitKind::Int(value, _) = scale.node {
                         items.push(MemoryRefItem::ScaledRegister(reg, value as isize));
@@ -756,7 +755,7 @@ fn parse_adds(state: &State, options: &ParserOptions, ecx: &ExtCtxt, expr: P<ast
                     }
                 }
             } // const * reg
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(state, options, right) {
+            if let Some(Spanned {node: reg, ..} ) = parse_reg(ctx, right) {
                 if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
                     if let ast::LitKind::Int(value, _) = scale.node {
                         items.push(MemoryRefItem::ScaledRegister(reg, value as isize));

@@ -44,9 +44,9 @@ bitflags! {
         const IMM_OP    = 0x0000_0004; // this instruction encodes the final opcode byte in the immediate position, like 3DNow! ops.
 
         // note: the first 4 in this block are mutually exclusive
-        const AUTO_SIZE = 0x0000_0008; // 16 bit -> OPSIZE , 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
-        const AUTO_NO32 = 0x0000_0010; // 16 bit -> OPSIZE , 32-bit -> illegal, 64-bit -> None
-        const AUTO_REXW = 0x0000_0020; // 16 bit -> illegal, 32-bit -> None   , 64-bit -> REX.W/VEX.W/XOP.W
+        const AUTO_SIZE = 0x0000_0008; // 16 bit -> OPSIZE , 32-bit -> None     , 64-bit -> REX.W/VEX.W/XOP.W
+        const AUTO_NO32 = 0x0000_0010; // 16 bit -> OPSIZE , 32-bit -> None(x86), 64-bit -> None(x64)
+        const AUTO_REXW = 0x0000_0020; // 16 bit -> illegal, 32-bit -> None     , 64-bit -> REX.W/VEX.W/XOP.W
         const AUTO_VEXL = 0x0000_0040; // 128bit -> None   , 256bit -> VEX.L
         const WORD_SIZE = 0x0000_0080; // implies opsize prefix
         const WITH_REXW = 0x0000_0100; // implies REX.W/VEX.W/XOP.W
@@ -67,6 +67,7 @@ bitflags! {
         const ENC_MR    = 0x0008_0000; // select alternate arg encoding
         const ENC_VM    = 0x0010_0000; // select alternate arg encoding
         const ENC_MIB   = 0x0020_0000; // A special encoding using the SIB to specify an immediate and two registers
+        const X86_ONLY  = 0x0040_0000; // instructions available in protected mode, but not long mode
     }
 }
 
@@ -148,6 +149,7 @@ const REPE       : u32 = Flags::REPE.bits;
 const ENC_MR     : u32 = Flags::ENC_MR.bits;
 const ENC_VM     : u32 = Flags::ENC_VM.bits;
 const ENC_MIB    : u32 = Flags::ENC_MIB.bits;
+const X86_ONLY   : u32 = Flags::X86_ONLY.bits;
 
 #[allow(dead_code)]
 const X64_IMPLICIT : u32 = Features::X64_IMPLICIT.bits;

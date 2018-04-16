@@ -67,6 +67,7 @@ pub enum Stmt {
     ForwardJumpTarget(Ident,        P<ast::Expr>),
     BackwardJumpTarget(Ident,       P<ast::Expr>),
     DynamicJumpTarget(P<ast::Expr>, P<ast::Expr>),
+    BareJumpTarget(   P<ast::Expr>, P<ast::Expr>),
 
     // a random statement that has to be inserted between assembly hunks
     Stmt(ast::Stmt)
@@ -166,6 +167,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
             Stmt::ForwardJumpTarget(n,    reloc) => ("forward_reloc" , vec![expr_string_from_ident(ecx, n), reloc]),
             Stmt::BackwardJumpTarget(n,   reloc) => ("backward_reloc", vec![expr_string_from_ident(ecx, n), reloc]),
             Stmt::DynamicJumpTarget(expr, reloc) => ("dynamic_reloc" , vec![expr, reloc]),
+            Stmt::BareJumpTarget(expr, reloc)    => ("bare_reloc"    , vec![expr, reloc]),
             Stmt::Stmt(s) => {
                 output.push(s);
                 continue;
@@ -202,10 +204,10 @@ pub fn expr_dynscale(ecx: &ExtCtxt, name: &P<ast::Expr>, scale: P<ast::Expr>, re
 }
 
 // makes (a, b)
-pub fn expr_tuple_of_2_u8s(ecx: &ExtCtxt, span: Span, a: u8, b: u8) -> P<ast::Expr> {
+pub fn expr_tuple_of_u8s(ecx: &ExtCtxt, span: Span, data: &[u8]) -> P<ast::Expr> {
     ecx.expr_tuple(
         span,
-        vec![ecx.expr_u8(span, a), ecx.expr_u8(span, b)]
+        data.iter().map(|&a| ecx.expr_u8(span, a)).collect()
     )
 }
 

@@ -4,8 +4,8 @@ use syntax::ast;
 use syntax::ptr::P;
 use syntax::codemap::Spanned;
 
-use ::State;
 use serialize::{self, Stmt, Size, Ident};
+use super::{Context, X86Mode};
 use super::parser::{Arg, Instruction, MemoryRef, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;
 use super::x64data::Flags;
@@ -63,24 +63,44 @@ const MOD_NOBASE: u8 = 0b00; // VSIB addressing
 const MOD_DISP8:  u8 = 0b01;
 const MOD_DISP32: u8 = 0b10;
 
+
+#[derive(Debug, Clone, Copy)]
+enum RelocationKind {
+    /// A rip-relative relocation. No need to keep track of.
+    Relative,
+    // An absolute offset to a rip-relative location.
+    Absolute,
+    // A relative offset to an absolute location,
+    Extern,
+}
+
+impl RelocationKind {
+    fn to_id(&self) -> u8 {
+        match *self {
+            RelocationKind::Relative => 0,
+            RelocationKind::Absolute => 1,
+            RelocationKind::Extern   => 2
+        }
+    }
+}
+
 /*
  * Implementation
  */
 
-pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instruction) -> Result<(), Option<String>> {
-    let buffer = &mut state.stmts;
+pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instruction) -> Result<(), Option<String>> {
     let Instruction(mut ops, mut args, _) = instruction;
     let op = ops.pop().unwrap();
     let prefixes = ops;
 
     // sanitize memory references and determine address size
-    let pref_addr = sanitize_addresses(ecx, &mut args)?;
+    let pref_addr = sanitize_addresses(&ctx, ecx, &mut args)?;
 
     // figure out immediate sizes where the immediates are constants
     size_immediates(&mut args);
 
     // this call also inserts more size information in the AST if applicable.
-    let data = match_op_format(ecx, op, &mut args)?;
+    let data = match_op_format(ctx, ecx, op, &mut args)?;
 
     // determine legacy prefixes
     let (mut pref_mod, pref_seg) = get_legacy_prefixes(ecx, data, prefixes)?;
@@ -94,11 +114,20 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         // determine operand size
         let op_size = get_operand_size(data, &mut args)?;
 
+        match ctx.mode {
+            X86Mode::Protected => if op_size == Size::QWORD {
+                return Err(Some(format!("'{}': Does not support 64 bit operands in 32-bit mode", &*op.node.name.as_str())));
+            },
+            X86Mode::Long => ()
+        }
+
         if data.flags.contains(Flags::AUTO_NO32) {
-            if op_size == Size::WORD {
-                pref_size = true;
-            } else if op_size != Size::QWORD {
-                return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", &*op.node.name.as_str())));
+            match (op_size, ctx.mode) {
+                (Size::WORD, _) => pref_size = true,
+                (Size::QWORD, X86Mode::Long) => (),
+                (Size::DWORD, X86Mode::Protected) => (),
+                (Size::DWORD, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", &*op.node.name.as_str()))),
+                (_, _) => panic!("bad formatting data"),
             }
         } else if data.flags.contains(Flags::AUTO_REXW) {
             if op_size == Size::QWORD {
@@ -141,6 +170,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     let (mut rm, reg, vvvv, ireg, mut args) = extract_args(data, args);
 
     // we'll need this to keep track of where relocations need to be made
+    // (target, offset, size, kind)
     let mut relocations = Vec::new();
 
     let mut ops = data.ops;
@@ -153,6 +183,9 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     } else {
         None
     };
+
+    // shorthand
+    let buffer = &mut ctx.state.stmts;
 
     // legacy-only prefixes
     if let Some(pref) = pref_seg {
@@ -182,6 +215,11 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
             buffer.push(Stmt::u8(0x66));
         }
         if need_rex {
+            // Certain SSE/AVX legacy encoded operations are not available in 32-bit mode
+            // as they require a REX.W prefix to be encoded, which is impossible. We catch those cases here
+            if ctx.mode == X86Mode::Protected {
+                return Err(Some(format!("'{}': Does not support 64 bit operand size in 32-bit mode", &*op.node.name.as_str())))
+            }
             compile_rex(ecx, buffer, rex_w, &reg, &rm);
         }
     }
@@ -244,7 +282,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
                 compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
                 if let Some(expr) = scale_expr {
-                    compile_sib_dynscale(ecx, buffer, &state.target, scale, expr, index, base);
+                    compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale, expr, index, base);
                 } else {
                     compile_modrm_sib(ecx, buffer, scale as u8, index, base);
                 }
@@ -289,7 +327,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
 
                     compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
                     if let Some(expr) = scale_expr {
-                        compile_sib_dynscale(ecx, buffer, &state.target, scale, expr, index.kind, base);
+                        compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale, expr, index.kind, base);
                     } else {
                         compile_modrm_sib(ecx, buffer, scale as u8, index.kind, base);
                     }
@@ -324,7 +362,10 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         compile_modrm_sib(ecx, buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
 
         buffer.push(Stmt::u32(0));
-        relocations.push((target, Size::DWORD, 0));
+        match ctx.mode {
+            X86Mode::Long      => relocations.push((target, 0, Size::DWORD, RelocationKind::Relative)),
+            X86Mode::Protected => relocations.push((target, 0, Size::DWORD, RelocationKind::Absolute))
+        }
     }
 
     // opcode encoded after the displacement
@@ -332,7 +373,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         buffer.push(Stmt::u8(code));
 
         // bump relocations
-        relocations.iter_mut().for_each(|r| r.2 += 1);
+        relocations.iter_mut().for_each(|r| r.1 += 1);
     }
 
     // register in immediate argument
@@ -356,7 +397,7 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
         buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
 
         // bump relocations
-        relocations.iter_mut().for_each(|r| r.2 += 1);
+        relocations.iter_mut().for_each(|r| r.1 += 1);
     }
 
     // immediates
@@ -366,17 +407,17 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
                 buffer.push(Stmt::ExprSigned(expr, size));
 
                 // bump relocations
-                relocations.iter_mut().for_each(|r| r.2 += size.in_bytes());
+                relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
             },
             Arg::JumpTarget(target, Some(size)) => {
                 // placeholder
                 buffer.push(Stmt::Const(0, size));
 
                 // bump relocations
-                relocations.iter_mut().for_each(|r| r.2 += size.in_bytes());
+                relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
 
                 // add the new relocation
-                relocations.push((target, size, 0));
+                relocations.push((target, 0, size, RelocationKind::Relative));
             },
             Arg::Immediate(_, None) => panic!("Immediate with undetermined size, did get_operand_size not run?"),
             Arg::JumpTarget(_, None) => panic!("Jumptarget with undetermined size, did get_operand_size not run?"),
@@ -385,22 +426,26 @@ pub fn compile_instruction(state: &mut State, ecx: &ExtCtxt, instruction: Instru
     }
 
     // push relocations
-    for (target, size, offset) in relocations.drain(..) {
+    for (target, offset, size, kind) in relocations.drain(..) {
         buffer.push(match target {
-            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(  ident, serialize::expr_tuple_of_2_u8s(ecx, ident.span, offset, size.in_bytes())),
-            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_2_u8s(ecx, ident.span, offset, size.in_bytes())),
-            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_2_u8s(ecx, ident.span, offset, size.in_bytes())),
+            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(  ident, serialize::expr_tuple_of_u8s(ecx, ident.span, &[offset, size.in_bytes(), kind.to_id()])),
+            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_u8s(ecx, ident.span, &[offset, size.in_bytes(), kind.to_id()])),
+            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_u8s(ecx, ident.span, &[offset, size.in_bytes(), kind.to_id()])),
             JumpType::Dynamic(expr)   => {
                 let span = expr.span;
-                Stmt::DynamicJumpTarget(expr, serialize::expr_tuple_of_2_u8s(ecx, span, offset, size.in_bytes()))
+                Stmt::DynamicJumpTarget(expr, serialize::expr_tuple_of_u8s(ecx, span, &[offset, size.in_bytes(), kind.to_id()]))
             },
+            JumpType::Bare(expr)      => {
+                let span = expr.span;
+                Stmt::BareJumpTarget(expr, serialize::expr_tuple_of_u8s(ecx, span, &[offset, size.in_bytes(), kind.to_id()]))
+            }
         })
     }
 
     Ok(())
 }
 
-fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<String>> {
+fn sanitize_addresses(ctx: &Context, ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<String>> {
     // determine if an address size prefix is necessary, and sanitize the register choice for memoryrefs
     let mut addr_size = None;
 
@@ -451,11 +496,14 @@ fn sanitize_addresses(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<bool, Option<St
         }
     }
 
-    let addr_size = addr_size.unwrap_or(Size::QWORD);
-    if addr_size != Size::DWORD && addr_size != Size::QWORD {
-        return Err(Some("Impossible address size".into()));
-    }
-    Ok(addr_size != Size::QWORD)
+    Ok(match (ctx.mode, addr_size) {
+        (_, None) => false,
+        (X86Mode::Long, Some(Size::QWORD)) => false,
+        (X86Mode::Long, Some(Size::DWORD)) => true,
+        (X86Mode::Protected, Some(Size::DWORD)) => false,
+        (X86Mode::Protected, Some(Size::WORD)) => true,
+        _ => return Err(Some("Impossible address size".into()))
+    })
 }
 
 fn process_raw_memoryrefs(ecx: &ExtCtxt, args: &mut [Arg]) -> Result<(), Option<String>> {
@@ -770,7 +818,7 @@ fn sanitize_memoryref(ecx: &ExtCtxt, mem: &mut MemoryRef) -> Result<(), Option<S
     Ok(())
 }
 
-fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'static Opdata, Option<String>> {
+fn match_op_format(ctx: &Context, ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'static Opdata, Option<String>> {
     let name = &*ident.node.name.as_str();
 
     let data = if let Some(data) = get_mnemnonic_data(name) {
@@ -781,7 +829,7 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     };
 
     for format in data {
-        if let Ok(_) = match_format_string(format, args) {
+        if let Ok(_) = match_format_string(ctx, format, args) {
             return Ok(format)
         }
     }
@@ -791,8 +839,12 @@ fn match_op_format(ecx: &ExtCtxt, ident: Ident, args: &mut [Arg]) -> Result<&'st
     ))
 }
 
-fn match_format_string(fmt: &'static Opdata, args: &mut [Arg]) -> Result<(), &'static str> {
+fn match_format_string(ctx: &Context, fmt: &'static Opdata, args: &mut [Arg]) -> Result<(), &'static str> {
     let fmtstr = &fmt.args;
+
+    if ctx.mode != X86Mode::Protected && fmt.flags.intersects(Flags::X86_ONLY) {
+        return Err("Not available in 32-bit mode");
+    }
 
     if fmtstr.len() != args.len() * 2 {
         return Err("argument length mismatch");
