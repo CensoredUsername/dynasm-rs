@@ -225,6 +225,8 @@ pub trait DynasmLabelApi : DynasmApi {
     fn global_reloc(  &mut self, name: &'static str, kind: Self::Relocation);
     /// Record a relocation spot for a reference to a dynamic label
     fn dynamic_reloc( &mut self, id: DynamicLabel,   kind: Self::Relocation);
+    /// Record a relocation spot to an arbitrary target
+    fn bare_reloc(    &mut self, target: usize,      kind: Self::Relocation);
 }
 
 /// A basic implementation of DynasmApi onto a simple Vec<u8> to assist debugging

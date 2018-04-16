@@ -12,41 +12,64 @@ use ::common::{BaseAssembler, LabelRegistry, UncommittedModifier};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
 #[derive(Debug, Clone, Copy)]
-enum RelocationType {
+enum RelocationSize {
     Byte,
     Word,
     DWord,
-    // this one is a bit special. In order to encode lookups into
-    // the instruction stream this one does not do a relative offset
-    // calculation but instead resolves to the absolute memory
-    // address of the target. This also means it needs to be kept
-    // track of for when a buffer swap happens
-    Absolute
+}
+
+impl RelocationSize {
+    fn size(&self) -> usize {
+        match *self {
+            RelocationSize::Byte  => 1,
+            RelocationSize::Word  => 2,
+            RelocationSize::DWord => 4,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum RelocationKind {
+    /// A rip-relative relocation. No need to keep track of.
+    Relative,
+    // An absolute offset to a rip-relative location.
+    Absolute,
+    // A relative offset to an absolute location,
+    Extern,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct RelocationType {
+    size: RelocationSize,
+    kind: RelocationKind,
+    offset: u8
 }
 
 impl RelocationType {
-    fn size(&self) -> usize {
-        match *self {
-            RelocationType::Byte  => 1,
-            RelocationType::Word  => 2,
-            RelocationType::DWord => 4,
-            RelocationType::Absolute => 4,
-        }
-    }
-
-    fn from_id(id: u8) -> Self {
-        match id {
-            1 => RelocationType::Byte,
-            2 => RelocationType::Word,
-            4 => RelocationType::DWord,
-            0 => RelocationType::Absolute,
-            x => panic!("Unsupported relocation size: {}", x)
+    fn from_tuple((offset, size, kind): (u8, u8, u8)) -> Self {
+        RelocationType {
+            size: match size {
+                1 => RelocationSize::Byte,
+                2 => RelocationSize::Word,
+                4 => RelocationSize::DWord,
+                x => panic!("Unsupported relocation size: {}", x)
+            },
+            kind: match kind {
+                0 => RelocationKind::Relative,
+                1 => RelocationKind::Absolute,
+                2 => RelocationKind::Extern,
+                x => panic!("Unsupported relocation kind: {}", x)
+            },
+            offset: offset
         }
     }
 }
 
-#[derive(Debug)]
-struct PatchLoc(usize, u8, RelocationType);
+#[derive(Debug, Clone, Copy)]
+struct PatchLoc(usize, RelocationType);
+
+#[derive(Debug, Clone, Copy)]
+struct ManagedRelocation(usize, RelocationSize, bool);
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
 /// compilation as well as multithreaded execution with simultaneous compilation.
@@ -67,9 +90,9 @@ pub struct Assembler {
     // locations to be patched once this label gets seen. name -> Vec<locs>
     local_relocs: HashMap<&'static str, Vec<PatchLoc>>,
 
-    // here we keep track of previously made absolute relocations
-    // as they all need to be fixed up when we resize the backing buffers
-    previous_absolute_relocs: Vec<usize>
+    // here we keep track of managed relocations that need fix-up
+    // work when the buffer is moved
+    managed_relocs: Vec<ManagedRelocation>
 }
 
 /// the default starting size for an allocation by this assembler.
@@ -93,7 +116,7 @@ impl Assembler {
             global_relocs: Vec::new(),
             dynamic_relocs: Vec::new(),
             local_relocs: HashMap::new(),
-            previous_absolute_relocs: Vec::new()
+            managed_relocs: Vec::new()
         })
     }
 
@@ -145,26 +168,43 @@ impl Assembler {
     }
 
     #[inline]
-    fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
+    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+        // calculate the offset that the relocation starts at
+        // in the executable buffer
+        let offset = loc.0 - loc.1.offset as usize - loc.1.size.size();
+
         // the value that the relocation will have
-        let t = target.0 as isize - loc.0 as isize;
-        let execbuffer_addr = self.base.execbuffer_addr();
-
-        // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - self.base.asmoffset() - loc.1 as usize;
-        let buf = &mut self.base.ops[offset - loc.2.size() .. offset];
-
-        match loc.2 {
-            RelocationType::Byte  => buf[0] = t as i8 as u8,
-            RelocationType::Word  => LittleEndian::write_i16(buf, t as i16),
-            RelocationType::DWord => LittleEndian::write_i32(buf, t as i32),
-            RelocationType::Absolute => {
+        let t = match loc.1.kind {
+            RelocationKind::Relative => target.wrapping_sub(loc.0),
+            RelocationKind::Absolute => {
                 // register it so it will be relocated when the buffer is moved
-                self.previous_absolute_relocs.push(offset);
-                // calculate the absolute address to refer to and write it into the buffer
-                let t = execbuffer_addr + target.0;
-                LittleEndian::write_u32(buf, t as u32);
+                self.managed_relocs.push(ManagedRelocation(
+                    offset,
+                    loc.1.size,
+                    false
+                ));
+                // calculate the absolute address to refer to
+                self.base.execbuffer_addr() + target
+            },
+            RelocationKind::Extern => {
+                // register it so it will be relocated when the buffer is moved
+                self.managed_relocs.push(ManagedRelocation(
+                    offset,
+                    loc.1.size,
+                    true
+                ));
+                // calculate the relative offset to the absolute address
+                target.wrapping_sub(self.base.execbuffer_addr() + loc.0)
             }
+        };
+
+        // write the relocation
+        let offset = offset - self.base.asmoffset();
+        let buf = &mut self.base.ops[offset .. offset + loc.1.size.size()];
+        match loc.1.size {
+            RelocationSize::Byte  => buf[0] = t as u8,
+            RelocationSize::Word  => LittleEndian::write_u16(buf, t as u16),
+            RelocationSize::DWord => LittleEndian::write_u32(buf, t as u32),
         }
     }
 
@@ -173,14 +213,14 @@ impl Assembler {
         mem::swap(&mut relocs, &mut self.global_relocs);
         for (loc, name) in relocs {
             let target = self.labels.resolve_global_label(name);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.dynamic_relocs);
         for (loc, id) in relocs {
             let target = self.labels.resolve_dynamic_label(id);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         if let Some(name) = self.local_relocs.keys().next() {
@@ -196,21 +236,22 @@ impl Assembler {
         // finalize all relocs in the newest part.
         self.encode_relocs();
 
-        let absolute_relocs = &self.previous_absolute_relocs;
+        let absolute_relocs = &self.managed_relocs;
 
         // update the executable buffer
         self.base.commit(|buffer, old_addr, new_addr| {
             // deal with absolute relocations
-            let change: u32 = new_addr.wrapping_sub(old_addr) as u32;
+            let _change: u32 = new_addr.wrapping_sub(old_addr) as u32;
 
             for &relocation in absolute_relocs {
                 // slice the part that needs to be relocated
-                let mut slice = &mut buffer[relocation - 4 .. relocation];
+                let mut _slice = &mut buffer[relocation.0 .. relocation.1.size()];
 
                 // add the change to the current 
-                let mut val = LittleEndian::read_u32(slice);
-                val = val.wrapping_add(change);
-                LittleEndian::write_u32(slice, val);
+                unimplemented!("relocation of absolute or extern relocation");
+                // let mut val = LittleEndian::read_u32(slice);
+                // val = val.wrapping_add(change);
+                // LittleEndian::write_u32(slice, val);
             }
 
         });
@@ -254,11 +295,8 @@ impl DynasmApi for Assembler {
 }
 
 impl DynasmLabelApi for Assembler {
-    // would really like to have a stronger typed one here, but
-    // currently it is impossible to construct an associated type just
-    // from the instance name and we can't find out what assembler
-    // is used in generated code.
-    type Relocation = (u8, u8);
+    /// tuple of encoded (offset, size, kind)
+    type Relocation = (u8, u8, u8);
 
     #[inline]
     fn align(&mut self, alignment: usize) {
@@ -274,7 +312,7 @@ impl DynasmLabelApi for Assembler {
     #[inline]
     fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         let offset = self.offset().0;
-        self.global_relocs.push((PatchLoc(offset, kind.0, RelocationType::from_id(kind.1)), name));
+        self.global_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), name));
     }
 
     #[inline]
@@ -286,7 +324,7 @@ impl DynasmLabelApi for Assembler {
     #[inline]
     fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
         let offset = self.offset().0;
-        self.dynamic_relocs.push((PatchLoc(offset, kind.0, RelocationType::from_id(kind.1)), id));
+        self.dynamic_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), id));
     }
 
     #[inline]
@@ -294,7 +332,7 @@ impl DynasmLabelApi for Assembler {
         let offset = self.offset();
         if let Some(relocs) = self.local_relocs.remove(&name) {
             for loc in relocs {
-                self.patch_loc(loc, offset);
+                self.patch_loc(loc, offset.0);
             }
         }
         self.labels.local_label(name, offset);
@@ -305,10 +343,10 @@ impl DynasmLabelApi for Assembler {
         let offset = self.offset().0;
         match self.local_relocs.entry(name) {
             Occupied(mut o) => {
-                o.get_mut().push(PatchLoc(offset, kind.0, RelocationType::from_id(kind.1)));
+                o.get_mut().push(PatchLoc(offset, RelocationType::from_tuple(kind)));
             },
             Vacant(v) => {
-                v.insert(vec![PatchLoc(offset, kind.0, RelocationType::from_id(kind.1))]);
+                v.insert(vec![PatchLoc(offset, RelocationType::from_tuple(kind))]);
             }
         }
     }
@@ -319,9 +357,17 @@ impl DynasmLabelApi for Assembler {
         let offset = self.offset().0;
         self.patch_loc(PatchLoc(
             offset,
-            kind.0,
-            RelocationType::from_id(kind.1)
-        ), target)
+            RelocationType::from_tuple(kind)
+        ), target.0)
+    }
+
+    #[inline]
+    fn bare_reloc(&mut self, target: usize, kind: Self::Relocation) {
+        let offset = self.offset().0;
+        self.patch_loc(PatchLoc(
+            offset,
+            RelocationType::from_tuple(kind)
+        ), target);
     }
 }
 
@@ -380,25 +426,42 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
+    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+        // calculate the offset that the relocation starts at
+        // in the executable buffer
+        let offset = loc.0 - loc.1.offset as usize - loc.1.size.size();
+
         // the value that the relocation will have
-        let t = target.0 as isize - loc.0 as isize;
-
-        // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - loc.1 as usize;
-        let buf = &mut self.buffer[offset - loc.2.size() .. offset];
-
-        match loc.2 {
-            RelocationType::Byte  => buf[0] = t as i8 as u8,
-            RelocationType::Word  => LittleEndian::write_i16(buf, t as i16),
-            RelocationType::DWord => LittleEndian::write_i32(buf, t as i32),
-            RelocationType::Absolute => {
+        let t = match loc.1.kind {
+            RelocationKind::Relative => target.wrapping_sub(loc.0),
+            RelocationKind::Absolute => {
                 // register it so it will be relocated when the buffer is moved
-                self.assembler.previous_absolute_relocs.push(offset);
-                // calculate the absolute address to refer to and write it into the buffer
-                let t = self.assembler.base.execbuffer_addr() + target.0;
-                LittleEndian::write_u32(buf, t as u32);
+                self.assembler.managed_relocs.push(ManagedRelocation(
+                    offset,
+                    loc.1.size,
+                    false
+                ));
+                // calculate the absolute address to refer to
+                self.assembler.base.execbuffer_addr() + target
+            },
+            RelocationKind::Extern => {
+                // register it so it will be relocated when the buffer is moved
+                self.assembler.managed_relocs.push(ManagedRelocation(
+                    offset,
+                    loc.1.size,
+                    true
+                ));
+                // calculate the relative offset to the absolute address
+                target.wrapping_sub(self.assembler.base.execbuffer_addr() + loc.0)
             }
+        };
+
+        // write the relocation
+        let buf = &mut self.buffer[offset .. offset + loc.1.size.size()];
+        match loc.1.size {
+            RelocationSize::Byte  => buf[0] = t as u8,
+            RelocationSize::Word  => LittleEndian::write_u16(buf, t as u16),
+            RelocationSize::DWord => LittleEndian::write_u32(buf, t as u32),
         }
     }
 
@@ -407,14 +470,14 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         mem::swap(&mut relocs, &mut self.assembler.global_relocs);
         for (loc, name) in relocs {
             let target = self.assembler.labels.resolve_global_label(name);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.dynamic_relocs);
         for (loc, id) in relocs {
             let target = self.assembler.labels.resolve_dynamic_label(id);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         if let Some(name) = self.assembler.local_relocs.keys().next() {
@@ -437,7 +500,7 @@ impl<'a, 'b> DynasmApi for AssemblyModifier<'a, 'b> {
 }
 
 impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
-    type Relocation = (u8, u8);
+    type Relocation = (u8, u8, u8);
 
     #[inline]
     fn align(&mut self, alignment: usize) {
@@ -469,7 +532,7 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
         let offset = self.offset();
         if let Some(relocs) = self.assembler.local_relocs.remove(&name) {
             for loc in relocs {
-                self.patch_loc(loc, offset);
+                self.patch_loc(loc, offset.0);
             }
         }
         self.assembler.labels.local_label(name, offset);
@@ -486,9 +549,13 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
         let offset = self.offset();
         self.patch_loc(PatchLoc(
             offset.0,
-            kind.0,
-            RelocationType::from_id(kind.1)
-        ), target)
+            RelocationType::from_tuple(kind)
+        ), target.0)
+    }
+
+    #[inline]
+    fn bare_reloc(&mut self, addr: usize, kind: Self::Relocation) {
+        self.assembler.bare_reloc(addr, kind);
     }
 }
 

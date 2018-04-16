@@ -12,36 +12,47 @@ use ::common::{BaseAssembler, LabelRegistry, UncommittedModifier};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
 #[derive(Debug, Clone, Copy)]
-enum RelocationType {
+enum RelocationSize {
     Byte,
     Word,
     DWord,
     QWord
 }
 
-impl RelocationType {
+impl RelocationSize {
     fn size(&self) -> usize {
         match *self {
-            RelocationType::Byte  => 1,
-            RelocationType::Word  => 2,
-            RelocationType::DWord => 4,
-            RelocationType::QWord => 8,
+            RelocationSize::Byte  => 1,
+            RelocationSize::Word  => 2,
+            RelocationSize::DWord => 4,
+            RelocationSize::QWord => 8,
         }
     }
+}
 
-    fn from_id(id: u8) -> Self {
-        match id {
-            1 => RelocationType::Byte,
-            2 => RelocationType::Word,
-            4 => RelocationType::DWord,
-            8 => RelocationType::QWord,
-            x => panic!("Unsupported relocation size: {}", x)
+#[derive(Debug, Clone, Copy)]
+struct RelocationType {
+    size: RelocationSize,
+    offset: u8
+}
+
+impl RelocationType {
+    fn from_tuple((offset, size): (u8, u8)) -> Self {
+        RelocationType {
+            size: match size {
+                1 => RelocationSize::Byte,
+                2 => RelocationSize::Word,
+                4 => RelocationSize::DWord,
+                8 => RelocationSize::QWord,
+                x => panic!("Unsupported relocation size: {}", x)
+            },
+            offset: offset
         }
     }
 }
 
 #[derive(Debug)]
-struct PatchLoc(usize, u8, RelocationType);
+struct PatchLoc(usize, RelocationType);
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
 /// compilation as well as multithreaded execution with simultaneous compilation.
@@ -135,19 +146,22 @@ impl Assembler {
     }
 
     #[inline]
-    fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
+    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+        // calculate the offset that the relocation starts at
+        // in the executable buffer
+        let offset = loc.0 - loc.1.offset as usize - loc.1.size.size();
+
         // the value that the relocation will have
-        let target = target.0 as isize - loc.0 as isize;
+        let t = target.wrapping_sub(loc.0 as usize);
 
-        // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - self.base.asmoffset() - loc.1 as usize;
-        let buf = &mut self.base.ops[offset - loc.2.size() .. offset];
-
-        match loc.2 {
-            RelocationType::Byte  => buf[0] = target as i8 as u8,
-            RelocationType::Word  => LittleEndian::write_i16(buf, target as i16),
-            RelocationType::DWord => LittleEndian::write_i32(buf, target as i32),
-            RelocationType::QWord => LittleEndian::write_i64(buf, target as i64)
+        // write the relocation
+        let offset = offset - self.base.asmoffset();
+        let buf = &mut self.base.ops[offset .. offset + loc.1.size.size()];
+        match loc.1.size {
+            RelocationSize::Byte  => buf[0] = t as u8,
+            RelocationSize::Word  => LittleEndian::write_u16(buf, t as u16),
+            RelocationSize::DWord => LittleEndian::write_u32(buf, t as u32),
+            RelocationSize::QWord => LittleEndian::write_u64(buf, t as u64)
         }
     }
 
@@ -156,14 +170,14 @@ impl Assembler {
         mem::swap(&mut relocs, &mut self.global_relocs);
         for (loc, name) in relocs {
             let target = self.labels.resolve_global_label(name);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.dynamic_relocs);
         for (loc, id) in relocs {
             let target = self.labels.resolve_dynamic_label(id);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         if let Some(name) = self.local_relocs.keys().next() {
@@ -221,10 +235,7 @@ impl DynasmApi for Assembler {
 }
 
 impl DynasmLabelApi for Assembler {
-    // would really like to have a stronger typed one here, but
-    // currently it is impossible to construct an associated type just
-    // from the instance name and we can't find out what assembler
-    // is used in generated code.
+    /// tuple of encoded (offset, size)
     type Relocation = (u8, u8);
 
     #[inline]
@@ -241,7 +252,7 @@ impl DynasmLabelApi for Assembler {
     #[inline]
     fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
         let offset = self.offset().0;
-        self.global_relocs.push((PatchLoc(offset, kind.0, RelocationType::from_id(kind.1)), name));
+        self.global_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), name));
     }
 
     #[inline]
@@ -253,7 +264,7 @@ impl DynasmLabelApi for Assembler {
     #[inline]
     fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
         let offset = self.offset().0;
-        self.dynamic_relocs.push((PatchLoc(offset, kind.0, RelocationType::from_id(kind.1)), id));
+        self.dynamic_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), id));
     }
 
     #[inline]
@@ -261,7 +272,7 @@ impl DynasmLabelApi for Assembler {
         let offset = self.offset();
         if let Some(relocs) = self.local_relocs.remove(&name) {
             for loc in relocs {
-                self.patch_loc(loc, offset);
+                self.patch_loc(loc, offset.0);
             }
         }
         self.labels.local_label(name, offset);
@@ -272,10 +283,10 @@ impl DynasmLabelApi for Assembler {
         let offset = self.offset().0;
         match self.local_relocs.entry(name) {
             Occupied(mut o) => {
-                o.get_mut().push(PatchLoc(offset, kind.0, RelocationType::from_id(kind.1)));
+                o.get_mut().push(PatchLoc(offset, RelocationType::from_tuple(kind)));
             },
             Vacant(v) => {
-                v.insert(vec![PatchLoc(offset, kind.0, RelocationType::from_id(kind.1))]);
+                v.insert(vec![PatchLoc(offset, RelocationType::from_tuple(kind))]);
             }
         }
     }
@@ -286,9 +297,17 @@ impl DynasmLabelApi for Assembler {
         let offset = self.offset().0;
         self.patch_loc(PatchLoc(
             offset,
-            kind.0,
-            RelocationType::from_id(kind.1)
-        ), target)
+            RelocationType::from_tuple(kind)
+        ), target.0)
+    }
+
+    #[inline]
+    fn bare_reloc(&mut self, target: usize, kind: Self::Relocation) {
+        let offset = self.offset().0;
+        self.patch_loc(PatchLoc(
+            offset,
+            RelocationType::from_tuple(kind)
+        ), target);
     }
 }
 
@@ -347,19 +366,21 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
     }
 
     #[inline]
-    fn patch_loc(&mut self, loc: PatchLoc, target: AssemblyOffset) {
+    fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
+        // calculate the offset that the relocation starts at
+        // in the executable buffer
+        let offset = loc.0 - loc.1.offset as usize - loc.1.size.size();
+
         // the value that the relocation will have
-        let target = target.0 as isize - loc.0 as isize;
+        let t = target.wrapping_sub(loc.0 as usize);
 
-        // slice out the part of the buffer to be overwritten with said value
-        let offset = loc.0 - loc.1 as usize;
-        let buf = &mut self.buffer[offset - loc.2.size() .. offset];
-
-        match loc.2 {
-            RelocationType::Byte  => buf[0] = target as i8 as u8,
-            RelocationType::Word  => LittleEndian::write_i16(buf, target as i16),
-            RelocationType::DWord => LittleEndian::write_i32(buf, target as i32),
-            RelocationType::QWord => LittleEndian::write_i64(buf, target as i64)
+        // write the relocation
+        let buf = &mut self.buffer[offset .. offset + loc.1.size.size()];
+        match loc.1.size {
+            RelocationSize::Byte  => buf[0] = t as u8,
+            RelocationSize::Word  => LittleEndian::write_u16(buf, t as u16),
+            RelocationSize::DWord => LittleEndian::write_u32(buf, t as u32),
+            RelocationSize::QWord => LittleEndian::write_u64(buf, t as u64)
         }
     }
 
@@ -368,14 +389,14 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         mem::swap(&mut relocs, &mut self.assembler.global_relocs);
         for (loc, name) in relocs {
             let target = self.assembler.labels.resolve_global_label(name);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.dynamic_relocs);
         for (loc, id) in relocs {
             let target = self.assembler.labels.resolve_dynamic_label(id);
-            self.patch_loc(loc, target);
+            self.patch_loc(loc, target.0);
         }
 
         if let Some(name) = self.assembler.local_relocs.keys().next() {
@@ -430,7 +451,7 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
         let offset = self.offset();
         if let Some(relocs) = self.assembler.local_relocs.remove(&name) {
             for loc in relocs {
-                self.patch_loc(loc, offset);
+                self.patch_loc(loc, offset.0);
             }
         }
         self.assembler.labels.local_label(name, offset);
@@ -447,9 +468,17 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
         let offset = self.offset();
         self.patch_loc(PatchLoc(
             offset.0,
-            kind.0,
-            RelocationType::from_id(kind.1)
-        ), target)
+            RelocationType::from_tuple(kind)
+        ), target.0)
+    }
+
+    #[inline]
+    fn bare_reloc(&mut self, target: usize, kind: Self::Relocation) {
+        let offset = self.offset().0;
+        self.patch_loc(PatchLoc(
+            offset,
+            RelocationType::from_tuple(kind)
+        ), target);
     }
 }
 
