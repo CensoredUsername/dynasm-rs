@@ -2179,8 +2179,9 @@ Ops!(OPMAP;
 "push" = [
     b"Uw"         , [0x0F, 0xA0        ], X;
     b"Vw"         , [0x0F, 0xA8        ], X;
-    b"ib"         , [0x6A              ], X;
-    b"i*"         , [0x68              ], X, AUTO_NO32;
+    b"ib"         , [0x6A              ], X, EXACT_SIZE;
+    b"iw"         , [0x68              ], X, EXACT_SIZE | WORD_SIZE;
+    b"id"         , [0x68              ], X;
     b"r*"         , [0x50              ], X, AUTO_NO32 | SHORT_ARG;
     b"v*"         , [0xFF              ], 6, AUTO_NO32;
 ]

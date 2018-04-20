@@ -2,8 +2,9 @@ use syntax::ext::base::ExtCtxt;
 use syntax::parse::parser::Parser;
 use syntax::parse::PResult;
 
-pub(super) mod parser;
+mod ast;
 mod compiler;
+mod parser;
 pub mod debug;
 pub mod x64data;
 
@@ -55,10 +56,10 @@ impl Arch for Archx64 {
             state: state,
             mode: X86Mode::Long
         };
-        let instruction = parser::parse_instruction(&mut ctx, ecx, parser)?;
-        let span = instruction.2;
+        let (instruction, args) = parser::parse_instruction(&mut ctx, ecx, parser)?;
+        let span = instruction.span;
 
-        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, ecx, instruction) {
+        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, ecx, instruction, args) {
             ecx.span_err(span, &e);
         }
         Ok(())
@@ -90,11 +91,10 @@ impl Arch for Archx86 {
             state: state,
             mode: X86Mode::Protected
         };
-        let instruction = parser::parse_instruction(&mut ctx, ecx, parser)?;
-        let span = instruction.2;
+        let (instruction, args) = parser::parse_instruction(&mut ctx, ecx, parser)?;
+        let span = instruction.span;
 
-
-        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, ecx, instruction) {
+        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, ecx, instruction, args) {
             ecx.span_err(span, &e);
         }
         Ok(())

@@ -5,314 +5,13 @@ use syntax::parse::token;
 use syntax::parse::PResult;
 use syntax::ast;
 use syntax::ptr::P;
-use syntax::codemap::{Spanned, Span};
+use syntax::codemap::{Spanned};
 
-use std::cmp::PartialEq;
 
 use super::{Context, X86Mode};
 use serialize::{Size, Ident};
 
-/**
- * collections
- */
-
-#[derive(Debug)]
-pub struct Instruction(pub Vec<Ident>, pub Vec<Arg>, pub Span);
-
-#[derive(Debug)]
-pub enum Arg {
-    // unprocessed typemapped argument
-    TypeMappedRaw {
-        span: Span,
-        base_reg: Register,
-        scale: ast::Path,
-        value_size: Option<Size>,
-        nosplit: bool,
-        disp_size: Option<Size>,
-        scaled_items: Vec<MemoryRefItem>,
-        attribute: Option<ast::Ident>,
-    },
-    // unprocessed memory reference argument
-    IndirectRaw {
-        span: Span,
-        value_size: Option<Size>,
-        nosplit: bool,
-        disp_size: Option<Size>,
-        items: Vec<MemoryRefItem>,
-    },
-    Indirect(MemoryRef), // indirect memory reference supporting scale, index, base and displacement.
-    Direct(Spanned<Register>), // a bare register (rax, ...)
-    JumpTarget(JumpType, Option<Size>), // jump target.
-    IndirectJumpTarget(JumpType, Option<Size>), // indirect jump target i.e. rip-relative displacement
-    Immediate(P<ast::Expr>, Option<Size>), // an expression that evaluates to a value. basically, anything that ain't the other three
-    Invalid // placeholder value
-}
-
-#[derive(Debug)]
-pub enum MemoryRefItem {
-    ScaledRegister(Register, isize),
-    Register(Register),
-    Displacement(P<ast::Expr>)
-}
-
-#[derive(Debug)]
-pub struct MemoryRef {
-    pub span:       Span,
-    pub size:       Option<Size>,
-    pub nosplit:    bool,
-    pub disp_size:  Option<Size>,
-    pub base:       Option<Register>,
-    pub index:      Option<(Register, isize, Option<P<ast::Expr>>)>,
-    pub disp:       Option<P<ast::Expr>>
-}
-
-#[derive(Debug)]
-pub enum JumpType {
-    // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
-    // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
-    // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
-    Global(Ident),         // -> label
-    Backward(Ident),       //  > label
-    Forward(Ident),        //  < label
-    Dynamic(P<ast::Expr>), // => expr
-    Bare(P<ast::Expr>)   // just an immediate in a displacement field
-}
-
-// encoding of this:
-// lower byte indicates which register it is
-// upper byte is used to indicate which size group it falls under.
-
-#[derive(Debug, Clone)]
-pub struct Register {
-    pub size: Size,
-    pub kind: RegKind
-}
-
-#[derive(Debug, Clone)]
-pub enum RegKind {
-    Static(RegId),
-    Dynamic(RegFamily, P<ast::Expr>)
-}
-
-// this map identifies the different registers that exist. some of these can be referred to as different sizes
-// but they share the same ID here (think AL/AX/EAX/RAX, XMM/YMM)
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum RegId {
-    // size: 1, 2, 4 or 8 bytes
-    RAX = 0x00, RCX = 0x01, RDX = 0x02, RBX = 0x03,
-    RSP = 0x04, RBP = 0x05, RSI = 0x06, RDI = 0x07,
-    R8  = 0x08, R9  = 0x09, R10 = 0x0A, R11 = 0x0B,
-    R12 = 0x0C, R13 = 0x0D, R14 = 0x0E, R15 = 0x0F,
-
-    // size: 8 bytes
-    RIP = 0x15,
-
-    // size: 1 byte
-    AH = 0x24, CH = 0x25, DH = 0x26, BH = 0x27,
-
-    // size: 10 bytes
-    ST0 = 0x30, ST1 = 0x31, ST2 = 0x32, ST3 = 0x33,
-    ST4 = 0x34, ST5 = 0x35, ST6 = 0x36, ST7 = 0x37,
-
-    // size: 8 bytes. alternative encoding exists
-    MMX0 = 0x40, MMX1 = 0x41, MMX2 = 0x42, MMX3 = 0x43,
-    MMX4 = 0x44, MMX5 = 0x45, MMX6 = 0x46, MMX7 = 0x47,
-
-    // size: 16 bytes or 32 bytes
-    XMM0  = 0x50, XMM1  = 0x51, XMM2  = 0x52, XMM3  = 0x53,
-    XMM4  = 0x54, XMM5  = 0x55, XMM6  = 0x56, XMM7  = 0x57,
-    XMM8  = 0x58, XMM9  = 0x59, XMM10 = 0x5A, XMM11 = 0x5B,
-    XMM12 = 0x5C, XMM13 = 0x5D, XMM14 = 0x5E, XMM15 = 0x5F,
-
-    // size: 2 bytes. alternative encoding exists
-    ES = 0x60, CS = 0x61, SS = 0x62, DS = 0x63,
-    FS = 0x64, GS = 0x65,
-
-    // size: 4 bytes
-    CR0  = 0x70, CR1  = 0x71, CR2  = 0x72, CR3  = 0x73,
-    CR4  = 0x74, CR5  = 0x75, CR6  = 0x76, CR7  = 0x77,
-    CR8  = 0x78, CR9  = 0x79, CR10 = 0x7A, CR11 = 0x7B,
-    CR12 = 0x7C, CR13 = 0x7D, CR14 = 0x7E, CR15 = 0x7F,
-
-    // size: 4 bytes
-    DR0  = 0x80, DR1  = 0x81, DR2  = 0x82, DR3  = 0x83,
-    DR4  = 0x84, DR5  = 0x85, DR6  = 0x86, DR7  = 0x87,
-    DR8  = 0x88, DR9  = 0x89, DR10 = 0x8A, DR11 = 0x8B,
-    DR12 = 0x8C, DR13 = 0x8D, DR14 = 0x8E, DR15 = 0x8F,
-
-    // size: 16 bytes
-    BND0 = 0x90, BND1 = 0x91, BND2 = 0x92, BND3 = 0x93
-}
-
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
-pub enum RegFamily {
-    LEGACY = 0,
-    RIP = 1,
-    HIGHBYTE = 2,
-    FP = 3,
-    MMX = 4,
-    XMM = 5,
-    SEGMENT = 6,
-    CONTROL = 7,
-    DEBUG = 8,
-    BOUND = 9
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct ParserOptions {
-    // if true: only valid x86 registers will be parsed
-    pub x86mode: bool
-}
-
-/*
- * impls
- */
-
-impl Register {
-    pub fn new_static(size: Size, id: RegId) -> Register {
-        Register {size: size, kind: RegKind::Static(id) }
-    }
-
-    pub fn new_dynamic(size: Size, family: RegFamily, id: P<ast::Expr>) -> Register {
-        Register {size: size, kind: RegKind::Dynamic(family, id) }
-    }
-
-    pub fn size(&self) -> Size {
-        self.size
-    }
-}
-
-impl RegKind {
-    pub fn code(&self) -> Option<u8> {
-        match *self {
-            RegKind::Static(code) => Some(code.code()),
-            RegKind::Dynamic(_, _) => None
-        }
-    }
-
-    pub fn family(&self) -> RegFamily {
-        match *self {
-            RegKind::Static(code) => code.family(),
-            RegKind::Dynamic(family, _) => family
-        }
-    }
-
-    pub fn is_dynamic(&self) -> bool {
-        match *self {
-            RegKind::Static(_) => false,
-            RegKind::Dynamic(_, _) => true
-        }
-    }
-
-    pub fn is_extended(&self) -> bool {
-        match self.family() {
-            RegFamily::LEGACY  |
-            RegFamily::XMM     |
-            RegFamily::CONTROL |
-            RegFamily::DEBUG   => self.code().unwrap_or(8) > 7,
-            _ => false
-        }
-    }
-
-    pub fn encode(&self) -> u8 {
-        self.code().unwrap_or(0)
-    }
-
-    pub fn from_number(id: u8) -> RegKind {
-        RegKind::Static(RegId::from_number(id))
-    }
-}
-
-impl PartialEq<Register> for Register {
-    fn eq(&self, other: &Register) -> bool {
-        if self.size == other.size {
-            if let RegKind::Static(code) = self.kind {
-                if let RegKind::Static(other_code) = other.kind {
-                    return code == other_code
-                }
-            }
-        }
-        return false;
-    }
-}
-
-impl PartialEq<RegId> for Register {
-    fn eq(&self, other: &RegId) -> bool {
-        self.kind == *other
-    }
-}
-
-impl PartialEq<RegId> for RegKind {
-    fn eq(&self, other: &RegId) -> bool {
-        match *self {
-            RegKind::Static(id) => id == *other,
-            RegKind::Dynamic(_, _) => false
-        }
-    }
-}
-
-// workarounds to mask an impl<A, B> PartialEq<B> for Option<A: PartialEq<B>>
-impl PartialEq<RegId> for Option<Register> {
-    fn eq(&self, other: &RegId) -> bool {
-        match *self {
-            Some(ref a) => a == other,
-            None => false
-        }
-    }
-}
-
-impl PartialEq<RegId> for Option<RegKind> {
-    fn eq(&self, other: &RegId) -> bool {
-        match *self {
-            Some(ref a) => a == other,
-            None => false
-        }
-    }
-}
-
-impl RegId {
-    pub fn code(&self) -> u8 {
-        *self as u8 & 0xF
-    }
-
-    pub fn family(&self) -> RegFamily {
-        match *self as u8 >> 4 {
-            0 => RegFamily::LEGACY,
-            1 => RegFamily::RIP,
-            2 => RegFamily::HIGHBYTE,
-            3 => RegFamily::FP,
-            4 => RegFamily::MMX,
-            5 => RegFamily::XMM,
-            6 => RegFamily::SEGMENT,
-            7 => RegFamily::CONTROL,
-            8 => RegFamily::DEBUG,
-            9 => RegFamily::BOUND,
-            _ => unreachable!()
-        }
-    }
-
-    pub fn from_number(id: u8) -> RegId {
-        match id {
-            0  => RegId::RAX,
-            1  => RegId::RCX,
-            2  => RegId::RDX,
-            3  => RegId::RBX,
-            4  => RegId::RSP,
-            5  => RegId::RBP,
-            6  => RegId::RSI,
-            7  => RegId::RDI,
-            8  => RegId::R8,
-            9  => RegId::R9,
-            10 => RegId::R10,
-            11 => RegId::R11,
-            12 => RegId::R12,
-            13 => RegId::R13,
-            14 => RegId::R14,
-            15 => RegId::R15,
-            _ => panic!("invalid register code {:?}", id)
-        }
-    }
-}
+use super::ast::{Instruction, RawArg, JumpType, Register, RegId, RegFamily, MemoryRefItem};
 
 /*
  * Code
@@ -322,7 +21,7 @@ impl RegId {
 // this means we don't have to figure out nesting via []'s by ourselves.
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 
-pub fn parse_instruction<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Instruction> {
+pub fn parse_instruction<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Instruction, Vec<RawArg>)> {
     let startspan = parser.span;
 
     let mut ops = Vec::new();
@@ -350,7 +49,13 @@ pub fn parse_instruction<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Pars
     let span = startspan.with_hi(parser.prev_span.hi());
 
     ops.push(op);
-    Ok(Instruction(ops, args, span))
+    Ok((
+        Instruction {
+            idents: ops,
+            span: span
+        },
+        args
+    ))
 }
 
 const PREFIXES: [&'static str; 12] = [
@@ -403,7 +108,7 @@ fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::
     }
 }
 
-fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Arg> {
+fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, RawArg> {
     // sizehint
     let size = eat_size_hint(parser);
 
@@ -424,9 +129,15 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         ($jump:expr, $size:expr) => {
             return Ok(if in_bracket {
                 parser.expect(&token::CloseDelim(token::Bracket))?;
-                Arg::IndirectJumpTarget($jump, $size)
+                RawArg::IndirectJumpTarget {
+                    type_: $jump,
+                    size: $size
+                }
             } else {
-                Arg::JumpTarget($jump, $size)
+                RawArg::JumpTarget {
+                    type_: $jump,
+                    size: $size
+                }
             });
         }
     }
@@ -471,10 +182,10 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         let items = parse_adds(ctx, ecx, expr);
 
         // assemble the memory location
-        return Ok(Arg::IndirectRaw {
+        return Ok(RawArg::IndirectRaw {
             span: span,
-            value_size: size,
             nosplit: nosplit,
+            value_size: size,
             disp_size: disp_size,
             items: items
         });
@@ -487,7 +198,7 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             let base = parse_reg(ctx, &arg);
             let base = if let Some(base) = base { base } else {
                 ecx.span_err(arg.span, "Expected register");
-                return Ok(Arg::Invalid);
+                return Ok(RawArg::Invalid);
             };
 
             let ty = parser.parse_path(PathStyle::Type)?;
@@ -514,13 +225,13 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
                 None
             };
 
-            return Ok(Arg::TypeMappedRaw {
+            return Ok(RawArg::TypeMappedRaw {
                 span: start.with_hi(parser.prev_span.hi()),
+                nosplit: nosplit,
+                value_size: size,
+                disp_size: disp_size,
                 base_reg: base.node,
                 scale: ty,
-                value_size: size,
-                nosplit: nosplit,
-                disp_size: disp_size,
                 scaled_items: items,
                 attribute: attr,
             });
@@ -531,11 +242,17 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
             if size.is_some() {
                 ecx.span_err(arg.span, "size hint with direct register");
             }
-            return Ok(Arg::Direct(reg))
+            return Ok(RawArg::Direct {
+                reg: reg.node,
+                span: reg.span
+            })
         }
 
         // immediate
-        Ok(Arg::Immediate(P(arg), size))
+        Ok(RawArg::Immediate {
+            value: P(arg),
+            size: size
+        })
     })
 }
 
@@ -591,7 +308,7 @@ fn parse_reg(ctx: &Context, expr: &ast::Expr) -> Option<Spanned<Register>> {
                 "r8b"      => (R8,  BYTE), "r9b"      => (R9,  BYTE), "r10b"     => (R10, BYTE), "r11b"     => (R11, BYTE),
                 "r12b"     => (R12, BYTE), "r13b"     => (R13, BYTE), "r14b"     => (R14, BYTE), "r15b"     => (R15, BYTE),
 
-                "rip"  => (RIP, QWORD),
+                "rip"  => (RIP, QWORD), "eip" => (RIP, DWORD),
 
                 "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
 
