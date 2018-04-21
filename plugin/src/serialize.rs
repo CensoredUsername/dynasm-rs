@@ -189,6 +189,11 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
 // this collection is very arbitrary, purely what's needed in codegen, trying to keep
 // most expression building logic in this file.
 
+// expression of value 0. sometimes needed.
+pub fn expr_zero(ecx: &ExtCtxt) -> P<ast::Expr> {
+    ecx.expr_lit(ecx.call_site(), ast::LitKind::Int(0u128, ast::LitIntType::Unsuffixed))
+}
+
 // given an ident, makes it into a "string"
 pub fn expr_string_from_ident(ecx: &ExtCtxt, i: Ident) -> P<ast::Expr> {
     ecx.expr_lit(i.span, ast::LitKind::Str(i.node.name, ast::StrStyle::Cooked))

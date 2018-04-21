@@ -355,6 +355,8 @@ fn parse_reg(ctx: &Context, expr: &ast::Expr) -> Option<Spanned<Register>> {
 
                 "al" => (RAX, BYTE), "cl" => (RCX, BYTE), "dl" => (RDX, BYTE), "bl" => (RBX, BYTE),
 
+                "eip" => (RIP, DWORD),
+
                 "ah" => (AH, BYTE), "ch" => (CH, BYTE), "dh" => (DH, BYTE), "bh" => (BH, BYTE),
 
                 "st0" => (ST0, PWORD), "st1" => (ST1, PWORD), "st2" => (ST2, PWORD), "st3" => (ST3, PWORD),
