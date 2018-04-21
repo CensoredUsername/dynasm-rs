@@ -97,7 +97,20 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
     let mut args = args.into_iter().map(|a| clean_memoryref(ecx, a)).collect::<Result<Vec<CleanArg>, _>>()?;
 
     // sanitize memory references, determine address size, and size immediates/displacements if possible
-    let pref_addr = sanitize_indirects_and_sizes(&ctx, ecx, &mut args)?;
+    let addr_size = sanitize_indirects_and_sizes(&ctx, ecx, &mut args)?;
+    let addr_size = addr_size.unwrap_or(match ctx.mode {
+        X86Mode::Long => Size::QWORD,
+        X86Mode::Protected => Size::DWORD
+    });
+
+    // determine if we need an address size override prefix
+    let pref_addr = match (ctx.mode, addr_size) {
+        (X86Mode::Long, Size::QWORD) => false,
+        (X86Mode::Long, Size::DWORD) => true,
+        (X86Mode::Protected, Size::DWORD) => false,
+        (X86Mode::Protected, Size::WORD) => true,
+        _ => return Err(Some("Impossible address size".into()))
+    };
 
     // this call also inserts more size information in the AST if applicable.
     // match the ast with a format string, resulting in a SizedAST
@@ -267,95 +280,146 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         } else {
             RegKind::from_number(data.reg)
         };
-        match index {
-            // VSIB has different mode rules
-            Some(_) if index.as_ref().unwrap().0.kind.family() == RegFamily::XMM => {
-                let (index, scale, scale_expr) = index.unwrap();
-                let index = index.kind;
 
-                let (base, mode) = if let Some(base) = base {
-                    (base.kind, match (&disp, disp_size) {
-                        (&Some(_), Some(Size::BYTE)) => MOD_DISP8,
-                        (&Some(_), _) => MOD_DISP32,
-                        (&None, _) => MOD_DISP8
-                    })
+        // check addressing mode special cases
+        let mode_vsib = index.as_ref().map_or(false, |&(ref i, _, _)| i.kind.family() == RegFamily::XMM);
+        let mode_16bit = addr_size == Size::WORD;
+        let mode_rip_relative = base.as_ref().map_or(false, |b| b.kind.family() == RegFamily::RIP);
+        let mode_rbp_base = base.as_ref().map_or(false, |b| b == &RegId::RBP || b == &RegId::R13);
+
+        if mode_vsib {
+            let (index, scale, scale_expr) = index.unwrap();
+            let index = index.kind;
+
+            // VSIB addressing has simplified rules.
+            let (base, mode) = if let Some(base) = base {
+                (base.kind, match (&disp, disp_size) {
+                    (&Some(_), Some(Size::BYTE)) => MOD_DISP8,
+                    (&Some(_), _) => MOD_DISP32,
+                    (&None, _) => MOD_DISP8
+                })
+            } else {
+                (RegKind::Static(RegId::RBP), MOD_NOBASE)
+            };
+
+            // always need a SIB byte for VSIB addressing
+            compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+
+            if let Some(expr) = scale_expr {
+                compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale as u8, expr, index, base);
+            } else {
+                compile_modrm_sib(ecx, buffer, encode_scale(scale).unwrap(), index, base);
+            }
+
+            if let Some(disp) = disp {
+                buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+            } else if mode == MOD_DISP8 {
+                // no displacement was asked for, but we have to encode one as there's a base
+                buffer.push(Stmt::u8(0));
+            } else {
+                // MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
+                buffer.push(Stmt::u32(0));
+            }
+
+        } else if mode_16bit {
+            // 16-bit mode: the index/base combination has been encoded in the base register.
+            // this register is guaranteed to be present.
+            let base_k = base.unwrap().kind;
+            let mode = match (&disp, disp_size) {
+                (&Some(_), Some(Size::BYTE)) => MOD_DISP8,
+                (&Some(_), _) => MOD_DISP32, // well, technically 16-bit.
+                (&None, _) => if mode_rbp_base {MOD_DISP8} else {MOD_NODISP}
+            };
+
+            // only need a mod.r/m byte for 16-bit addressing
+            compile_modrm_sib(ecx, buffer, mode, reg_k, base_k);
+
+            if let Some(disp) = disp {
+                buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::WORD}));
+            } else if mode == MOD_DISP8 {
+                buffer.push(Stmt::u8(0));
+            }
+
+        } else if mode_rip_relative {
+            // encode the RIP + disp32 or disp32 form
+            compile_modrm_sib(ecx, buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
+
+            match ctx.mode {
+                X86Mode::Long => if let Some(disp) = disp {
+                    buffer.push(Stmt::ExprSigned(disp, Size::DWORD));
                 } else {
-                    (RegKind::Static(RegId::RBP), MOD_NOBASE)
+                    buffer.push(Stmt::u32(0))
+                },
+                X86Mode::Protected => {
+                    // x86 doesn't actually allow RIP-relative addressing
+                    // but we can work around it with relocations
+                    buffer.push(Stmt::u32(0));
+                    let disp = disp.unwrap_or_else(|| serialize::expr_zero(ecx));
+                    relocations.push((JumpType::Bare(disp), 0, Size::DWORD, RelocationKind::Absolute));
+                },
+            }
+
+        } else {
+            // normal addressing
+            let no_base = base.is_none();
+
+            // RBP can only be encoded as base if a displacement is present.
+            let mode = if mode_rbp_base && disp.is_none() {
+                MOD_DISP8
+            // mode_nodisp if no base is to be encoded. note that in these scenarions a 32-bit disp has to be emitted
+            } else if disp.is_none() || no_base {
+                MOD_NODISP
+            } else if let Some(Size::BYTE) = disp_size {
+                MOD_DISP8
+            } else {
+                MOD_DISP32
+            };
+
+            // if there's an index we need to escape into the SIB byte
+            if let Some((index, scale, scale_expr)) = index {
+                // to encode the lack of a base we encode RBP
+                let base = if let Some(base) = base {
+                    base.kind
+                } else {
+                    RegKind::Static(RegId::RBP)
                 };
 
+                // escape into the SIB byte
                 compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
                 if let Some(expr) = scale_expr {
-                    compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale as u8, expr, index, base);
+                    compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale as u8, expr, index.kind, base);
                 } else {
-                    compile_modrm_sib(ecx, buffer, encode_scale(scale).unwrap(), index, base);
+                    compile_modrm_sib(ecx, buffer, encode_scale(scale).unwrap(), index.kind, base);
                 }
 
-                if let Some(disp) = disp {
-                    buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
-                } else if mode == MOD_DISP8 {
-                    // no displacement was asked for, but we have to encode one as there's a base
-                    buffer.push(Stmt::u8(0));
-                } else {
-                    // MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
-                    buffer.push(Stmt::u32(0));
-                }
-            },
-            // normal indirect addressing
-            index => {
-                // encoding special cases
-                let rip_relative = base == RegId::RIP;
-                let rbp_relative = base == RegId::RBP || base == RegId::R13;
-                let no_base      = base.is_none();
+            // no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled
+            } else if let Some(base) = base {
+                compile_modrm_sib(ecx, buffer, mode, reg_k, base.kind);
 
-                // RBP can only be encoded as base if a displacement is present.
-                let mode = if rbp_relative && disp.is_none() {
-                    MOD_DISP8
-                // mode_nodisp has to be selected if RIP is encoded, or if no base is to be encoded. note that in these scenarions the disp should actually be encoded
-                } else if disp.is_none() || rip_relative || no_base {
-                    MOD_NODISP
-                } else if let Some(Size::BYTE) = disp_size {
-                    MOD_DISP8
-                } else {
-                    MOD_DISP32
-                };
-
-                // if there's an index we need to escape into the SIB byte
-                if let Some((index, scale, scale_expr)) = index {
-                    // to encode the lack of a base we encode RBP
-                    let base = if let Some(base) = base {
-                        base.kind
-                    } else {
-                        RegKind::Static(RegId::RBP)
-                    };
-
-                    compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-                    if let Some(expr) = scale_expr {
-                        compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale as u8, expr, index.kind, base);
-                    } else {
-                        compile_modrm_sib(ecx, buffer, encode_scale(scale).unwrap(), index.kind, base);
+            // no base, no index. only disp. Easy in x86, but in x64 escape, use RBP as base and RSP as index
+            } else {
+                match ctx.mode {
+                    X86Mode::Protected => {
+                        compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RBP));
+                    },
+                    X86Mode::Long => {
+                        compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+                        compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
                     }
-
-                // no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled
-                } else if let Some(base) = base {
-                    compile_modrm_sib(ecx, buffer, mode, reg_k, base.kind);
-
-                // no base, no index. only disp. escape, use RBP as base and RSP as index
-                } else {
-                    compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-                    compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
-                }
-
-                // Disp
-                if let Some(disp) = disp {
-                    buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
-                } else if no_base || rip_relative {
-                    buffer.push(Stmt::u32(0));
-                } else if rbp_relative {
-                    buffer.push(Stmt::u8(0));
                 }
             }
+
+            // Disp
+            if let Some(disp) = disp {
+                buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+            } else if no_base {
+                buffer.push(Stmt::u32(0));
+            } else if mode == MOD_DISP8 {
+                buffer.push(Stmt::u8(0));
+            }
         }
+
     // jump-target relative addressing
     } else if let Some(SizedArg::IndirectJumpTarget {type_, ..}) = rm {
         let reg_k = if let Some(SizedArg::Direct {reg, ..}) = reg {
@@ -616,7 +680,7 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
 
 // Go through the CleanArgs, check for impossible to encode indirect arguments, fill in immediate/displacement size information
 // and return the effective address size
-fn sanitize_indirects_and_sizes(ctx: &Context, ecx: &ExtCtxt, args: &mut [CleanArg]) -> Result<bool, Option<String>> {
+fn sanitize_indirects_and_sizes(ctx: &Context, ecx: &ExtCtxt, args: &mut [CleanArg]) -> Result<Option<Size>, Option<String>> {
     // determine if an address size prefix is necessary, and sanitize the register choice for memoryrefs
     let mut addr_size = None;
     let mut encountered_indirect = false;
@@ -673,14 +737,7 @@ fn sanitize_indirects_and_sizes(ctx: &Context, ecx: &ExtCtxt, args: &mut [CleanA
         }
     }
 
-    Ok(match (ctx.mode, addr_size) {
-        (_, None) => false,
-        (X86Mode::Long, Some(Size::QWORD)) => false,
-        (X86Mode::Long, Some(Size::DWORD)) => true,
-        (X86Mode::Protected, Some(Size::DWORD)) => false,
-        (X86Mode::Protected, Some(Size::WORD)) => true,
-        _ => return Err(Some("Impossible address size".into()))
-    })
+    Ok(addr_size)
 }
 
 // Tries to find the maximum size necessary to hold the result of an expression.
