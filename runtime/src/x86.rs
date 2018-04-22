@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 use std::collections::hash_map::Entry::*;
 use std::iter::Extend;
 use std::mem;
@@ -68,8 +68,9 @@ impl RelocationType {
 #[derive(Debug, Clone, Copy)]
 struct PatchLoc(usize, RelocationType);
 
+// size of the relocation, if the relocation is absolute (false means extern)
 #[derive(Debug, Clone, Copy)]
-struct ManagedRelocation(usize, RelocationSize, bool);
+struct ManagedRelocation(RelocationSize, bool);
 
 /// This struct is an implementation of a dynasm runtime. It supports incremental
 /// compilation as well as multithreaded execution with simultaneous compilation.
@@ -91,8 +92,8 @@ pub struct Assembler {
     local_relocs: HashMap<&'static str, Vec<PatchLoc>>,
 
     // here we keep track of managed relocations that need fix-up
-    // work when the buffer is moved
-    managed_relocs: Vec<ManagedRelocation>
+    // work when the buffer is moved. Maps the offset to a tuple of size, absolute
+    managed_relocs: BTreeMap<usize, ManagedRelocation>
 }
 
 /// the default starting size for an allocation by this assembler.
@@ -116,7 +117,7 @@ impl Assembler {
             global_relocs: Vec::new(),
             dynamic_relocs: Vec::new(),
             local_relocs: HashMap::new(),
-            managed_relocs: Vec::new()
+            managed_relocs: BTreeMap::new()
         })
     }
 
@@ -146,7 +147,9 @@ impl Assembler {
                 let mut m = AssemblyModifier {
                     asmoffset: 0,
                     assembler: self,
-                    buffer: &mut buf
+                    buffer: &mut buf,
+                    last_asmoffset: 0,
+                    new_managed_relocs: Vec::new(),
                 };
                 f(&mut m);
                 m.encode_relocs();
@@ -167,7 +170,6 @@ impl Assembler {
         self.base.alter_uncommitted()
     }
 
-    #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
         // calculate the offset that the relocation starts at
         // in the executable buffer
@@ -178,20 +180,18 @@ impl Assembler {
             RelocationKind::Relative => target.wrapping_sub(loc.0),
             RelocationKind::Absolute => {
                 // register it so it will be relocated when the buffer is moved
-                self.managed_relocs.push(ManagedRelocation(
-                    offset,
+                self.managed_relocs.insert(offset, ManagedRelocation(
                     loc.1.size,
-                    false
+                    true
                 ));
                 // calculate the absolute address to refer to
                 self.base.execbuffer_addr() + target
             },
             RelocationKind::Extern => {
                 // register it so it will be relocated when the buffer is moved
-                self.managed_relocs.push(ManagedRelocation(
-                    offset,
+                self.managed_relocs.insert(offset, ManagedRelocation(
                     loc.1.size,
-                    true
+                    false
                 ));
                 // calculate the relative offset to the absolute address
                 target.wrapping_sub(self.base.execbuffer_addr() + loc.0)
@@ -240,20 +240,34 @@ impl Assembler {
 
         // update the executable buffer
         self.base.commit(|buffer, old_addr, new_addr| {
-            // deal with absolute relocations
-            let _change: u32 = new_addr.wrapping_sub(old_addr) as u32;
+            // calculate the change in addresses. For absolute relocs, this
+            // will need to be added to the calculated position. For Extern
+            // relocs, this needs to be subtracted
+            let change: u32 = new_addr.wrapping_sub(old_addr) as u32;
 
-            for &relocation in absolute_relocs {
+            for (&offset, &ManagedRelocation(size, absolute)) in absolute_relocs.iter() {
                 // slice the part that needs to be relocated
-                let mut _slice = &mut buffer[relocation.0 .. relocation.1.size()];
+                let mut slice = &mut buffer[offset .. offset + size.size()];
+                let mut val = match size {
+                    RelocationSize::Byte  => slice[0] as u32,
+                    RelocationSize::Word  => LittleEndian::read_u16(slice) as u32,
+                    RelocationSize::DWord => LittleEndian::read_u32(slice),
+                };
 
-                // add the change to the current 
-                unimplemented!("relocation of absolute or extern relocation");
-                // let mut val = LittleEndian::read_u32(slice);
-                // val = val.wrapping_add(change);
-                // LittleEndian::write_u32(slice, val);
+                // change the value
+                if absolute {
+                    val = val.wrapping_add(change);
+                } else {
+                    val = val.wrapping_sub(change);
+                }
+
+                // write it back
+                match size {
+                    RelocationSize::Byte  => slice[1] = val as u8,
+                    RelocationSize::Word  => LittleEndian::write_u16(slice, val as u16),
+                    RelocationSize::DWord => LittleEndian::write_u32(slice, val),
+                }
             }
-
         });
     }
 
@@ -395,14 +409,20 @@ impl<'a> Extend<&'a u8> for Assembler {
 pub struct AssemblyModifier<'a: 'b, 'b> {
     assembler: &'a mut Assembler,
     buffer: &'b mut MutableBuffer,
-    asmoffset: usize
+    asmoffset: usize,
+
+    // here we keep track of what relocations are overwritten / newly added
+    last_asmoffset: usize,
+    new_managed_relocs: Vec<(usize, ManagedRelocation)>,
 }
 
 impl<'a, 'b> AssemblyModifier<'a, 'b> {
     /// Sets the current modification offset to the given value
     #[inline]
     pub fn goto(&mut self, offset: AssemblyOffset) {
+        self.invalidate_managed_relocs();
         self.asmoffset = offset.0;
+        self.last_asmoffset = self.asmoffset;
     }
 
     /// Checks that the current modification offset is not larger than the specified offset.
@@ -425,7 +445,6 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         }
     }
 
-    #[inline]
     fn patch_loc(&mut self, loc: PatchLoc, target: usize) {
         // calculate the offset that the relocation starts at
         // in the executable buffer
@@ -436,21 +455,19 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
             RelocationKind::Relative => target.wrapping_sub(loc.0),
             RelocationKind::Absolute => {
                 // register it so it will be relocated when the buffer is moved
-                self.assembler.managed_relocs.push(ManagedRelocation(
-                    offset,
+                self.new_managed_relocs.push((offset, ManagedRelocation(
                     loc.1.size,
-                    false
-                ));
+                    true
+                )));
                 // calculate the absolute address to refer to
                 self.assembler.base.execbuffer_addr() + target
             },
             RelocationKind::Extern => {
                 // register it so it will be relocated when the buffer is moved
-                self.assembler.managed_relocs.push(ManagedRelocation(
-                    offset,
+                self.new_managed_relocs.push((offset, ManagedRelocation(
                     loc.1.size,
-                    true
-                ));
+                    false
+                )));
                 // calculate the relative offset to the absolute address
                 target.wrapping_sub(self.assembler.base.execbuffer_addr() + loc.0)
             }
@@ -465,7 +482,26 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         }
     }
 
+    fn invalidate_managed_relocs(&mut self) {
+        // no work to do
+        if self.last_asmoffset == self.asmoffset {
+            return;
+        }
+
+        // find the keys to invalidate
+        let keys = self.assembler.managed_relocs
+                       .range(self.last_asmoffset .. self.asmoffset)
+                       .map(|(&k, _)| k)
+                       .collect::<Vec<usize>>();
+
+        // and clear them from the managed relocations map.
+        for k in keys {
+            self.assembler.managed_relocs.remove(&k);
+        }
+    }
+
     fn encode_relocs(&mut self) {
+
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.global_relocs);
         for (loc, name) in relocs {
@@ -483,6 +519,9 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         if let Some(name) = self.assembler.local_relocs.keys().next() {
             panic!("Unknown local label '{}'", name);
         }
+
+        self.invalidate_managed_relocs();
+        self.assembler.managed_relocs.extend(self.new_managed_relocs.drain(..));
     }
 }
 
