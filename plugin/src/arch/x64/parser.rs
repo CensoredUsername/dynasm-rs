@@ -170,7 +170,13 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
         let id = parser.parse_expr()?;
         let jump = JumpType::Dynamic(id);
         label_return!(jump, size);
+    // extern location
+    } else if eat_pseudo_keyword(parser, "extern"){
+        let location = parser.parse_expr()?;
+        let jump = JumpType::Bare(location);
+        label_return!(jump, size);
     }
+
 
     // memory location
     if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {

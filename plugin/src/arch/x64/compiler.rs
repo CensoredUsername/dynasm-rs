@@ -222,7 +222,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         // map_sel is stored in the first byte of the opcode
         let (&map_sel, tail) = ops.split_first().expect("bad formatting data");
         ops = tail;
-        compile_vex_xop(ecx, buffer, data, &reg, &rm, map_sel, rex_w, &vvvv, vex_l, prefix);
+        compile_vex_xop(ctx.mode, ecx, buffer, data, &reg, &rm, map_sel, rex_w, &vvvv, vex_l, prefix);
     // otherwise, the size/mod prefixes have to be pushed and check if a rex prefix has to be generated.
     } else {
         if let Some(pref) = pref_mod {
@@ -485,7 +485,14 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
                 relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
 
                 // add the new relocation
-                relocations.push((type_, 0, size, RelocationKind::Relative));
+                if let JumpType::Bare(_) = type_ {
+                    match ctx.mode {
+                        X86Mode::Protected => relocations.push((type_, 0, size, RelocationKind::Extern)),
+                        X86Mode::Long => return Err(Some("Extern relocations are not supported in x64 mode".to_string()))
+                    }
+                } else {
+                    relocations.push((type_, 0, size, RelocationKind::Relative));
+                }
             },
             _ => panic!("bad immediate data")
         };
@@ -522,7 +529,12 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
     Ok(match arg {
         RawArg::Direct {span, reg} => CleanArg::Direct {span, reg},
         RawArg::JumpTarget {type_, size} => CleanArg::JumpTarget {type_, size},
-        RawArg::IndirectJumpTarget {type_, size} => CleanArg::IndirectJumpTarget {type_, size},
+        RawArg::IndirectJumpTarget {type_, size} => {
+            if let JumpType::Bare(_) = type_ {
+                return Err(Some("Extern indirect jumps are not supported. Use a displacement".to_string()))
+            }
+            CleanArg::IndirectJumpTarget {type_, size}
+        },
         RawArg::Immediate {value, size} => CleanArg::Immediate {value, size},
         RawArg::Invalid => unreachable!(),
         RawArg::IndirectRaw {span, value_size, nosplit, disp_size, items} => {
@@ -1510,42 +1522,51 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<
     buffer.push(Stmt::ExprUnsigned(rex, Size::BYTE));
 }
 
-fn compile_vex_xop(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<SizedArg>,
+fn compile_vex_xop(mode: X86Mode, ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<SizedArg>,
 rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l: bool, prefix: u8) {
     let mut reg_k   = RegKind::from_number(0);
     let mut index_k = RegKind::from_number(0);
     let mut base_k  = RegKind::from_number(0);
     let mut vvvv_k  = RegKind::from_number(0);
 
-    if let Some(SizedArg::Direct {ref reg, ..}) = *reg {
-        reg_k = reg.kind.clone();
-    }
-    if let Some(SizedArg::Direct {ref reg, ..}) = *rm {
-        base_k = reg.kind.clone();
-    }
-    if let Some(SizedArg::Indirect {ref base, ref index, ..}) = *rm {
-        if let Some(ref base) = *base {
-            base_k = base.kind.clone();
+    let byte1 = match mode {
+        X86Mode::Long => {
+            if let Some(SizedArg::Direct {ref reg, ..}) = *reg {
+                reg_k = reg.kind.clone();
+            }
+            if let Some(SizedArg::Direct {ref reg, ..}) = *rm {
+                base_k = reg.kind.clone();
+            }
+            if let Some(SizedArg::Indirect {ref base, ref index, ..}) = *rm {
+                if let Some(ref base) = *base {
+                    base_k = base.kind.clone();
+                }
+                if let Some((ref index, _, _)) = *index {
+                    index_k = index.kind.clone();
+                }
+            }
+
+            (map_sel        & 0x1F)      |
+            (!reg_k.encode()   & 8) << 4 |
+            (!index_k.encode() & 8) << 3 |
+            (!base_k.encode()  & 8) << 2
+        },
+        X86Mode::Protected => {
+            (map_sel & 0x1f) | 0xE0
         }
-        if let Some((ref index, _, _)) = *index {
-            index_k = index.kind.clone();
-        }
-    }
+    };
+
     if let Some(SizedArg::Direct {ref reg, ..}) = *vvvv {
         vvvv_k = reg.kind.clone();
     }
-
-    let byte1 = (map_sel        & 0x1F)      |
-                (!reg_k.encode()   & 8) << 4 |
-                (!index_k.encode() & 8) << 3 |
-                (!base_k.encode()  & 8) << 2 ;
 
     let byte2 = (prefix           & 0x3)      |
                 (rex_w            as u8) << 7 |
                 (!vvvv_k.encode() & 0xF) << 3 |
                 (vex_l            as u8) << 2 ;
 
-    if data.flags.contains(Flags::VEX_OP) && (byte1 & 0x7F) == 0x61 && (byte2 & 0x80) == 0 && !index_k.is_dynamic() && !base_k.is_dynamic() {
+    if data.flags.contains(Flags::VEX_OP) && (byte1 & 0x7F) == 0x61 && (byte2 & 0x80) == 0 &&
+    ((!index_k.is_dynamic() && !base_k.is_dynamic()) || mode == X86Mode::Protected) {
         // 2-byte vex
         buffer.push(Stmt::u8(0xC5));
 
@@ -1566,7 +1587,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
 
     buffer.push(Stmt::u8(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
 
-    if reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic() {
+    if mode == X86Mode::Long && (reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic()) {
         let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
 
         if let RegKind::Dynamic(_, expr) = reg_k {

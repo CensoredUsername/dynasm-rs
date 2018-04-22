@@ -252,7 +252,7 @@ pub enum JumpType {
     Backward(Ident),       //  > label
     Forward(Ident),        //  < label
     Dynamic(P<ast::Expr>), // => expr
-    Bare(P<ast::Expr>)     // just an immediate in a displacement field
+    Bare(P<ast::Expr>)     // jump to this address
 }
 
 /**
