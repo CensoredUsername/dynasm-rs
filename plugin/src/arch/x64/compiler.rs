@@ -1042,7 +1042,9 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
     // W: matches CR8
     // X: matches st0
 
-    // b, w, d, q match a byte, word, doubleword and quadword.
+    // b, w, d, q, o, h match a byte, word, doubleword, quadword, octword and hexadecword
+    // p matches a PWORD (10 bytes)
+    // f matches an FWORD (6 bytes)
     // * matches all possible sizes for this operand (w/d for i, w/d/q for r/v, o/h for y/w and everything for m)
     // ! matches a lack of size, only useful in combination with m
     // ? matches any size and doesn't participate in the operand size calculation
@@ -1131,6 +1133,7 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
                 (b'w', _)    => size == Size::WORD,
                 (b'd', _)    => size == Size::DWORD,
                 (b'q', _)    => size == Size::QWORD,
+                (b'f', _)    => size == Size::FWORD,
                 (b'p', _)    => size == Size::PWORD,
                 (b'o', _)    => size == Size::OWORD,
                 (b'h', _)    => size == Size::HWORD,
@@ -1245,6 +1248,7 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
             (b'd', _) => Size::DWORD,
             (_, b'l') |
             (b'q', _) => Size::QWORD,
+            (b'f', _) => Size::FWORD,
             (b'p', _) => Size::PWORD,
             (b'o', _) => Size::OWORD,
             (b'h', _) => Size::HWORD,

@@ -70,18 +70,34 @@ fn is_prefix(token: Ident) -> bool {
     PREFIXES.contains(&&*token.node.name.as_str())
 }
 
-const SIZES: [(&'static str, Size); 8] = [
+const X86_SIZES: [(&'static str, Size); 9] = [
     ("BYTE", Size::BYTE),
     ("WORD", Size::WORD),
     ("DWORD", Size::DWORD),
+    ("AWORD", Size::DWORD),
+    ("FWORD", Size::FWORD),
+    ("QWORD", Size::QWORD),
+    ("TWORD", Size::PWORD),
+    ("OWORD", Size::OWORD),
+    ("YWORD", Size::HWORD)
+];
+const X64_SIZES: [(&'static str, Size); 9] = [
+    ("BYTE", Size::BYTE),
+    ("WORD", Size::WORD),
+    ("DWORD", Size::DWORD),
+    ("FWORD", Size::FWORD),
     ("AWORD", Size::QWORD),
     ("QWORD", Size::QWORD),
     ("TWORD", Size::PWORD),
     ("OWORD", Size::OWORD),
     ("YWORD", Size::HWORD)
 ];
-fn eat_size_hint(parser: &mut Parser) -> Option<Size> {
-    for &(kw, size) in &SIZES {
+fn eat_size_hint(ctx: &Context, parser: &mut Parser) -> Option<Size> {
+    let sizes = match ctx.mode {
+        X86Mode::Protected => &X86_SIZES,
+        X86Mode::Long      => &X64_SIZES
+    };
+    for &(kw, size) in sizes {
         if eat_pseudo_keyword(parser, kw) {
             return Some(size);
         }
@@ -112,7 +128,7 @@ fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::
 
 fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, RawArg> {
     // sizehint
-    let size = eat_size_hint(parser);
+    let size = eat_size_hint(ctx, parser);
 
     let start = parser.span;
 
@@ -182,7 +198,7 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
     if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
         let span = parser.span;
         let nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
-        let disp_size = eat_size_hint(parser);
+        let disp_size = eat_size_hint(ctx, parser);
         let expr = parser.parse_expr()?;
         let span = expr.span.with_lo(span.lo());
         parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
@@ -218,7 +234,7 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
 
             if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
                 nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
-                disp_size = eat_size_hint(parser);
+                disp_size = eat_size_hint(ctx, parser);
                 let index_expr = parser.parse_expr()?;
 
                 parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;

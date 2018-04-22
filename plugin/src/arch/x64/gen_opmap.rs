@@ -1,5 +1,17 @@
 Ops!(OPMAP;
 
+"aaa" = [
+    b""           , [0x37              ], X, X86_ONLY;
+]
+"aad" = [
+    b""           , [0xD5, 0x0A        ], X, X86_ONLY;
+]
+"aam" = [
+    b""           , [0xD4, 0x0A        ], X, X86_ONLY;
+]
+"aas" = [
+    b""           , [0x3F              ], X, X86_ONLY;
+]
 "adc" = [
     b"Abib"       , [0x14              ], X;
     b"mbib"       , [0x80              ], 2, LOCK;
@@ -107,6 +119,9 @@ Ops!(OPMAP;
 "andps" = [
     b"yowo"       , [0x0F, 0x54        ], X, DEFAULT, SSE;
 ]
+"arpl" = [
+    b"vwrw"       , [0x63              ], X, X86_ONLY;
+]
 "bextr" = [
     b"r*v*id"     , [0x10, 0x10        ], X, XOP_OP | AUTO_REXW, TBM;
     b"r*v*r*"     , [0x02, 0xF7        ], X, VEX_OP | AUTO_REXW | ENC_MR, BMI1;
@@ -156,6 +171,9 @@ Ops!(OPMAP;
 ]
 "blsr" = [
     b"r*v*"       , [0x02, 0xF3        ], 1, VEX_OP | AUTO_REXW | ENC_VM, BMI1;
+]
+"bound" = [
+    b"r*m!"       , [0x62              ], X, AUTO_SIZE | X86_ONLY;
 ]
 "bndcl" = [
     b"bom!"       , [0x0F, 0x1A        ], X, PREF_F3, MPX;
@@ -524,6 +542,12 @@ Ops!(OPMAP;
 ]
 "cwde" = [
     b""           , [0x98              ], X;
+]
+"daa" = [
+    b""           , [0x27              ], X, X86_ONLY;
+]
+"das" = [
+    b""           , [0x2F              ], X, X86_ONLY;
 ]
 "dec" = [
     b"mb"         , [0xFE              ], 1, LOCK;
@@ -1052,6 +1076,9 @@ Ops!(OPMAP;
 "int" = [
     b"ib"         , [0xCD              ], X;
 ]
+"into" = [
+    b""           , [0xCE              ], X, X86_ONLY;
+]
 "int01" = [
     b""           , [0xF1              ], X;
 ]
@@ -1114,11 +1141,17 @@ Ops!(OPMAP;
 "ldmxcsr" = [
     b"md"         , [0x0F, 0xAE        ], 2, DEFAULT, SSE;
 ]
+"lds" = [
+    b"r*m!"       , [0xC5              ], X, AUTO_SIZE | X86_ONLY;
+]
 "lea" = [
     b"r*m!"       , [0x8D              ], X, AUTO_SIZE;
 ]
 "leave" = [
     b""           , [0xC9              ], X;
+]
+"les" = [
+    b"r*m!"       , [0xC4              ], X, AUTO_SIZE | X86_ONLY;
 ]
 "lfence" = [
     b""           , [0x0F, 0xAE, 0xE8  ], X, DEFAULT, AMD;
@@ -1972,10 +2005,19 @@ Ops!(OPMAP;
     b"xqmq"       , [0x0F, 0x58        ], X, DEFAULT, MMX | CYRIX;
 ]
 "pop" = [
+    b"Qw"         , [0x07              ], X, X86_ONLY;
+    b"Sw"         , [0x17              ], X, X86_ONLY;
+    b"Tw"         , [0x1F              ], X, X86_ONLY;
     b"Uw"         , [0x0F, 0xA1        ], X;
     b"Vw"         , [0x0F, 0xA9        ], X;
     b"r*"         , [0x58              ], X, AUTO_NO32 | SHORT_ARG;
     b"v*"         , [0x8F              ], 0, AUTO_NO32;
+]
+"popa" = [
+    b""           , [0x61              ], X, X86_ONLY | WORD_SIZE;
+]
+"popad" = [
+    b""           , [0x61              ], X, X86_ONLY;
 ]
 "popcnt" = [
     b"r*v*"       , [0x0F, 0xB8        ], X, AUTO_SIZE | PREF_F3;
@@ -2177,6 +2219,10 @@ Ops!(OPMAP;
     b"yowo"       , [0x0F, 0x61        ], X, PREF_66, SSE2;
 ]
 "push" = [
+    b"Qw"         , [0x06              ], X, X86_ONLY;
+    b"Rw"         , [0x0E              ], X, X86_ONLY;
+    b"Sw"         , [0x16              ], X, X86_ONLY;
+    b"Tw"         , [0x1E              ], X, X86_ONLY;
     b"Uw"         , [0x0F, 0xA0        ], X;
     b"Vw"         , [0x0F, 0xA8        ], X;
     b"ib"         , [0x6A              ], X, EXACT_SIZE;
@@ -2184,6 +2230,12 @@ Ops!(OPMAP;
     b"id"         , [0x68              ], X;
     b"r*"         , [0x50              ], X, AUTO_NO32 | SHORT_ARG;
     b"v*"         , [0xFF              ], 6, AUTO_NO32;
+]
+"pusha" = [
+    b""           , [0x60              ], X, X86_ONLY | WORD_SIZE;
+]
+"pushad" = [
+    b""           , [0x60              ], X, X86_ONLY;
 ]
 "pushf" = [
     b""           , [0x9C              ], X;
@@ -2536,10 +2588,10 @@ Ops!(OPMAP;
     b""           , [0x0F, 0x05        ], X, DEFAULT, AMD;
 ]
 "sysenter" = [
-    b""           , [0x0F, 0x34        ], X;
+    b""           , [0x0F, 0x34        ], X, X86_ONLY;
 ]
 "sysexit" = [
-    b""           , [0x0F, 0x35        ], X;
+    b""           , [0x0F, 0x35        ], X, X86_ONLY;
 ]
 "sysret" = [
     b""           , [0x0F, 0x07        ], X, DEFAULT, AMD;
@@ -5106,13 +5158,31 @@ Ops!(OPMAP;
 ]
 
 "call"  = [
+    b"iwiw"       , [0x9A              ], X, X86_ONLY | WORD_SIZE | EXACT_SIZE;
+    b"idiw"       , [0x9A              ], X, X86_ONLY;
+    b"mf"         , [0xFF              ], 3, X86_ONLY | EXACT_SIZE;
     b"od"         , [0xE8              ], X;
     b"v*"         , [0xFF              ], 2, AUTO_NO32;
 ]
+"callf" = [
+    b"iwiw"       , [0x9A              ], X, X86_ONLY | WORD_SIZE | EXACT_SIZE;
+    b"idiw"       , [0x9A              ], X, X86_ONLY;
+    b"md"         , [0xFF              ], 3, X86_ONLY | WORD_SIZE | EXACT_SIZE;
+    b"mf"         , [0xFF              ], 3, X86_ONLY;
+]
 "jmp"   = [
+    b"iwiw"       , [0x9A              ], X, X86_ONLY | WORD_SIZE | EXACT_SIZE;
+    b"idiw"       , [0xEA              ], X, X86_ONLY;
+    b"mf"         , [0xFF              ], 5, X86_ONLY | EXACT_SIZE;
     b"ob"         , [0xEB              ], X, EXACT_SIZE;
     b"od"         , [0xE9              ], X;
     b"v*"         , [0xFF              ], 4, AUTO_NO32 ;
+]
+"jmpf" = [
+    b"iwiw"       , [0x9A              ], X, X86_ONLY | WORD_SIZE | EXACT_SIZE;
+    b"idiw"       , [0xEA              ], X, X86_ONLY;
+    b"md"         , [0xFF              ], 5, X86_ONLY | WORD_SIZE | EXACT_SIZE;
+    b"mf"         , [0xFF              ], 5, X86_ONLY;
 ]
 "mov"   = [
     b"v*r*"       , [0x89              ], X, AUTO_SIZE;

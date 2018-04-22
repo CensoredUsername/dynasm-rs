@@ -17,10 +17,11 @@ pub enum Size {
     BYTE  = 1,
     WORD  = 2,
     DWORD = 4,
+    FWORD = 6,
     QWORD = 8,
     PWORD = 10,
     OWORD = 16,
-    HWORD = 32
+    HWORD = 32,
 }
 
 impl Size {
@@ -33,6 +34,7 @@ impl Size {
             Size::BYTE  => "i8",
             Size::WORD  => "i16",
             Size::DWORD => "i32",
+            Size::FWORD => "i48",
             Size::QWORD => "i64",
             Size::PWORD => "i80",
             Size::OWORD => "i128",
