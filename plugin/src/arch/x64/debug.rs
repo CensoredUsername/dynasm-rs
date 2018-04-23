@@ -35,7 +35,16 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
             buf.push_str(&format_arg(ty, size, opsize))
         }
         if data.flags.contains(Flags::X86_ONLY) {
+            for _ in buf.len() .. 45 {
+                buf.push(' ');
+            }
             buf.push_str(" (x86 only)");
+        }
+        if !data.features.is_empty() {
+            for _ in buf.len() .. 45 {
+                buf.push(' ');
+            }
+            buf.push_str(&format!(" ({})", data.features));
         }
         forms.push(buf);
     }
