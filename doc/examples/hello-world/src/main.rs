@@ -1,7 +1,6 @@
 #![feature(plugin)]
 #![plugin(dynasm)]
 
-#[macro_use]
 extern crate dynasmrt;
 
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -10,7 +9,7 @@ use std::{io, slice, mem};
 use std::io::Write;
 
 fn main() {
-    let mut ops = dynasmrt::x64::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     let string = "Hello World!";
 
     dynasm!(ops

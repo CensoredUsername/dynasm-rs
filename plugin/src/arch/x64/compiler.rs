@@ -116,6 +116,14 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
     // match the ast with a format string, resulting in a SizedAST
     let data = match_op_format(ctx, ecx, op, &args)?;
 
+    // determine if the features required for this op are fulfilled
+    if !ctx.features.contains(data.features) {
+        return Err(Some(format!(
+            "This instruction uses features that are not indicated to be available: {}",
+            data.features - ctx.features
+        )));
+    }
+
     // determine legacy prefixes
     let (mut pref_mod, pref_seg) = get_legacy_prefixes(ecx, data, prefixes)?;
 

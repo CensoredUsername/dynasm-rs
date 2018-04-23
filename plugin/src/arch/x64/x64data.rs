@@ -1,6 +1,7 @@
 use std::collections::{HashMap, hash_map};
 
 use super::compiler::Opdata;
+use std::fmt::{self, Display};
 
 macro_rules! constify {
     ($t:ty, $e:expr) => { {const C: &'static $t = &$e; C} }
@@ -115,6 +116,75 @@ impl Features {
         Features {
             bits: bits
         }
+    }
+
+    pub fn from_str(name: &str) -> Option<Features> {
+        match name {
+            "fpu"   => Some(Features::FPU),
+            "mmx"   => Some(Features::MMX),
+            "tdnow" => Some(Features::TDNOW),
+            "sse"   => Some(Features::SSE),
+            "sse2"  => Some(Features::SSE2),
+            "sse3"  => Some(Features::SSE3),
+            "vmx"   => Some(Features::VMX),
+            "ssse3" => Some(Features::SSSE3),
+            "sse4a" => Some(Features::SSE4A),
+            "sse41" => Some(Features::SSE41),
+            "sse42" => Some(Features::SSE42),
+            "sse5"  => Some(Features::SSE5),
+            "avx"   => Some(Features::AVX),
+            "avx2"  => Some(Features::AVX2),
+            "fma"   => Some(Features::FMA),
+            "bmi1"  => Some(Features::BMI1),
+            "bmi2"  => Some(Features::BMI2),
+            "tbm"   => Some(Features::TBM),
+            "rtm"   => Some(Features::RTM),
+            "invpcid" => Some(Features::INVPCID),
+            "mpx"   => Some(Features::MPX),
+            "sha"   => Some(Features::SHA),
+            "prefetchwt1" => Some(Features::PREFETCHWT1),
+            "cyrix" => Some(Features::CYRIX),
+            "amd"   => Some(Features::AMD),
+            _ => None
+        }
+    }
+}
+
+impl Display for Features {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut keys = Vec::new();
+        if self.contains(Features::FPU)   { keys.push("fpu"); }
+        if self.contains(Features::MMX)   { keys.push("mmx"); }
+        if self.contains(Features::TDNOW) { keys.push("tdnow"); }
+        if self.contains(Features::SSE)   { keys.push("sse"); }
+        if self.contains(Features::SSE2)  { keys.push("sse2"); }
+        if self.contains(Features::SSE3)  { keys.push("sse3"); }
+        if self.contains(Features::VMX)   { keys.push("vmx"); }
+        if self.contains(Features::SSSE3) { keys.push("ssse3"); }
+        if self.contains(Features::SSE4A) { keys.push("sse4a"); }
+        if self.contains(Features::SSE41) { keys.push("sse41"); }
+        if self.contains(Features::SSE42) { keys.push("sse42"); }
+        if self.contains(Features::SSE5)  { keys.push("sse5"); }
+        if self.contains(Features::AVX)   { keys.push("avx"); }
+        if self.contains(Features::AVX2)  { keys.push("avx2"); }
+        if self.contains(Features::FMA)   { keys.push("fma"); }
+        if self.contains(Features::BMI1)  { keys.push("bmi1"); }
+        if self.contains(Features::BMI2)  { keys.push("bmi2"); }
+        if self.contains(Features::TBM)   { keys.push("tbm"); }
+        if self.contains(Features::RTM)   { keys.push("rtm"); }
+        if self.contains(Features::INVPCID) { keys.push("invpcid"); }
+        if self.contains(Features::MPX)   { keys.push("mpx"); }
+        if self.contains(Features::SHA)   { keys.push("sha"); }
+        if self.contains(Features::PREFETCHWT1) { keys.push("prefetchwt1"); }
+        if self.contains(Features::CYRIX) { keys.push("cyrix"); }
+        if self.contains(Features::AMD)   { keys.push("amd"); }
+        for (i, k) in keys.into_iter().enumerate() {
+            if i != 0 {
+                f.write_str(", ")?;
+            }
+            f.write_str(k)?;
+        }
+        Ok(())
     }
 }
 

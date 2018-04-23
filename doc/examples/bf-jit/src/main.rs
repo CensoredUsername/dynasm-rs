@@ -73,7 +73,7 @@ struct Program {
 
 impl Program {
     fn compile(program: &[u8]) -> Result<Program, &'static str> {
-        let mut ops = dynasmrt::x64::Assembler::new();
+        let mut ops = dynasmrt::x64::Assembler::new().unwrap();
         let mut loops = Vec::new();
         let mut code = multipeek(program.iter().cloned());
 
