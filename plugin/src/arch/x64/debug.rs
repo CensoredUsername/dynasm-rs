@@ -34,6 +34,9 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
             }
             buf.push_str(&format_arg(ty, size, opsize))
         }
+        if data.flags.contains(Flags::X86_ONLY) {
+            buf.push_str(" (x86 only)");
+        }
         forms.push(buf);
     }
     forms
@@ -57,6 +60,7 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
             b'b' => "8",
             b'w' => "16",
             b'd' => "32",
+            b'f' => "48",
             b'q' => "64",
             b'p' => "80",
             b'o' => "128",

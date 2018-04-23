@@ -54,6 +54,7 @@ pub fn registrar(reg: &mut Registry) {
                                   SyntaxExtension::NormalTT {
                                       expander: Box::new(dynasm_opmap),
                                       def_info: None,
+                                      unstable_feature: None,
                                       allow_internal_unstable: false,
                                       allow_internal_unsafe: false
                                   });
