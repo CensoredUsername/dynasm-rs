@@ -544,7 +544,7 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
             CleanArg::IndirectJumpTarget {type_, size}
         },
         RawArg::Immediate {value, size} => CleanArg::Immediate {value, size},
-        RawArg::Invalid => unreachable!(),
+        RawArg::Invalid => return Err(None),
         RawArg::IndirectRaw {span, value_size, nosplit, disp_size, items} => {
             // split the ast on the memoryrefitem types
             let mut scaled = Vec::new();
