@@ -11,7 +11,7 @@ translation of assembly templates into rust code, the second part is a
 [small runtime](../runtime/dynasmrt/index.html) that handles the generation of the wanted
 machine code.
 
-For now dynasm-rs only supports the x64 instruction set.
+For now dynasm-rs only supports the x86 and x64 instruction set architectures.
 
 Dynasm-rs is inspired by the LuaJIT DynASM project for C and C++.
 

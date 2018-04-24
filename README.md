@@ -12,7 +12,7 @@ It is currently in alpha, meaning that while everything should work, a lot of fe
 ## Features
 
 - Fully integrated in the rust toolchain, no other tools necessary.
-- The assembly is optimized into a series of `Vec.push` and `Vec.extend` statements for high performance.
+- The assembly is optimized into a series of `Vec.push` and `Vec.extend` statements.
 - Errors are almost all diagnosed at compile time in a clear fashion.
 - Write the to be generated assembly inline in nasm-like syntax using a simple macro.
 
@@ -22,7 +22,7 @@ Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/
 
 ## Limitations
 
-- Currently only supports x64 long mode with every AMD/Intel/VIA extension except for AVX-512.
+- Currently only supports the x64 and x86 instruction sets in long and protected mode with every AMD/Intel/VIA extension except for AVX-512.
 
 ## Example
 
@@ -86,3 +86,11 @@ This project is heavily inspired by [Dynasm](http://luajit.org/dynasm.html)
 Mozilla Public License, v. 2.0, see LICENSE
 
 Copyright 2016 CensoredUsername
+
+## Guaranteed to be working compiler versions
+
+As this project is a compiler plugin, sometimes new compiler versions tend to break it.
+Here a list is kept of what versions of the compiler are guaranteed to work with specific
+dynasm-rs versions.
+
+- `v0.2.0`: `rustc 1.27.0-nightly (ac3c2288f 2018-04-18)`

@@ -37,6 +37,9 @@ impl DynasmData {
                     let ident = parser.parse_ident()?;
                     features.push(Ident {span: parser.prev_span, node: ident});
                 }
+                if features.len() == 1 && features[0].node.name.as_str() == "none" {
+                    features.pop();
+                }
                 self.current_arch.set_features(ecx, &features);
             },
             // ; .byte (expr ("," expr)*)?

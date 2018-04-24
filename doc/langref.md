@@ -58,7 +58,7 @@ They are executed at parse time, and each directive can have different parsing r
 
 `regrefitem : (register "*" num_lit | num_lit "*" register | register | expr) ;`
 
-`labelref : (">" ident | "<" ident | "->" ident | "=>" expr) ;`
+`labelref : (">" ident | "<" ident | "->" ident | "=>" expr | "extern" expr) ;`
 
 `register = static_reg | dynamic_reg ;`
 
@@ -75,14 +75,15 @@ Table 1: dynasm-rs directives
 
 Name      | Argument format | Description
 ----------|-----------------|------------
-`.arch`   | a single identifier | Specifies the current architecture to assemble. Defaults to the current target architecture. Only `x64` is supported as of now.
-`.alias`  | An name followed by a register | defines the name as an alias for the wanted register.
+`.arch`   | A single identifier | Specifies the current architecture to assemble. Defaults to the current target architecture. Only `x64` and `x86` are supported as of now.
+`.feature`| A comma-separated list of identifiers. | Set architectural features that are allowed to be used.
+`.alias`  | An name followed by a register | Defines the name as an alias for the wanted register.
 `.align`  | An expression of type usize | Pushes NOPs until the assembling head has reached the desired alignment.
 `.byte`   | One or more expressions of the type `i8`  | Pushes the values into the assembling buffer.
 `.word`   | One or more expressions of the type `i16` | Pushes the values into the assembling buffer.
 `.dword`  | One or more expressions of the type `i32` | Pushes the values into the assembling buffer.
 `.qword`  | One or more expressions of the type `i64` | Pushes the values into the assembling buffer.
-`.bytes`  | An expression of that implements `IntoIterator<Item=u8>` or `IntoIterator<Item=&u8>` | extends the assembling buffer with the iterator.
+`.bytes`  | An expression of that implements `IntoIterator<Item=u8>` or `IntoIterator<Item=&u8>` | Extends the assembling buffer with the iterator.
 
 ## Aliases
 
@@ -151,6 +152,7 @@ Type    | Definition   | Reference
 Local   | `label:`     | `>label` or `<label`
 GLobal  | `->label:`   | `->label`
 Dynamic | `=>expr`     | `=>expr`
+Extern  | `-`          | `extern expr`
 
 ### Local labels
 
@@ -168,37 +170,37 @@ Dynamic labels are similar to global labels in that they can be defined only onc
 
 The language used by dynasm-rs is a nasm-dialect. The largest difference is that instead of prefixing memory operands with segment registers, segment register overrides are prefixed to the entire instruction. Furthermore, it is currently not possible to override the size of the displacement used in memory operands.
 
-This results in the following syntax for instructions. First, zero or more prefixes can be listed (these prefixes can be found in the base units section). The instruction mnemnonic is then mentioned, followed by zero or more comma seperated operands.
+This results in the following syntax for instructions. First, zero or more prefixes can be listed (these prefixes can be found in the base units section). The instruction mnemnonic is then mentioned, followed by zero or more comma separated operands.
 
 ### Operands
 
 #### Register
 
-There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be postponed to the runtime. Note that this does prevent optimizations to register-specific forms. However, the expression inside a dynamic register reference may be evaluted multiple times by dynasm-rs.
+There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be postponed to the runtime. Note that this does prevent optimizations to register-specific forms. However, the expression inside a dynamic register reference may be evaluated multiple times by dynasm-rs.
 
 The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically.
 
-Table 4: dynasm-rs registers
+Table 4: dynasm-rs registers (x64/x86)
 
-Family              | 8-bit       | 8-bit high | 16-bit     | 32-bit      | 64-bit     | RIP   | Floating Point | MMX    | 128-bit   | 256-bit   | Segment | Control | Debug | Bound
--------------------:|:------------|:-----------|:-----------|:------------|:-----------|:------|:---------------|:-------|:----------|:----------|:--------|:--------|:------|:-----
-Dynamic Encoding    | `Rb`        | `Rh`       | `Rw`       | `Rd`        | `Rq`       |       | `Rf`           | `Rm`   | `Rx`      | `Ry`      | `Rs`    | `RC`    | `RD`  | `RB`
-                `0` | `al`/`r0b`  |            | `ax`/`r0w` | `eax`/`r0d` | `rax`/`r0` |       | `st0`          | `mmx0` | `xmm0`    | `ymm0`    | `es`    | `cr0`   | `dr0` | `bnd0`
-                `1` | `cl`/`r1b`  |            | `cx`/`r1w` | `ecx`/`r1d` | `rcx`/`r1` |       | `st1`          | `mmx1` | `xmm1`    | `ymm1`    | `cs`    | `cr1`   | `dr1` | `bnd1`
-                `2` | `dl`/`r2b`  |            | `dx`/`r2w` | `edx`/`r2d` | `rdx`/`r2` |       | `st2`          | `mmx2` | `xmm2`    | `ymm2`    | `ss`    | `cr2`   | `dr2` | `bnd2`
-                `3` | `bl`/`r3b`  |            | `bx`/`r3w` | `ebx`/`r3d` | `rbx`/`r3` |       | `st3`          | `mmx3` | `xmm3`    | `ymm3`    | `ds`    | `cr3`   | `dr3` | `bnd3`
-                `4` | `spl`/`r4b` | `ah`       | `sx`/`r4w` | `esx`/`r4d` | `rsx`/`r4` |       | `st4`          | `mmx4` | `xmm4`    | `ymm4`    | `fs`    | `cr4`   | `dr4` |
-                `5` | `bpl`/`r5b` | `ch`       | `bp`/`r5w` | `ebp`/`r5d` | `rbp`/`r5` | `rip` | `st5`          | `mmx5` | `xmm5`    | `ymm5`    | `gs`    | `cr5`   | `dr5` |
-                `6` | `sil`/`r6b` | `dh`       | `si`/`r6w` | `esi`/`r6d` | `rsi`/`r6` |       | `st6`          | `mmx6` | `xmm6`    | `ymm6`    |         | `cr6`   | `dr6` |
-                `7` | `dil`/`r7b` | `bh`       | `di`/`r7w` | `edi`/`r7d` | `rdi`/`r7` |       | `st7`          | `mmx7` | `xmm7`    | `ymm7`    |         | `cr7`   | `dr7` |
-                `8` | `r8b`       |            | `r8w`      | `r8d`       | `r8`       |       |                |        | `xmm8`    | `ymm8`    |         | `cr8`   | `dr8` |
-                `9` | `r9b`       |            | `r9w`      | `r9d`       | `r9`       |       |                |        | `xmm9`    | `ymm9`    |         | `cr9`   | `dr9` |
-               `10` | `r10b`      |            | `r10w`     | `r10d`      | `r10`      |       |                |        | `xmm10`   | `ymm10`   |         | `cr10`  | `dr10`|
-               `11` | `r11b`      |            | `r11w`     | `r11d`      | `r11`      |       |                |        | `xmm11`   | `ymm11`   |         | `cr11`  | `dr11`|
-               `12` | `r12b`      |            | `r12w`     | `r12d`      | `r12`      |       |                |        | `xmm12`   | `ymm12`   |         | `cr12`  | `dr12`|
-               `13` | `r13b`      |            | `r13w`     | `r13d`      | `r13`      |       |                |        | `xmm13`   | `ymm13`   |         | `cr13`  | `dr13`|
-               `14` | `r14b`      |            | `r14w`     | `r14d`      | `r14`      |       |                |        | `xmm14`   | `ymm14`   |         | `cr14`  | `dr14`|
-               `15` | `r15b`      |            | `r15w`     | `r15d`      | `r15`      |       |                |        | `xmm15`   | `ymm15`   |         | `cr15`  | `dr15`|
+Family              | 8-bit       | 8-bit high | 16-bit     | 32-bit      | 64-bit (x64 only) | RIP       | Floating Point | MMX    | 128-bit   | 256-bit   | Segment | Control | Debug | Bound
+-------------------:|:------------|:-----------|:-----------|:------------|:------------------|:----------|:---------------|:-------|:----------|:----------|:--------|:--------|:------|:-----
+Dynamic Encoding    | `Rb`        | `Rh`       | `Rw`       | `Rd`        | `Rq`              |           | `Rf`           | `Rm`   | `Rx`      | `Ry`      | `Rs`    | `RC`    | `RD`  | `RB`
+                `0` | `al`/`r0b`  |            | `ax`/`r0w` | `eax`/`r0d` | `rax`/`r0`        |           | `st0`          | `mmx0` | `xmm0`    | `ymm0`    | `es`    | `cr0`   | `dr0` | `bnd0`
+                `1` | `cl`/`r1b`  |            | `cx`/`r1w` | `ecx`/`r1d` | `rcx`/`r1`        |           | `st1`          | `mmx1` | `xmm1`    | `ymm1`    | `cs`    | `cr1`   | `dr1` | `bnd1`
+                `2` | `dl`/`r2b`  |            | `dx`/`r2w` | `edx`/`r2d` | `rdx`/`r2`        |           | `st2`          | `mmx2` | `xmm2`    | `ymm2`    | `ss`    | `cr2`   | `dr2` | `bnd2`
+                `3` | `bl`/`r3b`  |            | `bx`/`r3w` | `ebx`/`r3d` | `rbx`/`r3`        |           | `st3`          | `mmx3` | `xmm3`    | `ymm3`    | `ds`    | `cr3`   | `dr3` | `bnd3`
+                `4` | `spl`/`r4b` | `ah`       | `sx`/`r4w` | `esx`/`r4d` | `rsx`/`r4`        |           | `st4`          | `mmx4` | `xmm4`    | `ymm4`    | `fs`    | `cr4`   | `dr4` |
+                `5` | `bpl`/`r5b` | `ch`       | `bp`/`r5w` | `ebp`/`r5d` | `rbp`/`r5`        | `eip/rip` | `st5`          | `mmx5` | `xmm5`    | `ymm5`    | `gs`    | `cr5`   | `dr5` |
+                `6` | `sil`/`r6b` | `dh`       | `si`/`r6w` | `esi`/`r6d` | `rsi`/`r6`        |           | `st6`          | `mmx6` | `xmm6`    | `ymm6`    |         | `cr6`   | `dr6` |
+                `7` | `dil`/`r7b` | `bh`       | `di`/`r7w` | `edi`/`r7d` | `rdi`/`r7`        |           | `st7`          | `mmx7` | `xmm7`    | `ymm7`    |         | `cr7`   | `dr7` |
+    (x64 only)  `8` | `r8b`       |            | `r8w`      | `r8d`       | `r8`              |           |                |        | `xmm8`    | `ymm8`    |         | `cr8`   | `dr8` |
+    (x64 only)  `9` | `r9b`       |            | `r9w`      | `r9d`       | `r9`              |           |                |        | `xmm9`    | `ymm9`    |         | `cr9`   | `dr9` |
+    (x64 only) `10` | `r10b`      |            | `r10w`     | `r10d`      | `r10`             |           |                |        | `xmm10`   | `ymm10`   |         | `cr10`  | `dr10`|
+    (x64 only) `11` | `r11b`      |            | `r11w`     | `r11d`      | `r11`             |           |                |        | `xmm11`   | `ymm11`   |         | `cr11`  | `dr11`|
+    (x64 only) `12` | `r12b`      |            | `r12w`     | `r12d`      | `r12`             |           |                |        | `xmm12`   | `ymm12`   |         | `cr12`  | `dr12`|
+    (x64 only) `13` | `r13b`      |            | `r13w`     | `r13d`      | `r13`             |           |                |        | `xmm13`   | `ymm13`   |         | `cr13`  | `dr13`|
+    (x64 only) `14` | `r14b`      |            | `r14w`     | `r14d`      | `r14`             |           |                |        | `xmm14`   | `ymm14`   |         | `cr14`  | `dr14`|
+    (x64 only) `15` | `r15b`      |            | `r15w`     | `r15d`      | `r15`             |           |                |        | `xmm15`   | `ymm15`   |         | `cr15`  | `dr15`|
 
 #### Jump targets
 
