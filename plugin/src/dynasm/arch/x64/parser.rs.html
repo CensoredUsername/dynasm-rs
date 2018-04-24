@@ -1,49 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src\arch\x64\parser.rs`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang">
-
-    <title>parser.rs.html -- source</title>
-
-    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
-    
-
-    
-    
-</head>
-<body class="rustdoc source">
-    <!--[if lte IE 8]>
-    <div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-    </div>
-    <![endif]-->
-
-    
-
-    <nav class="sidebar">
-        
-        
-    </nav>
-
-    <nav class="sub">
-        <form class="search-form js-only">
-            <div class="search-container">
-                <input class="search-input" name="search"
-                       autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
-                       type="search">
-            </div>
-        </form>
-    </nav>
-
-    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\x64\parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -763,6 +718,38 @@
 <span id="718">718</span>
 <span id="719">719</span>
 <span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">build</span>::<span class="ident">AstBuilder</span>;
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">base</span>::<span class="ident">ExtCtxt</span>;
@@ -771,307 +758,15 @@
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">parse</span>::<span class="ident">PResult</span>;
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ast</span>;
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ptr</span>::<span class="ident">P</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">codemap</span>::{<span class="ident">Spanned</span>, <span class="ident">Span</span>};
+<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">codemap</span>::{<span class="ident">Spanned</span>};
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">PartialEq</span>;
 
-<span class="kw">use</span> ::<span class="ident">State</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Context</span>, <span class="ident">X86Mode</span>};
 <span class="kw">use</span> <span class="ident">serialize</span>::{<span class="ident">Size</span>, <span class="ident">Ident</span>};
 
-<span class="doccomment">/**
- * collections
- */</span>
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ast</span>::{<span class="ident">Instruction</span>, <span class="ident">RawArg</span>, <span class="ident">JumpType</span>, <span class="ident">Register</span>, <span class="ident">RegId</span>, <span class="ident">RegFamily</span>, <span class="ident">MemoryRefItem</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Instruction</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>, <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span>, <span class="kw">pub</span> <span class="ident">Span</span>);
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Arg</span> {
-    <span class="comment">// unprocessed typemapped argument</span>
-    <span class="ident">TypeMappedRaw</span> {
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">base_reg</span>: <span class="ident">Register</span>,
-        <span class="ident">scale</span>: <span class="ident">ast</span>::<span class="ident">Path</span>,
-        <span class="ident">value_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-        <span class="ident">nosplit</span>: <span class="ident">bool</span>,
-        <span class="ident">disp_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-        <span class="ident">scaled_items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemoryRefItem</span><span class="op">&gt;</span>,
-        <span class="ident">attribute</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-    },
-    <span class="comment">// unprocessed memory reference argument</span>
-    <span class="ident">IndirectRaw</span> {
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">value_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-        <span class="ident">nosplit</span>: <span class="ident">bool</span>,
-        <span class="ident">disp_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-        <span class="ident">items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemoryRefItem</span><span class="op">&gt;</span>,
-    },
-    <span class="ident">Indirect</span>(<span class="ident">MemoryRef</span>), <span class="comment">// indirect memory reference supporting scale, index, base and displacement.</span>
-    <span class="ident">Direct</span>(<span class="ident">Spanned</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span>), <span class="comment">// a bare register (rax, ...)</span>
-    <span class="ident">JumpTarget</span>(<span class="ident">JumpType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>), <span class="comment">// jump target.</span>
-    <span class="ident">IndirectJumpTarget</span>(<span class="ident">JumpType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>), <span class="comment">// indirect jump target i.e. rip-relative displacement</span>
-    <span class="ident">Immediate</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>), <span class="comment">// an expression that evaluates to a value. basically, anything that ain&#39;t the other three</span>
-    <span class="ident">Invalid</span> <span class="comment">// placeholder value</span>
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MemoryRefItem</span> {
-    <span class="ident">ScaledRegister</span>(<span class="ident">Register</span>, <span class="ident">isize</span>),
-    <span class="ident">Register</span>(<span class="ident">Register</span>),
-    <span class="ident">Displacement</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>)
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryRef</span> {
-    <span class="kw">pub</span> <span class="ident">span</span>:       <span class="ident">Span</span>,
-    <span class="kw">pub</span> <span class="ident">size</span>:       <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">nosplit</span>:    <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">disp_size</span>:  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">base</span>:       <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">index</span>:      <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Register</span>, <span class="ident">isize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">disp</span>:       <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span>
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JumpType</span> {
-    <span class="comment">// note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr</span>
-    <span class="comment">// in order to allow the full range of expressions to be used. the only currently existing ambiguity is</span>
-    <span class="comment">// with the symbol &lt;, as this symbol is also the starting symbol for the universal calling syntax &lt;Type as Trait&gt;.method(args)</span>
-    <span class="ident">Global</span>(<span class="ident">Ident</span>),         <span class="comment">// -&gt; label</span>
-    <span class="ident">Backward</span>(<span class="ident">Ident</span>),       <span class="comment">//  &gt; label</span>
-    <span class="ident">Forward</span>(<span class="ident">Ident</span>),        <span class="comment">//  &lt; label</span>
-    <span class="ident">Dynamic</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>), <span class="comment">// =&gt; expr</span>
-}
-
-<span class="comment">// encoding of this:</span>
-<span class="comment">// lower byte indicates which register it is</span>
-<span class="comment">// upper byte is used to indicate which size group it falls under.</span>
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Register</span> {
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="ident">Size</span>,
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">RegKind</span>
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RegKind</span> {
-    <span class="ident">Static</span>(<span class="ident">RegId</span>),
-    <span class="ident">Dynamic</span>(<span class="ident">RegFamily</span>, <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>)
-}
-
-<span class="comment">// this map identifies the different registers that exist. some of these can be referred to as different sizes</span>
-<span class="comment">// but they share the same ID here (think AL/AX/EAX/RAX, XMM/YMM)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RegId</span> {
-    <span class="comment">// size: 1, 2, 4 or 8 bytes</span>
-    <span class="ident">RAX</span> <span class="op">=</span> <span class="number">0x00</span>, <span class="ident">RCX</span> <span class="op">=</span> <span class="number">0x01</span>, <span class="ident">RDX</span> <span class="op">=</span> <span class="number">0x02</span>, <span class="ident">RBX</span> <span class="op">=</span> <span class="number">0x03</span>,
-    <span class="ident">RSP</span> <span class="op">=</span> <span class="number">0x04</span>, <span class="ident">RBP</span> <span class="op">=</span> <span class="number">0x05</span>, <span class="ident">RSI</span> <span class="op">=</span> <span class="number">0x06</span>, <span class="ident">RDI</span> <span class="op">=</span> <span class="number">0x07</span>,
-    <span class="ident">R8</span>  <span class="op">=</span> <span class="number">0x08</span>, <span class="ident">R9</span>  <span class="op">=</span> <span class="number">0x09</span>, <span class="ident">R10</span> <span class="op">=</span> <span class="number">0x0A</span>, <span class="ident">R11</span> <span class="op">=</span> <span class="number">0x0B</span>,
-    <span class="ident">R12</span> <span class="op">=</span> <span class="number">0x0C</span>, <span class="ident">R13</span> <span class="op">=</span> <span class="number">0x0D</span>, <span class="ident">R14</span> <span class="op">=</span> <span class="number">0x0E</span>, <span class="ident">R15</span> <span class="op">=</span> <span class="number">0x0F</span>,
-
-    <span class="comment">// size: 8 bytes</span>
-    <span class="ident">RIP</span> <span class="op">=</span> <span class="number">0x15</span>,
-
-    <span class="comment">// size: 1 byte</span>
-    <span class="ident">AH</span> <span class="op">=</span> <span class="number">0x24</span>, <span class="ident">CH</span> <span class="op">=</span> <span class="number">0x25</span>, <span class="ident">DH</span> <span class="op">=</span> <span class="number">0x26</span>, <span class="ident">BH</span> <span class="op">=</span> <span class="number">0x27</span>,
-
-    <span class="comment">// size: 10 bytes</span>
-    <span class="ident">ST0</span> <span class="op">=</span> <span class="number">0x30</span>, <span class="ident">ST1</span> <span class="op">=</span> <span class="number">0x31</span>, <span class="ident">ST2</span> <span class="op">=</span> <span class="number">0x32</span>, <span class="ident">ST3</span> <span class="op">=</span> <span class="number">0x33</span>,
-    <span class="ident">ST4</span> <span class="op">=</span> <span class="number">0x34</span>, <span class="ident">ST5</span> <span class="op">=</span> <span class="number">0x35</span>, <span class="ident">ST6</span> <span class="op">=</span> <span class="number">0x36</span>, <span class="ident">ST7</span> <span class="op">=</span> <span class="number">0x37</span>,
-
-    <span class="comment">// size: 8 bytes. alternative encoding exists</span>
-    <span class="ident">MMX0</span> <span class="op">=</span> <span class="number">0x40</span>, <span class="ident">MMX1</span> <span class="op">=</span> <span class="number">0x41</span>, <span class="ident">MMX2</span> <span class="op">=</span> <span class="number">0x42</span>, <span class="ident">MMX3</span> <span class="op">=</span> <span class="number">0x43</span>,
-    <span class="ident">MMX4</span> <span class="op">=</span> <span class="number">0x44</span>, <span class="ident">MMX5</span> <span class="op">=</span> <span class="number">0x45</span>, <span class="ident">MMX6</span> <span class="op">=</span> <span class="number">0x46</span>, <span class="ident">MMX7</span> <span class="op">=</span> <span class="number">0x47</span>,
-
-    <span class="comment">// size: 16 bytes or 32 bytes</span>
-    <span class="ident">XMM0</span>  <span class="op">=</span> <span class="number">0x50</span>, <span class="ident">XMM1</span>  <span class="op">=</span> <span class="number">0x51</span>, <span class="ident">XMM2</span>  <span class="op">=</span> <span class="number">0x52</span>, <span class="ident">XMM3</span>  <span class="op">=</span> <span class="number">0x53</span>,
-    <span class="ident">XMM4</span>  <span class="op">=</span> <span class="number">0x54</span>, <span class="ident">XMM5</span>  <span class="op">=</span> <span class="number">0x55</span>, <span class="ident">XMM6</span>  <span class="op">=</span> <span class="number">0x56</span>, <span class="ident">XMM7</span>  <span class="op">=</span> <span class="number">0x57</span>,
-    <span class="ident">XMM8</span>  <span class="op">=</span> <span class="number">0x58</span>, <span class="ident">XMM9</span>  <span class="op">=</span> <span class="number">0x59</span>, <span class="ident">XMM10</span> <span class="op">=</span> <span class="number">0x5A</span>, <span class="ident">XMM11</span> <span class="op">=</span> <span class="number">0x5B</span>,
-    <span class="ident">XMM12</span> <span class="op">=</span> <span class="number">0x5C</span>, <span class="ident">XMM13</span> <span class="op">=</span> <span class="number">0x5D</span>, <span class="ident">XMM14</span> <span class="op">=</span> <span class="number">0x5E</span>, <span class="ident">XMM15</span> <span class="op">=</span> <span class="number">0x5F</span>,
-
-    <span class="comment">// size: 2 bytes. alternative encoding exists</span>
-    <span class="ident">ES</span> <span class="op">=</span> <span class="number">0x60</span>, <span class="ident">CS</span> <span class="op">=</span> <span class="number">0x61</span>, <span class="ident">SS</span> <span class="op">=</span> <span class="number">0x62</span>, <span class="ident">DS</span> <span class="op">=</span> <span class="number">0x63</span>,
-    <span class="ident">FS</span> <span class="op">=</span> <span class="number">0x64</span>, <span class="ident">GS</span> <span class="op">=</span> <span class="number">0x65</span>,
-
-    <span class="comment">// size: 4 bytes</span>
-    <span class="ident">CR0</span>  <span class="op">=</span> <span class="number">0x70</span>, <span class="ident">CR1</span>  <span class="op">=</span> <span class="number">0x71</span>, <span class="ident">CR2</span>  <span class="op">=</span> <span class="number">0x72</span>, <span class="ident">CR3</span>  <span class="op">=</span> <span class="number">0x73</span>,
-    <span class="ident">CR4</span>  <span class="op">=</span> <span class="number">0x74</span>, <span class="ident">CR5</span>  <span class="op">=</span> <span class="number">0x75</span>, <span class="ident">CR6</span>  <span class="op">=</span> <span class="number">0x76</span>, <span class="ident">CR7</span>  <span class="op">=</span> <span class="number">0x77</span>,
-    <span class="ident">CR8</span>  <span class="op">=</span> <span class="number">0x78</span>, <span class="ident">CR9</span>  <span class="op">=</span> <span class="number">0x79</span>, <span class="ident">CR10</span> <span class="op">=</span> <span class="number">0x7A</span>, <span class="ident">CR11</span> <span class="op">=</span> <span class="number">0x7B</span>,
-    <span class="ident">CR12</span> <span class="op">=</span> <span class="number">0x7C</span>, <span class="ident">CR13</span> <span class="op">=</span> <span class="number">0x7D</span>, <span class="ident">CR14</span> <span class="op">=</span> <span class="number">0x7E</span>, <span class="ident">CR15</span> <span class="op">=</span> <span class="number">0x7F</span>,
-
-    <span class="comment">// size: 4 bytes</span>
-    <span class="ident">DR0</span>  <span class="op">=</span> <span class="number">0x80</span>, <span class="ident">DR1</span>  <span class="op">=</span> <span class="number">0x81</span>, <span class="ident">DR2</span>  <span class="op">=</span> <span class="number">0x82</span>, <span class="ident">DR3</span>  <span class="op">=</span> <span class="number">0x83</span>,
-    <span class="ident">DR4</span>  <span class="op">=</span> <span class="number">0x84</span>, <span class="ident">DR5</span>  <span class="op">=</span> <span class="number">0x85</span>, <span class="ident">DR6</span>  <span class="op">=</span> <span class="number">0x86</span>, <span class="ident">DR7</span>  <span class="op">=</span> <span class="number">0x87</span>,
-    <span class="ident">DR8</span>  <span class="op">=</span> <span class="number">0x88</span>, <span class="ident">DR9</span>  <span class="op">=</span> <span class="number">0x89</span>, <span class="ident">DR10</span> <span class="op">=</span> <span class="number">0x8A</span>, <span class="ident">DR11</span> <span class="op">=</span> <span class="number">0x8B</span>,
-    <span class="ident">DR12</span> <span class="op">=</span> <span class="number">0x8C</span>, <span class="ident">DR13</span> <span class="op">=</span> <span class="number">0x8D</span>, <span class="ident">DR14</span> <span class="op">=</span> <span class="number">0x8E</span>, <span class="ident">DR15</span> <span class="op">=</span> <span class="number">0x8F</span>,
-
-    <span class="comment">// size: 16 bytes</span>
-    <span class="ident">BND0</span> <span class="op">=</span> <span class="number">0x90</span>, <span class="ident">BND1</span> <span class="op">=</span> <span class="number">0x91</span>, <span class="ident">BND2</span> <span class="op">=</span> <span class="number">0x92</span>, <span class="ident">BND3</span> <span class="op">=</span> <span class="number">0x93</span>
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialOrd</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RegFamily</span> {
-    <span class="ident">LEGACY</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="ident">RIP</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">HIGHBYTE</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">FP</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">MMX</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">XMM</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="ident">SEGMENT</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="ident">CONTROL</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="ident">DEBUG</span> <span class="op">=</span> <span class="number">8</span>,
-    <span class="ident">BOUND</span> <span class="op">=</span> <span class="number">9</span>
-}
-
-<span class="comment">/*
- * impls
- */</span>
-
-<span class="kw">impl</span> <span class="ident">Register</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_static</span>(<span class="ident">size</span>: <span class="ident">Size</span>, <span class="ident">id</span>: <span class="ident">RegId</span>) <span class="op">-&gt;</span> <span class="ident">Register</span> {
-        <span class="ident">Register</span> {<span class="ident">size</span>: <span class="ident">size</span>, <span class="ident">kind</span>: <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">id</span>) }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dynamic</span>(<span class="ident">size</span>: <span class="ident">Size</span>, <span class="ident">family</span>: <span class="ident">RegFamily</span>, <span class="ident">id</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Register</span> {
-        <span class="ident">Register</span> {<span class="ident">size</span>: <span class="ident">size</span>, <span class="ident">kind</span>: <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="ident">family</span>, <span class="ident">id</span>) }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Size</span> {
-        <span class="self">self</span>.<span class="ident">size</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">RegKind</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>.<span class="ident">code</span>()),
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(_, _) <span class="op">=&gt;</span> <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RegFamily</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=&gt;</span> <span class="ident">code</span>.<span class="ident">family</span>(),
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="ident">family</span>, _) <span class="op">=&gt;</span> <span class="ident">family</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dynamic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(_) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(_, _) <span class="op">=&gt;</span> <span class="bool-val">true</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_extended</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">family</span>() {
-            <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>  <span class="op">|</span>
-            <span class="ident">RegFamily</span>::<span class="ident">XMM</span>     <span class="op">|</span>
-            <span class="ident">RegFamily</span>::<span class="ident">CONTROL</span> <span class="op">|</span>
-            <span class="ident">RegFamily</span>::<span class="ident">DEBUG</span>   <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">code</span>().<span class="ident">unwrap_or</span>(<span class="number">8</span>) <span class="op">&gt;</span> <span class="number">7</span>,
-            _ <span class="op">=&gt;</span> <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">code</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_number</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">RegKind</span> {
-        <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">from_number</span>(<span class="ident">id</span>))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Register</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Register</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">size</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">size</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">kind</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">other_code</span>) <span class="op">=</span> <span class="ident">other</span>.<span class="ident">kind</span> {
-                    <span class="kw">return</span> <span class="ident">code</span> <span class="op">==</span> <span class="ident">other_code</span>
-                }
-            }
-        }
-        <span class="kw">return</span> <span class="bool-val">false</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">RegId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Register</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RegId</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">RegId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RegKind</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RegId</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="ident">id</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>,
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(_, _) <span class="op">=&gt;</span> <span class="bool-val">false</span>
-        }
-    }
-}
-
-<span class="comment">// workarounds to mask an impl&lt;A, B&gt; PartialEq&lt;B&gt; for Option&lt;A: PartialEq&lt;B&gt;&gt;</span>
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">RegId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RegId</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">a</span>) <span class="op">=&gt;</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">other</span>,
-            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">RegId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RegKind</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RegId</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">a</span>) <span class="op">=&gt;</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">other</span>,
-            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">RegId</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">&amp;</span> <span class="number">0xF</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RegFamily</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">&gt;&gt;</span> <span class="number">4</span> {
-            <span class="number">0</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>,
-            <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">RIP</span>,
-            <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">HIGHBYTE</span>,
-            <span class="number">3</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">FP</span>,
-            <span class="number">4</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">MMX</span>,
-            <span class="number">5</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">XMM</span>,
-            <span class="number">6</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">SEGMENT</span>,
-            <span class="number">7</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">CONTROL</span>,
-            <span class="number">8</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">DEBUG</span>,
-            <span class="number">9</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">BOUND</span>,
-            _ <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>()
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_number</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">RegId</span> {
-        <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="number">0</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RAX</span>,
-            <span class="number">1</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RCX</span>,
-            <span class="number">2</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RDX</span>,
-            <span class="number">3</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RBX</span>,
-            <span class="number">4</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RSP</span>,
-            <span class="number">5</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RBP</span>,
-            <span class="number">6</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RSI</span>,
-            <span class="number">7</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">RDI</span>,
-            <span class="number">8</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R8</span>,
-            <span class="number">9</span>  <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R9</span>,
-            <span class="number">10</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R10</span>,
-            <span class="number">11</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R11</span>,
-            <span class="number">12</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R12</span>,
-            <span class="number">13</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R13</span>,
-            <span class="number">14</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R14</span>,
-            <span class="number">15</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">R15</span>,
-            _ <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;invalid register code {:?}&quot;</span>, <span class="ident">id</span>)
-        }
-    }
-}
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
 <span class="comment">/*
  * Code
@@ -1081,7 +776,7 @@
 <span class="comment">// this means we don&#39;t have to figure out nesting via []&#39;s by ourselves.</span>
 <span class="comment">// syntax for a single op: PREFIX* ident (SIZE? expr (&quot;,&quot; SIZE? expr)*)? &quot;;&quot;</span>
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_instruction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Instruction</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_instruction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">Instruction</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">startspan</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ops</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
@@ -1099,17 +794,23 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Semi</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Eof</span>) {
-        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">state</span>, <span class="ident">ecx</span>, <span class="ident">parser</span>)<span class="question-mark">?</span>);
+        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">parser</span>)<span class="question-mark">?</span>);
 
         <span class="kw">while</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Comma</span>) {
-            <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">state</span>, <span class="ident">ecx</span>, <span class="ident">parser</span>)<span class="question-mark">?</span>);
+            <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">parser</span>)<span class="question-mark">?</span>);
         }
     }
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span</span> {<span class="ident">hi</span>: <span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>, ..<span class="ident">startspan</span>};
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">startspan</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>());
 
     <span class="ident">ops</span>.<span class="ident">push</span>(<span class="ident">op</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">Instruction</span>(<span class="ident">ops</span>, <span class="ident">args</span>, <span class="ident">span</span>))
+    <span class="prelude-val">Ok</span>((
+        <span class="ident">Instruction</span> {
+            <span class="ident">idents</span>: <span class="ident">ops</span>,
+            <span class="ident">span</span>: <span class="ident">span</span>
+        },
+        <span class="ident">args</span>
+    ))
 }
 
 <span class="kw">const</span> <span class="ident">PREFIXES</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">12</span>] <span class="op">=</span> [
@@ -1122,18 +823,34 @@
     <span class="ident">PREFIXES</span>.<span class="ident">contains</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="ident">token</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
 }
 
-<span class="kw">const</span> <span class="ident">SIZES</span>: [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">8</span>] <span class="op">=</span> [
+<span class="kw">const</span> <span class="ident">X86_SIZES</span>: [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">9</span>] <span class="op">=</span> [
     (<span class="string">&quot;BYTE&quot;</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>),
     (<span class="string">&quot;WORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>),
     (<span class="string">&quot;DWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
+    (<span class="string">&quot;AWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
+    (<span class="string">&quot;FWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">FWORD</span>),
+    (<span class="string">&quot;QWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
+    (<span class="string">&quot;TWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">PWORD</span>),
+    (<span class="string">&quot;OWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">OWORD</span>),
+    (<span class="string">&quot;YWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">HWORD</span>)
+];
+<span class="kw">const</span> <span class="ident">X64_SIZES</span>: [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">9</span>] <span class="op">=</span> [
+    (<span class="string">&quot;BYTE&quot;</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>),
+    (<span class="string">&quot;WORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>),
+    (<span class="string">&quot;DWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
+    (<span class="string">&quot;FWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">FWORD</span>),
     (<span class="string">&quot;AWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
     (<span class="string">&quot;QWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
     (<span class="string">&quot;TWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">PWORD</span>),
     (<span class="string">&quot;OWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">OWORD</span>),
     (<span class="string">&quot;YWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">HWORD</span>)
 ];
-<span class="kw">fn</span> <span class="ident">eat_size_hint</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">kw</span>, <span class="ident">size</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">SIZES</span> {
+<span class="kw">fn</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">sizes</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
+        <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">X86_SIZES</span>,
+        <span class="ident">X86Mode</span>::<span class="ident">Long</span>      <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">X64_SIZES</span>
+    };
+    <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">kw</span>, <span class="ident">size</span>) <span class="kw">in</span> <span class="ident">sizes</span> {
         <span class="kw">if</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="ident">kw</span>) {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">size</span>);
         }
@@ -1143,15 +860,15 @@
 
 <span class="kw">fn</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span>, <span class="ident">kw</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">token</span> {
-        <span class="ident">token</span>::<span class="ident">Ident</span>(<span class="ident">ast</span>::<span class="ident">Ident</span> {<span class="kw-2">ref</span> <span class="ident">name</span>, ..}) <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">kw</span> <span class="op">=&gt;</span> (),
-        _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>
+        <span class="ident">token</span>::<span class="ident">Ident</span>(<span class="ident">ast</span>::<span class="ident">Ident</span> {<span class="kw-2">ref</span> <span class="ident">name</span>, ..}, <span class="kw">_</span>) <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">kw</span> <span class="op">=&gt;</span> (),
+        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>
     }
     <span class="ident">parser</span>.<span class="ident">bump</span>();
     <span class="bool-val">true</span>
 }
 
 <span class="kw">fn</span> <span class="ident">parse_ident_or_rust_keyword</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ast</span>::<span class="ident">Ident</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">token</span>::<span class="ident">Ident</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">token</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">token</span>::<span class="ident">Ident</span>(<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">token</span> {
         <span class="ident">parser</span>.<span class="ident">bump</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">i</span>)
     } <span class="kw">else</span> {
@@ -1162,9 +879,9 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_arg</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Arg</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_arg</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">RawArg</span><span class="op">&gt;</span> {
     <span class="comment">// sizehint</span>
-    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">parser</span>);
+    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">parser</span>);
 
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
 
@@ -1174,7 +891,7 @@
             <span class="ident">token</span>::<span class="ident">Gt</span>     <span class="op">|</span>
             <span class="ident">token</span>::<span class="ident">Lt</span>     <span class="op">|</span>
             <span class="ident">token</span>::<span class="ident">FatArrow</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
-            _ <span class="op">=&gt;</span> <span class="bool-val">false</span>
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>
         }) {
         <span class="ident">parser</span>.<span class="ident">bump</span>();
     }
@@ -1183,9 +900,15 @@
         (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="ident">in_bracket</span> {
                 <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">CloseDelim</span>(<span class="ident">token</span>::<span class="ident">Bracket</span>))<span class="question-mark">?</span>;
-                <span class="ident">Arg</span>::<span class="ident">IndirectJumpTarget</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>)
+                <span class="ident">RawArg</span>::<span class="ident">IndirectJumpTarget</span> {
+                    <span class="ident">type_</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>,
+                    <span class="ident">size</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>
+                }
             } <span class="kw">else</span> {
-                <span class="ident">Arg</span>::<span class="ident">JumpTarget</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>)
+                <span class="ident">RawArg</span>::<span class="ident">JumpTarget</span> {
+                    <span class="ident">type_</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>,
+                    <span class="ident">size</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>
+                }
             });
         }
     }
@@ -1194,21 +917,21 @@
     <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">RArrow</span>) {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Global</span>(
-            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">Span</span> {<span class="ident">hi</span>: <span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>, ..<span class="ident">start</span>} }
+            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()) }
         );
         <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
     <span class="comment">// forward local label</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Gt</span>) {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Forward</span>(
-            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">Span</span> {<span class="ident">hi</span>: <span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>, ..<span class="ident">start</span>} }
+            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()) }
         );
         <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
     <span class="comment">// forward global label</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Lt</span>) {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Backward</span>(
-            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">Span</span> {<span class="ident">hi</span>: <span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>, ..<span class="ident">start</span>} }
+            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()) }
         );
         <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
     <span class="comment">// dynamic label</span>
@@ -1216,24 +939,30 @@
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>);
         <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
+    <span class="comment">// extern location</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="string">&quot;extern&quot;</span>){
+        <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Bare</span>(<span class="ident">location</span>);
+        <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
     }
+
 
     <span class="comment">// memory location</span>
     <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">OpenDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>)) {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
         <span class="kw">let</span> <span class="ident">nosplit</span> <span class="op">=</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="string">&quot;NOSPLIT&quot;</span>);
-        <span class="kw">let</span> <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">parser</span>);
+        <span class="kw">let</span> <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">parser</span>);
         <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span</span> {<span class="ident">lo</span>: <span class="ident">span</span>.<span class="ident">lo</span>, ..<span class="ident">expr</span>.<span class="ident">span</span>};
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>.<span class="ident">with_lo</span>(<span class="ident">span</span>.<span class="ident">lo</span>());
         <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">CloseDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">state</span>, <span class="ident">ecx</span>, <span class="ident">expr</span>);
+        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">expr</span>);
 
         <span class="comment">// assemble the memory location</span>
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arg</span>::<span class="ident">IndirectRaw</span> {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">IndirectRaw</span> {
             <span class="ident">span</span>: <span class="ident">span</span>,
-            <span class="ident">value_size</span>: <span class="ident">size</span>,
             <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
+            <span class="ident">value_size</span>: <span class="ident">size</span>,
             <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
             <span class="ident">items</span>: <span class="ident">items</span>
         });
@@ -1243,10 +972,10 @@
     <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> {
         <span class="comment">// typemapped</span>
         <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">FatArrow</span>) {
-            <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>);
+            <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>);
             <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">base</span>) <span class="op">=</span> <span class="ident">base</span> { <span class="ident">base</span> } <span class="kw">else</span> {
                 <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">arg</span>.<span class="ident">span</span>, <span class="string">&quot;Expected register&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arg</span>::<span class="ident">Invalid</span>);
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Invalid</span>);
             };
 
             <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_path</span>(<span class="ident">PathStyle</span>::<span class="ident">Type</span>)<span class="question-mark">?</span>;
@@ -1258,11 +987,11 @@
 
             <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">OpenDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>)) {
                 <span class="ident">nosplit</span> <span class="op">=</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="string">&quot;NOSPLIT&quot;</span>);
-                <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">parser</span>);
+                <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">parser</span>);
                 <span class="kw">let</span> <span class="ident">index_expr</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
 
                 <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">CloseDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>))<span class="question-mark">?</span>;
-                <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">state</span>, <span class="ident">ecx</span>, <span class="ident">index_expr</span>);
+                <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">index_expr</span>);
             } <span class="kw">else</span> {
                 <span class="ident">items</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
             }
@@ -1273,35 +1002,41 @@
                 <span class="prelude-val">None</span>
             };
 
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arg</span>::<span class="ident">TypeMappedRaw</span> {
-                <span class="ident">span</span>: <span class="ident">Span</span> {<span class="ident">hi</span>: <span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>, ..<span class="ident">start</span>},
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">TypeMappedRaw</span> {
+                <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()),
+                <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
+                <span class="ident">value_size</span>: <span class="ident">size</span>,
+                <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
                 <span class="ident">base_reg</span>: <span class="ident">base</span>.<span class="ident">node</span>,
                 <span class="ident">scale</span>: <span class="ident">ty</span>,
-                <span class="ident">value_size</span>: <span class="ident">size</span>,
-                <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
-                <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
                 <span class="ident">scaled_items</span>: <span class="ident">items</span>,
                 <span class="ident">attribute</span>: <span class="ident">attr</span>,
             });
         }
 
         <span class="comment">// direct register reference</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reg</span>) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reg</span>) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>) {
             <span class="kw">if</span> <span class="ident">size</span>.<span class="ident">is_some</span>() {
                 <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">arg</span>.<span class="ident">span</span>, <span class="string">&quot;size hint with direct register&quot;</span>);
             }
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Arg</span>::<span class="ident">Direct</span>(<span class="ident">reg</span>))
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Direct</span> {
+                <span class="ident">reg</span>: <span class="ident">reg</span>.<span class="ident">node</span>,
+                <span class="ident">span</span>: <span class="ident">reg</span>.<span class="ident">span</span>
+            })
         }
 
         <span class="comment">// immediate</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">Arg</span>::<span class="ident">Immediate</span>(<span class="ident">P</span>(<span class="ident">arg</span>), <span class="ident">size</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Immediate</span> {
+            <span class="ident">value</span>: <span class="ident">P</span>(<span class="ident">arg</span>),
+            <span class="ident">size</span>: <span class="ident">size</span>
+        })
     })
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_simple_name</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">expr</span> {
         <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">ExprKind</span>::<span class="ident">Path</span>(<span class="prelude-val">None</span>, <span class="kw-2">ref</span> <span class="ident">path</span>) , ..} <span class="op">=&gt;</span> <span class="ident">path</span>,
-        _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
+        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
     };
 
     <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_global</span>() <span class="op">||</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">1</span> {
@@ -1313,78 +1048,22 @@
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">segment</span>.<span class="ident">identifier</span>, <span class="ident">span</span>: <span class="ident">path</span>.<span class="ident">span</span>})
+    <span class="prelude-val">Some</span>(<span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">segment</span>.<span class="ident">ident</span>, <span class="ident">span</span>: <span class="ident">path</span>.<span class="ident">span</span>})
 }
 
-<span class="kw">fn</span> <span class="ident">parse_reg</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Spanned</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Spanned</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">as_simple_name</span>(<span class="ident">expr</span>) {
         <span class="comment">// static register names</span>
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">path</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">crate_data</span>.<span class="ident">aliases</span>.<span class="ident">get</span>(<span class="ident">name</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">state</span>.<span class="ident">crate_data</span>.<span class="ident">aliases</span>.<span class="ident">get</span>(<span class="ident">name</span>) {
             <span class="ident">name</span> <span class="op">=</span> <span class="ident">x</span>;
         }
 
-        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">RegId</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">Size</span>::<span class="kw-2">*</span>;
-        <span class="kw">let</span> (<span class="ident">reg</span>, <span class="ident">size</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="string">&quot;rax&quot;</span><span class="op">|</span><span class="string">&quot;r0&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RAX</span>, <span class="ident">QWORD</span>), <span class="string">&quot;rcx&quot;</span><span class="op">|</span><span class="string">&quot;r1&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RCX</span>, <span class="ident">QWORD</span>), <span class="string">&quot;rdx&quot;</span><span class="op">|</span><span class="string">&quot;r2&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDX</span>, <span class="ident">QWORD</span>), <span class="string">&quot;rbx&quot;</span><span class="op">|</span><span class="string">&quot;r3&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBX</span>, <span class="ident">QWORD</span>),
-            <span class="string">&quot;rsp&quot;</span><span class="op">|</span><span class="string">&quot;r4&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RSP</span>, <span class="ident">QWORD</span>), <span class="string">&quot;rbp&quot;</span><span class="op">|</span><span class="string">&quot;r5&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBP</span>, <span class="ident">QWORD</span>), <span class="string">&quot;rsi&quot;</span><span class="op">|</span><span class="string">&quot;r6&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RSI</span>, <span class="ident">QWORD</span>), <span class="string">&quot;rdi&quot;</span><span class="op">|</span><span class="string">&quot;r7&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDI</span>, <span class="ident">QWORD</span>),
-            <span class="string">&quot;r8&quot;</span>       <span class="op">=&gt;</span> (<span class="ident">R8</span>,  <span class="ident">QWORD</span>), <span class="string">&quot;r9&quot;</span>       <span class="op">=&gt;</span> (<span class="ident">R9</span>,  <span class="ident">QWORD</span>), <span class="string">&quot;r10&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R10</span>, <span class="ident">QWORD</span>), <span class="string">&quot;r11&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R11</span>, <span class="ident">QWORD</span>),
-            <span class="string">&quot;r12&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R12</span>, <span class="ident">QWORD</span>), <span class="string">&quot;r13&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R13</span>, <span class="ident">QWORD</span>), <span class="string">&quot;r14&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R14</span>, <span class="ident">QWORD</span>), <span class="string">&quot;r15&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R15</span>, <span class="ident">QWORD</span>),
-
-            <span class="string">&quot;eax&quot;</span><span class="op">|</span><span class="string">&quot;r0d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RAX</span>, <span class="ident">DWORD</span>), <span class="string">&quot;ecx&quot;</span><span class="op">|</span><span class="string">&quot;r1d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RCX</span>, <span class="ident">DWORD</span>), <span class="string">&quot;edx&quot;</span><span class="op">|</span><span class="string">&quot;r2d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDX</span>, <span class="ident">DWORD</span>), <span class="string">&quot;ebx&quot;</span><span class="op">|</span><span class="string">&quot;r3d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBX</span>, <span class="ident">DWORD</span>),
-            <span class="string">&quot;esp&quot;</span><span class="op">|</span><span class="string">&quot;r4d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RSP</span>, <span class="ident">DWORD</span>), <span class="string">&quot;ebp&quot;</span><span class="op">|</span><span class="string">&quot;r5d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBP</span>, <span class="ident">DWORD</span>), <span class="string">&quot;esi&quot;</span><span class="op">|</span><span class="string">&quot;r6d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RSI</span>, <span class="ident">DWORD</span>), <span class="string">&quot;edi&quot;</span><span class="op">|</span><span class="string">&quot;r7d&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDI</span>, <span class="ident">DWORD</span>),
-            <span class="string">&quot;r8d&quot;</span>       <span class="op">=&gt;</span> (<span class="ident">R8</span>,  <span class="ident">DWORD</span>), <span class="string">&quot;r9d&quot;</span>       <span class="op">=&gt;</span> (<span class="ident">R9</span>,  <span class="ident">DWORD</span>), <span class="string">&quot;r10d&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R10</span>, <span class="ident">DWORD</span>), <span class="string">&quot;r11d&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R11</span>, <span class="ident">DWORD</span>),
-            <span class="string">&quot;r12d&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R12</span>, <span class="ident">DWORD</span>), <span class="string">&quot;r13d&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R13</span>, <span class="ident">DWORD</span>), <span class="string">&quot;r14d&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R14</span>, <span class="ident">DWORD</span>), <span class="string">&quot;r15d&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R15</span>, <span class="ident">DWORD</span>),
-
-            <span class="string">&quot;ax&quot;</span><span class="op">|</span><span class="string">&quot;r0w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RAX</span>, <span class="ident">WORD</span>), <span class="string">&quot;cx&quot;</span><span class="op">|</span><span class="string">&quot;r1w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RCX</span>, <span class="ident">WORD</span>), <span class="string">&quot;dx&quot;</span><span class="op">|</span><span class="string">&quot;r2w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDX</span>, <span class="ident">WORD</span>), <span class="string">&quot;bx&quot;</span><span class="op">|</span><span class="string">&quot;r3w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBX</span>, <span class="ident">WORD</span>),
-            <span class="string">&quot;sp&quot;</span><span class="op">|</span><span class="string">&quot;r4w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RSP</span>, <span class="ident">WORD</span>), <span class="string">&quot;bp&quot;</span><span class="op">|</span><span class="string">&quot;r5w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBP</span>, <span class="ident">WORD</span>), <span class="string">&quot;si&quot;</span><span class="op">|</span><span class="string">&quot;r6w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RSI</span>, <span class="ident">WORD</span>), <span class="string">&quot;di&quot;</span><span class="op">|</span><span class="string">&quot;r7w&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDI</span>, <span class="ident">WORD</span>),
-            <span class="string">&quot;r8w&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R8</span>,  <span class="ident">WORD</span>), <span class="string">&quot;r9w&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R9</span>,  <span class="ident">WORD</span>), <span class="string">&quot;r10w&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R10</span>, <span class="ident">WORD</span>), <span class="string">&quot;r11w&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R11</span>, <span class="ident">WORD</span>),
-            <span class="string">&quot;r12w&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R12</span>, <span class="ident">WORD</span>), <span class="string">&quot;r13w&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R13</span>, <span class="ident">WORD</span>), <span class="string">&quot;r14w&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R14</span>, <span class="ident">WORD</span>), <span class="string">&quot;r15w&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R15</span>, <span class="ident">WORD</span>),
-
-            <span class="string">&quot;al&quot;</span><span class="op">|</span><span class="string">&quot;r0b&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RAX</span>, <span class="ident">BYTE</span>), <span class="string">&quot;cl&quot;</span><span class="op">|</span><span class="string">&quot;r1b&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RCX</span>, <span class="ident">BYTE</span>), <span class="string">&quot;dl&quot;</span><span class="op">|</span><span class="string">&quot;r2b&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RDX</span>, <span class="ident">BYTE</span>), <span class="string">&quot;bl&quot;</span><span class="op">|</span><span class="string">&quot;r3b&quot;</span> <span class="op">=&gt;</span> (<span class="ident">RBX</span>, <span class="ident">BYTE</span>),
-            <span class="string">&quot;spl&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">RSP</span>, <span class="ident">BYTE</span>), <span class="string">&quot;bpl&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">RBP</span>, <span class="ident">BYTE</span>), <span class="string">&quot;sil&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">RSI</span>, <span class="ident">BYTE</span>), <span class="string">&quot;dil&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">RDI</span>, <span class="ident">BYTE</span>),
-            <span class="string">&quot;r8b&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R8</span>,  <span class="ident">BYTE</span>), <span class="string">&quot;r9b&quot;</span>      <span class="op">=&gt;</span> (<span class="ident">R9</span>,  <span class="ident">BYTE</span>), <span class="string">&quot;r10b&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R10</span>, <span class="ident">BYTE</span>), <span class="string">&quot;r11b&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R11</span>, <span class="ident">BYTE</span>),
-            <span class="string">&quot;r12b&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R12</span>, <span class="ident">BYTE</span>), <span class="string">&quot;r13b&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R13</span>, <span class="ident">BYTE</span>), <span class="string">&quot;r14b&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R14</span>, <span class="ident">BYTE</span>), <span class="string">&quot;r15b&quot;</span>     <span class="op">=&gt;</span> (<span class="ident">R15</span>, <span class="ident">BYTE</span>),
-
-            <span class="string">&quot;rip&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">RIP</span>, <span class="ident">QWORD</span>),
-
-            <span class="string">&quot;ah&quot;</span> <span class="op">=&gt;</span> (<span class="ident">AH</span>, <span class="ident">BYTE</span>), <span class="string">&quot;ch&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CH</span>, <span class="ident">BYTE</span>), <span class="string">&quot;dh&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DH</span>, <span class="ident">BYTE</span>), <span class="string">&quot;bh&quot;</span> <span class="op">=&gt;</span> (<span class="ident">BH</span>, <span class="ident">BYTE</span>),
-
-            <span class="string">&quot;st0&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST0</span>, <span class="ident">PWORD</span>), <span class="string">&quot;st1&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST1</span>, <span class="ident">PWORD</span>), <span class="string">&quot;st2&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST2</span>, <span class="ident">PWORD</span>), <span class="string">&quot;st3&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST3</span>, <span class="ident">PWORD</span>),
-            <span class="string">&quot;st4&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST4</span>, <span class="ident">PWORD</span>), <span class="string">&quot;st5&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST5</span>, <span class="ident">PWORD</span>), <span class="string">&quot;st6&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST6</span>, <span class="ident">PWORD</span>), <span class="string">&quot;st7&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ST7</span>, <span class="ident">PWORD</span>),
-
-            <span class="string">&quot;mm0&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX0</span>, <span class="ident">QWORD</span>), <span class="string">&quot;mm1&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX1</span>, <span class="ident">QWORD</span>), <span class="string">&quot;mm2&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX2</span>, <span class="ident">QWORD</span>), <span class="string">&quot;mm3&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX3</span>, <span class="ident">QWORD</span>),
-            <span class="string">&quot;mm4&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX4</span>, <span class="ident">QWORD</span>), <span class="string">&quot;mm5&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX5</span>, <span class="ident">QWORD</span>), <span class="string">&quot;mm6&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX6</span>, <span class="ident">QWORD</span>), <span class="string">&quot;mm7&quot;</span> <span class="op">=&gt;</span> (<span class="ident">MMX7</span>, <span class="ident">QWORD</span>),
-
-            <span class="string">&quot;xmm0&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM0</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm1&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM1</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm2&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM2</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm3&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM3</span> , <span class="ident">OWORD</span>),
-            <span class="string">&quot;xmm4&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM4</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm5&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM5</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm6&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM6</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm7&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM7</span> , <span class="ident">OWORD</span>),
-            <span class="string">&quot;xmm8&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM8</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm9&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM9</span> , <span class="ident">OWORD</span>), <span class="string">&quot;xmm10&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM10</span>, <span class="ident">OWORD</span>), <span class="string">&quot;xmm11&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM11</span>, <span class="ident">OWORD</span>),
-            <span class="string">&quot;xmm12&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM12</span>, <span class="ident">OWORD</span>), <span class="string">&quot;xmm13&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM13</span>, <span class="ident">OWORD</span>), <span class="string">&quot;xmm14&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM14</span>, <span class="ident">OWORD</span>), <span class="string">&quot;xmm15&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM15</span>, <span class="ident">OWORD</span>),
-
-            <span class="string">&quot;ymm0&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM0</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm1&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM1</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm2&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM2</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm3&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM3</span> , <span class="ident">HWORD</span>),
-            <span class="string">&quot;ymm4&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM4</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm5&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM5</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm6&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM6</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm7&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM7</span> , <span class="ident">HWORD</span>),
-            <span class="string">&quot;ymm8&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM8</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm9&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">XMM9</span> , <span class="ident">HWORD</span>), <span class="string">&quot;ymm10&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM10</span>, <span class="ident">HWORD</span>), <span class="string">&quot;ymm11&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM11</span>, <span class="ident">HWORD</span>),
-            <span class="string">&quot;ymm12&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM12</span>, <span class="ident">HWORD</span>), <span class="string">&quot;ymm13&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM13</span>, <span class="ident">HWORD</span>), <span class="string">&quot;ymm14&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM14</span>, <span class="ident">HWORD</span>), <span class="string">&quot;ymm15&quot;</span> <span class="op">=&gt;</span> (<span class="ident">XMM15</span>, <span class="ident">HWORD</span>),
-
-            <span class="string">&quot;es&quot;</span> <span class="op">=&gt;</span> (<span class="ident">ES</span>, <span class="ident">WORD</span>), <span class="string">&quot;cs&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CS</span>, <span class="ident">WORD</span>), <span class="string">&quot;ss&quot;</span> <span class="op">=&gt;</span> (<span class="ident">SS</span>, <span class="ident">WORD</span>), <span class="string">&quot;ds&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DS</span>, <span class="ident">WORD</span>),
-            <span class="string">&quot;fs&quot;</span> <span class="op">=&gt;</span> (<span class="ident">FS</span>, <span class="ident">WORD</span>), <span class="string">&quot;gs&quot;</span> <span class="op">=&gt;</span> (<span class="ident">GS</span>, <span class="ident">WORD</span>),
-
-            <span class="string">&quot;cr0&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR0</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr1&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR1</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr2&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR2</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr3&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR3</span> , <span class="ident">QWORD</span>),
-            <span class="string">&quot;cr4&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR4</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr5&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR5</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr6&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR6</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr7&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR7</span> , <span class="ident">QWORD</span>),
-            <span class="string">&quot;cr8&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR8</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr9&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">CR9</span> , <span class="ident">QWORD</span>), <span class="string">&quot;cr10&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CR10</span>, <span class="ident">QWORD</span>), <span class="string">&quot;cr11&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CR11</span>, <span class="ident">QWORD</span>),
-            <span class="string">&quot;cr12&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CR12</span>, <span class="ident">QWORD</span>), <span class="string">&quot;cr13&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CR13</span>, <span class="ident">QWORD</span>), <span class="string">&quot;cr14&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CR14</span>, <span class="ident">QWORD</span>), <span class="string">&quot;cr15&quot;</span> <span class="op">=&gt;</span> (<span class="ident">CR15</span>, <span class="ident">QWORD</span>),
-
-            <span class="string">&quot;dr0&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR0</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr1&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR1</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr2&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR2</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr3&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR3</span> , <span class="ident">QWORD</span>),
-            <span class="string">&quot;dr4&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR4</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr5&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR5</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr6&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR6</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr7&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR7</span> , <span class="ident">QWORD</span>),
-            <span class="string">&quot;dr8&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR8</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr9&quot;</span>  <span class="op">=&gt;</span> (<span class="ident">DR9</span> , <span class="ident">QWORD</span>), <span class="string">&quot;dr10&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DR10</span>, <span class="ident">QWORD</span>), <span class="string">&quot;dr11&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DR11</span>, <span class="ident">QWORD</span>),
-            <span class="string">&quot;dr12&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DR12</span>, <span class="ident">QWORD</span>), <span class="string">&quot;dr13&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DR13</span>, <span class="ident">QWORD</span>), <span class="string">&quot;dr14&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DR14</span>, <span class="ident">QWORD</span>), <span class="string">&quot;dr15&quot;</span> <span class="op">=&gt;</span> (<span class="ident">DR15</span>, <span class="ident">QWORD</span>),
-
-            <span class="string">&quot;bnd0&quot;</span> <span class="op">=&gt;</span> (<span class="ident">BND0</span>, <span class="ident">OWORD</span>), <span class="string">&quot;bnd1&quot;</span> <span class="op">=&gt;</span> (<span class="ident">BND1</span>, <span class="ident">OWORD</span>), <span class="string">&quot;bnd2&quot;</span> <span class="op">=&gt;</span> (<span class="ident">BND2</span>, <span class="ident">OWORD</span>), <span class="string">&quot;bnd3&quot;</span> <span class="op">=&gt;</span> (<span class="ident">BND3</span>, <span class="ident">OWORD</span>),
-
-            _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
-        };
+        <span class="kw">let</span> (<span class="ident">reg</span>, <span class="ident">size</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
+            <span class="ident">X86Mode</span>::<span class="ident">Long</span>      <span class="op">=&gt;</span> <span class="ident">X64_REGISTERS</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>(),
+            <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="ident">X86_REGISTERS</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>()
+        }<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {
             <span class="ident">node</span>: <span class="ident">Register</span>::<span class="ident">new_static</span>(<span class="ident">size</span>, <span class="ident">reg</span>),
@@ -1403,23 +1082,11 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         };
 
-        <span class="kw">let</span> (<span class="ident">size</span>, <span class="ident">family</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">called</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() {
-            <span class="string">&quot;Rb&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">BYTE</span>,  <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>),
-            <span class="string">&quot;Rh&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">BYTE</span>,  <span class="ident">RegFamily</span>::<span class="ident">HIGHBYTE</span>),
-            <span class="string">&quot;Rw&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">WORD</span>,  <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>),
-            <span class="string">&quot;Rd&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>),
-            <span class="string">&quot;Ra&quot;</span> <span class="op">|</span>
-            <span class="string">&quot;Rq&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>),
-            <span class="string">&quot;Rf&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">PWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">FP</span>),
-            <span class="string">&quot;Rm&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">MMX</span>),
-            <span class="string">&quot;Rx&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">OWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">XMM</span>),
-            <span class="string">&quot;Ry&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">HWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">XMM</span>),
-            <span class="string">&quot;Rs&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">WORD</span>,  <span class="ident">RegFamily</span>::<span class="ident">SEGMENT</span>),
-            <span class="string">&quot;RC&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">CONTROL</span>),
-            <span class="string">&quot;RD&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">DEBUG</span>),
-            <span class="string">&quot;RB&quot;</span> <span class="op">=&gt;</span> (<span class="ident">Size</span>::<span class="ident">OWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">BOUND</span>),
-            _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
-        };
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">called</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+        <span class="kw">let</span> (<span class="ident">size</span>, <span class="ident">family</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
+            <span class="ident">X86Mode</span>::<span class="ident">Long</span>      <span class="op">=&gt;</span> <span class="ident">X64_FAMILIES</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>(),
+            <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="ident">X86_FAMILIES</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>()
+        }<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {
             <span class="ident">node</span>: <span class="ident">Register</span>::<span class="ident">new_dynamic</span>(<span class="ident">size</span>, <span class="ident">family</span>, <span class="ident">args</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
@@ -1430,7 +1097,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_adds</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">expr</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemoryRefItem</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">expr</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemoryRefItem</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ast</span>::<span class="ident">ExprKind</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adds</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
@@ -1441,23 +1108,23 @@
     <span class="comment">// detect what kind of equation we&#39;re dealing with</span>
     <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="ident">adds</span> {
         <span class="comment">// simple reg</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>) {
             <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">Register</span>(<span class="ident">reg</span>));
             <span class="kw">continue</span>;
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ExprKind</span>::<span class="ident">Binary</span>(<span class="ident">ast</span>::<span class="ident">BinOp</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Mul</span>, ..}, <span class="kw-2">ref</span> <span class="ident">left</span>, <span class="kw-2">ref</span> <span class="ident">right</span>), ..} <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span> {
             <span class="comment">// reg * const</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">state</span>, <span class="ident">left</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="ident">left</span>) {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ExprKind</span>::<span class="ident">Lit</span>(<span class="kw-2">ref</span> <span class="ident">scale</span>), ..} <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">right</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">value</span>, _) <span class="op">=</span> <span class="ident">scale</span>.<span class="ident">node</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">scale</span>.<span class="ident">node</span> {
                         <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">ScaledRegister</span>(<span class="ident">reg</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">isize</span>));
                         <span class="kw">continue</span>;
                     }
                 }
             } <span class="comment">// const * reg</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">state</span>, <span class="ident">right</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="ident">right</span>) {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ExprKind</span>::<span class="ident">Lit</span>(<span class="kw-2">ref</span> <span class="ident">scale</span>), ..} <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">left</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">value</span>, _) <span class="op">=</span> <span class="ident">scale</span>.<span class="ident">node</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">scale</span>.<span class="ident">node</span> {
                         <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">ScaledRegister</span>(<span class="ident">reg</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">isize</span>));
                         <span class="kw">continue</span>;
                     }
@@ -1484,66 +1151,357 @@
         }
     })
 }
+
+<span class="macro">lazy_static</span><span class="macro">!</span>{
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">X64_REGISTERS</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, (<span class="ident">RegId</span>, <span class="ident">Size</span>)<span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">RegId</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">Size</span>::<span class="kw-2">*</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rax&quot;</span>, (<span class="ident">RAX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r0&quot;</span> , (<span class="ident">RAX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rcx&quot;</span>, (<span class="ident">RCX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r1&quot;</span> , (<span class="ident">RCX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rdx&quot;</span>, (<span class="ident">RDX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r2&quot;</span> , (<span class="ident">RDX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rbx&quot;</span>, (<span class="ident">RBX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r3&quot;</span> , (<span class="ident">RBX</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rsp&quot;</span>, (<span class="ident">RSP</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r4&quot;</span> , (<span class="ident">RSP</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rbp&quot;</span>, (<span class="ident">RBP</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r5&quot;</span> , (<span class="ident">RBP</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rsi&quot;</span>, (<span class="ident">RSI</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r6&quot;</span> , (<span class="ident">RSI</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rdi&quot;</span>, (<span class="ident">RDI</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r7&quot;</span> , (<span class="ident">RDI</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r8&quot;</span> , (<span class="ident">R8</span>,  <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r9&quot;</span> , (<span class="ident">R9</span>,  <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r10&quot;</span>, (<span class="ident">R10</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r11&quot;</span>, (<span class="ident">R11</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r12&quot;</span>, (<span class="ident">R12</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r13&quot;</span>, (<span class="ident">R13</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r14&quot;</span>, (<span class="ident">R14</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r15&quot;</span>, (<span class="ident">R15</span>, <span class="ident">QWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;eax&quot;</span> , (<span class="ident">RAX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r0d&quot;</span> , (<span class="ident">RAX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ecx&quot;</span> , (<span class="ident">RCX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r1d&quot;</span> , (<span class="ident">RCX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;edx&quot;</span> , (<span class="ident">RDX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r2d&quot;</span> , (<span class="ident">RDX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ebx&quot;</span> , (<span class="ident">RBX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r3d&quot;</span> , (<span class="ident">RBX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;esp&quot;</span> , (<span class="ident">RSP</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r4d&quot;</span> , (<span class="ident">RSP</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ebp&quot;</span> , (<span class="ident">RBP</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r5d&quot;</span> , (<span class="ident">RBP</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;esi&quot;</span> , (<span class="ident">RSI</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r6d&quot;</span> , (<span class="ident">RSI</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;edi&quot;</span> , (<span class="ident">RDI</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r7d&quot;</span> , (<span class="ident">RDI</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r8d&quot;</span> , (<span class="ident">R8</span>,  <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r9d&quot;</span> , (<span class="ident">R9</span>,  <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r10d&quot;</span>, (<span class="ident">R10</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r11d&quot;</span>, (<span class="ident">R11</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r12d&quot;</span>, (<span class="ident">R12</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r13d&quot;</span>, (<span class="ident">R13</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r14d&quot;</span>, (<span class="ident">R14</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r15d&quot;</span>, (<span class="ident">R15</span>, <span class="ident">DWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ax&quot;</span>  , (<span class="ident">RAX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r0w&quot;</span> , (<span class="ident">RAX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cx&quot;</span>  , (<span class="ident">RCX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r1w&quot;</span> , (<span class="ident">RCX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dx&quot;</span>  , (<span class="ident">RDX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r2w&quot;</span> , (<span class="ident">RDX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bx&quot;</span>  , (<span class="ident">RBX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r3w&quot;</span> , (<span class="ident">RBX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;sp&quot;</span>  , (<span class="ident">RSP</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r4w&quot;</span> , (<span class="ident">RSP</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bp&quot;</span>  , (<span class="ident">RBP</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r5w&quot;</span> , (<span class="ident">RBP</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;si&quot;</span>  , (<span class="ident">RSI</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r6w&quot;</span> , (<span class="ident">RSI</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;di&quot;</span>  , (<span class="ident">RDI</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r7w&quot;</span> , (<span class="ident">RDI</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r8w&quot;</span> , (<span class="ident">R8</span>,  <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r9w&quot;</span> , (<span class="ident">R9</span>,  <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r10w&quot;</span>, (<span class="ident">R10</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r11w&quot;</span>, (<span class="ident">R11</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r12w&quot;</span>, (<span class="ident">R12</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r13w&quot;</span>, (<span class="ident">R13</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r14w&quot;</span>, (<span class="ident">R14</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r15w&quot;</span>, (<span class="ident">R15</span>, <span class="ident">WORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;al&quot;</span>  , (<span class="ident">RAX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r0b&quot;</span> , (<span class="ident">RAX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cl&quot;</span>  , (<span class="ident">RCX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r1b&quot;</span> , (<span class="ident">RCX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dl&quot;</span>  , (<span class="ident">RDX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r2b&quot;</span> , (<span class="ident">RDX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bl&quot;</span>  , (<span class="ident">RBX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r3b&quot;</span> , (<span class="ident">RBX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;spl&quot;</span> , (<span class="ident">RSP</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r4b&quot;</span> , (<span class="ident">RSP</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bpl&quot;</span> , (<span class="ident">RBP</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r5b&quot;</span> , (<span class="ident">RBP</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;sil&quot;</span> , (<span class="ident">RSI</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r6b&quot;</span> , (<span class="ident">RSI</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dil&quot;</span> , (<span class="ident">RDI</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r7b&quot;</span> , (<span class="ident">RDI</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r8b&quot;</span> , (<span class="ident">R8</span>,  <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r9b&quot;</span> , (<span class="ident">R9</span>,  <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r10b&quot;</span>, (<span class="ident">R10</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r11b&quot;</span>, (<span class="ident">R11</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r12b&quot;</span>, (<span class="ident">R12</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r13b&quot;</span>, (<span class="ident">R13</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r14b&quot;</span>, (<span class="ident">R14</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;r15b&quot;</span>, (<span class="ident">R15</span>, <span class="ident">BYTE</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;rip&quot;</span>, (<span class="ident">RIP</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;eip&quot;</span>, (<span class="ident">RIP</span>, <span class="ident">DWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ah&quot;</span>, (<span class="ident">AH</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ch&quot;</span>, (<span class="ident">CH</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dh&quot;</span>, (<span class="ident">DH</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bh&quot;</span>, (<span class="ident">BH</span>, <span class="ident">BYTE</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st0&quot;</span>, (<span class="ident">ST0</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st1&quot;</span>, (<span class="ident">ST1</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st2&quot;</span>, (<span class="ident">ST2</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st3&quot;</span>, (<span class="ident">ST3</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st4&quot;</span>, (<span class="ident">ST4</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st5&quot;</span>, (<span class="ident">ST5</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st6&quot;</span>, (<span class="ident">ST6</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st7&quot;</span>, (<span class="ident">ST7</span>, <span class="ident">PWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm0&quot;</span>, (<span class="ident">MMX0</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm1&quot;</span>, (<span class="ident">MMX1</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm2&quot;</span>, (<span class="ident">MMX2</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm3&quot;</span>, (<span class="ident">MMX3</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm4&quot;</span>, (<span class="ident">MMX4</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm5&quot;</span>, (<span class="ident">MMX5</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm6&quot;</span>, (<span class="ident">MMX6</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm7&quot;</span>, (<span class="ident">MMX7</span>, <span class="ident">QWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm0&quot;</span> , (<span class="ident">XMM0</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm1&quot;</span> , (<span class="ident">XMM1</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm2&quot;</span> , (<span class="ident">XMM2</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm3&quot;</span> , (<span class="ident">XMM3</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm4&quot;</span> , (<span class="ident">XMM4</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm5&quot;</span> , (<span class="ident">XMM5</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm6&quot;</span> , (<span class="ident">XMM6</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm7&quot;</span> , (<span class="ident">XMM7</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm8&quot;</span> , (<span class="ident">XMM8</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm9&quot;</span> , (<span class="ident">XMM9</span> , <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm10&quot;</span>, (<span class="ident">XMM10</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm11&quot;</span>, (<span class="ident">XMM11</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm12&quot;</span>, (<span class="ident">XMM12</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm13&quot;</span>, (<span class="ident">XMM13</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm14&quot;</span>, (<span class="ident">XMM14</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm15&quot;</span>, (<span class="ident">XMM15</span>, <span class="ident">OWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm0&quot;</span> , (<span class="ident">XMM0</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm1&quot;</span> , (<span class="ident">XMM1</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm2&quot;</span> , (<span class="ident">XMM2</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm3&quot;</span> , (<span class="ident">XMM3</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm4&quot;</span> , (<span class="ident">XMM4</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm5&quot;</span> , (<span class="ident">XMM5</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm6&quot;</span> , (<span class="ident">XMM6</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm7&quot;</span> , (<span class="ident">XMM7</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm8&quot;</span> , (<span class="ident">XMM8</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm9&quot;</span> , (<span class="ident">XMM9</span> , <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm10&quot;</span>, (<span class="ident">XMM10</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm11&quot;</span>, (<span class="ident">XMM11</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm12&quot;</span>, (<span class="ident">XMM12</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm13&quot;</span>, (<span class="ident">XMM13</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm14&quot;</span>, (<span class="ident">XMM14</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm15&quot;</span>, (<span class="ident">XMM15</span>, <span class="ident">HWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;es&quot;</span>, (<span class="ident">ES</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cs&quot;</span>, (<span class="ident">CS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ss&quot;</span>, (<span class="ident">SS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ds&quot;</span>, (<span class="ident">DS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;fs&quot;</span>, (<span class="ident">FS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;gs&quot;</span>, (<span class="ident">GS</span>, <span class="ident">WORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr0&quot;</span> , (<span class="ident">CR0</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr1&quot;</span> , (<span class="ident">CR1</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr2&quot;</span> , (<span class="ident">CR2</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr3&quot;</span> , (<span class="ident">CR3</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr4&quot;</span> , (<span class="ident">CR4</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr5&quot;</span> , (<span class="ident">CR5</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr6&quot;</span> , (<span class="ident">CR6</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr7&quot;</span> , (<span class="ident">CR7</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr8&quot;</span> , (<span class="ident">CR8</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr9&quot;</span> , (<span class="ident">CR9</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr10&quot;</span>, (<span class="ident">CR10</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr11&quot;</span>, (<span class="ident">CR11</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr12&quot;</span>, (<span class="ident">CR12</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr13&quot;</span>, (<span class="ident">CR13</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr14&quot;</span>, (<span class="ident">CR14</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr15&quot;</span>, (<span class="ident">CR15</span>, <span class="ident">QWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr0&quot;</span> , (<span class="ident">DR0</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr1&quot;</span> , (<span class="ident">DR1</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr2&quot;</span> , (<span class="ident">DR2</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr3&quot;</span> , (<span class="ident">DR3</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr4&quot;</span> , (<span class="ident">DR4</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr5&quot;</span> , (<span class="ident">DR5</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr6&quot;</span> , (<span class="ident">DR6</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr7&quot;</span> , (<span class="ident">DR7</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr8&quot;</span> , (<span class="ident">DR8</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr9&quot;</span> , (<span class="ident">DR9</span> , <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr10&quot;</span>, (<span class="ident">DR10</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr11&quot;</span>, (<span class="ident">DR11</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr12&quot;</span>, (<span class="ident">DR12</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr13&quot;</span>, (<span class="ident">DR13</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr14&quot;</span>, (<span class="ident">DR14</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr15&quot;</span>, (<span class="ident">DR15</span>, <span class="ident">QWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd0&quot;</span>, (<span class="ident">BND0</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd1&quot;</span>, (<span class="ident">BND1</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd2&quot;</span>, (<span class="ident">BND2</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd3&quot;</span>, (<span class="ident">BND3</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>
+    };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">X86_REGISTERS</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, (<span class="ident">RegId</span>, <span class="ident">Size</span>)<span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">RegId</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">Size</span>::<span class="kw-2">*</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;eax&quot;</span>, (<span class="ident">RAX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ecx&quot;</span>, (<span class="ident">RCX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;edx&quot;</span>, (<span class="ident">RDX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ebx&quot;</span>, (<span class="ident">RBX</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;esp&quot;</span>, (<span class="ident">RSP</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ebp&quot;</span>, (<span class="ident">RBP</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;esi&quot;</span>, (<span class="ident">RSI</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;edi&quot;</span>, (<span class="ident">RDI</span>, <span class="ident">DWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ax&quot;</span>, (<span class="ident">RAX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cx&quot;</span>, (<span class="ident">RCX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dx&quot;</span>, (<span class="ident">RDX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bx&quot;</span>, (<span class="ident">RBX</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;sp&quot;</span>, (<span class="ident">RSP</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bp&quot;</span>, (<span class="ident">RBP</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;si&quot;</span>, (<span class="ident">RSI</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;di&quot;</span>, (<span class="ident">RDI</span>, <span class="ident">WORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;al&quot;</span>, (<span class="ident">RAX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cl&quot;</span>, (<span class="ident">RCX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dl&quot;</span>, (<span class="ident">RDX</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bl&quot;</span>, (<span class="ident">RBX</span>, <span class="ident">BYTE</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;eip&quot;</span>, (<span class="ident">RIP</span>, <span class="ident">DWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ah&quot;</span>, (<span class="ident">AH</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ch&quot;</span>, (<span class="ident">CH</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dh&quot;</span>, (<span class="ident">DH</span>, <span class="ident">BYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bh&quot;</span>, (<span class="ident">BH</span>, <span class="ident">BYTE</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st0&quot;</span>, (<span class="ident">ST0</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st1&quot;</span>, (<span class="ident">ST1</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st2&quot;</span>, (<span class="ident">ST2</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st3&quot;</span>, (<span class="ident">ST3</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st4&quot;</span>, (<span class="ident">ST4</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st5&quot;</span>, (<span class="ident">ST5</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st6&quot;</span>, (<span class="ident">ST6</span>, <span class="ident">PWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;st7&quot;</span>, (<span class="ident">ST7</span>, <span class="ident">PWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm0&quot;</span>, (<span class="ident">MMX0</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm1&quot;</span>, (<span class="ident">MMX1</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm2&quot;</span>, (<span class="ident">MMX2</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm3&quot;</span>, (<span class="ident">MMX3</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm4&quot;</span>, (<span class="ident">MMX4</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm5&quot;</span>, (<span class="ident">MMX5</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm6&quot;</span>, (<span class="ident">MMX6</span>, <span class="ident">QWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;mm7&quot;</span>, (<span class="ident">MMX7</span>, <span class="ident">QWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm0&quot;</span>, (<span class="ident">XMM0</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm1&quot;</span>, (<span class="ident">XMM1</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm2&quot;</span>, (<span class="ident">XMM2</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm3&quot;</span>, (<span class="ident">XMM3</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm4&quot;</span>, (<span class="ident">XMM4</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm5&quot;</span>, (<span class="ident">XMM5</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm6&quot;</span>, (<span class="ident">XMM6</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;xmm7&quot;</span>, (<span class="ident">XMM7</span>, <span class="ident">OWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm0&quot;</span>, (<span class="ident">XMM0</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm1&quot;</span>, (<span class="ident">XMM1</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm2&quot;</span>, (<span class="ident">XMM2</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm3&quot;</span>, (<span class="ident">XMM3</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm4&quot;</span>, (<span class="ident">XMM4</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm5&quot;</span>, (<span class="ident">XMM5</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm6&quot;</span>, (<span class="ident">XMM6</span>, <span class="ident">HWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ymm7&quot;</span>, (<span class="ident">XMM7</span>, <span class="ident">HWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;es&quot;</span>, (<span class="ident">ES</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cs&quot;</span>, (<span class="ident">CS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ss&quot;</span>, (<span class="ident">SS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;ds&quot;</span>, (<span class="ident">DS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;fs&quot;</span>, (<span class="ident">FS</span>, <span class="ident">WORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;gs&quot;</span>, (<span class="ident">GS</span>, <span class="ident">WORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr0&quot;</span>, (<span class="ident">CR0</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr1&quot;</span>, (<span class="ident">CR1</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr2&quot;</span>, (<span class="ident">CR2</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr3&quot;</span>, (<span class="ident">CR3</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr4&quot;</span>, (<span class="ident">CR4</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr5&quot;</span>, (<span class="ident">CR5</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr6&quot;</span>, (<span class="ident">CR6</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;cr7&quot;</span>, (<span class="ident">CR7</span>, <span class="ident">DWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr0&quot;</span>, (<span class="ident">DR0</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr1&quot;</span>, (<span class="ident">DR1</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr2&quot;</span>, (<span class="ident">DR2</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr3&quot;</span>, (<span class="ident">DR3</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr4&quot;</span>, (<span class="ident">DR4</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr5&quot;</span>, (<span class="ident">DR5</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr6&quot;</span>, (<span class="ident">DR6</span>, <span class="ident">DWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;dr7&quot;</span>, (<span class="ident">DR7</span>, <span class="ident">DWORD</span>));
+
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd0&quot;</span>, (<span class="ident">BND0</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd1&quot;</span>, (<span class="ident">BND1</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd2&quot;</span>, (<span class="ident">BND2</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;bnd3&quot;</span>, (<span class="ident">BND3</span>, <span class="ident">OWORD</span>));
+        <span class="ident">h</span>
+    };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">X64_FAMILIES</span>:  <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, (<span class="ident">Size</span>, <span class="ident">RegFamily</span>)<span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rb&quot;</span>, (<span class="ident">Size</span>::<span class="ident">BYTE</span>,  <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rh&quot;</span>, (<span class="ident">Size</span>::<span class="ident">BYTE</span>,  <span class="ident">RegFamily</span>::<span class="ident">HIGHBYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rw&quot;</span>, (<span class="ident">Size</span>::<span class="ident">WORD</span>,  <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rd&quot;</span>, (<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Ra&quot;</span>, (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rq&quot;</span>, (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rf&quot;</span>, (<span class="ident">Size</span>::<span class="ident">PWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">FP</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rm&quot;</span>, (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">MMX</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rx&quot;</span>, (<span class="ident">Size</span>::<span class="ident">OWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">XMM</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Ry&quot;</span>, (<span class="ident">Size</span>::<span class="ident">HWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">XMM</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rs&quot;</span>, (<span class="ident">Size</span>::<span class="ident">WORD</span>,  <span class="ident">RegFamily</span>::<span class="ident">SEGMENT</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;RC&quot;</span>, (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">CONTROL</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;RD&quot;</span>, (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">DEBUG</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;RB&quot;</span>, (<span class="ident">Size</span>::<span class="ident">OWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">BOUND</span>));
+        <span class="ident">h</span>
+    };
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">X86_FAMILIES</span>:  <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, (<span class="ident">Size</span>, <span class="ident">RegFamily</span>)<span class="op">&gt;</span> <span class="op">=</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rb&quot;</span>,(<span class="ident">Size</span>::<span class="ident">BYTE</span>,  <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rh&quot;</span>,(<span class="ident">Size</span>::<span class="ident">BYTE</span>,  <span class="ident">RegFamily</span>::<span class="ident">HIGHBYTE</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rw&quot;</span>,(<span class="ident">Size</span>::<span class="ident">WORD</span>,  <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Ra&quot;</span>,(<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rd&quot;</span>,(<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rf&quot;</span>,(<span class="ident">Size</span>::<span class="ident">PWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">FP</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rm&quot;</span>,(<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">MMX</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rx&quot;</span>,(<span class="ident">Size</span>::<span class="ident">OWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">XMM</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Ry&quot;</span>,(<span class="ident">Size</span>::<span class="ident">HWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">XMM</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;Rs&quot;</span>,(<span class="ident">Size</span>::<span class="ident">WORD</span>,  <span class="ident">RegFamily</span>::<span class="ident">SEGMENT</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;RC&quot;</span>,(<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">CONTROL</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;RD&quot;</span>,(<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">DEBUG</span>));
+        <span class="ident">h</span>.<span class="ident">insert</span>(<span class="string">&quot;RB&quot;</span>,(<span class="ident">Size</span>::<span class="ident">OWORD</span>, <span class="ident">RegFamily</span>::<span class="ident">BOUND</span>));
+        <span class="ident">h</span>
+    };
+}
 </pre>
-</section>
-    <section id='search' class="content hidden"></section>
-
-    <section class="footer"></section>
-
-    <aside id="help" class="hidden">
-        <div>
-            <h1 class="hidden">Help</h1>
-
-            <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h2>Search Tricks</h2>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
-                </p>
-            </div>
-        </div>
-    </aside>
-
-    
-
-    <script>
-        window.rootPath = "../../../../";
-        window.currentCrate = "dynasm";
-    </script>
-    <script src="../../../../jquery.js"></script>
-    <script src="../../../../main.js"></script>
-    <script defer src="../../../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../main.js"></script><script defer src="../../../../search-index.js"></script></body></html>

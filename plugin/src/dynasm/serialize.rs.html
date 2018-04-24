@@ -1,49 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src\serialize.rs`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang">
-
-    <title>serialize.rs.html -- source</title>
-
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
-    
-
-    
-    
-</head>
-<body class="rustdoc source">
-    <!--[if lte IE 8]>
-    <div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-    </div>
-    <![endif]-->
-
-    
-
-    <nav class="sidebar">
-        
-        
-    </nav>
-
-    <nav class="sub">
-        <form class="search-form js-only">
-            <div class="search-container">
-                <input class="search-input" name="search"
-                       autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
-                       type="search">
-            </div>
-        </form>
-    </nav>
-
-    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\serialize.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serialize.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -351,8 +306,86 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
+
+<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">LittleEndian</span>};
 
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">util</span>::<span class="ident">ThinVec</span>;
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">build</span>::<span class="ident">AstBuilder</span>;
@@ -369,10 +402,11 @@
     <span class="ident">BYTE</span>  <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">WORD</span>  <span class="op">=</span> <span class="number">2</span>,
     <span class="ident">DWORD</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">FWORD</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="ident">QWORD</span> <span class="op">=</span> <span class="number">8</span>,
     <span class="ident">PWORD</span> <span class="op">=</span> <span class="number">10</span>,
     <span class="ident">OWORD</span> <span class="op">=</span> <span class="number">16</span>,
-    <span class="ident">HWORD</span> <span class="op">=</span> <span class="number">32</span>
+    <span class="ident">HWORD</span> <span class="op">=</span> <span class="number">32</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Size</span> {
@@ -385,6 +419,7 @@
             <span class="ident">Size</span>::<span class="ident">BYTE</span>  <span class="op">=&gt;</span> <span class="string">&quot;i8&quot;</span>,
             <span class="ident">Size</span>::<span class="ident">WORD</span>  <span class="op">=&gt;</span> <span class="string">&quot;i16&quot;</span>,
             <span class="ident">Size</span>::<span class="ident">DWORD</span> <span class="op">=&gt;</span> <span class="string">&quot;i32&quot;</span>,
+            <span class="ident">Size</span>::<span class="ident">FWORD</span> <span class="op">=&gt;</span> <span class="string">&quot;i48&quot;</span>,
             <span class="ident">Size</span>::<span class="ident">QWORD</span> <span class="op">=&gt;</span> <span class="string">&quot;i64&quot;</span>,
             <span class="ident">Size</span>::<span class="ident">PWORD</span> <span class="op">=&gt;</span> <span class="string">&quot;i80&quot;</span>,
             <span class="ident">Size</span>::<span class="ident">OWORD</span> <span class="op">=&gt;</span> <span class="string">&quot;i128&quot;</span>,
@@ -393,122 +428,183 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Stmt</span> {
-    <span class="ident">Const</span>(<span class="ident">u8</span>),
-    <span class="ident">ExprConst</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
+    <span class="comment">// simply push data into the instruction stream. unsigned</span>
+    <span class="ident">Const</span>(<span class="ident">u64</span>, <span class="ident">Size</span>),
+    <span class="comment">// push data that is stored inside of an expression. unsigned</span>
+    <span class="ident">ExprUnsigned</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">Size</span>),
+    <span class="comment">// push signed data into the instruction stream. signed</span>
+    <span class="ident">ExprSigned</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">Size</span>),
 
-    <span class="ident">Var</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">Size</span>),
-    <span class="ident">Extend</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
-
-    <span class="ident">DynScale</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
-
+    <span class="comment">// extend the instruction stream with unsigned bytes</span>
+    <span class="ident">Extend</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
+    <span class="comment">// extend the instruction stream with unsigned bytes</span>
+    <span class="ident">ExprExtend</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
+    <span class="comment">// align the instruction stream to some alignment</span>
     <span class="ident">Align</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
 
+    <span class="comment">// label declarations</span>
     <span class="ident">GlobalLabel</span>(<span class="ident">Ident</span>),
     <span class="ident">LocalLabel</span>(<span class="ident">Ident</span>),
     <span class="ident">DynamicLabel</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
 
-    <span class="ident">GlobalJumpTarget</span>(<span class="ident">Ident</span>, <span class="ident">Size</span>),
-    <span class="ident">ForwardJumpTarget</span>(<span class="ident">Ident</span>, <span class="ident">Size</span>),
-    <span class="ident">BackwardJumpTarget</span>(<span class="ident">Ident</span>, <span class="ident">Size</span>),
-    <span class="ident">DynamicJumpTarget</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">Size</span>),
+    <span class="comment">// and their respective relocations (as expressions as they differ per assembler)</span>
+    <span class="ident">GlobalJumpTarget</span>(<span class="ident">Ident</span>,         <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
+    <span class="ident">ForwardJumpTarget</span>(<span class="ident">Ident</span>,        <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
+    <span class="ident">BackwardJumpTarget</span>(<span class="ident">Ident</span>,       <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
+    <span class="ident">DynamicJumpTarget</span>(<span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
+    <span class="ident">BareJumpTarget</span>(   <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>),
 
-    <span class="ident">Stmt</span>(<span class="ident">ast</span>::<span class="ident">Stmt</span>),
+    <span class="comment">// a random statement that has to be inserted between assembly hunks</span>
+    <span class="ident">Stmt</span>(<span class="ident">ast</span>::<span class="ident">Stmt</span>)
+}
+
+<span class="comment">// convenience methods</span>
+<span class="kw">impl</span> <span class="ident">Stmt</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u8</span>(<span class="ident">value</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">Stmt</span> {
+        <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u16</span>(<span class="ident">value</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">Stmt</span> {
+        <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u32</span>(<span class="ident">value</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">Stmt</span> {
+        <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u64</span>(<span class="ident">value</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="ident">Stmt</span> {
+        <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>)
+    }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExtCtxt</span>, <span class="ident">name</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Stmt</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="comment">// first, try to fold constants into a byte stream</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">folded_stmts</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">const_buffer</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="kw">for</span> <span class="ident">stmt</span> <span class="kw">in</span> <span class="ident">stmts</span> {
+        <span class="kw">match</span> <span class="ident">stmt</span> {
+            <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> {
+                <span class="kw">match</span> <span class="ident">size</span> {
+                    <span class="ident">Size</span>::<span class="ident">BYTE</span> <span class="op">=&gt;</span> <span class="ident">const_buffer</span>.<span class="ident">push</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u8</span>),
+                    <span class="ident">Size</span>::<span class="ident">WORD</span> <span class="op">=&gt;</span> {
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
+                        <span class="ident">LittleEndian</span>::<span class="ident">write_u16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u16</span>);
+                        <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
+                    },
+                    <span class="ident">Size</span>::<span class="ident">DWORD</span> <span class="op">=&gt;</span> {
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
+                        <span class="ident">LittleEndian</span>::<span class="ident">write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                        <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
+                    },
+                    <span class="ident">Size</span>::<span class="ident">QWORD</span> <span class="op">=&gt;</span> {
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
+                        <span class="ident">LittleEndian</span>::<span class="ident">write_u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>);
+                        <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
+                    },
+                    <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>()
+                }
+            },
+            <span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">data</span>) <span class="op">=&gt;</span> {
+                <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="ident">data</span>);
+            },
+            <span class="ident">s</span> <span class="op">=&gt;</span> {
+                <span class="comment">// empty the const buffer</span>
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">const_buffer</span>.<span class="ident">is_empty</span>() {
+                    <span class="ident">folded_stmts</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">const_buffer</span>));
+                    <span class="ident">const_buffer</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                }
+                <span class="ident">folded_stmts</span>.<span class="ident">push</span>(<span class="ident">s</span>);
+            }
+        }
+        <span class="kw">while</span> <span class="ident">const_buffer</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">32</span> {
+            <span class="kw">let</span> <span class="ident">new_buffer</span> <span class="op">=</span> <span class="ident">const_buffer</span>.<span class="ident">split_off</span>(<span class="number">32</span>);
+            <span class="ident">folded_stmts</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">const_buffer</span>));
+            <span class="ident">const_buffer</span> <span class="op">=</span> <span class="ident">new_buffer</span>;
+        }
+    }
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">const_buffer</span>.<span class="ident">is_empty</span>() {
+        <span class="ident">folded_stmts</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">const_buffer</span>));
+    }
 
-    <span class="comment">// construction for `op.push(expr)` is as follows</span>
-    <span class="comment">// op = Path::from_ident(name)</span>
-    <span class="comment">// push = Ident::from_str(&quot;push&quot;)</span>
-    <span class="comment">// expr = expr_lit(span, LitKind::Byte)</span>
-    <span class="comment">// expr_method_call(span, op, Vec![expr])</span>
+    <span class="comment">// and now do the final output pass in one go</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">stmts</span>.<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
-
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stmt</span>) <span class="op">=</span> <span class="ident">stmts</span>.<span class="ident">next</span>() {
-        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Stmt</span>::<span class="kw-2">*</span>;
-
+    <span class="kw">for</span> <span class="ident">stmt</span> <span class="kw">in</span> <span class="ident">folded_stmts</span> {
         <span class="kw">let</span> (<span class="ident">method</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">stmt</span> {
-            <span class="ident">Const</span>(<span class="ident">byte</span>)            <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">byte</span>];
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Const</span>(<span class="ident">byte</span>)) <span class="op">=</span> <span class="ident">stmts</span>.<span class="ident">peek</span>() {
-                    <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
-                    <span class="ident">stmts</span>.<span class="ident">next</span>();
-                    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">32</span> {
-                        <span class="kw">break</span>;
-                    }
-                }
-
-                <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                    (<span class="string">&quot;push&quot;</span>,   <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">bytes</span>[<span class="number">0</span>]))])
-                } <span class="kw">else</span> {
-                    (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">ByteStr</span>(<span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">bytes</span>)))])
-                }
-            },
-            <span class="ident">ExprConst</span>(<span class="ident">expr</span>)        <span class="op">=&gt;</span> (<span class="string">&quot;push&quot;</span>,    <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-
-            <span class="ident">Var</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_i8&quot;</span>,  <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Var</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_i16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Var</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_i32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Var</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_i64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Var</span>(_, _)           <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;immediate serializaiton of this size is not supported yet&quot;</span>),
-
-            <span class="ident">Extend</span>(<span class="ident">expr</span>)           <span class="op">=&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-
-            <span class="ident">DynScale</span>(<span class="ident">scale</span>, <span class="ident">rest</span>)  <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="ident">ast</span>::<span class="ident">Ident</span>::<span class="ident">from_str</span>(<span class="string">&quot;temp&quot;</span>);
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">ecx</span>.<span class="ident">stmt_let</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="bool-val">false</span>, <span class="ident">temp</span>, <span class="ident">encoded_size_expr</span>(<span class="ident">ecx</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">scale</span>)));
-                (<span class="string">&quot;push&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">or_mask_shift_expr</span>(<span class="ident">ecx</span>, <span class="ident">rest</span>, <span class="ident">ecx</span>.<span class="ident">expr_ident</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">temp</span>), <span class="number">3</span>, <span class="number">6</span>)])
-            },
-
-            <span class="ident">Align</span>(<span class="ident">expr</span>)            <span class="op">=&gt;</span> (<span class="string">&quot;align&quot;</span>,   <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-
-            <span class="ident">GlobalLabel</span>(<span class="ident">ident</span>)     <span class="op">=&gt;</span> (<span class="string">&quot;global_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(
-                <span class="ident">ident</span>.<span class="ident">span</span>,
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Str</span>(<span class="ident">ident</span>.<span class="ident">node</span>.<span class="ident">name</span>, <span class="ident">ast</span>::<span class="ident">StrStyle</span>::<span class="ident">Cooked</span>)
-            )]),
-            <span class="ident">LocalLabel</span>(<span class="ident">ident</span>)      <span class="op">=&gt;</span> (<span class="string">&quot;local_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(
-                <span class="ident">ident</span>.<span class="ident">span</span>,
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Str</span>(<span class="ident">ident</span>.<span class="ident">node</span>.<span class="ident">name</span>, <span class="ident">ast</span>::<span class="ident">StrStyle</span>::<span class="ident">Cooked</span>)
-            )]),
-            <span class="ident">DynamicLabel</span>(<span class="ident">expr</span>)     <span class="op">=&gt;</span> (<span class="string">&quot;dynamic_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-
-            <span class="ident">GlobalJumpTarget</span>(<span class="ident">ident</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> (<span class="string">&quot;global_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(
-                <span class="ident">ident</span>.<span class="ident">span</span>,
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Str</span>(<span class="ident">ident</span>.<span class="ident">node</span>.<span class="ident">name</span>, <span class="ident">ast</span>::<span class="ident">StrStyle</span>::<span class="ident">Cooked</span>)
-            ), <span class="ident">ecx</span>.<span class="ident">expr_u8</span>(<span class="ident">ident</span>.<span class="ident">span</span>, <span class="ident">size</span>.<span class="ident">in_bytes</span>())]),
-            <span class="ident">ForwardJumpTarget</span>(<span class="ident">ident</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> (<span class="string">&quot;forward_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(
-                <span class="ident">ident</span>.<span class="ident">span</span>,
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Str</span>(<span class="ident">ident</span>.<span class="ident">node</span>.<span class="ident">name</span>, <span class="ident">ast</span>::<span class="ident">StrStyle</span>::<span class="ident">Cooked</span>)
-            ), <span class="ident">ecx</span>.<span class="ident">expr_u8</span>(<span class="ident">ident</span>.<span class="ident">span</span>, <span class="ident">size</span>.<span class="ident">in_bytes</span>())]),
-            <span class="ident">BackwardJumpTarget</span>(<span class="ident">ident</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> (<span class="string">&quot;backward_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(
-                <span class="ident">ident</span>.<span class="ident">span</span>,
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Str</span>(<span class="ident">ident</span>.<span class="ident">node</span>.<span class="ident">name</span>, <span class="ident">ast</span>::<span class="ident">StrStyle</span>::<span class="ident">Cooked</span>)
-            ), <span class="ident">ecx</span>.<span class="ident">expr_u8</span>(<span class="ident">ident</span>.<span class="ident">span</span>, <span class="ident">size</span>.<span class="ident">in_bytes</span>())]),
-            <span class="ident">DynamicJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>;
-                (<span class="string">&quot;dynamic_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">ecx</span>.<span class="ident">expr_u8</span>(<span class="ident">span</span>, <span class="ident">size</span>.<span class="ident">in_bytes</span>())])
-            },
-            <span class="ident">Stmt</span>(<span class="ident">stmt</span>) <span class="op">=&gt;</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">stmt</span>);
+            <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push&quot;</span>,     <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_u16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_u32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_u64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_i8&quot;</span>,  <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_i16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_i32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_i64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
+            <span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">data</span>)     <span class="op">=&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">ByteStr</span>(<span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">data</span>)))]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprExtend</span>(<span class="ident">expr</span>) <span class="op">=&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">Align</span>(<span class="ident">expr</span>)      <span class="op">=&gt;</span> (<span class="string">&quot;align&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">GlobalLabel</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> (<span class="string">&quot;global_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="ident">ecx</span>, <span class="ident">n</span>)]),
+            <span class="ident">Stmt</span>::<span class="ident">LocalLabel</span>(<span class="ident">n</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;local_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="ident">ecx</span>, <span class="ident">n</span>)]),
+            <span class="ident">Stmt</span>::<span class="ident">DynamicLabel</span>(<span class="ident">expr</span>) <span class="op">=&gt;</span> (<span class="string">&quot;dynamic_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">GlobalJumpTarget</span>(<span class="ident">n</span>,     <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;global_reloc&quot;</span>  , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="ident">ecx</span>, <span class="ident">n</span>), <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ForwardJumpTarget</span>(<span class="ident">n</span>,    <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;forward_reloc&quot;</span> , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="ident">ecx</span>, <span class="ident">n</span>), <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">BackwardJumpTarget</span>(<span class="ident">n</span>,   <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;backward_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="ident">ecx</span>, <span class="ident">n</span>), <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">DynamicJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;dynamic_reloc&quot;</span> , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">BareJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">reloc</span>)    <span class="op">=&gt;</span> (<span class="string">&quot;bare_reloc&quot;</span>    , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">Stmt</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> {
+                <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">s</span>);
                 <span class="kw">continue</span>;
             }
+
         };
 
+        <span class="comment">// and construct the appropriate method call</span>
         <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">ast</span>::<span class="ident">Ident</span>::<span class="ident">from_str</span>(<span class="ident">method</span>);
         <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_method_call</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">op</span>, <span class="ident">method</span>, <span class="ident">args</span>);
-
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">ecx</span>.<span class="ident">stmt_semi</span>(<span class="ident">expr</span>));
+        <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">ecx</span>.<span class="ident">stmt_semi</span>(<span class="ident">expr</span>));
     }
 
-    <span class="ident">buffer</span>
+    <span class="ident">output</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_exprs</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="kw-2">mut</span> <span class="ident">exprs</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span> {
+<span class="comment">// below here are all kinds of utility functions to quickly generate ast constructs</span>
+<span class="comment">// this collection is very arbitrary, purely what&#39;s needed in codegen, trying to keep</span>
+<span class="comment">// most expression building logic in this file.</span>
+
+<span class="comment">// expression of value 0. sometimes needed.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_zero</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+    <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="number">0u128</span>, <span class="ident">ast</span>::<span class="ident">LitIntType</span>::<span class="ident">Unsuffixed</span>))
+}
+
+<span class="comment">// given an ident, makes it into a &quot;string&quot;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_string_from_ident</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">i</span>: <span class="ident">Ident</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+    <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">i</span>.<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Str</span>(<span class="ident">i</span>.<span class="ident">node</span>.<span class="ident">name</span>, <span class="ident">ast</span>::<span class="ident">StrStyle</span>::<span class="ident">Cooked</span>))
+}
+
+<span class="comment">// </span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_dynscale</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">scale</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">rest</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> (<span class="ident">ast</span>::<span class="ident">Stmt</span>, <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="ident">ast</span>::<span class="ident">Ident</span>::<span class="ident">from_str</span>(<span class="string">&quot;temp&quot;</span>);
+    (
+        <span class="ident">ecx</span>.<span class="ident">stmt_let</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="bool-val">false</span>, <span class="ident">temp</span>, <span class="ident">expr_encode_x64_sib_scale</span>(<span class="ident">ecx</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">scale</span>)),
+        <span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">rest</span>, <span class="ident">ecx</span>.<span class="ident">expr_ident</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">temp</span>), <span class="number">3</span>, <span class="number">6</span>)
+    )
+}
+
+<span class="comment">// makes (a, b)</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_tuple_of_u8s</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+    <span class="ident">ecx</span>.<span class="ident">expr_tuple</span>(
+        <span class="ident">span</span>,
+        <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">a</span><span class="op">|</span> <span class="ident">ecx</span>.<span class="ident">expr_u8</span>(<span class="ident">span</span>, <span class="ident">a</span>)).<span class="ident">collect</span>()
+    )
+}
+
+<span class="comment">// makes sum(exprs)</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_add_many</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="kw-2">mut</span> <span class="ident">exprs</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span> {
     <span class="ident">exprs</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">accum</span><span class="op">|</span> {
         <span class="kw">for</span> <span class="ident">next</span> <span class="kw">in</span> <span class="ident">exprs</span> {
             <span class="ident">accum</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_binary</span>(<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Add</span>, <span class="ident">accum</span>, <span class="ident">next</span>);
@@ -517,21 +613,22 @@
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size_of_scale_expr</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">ty</span>: <span class="ident">ast</span>::<span class="ident">Path</span>, <span class="ident">value</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="comment">// makes (size_of&lt;ty&gt;() * value)</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_size_of_scale</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">ty</span>: <span class="ident">ast</span>::<span class="ident">Path</span>, <span class="ident">value</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">span</span>;
     <span class="ident">ecx</span>.<span class="ident">expr_binary</span>(<span class="ident">span</span>,
         <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Mul</span>,
         <span class="ident">ecx</span>.<span class="ident">expr_cast</span>(<span class="ident">span</span>,
-            <span class="ident">size_of_expr</span>(<span class="ident">ecx</span>, <span class="ident">ty</span>),
+            <span class="ident">expr_size_of</span>(<span class="ident">ecx</span>, <span class="ident">ty</span>),
             <span class="ident">ecx</span>.<span class="ident">ty_ident</span>(<span class="ident">span</span>, <span class="ident">size</span>.<span class="ident">as_literal</span>())
         ),
         <span class="ident">value</span>
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or_mask_shift_expr</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">orig</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">expr</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shift</span>: <span class="ident">i8</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="doccomment">/// returns orig | ((expr &amp; mask) &lt;&lt; shift)</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">orig</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">expr</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shift</span>: <span class="ident">i8</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>;
-    <span class="comment">// take expr and return !((expr &amp; mask) &lt;&lt; shift)</span>
 
     <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_binary</span>(<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">BitAnd</span>, <span class="ident">expr</span>, <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(
         <span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">mask</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="ident">ast</span>::<span class="ident">LitIntType</span>::<span class="ident">Unsuffixed</span>)
@@ -550,7 +647,8 @@
     <span class="ident">ecx</span>.<span class="ident">expr_binary</span>(<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">BitOr</span>, <span class="ident">orig</span>, <span class="ident">expr</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset_of_expr</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">path</span>: <span class="ident">ast</span>::<span class="ident">Path</span>, <span class="ident">attr</span>: <span class="ident">ast</span>::<span class="ident">Ident</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="doccomment">/// returns (offset_of!(path, attr) as size)</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_offset_of</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">path</span>: <span class="ident">ast</span>::<span class="ident">Path</span>, <span class="ident">attr</span>: <span class="ident">ast</span>::<span class="ident">Ident</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="comment">// generate a P&lt;Expr&gt; that resolves into the offset of an attribute to a type.</span>
     <span class="comment">// this is somewhat ridiculously complex because we can&#39;t expand macros here</span>
 
@@ -564,7 +662,7 @@
             <span class="ident">is_shorthand</span>: <span class="bool-val">false</span>
         }},
     ]).<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">pat</span><span class="op">|</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">PatKind</span>::<span class="ident">Struct</span>(_, _, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dotdot</span>) <span class="op">=</span> <span class="ident">pat</span>.<span class="ident">node</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">PatKind</span>::<span class="ident">Struct</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dotdot</span>) <span class="op">=</span> <span class="ident">pat</span>.<span class="ident">node</span> {
             <span class="kw-2">*</span><span class="ident">dotdot</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
         <span class="ident">pat</span>
@@ -633,7 +731,8 @@
     <span class="ident">ecx</span>.<span class="ident">expr_block</span>(<span class="ident">block</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size_of_expr</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">path</span>: <span class="ident">ast</span>::<span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="comment">// returns std::mem::size_of&lt;path&gt;()</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_size_of</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">path</span>: <span class="ident">ast</span>::<span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="comment">// generate a P&lt;Expr&gt; that returns the size of type at path</span>
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">span</span>;
 
@@ -643,7 +742,15 @@
     <span class="ident">ecx</span>.<span class="ident">expr_call</span>(<span class="ident">span</span>, <span class="ident">ecx</span>.<span class="ident">expr_path</span>(<span class="ident">size_of</span>), <span class="ident">Vec</span>::<span class="ident">new</span>())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_size_expr</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">size</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="comment">// makes the following</span>
+<span class="comment">// match size {</span>
+<span class="comment">//    8 =&gt; 3,</span>
+<span class="comment">//    4 =&gt; 2,</span>
+<span class="comment">//    2 =&gt; 1,</span>
+<span class="comment">//    1 =&gt; 0,</span>
+<span class="comment">//  _ =&gt; name.runtime_error(&quot;Type size not representable as scale&quot;)</span>
+<span class="comment">//}</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_encode_x64_sib_scale</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">size</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">span</span>;
 
     <span class="ident">ecx</span>.<span class="ident">expr_match</span>(<span class="ident">span</span>, <span class="ident">size</span>, <span class="macro">vec</span><span class="macro">!</span>[
@@ -661,65 +768,4 @@
     ])
 }
 </pre>
-</section>
-    <section id='search' class="content hidden"></section>
-
-    <section class="footer"></section>
-
-    <aside id="help" class="hidden">
-        <div>
-            <h1 class="hidden">Help</h1>
-
-            <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h2>Search Tricks</h2>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
-                </p>
-            </div>
-        </div>
-    </aside>
-
-    
-
-    <script>
-        window.rootPath = "../../";
-        window.currentCrate = "dynasm";
-    </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
-    <script defer src="../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "dynasm";</script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

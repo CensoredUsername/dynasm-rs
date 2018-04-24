@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["get_mnemnonic_data",""],["mnemnonics",""]],"mod":[["features",""],["flags",""]]});
+initSidebarItems({"fn":[["get_mnemnonic_data",""],["mnemnonics",""]],"struct":[["Features",""],["Flags",""]]});

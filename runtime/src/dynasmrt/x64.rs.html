@@ -1,49 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src\x64.rs`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang">
-
-    <title>x64.rs.html -- source</title>
-
-    <link rel="stylesheet" type="text/css" href="../../normalize.css">
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
-    
-
-    
-    
-</head>
-<body class="rustdoc source">
-    <!--[if lte IE 8]>
-    <div class="warning">
-        This old browser is unsupported and will most likely display funky
-        things.
-    </div>
-    <![endif]-->
-
-    
-
-    <nav class="sidebar">
-        
-        
-    </nav>
-
-    <nav class="sub">
-        <form class="search-form js-only">
-            <div class="search-container">
-                <input class="search-input" name="search"
-                       autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
-                       type="search">
-            </div>
-        </form>
-    </nav>
-
-    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\x64.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x64.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -552,86 +507,62 @@
 <span id="507">507</span>
 <span id="508">508</span>
 <span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
 </pre><pre class="rust ">
-
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">Entry</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">Extend</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">DerefMut</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
-<span class="kw">use</span> <span class="ident">memmap</span>::{<span class="ident">Mmap</span>, <span class="ident">Protection</span>};
-<span class="kw">use</span> ::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>};
+<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">LittleEndian</span>};
+<span class="kw">use</span> <span class="ident">take_mut</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> ::{<span class="ident">ExecutableBuffer</span>, <span class="ident">Executor</span>, <span class="ident">DynamicLabel</span>, <span class="ident">AssemblyOffset</span>};
+<span class="kw">use</span> ::{<span class="ident">DynasmApi</span>, <span class="ident">DynasmLabelApi</span>, <span class="ident">DynasmError</span>};
+<span class="kw">use</span> ::<span class="ident">common</span>::{<span class="ident">BaseAssembler</span>, <span class="ident">LabelRegistry</span>, <span class="ident">UncommittedModifier</span>};
+<span class="kw">use</span> ::{<span class="ident">ExecutableBuffer</span>, <span class="ident">MutableBuffer</span>, <span class="ident">Executor</span>, <span class="ident">DynamicLabel</span>, <span class="ident">AssemblyOffset</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">enum</span> <span class="ident">RelocationSize</span> {
+    <span class="ident">Byte</span>,
+    <span class="ident">Word</span>,
+    <span class="ident">DWord</span>,
+    <span class="ident">QWord</span>
+}
+
+<span class="kw">impl</span> <span class="ident">RelocationSize</span> {
+    <span class="kw">fn</span> <span class="ident">in_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">RelocationSize</span>::<span class="ident">Byte</span>  <span class="op">=&gt;</span> <span class="number">1</span>,
+            <span class="ident">RelocationSize</span>::<span class="ident">Word</span>  <span class="op">=&gt;</span> <span class="number">2</span>,
+            <span class="ident">RelocationSize</span>::<span class="ident">DWord</span> <span class="op">=&gt;</span> <span class="number">4</span>,
+            <span class="ident">RelocationSize</span>::<span class="ident">QWord</span> <span class="op">=&gt;</span> <span class="number">8</span>,
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">struct</span> <span class="ident">RelocationType</span> {
+    <span class="ident">size</span>: <span class="ident">RelocationSize</span>,
+    <span class="ident">offset</span>: <span class="ident">u8</span>
+}
+
+<span class="kw">impl</span> <span class="ident">RelocationType</span> {
+    <span class="kw">fn</span> <span class="ident">from_tuple</span>((<span class="ident">offset</span>, <span class="ident">size</span>): (<span class="ident">u8</span>, <span class="ident">u8</span>)) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">RelocationType</span> {
+            <span class="ident">size</span>: <span class="kw">match</span> <span class="ident">size</span> {
+                <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">RelocationSize</span>::<span class="ident">Byte</span>,
+                <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">RelocationSize</span>::<span class="ident">Word</span>,
+                <span class="number">4</span> <span class="op">=&gt;</span> <span class="ident">RelocationSize</span>::<span class="ident">DWord</span>,
+                <span class="number">8</span> <span class="op">=&gt;</span> <span class="ident">RelocationSize</span>::<span class="ident">QWord</span>,
+                <span class="ident">x</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unsupported relocation size: {}&quot;</span>, <span class="ident">x</span>)
+            },
+            <span class="ident">offset</span>: <span class="ident">offset</span>
+        }
+    }
+}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">PatchLoc</span>(<span class="ident">usize</span>, <span class="ident">u8</span>);
+<span class="kw">struct</span> <span class="ident">PatchLoc</span>(<span class="ident">usize</span>, <span class="ident">RelocationType</span>);
 
 <span class="doccomment">/// This struct is an implementation of a dynasm runtime. It supports incremental</span>
 <span class="doccomment">/// compilation as well as multithreaded execution with simultaneous compilation.</span>
@@ -639,58 +570,47 @@
 <span class="doccomment">/// same time.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Assembler</span> {
-    <span class="comment">// buffer where the end result is copied into</span>
-    <span class="ident">execbuffer</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">ExecutableBuffer</span><span class="op">&gt;&gt;</span>,
-    <span class="comment">// length of the allocated mmap (so we don&#39;t have to go through RwLock to get it)</span>
-    <span class="ident">map_len</span>: <span class="ident">usize</span>,
+    <span class="comment">// protection swapping executable buffer</span>
+    <span class="ident">base</span>: <span class="ident">BaseAssembler</span>,
 
-    <span class="comment">// offset of the buffer that&#39;s being assembled into to the start of the execbuffer</span>
-    <span class="ident">asmoffset</span>: <span class="ident">usize</span>,
-    <span class="comment">// instruction buffer while building the assembly</span>
-    <span class="ident">ops</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="comment">// label data storage</span>
+    <span class="ident">labels</span>: <span class="ident">LabelRegistry</span>,
 
-    <span class="comment">// label name -&gt; target loc</span>
-    <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="comment">// end of patch location -&gt; name</span>
     <span class="ident">global_relocs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">PatchLoc</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span>,
-
-    <span class="comment">// label id -&gt; target loc</span>
-    <span class="ident">dynamic_labels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;&gt;</span>,
     <span class="comment">// location to be resolved, loc, label id</span>
     <span class="ident">dynamic_relocs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">PatchLoc</span>, <span class="ident">DynamicLabel</span>)<span class="op">&gt;</span>,
-
-    <span class="comment">// labelname -&gt; most recent patch location</span>
-    <span class="ident">local_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="comment">// locations to be patched once this label gets seen. name -&gt; Vec&lt;locs&gt;</span>
     <span class="ident">local_relocs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PatchLoc</span><span class="op">&gt;&gt;</span>
 }
 
+<span class="doccomment">/// the default starting size for an allocation by this assembler.</span>
+<span class="doccomment">/// This is the page size on x64 platforms.</span>
+<span class="kw">const</span> <span class="ident">MMAP_INIT_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
+
 <span class="kw">impl</span> <span class="ident">Assembler</span> {
     <span class="doccomment">/// Create a new `Assembler` instance</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Assembler</span> {
-        <span class="kw">const</span> <span class="ident">MMAP_INIT_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">256</span>;
-        <span class="ident">Assembler</span> {
-            <span class="ident">execbuffer</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">ExecutableBuffer</span> {
-                <span class="ident">length</span>: <span class="number">0</span>,
-                <span class="ident">buffer</span>: <span class="ident">Mmap</span>::<span class="ident">anonymous</span>(<span class="ident">MMAP_INIT_SIZE</span>, <span class="ident">Protection</span>::<span class="ident">ReadExecute</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to allocate executable memory&quot;</span>)
-            })),
-            <span class="ident">asmoffset</span>: <span class="number">0</span>,
-            <span class="ident">map_len</span>: <span class="ident">MMAP_INIT_SIZE</span>,
-            <span class="ident">ops</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">global_labels</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-            <span class="ident">dynamic_labels</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">local_labels</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+    <span class="doccomment">/// This function will return an error if it was not</span>
+    <span class="doccomment">/// able to map the required executable memory. However, further methods</span>
+    <span class="doccomment">/// on the `Assembler` will simply panic if an error occurs during memory</span>
+    <span class="doccomment">/// remapping as otherwise it would violate the invariants of the assembler.</span>
+    <span class="doccomment">/// This behaviour could be improved but currently the underlying memmap crate</span>
+    <span class="doccomment">/// does not return the original mappings if a call to mprotect/VirtualProtect</span>
+    <span class="doccomment">/// fails so there is no reliable way to error out if a call fails while leaving</span>
+    <span class="doccomment">/// the logic of the `Assembler` intact.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Assembler</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">Assembler</span> {
+            <span class="ident">base</span>: <span class="ident">BaseAssembler</span>::<span class="ident">new</span>(<span class="ident">MMAP_INIT_SIZE</span>)<span class="question-mark">?</span>,
+            <span class="ident">labels</span>: <span class="ident">LabelRegistry</span>::<span class="ident">new</span>(),
             <span class="ident">global_relocs</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
             <span class="ident">dynamic_relocs</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
             <span class="ident">local_relocs</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>()
-        }
+        })
     }
 
     <span class="doccomment">/// Create a new dynamic label that can be referenced and defined.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dynamic_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">DynamicLabel</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dynamic_labels</span>.<span class="ident">len</span>();
-        <span class="self">self</span>.<span class="ident">dynamic_labels</span>.<span class="ident">push</span>(<span class="prelude-val">None</span>);
-        <span class="ident">DynamicLabel</span>(<span class="ident">id</span>)
+        <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">new_dynamic_label</span>()
     }
 
     <span class="doccomment">/// To allow already committed code to be altered, this method allows modification</span>
@@ -702,25 +622,28 @@
     <span class="doccomment">/// and the `ExecutableBuffer` will be unlocked again.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alter</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AssemblyModifier</span>) <span class="op">-&gt;</span> () {
         <span class="self">self</span>.<span class="ident">commit</span>();
-        <span class="kw">let</span> <span class="ident">asmoffset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asmoffset</span>;
-        <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">=</span> <span class="number">0</span>;
 
-        <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execbuffer</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">deref_mut</span>();
-        <span class="ident">buf</span>.<span class="ident">buffer</span>.<span class="ident">set_protection</span>(<span class="ident">Protection</span>::<span class="ident">ReadWrite</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to change memory protection mode&quot;</span>);
+        <span class="kw">let</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">reader</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">cloned</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
 
-        {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">AssemblyModifier</span> {
-                <span class="ident">assembler</span>: <span class="self">self</span>,
-                <span class="ident">buffer</span>: <span class="ident">buf</span>
-            };
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">m</span>);
-            <span class="ident">m</span>.<span class="ident">encode_relocs</span>();
-        }
+        <span class="comment">// move the buffer out of the assembler for a bit</span>
+        <span class="ident">take_mut</span>::<span class="ident">take_or_recover</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">lock</span>, <span class="op">||</span> <span class="ident">ExecutableBuffer</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="ident">MMAP_INIT_SIZE</span>).<span class="ident">unwrap</span>(), <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">make_mut</span>().<span class="ident">unwrap</span>();
 
-        <span class="ident">buf</span>.<span class="ident">buffer</span>.<span class="ident">set_protection</span>(<span class="ident">Protection</span>::<span class="ident">ReadExecute</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to change memory protection mode&quot;</span>);
-        <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">=</span> <span class="ident">asmoffset</span>;
+            {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">AssemblyModifier</span> {
+                    <span class="ident">asmoffset</span>: <span class="number">0</span>,
+                    <span class="ident">assembler</span>: <span class="self">self</span>,
+                    <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>
+                };
+                <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">m</span>);
+                <span class="ident">m</span>.<span class="ident">encode_relocs</span>();
+            }
+
+            <span class="comment">// and stuff it back in</span>
+            <span class="ident">buf</span>.<span class="ident">make_exec</span>().<span class="ident">unwrap</span>()
+        });
+
         <span class="comment">// no commit is required as we directly modified the buffer.</span>
     }
 
@@ -728,47 +651,43 @@
     <span class="doccomment">/// committed assembing buffer. Note that it is not possible to use labels in this</span>
     <span class="doccomment">/// context, and overriding labels will cause corruption when the assembler tries to</span>
     <span class="doccomment">/// resolve the labels at commit time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alter_uncommitted</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UncommittedModifier</span>) <span class="op">-&gt;</span> () {
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UncommittedModifier</span> {
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">asmoffset</span>,
-            <span class="ident">assembler</span>: <span class="self">self</span>
-        });
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alter_uncommitted</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">UncommittedModifier</span> {
+        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">alter_uncommitted</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">patch_loc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">loc</span>: <span class="ident">PatchLoc</span>, <span class="ident">target</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">buf_loc</span> <span class="op">=</span> <span class="ident">loc</span>.<span class="number">0</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">asmoffset</span>;
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">buf_loc</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">1</span> <span class="kw">as</span> <span class="ident">usize</span> .. <span class="ident">buf_loc</span>];
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">target</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">isize</span>;
+        <span class="comment">// calculate the offset that the relocation starts at</span>
+        <span class="comment">// in the executable buffer</span>
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">loc</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">size</span>.<span class="ident">in_bytes</span>();
 
-        <span class="kw">unsafe</span> { <span class="kw">match</span> <span class="ident">loc</span>.<span class="number">1</span> {
-            <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">1</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i8</span> ).<span class="ident">to_le</span>() )),
-            <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">2</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i16</span>).<span class="ident">to_le</span>() )),
-            <span class="number">4</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">4</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_le</span>() )),
-            <span class="number">8</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">8</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">to_le</span>() )),
-            _ <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;invalid patch size&quot;</span>)
-        } }
+        <span class="comment">// the value that the relocation will have</span>
+        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">target</span>.<span class="ident">wrapping_sub</span>(<span class="ident">loc</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>);
+
+        <span class="comment">// write the relocation</span>
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">asmoffset</span>();
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">ops</span>[<span class="ident">offset</span> .. <span class="ident">offset</span> <span class="op">+</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">size</span>.<span class="ident">in_bytes</span>()];
+        <span class="kw">match</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">size</span> {
+            <span class="ident">RelocationSize</span>::<span class="ident">Byte</span>  <span class="op">=&gt;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident">RelocationSize</span>::<span class="ident">Word</span>  <span class="op">=&gt;</span> <span class="ident">LittleEndian</span>::<span class="ident">write_u16</span>(<span class="ident">buf</span>, <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u16</span>),
+            <span class="ident">RelocationSize</span>::<span class="ident">DWord</span> <span class="op">=&gt;</span> <span class="ident">LittleEndian</span>::<span class="ident">write_u32</span>(<span class="ident">buf</span>, <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u32</span>),
+            <span class="ident">RelocationSize</span>::<span class="ident">QWord</span> <span class="op">=&gt;</span> <span class="ident">LittleEndian</span>::<span class="ident">write_u64</span>(<span class="ident">buf</span>, <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u64</span>)
+        }
     }
 
     <span class="kw">fn</span> <span class="ident">encode_relocs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relocs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">relocs</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">global_relocs</span>);
         <span class="kw">for</span> (<span class="ident">loc</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="ident">relocs</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">global_labels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
-                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>)
-            } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unkonwn global label &#39;{}&#39;&quot;</span>, <span class="ident">name</span>);
-            }
+            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_global_label</span>(<span class="ident">name</span>);
+            <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>.<span class="number">0</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relocs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">relocs</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">dynamic_relocs</span>);
         <span class="kw">for</span> (<span class="ident">loc</span>, <span class="ident">id</span>) <span class="kw">in</span> <span class="ident">relocs</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">target</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">dynamic_labels</span>.<span class="ident">get</span>(<span class="ident">id</span>.<span class="number">0</span>) {
-                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>)
-            } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unkonwn dynamic label &#39;{}&#39;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>);
-            }
+            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_dynamic_label</span>(<span class="ident">id</span>);
+            <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>.<span class="number">0</span>);
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_relocs</span>.<span class="ident">keys</span>().<span class="ident">next</span>() {
@@ -781,60 +700,11 @@
     <span class="doccomment">/// has to obtain a lock on the datastructure. When this method is called, all</span>
     <span class="doccomment">/// labels will be resolved, and the result can no longer be changed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="comment">// This is where the part overridden by the current assembling buffer starts.</span>
-        <span class="comment">// This is guaranteed to be in the actual backing buffer.</span>
-        <span class="kw">let</span> <span class="ident">buf_start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asmoffset</span>;
-        <span class="comment">// and this is where it ends. This is not guaranteed to be in the actual mmap</span>
-        <span class="kw">let</span> <span class="ident">buf_end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-        <span class="comment">// is there any work to do?</span>
-        <span class="kw">if</span> <span class="ident">buf_start</span> <span class="op">==</span> <span class="ident">buf_end</span> {
-            <span class="kw">return</span>
-        }
         <span class="comment">// finalize all relocs in the newest part.</span>
         <span class="self">self</span>.<span class="ident">encode_relocs</span>();
 
-        <span class="kw">let</span> <span class="ident">same</span>    <span class="op">=</span>          ..<span class="ident">buf_start</span>;
-        <span class="kw">let</span> <span class="ident">changed</span> <span class="op">=</span> <span class="ident">buf_start</span>..<span class="ident">buf_end</span>;
-
-        <span class="comment">// The reason we don&#39;t have to copy the part after buf_end here is because we will only</span>
-        <span class="comment">// enter the resize branch if all data past buf_start has been overwritten if we&#39;re in an</span>
-        <span class="comment">// alter invocation</span>
-        <span class="kw">if</span> <span class="ident">buf_end</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">map_len</span> {
-            <span class="comment">// create a new buffer of the necessary size max(current_buf_len * 2, wanted_len)</span>
-            <span class="kw">let</span> <span class="ident">map_len</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">buf_end</span>, <span class="self">self</span>.<span class="ident">map_len</span> <span class="op">*</span> <span class="number">2</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_buf</span> <span class="op">=</span> <span class="ident">Mmap</span>::<span class="ident">anonymous</span>(<span class="ident">map_len</span>, <span class="ident">Protection</span>::<span class="ident">ReadWrite</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to change memory protection mode&quot;</span>);
-            <span class="self">self</span>.<span class="ident">map_len</span> <span class="op">=</span> <span class="ident">new_buf</span>.<span class="ident">len</span>();
-
-            <span class="comment">// copy over from the old buffer and the asm buffer (unsafe is completely safe due to use of anonymous mappings)</span>
-            <span class="kw">unsafe</span> {
-                <span class="ident">new_buf</span>.<span class="ident">as_mut_slice</span>()[<span class="ident">same</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">execbuffer</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">buffer</span>.<span class="ident">as_slice</span>()[<span class="ident">same</span>]);
-                <span class="ident">new_buf</span>.<span class="ident">as_mut_slice</span>()[<span class="ident">changed</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ops</span>);
-            }
-            <span class="ident">new_buf</span>.<span class="ident">set_protection</span>(<span class="ident">Protection</span>::<span class="ident">ReadExecute</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to change memory protection mode&quot;</span>);
-
-            <span class="comment">// swap the buffers and the initialized length</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ExecutableBuffer</span> {
-                <span class="ident">length</span>: <span class="ident">buf_end</span>,
-                <span class="ident">buffer</span>: <span class="ident">new_buf</span>
-            };
-            <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">execbuffer</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>());
-            <span class="comment">// and the old buffer is dropped.</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// make the buffer writeable and copy things over.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execbuffer</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
-            <span class="ident">data</span>.<span class="ident">buffer</span>.<span class="ident">set_protection</span>(<span class="ident">Protection</span>::<span class="ident">ReadWrite</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to change memory protection mode&quot;</span>);
-            <span class="kw">unsafe</span> {
-                <span class="ident">data</span>.<span class="ident">buffer</span>.<span class="ident">as_mut_slice</span>()[<span class="ident">changed</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ops</span>);
-            }
-            <span class="ident">data</span>.<span class="ident">buffer</span>.<span class="ident">set_protection</span>(<span class="ident">Protection</span>::<span class="ident">ReadExecute</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to change memory protection mode&quot;</span>);
-            <span class="comment">// update the length of the initialized part of the buffer, if this commit adds length</span>
-            <span class="kw">if</span> <span class="ident">buf_end</span> <span class="op">&gt;</span> <span class="ident">data</span>.<span class="ident">length</span> {
-                <span class="ident">data</span>.<span class="ident">length</span> <span class="op">=</span> <span class="ident">buf_end</span>;
-            }
-        }
-        <span class="comment">// empty the assembling buffer and update the assembling offset</span>
-        <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">=</span> <span class="ident">buf_end</span>;
+        <span class="comment">// update the executable buffer</span>
+        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">commit</span>(<span class="op">|</span><span class="kw">_</span>,<span class="kw">_</span>,<span class="kw">_</span><span class="op">|</span>());
     }
 
     <span class="doccomment">/// Consumes the assembler to return the internal ExecutableBuffer. This</span>
@@ -842,10 +712,10 @@
     <span class="doccomment">/// in which case it will return itself.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutableBuffer</span>, <span class="ident">Assembler</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">commit</span>();
-        <span class="kw">match</span> <span class="ident">Arc</span>::<span class="ident">try_unwrap</span>(<span class="self">self</span>.<span class="ident">execbuffer</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">execbuffer</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">execbuffer</span>.<span class="ident">into_inner</span>().<span class="ident">unwrap</span>()),
-            <span class="prelude-val">Err</span>(<span class="ident">arc</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Assembler</span> {
-                <span class="ident">execbuffer</span>: <span class="ident">arc</span>,
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">finalize</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">execbuffer</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">execbuffer</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">base</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Assembler</span> {
+                <span class="ident">base</span>: <span class="ident">base</span>,
                 ..<span class="self">self</span>
             })
         }
@@ -857,110 +727,111 @@
     <span class="doccomment">/// calls.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Executor</span> {
         <span class="ident">Executor</span> {
-            <span class="ident">execbuffer</span>: <span class="self">self</span>.<span class="ident">execbuffer</span>.<span class="ident">clone</span>()
+            <span class="ident">execbuffer</span>: <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">reader</span>()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DynasmApi</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Assembler</span> {
+<span class="kw">impl</span> <span class="ident">DynasmApi</span> <span class="kw">for</span> <span class="ident">Assembler</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">AssemblyOffset</span> {
-        <span class="ident">AssemblyOffset</span>(<span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">asmoffset</span>)
+        <span class="ident">AssemblyOffset</span>(<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">offset</span>())
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">push</span>(<span class="ident">value</span>);
+        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">push</span>(<span class="ident">value</span>);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DynasmLabelApi</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Assembler</span> {
+<span class="kw">impl</span> <span class="ident">DynasmLabelApi</span> <span class="kw">for</span> <span class="ident">Assembler</span> {
+    <span class="doccomment">/// tuple of encoded (offset, size)</span>
+    <span class="kw">type</span> <span class="ident">Relocation</span> <span class="op">=</span> (<span class="ident">u8</span>, <span class="ident">u8</span>);
+
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alignment</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span> <span class="op">%</span> <span class="ident">alignment</span>;
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">!=</span> <span class="number">0</span> {
-            <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">alignment</span> <span class="op">-</span> <span class="ident">offset</span>) {
-                <span class="self">self</span>.<span class="ident">push</span>(<span class="number">0x90</span>);
-            }
-        }
+        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">align</span>(<span class="ident">alignment</span>, <span class="number">0x90</span>);
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">global_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">global_labels</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">offset</span>) {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Duplicate global label &#39;{}&#39;&quot;</span>, <span class="ident">name</span>);
-        }
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
+        <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">global_label</span>(<span class="ident">name</span>, <span class="ident">offset</span>);
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">global_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
+    <span class="kw">fn</span> <span class="ident">global_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">global_relocs</span>.<span class="ident">push</span>((<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">size</span>), <span class="ident">name</span>));
+        <span class="self">self</span>.<span class="ident">global_relocs</span>.<span class="ident">push</span>((<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)), <span class="ident">name</span>));
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">dynamic_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>) {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">dynamic_labels</span>[<span class="ident">id</span>.<span class="number">0</span>];
-        <span class="kw">if</span> <span class="ident">entry</span>.<span class="ident">is_some</span>() {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Duplicate label &#39;{}&#39;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>);
-        }
-        <span class="kw-2">*</span><span class="ident">entry</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>);
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
+        <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">dynamic_label</span>(<span class="ident">id</span>, <span class="ident">offset</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dynamic_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
+    <span class="kw">fn</span> <span class="ident">dynamic_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">dynamic_relocs</span>.<span class="ident">push</span>((<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">size</span>), <span class="ident">id</span>));
+        <span class="self">self</span>.<span class="ident">dynamic_relocs</span>.<span class="ident">push</span>((<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)), <span class="ident">id</span>));
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">local_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relocs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_relocs</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
             <span class="kw">for</span> <span class="ident">loc</span> <span class="kw">in</span> <span class="ident">relocs</span> {
-                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">offset</span>);
+                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">offset</span>.<span class="number">0</span>);
             }
         }
-        <span class="self">self</span>.<span class="ident">local_labels</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">offset</span>);
+        <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">local_label</span>(<span class="ident">name</span>, <span class="ident">offset</span>);
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">forward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
+    <span class="kw">fn</span> <span class="ident">forward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">local_relocs</span>.<span class="ident">entry</span>(<span class="ident">name</span>) {
             <span class="ident">Occupied</span>(<span class="kw-2">mut</span> <span class="ident">o</span>) <span class="op">=&gt;</span> {
-                <span class="ident">o</span>.<span class="ident">get_mut</span>().<span class="ident">push</span>(<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">size</span>));
+                <span class="ident">o</span>.<span class="ident">get_mut</span>().<span class="ident">push</span>(<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)));
             },
             <span class="ident">Vacant</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> {
-                <span class="ident">v</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">size</span>)]);
+                <span class="ident">v</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>))]);
             }
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">backward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_labels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-            <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">PatchLoc</span>(<span class="ident">len</span>, <span class="ident">size</span>), <span class="ident">target</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown local label &#39;{}&#39;&quot;</span>, <span class="ident">name</span>);
-        }
+    <span class="kw">fn</span> <span class="ident">backward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_local_label</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">PatchLoc</span>(
+            <span class="ident">offset</span>,
+            <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)
+        ), <span class="ident">target</span>.<span class="number">0</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bare_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">PatchLoc</span>(
+            <span class="ident">offset</span>,
+            <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)
+        ), <span class="ident">target</span>);
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Assembler</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">T</span>) <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">extend</span>(<span class="ident">iter</span>)
+        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">extend</span>(<span class="ident">iter</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Assembler</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">T</span>) <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">cloned</span>())
+        <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">extend</span>(<span class="ident">iter</span>)
     }
 }
 
@@ -973,67 +844,69 @@
 <span class="doccomment">/// overwritten by assembling into this struct.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
     <span class="ident">assembler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Assembler</span>,
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">ExecutableBuffer</span>
+    <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">MutableBuffer</span>,
+    <span class="ident">asmoffset</span>: <span class="ident">usize</span>
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Sets the current modification offset to the given value</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">goto</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) {
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">asmoffset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="number">0</span>;
     }
 
     <span class="doccomment">/// Checks that the current modification offset is not larger than the specified offset.</span>
-    <span class="doccomment">/// If this is violated, it panics.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">asmoffset</span> <span class="op">&gt;</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;specified offset to check is smaller than the actual offset&quot;</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynasmError</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">&gt;</span> <span class="ident">offset</span>.<span class="number">0</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(())
         }
     }
 
     <span class="doccomment">/// Checks that the current modification offset is exactly the specified offset.</span>
-    <span class="doccomment">/// If this is violated, it panics.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">asmoffset</span> <span class="op">!=</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;specified offset to check is smaller than the actual offset&quot;</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynasmError</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">!=</span> <span class="ident">offset</span>.<span class="number">0</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(())
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">patch_loc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">loc</span>: <span class="ident">PatchLoc</span>, <span class="ident">target</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_mut_slice</span>()[<span class="ident">loc</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">1</span> <span class="kw">as</span> <span class="ident">usize</span> .. <span class="ident">loc</span>.<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">target</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">isize</span>;
+        <span class="comment">// calculate the offset that the relocation starts at</span>
+        <span class="comment">// in the executable buffer</span>
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">loc</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">size</span>.<span class="ident">in_bytes</span>();
 
-        <span class="kw">unsafe</span> { <span class="kw">match</span> <span class="ident">loc</span>.<span class="number">1</span> {
-            <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">1</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i8</span> ).<span class="ident">to_le</span>() )),
-            <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">2</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i16</span>).<span class="ident">to_le</span>() )),
-            <span class="number">4</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">4</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_le</span>() )),
-            <span class="number">8</span> <span class="op">=&gt;</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>_, [<span class="ident">u8</span>; <span class="number">8</span>]<span class="op">&gt;</span>( (<span class="ident">target</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">to_le</span>() )),
-            _ <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;invalid patch size&quot;</span>)
-        } }
+        <span class="comment">// the value that the relocation will have</span>
+        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">target</span>.<span class="ident">wrapping_sub</span>(<span class="ident">loc</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>);
+
+        <span class="comment">// write the relocation</span>
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">offset</span> .. <span class="ident">offset</span> <span class="op">+</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">size</span>.<span class="ident">in_bytes</span>()];
+        <span class="kw">match</span> <span class="ident">loc</span>.<span class="number">1</span>.<span class="ident">size</span> {
+            <span class="ident">RelocationSize</span>::<span class="ident">Byte</span>  <span class="op">=&gt;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident">RelocationSize</span>::<span class="ident">Word</span>  <span class="op">=&gt;</span> <span class="ident">LittleEndian</span>::<span class="ident">write_u16</span>(<span class="ident">buf</span>, <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u16</span>),
+            <span class="ident">RelocationSize</span>::<span class="ident">DWord</span> <span class="op">=&gt;</span> <span class="ident">LittleEndian</span>::<span class="ident">write_u32</span>(<span class="ident">buf</span>, <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u32</span>),
+            <span class="ident">RelocationSize</span>::<span class="ident">QWord</span> <span class="op">=&gt;</span> <span class="ident">LittleEndian</span>::<span class="ident">write_u64</span>(<span class="ident">buf</span>, <span class="ident">t</span> <span class="kw">as</span> <span class="ident">u64</span>)
+        }
     }
 
     <span class="kw">fn</span> <span class="ident">encode_relocs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relocs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">relocs</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">global_relocs</span>);
         <span class="kw">for</span> (<span class="ident">loc</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="ident">relocs</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">global_labels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
-                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>)
-            } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unkonwn global label &#39;{}&#39;&quot;</span>, <span class="ident">name</span>);
-            }
+            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">labels</span>.<span class="ident">resolve_global_label</span>(<span class="ident">name</span>);
+            <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>.<span class="number">0</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relocs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">relocs</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">dynamic_relocs</span>);
         <span class="kw">for</span> (<span class="ident">loc</span>, <span class="ident">id</span>) <span class="kw">in</span> <span class="ident">relocs</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">target</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">dynamic_labels</span>.<span class="ident">get</span>(<span class="ident">id</span>.<span class="number">0</span>) {
-                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>)
-            } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unkonwn dynamic label &#39;{}&#39;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>);
-            }
+            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">labels</span>.<span class="ident">resolve_dynamic_label</span>(<span class="ident">id</span>);
+            <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">target</span>.<span class="number">0</span>);
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">local_relocs</span>.<span class="ident">keys</span>().<span class="ident">next</span>() {
@@ -1042,20 +915,22 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">DynasmApi</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">DynasmApi</span> <span class="kw">for</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">AssemblyOffset</span> {
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">offset</span>()
+        <span class="ident">AssemblyOffset</span>(<span class="self">self</span>.<span class="ident">asmoffset</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_mut_slice</span>()[<span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">asmoffset</span>] <span class="op">=</span> <span class="ident">value</span>;
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">asmoffset</span> <span class="op">+=</span> <span class="number">1</span>;
+        <span class="self">self</span>.<span class="ident">buffer</span>[<span class="self">self</span>.<span class="ident">asmoffset</span>] <span class="op">=</span> <span class="ident">value</span>;
+        <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">+=</span> <span class="number">1</span>;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">DynasmLabelApi</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">DynasmLabelApi</span> <span class="kw">for</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Relocation</span> <span class="op">=</span> (<span class="ident">u8</span>, <span class="ident">u8</span>);
+
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alignment</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">align</span>(<span class="ident">alignment</span>);
@@ -1067,8 +942,9 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">global_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">global_reloc</span>(<span class="ident">name</span>, <span class="ident">size</span>);
+    <span class="kw">fn</span> <span class="ident">global_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asmoffset</span>;
+        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">global_relocs</span>.<span class="ident">push</span>((<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)), <span class="ident">name</span>));
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -1077,34 +953,52 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dynamic_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">dynamic_reloc</span>(<span class="ident">id</span>, <span class="ident">size</span>);
+    <span class="kw">fn</span> <span class="ident">dynamic_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asmoffset</span>;
+        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">dynamic_relocs</span>.<span class="ident">push</span>((<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)), <span class="ident">id</span>));
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">local_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relocs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">local_relocs</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
             <span class="kw">for</span> <span class="ident">loc</span> <span class="kw">in</span> <span class="ident">relocs</span> {
-                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">offset</span>);
+                <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">loc</span>, <span class="ident">offset</span>.<span class="number">0</span>);
             }
         }
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">local_labels</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">offset</span>);
+        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">labels</span>.<span class="ident">local_label</span>(<span class="ident">name</span>, <span class="ident">offset</span>);
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">forward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">forward_reloc</span>(<span class="ident">name</span>, <span class="ident">size</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">backward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">size</span>: <span class="ident">u8</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">local_labels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
-            <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">PatchLoc</span>(<span class="ident">len</span>, <span class="ident">size</span>), <span class="ident">target</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown local label &#39;{}&#39;&quot;</span>, <span class="ident">name</span>);
+    <span class="kw">fn</span> <span class="ident">forward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">asmoffset</span>;
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">local_relocs</span>.<span class="ident">entry</span>(<span class="ident">name</span>) {
+            <span class="ident">Occupied</span>(<span class="kw-2">mut</span> <span class="ident">o</span>) <span class="op">=&gt;</span> {
+                <span class="ident">o</span>.<span class="ident">get_mut</span>().<span class="ident">push</span>(<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)));
+            },
+            <span class="ident">Vacant</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> {
+                <span class="ident">v</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">PatchLoc</span>(<span class="ident">offset</span>, <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>))]);
+            }
         }
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">backward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">labels</span>.<span class="ident">resolve_local_label</span>(<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
+        <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">PatchLoc</span>(
+            <span class="ident">offset</span>.<span class="number">0</span>,
+            <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)
+        ), <span class="ident">target</span>.<span class="number">0</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bare_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>) {
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">patch_loc</span>(<span class="ident">PatchLoc</span>(
+            <span class="ident">offset</span>,
+            <span class="ident">RelocationType</span>::<span class="ident">from_tuple</span>(<span class="ident">kind</span>)
+        ), <span class="ident">target</span>);
     }
 }
 
@@ -1123,131 +1017,5 @@
         <span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">cloned</span>())
     }
 }
-
-<span class="doccomment">/// This struct is a wrapper around an `Assembler` normally created using the</span>
-<span class="doccomment">/// `Assembler.alter_uncommitted` method. It allows the user to edit parts</span>
-<span class="doccomment">/// of the assembling buffer that cannot be determined easily or efficiently</span>
-<span class="doccomment">/// in advance. Due to limitations of the label resolution algorithms, this</span>
-<span class="doccomment">/// assembler does not allow labels to be used.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">assembler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Assembler</span>,
-    <span class="ident">offset</span>: <span class="ident">usize</span>
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets the current modification offset to the given value</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">goto</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) {
-        <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="number">0</span>;
-    }
-
-    <span class="doccomment">/// Checks that the current modification offset is not larger than the specified offset.</span>
-    <span class="doccomment">/// If this is violated, it panics.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;specified offset to check is smaller than the actual offset&quot;</span>);
-        }
-    }
-
-    <span class="doccomment">/// Checks that the current modification offset is exactly the specified offset.</span>
-    <span class="doccomment">/// If this is violated, it panics.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">!=</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;specified offset to check is smaller than the actual offset&quot;</span>);
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">DynasmApi</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">AssemblyOffset</span> {
-        <span class="ident">AssemblyOffset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">ops</span>[<span class="self">self</span>.<span class="ident">offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">assembler</span>.<span class="ident">asmoffset</span>] <span class="op">=</span> <span class="ident">value</span>;
-        <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+=</span> <span class="number">1</span>;
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">T</span>) <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">i</span>)
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">T</span>) <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">cloned</span>())
-    }
-}
 </pre>
-</section>
-    <section id='search' class="content hidden"></section>
-
-    <section class="footer"></section>
-
-    <aside id="help" class="hidden">
-        <div>
-            <h1 class="hidden">Help</h1>
-
-            <div class="shortcuts">
-                <h2>Keyboard Shortcuts</h2>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h2>Search Tricks</h2>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>type</code>, <code>macro</code>,
-                    and <code>const</code>.
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
-                </p>
-            </div>
-        </div>
-    </aside>
-
-    
-
-    <script>
-        window.rootPath = "../../";
-        window.currentCrate = "dynasmrt";
-    </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
-    <script defer src="../../search-index.js"></script>
-</body>
-</html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "dynasmrt";</script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

@@ -59,31 +59,24 @@
     <h1 class="title">Dynasm-rs</h1>
     <p>In the search for faster interpreters, Just-In-Time compilation is often a useful tool.
 This compiler extension attempts to make the writing of such programs easier and faster.</p>
-
 <p>At its core, dynasm-rs is an assembler compiler. It reads assembly templates which it then
 compiles into code that when executed will result in the proper machine code being emitted.</p>
-
 <p>Dynasm is split up into two parts. The first is the compiler extension that performs the
 translation of assembly templates into rust code, the second part is a
 <a href="../runtime/dynasmrt/index.html">small runtime</a> that handles the generation of the wanted
 machine code.</p>
-
-<p>For now dynasm-rs only supports the x64 instruction set.</p>
-
+<p>For now dynasm-rs only supports the x86 and x64 instruction set architectures.</p>
 <p>Dynasm-rs is inspired by the LuaJIT DynASM project for C and C++.</p>
-
-<h1 id='documentation' class='section-header'><a href='#documentation'>Documentation</a></h1>
-<p>The documentation of dynasm-rs is split up into several parts. To get started, you&#39;re advised
+<h1 id="documentation" class="section-header"><a href="#documentation">Documentation</a></h1>
+<p>The documentation of dynasm-rs is split up into several parts. To get started, you're advised
 to read through the <a href="./tutorial.html">tutorial</a>. After this, you can read through the
 <a href="./langref.html">language reference</a> to learn about the syntax used by dynasm-rs. You can
 also read through the <a href="../runtime/dynasmrt/index.html">runtime documentation</a> to learn about the
 runtime API. The <a href="./instructionref.html">instruction reference</a> lists all assembly mnemnonics
 and formats supported by dynasm-rs. Finally, documentation on the
 <a href="../plugin/dynasm/index.html">internals on dynasm-rs</a> can be browsed here.</p>
-
-<h1 id='differences-from-luajit-dynasm' class='section-header'><a href='#differences-from-luajit-dynasm'>Differences from LuaJit Dynasm</a></h1>
+<h1 id="differences-from-luajit-dynasm" class="section-header"><a href="#differences-from-luajit-dynasm">Differences from LuaJit Dynasm</a></h1>
 <p>The following list summarizes some of the larger differences between LuaJIT dynasm and dynasm-rs.</p>
-
 <ul>
 <li>LuaJIT dynasm uses full program analysis, allowing it to compile local and global labels down to
 enums. Dynasm-rs however uses Hashmaps keyed by static strings, meaning label resolution in dynasm-rs
@@ -98,7 +91,7 @@ in dynasm-rs it is <code>reg =&gt; Type.attr</code>.</li>
 <li>LuaJIT dynasm uses a special preprocessor which detects lines starting with pipes (<code>|</code>) as dynasm
 instructions, dynasm-rs uses the <code>dynasm!</code> procedural macro with lines starting with semicolons (<code>;</code>).</li>
 <li>LuaJIT has macros in its invocations, dynasm-rs uses rust macros that expand to <code>dynasm!</code> invocations.</li>
-<li>Dynasm-rs doesn&#39;t have typed aliases</li>
+<li>Dynasm-rs doesn't have typed aliases</li>
 </ul>
 
     </section>
