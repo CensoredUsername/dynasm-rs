@@ -553,7 +553,7 @@ Ops!(OPMAP;
     b"mb"         , [0xFE              ], 1, LOCK;
     b"rb"         , [0xFE              ], 1;
     b"m*"         , [0xFF              ], 1, AUTO_SIZE | LOCK;
-    b"r*"         , [0x40              ], 0, X86_ONLY | SHORT_ARG;
+    b"r*"         , [0x48              ], 0, X86_ONLY | SHORT_ARG;
     b"r*"         , [0xFF              ], 1, AUTO_SIZE ;
 ]
 "div" = [
