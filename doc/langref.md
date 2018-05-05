@@ -189,7 +189,7 @@ Dynamic Encoding    | `Rb`        | `Rh`       | `Rw`       | `Rd`        | `Rq`
                 `1` | `cl`/`r1b`  |            | `cx`/`r1w` | `ecx`/`r1d` | `rcx`/`r1`        |           | `st1`          | `mmx1` | `xmm1`    | `ymm1`    | `cs`    | `cr1`   | `dr1` | `bnd1`
                 `2` | `dl`/`r2b`  |            | `dx`/`r2w` | `edx`/`r2d` | `rdx`/`r2`        |           | `st2`          | `mmx2` | `xmm2`    | `ymm2`    | `ss`    | `cr2`   | `dr2` | `bnd2`
                 `3` | `bl`/`r3b`  |            | `bx`/`r3w` | `ebx`/`r3d` | `rbx`/`r3`        |           | `st3`          | `mmx3` | `xmm3`    | `ymm3`    | `ds`    | `cr3`   | `dr3` | `bnd3`
-                `4` | `spl`/`r4b` | `ah`       | `sx`/`r4w` | `esx`/`r4d` | `rsx`/`r4`        |           | `st4`          | `mmx4` | `xmm4`    | `ymm4`    | `fs`    | `cr4`   | `dr4` |
+                `4` | `spl`/`r4b` | `ah`       | `sp`/`r4w` | `esp`/`r4d` | `rsp`/`r4`        |           | `st4`          | `mmx4` | `xmm4`    | `ymm4`    | `fs`    | `cr4`   | `dr4` |
                 `5` | `bpl`/`r5b` | `ch`       | `bp`/`r5w` | `ebp`/`r5d` | `rbp`/`r5`        | `eip/rip` | `st5`          | `mmx5` | `xmm5`    | `ymm5`    | `gs`    | `cr5`   | `dr5` |
                 `6` | `sil`/`r6b` | `dh`       | `si`/`r6w` | `esi`/`r6d` | `rsi`/`r6`        |           | `st6`          | `mmx6` | `xmm6`    | `ymm6`    |         | `cr6`   | `dr6` |
                 `7` | `dil`/`r7b` | `bh`       | `di`/`r7w` | `edi`/`r7d` | `rdi`/`r7`        |           | `st7`          | `mmx7` | `xmm7`    | `ymm7`    |         | `cr7`   | `dr7` |

@@ -112,8 +112,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         _ => return Err(Some("Impossible address size".into()))
     };
 
-    // this call also inserts more size information in the AST if applicable.
-    // match the ast with a format string, resulting in a SizedAST
+    // find a matching op
     let data = match_op_format(ctx, ecx, op, &args)?;
 
     // determine if the features required for this op are fulfilled
