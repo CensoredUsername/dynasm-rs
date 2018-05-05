@@ -1678,7 +1678,6 @@
 <span id="1678">1678</span>
 <span id="1679">1679</span>
 <span id="1680">1680</span>
-<span id="1681">1681</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">base</span>::<span class="ident">ExtCtxt</span>;
 <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">build</span>::<span class="ident">AstBuilder</span>;
@@ -1794,8 +1793,7 @@
         <span class="kw">_</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Impossible address size&quot;</span>.<span class="ident">into</span>()))
     };
 
-    <span class="comment">// this call also inserts more size information in the AST if applicable.</span>
-    <span class="comment">// match the ast with a format string, resulting in a SizedAST</span>
+    <span class="comment">// find a matching op</span>
     <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">match_op_format</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// determine if the features required for this op are fulfilled</span>
