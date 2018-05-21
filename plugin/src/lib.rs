@@ -11,6 +11,7 @@ extern crate owning_ref;
 extern crate byteorder;
 
 use rustc_plugin::registry::Registry;
+use syntax::edition::DEFAULT_EDITION;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
 use syntax::ext::build::AstBuilder;
 use syntax::codemap::{Span, Spanned};
@@ -46,7 +47,8 @@ pub fn registrar(reg: &mut Registry) {
                                       def_info: None,
                                       unstable_feature: None,
                                       allow_internal_unstable: false,
-                                      allow_internal_unsafe: false
+                                      allow_internal_unsafe: false,
+                                      edition: DEFAULT_EDITION
                                   });
 
     #[cfg(feature = "dynasm_opmap")]
@@ -56,7 +58,8 @@ pub fn registrar(reg: &mut Registry) {
                                       def_info: None,
                                       unstable_feature: None,
                                       allow_internal_unstable: false,
-                                      allow_internal_unsafe: false
+                                      allow_internal_unsafe: false,
+                                      edition: DEFAULT_EDITION
                                   });
 }
 
