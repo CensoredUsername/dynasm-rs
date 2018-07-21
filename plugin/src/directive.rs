@@ -78,7 +78,7 @@ impl DynasmData {
             d => {
                 // unknown directive. skip ahead until we hit a ; so the parser can recover
                 ecx.span_err(parser.span, &format!("unknown directive '{}'", d));
-                while !(parser.check(&token::Semi) && parser.check(&token::Eof)) {
+                while !parser.look_ahead(0, |x| x == &token::Semi || x == &token::Eof) {
                     parser.bump();
                 }
             }
@@ -88,7 +88,7 @@ impl DynasmData {
     }
 
     fn directive_const<'b>(stmts: &mut Vec<Stmt>, parser: &mut Parser<'b>, size: Size) -> PResult<'b, ()> {
-        if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
+        if !parser.look_ahead(0, |x| x == &token::Semi || x == &token::Eof) {
             stmts.push(Stmt::ExprSigned(parser.parse_expr()?, size));
 
             while parser.eat(&token::Comma) {

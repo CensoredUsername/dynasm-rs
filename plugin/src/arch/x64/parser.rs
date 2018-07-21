@@ -40,7 +40,7 @@ pub fn parse_instruction<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Pars
     // parse (sizehint? expr),*
     let mut args = Vec::new();
 
-    if !parser.check(&token::Semi) && !parser.check(&token::Eof) {
+    if !parser.look_ahead(0, |x| x == &token::Semi || x == &token::Eof) {
         args.push(parse_arg(ctx, ecx, parser)?);
 
         while parser.eat(&token::Comma) {
@@ -132,7 +132,7 @@ fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> P
 
     let start = parser.span;
 
-    let in_bracket = parser.check(&token::OpenDelim(token::Bracket));
+    let in_bracket = parser.look_ahead(0, |x| x == &token::OpenDelim(token::Bracket));
     if in_bracket && parser.look_ahead(1, |x| match *x {
             token::RArrow |
             token::Gt     |

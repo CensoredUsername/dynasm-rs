@@ -188,7 +188,7 @@ fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<as
 
     let mut stmts = Vec::new();
 
-    while !parser.check(&token::Eof) {
+    while !parser.look_ahead(0, |x| x == &token::Eof) {
         parser.expect(&token::Semi)?;
 
         // ;; stmt
