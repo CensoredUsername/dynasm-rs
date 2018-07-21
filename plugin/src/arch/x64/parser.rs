@@ -291,7 +291,7 @@ pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
     }
 
     let segment = &path.segments[0];
-    if !segment.parameters.is_none() {
+    if !segment.args.is_none() {
         return None;
     }
 

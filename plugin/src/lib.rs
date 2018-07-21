@@ -48,7 +48,8 @@ pub fn registrar(reg: &mut Registry) {
                                       unstable_feature: None,
                                       allow_internal_unstable: false,
                                       allow_internal_unsafe: false,
-                                      edition: DEFAULT_EDITION
+                                      edition: DEFAULT_EDITION,
+                                      local_inner_macros: false,
                                   });
 
     #[cfg(feature = "dynasm_opmap")]
@@ -59,7 +60,8 @@ pub fn registrar(reg: &mut Registry) {
                                       unstable_feature: None,
                                       allow_internal_unstable: false,
                                       allow_internal_unsafe: false,
-                                      edition: DEFAULT_EDITION
+                                      edition: DEFAULT_EDITION,
+                                      local_inner_macros: false,
                                   });
 }
 

@@ -353,7 +353,7 @@ pub fn expr_size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
 
     let ty = ecx.ty_path(path);
     let idents = ["std", "mem", "size_of"].iter().cloned().map(ast::Ident::from_str).collect();
-    let size_of = ecx.path_all(span, true, idents, Vec::new(), vec![ty], Vec::new());
+    let size_of = ecx.path_all(span, true, idents, vec![ast::GenericArg::Type(ty)], Vec::new());
     ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
 }
 
