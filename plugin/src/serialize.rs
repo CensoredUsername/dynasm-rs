@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use byteorder::{ByteOrder, LittleEndian};
 
-use syntax::util::ThinVec;
+use syntax::ThinVec;
 use syntax::ext::build::AstBuilder;
 use syntax::ext::base::ExtCtxt;
 use syntax::ast;
@@ -293,7 +293,7 @@ pub fn expr_offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Si
             init: None,
             id: ast::DUMMY_NODE_ID,
             span: span,
-            attrs: ast::ThinVec::new()
+            attrs: ThinVec::new()
         }))
     };
 

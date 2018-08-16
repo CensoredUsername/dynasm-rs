@@ -16,7 +16,7 @@ use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
 use syntax::ext::build::AstBuilder;
 use syntax::codemap::{Span, Spanned};
 use syntax::ast;
-use syntax::util::small_vector::SmallVector;
+use syntax::OneVector;
 use syntax::parse::parser::Parser;
 use syntax::parse::PResult;
 use syntax::symbol::Symbol;
@@ -76,13 +76,13 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
         Some(self.ecx.expr_block(self.ecx.block(self.ecx.call_site(), self.stmts)))
     }
 
-    fn make_stmts(self: Box<Self>) -> Option<SmallVector<ast::Stmt>> {
-        Some(SmallVector::many(self.stmts))
+    fn make_stmts(self: Box<Self>) -> Option<OneVector<ast::Stmt>> {
+        Some(OneVector::many(self.stmts))
     }
 
-    fn make_items(self: Box<Self>) -> Option<SmallVector<P<ast::Item>>> {
+    fn make_items(self: Box<Self>) -> Option<OneVector<P<ast::Item>>> {
         if self.stmts.is_empty() {
-            Some(SmallVector::new())
+            Some(OneVector::new())
         } else {
             None
         }
