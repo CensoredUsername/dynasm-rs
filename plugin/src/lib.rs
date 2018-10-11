@@ -9,20 +9,22 @@ extern crate lazy_static;
 extern crate bitflags;
 extern crate owning_ref;
 extern crate byteorder;
+extern crate smallvec;
 
 use rustc_plugin::registry::Registry;
 use syntax::edition::DEFAULT_EDITION;
 use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
 use syntax::ext::build::AstBuilder;
-use syntax::codemap::{Span, Spanned};
+use syntax::source_map::{Span, Spanned};
 use syntax::ast;
-use syntax::OneVector;
 use syntax::parse::parser::Parser;
 use syntax::parse::PResult;
 use syntax::symbol::Symbol;
 use syntax::parse::token;
 use syntax::tokenstream::TokenTree;
 use syntax::ptr::P;
+
+use smallvec::SmallVec;
 
 use std::sync::{RwLock, RwLockReadGuard, Mutex};
 use std::collections::HashMap;
@@ -76,13 +78,13 @@ impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
         Some(self.ecx.expr_block(self.ecx.block(self.ecx.call_site(), self.stmts)))
     }
 
-    fn make_stmts(self: Box<Self>) -> Option<OneVector<ast::Stmt>> {
-        Some(OneVector::many(self.stmts))
+    fn make_stmts(self: Box<Self>) -> Option<SmallVec<[ast::Stmt; 1]>> {
+        Some(SmallVec::from_vec(self.stmts))
     }
 
-    fn make_items(self: Box<Self>) -> Option<OneVector<P<ast::Item>>> {
+    fn make_items(self: Box<Self>) -> Option<SmallVec<[P<ast::Item>; 1]>> {
         if self.stmts.is_empty() {
-            Some(OneVector::new())
+            Some(SmallVec::new())
         } else {
             None
         }

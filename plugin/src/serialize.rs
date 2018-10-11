@@ -8,7 +8,7 @@ use syntax::ext::base::ExtCtxt;
 use syntax::ast;
 use syntax::ptr::P;
 use syntax::symbol::Symbol;
-use syntax::codemap::{Span, Spanned};
+use syntax::source_map::{Span, Spanned};
 
 pub type Ident = Spanned<ast::Ident>;
 

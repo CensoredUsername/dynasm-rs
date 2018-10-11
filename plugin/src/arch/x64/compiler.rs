@@ -2,7 +2,7 @@ use syntax::ext::base::ExtCtxt;
 use syntax::ext::build::AstBuilder;
 use syntax::ast;
 use syntax::ptr::P;
-use syntax::codemap::Span;
+use syntax::source_map::Span;
 
 use serialize::{self, Stmt, Size, Ident};
 use super::{Context, X86Mode};

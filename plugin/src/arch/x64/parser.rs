@@ -5,7 +5,7 @@ use syntax::parse::token;
 use syntax::parse::PResult;
 use syntax::ast;
 use syntax::ptr::P;
-use syntax::codemap::{Spanned};
+use syntax::source_map::{Spanned};
 
 
 use super::{Context, X86Mode};

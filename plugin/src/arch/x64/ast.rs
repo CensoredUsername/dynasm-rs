@@ -1,6 +1,6 @@
 use syntax::ast;
 use syntax::ptr::P;
-use syntax::codemap::Span;
+use syntax::source_map::Span;
 
 use serialize::{Size, Ident};
 

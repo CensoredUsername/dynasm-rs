@@ -95,3 +95,4 @@ dynasm-rs versions.
 
 - `v0.2.0`: `rustc 1.27.0-nightly (ac3c2288f 2018-04-18)`
 - `v0.2.1`: `rustc 1.28.0-nightly (a1d4a9503 2018-05-20)`
+- `v0.2.3`: `rustc 1.31.0-nightly (96cafc53c 2018-10-09)`
