@@ -73,7 +73,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ops</span> <span class="op">=</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ops</span> <span class="op">=</span> <span class="ident">dynasmrt</span>::<span class="ident">x64</span>::<span class="ident">Assembler</span>::<span class="ident">new</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="string">&quot;Hello World!&quot;</span>;
 
     <span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">ops</span>
