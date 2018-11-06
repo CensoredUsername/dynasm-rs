@@ -1,8 +1,8 @@
-#![feature(plugin)]
-#![plugin(dynasm)]
-
+#![feature(proc_macro_hygiene)]
 extern crate dynasmrt;
+extern crate dynasm;
 
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
@@ -40,4 +40,9 @@ pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
     io::stdout()
         .write_all(unsafe { slice::from_raw_parts(buffer, length as usize) })
         .is_ok()
+}
+#[test]
+fn ex_hello_world()
+{
+    main();
 }

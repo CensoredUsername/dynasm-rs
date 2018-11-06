@@ -1,144 +1,151 @@
-#![feature(plugin_registrar, rustc_private)]
-#![feature(const_fn)]
+#![feature(proc_macro_diagnostic)]
 
-extern crate syntax;
-extern crate rustc_plugin;
-#[macro_use]
+// token/ast manipulation
+extern crate proc_macro;
+extern crate proc_macro2;
+extern crate syn;
+extern crate quote;
+
+// utility
 extern crate lazy_static;
-#[macro_use]
 extern crate bitflags;
 extern crate owning_ref;
 extern crate byteorder;
-extern crate smallvec;
 
-use rustc_plugin::registry::Registry;
-use syntax::edition::DEFAULT_EDITION;
-use syntax::ext::base::{SyntaxExtension, ExtCtxt, MacResult, DummyResult};
-use syntax::ext::build::AstBuilder;
-use syntax::source_map::{Span, Spanned};
-use syntax::ast;
-use syntax::parse::parser::Parser;
-use syntax::parse::PResult;
-use syntax::symbol::Symbol;
-use syntax::parse::token;
-use syntax::tokenstream::TokenTree;
-use syntax::ptr::P;
+use syn::parse;
+use syn::{Token, parse_macro_input};
+use proc_macro2::{Span, TokenTree};
 
-use smallvec::SmallVec;
+use lazy_static::lazy_static;
+use owning_ref::{OwningRef, RwLockReadGuardRef};
 
 use std::sync::{RwLock, RwLockReadGuard, Mutex};
 use std::collections::HashMap;
 
-use owning_ref::{OwningRef, RwLockReadGuardRef};
-
-pub mod arch;
+/// Module with architecture-specific assembler implementations
+mod arch;
+/// Module contaning the implementation of directives
 mod directive;
+/// Module containing utility functions for creating TokenTrees from assembler / directive output
 mod serialize;
 
+/// The whole point
+#[proc_macro]
+pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    // try parsing the tokenstream into a dynasm struct containing
+    // an abstract representation of the statements to create
+    let dynasm = parse_macro_input!(tokens as Dynasm);
 
-/// Welcome to the documentation of the dynasm plugin. This mostly exists to ease
-/// development and to show a glimpse of what is under the hood of dynasm. Please
-/// be aware that nothing in here should be counted on to be stable, the only
-/// guarantees are in the syntax the `dynasm!` macro parses and in the code it
-/// generates.
-#[plugin_registrar]
-pub fn registrar(reg: &mut Registry) {
-    reg.register_syntax_extension(Symbol::intern("dynasm"),
-                                  SyntaxExtension::NormalTT {
-                                      expander: Box::new(dynasm),
-                                      def_info: None,
-                                      unstable_feature: None,
-                                      allow_internal_unstable: false,
-                                      allow_internal_unsafe: false,
-                                      edition: DEFAULT_EDITION,
-                                      local_inner_macros: false,
-                                  });
-
-    #[cfg(feature = "dynasm_opmap")]
-    reg.register_syntax_extension(Symbol::intern("dynasm_opmap"),
-                                  SyntaxExtension::NormalTT {
-                                      expander: Box::new(dynasm_opmap),
-                                      def_info: None,
-                                      unstable_feature: None,
-                                      allow_internal_unstable: false,
-                                      allow_internal_unsafe: false,
-                                      edition: DEFAULT_EDITION,
-                                      local_inner_macros: false,
-                                  });
+    // serialize the resulting output into tokens
+    let res = serialize::serialize(&dynasm.target, dynasm.stmts).into();
+    res
 }
 
-/// dynasm! macro expansion result type
-struct DynAsm<'cx, 'a: 'cx> {
-    ecx: &'cx ExtCtxt<'a>,
-    stmts: Vec<ast::Stmt>,
+/// output from parsing a full dynasm invocation. target represents the first dynasm argument, being the assembler
+/// variable being used. stmts contains an abstract representation of the statements to be generated from this dynasm
+/// invocation.
+struct Dynasm {
+    target: TokenTree,
+    stmts: Vec<serialize::Stmt>
 }
 
-impl<'cx, 'a> MacResult for DynAsm<'cx, 'a> {
-    fn make_expr(self: Box<Self>) -> Option<P<ast::Expr>> {
-        Some(self.ecx.expr_block(self.ecx.block(self.ecx.call_site(), self.stmts)))
-    }
+/// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
+/// when an assembly instruction is encountered. When parsing fails an Err() is returned, when
+/// non-parsing errors happen err() will be called, but this function returns Ok().
+impl parse::Parse for Dynasm {
+    fn parse(input: parse::ParseStream) -> parse::Result<Self> {
 
-    fn make_stmts(self: Box<Self>) -> Option<SmallVec<[ast::Stmt; 1]>> {
-        Some(SmallVec::from_vec(self.stmts))
-    }
+        // parse the assembler target declaration
+        let target: syn::Expr = input.parse()?;
+        // and just convert it back to a tokentree since that's how we'll always be using it.
+        let target = serialize::delimited(target);
 
-    fn make_items(self: Box<Self>) -> Option<SmallVec<[P<ast::Item>; 1]>> {
-        if self.stmts.is_empty() {
-            Some(SmallVec::new())
-        } else {
-            None
+        // get crate-local data (alias definitions, current architecture) based on ???
+        // FIXME: find a way to get the crate name? or maybe the file name at the expansion site?
+        let crate_data = crate_local_data();
+        let mut crate_data = crate_data.lock().unwrap();
+
+        // prepare the statement buffer
+        let mut stmts = Vec::new();
+
+        // if we're not at the end of the macro, we should be expecting a semicolon and a new directive/statement/label/op
+        while !input.is_empty() {
+            let _: Token![;] = input.parse()?;
+
+            // ;; stmt
+            if input.peek(Token![;]) {
+                let _: Token![;] = input.parse()?;
+
+                let stmt: syn::Expr = input.parse()?; // FIXME statement used to be optional
+
+                stmts.push(serialize::Stmt::Stmt(serialize::delimited(stmt)));
+                continue;
+            }
+
+            // ; . directive
+            if input.peek(Token![.]) {
+                let _: Token![.] = input.parse()?;
+
+                crate_data.evaluate_directive(&mut stmts, input)?;
+                continue;
+            }
+
+            // ; -> label :
+            if input.peek(Token![->]) {
+                let _: Token![->] = input.parse()?;
+
+                let name: syn::Ident = input.parse()?;
+                let _: Token![:] = input.parse()?;
+
+                stmts.push(serialize::Stmt::GlobalLabel(name));
+                continue;
+            }
+
+            // ; => expr
+            if input.peek(Token![=>]) {
+                let _: Token![=>] = input.parse()?;
+
+                let expr: syn::Expr = input.parse()?;
+
+                stmts.push(serialize::Stmt::DynamicLabel(serialize::delimited(expr)));
+                continue;
+            }
+
+            // ; label :
+            if input.peek(syn::Ident) && input.peek2(Token![:]) {
+
+                let name: syn::Ident = input.parse()?;
+                let _: Token![:] = input.parse()?;
+
+                stmts.push(serialize::Stmt::LocalLabel(name));
+                continue;
+            }
+
+            // anything else is an assembly instruction which should be in current_arch
+            let mut state = State {
+                stmts: &mut stmts,
+                target: &target,
+                crate_data: &*crate_data,
+            };
+            crate_data.current_arch.compile_instruction(&mut state, input)?;
+
         }
+
+        Ok(Dynasm {
+            target,
+            stmts
+        })
     }
 }
 
-/// The guts of the dynasm! macro start here.
-fn dynasm<'cx>(ecx: &'cx mut ExtCtxt,
-               span: Span,
-               token_tree: &[TokenTree])
-               -> Box<MacResult + 'cx> {
-    // expand all macros in our token tree first. This enables the use of rust macros
-    // within dynasm (whenever this actually gets implemented within rustc)
-    let mut parser = ecx.new_parser_from_tts(token_tree);
-
-    // due to the structure of directives / assembly, we have to evaluate while parsing as
-    // things like aliases, arch choices, affect the way in which parsing works.
-
-    match compile(ecx, &mut parser) {
-        Ok(stmts) => {
-            Box::new(DynAsm {
-                         ecx: ecx,
-                         stmts: stmts,
-                     })
-        }
-        Err(mut e) => {
-            e.emit();
-            DummyResult::any(span)
-        }
-    }
-}
-
-// this is a macro internal to dynasm's documentation
+/// This is only compiled when the dynasm_opmap feature is used. It exports the internal assembly listings
+/// into a string that can then be included into the documentation for dynasm.
 #[cfg(feature = "dynasm_opmap")]
-struct DynAsmDoc<'cx, 'a: 'cx> {
-    ecx: &'cx ExtCtxt<'a>,
-    data: String,
-}
+#[proc_macro]
+pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
-#[cfg(feature = "dynasm_opmap")]
-impl<'cx, 'a> MacResult for DynAsmDoc<'cx, 'a> {
-    fn make_expr(self: Box<Self>) -> Option<P<ast::Expr>> {
-        Some(self.ecx.expr_str(self.ecx.call_site(), Symbol::intern(&self.data)))
-    }
-}
-
-#[cfg(feature = "dynasm_opmap")]
-fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt,
-                     span: Span,
-                     token_tree: &[TokenTree])
-                     -> Box<MacResult + 'cx> {
-    if token_tree.len() > 0 {
-        ecx.span_err(span, "dynasm_opmap does not take any arguments");
-    }
+    // parse to ensure that no macro arguments were provided
+    let _ = parse_macro_input!(tokens as DynasmOpmap);
 
     let mut s = String::new();
     s.push_str("% Instruction Reference\n\n");
@@ -166,95 +173,37 @@ fn dynasm_opmap<'cx>(ecx: &'cx mut ExtCtxt,
         s.push_str("\n```\n");
     }
 
-    Box::new(DynAsmDoc {
-                 ecx: ecx,
-                 data: s,
-             })
+    let token = quote::quote! {
+        #s
+    };
+    token.into()
+}
+
+/// As dynasm_opmap takes no args it doesn't parse to anything
+struct DynasmOpmap {
+
+}
+
+/// As dynasm_opmap takes no args it doesn't parse to anything.
+/// This just exists so syn will give an error when no args are present.
+impl parse::Parse for DynasmOpmap {
+    fn parse(_input: parse::ParseStream) -> parse::Result<Self> {
+        Ok(DynasmOpmap {})
+    }
 }
 
 /// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
-pub struct State<'a> {
+struct State<'a> {
     pub stmts: &'a mut Vec<serialize::Stmt>,
-    pub target: &'a P<ast::Expr>,
+    pub target: &'a TokenTree,
     pub crate_data: &'a DynasmData,
-}
-
-/// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
-/// when an assembly instruction is encountered. When parsing fails an Err() is returned, when
-/// non-parsing errors happen a local error message is generated but the function returns Ok().
-fn compile<'a>(ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, Vec<ast::Stmt>> {
-    let target = parser.parse_expr()?;
-
-    let crate_data = crate_local_data(ecx);
-    let mut crate_data = crate_data.lock().unwrap();
-
-    let mut stmts = Vec::new();
-
-    while !parser.look_ahead(0, |x| x == &token::Eof) {
-        parser.expect(&token::Semi)?;
-
-        // ;; stmt
-        if parser.eat(&token::Semi) {
-            if let Some(stmt) = parser.parse_stmt()? {
-                stmts.push(serialize::Stmt::Stmt(stmt));
-            }
-            continue;
-        }
-
-        // ; . directive
-        if parser.eat(&token::Dot) {
-            crate_data.evaluate_directive(&mut stmts, ecx, parser)?;
-            continue;
-        }
-
-        // ; -> label :
-        if parser.eat(&token::RArrow) {
-            let span = parser.span;
-            let name = parser.parse_ident()?;
-            parser.expect(&token::Colon)?;
-            stmts.push(serialize::Stmt::GlobalLabel(Spanned {
-                                                        span: span,
-                                                        node: name,
-                                                    }));
-            continue;
-        }
-
-        // ; => expr
-        if parser.eat(&token::FatArrow) {
-            let expr = parser.parse_expr()?;
-            stmts.push(serialize::Stmt::DynamicLabel(expr));
-            continue;
-        }
-
-        // ; label :
-        if parser.token.is_ident() && parser.look_ahead(1, |t| t == &token::Colon) {
-            let span = parser.span;
-            let name = parser.parse_ident()?;
-            parser.expect(&token::Colon)?;
-            stmts.push(serialize::Stmt::LocalLabel(Spanned {
-                                                       span: span,
-                                                       node: name,
-                                                   }));
-            continue;
-        }
-
-        // anything else is an assembly instruction which should be in current_arch
-        let mut state = State {
-            stmts: &mut stmts,
-            target: &target,
-            crate_data: &*crate_data,
-        };
-        crate_data.current_arch.compile_instruction(&mut state, ecx, parser)?;
-    }
-
-    Ok(serialize::serialize(ecx, target, stmts))
 }
 
 // Crate local data implementation.
 
 type DynasmStorage = HashMap<String, Mutex<DynasmData>>;
 
-pub struct DynasmData {
+struct DynasmData {
     pub current_arch: Box<arch::Arch>,
     pub aliases: HashMap<String, String>,
 }
@@ -269,10 +218,10 @@ impl DynasmData {
     }
 }
 
-pub type CrateLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
+type CrateLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
 
-pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
-    let id = &ecx.ecfg.crate_name;
+fn crate_local_data() -> CrateLocalData {
+    let id = &"FIXME".to_string(); // FIXME: do we have any way of getting the crate name? or maybe the source file name
 
     {
         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
@@ -293,4 +242,12 @@ pub fn crate_local_data(ecx: &ExtCtxt) -> CrateLocalData {
 
 lazy_static! {
     static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
+}
+
+
+// temporary till Diagnostic gets stabilized
+fn err(span: Span, msg: String) { // FIXME
+    let span: proc_macro::Span = span.unstable();
+    let diag = proc_macro::Diagnostic::spanned(span, proc_macro::Level::Error, msg);
+    diag.emit();
 }

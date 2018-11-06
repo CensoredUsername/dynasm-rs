@@ -3,6 +3,9 @@ use std::collections::{HashMap, hash_map};
 use super::compiler::Opdata;
 use std::fmt::{self, Display};
 
+use lazy_static::lazy_static;
+use bitflags::bitflags;
+
 macro_rules! constify {
     ($t:ty, $e:expr) => { {const C: &'static $t = &$e; C} }
 }
@@ -34,7 +37,7 @@ macro_rules! Ops {
 }
 
 pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
-    OPMAP.get(&name).map(|x| *x)
+    OPMAP.get(&name).cloned()
 }
 
 bitflags! {
@@ -74,9 +77,7 @@ bitflags! {
 
 impl Flags {
     const fn make(bits: u32) -> Flags {
-        Flags {
-            bits: bits
-        }
+        Flags { bits }
     }
 }
 
@@ -113,9 +114,7 @@ bitflags! {
 
 impl Features {
     const fn make(bits: u32) -> Features {
-        Features {
-            bits: bits
-        }
+        Features { bits }
     }
 
     pub fn from_str(name: &str) -> Option<Features> {
@@ -188,8 +187,7 @@ impl Display for Features {
     }
 }
 
-
-
+#[allow(dead_code)]
 pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> {
     OPMAP.keys()
 }

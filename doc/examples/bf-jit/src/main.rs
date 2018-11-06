@@ -1,7 +1,8 @@
-#![feature(plugin)]
-#![plugin(dynasm)]
-
+#![feature(proc_macro_hygiene)]
 extern crate dynasmrt;
+extern crate dynasm;
+
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 extern crate itertools;
@@ -261,4 +262,9 @@ fn main() {
         println!("{}", e);
         return;
     }
+}
+#[test]
+fn ex_bf_jit()
+{
+    main();
 }

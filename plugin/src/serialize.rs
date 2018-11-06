@@ -1,17 +1,12 @@
-use std::rc::Rc;
+use syn;
+use syn::parse;
+use syn::spanned::Spanned;
+use proc_macro2::{Span, TokenStream, TokenTree};
+use quote::{quote, quote_spanned, ToTokens};
 
 use byteorder::{ByteOrder, LittleEndian};
 
-use syntax::ThinVec;
-use syntax::ext::build::AstBuilder;
-use syntax::ext::base::ExtCtxt;
-use syntax::ast;
-use syntax::ptr::P;
-use syntax::symbol::Symbol;
-use syntax::source_map::{Span, Spanned};
-
-pub type Ident = Spanned<ast::Ident>;
-
+/// Enum representing the result size of a value/expression/register/etc in bytes.
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 pub enum Size {
     BYTE  = 1,
@@ -25,12 +20,12 @@ pub enum Size {
 }
 
 impl Size {
-    pub fn in_bytes(&self) -> u8 {
-        *self as u8
+    pub fn in_bytes(self) -> u8 {
+        self as u8
     }
 
-    pub fn as_literal(&self) -> ast::Ident {
-        ast::Ident::from_str(match *self {
+    pub fn as_literal(self) -> syn::Ident {
+        syn::Ident::new(match self {
             Size::BYTE  => "i8",
             Size::WORD  => "i16",
             Size::DWORD => "i32",
@@ -39,54 +34,57 @@ impl Size {
             Size::PWORD => "i80",
             Size::OWORD => "i128",
             Size::HWORD => "i256"
-        })
+        }, Span::call_site())
     }
 }
 
+/// An abstract representation of a dynasm runtime statement to be emitted
 #[derive(Debug, Clone)]
 pub enum Stmt {
     // simply push data into the instruction stream. unsigned
     Const(u64, Size),
     // push data that is stored inside of an expression. unsigned
-    ExprUnsigned(P<ast::Expr>, Size),
+    ExprUnsigned(TokenTree, Size),
     // push signed data into the instruction stream. signed
-    ExprSigned(P<ast::Expr>, Size),
+    ExprSigned(TokenTree, Size),
 
     // extend the instruction stream with unsigned bytes
     Extend(Vec<u8>),
     // extend the instruction stream with unsigned bytes
-    ExprExtend(P<ast::Expr>),
+    ExprExtend(TokenTree),
     // align the instruction stream to some alignment
-    Align(P<ast::Expr>),
+    Align(TokenTree),
 
     // label declarations
-    GlobalLabel(Ident),
-    LocalLabel(Ident),
-    DynamicLabel(P<ast::Expr>),
+    GlobalLabel(syn::Ident),
+    LocalLabel(syn::Ident),
+    DynamicLabel(TokenTree),
 
     // and their respective relocations (as expressions as they differ per assembler)
-    GlobalJumpTarget(Ident,         P<ast::Expr>),
-    ForwardJumpTarget(Ident,        P<ast::Expr>),
-    BackwardJumpTarget(Ident,       P<ast::Expr>),
-    DynamicJumpTarget(P<ast::Expr>, P<ast::Expr>),
-    BareJumpTarget(   P<ast::Expr>, P<ast::Expr>),
+    GlobalJumpTarget(  syn::Ident,    TokenTree),
+    ForwardJumpTarget( syn::Ident,    TokenTree),
+    BackwardJumpTarget(syn::Ident,    TokenTree),
+    DynamicJumpTarget(TokenTree, TokenTree),
+    BareJumpTarget(   TokenTree, TokenTree),
 
     // a random statement that has to be inserted between assembly hunks
-    Stmt(ast::Stmt)
+    Stmt(TokenTree)
 }
 
 // convenience methods
 impl Stmt {
+    #![allow(dead_code)]
+
     pub fn u8(value: u8) -> Stmt {
-        Stmt::Const(value as u64, Size::BYTE)
+        Stmt::Const(u64::from(value), Size::BYTE)
     }
 
     pub fn u16(value: u16) -> Stmt {
-        Stmt::Const(value as u64, Size::WORD)
+        Stmt::Const(u64::from(value), Size::WORD)
     }
 
     pub fn u32(value: u32) -> Stmt {
-        Stmt::Const(value as u64, Size::DWORD)
+        Stmt::Const(u64::from(value), Size::DWORD)
     }
 
     pub fn u64(value: u64) -> Stmt {
@@ -94,7 +92,8 @@ impl Stmt {
     }
 }
 
-pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec<ast::Stmt> {
+/// Converts a sequence of abstract Statements to actual tokens
+pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
     // first, try to fold constants into a byte stream
     let mut folded_stmts = Vec::new();
     let mut const_buffer = Vec::new();
@@ -144,7 +143,7 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
     }
 
     // and now do the final output pass in one go
-    let mut output = Vec::new();
+    let mut output = TokenStream::new();
 
     for stmt in folded_stmts {
         let (method, args) = match stmt {
@@ -159,202 +158,163 @@ pub fn serialize(ecx: &mut ExtCtxt, name: P<ast::Expr>, stmts: Vec<Stmt>) -> Vec
             Stmt::ExprSigned(  expr, Size::DWORD) => ("push_i32", vec![expr]),
             Stmt::ExprSigned(  expr, Size::QWORD) => ("push_i64", vec![expr]),
             Stmt::ExprSigned(_, _) => unimplemented!(),
-            Stmt::Extend(data)     => ("extend", vec![ecx.expr_lit(ecx.call_site(), ast::LitKind::ByteStr(Rc::new(data)))]),
+            Stmt::Extend(data)     => ("extend", vec![proc_macro2::Literal::byte_string(&data).into()]),
             Stmt::ExprExtend(expr) => ("extend", vec![expr]),
             Stmt::Align(expr)      => ("align", vec![expr]),
-            Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(ecx, n)]),
-            Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(ecx, n)]),
+            Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(&n)]),
+            Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(&n)]),
             Stmt::DynamicLabel(expr) => ("dynamic_label", vec![expr]),
-            Stmt::GlobalJumpTarget(n,     reloc) => ("global_reloc"  , vec![expr_string_from_ident(ecx, n), reloc]),
-            Stmt::ForwardJumpTarget(n,    reloc) => ("forward_reloc" , vec![expr_string_from_ident(ecx, n), reloc]),
-            Stmt::BackwardJumpTarget(n,   reloc) => ("backward_reloc", vec![expr_string_from_ident(ecx, n), reloc]),
+            Stmt::GlobalJumpTarget(n,     reloc) => ("global_reloc"  , vec![expr_string_from_ident(&n), reloc]),
+            Stmt::ForwardJumpTarget(n,    reloc) => ("forward_reloc" , vec![expr_string_from_ident(&n), reloc]),
+            Stmt::BackwardJumpTarget(n,   reloc) => ("backward_reloc", vec![expr_string_from_ident(&n), reloc]),
             Stmt::DynamicJumpTarget(expr, reloc) => ("dynamic_reloc" , vec![expr, reloc]),
             Stmt::BareJumpTarget(expr, reloc)    => ("bare_reloc"    , vec![expr, reloc]),
             Stmt::Stmt(s) => {
-                output.push(s);
+                output.extend(quote! {
+                    #s ;
+                });
                 continue;
             }
 
         };
 
         // and construct the appropriate method call
-        let op = name.clone();
-        let method = ast::Ident::from_str(method);
-        let expr = ecx.expr_method_call(ecx.call_site(), op, method, args);
-        output.push(ecx.stmt_semi(expr));
+        let method = syn::Ident::new(method, Span::call_site());
+        output.extend(quote! {
+            #name . #method ( #( #args ),* ) ;
+        })
     }
 
-    output
+    // if we have nothing to emit, expand to nothing. Else, wrap it into a block.
+    if output.is_empty() {
+        output
+    } else {
+        quote!{
+            {
+                #output
+            }
+        }
+    }
 }
 
-// below here are all kinds of utility functions to quickly generate ast constructs
-// this collection is very arbitrary, purely what's needed in codegen, trying to keep
-// most expression building logic in this file.
+// below here are all kinds of utility functions to quickly generate TokenTree constructs
+// this collection is arbitrary and purely based on what special things are needed for assembler
+// codegen implementations
+
+// Makes a None-delimited TokenTree item out of anything that can be converted to tokens.
+// This is a useful shortcut to escape issues around not-properly delimited tokenstreams
+// because it is guaranteed to be parsed back properly to its source ast at type-level.
+pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
+    let span = expr.span();
+    let mut group = proc_macro2::Group::new(
+        proc_macro2::Delimiter::None, expr.into_token_stream()
+    );
+    group.set_span(span);
+    proc_macro2::TokenTree::Group(group)
+}
 
 // expression of value 0. sometimes needed.
-pub fn expr_zero(ecx: &ExtCtxt) -> P<ast::Expr> {
-    ecx.expr_lit(ecx.call_site(), ast::LitKind::Int(0u128, ast::LitIntType::Unsuffixed))
+pub fn expr_zero() -> TokenTree {
+    proc_macro2::Literal::u8_unsuffixed(0).into()
 }
 
 // given an ident, makes it into a "string"
-pub fn expr_string_from_ident(ecx: &ExtCtxt, i: Ident) -> P<ast::Expr> {
-    ecx.expr_lit(i.span, ast::LitKind::Str(i.node.name, ast::StrStyle::Cooked))
+pub fn expr_string_from_ident(i: &syn::Ident) -> TokenTree {
+    let name = i.to_string();
+    proc_macro2::Literal::string(&name).into()
 }
 
-// 
-pub fn expr_dynscale(ecx: &ExtCtxt, name: &P<ast::Expr>, scale: P<ast::Expr>, rest: P<ast::Expr>) -> (ast::Stmt, P<ast::Expr>) {
-    let temp = ast::Ident::from_str("temp");
-    (
-        ecx.stmt_let(ecx.call_site(), false, temp, expr_encode_x64_sib_scale(ecx, &name, scale)),
-        expr_mask_shift_or(ecx, rest, ecx.expr_ident(ecx.call_site(), temp), 3, 6)
-    )
-}
-
-// makes (a, b)
-pub fn expr_tuple_of_u8s(ecx: &ExtCtxt, span: Span, data: &[u8]) -> P<ast::Expr> {
-    ecx.expr_tuple(
-        span,
-        data.iter().map(|&a| ecx.expr_u8(span, a)).collect()
-    )
-}
-
-// makes sum(exprs)
-pub fn expr_add_many<T: Iterator<Item=P<ast::Expr>>>(ecx: &ExtCtxt, span: Span, mut exprs: T) -> Option<P<ast::Expr>> {
-    exprs.next().map(|mut accum| {
-        for next in exprs {
-            accum = ecx.expr_binary(span, ast::BinOpKind::Add, accum, next);
-        }
-        accum
+// given an expression, turns it into a negate expression
+pub fn inverted(expr: &TokenTree) -> TokenTree {
+    delimited(quote! {
+        ! #expr
     })
 }
 
+// 
+pub fn expr_dynscale(name: &TokenTree, scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
+    let tempval = expr_encode_x64_sib_scale(name, &scale);
+    (delimited(quote! {
+        let temp = #tempval
+    }), delimited(quote! {
+         #rest | ((temp & 3) << 6)
+    }))
+}
+
+// makes (a, b)
+pub fn expr_tuple_of_u8s(span: Span, data: &[u8]) -> TokenTree {
+    delimited(quote_spanned! {span=>
+        (#(#data),*)
+    })
+}
+
+// makes sum(exprs)
+pub fn expr_add_many<T: Iterator<Item=TokenTree>>(span: Span, mut exprs: T) -> Option<TokenTree> {
+    let first_expr = exprs.next()?;
+
+    let tokens = quote_spanned!{ span=>
+        #first_expr #( + #exprs )*
+    };
+
+    Some(delimited(tokens))
+}
+
 // makes (size_of<ty>() * value)
-pub fn expr_size_of_scale(ecx: &ExtCtxt, ty: ast::Path, value: P<ast::Expr>, size: Size) -> P<ast::Expr> {
-    let span = value.span;
-    ecx.expr_binary(span,
-        ast::BinOpKind::Mul,
-        ecx.expr_cast(span,
-            expr_size_of(ecx, ty),
-            ecx.ty_ident(span, size.as_literal())
-        ),
-        value
-    )
+pub fn expr_size_of_scale(ty: &syn::Path, value: &TokenTree, size: Size) -> TokenTree {
+    let span = value.span();
+    let size = size.as_literal();
+
+    delimited(quote_spanned! { span=>
+        (::std::mem::size_of::<#ty>() as #size) * #value
+    })
 }
 
 /// returns orig | ((expr & mask) << shift)
-pub fn expr_mask_shift_or(ecx: &ExtCtxt, orig: P<ast::Expr>, mut expr: P<ast::Expr>, mask: u64, shift: i8) -> P<ast::Expr> {
-    let span = expr.span;
+pub fn expr_mask_shift_or(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: i8) -> TokenTree {
+    let span = expr.span();
 
-    expr = ecx.expr_binary(span, ast::BinOpKind::BitAnd, expr, ecx.expr_lit(
-        span, ast::LitKind::Int(mask as u128, ast::LitIntType::Unsuffixed)
-    ));
+    let mask: TokenTree = proc_macro2::Literal::u64_unsuffixed(mask).into();
 
-    if shift < 0 {
-        expr = ecx.expr_binary(span, ast::BinOpKind::Shr, expr, ecx.expr_lit(
-            span, ast::LitKind::Int((-shift) as u128, ast::LitIntType::Unsuffixed)
-        ));
-    } else if shift > 0 {
-        expr = ecx.expr_binary(span, ast::BinOpKind::Shl, expr, ecx.expr_lit(
-            span, ast::LitKind::Int(shift as u128, ast::LitIntType::Unsuffixed)
-        ));
-    }
-
-    ecx.expr_binary(span, ast::BinOpKind::BitOr, orig, expr)
+    delimited(if shift >= 0 {
+        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(shift).into();
+        quote_spanned! { span=>
+            #orig | ((#expr & #mask) << #shift)
+        }
+    } else {
+        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(-shift).into();
+        quote_spanned! { span=>
+            #orig | ((#expr & #mask) << #shift)
+        }
+    })
 }
 
 /// returns (offset_of!(path, attr) as size)
-pub fn expr_offset_of(ecx: &ExtCtxt, path: ast::Path, attr: ast::Ident, size: Size) -> P<ast::Expr> {
+pub fn expr_offset_of(path: &syn::Path, attr: &syn::Ident, size: Size) -> TokenTree {
     // generate a P<Expr> that resolves into the offset of an attribute to a type.
     // this is somewhat ridiculously complex because we can't expand macros here
 
-    let span = path.span;
+    let span = path.span();
+    let size = size.as_literal();
 
-    let structpat = ecx.pat_struct(span, path.clone(), vec![
-        Spanned {span: span, node: ast::FieldPat {
-            attrs: ThinVec::new(),
-            ident: attr,
-            pat: ecx.pat_wild(span),
-            is_shorthand: false
-        }},
-    ]).map(|mut pat| {
-        if let ast::PatKind::Struct(_, _, ref mut dotdot) = pat.node {
-            *dotdot = true;
+    delimited(quote_spanned! { span=>
+        unsafe {
+            let #path {#attr: _, ..};
+            let temp: #path = ::std::mem::uninitialized();
+            let rv = &temp.#attr as *const _ as usize - &temp as *const _ as usize;
+            ::std::mem::forget(temp);
+            rv as #size
         }
-        pat
-    });
-
-    // there's no default constructor function for let pattern;
-    let validation_stmt = ast::Stmt {
-        id: ast::DUMMY_NODE_ID,
-        span: span,
-        node: ast::StmtKind::Local(P(ast::Local {
-            pat: structpat,
-            ty: None,
-            init: None,
-            id: ast::DUMMY_NODE_ID,
-            span: span,
-            attrs: ThinVec::new()
-        }))
-    };
-
-    let temp     = ast::Ident::from_str("temp");
-    let rv       = ast::Ident::from_str("rv");
-    let usize_id = ast::Ident::from_str("usize");
-    let uninitialized = ["std", "mem", "uninitialized"].iter().cloned().map(ast::Ident::from_str).collect();
-    let forget        = ["std", "mem", "forget"       ].iter().cloned().map(ast::Ident::from_str).collect();
-
-    // unsafe {
-    let block = ecx.block(span, vec![
-        // let path { attr: _, ..};
-        validation_stmt,
-        // let temp: path = ::std::mem::uninitialized();
-        ecx.stmt_let_typed(span, false, temp, ecx.ty_path(path),
-            ecx.expr_call_global(span, uninitialized, Vec::new())
-        ),
-        // let rv = &temp.attr as *const _ as usize - &temp as *const _ as usize;
-        ecx.stmt_let(span,
-            false,
-            rv,
-            ecx.expr_binary(span, ast::BinOpKind::Sub,
-                ecx.expr_cast(span,
-                    ecx.expr_cast(span,
-                        ecx.expr_addr_of(span,
-                            ecx.expr_field_access(span,
-                                ecx.expr_ident(span, temp),
-                                attr
-                            )
-                        ), ecx.ty_ptr(span, ecx.ty_infer(span), ast::Mutability::Immutable)
-                    ), ecx.ty_ident(span, usize_id)
-                ),
-                ecx.expr_cast(span,
-                    ecx.expr_cast(span,
-                        ecx.expr_addr_of(span, ecx.expr_ident(span, temp)),
-                        ecx.ty_ptr(span, ecx.ty_infer(span), ast::Mutability::Immutable)
-                    ), ecx.ty_ident(span, usize_id)
-                )
-            )
-        ),
-        // ::std::mem::forget(temp);
-        ecx.stmt_semi(ecx.expr_call_global(span, forget, vec![ecx.expr_ident(span, temp)])),
-        // rv as i32
-        ecx.stmt_expr(ecx.expr_cast(span, ecx.expr_ident(span, rv), ecx.ty_ident(span, size.as_literal())))
-    ]).map(|mut b| {
-        b.rules = ast::BlockCheckMode::Unsafe(ast::UnsafeSource::CompilerGenerated);
-        b
-    });
-
-    ecx.expr_block(block)
+    })
 }
 
 // returns std::mem::size_of<path>()
-pub fn expr_size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
+pub fn expr_size_of(path: &syn::Path) -> TokenTree {
     // generate a P<Expr> that returns the size of type at path
-    let span = path.span;
+    let span = path.span();
 
-    let ty = ecx.ty_path(path);
-    let idents = ["std", "mem", "size_of"].iter().cloned().map(ast::Ident::from_str).collect();
-    let size_of = ecx.path_all(span, true, idents, vec![ast::GenericArg::Type(ty)], Vec::new());
-    ecx.expr_call(span, ecx.expr_path(size_of), Vec::new())
+    delimited(quote_spanned! { span=>
+        ::std::mem::size_of::<#path>()
+    })
 }
 
 // makes the following
@@ -365,20 +325,21 @@ pub fn expr_size_of(ecx: &ExtCtxt, path: ast::Path) -> P<ast::Expr> {
 //    1 => 0,
 //  _ => name.runtime_error("Type size not representable as scale")
 //}
-pub fn expr_encode_x64_sib_scale(ecx: &ExtCtxt, name: &P<ast::Expr>, size: P<ast::Expr>) -> P<ast::Expr> {
-    let span = size.span;
+pub fn expr_encode_x64_sib_scale(name: &TokenTree, size: &TokenTree) -> TokenTree {
+    let span = size.span();
 
-    ecx.expr_match(span, size, vec![
-        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 8))], ecx.expr_u8(span, 3)),
-        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 4))], ecx.expr_u8(span, 2)),
-        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 2))], ecx.expr_u8(span, 1)),
-        ecx.arm(span, vec![ecx.pat_lit(span, ecx.expr_usize(span, 1))], ecx.expr_u8(span, 0)),
-        ecx.arm(span, vec![ecx.pat_wild(span)], ecx.expr_method_call(span,
-            name.clone(),
-            ast::Ident::from_str("runtime_error"),
-            vec![ecx.expr_str(span,
-                Symbol::intern("Type size not representable as scale")
-            )]
-        ))
-    ])
+    delimited(quote_spanned! { span=>
+        match #size {
+            8 => 3,
+            4 => 2,
+            2 => 1,
+            1 => 0,
+            _ => #name.runtime_error("Type size not representable as scale")
+        }
+    })
+}
+
+// Reparses a tokentree into an expression
+pub fn reparse(tt: &TokenTree) -> parse::Result<syn::Expr> {
+    syn::parse2(tt.into_token_stream())
 }

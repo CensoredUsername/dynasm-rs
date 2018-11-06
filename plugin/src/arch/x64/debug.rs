@@ -108,7 +108,6 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
                    else if i < 8 { format!("e{}", REGS[i]).into() }
                    else          { format!("{}d", REGS[i]).into() },
                 b'q' => if i < 4 { format!("r{}x",REGS[i]).into() }
-                   else if i < 8 { format!("r{}", REGS[i]).into() }
                    else          { format!("r{}", REGS[i]).into() },
                 _ => panic!("invalid formatting data")
             }

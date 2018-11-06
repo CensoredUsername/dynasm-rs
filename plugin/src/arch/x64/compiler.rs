@@ -1,10 +1,9 @@
-use syntax::ext::base::ExtCtxt;
-use syntax::ext::build::AstBuilder;
-use syntax::ast;
-use syntax::ptr::P;
-use syntax::source_map::Span;
+use syn::spanned::Spanned;
+use proc_macro2::{Span, TokenTree};
+use quote::{quote_spanned};
 
-use serialize::{self, Stmt, Size, Ident};
+use ::err;
+use serialize::{self, Stmt, Size};
 use super::{Context, X86Mode};
 use super::ast::{RawArg, CleanArg, SizedArg, Instruction, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;
@@ -75,8 +74,8 @@ enum RelocationKind {
 }
 
 impl RelocationKind {
-    fn to_id(&self) -> u8 {
-        match *self {
+    fn to_id(self) -> u8 {
+        match self {
             RelocationKind::Relative => 0,
             RelocationKind::Absolute => 1,
             RelocationKind::Extern   => 2
@@ -88,16 +87,16 @@ impl RelocationKind {
  * Implementation
  */
 
-pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instruction, args: Vec<RawArg>) -> Result<(), Option<String>> {
+pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, args: Vec<RawArg>) -> Result<(), Option<String>> {
     let mut ops = instruction.idents;
     let op = ops.pop().unwrap();
     let prefixes = ops;
 
     // Fold RawArgs into CleanArgs
-    let mut args = args.into_iter().map(|a| clean_memoryref(ecx, a)).collect::<Result<Vec<CleanArg>, _>>()?;
+    let mut args = args.into_iter().map(clean_memoryref).collect::<Result<Vec<CleanArg>, _>>()?;
 
     // sanitize memory references, determine address size, and size immediates/displacements if possible
-    let addr_size = sanitize_indirects_and_sizes(&ctx, ecx, &mut args)?;
+    let addr_size = sanitize_indirects_and_sizes(&ctx, &mut args)?;
     let addr_size = addr_size.unwrap_or(match ctx.mode {
         X86Mode::Long => Size::QWORD,
         X86Mode::Protected => Size::DWORD
@@ -113,7 +112,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
     };
 
     // find a matching op
-    let data = match_op_format(ctx, ecx, op, &args)?;
+    let data = match_op_format(ctx, &op, &args)?;
 
     // determine if the features required for this op are fulfilled
     if !ctx.features.contains(data.features) {
@@ -124,7 +123,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
     }
 
     // determine legacy prefixes
-    let (mut pref_mod, pref_seg) = get_legacy_prefixes(ecx, data, prefixes)?;
+    let (mut pref_mod, pref_seg) = get_legacy_prefixes(data, prefixes)?;
 
     // fill in size info from the format string to create the final SizedArg vec
     let (op_size, args) = size_operands(data, args)?;
@@ -140,7 +139,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
 
         match ctx.mode {
             X86Mode::Protected => if op_size == Size::QWORD {
-                return Err(Some(format!("'{}': Does not support 64 bit operands in 32-bit mode", &*op.node.name.as_str())));
+                return Err(Some(format!("'{}': Does not support 64 bit operands in 32-bit mode", op.to_string())));
             },
             X86Mode::Long => ()
         }
@@ -150,14 +149,14 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
                 (Size::WORD, _) => pref_size = true,
                 (Size::QWORD, X86Mode::Long) => (),
                 (Size::DWORD, X86Mode::Protected) => (),
-                (Size::DWORD, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", &*op.node.name.as_str()))),
+                (Size::DWORD, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", op.to_string()))),
                 (_, _) => panic!("bad formatting data"),
             }
         } else if data.flags.contains(Flags::AUTO_REXW) {
             if op_size == Size::QWORD {
                 rex_w = true;
             } else if op_size != Size::DWORD {
-                return Err(Some(format!("'{}': Does not support 16-bit operands", &*op.node.name.as_str())));
+                return Err(Some(format!("'{}': Does not support 16-bit operands", op.to_string())));
             }
         } else if data.flags.contains(Flags::AUTO_VEXL) {
             if op_size == Size::HWORD {
@@ -165,14 +164,12 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
             } else if op_size != Size::OWORD {
                 panic!("bad formatting data");
             }
-        } else {
-            if op_size == Size::WORD {
-                pref_size = true;
-            } else if op_size == Size::QWORD {
-                rex_w = true;
-            } else if op_size != Size::DWORD {
-                panic!("bad formatting data");
-            }
+        } else if op_size == Size::WORD {
+            pref_size = true;
+        } else if op_size == Size::QWORD {
+            rex_w = true;
+        } else if op_size != Size::DWORD {
+            panic!("bad formatting data");
         }
     }
 
@@ -229,7 +226,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         // map_sel is stored in the first byte of the opcode
         let (&map_sel, tail) = ops.split_first().expect("bad formatting data");
         ops = tail;
-        compile_vex_xop(ctx.mode, ecx, buffer, data, &reg, &rm, map_sel, rex_w, &vvvv, vex_l, prefix);
+        compile_vex_xop(ctx.mode, buffer, data, &reg, &rm, map_sel, rex_w, &vvvv, vex_l, prefix);
     // otherwise, the size/mod prefixes have to be pushed and check if a rex prefix has to be generated.
     } else {
         if let Some(pref) = pref_mod {
@@ -242,9 +239,9 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
             // Certain SSE/AVX legacy encoded operations are not available in 32-bit mode
             // as they require a REX.W prefix to be encoded, which is impossible. We catch those cases here
             if ctx.mode == X86Mode::Protected {
-                return Err(Some(format!("'{}': Does not support 64 bit operand size in 32-bit mode", &*op.node.name.as_str())))
+                return Err(Some(format!("'{}': Does not support 64 bit operand size in 32-bit mode", op.to_string())))
             }
-            compile_rex(ecx, buffer, rex_w, &reg, &rm);
+            compile_rex(buffer, rex_w, &reg, &rm);
         }
     }
 
@@ -261,8 +258,8 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         };
 
         if let RegKind::Dynamic(_, expr) = rm_k {
-            let last = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(*last));
-            buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(ecx, last, expr, 7, 0), Size::BYTE));
+            let last: TokenTree = proc_macro2::Literal::u8_suffixed(*last).into();
+            buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(&last, &serialize::delimited(expr), 7, 0), Size::BYTE));
         } else {
             buffer.push(Stmt::u8(last + (rm_k.encode() & 7)));
         }
@@ -279,7 +276,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
             RegKind::from_number(data.reg)
         };
 
-        compile_modrm_sib(ecx, buffer, MOD_DIRECT, reg_k, rm.kind);
+        compile_modrm_sib(buffer, MOD_DIRECT, reg_k, rm.kind);
     // Indirect ModRM (+SIB) addressing
     } else if let Some(SizedArg::Indirect {disp_size, base, index, disp, ..}) = rm {
         let reg_k = if let Some(SizedArg::Direct {reg, ..}) = reg {
@@ -310,16 +307,16 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
             };
 
             // always need a SIB byte for VSIB addressing
-            compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+            compile_modrm_sib(buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
             if let Some(expr) = scale_expr {
-                compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale as u8, expr, index, base);
+                compile_sib_dynscale(buffer, &ctx.state.target, scale as u8, expr, index, base);
             } else {
-                compile_modrm_sib(ecx, buffer, encode_scale(scale).unwrap(), index, base);
+                compile_modrm_sib(buffer, encode_scale(scale).unwrap(), index, base);
             }
 
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(serialize::delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
             } else if mode == MOD_DISP8 {
                 // no displacement was asked for, but we have to encode one as there's a base
                 buffer.push(Stmt::u8(0));
@@ -339,21 +336,21 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
             };
 
             // only need a mod.r/m byte for 16-bit addressing
-            compile_modrm_sib(ecx, buffer, mode, reg_k, base_k);
+            compile_modrm_sib(buffer, mode, reg_k, base_k);
 
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::WORD}));
+                buffer.push(Stmt::ExprSigned(serialize::delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::WORD}));
             } else if mode == MOD_DISP8 {
                 buffer.push(Stmt::u8(0));
             }
 
         } else if mode_rip_relative {
             // encode the RIP + disp32 or disp32 form
-            compile_modrm_sib(ecx, buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
+            compile_modrm_sib(buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
 
             match ctx.mode {
                 X86Mode::Long => if let Some(disp) = disp {
-                    buffer.push(Stmt::ExprSigned(disp, Size::DWORD));
+                    buffer.push(Stmt::ExprSigned(serialize::delimited(disp), Size::DWORD));
                 } else {
                     buffer.push(Stmt::u32(0))
                 },
@@ -361,7 +358,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
                     // x86 doesn't actually allow RIP-relative addressing
                     // but we can work around it with relocations
                     buffer.push(Stmt::u32(0));
-                    let disp = disp.unwrap_or_else(|| serialize::expr_zero(ecx));
+                    let disp = disp.unwrap_or_else(|| serialize::reparse(&serialize::expr_zero()).expect("Invalid expression generated"));
                     relocations.push((JumpType::Bare(disp), 0, Size::DWORD, RelocationKind::Absolute));
                 },
             }
@@ -392,34 +389,34 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
                 };
 
                 // escape into the SIB byte
-                compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+                compile_modrm_sib(buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
                 if let Some(expr) = scale_expr {
-                    compile_sib_dynscale(ecx, buffer, &ctx.state.target, scale as u8, expr, index.kind, base);
+                    compile_sib_dynscale(buffer, &ctx.state.target, scale as u8, expr, index.kind, base);
                 } else {
-                    compile_modrm_sib(ecx, buffer, encode_scale(scale).unwrap(), index.kind, base);
+                    compile_modrm_sib(buffer, encode_scale(scale).unwrap(), index.kind, base);
                 }
 
             // no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled
             } else if let Some(base) = base {
-                compile_modrm_sib(ecx, buffer, mode, reg_k, base.kind);
+                compile_modrm_sib(buffer, mode, reg_k, base.kind);
 
             // no base, no index. only disp. Easy in x86, but in x64 escape, use RBP as base and RSP as index
             } else {
                 match ctx.mode {
                     X86Mode::Protected => {
-                        compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RBP));
+                        compile_modrm_sib(buffer, mode, reg_k, RegKind::Static(RegId::RBP));
                     },
                     X86Mode::Long => {
-                        compile_modrm_sib(ecx, buffer, mode, reg_k, RegKind::Static(RegId::RSP));
-                        compile_modrm_sib(ecx, buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
+                        compile_modrm_sib(buffer, mode, reg_k, RegKind::Static(RegId::RSP));
+                        compile_modrm_sib(buffer, 0, RegKind::Static(RegId::RSP), RegKind::Static(RegId::RBP));
                     }
                 }
             }
 
             // Disp
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(disp, if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(serialize::delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
             } else if no_base {
                 buffer.push(Stmt::u32(0));
             } else if mode == MOD_DISP8 {
@@ -434,7 +431,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         } else {
             RegKind::from_number(data.reg)
         };
-        compile_modrm_sib(ecx, buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
+        compile_modrm_sib(buffer, MOD_NODISP, reg_k, RegKind::Static(RegId::RBP));
 
         buffer.push(Stmt::u32(0));
         match ctx.mode {
@@ -456,15 +453,15 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         let ireg = ireg.kind;
         let byte = ireg.encode() << 4;
 
-        let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
+        let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
         if let RegKind::Dynamic(_, expr) = ireg {
-            byte = serialize::expr_mask_shift_or(ecx, byte, expr, 0xF, 4);
+            byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 0xF, 4);
         }
         // if immediates are present, the register argument will be merged into the
         // first immediate byte.
         if !args.is_empty() {
             if let SizedArg::Immediate {value, size: Size::BYTE} = args.remove(0) {
-                byte = serialize::expr_mask_shift_or(ecx, byte, value, 0xF, 0);
+                byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(value), 0xF, 0);
             } else {
                 panic!("bad formatting data")
             }
@@ -479,7 +476,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
     for arg in args {
         match arg {
             SizedArg::Immediate {value, size} => {
-                buffer.push(Stmt::ExprSigned(value, size));
+                buffer.push(Stmt::ExprSigned(serialize::delimited(value), size));
 
                 // bump relocations
                 relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
@@ -514,16 +511,25 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
         };
 
         buffer.push(match target {
-            JumpType::Global(ident)   => Stmt::GlobalJumpTarget(  ident, serialize::expr_tuple_of_u8s(ecx, ident.span, data)),
-            JumpType::Forward(ident)  => Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_u8s(ecx, ident.span, data)),
-            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_u8s(ecx, ident.span, data)),
+            JumpType::Global(ident)   => {
+                let span = ident.span();
+                Stmt::GlobalJumpTarget(ident, serialize::expr_tuple_of_u8s(span, data))
+            },
+            JumpType::Forward(ident)  => {
+                let span = ident.span();
+                Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_u8s(span, data))
+            },
+            JumpType::Backward(ident) => {
+                let span = ident.span();
+                Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_u8s(span, data))
+            },
             JumpType::Dynamic(expr)   => {
-                let span = expr.span;
-                Stmt::DynamicJumpTarget(expr, serialize::expr_tuple_of_u8s(ecx, span, data))
+                let span = expr.span();
+                Stmt::DynamicJumpTarget(serialize::delimited(expr), serialize::expr_tuple_of_u8s(span, data))
             },
             JumpType::Bare(expr)      => {
-                let span = expr.span;
-                Stmt::BareJumpTarget(expr, serialize::expr_tuple_of_u8s(ecx, span, data))
+                let span = expr.span();
+                Stmt::BareJumpTarget(serialize::delimited(expr), serialize::expr_tuple_of_u8s(span, data))
             }
         })
     }
@@ -532,7 +538,7 @@ pub fn compile_instruction(ctx: &mut Context, ecx: &ExtCtxt, instruction: Instru
 }
 
 // Folds RawArgs into CleanArgs by analyzing the different raw memoryref variants
-fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String>> {
+fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
     Ok(match arg {
         RawArg::Direct {span, reg} => CleanArg::Direct {span, reg},
         RawArg::JumpTarget {type_, size} => CleanArg::JumpTarget {type_, size},
@@ -601,22 +607,23 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
 
 
             if !joined_regs.is_empty() {
-                ecx.span_err(span, "Impossible memory argument");
+                err(span, "Impossible memory argument".into());
                 return Err(None);
             }
 
             // merge disps
-            let disp = serialize::expr_add_many(ecx, span, disps.into_iter());
+            let disp = serialize::expr_add_many(span, disps.into_iter().map(serialize::delimited));
+            let disp = disp.map(|d| serialize::reparse(&d).expect("Invalid expression generated internally"));
 
             // finalize the memoryref
             CleanArg::Indirect {
-                span: span,
-                nosplit: nosplit,
+                span,
+                nosplit,
                 size: value_size,
-                disp_size: disp_size,
-                base: base,
+                disp_size,
+                base,
                 index: index.map(|(r, s)| (r, s, None)),
-                disp: disp,
+                disp,
             }
         },
         RawArg::TypeMappedRaw {span, base_reg, scale, value_size, nosplit, disp_size, scaled_items, attribute} => {
@@ -648,7 +655,7 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
             let index = joined_regs.pop();
 
             if !joined_regs.is_empty() {
-                ecx.span_err(span, "Impossible memory argument");
+                err(span, "Impossible memory argument".into());
                 return Err(None);
             }
 
@@ -664,18 +671,18 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
             let true_disp_size = disp_size.unwrap_or(Size::DWORD);
 
             // merge disps [a, b, c] into (a + b + c)
-            let scaled_disp = serialize::expr_add_many(ecx, span, disps.into_iter());
+            let scaled_disp = serialize::expr_add_many(span, disps.into_iter().map(serialize::delimited));
 
             // scale disps (a + b + c) * size_of<scale> as disp_size
-            let scaled_disp = scaled_disp.map(|disp| serialize::expr_size_of_scale(ecx, scale.clone(), disp, true_disp_size));
+            let scaled_disp = scaled_disp.map(|disp| serialize::expr_size_of_scale(&scale, &disp, true_disp_size));
 
             // attribute displacement offset_of(scale, attr) as disp_size
-            let attr_disp = attribute.map(|attr| serialize::expr_offset_of(ecx, scale.clone(), attr, true_disp_size));
+            let attr_disp = attribute.map(|attr| serialize::expr_offset_of(&scale, &attr, true_disp_size));
 
             // add displacement sources together
             let disp = if let Some(scaled_disp) = scaled_disp {
                 if let Some(attr_disp) = attr_disp {
-                    Some(ecx.expr_binary(span, ast::BinOpKind::Add, attr_disp, scaled_disp))
+                    serialize::expr_add_many(span, vec![attr_disp, scaled_disp].into_iter())
                 } else {
                     Some(scaled_disp)
                 }
@@ -683,15 +690,22 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
                 attr_disp
             };
 
+            let disp = disp.map(|d| serialize::reparse(&d).expect("Invalid expression generated internally"));
+
+            let index = index.map(|(r, s)| {
+                let scale_expr = serialize::reparse(&serialize::expr_size_of(&scale)).expect("Invalid expression generated internally");
+                (r, s, Some(scale_expr))
+            });
+
             // finalize the memoryref
             CleanArg::Indirect {
-                span: span,
-                nosplit: nosplit,
+                span,
+                nosplit,
                 size: value_size,
-                disp_size: disp_size,
+                disp_size,
                 base: Some(base),
-                index: index.map(|(r, s)| (r, s, Some(serialize::expr_size_of(ecx, scale)))),
-                disp: disp,
+                index,
+                disp,
             }
         },
     })
@@ -699,7 +713,7 @@ fn clean_memoryref(ecx: &ExtCtxt, arg: RawArg) -> Result<CleanArg, Option<String
 
 // Go through the CleanArgs, check for impossible to encode indirect arguments, fill in immediate/displacement size information
 // and return the effective address size
-fn sanitize_indirects_and_sizes(ctx: &Context, ecx: &ExtCtxt, args: &mut [CleanArg]) -> Result<Option<Size>, Option<String>> {
+fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<Option<Size>, Option<String>> {
     // determine if an address size prefix is necessary, and sanitize the register choice for memoryrefs
     let mut addr_size = None;
     let mut encountered_indirect = false;
@@ -709,48 +723,44 @@ fn sanitize_indirects_and_sizes(ctx: &Context, ecx: &ExtCtxt, args: &mut [CleanA
             CleanArg::Indirect {span, nosplit, ref mut disp_size, ref mut base, ref mut index, ref disp, ..} => {
 
                 if encountered_indirect {
-                    ecx.span_err(span, "Multiple memory references in a single instruction")
+                    err(span, "Multiple memory references in a single instruction".into())
                 }
                 encountered_indirect = true;
 
                 // figure out the effective address size and error on impossible combinations
-                addr_size = sanitize_indirect(ctx, ecx, span, nosplit, base, index)?;
+                addr_size = sanitize_indirect(ctx, span, nosplit, base, index)?;
 
                 if let Some((_, scale, _)) = *index {
                     if encode_scale(scale).is_none() {
-                        ecx.span_err(span, "Impossible scale");
+                        err(span, "Impossible scale".into());
                     }
                 }
 
-                // fif specified, sanitize the displacement size. Else, derive one
+                // if specified, sanitize the displacement size. Else, derive one
                 if let Some(size) = *disp_size {
                     if disp.is_none() {
-                        ecx.span_err(span, "Displacement size without displacement");
+                        err(span, "Displacement size without displacement".into());
                     }
 
                     // 16-bit addressing has smaller displacements
                     if addr_size == Some(Size::WORD) {
                         if size != Size::BYTE && size != Size::WORD {
-                            ecx.span_err(span, "Invalid displacement size, only BYTE or WORD are possible");
+                            err(span, "Invalid displacement size, only BYTE or WORD are possible".into());
                         }
-                    } else {
-                        if size != Size::BYTE && size != Size::DWORD {
-                            ecx.span_err(span, "Invalid displacement size, only BYTE or DWORD are possible");
-                        }
+                    } else if size != Size::BYTE && size != Size::DWORD {
+                        err(span, "Invalid displacement size, only BYTE or DWORD are possible".into());
                     }
-                } else  {
-                    if let Some(ref disp) = *disp {
-                        match derive_size(&*disp) {
-                            Some(Size::BYTE)                         => *disp_size = Some(Size::BYTE),
-                            Some(_) if addr_size == Some(Size::WORD) => *disp_size = Some(Size::WORD),
-                            Some(_)                                  => *disp_size = Some(Size::DWORD),
-                            None => ()
-                        }
+                } else if let Some(ref disp) = *disp {
+                    match derive_size(disp) {
+                        Some(Size::BYTE)                         => *disp_size = Some(Size::BYTE),
+                        Some(_) if addr_size == Some(Size::WORD) => *disp_size = Some(Size::WORD),
+                        Some(_)                                  => *disp_size = Some(Size::DWORD),
+                        None => ()
                     }
                 }
             },
             CleanArg::Immediate {ref value, size: ref mut size @ None} => {
-                *size = derive_size(&*value);
+                *size = derive_size(value);
             },
             _ => ()
         }
@@ -760,31 +770,35 @@ fn sanitize_indirects_and_sizes(ctx: &Context, ecx: &ExtCtxt, args: &mut [CleanA
 }
 
 // Tries to find the maximum size necessary to hold the result of an expression.
-fn derive_size(expr: &ast::Expr) -> Option<Size> {
-    use syntax::ast::ExprKind;
+fn derive_size(expr: &syn::Expr) -> Option<Size> {
+    // strip any wrapping Group nodes due to delimiting
+    let mut inner = expr;
+    while let syn::Expr::Group(syn::ExprGroup { expr, .. }) = inner {
+        inner = expr;
+    }
 
-    match expr.node {
-        ExprKind::Lit(ref lit) => match lit.node {
-            ast::LitKind::Byte(_) => Some(Size::BYTE),
-            ast::LitKind::Int(i, _) => if i < 0x80 {
+    match inner {
+        syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => match lit {
+            syn::Lit::Byte(_) => Some(Size::BYTE),
+            syn::Lit::Int(i) => if i.value() < 0x80 {
                 Some(Size::BYTE)
-            } else if i < 0x8000 {
+            } else if i.value() < 0x8000 {
                 Some(Size::WORD)
-            } else if i < 0x8000_0000 {
+            } else if i.value() < 0x8000_0000 {
                 Some(Size::DWORD)
             } else {
                 Some(Size::QWORD)
             },
             _ => None
         },
-        ExprKind::Unary(ast::UnOp::Neg, ref expr) => match expr.node {
-            ExprKind::Lit(ref lit) => match lit.node {
-                ast::LitKind::Byte(_) => Some(Size::BYTE),
-                ast::LitKind::Int(i, _) => if i >= 0x80 {
+        syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(_), ref expr, .. } ) => match &**expr {
+            syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => match lit {
+                syn::Lit::Byte(_) => Some(Size::BYTE),
+                syn::Lit::Int(i) => if i.value() <= 0x80 {
                     Some(Size::BYTE)
-                } else if i >= 0x8000 {
+                } else if i.value() <= 0x8000 {
                     Some(Size::WORD)
-                } else if i >= 0x8000_0000 {
+                } else if i.value() <= 0x8000_0000 {
                     Some(Size::DWORD)
                 } else {
                     Some(Size::QWORD)
@@ -799,8 +813,8 @@ fn derive_size(expr: &ast::Expr) -> Option<Size> {
 
 /// Validates that the base/index combination can actually be encoded and returns the effective address size.
 /// If the address size can't be determined (purely displacement, or VSIB without base), the result is None.
-fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, base: &mut Option<Register>,
-                     index: &mut Option<(Register, isize, Option<P<ast::Expr>>)>) -> Result<Option<Size>, Option<String>> 
+fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option<Register>,
+                     index: &mut Option<(Register, isize, Option<syn::Expr>)>) -> Result<Option<Size>, Option<String>> 
 {
 
     // figure out the addressing size/mode used.
@@ -824,51 +838,50 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
         },
         (&Some((f1, s1)), &Some((f2, s2))) => if f1 == f2 {
             if s1 != s2 {
-                ecx.span_err(span, "Registers of differing sizes");
+                err(span, "Registers of differing sizes".into());
                 return Err(None);
             }
             size = s1;
             family = f1;
+
+        // allow only vsib addressing
+        } else if f1 == RegFamily::XMM {
+            vsib_mode = true;
+            size = s2;
+            family = f2;
+        } else if f2 == RegFamily::XMM {
+            vsib_mode = true;
+            size = s1;
+            family = f1;
         } else {
-            // allow only vsib addressing
-            if f1 == RegFamily::XMM {
-                vsib_mode = true;
-                size = s2;
-                family = f2;
-            } else if f2 == RegFamily::XMM {
-                vsib_mode = true;
-                size = s1;
-                family = f1;
-            } else {
-                ecx.span_err(span, "Register type combination not supported");
-                return Err(None);
-            }
+            err(span, "Register type combination not supported".into());
+            return Err(None);
         }
     }
     
     // filter out combinations that are impossible to encode
     match family {
         RegFamily::RIP => if b.is_some() && i.is_some() {
-            ecx.span_err(span, "Register type combination not supported");
+            err(span, "Register type combination not supported".into());
             return Err(None);
         },
         RegFamily::LEGACY => match size {
             Size::DWORD => (),
             Size::QWORD => (), // only valid in long mode, but should only be possible in long mode
             Size::WORD  => if ctx.mode == X86Mode::Protected || vsib_mode {
-                ecx.span_err(span, "16-bit addressing is not supported in this mode");
+                err(span, "16-bit addressing is not supported in this mode".into());
                 return Err(None);
             },
             _ => {
-                ecx.span_err(span, "Register type not supported");
+                err(span, "Register type not supported".into());
                 return Err(None);
             }
         },
         RegFamily::XMM => if b.is_some() && i.is_some() {
-            ecx.span_err(span, "Register type combination not supported");
+            err(span, "Register type combination not supported".into());
         },
         _ => {
-            ecx.span_err(span, "Register type not supported");
+            err(span, "Register type not supported".into());
             return Err(None);
         }
     }
@@ -879,7 +892,7 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
         match index.take() {
             Some((index, 1, None)) => *base = Some(index),
             Some(_) => {
-                ecx.span_err(span, "RIP cannot be scaled");
+                err(span, "RIP cannot be scaled".into());
                 return Err(None);
             },
             None => ()
@@ -906,7 +919,7 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
             if let (ref mut i, 1, None) = index.as_mut().unwrap() {
                 swap(i, base.as_mut().unwrap())
             } else {
-                ecx.span_err(span, "vsib addressing requires a general purpose register as base");
+                err(span, "vsib addressing requires a general purpose register as base".into());
                 return Err(None);
             }
         }
@@ -922,7 +935,7 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
             Some((i, 1, None)) => Some(i),
             None => None,
             Some(_) => {
-                ecx.span_err(span, "16-bit addressing with scaled index");
+                err(span, "16-bit addressing with scaled index".into());
                 return Err(None);
             },
         };
@@ -945,7 +958,7 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
             (r, None) if r == &RegId::RBP => RegId::from_number(6),
             (r, None) if r == &RegId::RBX => RegId::from_number(7),
             _ => {
-                ecx.span_err(span, "Impossible register combination");
+                err(span, "Impossible register combination".into());
                 return Err(None);
             }
         };
@@ -976,7 +989,7 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
                 *index = base.take().map(|reg| (reg, 1, None));
                 *base = Some(i);
             } else {
-                ecx.span_err(span, "'rsp' cannot be used as index field");
+                err(span, "'rsp' cannot be used as index field".into());
                 return Err(None);
             }
         } else {
@@ -993,13 +1006,14 @@ fn sanitize_indirect(ctx: &Context, ecx: &ExtCtxt, span: Span, nosplit: bool, ba
     Ok(Some(size))
 }
 
-fn match_op_format(ctx: &Context, ecx: &ExtCtxt, ident: Ident, args: &[CleanArg]) -> Result<&'static Opdata, Option<String>> {
-    let name = &*ident.node.name.as_str();
+fn match_op_format(ctx: &Context, ident: &syn::Ident, args: &[CleanArg]) -> Result<&'static Opdata, Option<String>> {
+    let name = ident.to_string();
+    let name = name.as_str();
 
     let data = if let Some(data) = get_mnemnonic_data(name) {
         data
     } else {
-        ecx.span_err(ident.span, &format!("'{}' is not a valid instruction", name));
+        err(ident.span(), format!("'{}' is not a valid instruction", name));
         return Err(None);
     };
 
@@ -1169,7 +1183,7 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
     }
 
     // match found
-    return Ok(())
+    Ok(())
 }
 
 fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec<SizedArg>), Option<String>> {
@@ -1267,52 +1281,52 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
 
         new_args.push(match arg {
             CleanArg::Direct {span, reg} =>
-                SizedArg::Direct {span: span, reg: reg},
+                SizedArg::Direct {span, reg},
             CleanArg::JumpTarget {type_, ..} =>
-                SizedArg::JumpTarget {type_: type_, size: size},
+                SizedArg::JumpTarget {type_, size},
             CleanArg::IndirectJumpTarget {type_, ..} =>
-                SizedArg::IndirectJumpTarget {type_: type_},
+                SizedArg::IndirectJumpTarget {type_},
             CleanArg::Immediate {value, ..} =>
-                SizedArg::Immediate {value: value, size: size},
+                SizedArg::Immediate {value, size},
             CleanArg::Indirect {span, disp_size, base, index, disp, ..} => 
-                SizedArg::Indirect {span: span, disp_size: disp_size, base: base, index: index, disp: disp},
+                SizedArg::Indirect {span, disp_size, base, index, disp},
         });
     }
 
     Ok((op_size, new_args))
 }
 
-fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>) -> Result<(Option<u8>, Option<u8>), Option<String>> {
+fn get_legacy_prefixes(fmt: &'static Opdata, idents: Vec<syn::Ident>) -> Result<(Option<u8>, Option<u8>), Option<String>> {
     let mut group1 = None;
     let mut group2 = None;
 
     for prefix in idents {
-        let name = &*prefix.node.name.as_str();
-        let (group, value) = match name {
+        let name = prefix.to_string();
+        let (group, value) = match name.as_str() {
             "rep"   => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF3)
             } else {
-                ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
+                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "repe"  |
             "repz"  => if fmt.flags.contains(Flags::REPE) {
                 (&mut group1, 0xF3)
             } else {
-                ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
+                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "repnz" |
             "repne" => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF2)
             } else {
-                ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
+                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "lock"  => if fmt.flags.contains(Flags::LOCK) {
                 (&mut group1, 0xF0)
             } else {
-                ecx.span_err(prefix.span, &format!("Cannot use prefix {} on this instruction", name));
+                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "ss"    => (&mut group2, 0x36),
@@ -1324,7 +1338,7 @@ fn get_legacy_prefixes(ecx: &ExtCtxt, fmt: &'static Opdata, idents: Vec<Ident>) 
             _       => panic!("unimplemented prefix")
         };
         if group.is_some() {
-            ecx.span_err(prefix.span, "Duplicate prefix group");
+            err(prefix.span(), "Duplicate prefix group".into());
             return Err(None);
         }
         *group = Some(value);
@@ -1490,7 +1504,7 @@ fn encode_scale(scale: isize) -> Option<u8> {
     }
 }
 
-fn compile_rex(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<SizedArg>, rm: &Option<SizedArg>) {
+fn compile_rex(buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<SizedArg>, rm: &Option<SizedArg>) {
     let mut reg_k   = RegKind::from_number(0);
     let mut index_k = RegKind::from_number(0);
     let mut base_k  = RegKind::from_number(0);
@@ -1519,21 +1533,21 @@ fn compile_rex(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<
         return;
     }
 
-    let mut rex = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(rex));
+    let mut rex: TokenTree = proc_macro2::Literal::u8_suffixed(rex).into();
 
     if let RegKind::Dynamic(_, expr) = reg_k {
-        rex = serialize::expr_mask_shift_or(ecx, rex, expr, 8, -1);
+        rex = serialize::expr_mask_shift_or(&rex, &serialize::delimited(expr), 8, -1);
     }
     if let RegKind::Dynamic(_, expr) = index_k {
-        rex = serialize::expr_mask_shift_or(ecx, rex, expr, 8, -2);
+        rex = serialize::expr_mask_shift_or(&rex, &serialize::delimited(expr), 8, -2);
     }
     if let RegKind::Dynamic(_, expr) = base_k {
-        rex = serialize::expr_mask_shift_or(ecx, rex, expr, 8, -3);
+        rex = serialize::expr_mask_shift_or(&rex, &serialize::delimited(expr), 8, -3);
     }
     buffer.push(Stmt::ExprUnsigned(rex, Size::BYTE));
 }
 
-fn compile_vex_xop(mode: X86Mode, ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<SizedArg>,
+fn compile_vex_xop(mode: X86Mode, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<SizedArg>,
 rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l: bool, prefix: u8) {
     let mut reg_k   = RegKind::from_number(0);
     let mut index_k = RegKind::from_number(0);
@@ -1587,10 +1601,10 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
             return;
         }
 
-        let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
+        let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
         if let RegKind::Dynamic(_, expr) = reg_k {
-            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 4)
+            let expr = serialize::inverted(&serialize::delimited(expr));
+            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 4)
         }
         buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
         return;
@@ -1599,19 +1613,19 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
     buffer.push(Stmt::u8(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
 
     if mode == X86Mode::Long && (reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic()) {
-        let mut byte1 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte1));
+        let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
-            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 4);
+            let expr = serialize::inverted(&serialize::delimited(expr));
+            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 4);
         }
         if let RegKind::Dynamic(_, expr) = index_k {
-            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 3);
+            let expr = serialize::inverted(&serialize::delimited(expr));
+            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 3);
         }
         if let RegKind::Dynamic(_, expr) = base_k {
-            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte1 = serialize::expr_mask_shift_or(ecx, byte1, expr, 8, 2);
+            let expr = serialize::inverted(&serialize::delimited(expr));
+            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 2);
         }
         buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
     } else {
@@ -1619,11 +1633,11 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
     }
 
     if vvvv_k.is_dynamic() {
-        let mut byte2 = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte2));
+        let mut byte2: TokenTree = proc_macro2::Literal::u8_suffixed(byte2).into();
 
         if let RegKind::Dynamic(_, expr) = vvvv_k {
-            let expr = ecx.expr_unary(expr.span, ast::UnOp::Not, expr);
-            byte2 = serialize::expr_mask_shift_or(ecx, byte2, expr, 0xF, 3)
+            let expr = serialize::inverted(&serialize::delimited(expr));
+            byte2 = serialize::expr_mask_shift_or(&byte2, &expr, 0xF, 3)
         }
         buffer.push(Stmt::ExprUnsigned(byte2, Size::BYTE));
     } else {
@@ -1631,7 +1645,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
     }
 }
 
-fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegKind) {
+fn compile_modrm_sib(buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegKind) {
     let byte = mode                << 6 |
               (reg1.encode()  & 7) << 3 |
               (reg2.encode()  & 7)      ;
@@ -1641,40 +1655,41 @@ fn compile_modrm_sib(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, mode: u8, reg1: RegK
         return;
     }
 
-    let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
+    let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
+
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 3);
+        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 3);
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 0);
+        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 0);
     }
     buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
 }
 
-fn compile_sib_dynscale(ecx: &ExtCtxt, buffer: &mut Vec<Stmt>, target: &P<ast::Expr>, scale: u8, scale_expr: P<ast::Expr>, reg1: RegKind, reg2: RegKind) {
+fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, target: &TokenTree, scale: u8, scale_expr: syn::Expr, reg1: RegKind, reg2: RegKind) {
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 
-    let mut byte = ecx.expr_lit(ecx.call_site(), ast::LitKind::Byte(byte));
+    let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
+    let scale: TokenTree = proc_macro2::Literal::u8_unsuffixed(scale).into();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 3);
+        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 3);
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = serialize::expr_mask_shift_or(ecx, byte, expr, 7, 0);
+        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 0);
     }
-    let span = scale_expr.span;
-    let (stmt, expr) = serialize::expr_dynscale(
-        ecx, 
+
+    let span = scale_expr.span();
+    let scale_expr = serialize::delimited(scale_expr);
+
+    let (expr1, expr2) = serialize::expr_dynscale(
         target,
-        ecx.expr_binary(
-            span,
-            ast::BinOpKind::Mul,
-            scale_expr,
-            ecx.expr_lit(span, ast::LitKind::Int(scale as u128, ast::LitIntType::Unsuffixed)),
-        ),
-        byte
+        &serialize::delimited(quote_spanned!{ span=>
+            #scale_expr * #scale
+        }),
+        &byte
     );
-    buffer.push(Stmt::Stmt(stmt));
-    buffer.push(Stmt::ExprUnsigned(expr, Size::BYTE));
+    buffer.push(Stmt::Stmt(expr1));
+    buffer.push(Stmt::ExprUnsigned(expr2, Size::BYTE));
 }

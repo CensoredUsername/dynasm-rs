@@ -1,8 +1,7 @@
-use syntax::ast;
-use syntax::ptr::P;
-use syntax::source_map::Span;
+use syn;
+use proc_macro2::Span;
 
-use serialize::{Size, Ident};
+use serialize::Size;
 
 use std::cmp::PartialEq;
 
@@ -24,7 +23,7 @@ pub struct Register {
 #[derive(Debug, Clone)]
 pub enum RegKind {
     Static(RegId),
-    Dynamic(RegFamily, P<ast::Expr>)
+    Dynamic(RegFamily, syn::Expr)
 }
 
 // this map identifies the different registers that exist. some of these can be referred to as different sizes
@@ -93,11 +92,11 @@ pub enum RegFamily {
 
 impl Register {
     pub fn new_static(size: Size, id: RegId) -> Register {
-        Register {size: size, kind: RegKind::Static(id) }
+        Register {size, kind: RegKind::Static(id) }
     }
 
-    pub fn new_dynamic(size: Size, family: RegFamily, id: P<ast::Expr>) -> Register {
-        Register {size: size, kind: RegKind::Dynamic(family, id) }
+    pub fn new_dynamic(size: Size, family: RegFamily, id: syn::Expr) -> Register {
+        Register {size, kind: RegKind::Dynamic(family, id) }
     }
 
     pub fn size(&self) -> Size {
@@ -156,7 +155,7 @@ impl PartialEq<Register> for Register {
                 }
             }
         }
-        return false;
+        false
     }
 }
 
@@ -195,12 +194,12 @@ impl PartialEq<RegId> for Option<RegKind> {
 }
 
 impl RegId {
-    pub fn code(&self) -> u8 {
-        *self as u8 & 0xF
+    pub fn code(self) -> u8 {
+        self as u8 & 0xF
     }
 
-    pub fn family(&self) -> RegFamily {
-        match *self as u8 >> 4 {
+    pub fn family(self) -> RegFamily {
+        match self as u8 >> 4 {
             0 => RegFamily::LEGACY,
             1 => RegFamily::RIP,
             2 => RegFamily::HIGHBYTE,
@@ -248,11 +247,11 @@ pub enum JumpType {
     // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
     // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
     // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
-    Global(Ident),         // -> label
-    Backward(Ident),       //  > label
-    Forward(Ident),        //  < label
-    Dynamic(P<ast::Expr>), // => expr
-    Bare(P<ast::Expr>)     // jump to this address
+    Global(syn::Ident),         // -> label
+    Backward(syn::Ident),       //  > label
+    Forward(syn::Ident),        //  < label
+    Dynamic(syn::Expr), // => expr
+    Bare(syn::Expr)     // jump to this address
 }
 
 /**
@@ -263,7 +262,7 @@ pub enum JumpType {
 pub enum MemoryRefItem {
     ScaledRegister(Register, isize),
     Register(Register),
-    Displacement(P<ast::Expr>)
+    Displacement(syn::Expr)
 }
 
 /**
@@ -279,9 +278,9 @@ pub enum RawArg {
         value_size: Option<Size>,
         disp_size: Option<Size>,
         base_reg: Register,
-        scale: ast::Path,
+        scale: syn::Path,
         scaled_items: Vec<MemoryRefItem>,
-        attribute: Option<ast::Ident>,
+        attribute: Option<syn::Ident>,
     },
     // unprocessed memory reference argument
     IndirectRaw {
@@ -308,7 +307,7 @@ pub enum RawArg {
     },
     // just an arbitrary expression
     Immediate {
-        value: P<ast::Expr>,
+        value: syn::Expr,
         size: Option<Size>
     },
     // used to not block the parser on a parsing error in a single arg
@@ -324,8 +323,8 @@ pub enum CleanArg {
         size: Option<Size>,
         disp_size: Option<Size>,
         base: Option<Register>,
-        index: Option<(Register, isize, Option<P<ast::Expr>>)>,
-        disp: Option<P<ast::Expr>>
+        index: Option<(Register, isize, Option<syn::Expr>)>,
+        disp: Option<syn::Expr>
     },
     // direct register reference, 
     Direct {
@@ -344,7 +343,7 @@ pub enum CleanArg {
     },
     // just an arbitrary expression
     Immediate {
-        value: P<ast::Expr>,
+        value: syn::Expr,
         size: Option<Size>
     }
 }
@@ -357,8 +356,8 @@ pub enum SizedArg {
         span: Span,
         disp_size: Option<Size>,
         base: Option<Register>,
-        index: Option<(Register, isize, Option<P<ast::Expr>>)>,
-        disp: Option<P<ast::Expr>>
+        index: Option<(Register, isize, Option<syn::Expr>)>,
+        disp: Option<syn::Expr>
     },
     // direct register reference, 
     Direct {
@@ -376,7 +375,7 @@ pub enum SizedArg {
     },
     // just an arbitrary expression
     Immediate {
-        value: P<ast::Expr>,
+        value: syn::Expr,
         size: Size
     }
 }
@@ -387,5 +386,5 @@ pub enum SizedArg {
 
 pub struct Instruction {
     pub span: Span,
-    pub idents: Vec<Ident>
+    pub idents: Vec<syn::Ident>
 }

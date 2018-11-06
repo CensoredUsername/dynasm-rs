@@ -1,6 +1,4 @@
-use syntax::ext::base::ExtCtxt;
-use syntax::parse::parser::Parser;
-use syntax::parse::PResult;
+use syn::parse;
 
 mod ast;
 mod compiler;
@@ -9,7 +7,7 @@ pub mod debug;
 pub mod x64data;
 
 use ::State;
-use serialize::Ident;
+use ::err;
 use arch::Arch;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,7 +16,7 @@ pub enum X86Mode {
     Protected
 }
 
-pub struct Context<'a, 'b: 'a> {
+struct Context<'a, 'b: 'a> {
     pub state: &'a mut State<'b>,
     pub mode: X86Mode,
     pub features: x64data::Features
@@ -40,13 +38,13 @@ impl Arch for Archx64 {
         "x64"
     }
 
-    fn set_features(&mut self, ecx: &ExtCtxt, features: &[Ident]) {
+    fn set_features(&mut self, features: &[syn::Ident]) {
         let mut new_features = x64data::Features::empty();
-        for &Ident {span, ref node} in features {
-            new_features |= match x64data::Features::from_str(&*node.name.as_str()) {
+        for ident in features {
+            new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    ecx.span_err(span, &format!("Architecture x64 does not support feature '{}'", &*node.name.as_str()));
+                    err(ident.span(), format!("Architecture x64 does not support feature '{}'", ident.to_string()));
                     continue;
                 }
             }
@@ -54,17 +52,17 @@ impl Arch for Archx64 {
         self.features = new_features;
     }
 
-    fn compile_instruction<'a>(&self, state: &mut State, ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, ()> {
+    fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
         let mut ctx = Context {
-            state: state,
+            state,
             mode: X86Mode::Long,
             features: self.features
         };
-        let (instruction, args) = parser::parse_instruction(&mut ctx, ecx, parser)?;
+        let (instruction, args) = parser::parse_instruction(&mut ctx, input)?;
         let span = instruction.span;
 
-        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, ecx, instruction, args) {
-            ecx.span_err(span, &e);
+        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, instruction, args) {
+            err(span, e);
         }
         Ok(())
     }
@@ -86,13 +84,13 @@ impl Arch for Archx86 {
         "x86"
     }
 
-    fn set_features(&mut self, ecx: &ExtCtxt, features: &[Ident]) {
+    fn set_features(&mut self, features: &[syn::Ident]) {
         let mut new_features = x64data::Features::empty();
-        for &Ident {span, ref node} in features {
-            new_features |= match x64data::Features::from_str(&*node.name.as_str()) {
+        for ident in features {
+            new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    ecx.span_err(span, &format!("Architecture x86 does not support feature '{}'", &*node.name.as_str()));
+                    err(ident.span(), format!("Architecture x86 does not support feature '{}'", ident.to_string()));
                     continue;
                 }
             }
@@ -100,17 +98,17 @@ impl Arch for Archx86 {
         self.features = new_features;
     }
 
-    fn compile_instruction<'a>(&self, state: &mut State, ecx: &mut ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, ()> {
+    fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
         let mut ctx = Context {
-            state: state,
+            state,
             mode: X86Mode::Protected,
             features: self.features
         };
-        let (instruction, args) = parser::parse_instruction(&mut ctx, ecx, parser)?;
+        let (instruction, args) = parser::parse_instruction(&mut ctx, input)?;
         let span = instruction.span;
 
-        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, ecx, instruction, args) {
-            ecx.span_err(span, &e);
+        if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, instruction, args) {
+            err(span, e);
         }
         Ok(())
     }

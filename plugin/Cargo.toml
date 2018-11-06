@@ -14,13 +14,22 @@ license = "MPL-2.0"
 
 [lib]
 name = "dynasm"
-plugin = true
+crate-type = ["proc-macro"]
 
 [dependencies]
-lazy_static = "^0.2.8"
+lazy_static = "^1.1.0"
 bitflags = "1.0"
 owning_ref = "^0.3.3"
 byteorder = "1"
+quote = "^0.6.8"
+
+[dependencies.syn]
+version = "^0.15.18"
+features = ["full", "extra-traits"]
+
+[dependencies.proc-macro2]
+version = "^0.4.20"
+features = ["nightly"]
 
 [features]
 dynasm_opmap = []

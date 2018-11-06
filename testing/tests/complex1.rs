@@ -1,11 +1,11 @@
-#![feature(plugin)]
-#![plugin(dynasm)]
-
+#![feature(proc_macro_hygiene)]
 #![allow(unused_imports)]
 
 #[macro_use]
 extern crate dynasmrt;
+extern crate dynasm;
 
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 // aliases, and dynasm! in item position
@@ -29,7 +29,7 @@ fn complex1() {
         // immediate
         ; ret 16
         // register
-        ; inc test
+        ; inc rax
         // memory ref
         ; inc DWORD [16]
         ; inc DWORD [test]

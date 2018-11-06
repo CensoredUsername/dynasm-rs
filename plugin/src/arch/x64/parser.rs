@@ -1,16 +1,12 @@
-use syntax::ext::build::AstBuilder;
-use syntax::ext::base::ExtCtxt;
-use syntax::parse::parser::{Parser, PathStyle};
-use syntax::parse::token;
-use syntax::parse::PResult;
-use syntax::ast;
-use syntax::ptr::P;
-use syntax::source_map::{Spanned};
+use syn::{parse, Token};
+use syn::spanned::Spanned;
+use proc_macro2::Span;
 
+use lazy_static::lazy_static;
 
+use ::err;
+use serialize::Size;
 use super::{Context, X86Mode};
-use serialize::{Size, Ident};
-
 use super::ast::{Instruction, RawArg, JumpType, Register, RegId, RegFamily, MemoryRefItem};
 
 use std::collections::HashMap;
@@ -19,290 +15,302 @@ use std::collections::HashMap;
  * Code
  */
 
-// tokentree is a list of tokens and delimited lists of tokens.
-// this means we don't have to figure out nesting via []'s by ourselves.
+// parses a full instruction
 // syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
-
-pub fn parse_instruction<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, (Instruction, Vec<RawArg>)> {
-    let startspan = parser.span;
+pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<(Instruction, Vec<RawArg>)> {
+    let span = input.cursor().span();
 
     let mut ops = Vec::new();
-    let mut span = parser.span;
-    let mut op = Spanned {node: parse_ident_or_rust_keyword(parser)?, span: span};
 
-    // read prefixes
-    while is_prefix(op) {
+    // read prefixes + op
+    let mut op = parse_ident_or_rust_keyword(input)?;
+    while is_prefix(&op) {
         ops.push(op);
-        span = parser.span;
-        op = Spanned {node: parse_ident_or_rust_keyword(parser)?, span: span};
+        op = parse_ident_or_rust_keyword(input)?;
     }
+    ops.push(op);
 
     // parse (sizehint? expr),*
     let mut args = Vec::new();
 
-    if !parser.look_ahead(0, |x| x == &token::Semi || x == &token::Eof) {
-        args.push(parse_arg(ctx, ecx, parser)?);
+    if !(input.is_empty() || input.peek(Token![;])) {
+        args.push(parse_arg(ctx, input)?);
 
-        while parser.eat(&token::Comma) {
-            args.push(parse_arg(ctx, ecx, parser)?);
+        while input.peek(Token![,]) {
+            let _: Token![,] = input.parse()?;
+
+            args.push(parse_arg(ctx, input)?);
         }
     }
 
-    let span = startspan.with_hi(parser.prev_span.hi());
+    // let span = span.join(input.cursor().span()); // FIXME can't join spans ATM
 
-    ops.push(op);
     Ok((
         Instruction {
             idents: ops,
-            span: span
+            span
         },
         args
     ))
 }
 
-const PREFIXES: [&'static str; 12] = [
-    "lock",
-    "rep", "repe", "repz",
-    "repne", "repnz",
-    "ss", "cs", "ds", "es", "fs", "gs"
-];
-fn is_prefix(token: Ident) -> bool {
-    PREFIXES.contains(&&*token.node.name.as_str())
+/// checks if the given ident is a valid x86 prefix
+fn is_prefix(ident: &syn::Ident) -> bool {
+    const PREFIXES: [&str; 12] = [
+        "lock",
+        "rep", "repe", "repz",
+        "repne", "repnz",
+        "ss", "cs", "ds", "es", "fs", "gs"
+    ];
+
+    PREFIXES.contains(&ident.to_string().as_str())
 }
 
-const X86_SIZES: [(&'static str, Size); 9] = [
-    ("BYTE", Size::BYTE),
-    ("WORD", Size::WORD),
-    ("DWORD", Size::DWORD),
-    ("AWORD", Size::DWORD),
-    ("FWORD", Size::FWORD),
-    ("QWORD", Size::QWORD),
-    ("TWORD", Size::PWORD),
-    ("OWORD", Size::OWORD),
-    ("YWORD", Size::HWORD)
-];
-const X64_SIZES: [(&'static str, Size); 9] = [
-    ("BYTE", Size::BYTE),
-    ("WORD", Size::WORD),
-    ("DWORD", Size::DWORD),
-    ("FWORD", Size::FWORD),
-    ("AWORD", Size::QWORD),
-    ("QWORD", Size::QWORD),
-    ("TWORD", Size::PWORD),
-    ("OWORD", Size::OWORD),
-    ("YWORD", Size::HWORD)
-];
-fn eat_size_hint(ctx: &Context, parser: &mut Parser) -> Option<Size> {
+/// if a size hint is present in the parse stream, returning the indicated size
+fn eat_size_hint(ctx: &Context, input: parse::ParseStream) -> Option<Size> {
+    const X86_SIZES: [(&str, Size); 9] = [
+        ("BYTE", Size::BYTE),
+        ("WORD", Size::WORD),
+        ("DWORD", Size::DWORD),
+        ("AWORD", Size::DWORD),
+        ("FWORD", Size::FWORD),
+        ("QWORD", Size::QWORD),
+        ("TWORD", Size::PWORD),
+        ("OWORD", Size::OWORD),
+        ("YWORD", Size::HWORD)
+    ];
+    const X64_SIZES: [(&str, Size); 9] = [
+        ("BYTE", Size::BYTE),
+        ("WORD", Size::WORD),
+        ("DWORD", Size::DWORD),
+        ("FWORD", Size::FWORD),
+        ("AWORD", Size::QWORD),
+        ("QWORD", Size::QWORD),
+        ("TWORD", Size::PWORD),
+        ("OWORD", Size::OWORD),
+        ("YWORD", Size::HWORD)
+    ];
+
     let sizes = match ctx.mode {
         X86Mode::Protected => &X86_SIZES,
         X86Mode::Long      => &X64_SIZES
     };
     for &(kw, size) in sizes {
-        if eat_pseudo_keyword(parser, kw) {
+        if eat_pseudo_keyword(input, kw) {
             return Some(size);
         }
     }
     None
 }
 
-fn eat_pseudo_keyword(parser: &mut Parser, kw: &str) -> bool {
-    match parser.token {
-        token::Ident(ast::Ident {ref name, ..}, _) if &*name.as_str() == kw => (),
-        _ => return false
-    }
-    parser.bump();
-    true
+/// Tries to parse an ident that has a specific name as a keyword. Returns true if it worked.
+fn eat_pseudo_keyword(input: parse::ParseStream, kw: &str) -> bool {
+    input.step(|cursor| {
+        if let Some((ident, rest)) = cursor.ident() {
+            if ident == kw {
+                return Ok((ident, rest));
+            }
+        }
+        Err(cursor.error("expected identifier"))
+    }).is_ok()
 }
 
-fn parse_ident_or_rust_keyword<'a>(parser: &mut Parser<'a>) -> PResult<'a, ast::Ident> {
-    if let token::Ident(i, _) = parser.token {
-        parser.bump();
-        Ok(i)
-    } else {
-        // technically we could generate the error here directly, but
-        // that way this error branch could diverge in behaviour from
-        // the normal parse_ident.
-        parser.parse_ident()
-    }
-}
-
-fn parse_arg<'a>(ctx: &mut Context, ecx: &ExtCtxt, parser: &mut Parser<'a>) -> PResult<'a, RawArg> {
-    // sizehint
-    let size = eat_size_hint(ctx, parser);
-
-    let start = parser.span;
-
-    let in_bracket = parser.look_ahead(0, |x| x == &token::OpenDelim(token::Bracket));
-    if in_bracket && parser.look_ahead(1, |x| match *x {
-            token::RArrow |
-            token::Gt     |
-            token::Lt     |
-            token::FatArrow => true,
-            _ => false
-        }) {
-        parser.bump();
-    }
-
-    macro_rules! label_return {
-        ($jump:expr, $size:expr) => {
-            return Ok(if in_bracket {
-                parser.expect(&token::CloseDelim(token::Bracket))?;
-                RawArg::IndirectJumpTarget {
-                    type_: $jump,
-                    size: $size
-                }
-            } else {
-                RawArg::JumpTarget {
-                    type_: $jump,
-                    size: $size
-                }
-            });
+/// parses an ident, but instead of syn's Parse impl it does also parse keywords as idents
+fn parse_ident_or_rust_keyword(input: parse::ParseStream) -> parse::Result<syn::Ident> {
+    input.step(|cursor| {
+        if let Some((ident, rest)) = cursor.ident() {
+            return Ok((ident, rest));
         }
-    }
-
-    // global label
-    if parser.eat(&token::RArrow) {
-        let name = parser.parse_ident()?;
-        let jump = JumpType::Global(
-            Ident {node: name, span: start.with_hi(parser.prev_span.hi()) }
-        );
-        label_return!(jump, size);
-    // forward local label
-    } else if parser.eat(&token::Gt) {
-        let name = parser.parse_ident()?;
-        let jump = JumpType::Forward(
-            Ident {node: name, span: start.with_hi(parser.prev_span.hi()) }
-        );
-        label_return!(jump, size);
-    // forward global label
-    } else if parser.eat(&token::Lt) {
-        let name = parser.parse_ident()?;
-        let jump = JumpType::Backward(
-            Ident {node: name, span: start.with_hi(parser.prev_span.hi()) }
-        );
-        label_return!(jump, size);
-    // dynamic label
-    } else if parser.eat(&token::FatArrow) {
-        let id = parser.parse_expr()?;
-        let jump = JumpType::Dynamic(id);
-        label_return!(jump, size);
-    // extern location
-    } else if eat_pseudo_keyword(parser, "extern"){
-        let location = parser.parse_expr()?;
-        let jump = JumpType::Bare(location);
-        label_return!(jump, size);
-    }
-
-
-    // memory location
-    if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
-        let span = parser.span;
-        let nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
-        let disp_size = eat_size_hint(ctx, parser);
-        let expr = parser.parse_expr()?;
-        let span = expr.span.with_lo(span.lo());
-        parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
-
-        let items = parse_adds(ctx, ecx, expr);
-
-        // assemble the memory location
-        return Ok(RawArg::IndirectRaw {
-            span: span,
-            nosplit: nosplit,
-            value_size: size,
-            disp_size: disp_size,
-            items: items
-        });
-    }
-
-    // it's a normal (register/immediate/typemapped) operand
-    parser.parse_expr()?.and_then(|arg| {
-        // typemapped
-        if parser.eat(&token::FatArrow) {
-            let base = parse_reg(ctx, &arg);
-            let base = if let Some(base) = base { base } else {
-                ecx.span_err(arg.span, "Expected register");
-                return Ok(RawArg::Invalid);
-            };
-
-            let ty = parser.parse_path(PathStyle::Type)?;
-
-            // any attribute, register as index and immediate in index
-            let mut nosplit = false;
-            let mut disp_size = None;
-            let items;
-
-            if parser.eat(&token::OpenDelim(token::DelimToken::Bracket)) {
-                nosplit = eat_pseudo_keyword(parser, "NOSPLIT");
-                disp_size = eat_size_hint(ctx, parser);
-                let index_expr = parser.parse_expr()?;
-
-                parser.expect(&token::CloseDelim(token::DelimToken::Bracket))?;
-                items = parse_adds(ctx, ecx, index_expr);
-            } else {
-                items = Vec::new();
-            }
-
-            let attr = if parser.eat(&token::Dot) {
-                Some(parser.parse_ident()?)
-            } else {
-                None
-            };
-
-            return Ok(RawArg::TypeMappedRaw {
-                span: start.with_hi(parser.prev_span.hi()),
-                nosplit: nosplit,
-                value_size: size,
-                disp_size: disp_size,
-                base_reg: base.node,
-                scale: ty,
-                scaled_items: items,
-                attribute: attr,
-            });
-        }
-
-        // direct register reference
-        if let Some(reg) = parse_reg(ctx, &arg) {
-            if size.is_some() {
-                ecx.span_err(arg.span, "size hint with direct register");
-            }
-            return Ok(RawArg::Direct {
-                reg: reg.node,
-                span: reg.span
-            })
-        }
-
-        // immediate
-        Ok(RawArg::Immediate {
-            value: P(arg),
-            size: size
-        })
+        Err(cursor.error("expected identifier"))
     })
 }
 
-pub fn as_simple_name(expr: &ast::Expr) -> Option<Ident> {
+/// Parses a label (jump target) declaration. Returns Some(JumpType) if a jump was present
+fn parse_label(input: parse::ParseStream) -> parse::Result<Option<JumpType>> {
+    // -> global_label
+    Ok(if input.peek(Token![->]) {
+        let _: Token![->] = input.parse()?;
+        let name: syn::Ident = input.parse()?;
+
+        Some(JumpType::Global(name))
+
+    // > forward_label
+    } else if input.peek(Token![>]) {
+        let _: Token![>] = input.parse()?;
+        let name: syn::Ident = input.parse()?;
+
+        Some(JumpType::Forward(name))
+
+    // < backwards_label
+    } else if input.peek(Token![<]) {
+        let _: Token![<] = input.parse()?;
+        let name: syn::Ident = input.parse()?;
+
+        Some(JumpType::Backward(name))
+        
+    // => dynamic_label
+    } else if input.peek(Token![=>]) {
+        let _: Token![=>] = input.parse()?;
+        let expr: syn::Expr = input.parse()?;
+
+        Some(JumpType::Dynamic(expr))
+
+    // extern label
+    } else if eat_pseudo_keyword(input, "extern") {
+        let expr: syn::Expr = input.parse()?;
+
+        Some(JumpType::Bare(expr))
+
+    } else {
+        None
+    })
+}
+
+/// tries to parse a full arg definition
+fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawArg> {
+    // sizehint
+    let size = eat_size_hint(ctx, input);
+
+    let _start = input.cursor().span(); // FIXME can't join spans yet
+
+    // bare label
+    if let Some(jump) = parse_label(input)? {
+        return Ok(RawArg::JumpTarget {
+            type_: jump,
+            size
+        })
+    }
+
+    // indirect
+    if input.peek(syn::token::Bracket) {
+        let span = input.cursor().span();
+        let inner;
+        let _ = syn::bracketed!(inner in input);
+        let inner = &inner;
+
+        // label
+        if let Some(jump) = parse_label(inner)? {
+            return Ok(RawArg::IndirectJumpTarget {
+                type_: jump,
+                size
+            })
+        }
+
+        // memory reference 
+        let nosplit = eat_pseudo_keyword(inner, "NOSPLIT");
+        let disp_size = eat_size_hint(ctx, inner);
+        let expr: syn::Expr = inner.parse()?;
+
+        // split the expression into the different (displacement, register, scaled register) components
+        let items = parse_adds(ctx, expr);
+
+        return Ok(RawArg::IndirectRaw {
+            span,
+            nosplit,
+            value_size: size,
+            disp_size,
+            items
+        })
+
+    }
+
+    // it's a normal (register/immediate/typemapped) operand
+    let arg: syn::Expr = input.parse()?;
+
+    // typemapped: expr => type [expr] . ident
+    if input.peek(Token![=>]) {
+        let _: Token![=>] = input.parse()?;
+
+        let base = if let Some((_, base)) = parse_reg(ctx, &arg) {
+            base
+        } else {
+            err(arg.span(), "Expected register".into());
+            return Ok(RawArg::Invalid);
+        };
+
+        let ty: syn::Path = input.parse()?;
+
+        // any attribute, register as index and immediate in index
+        let mut nosplit = false;
+        let mut disp_size = None;
+
+        let items = if input.peek(syn::token::Bracket) {
+            let inner;
+            let _brackets = syn::bracketed!(inner in input);
+            let inner = &inner;
+
+            nosplit = eat_pseudo_keyword(inner, "NOSPLIT");
+            disp_size = eat_size_hint(ctx, inner);
+            let index_expr: syn::Expr = inner.parse()?;
+
+            parse_adds(ctx, index_expr)
+        } else {
+            Vec::new()
+        };
+
+        let attr: Option<syn::Ident> = if input.peek(Token![.]) {
+            let _: Token![.] = input.parse()?;
+            Some(input.parse()?)
+        } else {
+            None
+        };
+
+        return Ok(RawArg::TypeMappedRaw {
+            span: arg.span(), // FIXME can't join spans yet
+            nosplit,
+            value_size: size,
+            disp_size,
+            base_reg: base,
+            scale: ty,
+            scaled_items: items,
+            attribute: attr,
+        });
+    }
+
+    // direct register
+    if let Some((span, reg)) = parse_reg(ctx, &arg) {
+        if size.is_some() {
+            err(span, "size hint with direct register".into());
+        }
+        return Ok(RawArg::Direct {
+            reg,
+            span
+        })
+    }
+
+    // immediate
+    Ok(RawArg::Immediate {
+        value: arg,
+        size
+    })
+}
+
+/// checks if an expression is simply an ident, and if so, returns a clone of it.
+pub fn as_simple_name(expr: &syn::Expr) -> Option<syn::Ident> {
     let path = match *expr {
-        ast::Expr {node: ast::ExprKind::Path(None, ref path) , ..} => path,
+        syn::Expr::Path(syn::ExprPath {ref path, qself: None, ..}) => path,
         _ => return None
     };
 
-    if path.is_global() || path.segments.len() != 1 {
+    if path.leading_colon.is_some() || path.segments.len() != 1 {
         return None;
     }
 
     let segment = &path.segments[0];
-    if !segment.args.is_none() {
+    if segment.arguments != syn::PathArguments::None {
         return None;
     }
 
-    Some(Ident {node: segment.ident, span: path.span})
+    Some(segment.ident.clone())
 }
 
-fn parse_reg(ctx: &Context, expr: &ast::Expr) -> Option<Spanned<Register>> {
+/// checks if an expression is interpretable as a register reference.
+fn parse_reg(ctx: &Context, expr: &syn::Expr) -> Option<(Span, Register)> {
     if let Some(path) = as_simple_name(expr) {
         // static register names
 
-        let mut name = &*path.node.name.as_str();
+        let name = path.to_string();
+        let mut name = name.as_str();
         if let Some(x) = ctx.state.crate_data.aliases.get(name) {
             name = x;
         }
@@ -312,67 +320,67 @@ fn parse_reg(ctx: &Context, expr: &ast::Expr) -> Option<Spanned<Register>> {
             X86Mode::Protected => X86_REGISTERS.get(&name).cloned()
         }?;
 
-        Some(Spanned {
-            node: Register::new_static(size, reg),
-            span: path.span
-        })
+        Some((
+            path.span(),
+            Register::new_static(size, reg)
+        ))
 
-    } else if let ast::Expr {node: ast::ExprKind::Call(ref called, ref args), span, ..} = *expr {
-        // dynamically chosen registers
+    } else if let syn::Expr::Call(syn::ExprCall {ref func, ref args, ..}) = expr {
+        // dynamically chosen registers ( ident(expr) )
         if args.len() != 1 {
             return None;
         }
 
-        let called = if let Some(called) = as_simple_name(called) {
+        let called = if let Some(called) = as_simple_name(&&*func) {
             called
         } else {
             return None;
         };
 
-        let name = &*called.node.name.as_str();
+        let name = called.to_string();
+        let name = name.as_str();
         let (size, family) = match ctx.mode {
             X86Mode::Long      => X64_FAMILIES.get(&name).cloned(),
             X86Mode::Protected => X86_FAMILIES.get(&name).cloned()
         }?;
 
-        Some(Spanned {
-            node: Register::new_dynamic(size, family, args[0].clone()),
-            span: span
-        })
+        Some((
+            expr.span(), // FIXME:can't join spans atm
+            Register::new_dynamic(size, family, args[0].clone())
+        ))
     } else {
         None
     }
 }
 
-fn parse_adds(ctx: &Context, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRefItem> {
-    use syntax::ast::ExprKind;
-
+/// splits an expression into different components of a memory reference.
+fn parse_adds(ctx: &Context, expr: syn::Expr) -> Vec<MemoryRefItem> {
     let mut adds = Vec::new();
-    collect_adds(ecx, expr, &mut adds);
+    collect_adds(expr, &mut adds);
 
     let mut items = Vec::new();
 
     // detect what kind of equation we're dealing with
     for node in adds {
         // simple reg
-        if let Some(Spanned {node: reg, ..} ) = parse_reg(ctx, &node) {
+        if let Some((_, reg)) = parse_reg(ctx, &node) {
             items.push(MemoryRefItem::Register(reg));
             continue;
         }
-        if let ast::Expr {node: ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Mul, ..}, ref left, ref right), ..} = *node {
+        if let syn::Expr::Binary(syn::ExprBinary { op: syn::BinOp::Mul(_), ref left, ref right, .. } ) = node {
             // reg * const
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(ctx, left) {
-                if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **right {
-                    if let ast::LitKind::Int(value, _) = scale.node {
-                        items.push(MemoryRefItem::ScaledRegister(reg, value as isize));
+            if let Some((_, reg)) = parse_reg(ctx, left) {
+                if let syn::Expr::Lit(syn::ExprLit {ref lit, ..}) = **right {
+                    if let syn::Lit::Int(lit) = lit {
+                        items.push(MemoryRefItem::ScaledRegister(reg, lit.value() as isize));
                         continue;
                     }
                 }
             } // const * reg
-            if let Some(Spanned {node: reg, ..} ) = parse_reg(ctx, right) {
-                if let ast::Expr {node: ExprKind::Lit(ref scale), ..} = **left {
-                    if let ast::LitKind::Int(value, _) = scale.node {
-                        items.push(MemoryRefItem::ScaledRegister(reg, value as isize));
+            if let Some((_, reg)) = parse_reg(ctx, right) {
+                if let syn::Expr::Lit(syn::ExprLit {ref lit, ..}) = **left {
+                    if let syn::Lit::Int(lit) = lit {
+                        items.push(MemoryRefItem::ScaledRegister(reg, lit.value() as isize));
                         continue;
                     }
                 }
@@ -384,21 +392,20 @@ fn parse_adds(ctx: &Context, ecx: &ExtCtxt, expr: P<ast::Expr>) -> Vec<MemoryRef
     items
 }
 
-fn collect_adds(ecx: &ExtCtxt, node: P<ast::Expr>, collection: &mut Vec<P<ast::Expr>>) {
-    node.and_then(|node| {
-        if let ast::Expr {node: ast::ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Add, ..}, left, right), ..} = node {
-            collect_adds(ecx, left, collection);
-            collect_adds(ecx, right, collection);
-        } else if let ast::Expr {node: ast::ExprKind::Binary(ast::BinOp {node: ast::BinOpKind::Sub, ..}, left, right), ..} = node {
-            collect_adds(ecx, left, collection);
-            let span = right.span;
-            collection.push(ecx.expr_unary(span, ast::UnOp::Neg, right));
-        } else {
-            collection.push(P(node));
-        }
-    })
+/// Takes an expression and splits all added (and subtracted) components
+fn collect_adds(node: syn::Expr, collection: &mut Vec<syn::Expr>) {
+    if let syn::Expr::Binary(syn::ExprBinary { op: syn::BinOp::Add(_), left, right, .. } ) = node {
+        collect_adds(*left, collection);
+        collect_adds(*right, collection);
+    } else if let syn::Expr::Binary(syn::ExprBinary { op: syn::BinOp::Sub(sub), left, right, .. } ) = node {
+        collect_adds(*left, collection);
+        collection.push(syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(sub), expr: right, attrs: Vec::new() } ));
+    } else {
+        collection.push(node);
+    }
 }
 
+/// why
 lazy_static!{
     static ref X64_REGISTERS: HashMap<&'static str, (RegId, Size)> = {
         use self::RegId::*;
