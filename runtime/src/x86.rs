@@ -133,13 +133,18 @@ impl Assembler {
     /// Using this `AssemblyModifier` changes can be made to the committed code.
     /// After this function returns, any labels in these changes will be resolved
     /// and the `ExecutableBuffer` will be unlocked again.
-    pub fn alter<F>(&mut self, f: F) where F: FnOnce(&mut AssemblyModifier) -> () {
+    pub fn alter<F, O>(&mut self, f: F) -> O
+    where
+        F: FnOnce(&mut AssemblyModifier) -> O
+    {
         self.commit();
 
         let cloned = self.base.reader();
         let mut lock = cloned.write().unwrap();
+        let mut out = None;
 
         // move the buffer out of the assembler for a bit
+        // no commit is required afterwards as we directly modified the buffer.
         take_mut::take_or_recover(&mut *lock, || ExecutableBuffer::new(0, MMAP_INIT_SIZE).unwrap(), |buf| {
             let mut buf = buf.make_mut().unwrap();
 
@@ -151,7 +156,7 @@ impl Assembler {
                     last_asmoffset: 0,
                     new_managed_relocs: Vec::new(),
                 };
-                f(&mut m);
+                out = Some(f(&mut m));
                 m.encode_relocs();
             }
 
@@ -159,7 +164,7 @@ impl Assembler {
             buf.make_exec().unwrap()
         });
 
-        // no commit is required as we directly modified the buffer.
+        out.expect("Programmer error: `take_or_recover` didn't initialize `out`. This is a bug!")
     }
 
     /// Similar to `Assembler::alter`, this method allows modification of the yet to be
