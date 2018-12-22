@@ -5370,14 +5370,12 @@ Ops!(OPMAP;
 "setno"       = [
     b"vb",       [0x0F, 0x91      ], 0;
 ]
-"set
-    b"        |
+"setb"        |
 "setc"        |
 "setnae"      = [
     b"vb",       [0x0F, 0x92      ], 0;
 ]
-"setn
-    b"       |
+"setnb"       |
 "setnc"       |
 "setae"       = [
     b"vb",       [0x0F, 0x93      ], 0;
