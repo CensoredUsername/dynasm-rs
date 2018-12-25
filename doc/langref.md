@@ -87,7 +87,7 @@ Name      | Argument format | Description
 
 ## Aliases
 
-Dynasm-rs allows the user to define aliases for registers using the `.alias name, register` directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order and that their scoping is crate-global.
+Dynasm-rs allows the user to define aliases for registers using the `.alias name, register` directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order and that their scoping is file-global.
 
 ## Macros
 
