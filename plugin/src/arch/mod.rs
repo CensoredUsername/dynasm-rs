@@ -1,7 +1,7 @@
 use syn::parse;
 
 use ::State;
-use ::err;
+use ::emit_error_at;
 
 use std::fmt::Debug;
 
@@ -31,12 +31,12 @@ impl Arch for DummyArch {
 
     fn set_features(&mut self, features: &[syn::Ident]) {
         if let Some(feature) = features.first() {
-            err(feature.span(), "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive".into());
+            emit_error_at(feature.span(), "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive".into());
         }
     }
 
     fn compile_instruction(&self, _state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
-        err(input.cursor().span(), "Current assembling architecture is undefined. Define it using a .arch directive".into());
+        emit_error_at(input.cursor().span(), "Current assembling architecture is undefined. Define it using a .arch directive".into());
         Ok(())
     }
 }

@@ -2,7 +2,7 @@ use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenTree};
 use quote::{quote_spanned};
 
-use ::err;
+use ::emit_error_at;
 use serialize::{self, Stmt, Size};
 use super::{Context, X86Mode};
 use super::ast::{RawArg, CleanArg, SizedArg, Instruction, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
@@ -310,7 +310,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             compile_modrm_sib(buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
             if let Some(expr) = scale_expr {
-                compile_sib_dynscale(buffer, &ctx.state.target, scale as u8, expr, index, base);
+                compile_sib_dynscale(buffer, scale as u8, expr, index, base);
             } else {
                 compile_modrm_sib(buffer, encode_scale(scale).unwrap(), index, base);
             }
@@ -392,7 +392,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
                 compile_modrm_sib(buffer, mode, reg_k, RegKind::Static(RegId::RSP));
 
                 if let Some(expr) = scale_expr {
-                    compile_sib_dynscale(buffer, &ctx.state.target, scale as u8, expr, index.kind, base);
+                    compile_sib_dynscale(buffer, scale as u8, expr, index.kind, base);
                 } else {
                     compile_modrm_sib(buffer, encode_scale(scale).unwrap(), index.kind, base);
                 }
@@ -607,7 +607,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
 
 
             if !joined_regs.is_empty() {
-                err(span, "Impossible memory argument".into());
+                emit_error_at(span, "Impossible memory argument".into());
                 return Err(None);
             }
 
@@ -655,7 +655,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             let index = joined_regs.pop();
 
             if !joined_regs.is_empty() {
-                err(span, "Impossible memory argument".into());
+                emit_error_at(span, "Impossible memory argument".into());
                 return Err(None);
             }
 
@@ -723,7 +723,7 @@ fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<
             CleanArg::Indirect {span, nosplit, ref mut disp_size, ref mut base, ref mut index, ref disp, ..} => {
 
                 if encountered_indirect {
-                    err(span, "Multiple memory references in a single instruction".into())
+                    emit_error_at(span, "Multiple memory references in a single instruction".into())
                 }
                 encountered_indirect = true;
 
@@ -732,23 +732,23 @@ fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<
 
                 if let Some((_, scale, _)) = *index {
                     if encode_scale(scale).is_none() {
-                        err(span, "Impossible scale".into());
+                        emit_error_at(span, "Impossible scale".into());
                     }
                 }
 
                 // if specified, sanitize the displacement size. Else, derive one
                 if let Some(size) = *disp_size {
                     if disp.is_none() {
-                        err(span, "Displacement size without displacement".into());
+                        emit_error_at(span, "Displacement size without displacement".into());
                     }
 
                     // 16-bit addressing has smaller displacements
                     if addr_size == Some(Size::WORD) {
                         if size != Size::BYTE && size != Size::WORD {
-                            err(span, "Invalid displacement size, only BYTE or WORD are possible".into());
+                            emit_error_at(span, "Invalid displacement size, only BYTE or WORD are possible".into());
                         }
                     } else if size != Size::BYTE && size != Size::DWORD {
-                        err(span, "Invalid displacement size, only BYTE or DWORD are possible".into());
+                        emit_error_at(span, "Invalid displacement size, only BYTE or DWORD are possible".into());
                     }
                 } else if let Some(ref disp) = *disp {
                     match derive_size(disp) {
@@ -838,7 +838,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
         },
         (&Some((f1, s1)), &Some((f2, s2))) => if f1 == f2 {
             if s1 != s2 {
-                err(span, "Registers of differing sizes".into());
+                emit_error_at(span, "Registers of differing sizes".into());
                 return Err(None);
             }
             size = s1;
@@ -854,7 +854,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             size = s1;
             family = f1;
         } else {
-            err(span, "Register type combination not supported".into());
+            emit_error_at(span, "Register type combination not supported".into());
             return Err(None);
         }
     }
@@ -862,26 +862,26 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
     // filter out combinations that are impossible to encode
     match family {
         RegFamily::RIP => if b.is_some() && i.is_some() {
-            err(span, "Register type combination not supported".into());
+            emit_error_at(span, "Register type combination not supported".into());
             return Err(None);
         },
         RegFamily::LEGACY => match size {
             Size::DWORD => (),
             Size::QWORD => (), // only valid in long mode, but should only be possible in long mode
             Size::WORD  => if ctx.mode == X86Mode::Protected || vsib_mode {
-                err(span, "16-bit addressing is not supported in this mode".into());
+                emit_error_at(span, "16-bit addressing is not supported in this mode".into());
                 return Err(None);
             },
             _ => {
-                err(span, "Register type not supported".into());
+                emit_error_at(span, "Register type not supported".into());
                 return Err(None);
             }
         },
         RegFamily::XMM => if b.is_some() && i.is_some() {
-            err(span, "Register type combination not supported".into());
+            emit_error_at(span, "Register type combination not supported".into());
         },
         _ => {
-            err(span, "Register type not supported".into());
+            emit_error_at(span, "Register type not supported".into());
             return Err(None);
         }
     }
@@ -892,7 +892,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
         match index.take() {
             Some((index, 1, None)) => *base = Some(index),
             Some(_) => {
-                err(span, "RIP cannot be scaled".into());
+                emit_error_at(span, "RIP cannot be scaled".into());
                 return Err(None);
             },
             None => ()
@@ -919,7 +919,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             if let (ref mut i, 1, None) = index.as_mut().unwrap() {
                 swap(i, base.as_mut().unwrap())
             } else {
-                err(span, "vsib addressing requires a general purpose register as base".into());
+                emit_error_at(span, "vsib addressing requires a general purpose register as base".into());
                 return Err(None);
             }
         }
@@ -935,7 +935,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             Some((i, 1, None)) => Some(i),
             None => None,
             Some(_) => {
-                err(span, "16-bit addressing with scaled index".into());
+                emit_error_at(span, "16-bit addressing with scaled index".into());
                 return Err(None);
             },
         };
@@ -958,7 +958,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             (r, None) if r == &RegId::RBP => RegId::from_number(6),
             (r, None) if r == &RegId::RBX => RegId::from_number(7),
             _ => {
-                err(span, "Impossible register combination".into());
+                emit_error_at(span, "Impossible register combination".into());
                 return Err(None);
             }
         };
@@ -989,7 +989,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
                 *index = base.take().map(|reg| (reg, 1, None));
                 *base = Some(i);
             } else {
-                err(span, "'rsp' cannot be used as index field".into());
+                emit_error_at(span, "'rsp' cannot be used as index field".into());
                 return Err(None);
             }
         } else {
@@ -1013,7 +1013,7 @@ fn match_op_format(ctx: &Context, ident: &syn::Ident, args: &[CleanArg]) -> Resu
     let data = if let Some(data) = get_mnemnonic_data(name) {
         data
     } else {
-        err(ident.span(), format!("'{}' is not a valid instruction", name));
+        emit_error_at(ident.span(), format!("'{}' is not a valid instruction", name));
         return Err(None);
     };
 
@@ -1306,27 +1306,27 @@ fn get_legacy_prefixes(fmt: &'static Opdata, idents: Vec<syn::Ident>) -> Result<
             "rep"   => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF3)
             } else {
-                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "repe"  |
             "repz"  => if fmt.flags.contains(Flags::REPE) {
                 (&mut group1, 0xF3)
             } else {
-                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "repnz" |
             "repne" => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF2)
             } else {
-                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "lock"  => if fmt.flags.contains(Flags::LOCK) {
                 (&mut group1, 0xF0)
             } else {
-                err(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
                 return Err(None);
             },
             "ss"    => (&mut group2, 0x36),
@@ -1338,7 +1338,7 @@ fn get_legacy_prefixes(fmt: &'static Opdata, idents: Vec<syn::Ident>) -> Result<
             _       => panic!("unimplemented prefix")
         };
         if group.is_some() {
-            err(prefix.span(), "Duplicate prefix group".into());
+            emit_error_at(prefix.span(), "Duplicate prefix group".into());
             return Err(None);
         }
         *group = Some(value);
@@ -1666,7 +1666,7 @@ fn compile_modrm_sib(buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegK
     buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
 }
 
-fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, target: &TokenTree, scale: u8, scale_expr: syn::Expr, reg1: RegKind, reg2: RegKind) {
+fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr, reg1: RegKind, reg2: RegKind) {
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 
@@ -1684,7 +1684,6 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, target: &TokenTree, scale: u8, s
     let scale_expr = serialize::delimited(scale_expr);
 
     let (expr1, expr2) = serialize::expr_dynscale(
-        target,
         &serialize::delimited(quote_spanned!{ span=>
             #scale_expr * #scale
         }),

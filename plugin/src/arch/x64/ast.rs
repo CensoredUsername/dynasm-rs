@@ -126,7 +126,6 @@ impl RegKind {
         }
     }
 
-    // TODO: on x86 the default should be false
     pub fn is_extended(&self) -> bool {
         match self.family() {
             RegFamily::LEGACY  |

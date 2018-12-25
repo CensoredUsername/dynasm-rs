@@ -1,4 +1,5 @@
 #![feature(proc_macro_diagnostic)]
+#![feature(proc_macro_span)]
 
 // token/ast manipulation
 extern crate proc_macro;
@@ -14,13 +15,15 @@ extern crate byteorder;
 
 use syn::parse;
 use syn::{Token, parse_macro_input};
-use proc_macro2::{Span, TokenTree};
+use proc_macro2::{Span, TokenTree, TokenStream};
+use quote::quote;
 
 use lazy_static::lazy_static;
 use owning_ref::{OwningRef, RwLockReadGuardRef};
 
 use std::sync::{RwLock, RwLockReadGuard, Mutex};
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// Module with architecture-specific assembler implementations
 mod arch;
@@ -60,10 +63,9 @@ impl parse::Parse for Dynasm {
         // and just convert it back to a tokentree since that's how we'll always be using it.
         let target = serialize::delimited(target);
 
-        // get crate-local data (alias definitions, current architecture) based on ???
-        // FIXME: find a way to get the crate name? or maybe the file name at the expansion site?
-        let crate_data = crate_local_data();
-        let mut crate_data = crate_data.lock().unwrap();
+        // get file-local data (alias definitions, current architecture)
+        let file_data = file_local_data();
+        let mut file_data = file_data.lock().unwrap();
 
         // prepare the statement buffer
         let mut stmts = Vec::new();
@@ -76,9 +78,19 @@ impl parse::Parse for Dynasm {
             if input.peek(Token![;]) {
                 let _: Token![;] = input.parse()?;
 
-                let stmt: syn::Expr = input.parse()?; // FIXME statement used to be optional
+                // collect all tokentrees till the next ;
+                let mut buffer = TokenStream::new();
+                while !(input.is_empty() || input.peek(Token![;])) {
+                    buffer.extend(std::iter::once(input.parse::<TokenTree>()?));
+                }
+                // glue an extra ; on there
+                buffer.extend(quote! { ; } );
 
-                stmts.push(serialize::Stmt::Stmt(serialize::delimited(stmt)));
+                if !buffer.is_empty() {
+                    // ensure that the statement is actually a proper statement and then emit it for serialization
+                    let stmt: syn::Stmt = syn::parse2(buffer)?;
+                    stmts.push(serialize::Stmt::Stmt(serialize::delimited(stmt)));
+                }
                 continue;
             }
 
@@ -86,7 +98,7 @@ impl parse::Parse for Dynasm {
             if input.peek(Token![.]) {
                 let _: Token![.] = input.parse()?;
 
-                crate_data.evaluate_directive(&mut stmts, input)?;
+                file_data.evaluate_directive(&mut stmts, input)?;
                 continue;
             }
 
@@ -125,9 +137,9 @@ impl parse::Parse for Dynasm {
             let mut state = State {
                 stmts: &mut stmts,
                 target: &target,
-                crate_data: &*crate_data,
+                file_data: &*file_data,
             };
-            crate_data.current_arch.compile_instruction(&mut state, input)?;
+            file_data.current_arch.compile_instruction(&mut state, input)?;
 
         }
 
@@ -196,12 +208,12 @@ impl parse::Parse for DynasmOpmap {
 struct State<'a> {
     pub stmts: &'a mut Vec<serialize::Stmt>,
     pub target: &'a TokenTree,
-    pub crate_data: &'a DynasmData,
+    pub file_data: &'a DynasmData,
 }
 
-// Crate local data implementation.
+// File local data implementation.
 
-type DynasmStorage = HashMap<String, Mutex<DynasmData>>;
+type DynasmStorage = HashMap<PathBuf, Mutex<DynasmData>>;
 
 struct DynasmData {
     pub current_arch: Box<arch::Arch>,
@@ -218,16 +230,20 @@ impl DynasmData {
     }
 }
 
-type CrateLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
+type FileLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
 
-fn crate_local_data() -> CrateLocalData {
-    let id = &"FIXME".to_string(); // FIXME: do we have any way of getting the crate name? or maybe the source file name
+fn file_local_data() -> FileLocalData {
+    // get the file that generated this macro expansion
+    let span = Span::call_site().unstable();
+
+    // and use the file that that was at as scope for resolving dynasm data
+    let id = span.source_file().path();
 
     {
         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
 
-        if data.get(id).is_some() {
-            return data.map(|x| x.get(id).unwrap());
+        if data.get(&id).is_some() {
+            return data.map(|x| x.get(&id).unwrap());
         }
     }
 
@@ -235,19 +251,16 @@ fn crate_local_data() -> CrateLocalData {
         let mut lock = DYNASM_STORAGE.write().unwrap();
         lock.insert(id.clone(), Mutex::new(DynasmData::new()));
     }
-    RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(id).unwrap())
+    RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&id).unwrap())
 }
 
 // this is where the actual storage resides.
-
 lazy_static! {
     static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
 }
 
-
-// temporary till Diagnostic gets stabilized
-fn err(span: Span, msg: String) { // FIXME
+// FIXME: temporary till Diagnostic gets stabilized
+fn emit_error_at(span: Span, msg: String) {
     let span: proc_macro::Span = span.unstable();
-    let diag = proc_macro::Diagnostic::spanned(span, proc_macro::Level::Error, msg);
-    diag.emit();
+    span.error(msg).emit();
 }

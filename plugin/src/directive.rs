@@ -6,7 +6,7 @@ use syn::Token;
 use super::DynasmData;
 use serialize::{Stmt, Size, delimited};
 use arch;
-use ::err;
+use ::emit_error_at;
 
 impl DynasmData {
     pub fn evaluate_directive(&mut self, stmts: &mut Vec<Stmt>, input: parse::ParseStream) -> parse::Result<()> {
@@ -21,7 +21,7 @@ impl DynasmData {
                 if let Some(a) = arch::from_str(arch.to_string().as_str()) {
                     self.current_arch = a;
                 } else {
-                    err(arch.span(), format!("Unknown architecture '{}'", arch.to_string()));
+                    emit_error_at(arch.span(), format!("Unknown architecture '{}'", arch.to_string()));
                 }
             },
             "feature" => {
@@ -69,7 +69,7 @@ impl DynasmData {
 
                 match self.aliases.entry(alias_name) {
                     Entry::Occupied(_) => {
-                        err(alias.span(), format!("Duplicate alias definition, alias '{}' was already defined", alias.to_string()));
+                        emit_error_at(alias.span(), format!("Duplicate alias definition, alias '{}' was already defined", alias.to_string()));
                     },
                     Entry::Vacant(v) => {
                         v.insert(reg.to_string());
@@ -78,7 +78,7 @@ impl DynasmData {
             },
             d => {
                 // unknown directive. skip ahead until we hit a ; so the parser can recover
-                err(directive.span(), format!("unknown directive '{}'", d));
+                emit_error_at(directive.span(), format!("unknown directive '{}'", d));
                 skip_until_semicolon(input);
             }
         }

@@ -7,7 +7,7 @@ pub mod debug;
 pub mod x64data;
 
 use ::State;
-use ::err;
+use ::emit_error_at;
 use arch::Arch;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ impl Arch for Archx64 {
             new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    err(ident.span(), format!("Architecture x64 does not support feature '{}'", ident.to_string()));
+                    emit_error_at(ident.span(), format!("Architecture x64 does not support feature '{}'", ident.to_string()));
                     continue;
                 }
             }
@@ -62,7 +62,7 @@ impl Arch for Archx64 {
         let span = instruction.span;
 
         if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, instruction, args) {
-            err(span, e);
+            emit_error_at(span, e);
         }
         Ok(())
     }
@@ -90,7 +90,7 @@ impl Arch for Archx86 {
             new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    err(ident.span(), format!("Architecture x86 does not support feature '{}'", ident.to_string()));
+                    emit_error_at(ident.span(), format!("Architecture x86 does not support feature '{}'", ident.to_string()));
                     continue;
                 }
             }
@@ -108,7 +108,7 @@ impl Arch for Archx86 {
         let span = instruction.span;
 
         if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, instruction, args) {
-            err(span, e);
+            emit_error_at(span, e);
         }
         Ok(())
     }

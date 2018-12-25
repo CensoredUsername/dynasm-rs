@@ -4,7 +4,7 @@ use proc_macro2::Span;
 
 use lazy_static::lazy_static;
 
-use ::err;
+use ::emit_error_at;
 use serialize::Size;
 use super::{Context, X86Mode};
 use super::ast::{Instruction, RawArg, JumpType, Register, RegId, RegFamily, MemoryRefItem};
@@ -224,7 +224,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
         let base = if let Some((_, base)) = parse_reg(ctx, &arg) {
             base
         } else {
-            err(arg.span(), "Expected register".into());
+            emit_error_at(arg.span(), "Expected register".into());
             return Ok(RawArg::Invalid);
         };
 
@@ -270,7 +270,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     // direct register
     if let Some((span, reg)) = parse_reg(ctx, &arg) {
         if size.is_some() {
-            err(span, "size hint with direct register".into());
+            emit_error_at(span, "size hint with direct register".into());
         }
         return Ok(RawArg::Direct {
             reg,
@@ -311,7 +311,7 @@ fn parse_reg(ctx: &Context, expr: &syn::Expr) -> Option<(Span, Register)> {
 
         let name = path.to_string();
         let mut name = name.as_str();
-        if let Some(x) = ctx.state.crate_data.aliases.get(name) {
+        if let Some(x) = ctx.state.file_data.aliases.get(name) {
             name = x;
         }
 

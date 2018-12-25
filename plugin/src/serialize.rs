@@ -175,7 +175,6 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
                 });
                 continue;
             }
-
         };
 
         // and construct the appropriate method call
@@ -232,8 +231,8 @@ pub fn inverted(expr: &TokenTree) -> TokenTree {
 }
 
 // 
-pub fn expr_dynscale(name: &TokenTree, scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
-    let tempval = expr_encode_x64_sib_scale(name, &scale);
+pub fn expr_dynscale(scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
+    let tempval = expr_encode_x64_sib_scale(&scale);
     (delimited(quote! {
         let temp = #tempval
     }), delimited(quote! {
@@ -323,9 +322,9 @@ pub fn expr_size_of(path: &syn::Path) -> TokenTree {
 //    4 => 2,
 //    2 => 1,
 //    1 => 0,
-//  _ => name.runtime_error("Type size not representable as scale")
+//    _ => panic!r("Type size not representable as scale")
 //}
-pub fn expr_encode_x64_sib_scale(name: &TokenTree, size: &TokenTree) -> TokenTree {
+pub fn expr_encode_x64_sib_scale(size: &TokenTree) -> TokenTree {
     let span = size.span();
 
     delimited(quote_spanned! { span=>
@@ -334,7 +333,7 @@ pub fn expr_encode_x64_sib_scale(name: &TokenTree, size: &TokenTree) -> TokenTre
             4 => 2,
             2 => 1,
             1 => 0,
-            _ => #name.runtime_error("Type size not representable as scale")
+            _ => panic!("Type size not representable as scale")
         }
     })
 }
