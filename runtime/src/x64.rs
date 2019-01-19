@@ -103,6 +103,11 @@ impl Assembler {
         self.labels.new_dynamic_label()
     }
 
+    /// Query the offset of a dynamic label.
+    pub fn get_dynamic_label_offset(&self, label: DynamicLabel) -> Option<AssemblyOffset> {
+        self.labels.try_resolve_dynamic_label(label)
+    }
+
     /// To allow already committed code to be altered, this method allows modification
     /// of the internal ExecutableBuffer directly. When this method is called, all
     /// data will be committed and access to the internal `ExecutableBuffer` will be locked.

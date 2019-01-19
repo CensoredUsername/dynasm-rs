@@ -242,6 +242,7 @@ pub(crate) struct LabelRegistry {
 }
 
 impl LabelRegistry {
+    /// Create a new, empty label registry
     pub fn new() -> LabelRegistry {
         LabelRegistry {
             global_labels: HashMap::new(),
@@ -250,12 +251,20 @@ impl LabelRegistry {
         }
     }
 
+    /// API for the user to create a new dynamic label
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         let id = self.dynamic_labels.len();
         self.dynamic_labels.push(None);
         DynamicLabel(id)
     }
 
+    /// API for the user to get the definition offset of a dynamic label so they don't have to
+    /// keep both the dynamic label id and the offset stored when we already do so as well
+    pub fn try_resolve_dynamic_label(&self, id: DynamicLabel) -> Option<AssemblyOffset> {
+        self.dynamic_labels.get(id.0).and_then(|&x| x)
+    }
+
+    /// API for dynasm! to create a new dynamic label target
     pub fn dynamic_label(&mut self, id: DynamicLabel, offset: AssemblyOffset)  {
         let entry = &mut self.dynamic_labels[id.0];
         if entry.is_some() {
@@ -264,24 +273,28 @@ impl LabelRegistry {
         *entry = Some(offset);
     }
 
+    /// API for dynasm! to create a new global label target
     pub fn global_label(&mut self, name: &'static str, offset: AssemblyOffset) {
         if let Some(_) = self.global_labels.insert(name, offset) {
             panic!("Duplicate global label '{}'", name);
         }
     }
 
+    /// API for dynasm! to create a new local label target
     pub fn local_label(&mut self, name: &'static str, offset: AssemblyOffset) {
         self.local_labels.insert(name, offset);
     }
 
+    /// API for dynasm! to resolve a dynamic label reference
     pub fn resolve_dynamic_label(&self, id: DynamicLabel) -> AssemblyOffset {
-        if let Some(&Some(target)) = self.dynamic_labels.get(id.0) {
+        if let Some(target) = self.try_resolve_dynamic_label(id) {
             target
         } else {
             panic!("Unknown dynamic label '{}'", id.0);
         }
     }
 
+    /// API for dynasm! to resolve a global label reference
     pub fn resolve_global_label(&self, name: &'static str) -> AssemblyOffset {
         if let Some(&target) = self.global_labels.get(&name) {
             target
@@ -290,6 +303,7 @@ impl LabelRegistry {
         }
     }
 
+    /// API for dynasm! to resolve a dynamic label reference
     pub fn resolve_local_label(&self, name: &'static str) -> AssemblyOffset {
         if let Some(&target) = self.local_labels.get(&name) {
             target
