@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\x64\parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\x64\parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -750,20 +750,23 @@
 <span id="750">750</span>
 <span id="751">751</span>
 <span id="752">752</span>
-</pre><pre class="rust ">
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">build</span>::<span class="ident">AstBuilder</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">base</span>::<span class="ident">ExtCtxt</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">parse</span>::<span class="ident">parser</span>::{<span class="ident">Parser</span>, <span class="ident">PathStyle</span>};
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">parse</span>::<span class="ident">token</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">parse</span>::<span class="ident">PResult</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ast</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ptr</span>::<span class="ident">P</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">source_map</span>::{<span class="ident">Spanned</span>};
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse</span>, <span class="ident">Token</span>};
+<span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">spanned</span>::<span class="ident">Spanned</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
 
+<span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="ident">lazy_static</span>;
 
+<span class="kw">use</span> ::<span class="ident">emit_error_at</span>;
+<span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">Size</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Context</span>, <span class="ident">X86Mode</span>};
-<span class="kw">use</span> <span class="ident">serialize</span>::{<span class="ident">Size</span>, <span class="ident">Ident</span>};
-
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ast</span>::{<span class="ident">Instruction</span>, <span class="ident">RawArg</span>, <span class="ident">JumpType</span>, <span class="ident">Register</span>, <span class="ident">RegId</span>, <span class="ident">RegFamily</span>, <span class="ident">MemoryRefItem</span>};
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
@@ -772,291 +775,303 @@
  * Code
  */</span>
 
-<span class="comment">// tokentree is a list of tokens and delimited lists of tokens.</span>
-<span class="comment">// this means we don&#39;t have to figure out nesting via []&#39;s by ourselves.</span>
+<span class="comment">// parses a full instruction</span>
 <span class="comment">// syntax for a single op: PREFIX* ident (SIZE? expr (&quot;,&quot; SIZE? expr)*)? &quot;;&quot;</span>
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_instruction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">Instruction</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">startspan</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse_instruction</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Instruction</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">cursor</span>().<span class="ident">span</span>();
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ops</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">parse_ident_or_rust_keyword</span>(<span class="ident">parser</span>)<span class="question-mark">?</span>, <span class="ident">span</span>: <span class="ident">span</span>};
 
-    <span class="comment">// read prefixes</span>
-    <span class="kw">while</span> <span class="ident">is_prefix</span>(<span class="ident">op</span>) {
+    <span class="comment">// read prefixes + op</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">parse_ident_or_rust_keyword</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+    <span class="kw">while</span> <span class="ident">is_prefix</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>) {
         <span class="ident">ops</span>.<span class="ident">push</span>(<span class="ident">op</span>);
-        <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
-        <span class="ident">op</span> <span class="op">=</span> <span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">parse_ident_or_rust_keyword</span>(<span class="ident">parser</span>)<span class="question-mark">?</span>, <span class="ident">span</span>: <span class="ident">span</span>};
+        <span class="ident">op</span> <span class="op">=</span> <span class="ident">parse_ident_or_rust_keyword</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
     }
+    <span class="ident">ops</span>.<span class="ident">push</span>(<span class="ident">op</span>);
 
     <span class="comment">// parse (sizehint? expr),*</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">look_ahead</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Semi</span> <span class="op">||</span> <span class="ident">x</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Eof</span>) {
-        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">parser</span>)<span class="question-mark">?</span>);
+    <span class="kw">if</span> <span class="op">!</span>(<span class="ident">input</span>.<span class="ident">is_empty</span>() <span class="op">||</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[;])) {
+        <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">ctx</span>, <span class="ident">input</span>)<span class="question-mark">?</span>);
 
-        <span class="kw">while</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Comma</span>) {
-            <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">parser</span>)<span class="question-mark">?</span>);
+        <span class="kw">while</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[,]) {
+            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[,] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+            <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">parse_arg</span>(<span class="ident">ctx</span>, <span class="ident">input</span>)<span class="question-mark">?</span>);
         }
     }
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">startspan</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>());
+    <span class="comment">// let span = span.join(input.cursor().span()); // FIXME can&#39;t join spans ATM</span>
 
-    <span class="ident">ops</span>.<span class="ident">push</span>(<span class="ident">op</span>);
     <span class="prelude-val">Ok</span>((
         <span class="ident">Instruction</span> {
             <span class="ident">idents</span>: <span class="ident">ops</span>,
-            <span class="ident">span</span>: <span class="ident">span</span>
+            <span class="ident">span</span>
         },
         <span class="ident">args</span>
     ))
 }
 
-<span class="kw">const</span> <span class="ident">PREFIXES</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">12</span>] <span class="op">=</span> [
-    <span class="string">&quot;lock&quot;</span>,
-    <span class="string">&quot;rep&quot;</span>, <span class="string">&quot;repe&quot;</span>, <span class="string">&quot;repz&quot;</span>,
-    <span class="string">&quot;repne&quot;</span>, <span class="string">&quot;repnz&quot;</span>,
-    <span class="string">&quot;ss&quot;</span>, <span class="string">&quot;cs&quot;</span>, <span class="string">&quot;ds&quot;</span>, <span class="string">&quot;es&quot;</span>, <span class="string">&quot;fs&quot;</span>, <span class="string">&quot;gs&quot;</span>
-];
-<span class="kw">fn</span> <span class="ident">is_prefix</span>(<span class="ident">token</span>: <span class="ident">Ident</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">PREFIXES</span>.<span class="ident">contains</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="ident">token</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
+<span class="doccomment">/// checks if the given ident is a valid x86 prefix</span>
+<span class="kw">fn</span> <span class="ident">is_prefix</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ident</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">const</span> <span class="ident">PREFIXES</span>: [<span class="kw-2">&amp;</span><span class="ident">str</span>; <span class="number">12</span>] <span class="op">=</span> [
+        <span class="string">&quot;lock&quot;</span>,
+        <span class="string">&quot;rep&quot;</span>, <span class="string">&quot;repe&quot;</span>, <span class="string">&quot;repz&quot;</span>,
+        <span class="string">&quot;repne&quot;</span>, <span class="string">&quot;repnz&quot;</span>,
+        <span class="string">&quot;ss&quot;</span>, <span class="string">&quot;cs&quot;</span>, <span class="string">&quot;ds&quot;</span>, <span class="string">&quot;es&quot;</span>, <span class="string">&quot;fs&quot;</span>, <span class="string">&quot;gs&quot;</span>
+    ];
+
+    <span class="ident">PREFIXES</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>())
 }
 
-<span class="kw">const</span> <span class="ident">X86_SIZES</span>: [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">9</span>] <span class="op">=</span> [
-    (<span class="string">&quot;BYTE&quot;</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>),
-    (<span class="string">&quot;WORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>),
-    (<span class="string">&quot;DWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
-    (<span class="string">&quot;AWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
-    (<span class="string">&quot;FWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">FWORD</span>),
-    (<span class="string">&quot;QWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
-    (<span class="string">&quot;TWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">PWORD</span>),
-    (<span class="string">&quot;OWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">OWORD</span>),
-    (<span class="string">&quot;YWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">HWORD</span>)
-];
-<span class="kw">const</span> <span class="ident">X64_SIZES</span>: [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">9</span>] <span class="op">=</span> [
-    (<span class="string">&quot;BYTE&quot;</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>),
-    (<span class="string">&quot;WORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>),
-    (<span class="string">&quot;DWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
-    (<span class="string">&quot;FWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">FWORD</span>),
-    (<span class="string">&quot;AWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
-    (<span class="string">&quot;QWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
-    (<span class="string">&quot;TWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">PWORD</span>),
-    (<span class="string">&quot;OWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">OWORD</span>),
-    (<span class="string">&quot;YWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">HWORD</span>)
-];
-<span class="kw">fn</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
+<span class="doccomment">/// if a size hint is present in the parse stream, returning the indicated size</span>
+<span class="kw">fn</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
+    <span class="kw">const</span> <span class="ident">X86_SIZES</span>: [(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">9</span>] <span class="op">=</span> [
+        (<span class="string">&quot;BYTE&quot;</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>),
+        (<span class="string">&quot;WORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>),
+        (<span class="string">&quot;DWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
+        (<span class="string">&quot;AWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
+        (<span class="string">&quot;FWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">FWORD</span>),
+        (<span class="string">&quot;QWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
+        (<span class="string">&quot;TWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">PWORD</span>),
+        (<span class="string">&quot;OWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">OWORD</span>),
+        (<span class="string">&quot;YWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">HWORD</span>)
+    ];
+    <span class="kw">const</span> <span class="ident">X64_SIZES</span>: [(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Size</span>); <span class="number">9</span>] <span class="op">=</span> [
+        (<span class="string">&quot;BYTE&quot;</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>),
+        (<span class="string">&quot;WORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>),
+        (<span class="string">&quot;DWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>),
+        (<span class="string">&quot;FWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">FWORD</span>),
+        (<span class="string">&quot;AWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
+        (<span class="string">&quot;QWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>),
+        (<span class="string">&quot;TWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">PWORD</span>),
+        (<span class="string">&quot;OWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">OWORD</span>),
+        (<span class="string">&quot;YWORD&quot;</span>, <span class="ident">Size</span>::<span class="ident">HWORD</span>)
+    ];
+
     <span class="kw">let</span> <span class="ident">sizes</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
         <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">X86_SIZES</span>,
         <span class="ident">X86Mode</span>::<span class="ident">Long</span>      <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">X64_SIZES</span>
     };
     <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">kw</span>, <span class="ident">size</span>) <span class="kw">in</span> <span class="ident">sizes</span> {
-        <span class="kw">if</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="ident">kw</span>) {
+        <span class="kw">if</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">input</span>, <span class="ident">kw</span>) {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">size</span>);
         }
     }
     <span class="prelude-val">None</span>
 }
 
-<span class="kw">fn</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span>, <span class="ident">kw</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">token</span> {
-        <span class="ident">token</span>::<span class="ident">Ident</span>(<span class="ident">ast</span>::<span class="ident">Ident</span> {<span class="kw-2">ref</span> <span class="ident">name</span>, ..}, <span class="kw">_</span>) <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">kw</span> <span class="op">=&gt;</span> (),
-        <span class="kw">_</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>
-    }
-    <span class="ident">parser</span>.<span class="ident">bump</span>();
-    <span class="bool-val">true</span>
+<span class="doccomment">/// Tries to parse an ident that has a specific name as a keyword. Returns true if it worked.</span>
+<span class="kw">fn</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>, <span class="ident">kw</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="ident">input</span>.<span class="ident">step</span>(<span class="op">|</span><span class="ident">cursor</span><span class="op">|</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">ident</span>, <span class="ident">rest</span>)) <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">ident</span>() {
+            <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="ident">kw</span> {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">ident</span>, <span class="ident">rest</span>));
+            }
+        }
+        <span class="prelude-val">Err</span>(<span class="ident">cursor</span>.<span class="ident">error</span>(<span class="string">&quot;expected identifier&quot;</span>))
+    }).<span class="ident">is_ok</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_ident_or_rust_keyword</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ast</span>::<span class="ident">Ident</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">token</span>::<span class="ident">Ident</span>(<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">token</span> {
-        <span class="ident">parser</span>.<span class="ident">bump</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">i</span>)
-    } <span class="kw">else</span> {
-        <span class="comment">// technically we could generate the error here directly, but</span>
-        <span class="comment">// that way this error branch could diverge in behaviour from</span>
-        <span class="comment">// the normal parse_ident.</span>
-        <span class="ident">parser</span>.<span class="ident">parse_ident</span>()
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">parse_arg</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">PResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">RawArg</span><span class="op">&gt;</span> {
-    <span class="comment">// sizehint</span>
-    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">parser</span>);
-
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
-
-    <span class="kw">let</span> <span class="ident">in_bracket</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">look_ahead</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">OpenDelim</span>(<span class="ident">token</span>::<span class="ident">Bracket</span>));
-    <span class="kw">if</span> <span class="ident">in_bracket</span> <span class="op">&amp;&amp;</span> <span class="ident">parser</span>.<span class="ident">look_ahead</span>(<span class="number">1</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">x</span> {
-            <span class="ident">token</span>::<span class="ident">RArrow</span> <span class="op">|</span>
-            <span class="ident">token</span>::<span class="ident">Gt</span>     <span class="op">|</span>
-            <span class="ident">token</span>::<span class="ident">Lt</span>     <span class="op">|</span>
-            <span class="ident">token</span>::<span class="ident">FatArrow</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>
-        }) {
-        <span class="ident">parser</span>.<span class="ident">bump</span>();
-    }
-
-    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">label_return</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="ident">in_bracket</span> {
-                <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">CloseDelim</span>(<span class="ident">token</span>::<span class="ident">Bracket</span>))<span class="question-mark">?</span>;
-                <span class="ident">RawArg</span>::<span class="ident">IndirectJumpTarget</span> {
-                    <span class="ident">type_</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>,
-                    <span class="ident">size</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>
-                }
-            } <span class="kw">else</span> {
-                <span class="ident">RawArg</span>::<span class="ident">JumpTarget</span> {
-                    <span class="ident">type_</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">jump</span>,
-                    <span class="ident">size</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>
-                }
-            });
+<span class="doccomment">/// parses an ident, but instead of syn&#39;s Parse impl it does also parse keywords as idents</span>
+<span class="kw">fn</span> <span class="ident">parse_ident_or_rust_keyword</span>(<span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span> {
+    <span class="ident">input</span>.<span class="ident">step</span>(<span class="op">|</span><span class="ident">cursor</span><span class="op">|</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">ident</span>, <span class="ident">rest</span>)) <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">ident</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">ident</span>, <span class="ident">rest</span>));
         }
-    }
-
-    <span class="comment">// global label</span>
-    <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">RArrow</span>) {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Global</span>(
-            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()) }
-        );
-        <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
-    <span class="comment">// forward local label</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Gt</span>) {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Forward</span>(
-            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()) }
-        );
-        <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
-    <span class="comment">// forward global label</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Lt</span>) {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Backward</span>(
-            <span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">name</span>, <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()) }
-        );
-        <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
-    <span class="comment">// dynamic label</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">FatArrow</span>) {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>);
-        <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
-    <span class="comment">// extern location</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="string">&quot;extern&quot;</span>){
-        <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">jump</span> <span class="op">=</span> <span class="ident">JumpType</span>::<span class="ident">Bare</span>(<span class="ident">location</span>);
-        <span class="macro">label_return</span><span class="macro">!</span>(<span class="ident">jump</span>, <span class="ident">size</span>);
-    }
-
-
-    <span class="comment">// memory location</span>
-    <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">OpenDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>)) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">span</span>;
-        <span class="kw">let</span> <span class="ident">nosplit</span> <span class="op">=</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="string">&quot;NOSPLIT&quot;</span>);
-        <span class="kw">let</span> <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">parser</span>);
-        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>.<span class="ident">with_lo</span>(<span class="ident">span</span>.<span class="ident">lo</span>());
-        <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">CloseDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>))<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">expr</span>);
-
-        <span class="comment">// assemble the memory location</span>
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">IndirectRaw</span> {
-            <span class="ident">span</span>: <span class="ident">span</span>,
-            <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
-            <span class="ident">value_size</span>: <span class="ident">size</span>,
-            <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
-            <span class="ident">items</span>: <span class="ident">items</span>
-        });
-    }
-
-    <span class="comment">// it&#39;s a normal (register/immediate/typemapped) operand</span>
-    <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> {
-        <span class="comment">// typemapped</span>
-        <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">FatArrow</span>) {
-            <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>);
-            <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">base</span>) <span class="op">=</span> <span class="ident">base</span> { <span class="ident">base</span> } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">arg</span>.<span class="ident">span</span>, <span class="string">&quot;Expected register&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Invalid</span>);
-            };
-
-            <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_path</span>(<span class="ident">PathStyle</span>::<span class="ident">Type</span>)<span class="question-mark">?</span>;
-
-            <span class="comment">// any attribute, register as index and immediate in index</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nosplit</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="ident">items</span>;
-
-            <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">OpenDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>)) {
-                <span class="ident">nosplit</span> <span class="op">=</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">parser</span>, <span class="string">&quot;NOSPLIT&quot;</span>);
-                <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">parser</span>);
-                <span class="kw">let</span> <span class="ident">index_expr</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse_expr</span>()<span class="question-mark">?</span>;
-
-                <span class="ident">parser</span>.<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">CloseDelim</span>(<span class="ident">token</span>::<span class="ident">DelimToken</span>::<span class="ident">Bracket</span>))<span class="question-mark">?</span>;
-                <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">index_expr</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">items</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
-            }
-
-            <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>::<span class="ident">Dot</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">parse_ident</span>()<span class="question-mark">?</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
-
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">TypeMappedRaw</span> {
-                <span class="ident">span</span>: <span class="ident">start</span>.<span class="ident">with_hi</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>.<span class="ident">hi</span>()),
-                <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
-                <span class="ident">value_size</span>: <span class="ident">size</span>,
-                <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
-                <span class="ident">base_reg</span>: <span class="ident">base</span>.<span class="ident">node</span>,
-                <span class="ident">scale</span>: <span class="ident">ty</span>,
-                <span class="ident">scaled_items</span>: <span class="ident">items</span>,
-                <span class="ident">attribute</span>: <span class="ident">attr</span>,
-            });
-        }
-
-        <span class="comment">// direct register reference</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reg</span>) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>) {
-            <span class="kw">if</span> <span class="ident">size</span>.<span class="ident">is_some</span>() {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">arg</span>.<span class="ident">span</span>, <span class="string">&quot;size hint with direct register&quot;</span>);
-            }
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Direct</span> {
-                <span class="ident">reg</span>: <span class="ident">reg</span>.<span class="ident">node</span>,
-                <span class="ident">span</span>: <span class="ident">reg</span>.<span class="ident">span</span>
-            })
-        }
-
-        <span class="comment">// immediate</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Immediate</span> {
-            <span class="ident">value</span>: <span class="ident">P</span>(<span class="ident">arg</span>),
-            <span class="ident">size</span>: <span class="ident">size</span>
-        })
+        <span class="prelude-val">Err</span>(<span class="ident">cursor</span>.<span class="ident">error</span>(<span class="string">&quot;expected identifier&quot;</span>))
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_simple_name</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Parses a label (jump target) declaration. Returns Some(JumpType) if a jump was present</span>
+<span class="kw">fn</span> <span class="ident">parse_label</span>(<span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JumpType</span><span class="op">&gt;&gt;</span> {
+    <span class="comment">// -&gt; global_label</span>
+    <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">-&gt;</span>]) {
+        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">-&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn</span>::<span class="ident">Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(<span class="ident">JumpType</span>::<span class="ident">Global</span>(<span class="ident">name</span>))
+
+    <span class="comment">// &gt; forward_label</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">&gt;</span>]) {
+        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn</span>::<span class="ident">Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(<span class="ident">JumpType</span>::<span class="ident">Forward</span>(<span class="ident">name</span>))
+
+    <span class="comment">// &lt; backwards_label</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">&lt;</span>]) {
+        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">&lt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn</span>::<span class="ident">Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(<span class="ident">JumpType</span>::<span class="ident">Backward</span>(<span class="ident">name</span>))
+        
+    <span class="comment">// =&gt; dynamic_label</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">=&gt;</span>]) {
+        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">=&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(<span class="ident">JumpType</span>::<span class="ident">Dynamic</span>(<span class="ident">expr</span>))
+
+    <span class="comment">// extern label</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">input</span>, <span class="string">&quot;extern&quot;</span>) {
+        <span class="kw">let</span> <span class="ident">expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(<span class="ident">JumpType</span>::<span class="ident">Bare</span>(<span class="ident">expr</span>))
+
+    } <span class="kw">else</span> {
+        <span class="prelude-val">None</span>
+    })
+}
+
+<span class="doccomment">/// tries to parse a full arg definition</span>
+<span class="kw">fn</span> <span class="ident">parse_arg</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span> {
+    <span class="comment">// sizehint</span>
+    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">input</span>);
+
+    <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">cursor</span>().<span class="ident">span</span>(); <span class="comment">// FIXME can&#39;t join spans yet</span>
+
+    <span class="comment">// bare label</span>
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">jump</span>) <span class="op">=</span> <span class="ident">parse_label</span>(<span class="ident">input</span>)<span class="question-mark">?</span> {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">JumpTarget</span> {
+            <span class="ident">type_</span>: <span class="ident">jump</span>,
+            <span class="ident">size</span>
+        })
+    }
+
+    <span class="comment">// indirect</span>
+    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">syn</span>::<span class="ident">token</span>::<span class="ident">Bracket</span>) {
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">cursor</span>().<span class="ident">span</span>();
+        <span class="kw">let</span> <span class="ident">inner</span>;
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="macro">bracketed</span><span class="macro">!</span>(<span class="ident">inner</span> <span class="kw">in</span> <span class="ident">input</span>);
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">inner</span>;
+
+        <span class="comment">// label</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">jump</span>) <span class="op">=</span> <span class="ident">parse_label</span>(<span class="ident">inner</span>)<span class="question-mark">?</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">IndirectJumpTarget</span> {
+                <span class="ident">type_</span>: <span class="ident">jump</span>,
+                <span class="ident">size</span>
+            })
+        }
+
+        <span class="comment">// memory reference </span>
+        <span class="kw">let</span> <span class="ident">nosplit</span> <span class="op">=</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">inner</span>, <span class="string">&quot;NOSPLIT&quot;</span>);
+        <span class="kw">let</span> <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">inner</span>);
+        <span class="kw">let</span> <span class="ident">expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="comment">// split the expression into the different (displacement, register, scaled register) components</span>
+        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>, <span class="ident">expr</span>);
+
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">IndirectRaw</span> {
+            <span class="ident">span</span>,
+            <span class="ident">nosplit</span>,
+            <span class="ident">value_size</span>: <span class="ident">size</span>,
+            <span class="ident">disp_size</span>,
+            <span class="ident">items</span>
+        })
+
+    }
+
+    <span class="comment">// it&#39;s a normal (register/immediate/typemapped) operand</span>
+    <span class="kw">let</span> <span class="ident">arg</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+    <span class="comment">// typemapped: expr =&gt; type [expr] . ident</span>
+    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">=&gt;</span>]) {
+        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">=&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">base</span>)) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>) {
+            <span class="ident">base</span>
+        } <span class="kw">else</span> {
+            <span class="ident">emit_error_at</span>(<span class="ident">arg</span>.<span class="ident">span</span>(), <span class="string">&quot;Expected register&quot;</span>.<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Invalid</span>);
+        };
+
+        <span class="kw">let</span> <span class="ident">ty</span>: <span class="ident">syn</span>::<span class="ident">Path</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+        <span class="comment">// any attribute, register as index and immediate in index</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nosplit</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+
+        <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">syn</span>::<span class="ident">token</span>::<span class="ident">Bracket</span>) {
+            <span class="kw">let</span> <span class="ident">inner</span>;
+            <span class="kw">let</span> <span class="ident">_brackets</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="macro">bracketed</span><span class="macro">!</span>(<span class="ident">inner</span> <span class="kw">in</span> <span class="ident">input</span>);
+            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">inner</span>;
+
+            <span class="ident">nosplit</span> <span class="op">=</span> <span class="ident">eat_pseudo_keyword</span>(<span class="ident">inner</span>, <span class="string">&quot;NOSPLIT&quot;</span>);
+            <span class="ident">disp_size</span> <span class="op">=</span> <span class="ident">eat_size_hint</span>(<span class="ident">ctx</span>, <span class="ident">inner</span>);
+            <span class="kw">let</span> <span class="ident">index_expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+
+            <span class="ident">parse_adds</span>(<span class="ident">ctx</span>, <span class="ident">index_expr</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">Vec</span>::<span class="ident">new</span>()
+        };
+
+        <span class="kw">let</span> <span class="ident">attr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[.]) {
+            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[.] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        };
+
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">TypeMappedRaw</span> {
+            <span class="ident">span</span>: <span class="ident">arg</span>.<span class="ident">span</span>(), <span class="comment">// FIXME can&#39;t join spans yet</span>
+            <span class="ident">nosplit</span>,
+            <span class="ident">value_size</span>: <span class="ident">size</span>,
+            <span class="ident">disp_size</span>,
+            <span class="ident">base_reg</span>: <span class="ident">base</span>,
+            <span class="ident">scale</span>: <span class="ident">ty</span>,
+            <span class="ident">scaled_items</span>: <span class="ident">items</span>,
+            <span class="ident">attribute</span>: <span class="ident">attr</span>,
+        });
+    }
+
+    <span class="comment">// direct register</span>
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="ident">reg</span>)) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>) {
+        <span class="kw">if</span> <span class="ident">size</span>.<span class="ident">is_some</span>() {
+            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;size hint with direct register&quot;</span>.<span class="ident">into</span>());
+        }
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Direct</span> {
+            <span class="ident">reg</span>,
+            <span class="ident">span</span>
+        })
+    }
+
+    <span class="comment">// immediate</span>
+    <span class="prelude-val">Ok</span>(<span class="ident">RawArg</span>::<span class="ident">Immediate</span> {
+        <span class="ident">value</span>: <span class="ident">arg</span>,
+        <span class="ident">size</span>
+    })
+}
+
+<span class="doccomment">/// checks if an expression is simply an ident, and if so, returns a clone of it.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_simple_name</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">expr</span> {
-        <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">ExprKind</span>::<span class="ident">Path</span>(<span class="prelude-val">None</span>, <span class="kw-2">ref</span> <span class="ident">path</span>) , ..} <span class="op">=&gt;</span> <span class="ident">path</span>,
+        <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Path</span>(<span class="ident">syn</span>::<span class="ident">ExprPath</span> {<span class="kw-2">ref</span> <span class="ident">path</span>, <span class="ident">qself</span>: <span class="prelude-val">None</span>, ..}) <span class="op">=&gt;</span> <span class="ident">path</span>,
         <span class="kw">_</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
     };
 
-    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_global</span>() <span class="op">||</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">1</span> {
+    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">leading_colon</span>.<span class="ident">is_some</span>() <span class="op">||</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">1</span> {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
     <span class="kw">let</span> <span class="ident">segment</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>];
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">segment</span>.<span class="ident">args</span>.<span class="ident">is_none</span>() {
+    <span class="kw">if</span> <span class="ident">segment</span>.<span class="ident">arguments</span> <span class="op">!=</span> <span class="ident">syn</span>::<span class="ident">PathArguments</span>::<span class="prelude-val">None</span> {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">Ident</span> {<span class="ident">node</span>: <span class="ident">segment</span>.<span class="ident">ident</span>, <span class="ident">span</span>: <span class="ident">path</span>.<span class="ident">span</span>})
+    <span class="prelude-val">Some</span>(<span class="ident">segment</span>.<span class="ident">ident</span>.<span class="ident">clone</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Spanned</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;&gt;</span> {
+<span class="doccomment">/// checks if an expression is interpretable as a register reference.</span>
+<span class="kw">fn</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Span</span>, <span class="ident">Register</span>)<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">as_simple_name</span>(<span class="ident">expr</span>) {
         <span class="comment">// static register names</span>
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">path</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">state</span>.<span class="ident">crate_data</span>.<span class="ident">aliases</span>.<span class="ident">get</span>(<span class="ident">name</span>) {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_str</span>();
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">state</span>.<span class="ident">file_data</span>.<span class="ident">aliases</span>.<span class="ident">get</span>(<span class="ident">name</span>) {
             <span class="ident">name</span> <span class="op">=</span> <span class="ident">x</span>;
         }
 
@@ -1065,67 +1080,67 @@
             <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="ident">X86_REGISTERS</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>()
         }<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {
-            <span class="ident">node</span>: <span class="ident">Register</span>::<span class="ident">new_static</span>(<span class="ident">size</span>, <span class="ident">reg</span>),
-            <span class="ident">span</span>: <span class="ident">path</span>.<span class="ident">span</span>
-        })
+        <span class="prelude-val">Some</span>((
+            <span class="ident">path</span>.<span class="ident">span</span>(),
+            <span class="ident">Register</span>::<span class="ident">new_static</span>(<span class="ident">size</span>, <span class="ident">reg</span>)
+        ))
 
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">ExprKind</span>::<span class="ident">Call</span>(<span class="kw-2">ref</span> <span class="ident">called</span>, <span class="kw-2">ref</span> <span class="ident">args</span>), <span class="ident">span</span>, ..} <span class="op">=</span> <span class="kw-2">*</span><span class="ident">expr</span> {
-        <span class="comment">// dynamically chosen registers</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Call</span>(<span class="ident">syn</span>::<span class="ident">ExprCall</span> {<span class="kw-2">ref</span> <span class="ident">func</span>, <span class="kw-2">ref</span> <span class="ident">args</span>, ..}) <span class="op">=</span> <span class="ident">expr</span> {
+        <span class="comment">// dynamically chosen registers ( ident(expr) )</span>
         <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">called</span>) <span class="op">=</span> <span class="ident">as_simple_name</span>(<span class="ident">called</span>) {
+        <span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">called</span>) <span class="op">=</span> <span class="ident">as_simple_name</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="ident">func</span>) {
             <span class="ident">called</span>
         } <span class="kw">else</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         };
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">called</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">called</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_str</span>();
         <span class="kw">let</span> (<span class="ident">size</span>, <span class="ident">family</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
             <span class="ident">X86Mode</span>::<span class="ident">Long</span>      <span class="op">=&gt;</span> <span class="ident">X64_FAMILIES</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>(),
             <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="ident">X86_FAMILIES</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>()
         }<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {
-            <span class="ident">node</span>: <span class="ident">Register</span>::<span class="ident">new_dynamic</span>(<span class="ident">size</span>, <span class="ident">family</span>, <span class="ident">args</span>[<span class="number">0</span>].<span class="ident">clone</span>()),
-            <span class="ident">span</span>: <span class="ident">span</span>
-        })
+        <span class="prelude-val">Some</span>((
+            <span class="ident">expr</span>.<span class="ident">span</span>(), <span class="comment">// FIXME:can&#39;t join spans atm</span>
+            <span class="ident">Register</span>::<span class="ident">new_dynamic</span>(<span class="ident">size</span>, <span class="ident">family</span>, <span class="ident">args</span>[<span class="number">0</span>].<span class="ident">clone</span>())
+        ))
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">expr</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemoryRefItem</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ast</span>::<span class="ident">ExprKind</span>;
-
+<span class="doccomment">/// splits an expression into different components of a memory reference.</span>
+<span class="kw">fn</span> <span class="ident">parse_adds</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemoryRefItem</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adds</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
-    <span class="ident">collect_adds</span>(<span class="ident">ecx</span>, <span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">adds</span>);
+    <span class="ident">collect_adds</span>(<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">adds</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
     <span class="comment">// detect what kind of equation we&#39;re dealing with</span>
     <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="ident">adds</span> {
         <span class="comment">// simple reg</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">reg</span>)) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>) {
             <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">Register</span>(<span class="ident">reg</span>));
             <span class="kw">continue</span>;
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ExprKind</span>::<span class="ident">Binary</span>(<span class="ident">ast</span>::<span class="ident">BinOp</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Mul</span>, ..}, <span class="kw-2">ref</span> <span class="ident">left</span>, <span class="kw-2">ref</span> <span class="ident">right</span>), ..} <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Binary</span>(<span class="ident">syn</span>::<span class="ident">ExprBinary</span> { <span class="ident">op</span>: <span class="ident">syn</span>::<span class="ident">BinOp</span>::<span class="ident">Mul</span>(<span class="kw">_</span>), <span class="kw-2">ref</span> <span class="ident">left</span>, <span class="kw-2">ref</span> <span class="ident">right</span>, .. } ) <span class="op">=</span> <span class="ident">node</span> {
             <span class="comment">// reg * const</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="ident">left</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ExprKind</span>::<span class="ident">Lit</span>(<span class="kw-2">ref</span> <span class="ident">scale</span>), ..} <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">right</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">scale</span>.<span class="ident">node</span> {
-                        <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">ScaledRegister</span>(<span class="ident">reg</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">isize</span>));
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">reg</span>)) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="ident">left</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Lit</span>(<span class="ident">syn</span>::<span class="ident">ExprLit</span> {<span class="kw-2">ref</span> <span class="ident">lit</span>, ..}) <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">right</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Lit</span>::<span class="ident">Int</span>(<span class="ident">lit</span>) <span class="op">=</span> <span class="ident">lit</span> {
+                        <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">ScaledRegister</span>(<span class="ident">reg</span>, <span class="ident">lit</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">isize</span>));
                         <span class="kw">continue</span>;
                     }
                 }
             } <span class="comment">// const * reg</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Spanned</span> {<span class="ident">node</span>: <span class="ident">reg</span>, ..} ) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="ident">right</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ExprKind</span>::<span class="ident">Lit</span>(<span class="kw-2">ref</span> <span class="ident">scale</span>), ..} <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">left</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">scale</span>.<span class="ident">node</span> {
-                        <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">ScaledRegister</span>(<span class="ident">reg</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">isize</span>));
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">reg</span>)) <span class="op">=</span> <span class="ident">parse_reg</span>(<span class="ident">ctx</span>, <span class="ident">right</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Lit</span>(<span class="ident">syn</span>::<span class="ident">ExprLit</span> {<span class="kw-2">ref</span> <span class="ident">lit</span>, ..}) <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">left</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Lit</span>::<span class="ident">Int</span>(<span class="ident">lit</span>) <span class="op">=</span> <span class="ident">lit</span> {
+                        <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">MemoryRefItem</span>::<span class="ident">ScaledRegister</span>(<span class="ident">reg</span>, <span class="ident">lit</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">isize</span>));
                         <span class="kw">continue</span>;
                     }
                 }
@@ -1137,21 +1152,20 @@
     <span class="ident">items</span>
 }
 
-<span class="kw">fn</span> <span class="ident">collect_adds</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">node</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span>) {
-    <span class="ident">node</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">ExprKind</span>::<span class="ident">Binary</span>(<span class="ident">ast</span>::<span class="ident">BinOp</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Add</span>, ..}, <span class="ident">left</span>, <span class="ident">right</span>), ..} <span class="op">=</span> <span class="ident">node</span> {
-            <span class="ident">collect_adds</span>(<span class="ident">ecx</span>, <span class="ident">left</span>, <span class="ident">collection</span>);
-            <span class="ident">collect_adds</span>(<span class="ident">ecx</span>, <span class="ident">right</span>, <span class="ident">collection</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">Expr</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">ExprKind</span>::<span class="ident">Binary</span>(<span class="ident">ast</span>::<span class="ident">BinOp</span> {<span class="ident">node</span>: <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Sub</span>, ..}, <span class="ident">left</span>, <span class="ident">right</span>), ..} <span class="op">=</span> <span class="ident">node</span> {
-            <span class="ident">collect_adds</span>(<span class="ident">ecx</span>, <span class="ident">left</span>, <span class="ident">collection</span>);
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">span</span>;
-            <span class="ident">collection</span>.<span class="ident">push</span>(<span class="ident">ecx</span>.<span class="ident">expr_unary</span>(<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Neg</span>, <span class="ident">right</span>));
-        } <span class="kw">else</span> {
-            <span class="ident">collection</span>.<span class="ident">push</span>(<span class="ident">P</span>(<span class="ident">node</span>));
-        }
-    })
+<span class="doccomment">/// Takes an expression and splits all added (and subtracted) components</span>
+<span class="kw">fn</span> <span class="ident">collect_adds</span>(<span class="ident">node</span>: <span class="ident">syn</span>::<span class="ident">Expr</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Binary</span>(<span class="ident">syn</span>::<span class="ident">ExprBinary</span> { <span class="ident">op</span>: <span class="ident">syn</span>::<span class="ident">BinOp</span>::<span class="ident">Add</span>(<span class="kw">_</span>), <span class="ident">left</span>, <span class="ident">right</span>, .. } ) <span class="op">=</span> <span class="ident">node</span> {
+        <span class="ident">collect_adds</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">collection</span>);
+        <span class="ident">collect_adds</span>(<span class="kw-2">*</span><span class="ident">right</span>, <span class="ident">collection</span>);
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Binary</span>(<span class="ident">syn</span>::<span class="ident">ExprBinary</span> { <span class="ident">op</span>: <span class="ident">syn</span>::<span class="ident">BinOp</span>::<span class="ident">Sub</span>(<span class="ident">sub</span>), <span class="ident">left</span>, <span class="ident">right</span>, .. } ) <span class="op">=</span> <span class="ident">node</span> {
+        <span class="ident">collect_adds</span>(<span class="kw-2">*</span><span class="ident">left</span>, <span class="ident">collection</span>);
+        <span class="ident">collection</span>.<span class="ident">push</span>(<span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Unary</span>(<span class="ident">syn</span>::<span class="ident">ExprUnary</span> { <span class="ident">op</span>: <span class="ident">syn</span>::<span class="ident">UnOp</span>::<span class="ident">Neg</span>(<span class="ident">sub</span>), <span class="ident">expr</span>: <span class="ident">right</span>, <span class="ident">attrs</span>: <span class="ident">Vec</span>::<span class="ident">new</span>() } ));
+    } <span class="kw">else</span> {
+        <span class="ident">collection</span>.<span class="ident">push</span>(<span class="ident">node</span>);
+    }
 }
 
+<span class="doccomment">/// why</span>
 <span class="macro">lazy_static</span><span class="macro">!</span>{
     <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">X64_REGISTERS</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, (<span class="ident">RegId</span>, <span class="ident">Size</span>)<span class="op">&gt;</span> <span class="op">=</span> {
         <span class="kw">use</span> <span class="self">self</span>::<span class="ident">RegId</span>::<span class="kw-2">*</span>;
@@ -1503,5 +1517,5 @@
         <span class="ident">h</span>
     };
 }
-</pre>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

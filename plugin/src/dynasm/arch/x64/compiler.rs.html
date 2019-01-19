@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\x64\compiler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compiler.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\x64\compiler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compiler.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1678,14 +1678,27 @@
 <span id="1678">1678</span>
 <span id="1679">1679</span>
 <span id="1680">1680</span>
-</pre><pre class="rust ">
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">base</span>::<span class="ident">ExtCtxt</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ext</span>::<span class="ident">build</span>::<span class="ident">AstBuilder</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ast</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ptr</span>::<span class="ident">P</span>;
-<span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">source_map</span>::<span class="ident">Span</span>;
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">spanned</span>::<span class="ident">Spanned</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenTree</span>};
+<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote_spanned</span>};
 
-<span class="kw">use</span> <span class="ident">serialize</span>::{<span class="self">self</span>, <span class="ident">Stmt</span>, <span class="ident">Size</span>, <span class="ident">Ident</span>};
+<span class="kw">use</span> ::<span class="ident">emit_error_at</span>;
+<span class="kw">use</span> <span class="ident">serialize</span>::{<span class="self">self</span>, <span class="ident">Stmt</span>, <span class="ident">Size</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Context</span>, <span class="ident">X86Mode</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ast</span>::{<span class="ident">RawArg</span>, <span class="ident">CleanArg</span>, <span class="ident">SizedArg</span>, <span class="ident">Instruction</span>, <span class="ident">MemoryRefItem</span>, <span class="ident">Register</span>, <span class="ident">RegKind</span>, <span class="ident">RegFamily</span>, <span class="ident">RegId</span>, <span class="ident">JumpType</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">x64data</span>::<span class="ident">get_mnemnonic_data</span>;
@@ -1756,8 +1769,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelocationKind</span> {
-    <span class="kw">fn</span> <span class="ident">to_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+    <span class="kw">fn</span> <span class="ident">to_id</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">RelocationKind</span>::<span class="ident">Relative</span> <span class="op">=&gt;</span> <span class="number">0</span>,
             <span class="ident">RelocationKind</span>::<span class="ident">Absolute</span> <span class="op">=&gt;</span> <span class="number">1</span>,
             <span class="ident">RelocationKind</span>::<span class="ident">Extern</span>   <span class="op">=&gt;</span> <span class="number">2</span>
@@ -1769,16 +1782,16 @@
  * Implementation
  */</span>
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">instruction</span>: <span class="ident">Instruction</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">instruction</span>: <span class="ident">Instruction</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ops</span> <span class="op">=</span> <span class="ident">instruction</span>.<span class="ident">idents</span>;
     <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">prefixes</span> <span class="op">=</span> <span class="ident">ops</span>;
 
     <span class="comment">// Fold RawArgs into CleanArgs</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">clean_memoryref</span>(<span class="ident">ecx</span>, <span class="ident">a</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CleanArg</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;&gt;</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">clean_memoryref</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CleanArg</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="comment">// sanitize memory references, determine address size, and size immediates/displacements if possible</span>
-    <span class="kw">let</span> <span class="ident">addr_size</span> <span class="op">=</span> <span class="ident">sanitize_indirects_and_sizes</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">args</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">addr_size</span> <span class="op">=</span> <span class="ident">sanitize_indirects_and_sizes</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">args</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">addr_size</span> <span class="op">=</span> <span class="ident">addr_size</span>.<span class="ident">unwrap_or</span>(<span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
         <span class="ident">X86Mode</span>::<span class="ident">Long</span> <span class="op">=&gt;</span> <span class="ident">Size</span>::<span class="ident">QWORD</span>,
         <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="ident">Size</span>::<span class="ident">DWORD</span>
@@ -1794,7 +1807,7 @@
     };
 
     <span class="comment">// find a matching op</span>
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">match_op_format</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">match_op_format</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// determine if the features required for this op are fulfilled</span>
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">features</span>.<span class="ident">contains</span>(<span class="ident">data</span>.<span class="ident">features</span>) {
@@ -1805,7 +1818,7 @@
     }
 
     <span class="comment">// determine legacy prefixes</span>
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">pref_mod</span>, <span class="ident">pref_seg</span>) <span class="op">=</span> <span class="ident">get_legacy_prefixes</span>(<span class="ident">ecx</span>, <span class="ident">data</span>, <span class="ident">prefixes</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">pref_mod</span>, <span class="ident">pref_seg</span>) <span class="op">=</span> <span class="ident">get_legacy_prefixes</span>(<span class="ident">data</span>, <span class="ident">prefixes</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// fill in size info from the format string to create the final SizedArg vec</span>
     <span class="kw">let</span> (<span class="ident">op_size</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="ident">size_operands</span>(<span class="ident">data</span>, <span class="ident">args</span>)<span class="question-mark">?</span>;
@@ -1821,7 +1834,7 @@
 
         <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
             <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">QWORD</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 64 bit operands in 32-bit mode&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">op</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 64 bit operands in 32-bit mode&quot;</span>, <span class="ident">op</span>.<span class="ident">to_string</span>())));
             },
             <span class="ident">X86Mode</span>::<span class="ident">Long</span> <span class="op">=&gt;</span> ()
         }
@@ -1831,14 +1844,14 @@
                 (<span class="ident">Size</span>::<span class="ident">WORD</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">pref_size</span> <span class="op">=</span> <span class="bool-val">true</span>,
                 (<span class="ident">Size</span>::<span class="ident">QWORD</span>, <span class="ident">X86Mode</span>::<span class="ident">Long</span>) <span class="op">=&gt;</span> (),
                 (<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">X86Mode</span>::<span class="ident">Protected</span>) <span class="op">=&gt;</span> (),
-                (<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">X86Mode</span>::<span class="ident">Long</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 32 bit operands in 64-bit mode&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">op</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()))),
+                (<span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">X86Mode</span>::<span class="ident">Long</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 32 bit operands in 64-bit mode&quot;</span>, <span class="ident">op</span>.<span class="ident">to_string</span>()))),
                 (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;bad formatting data&quot;</span>),
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">AUTO_REXW</span>) {
             <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">QWORD</span> {
                 <span class="ident">rex_w</span> <span class="op">=</span> <span class="bool-val">true</span>;
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">DWORD</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 16-bit operands&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">op</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 16-bit operands&quot;</span>, <span class="ident">op</span>.<span class="ident">to_string</span>())));
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">AUTO_VEXL</span>) {
             <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">HWORD</span> {
@@ -1846,14 +1859,12 @@
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">OWORD</span> {
                 <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;bad formatting data&quot;</span>);
             }
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">WORD</span> {
-                <span class="ident">pref_size</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">QWORD</span> {
-                <span class="ident">rex_w</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">DWORD</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;bad formatting data&quot;</span>);
-            }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">WORD</span> {
+            <span class="ident">pref_size</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">==</span> <span class="ident">Size</span>::<span class="ident">QWORD</span> {
+            <span class="ident">rex_w</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">op_size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">DWORD</span> {
+            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;bad formatting data&quot;</span>);
         }
     }
 
@@ -1910,7 +1921,7 @@
         <span class="comment">// map_sel is stored in the first byte of the opcode</span>
         <span class="kw">let</span> (<span class="kw-2">&amp;</span><span class="ident">map_sel</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">split_first</span>().<span class="ident">expect</span>(<span class="string">&quot;bad formatting data&quot;</span>);
         <span class="ident">ops</span> <span class="op">=</span> <span class="ident">tail</span>;
-        <span class="ident">compile_vex_xop</span>(<span class="ident">ctx</span>.<span class="ident">mode</span>, <span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">reg</span>, <span class="kw-2">&amp;</span><span class="ident">rm</span>, <span class="ident">map_sel</span>, <span class="ident">rex_w</span>, <span class="kw-2">&amp;</span><span class="ident">vvvv</span>, <span class="ident">vex_l</span>, <span class="ident">prefix</span>);
+        <span class="ident">compile_vex_xop</span>(<span class="ident">ctx</span>.<span class="ident">mode</span>, <span class="ident">buffer</span>, <span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">reg</span>, <span class="kw-2">&amp;</span><span class="ident">rm</span>, <span class="ident">map_sel</span>, <span class="ident">rex_w</span>, <span class="kw-2">&amp;</span><span class="ident">vvvv</span>, <span class="ident">vex_l</span>, <span class="ident">prefix</span>);
     <span class="comment">// otherwise, the size/mod prefixes have to be pushed and check if a rex prefix has to be generated.</span>
     } <span class="kw">else</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pref</span>) <span class="op">=</span> <span class="ident">pref_mod</span> {
@@ -1923,9 +1934,9 @@
             <span class="comment">// Certain SSE/AVX legacy encoded operations are not available in 32-bit mode</span>
             <span class="comment">// as they require a REX.W prefix to be encoded, which is impossible. We catch those cases here</span>
             <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">mode</span> <span class="op">==</span> <span class="ident">X86Mode</span>::<span class="ident">Protected</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 64 bit operand size in 32-bit mode&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">op</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())))
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 64 bit operand size in 32-bit mode&quot;</span>, <span class="ident">op</span>.<span class="ident">to_string</span>())))
             }
-            <span class="ident">compile_rex</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">rex_w</span>, <span class="kw-2">&amp;</span><span class="ident">reg</span>, <span class="kw-2">&amp;</span><span class="ident">rm</span>);
+            <span class="ident">compile_rex</span>(<span class="ident">buffer</span>, <span class="ident">rex_w</span>, <span class="kw-2">&amp;</span><span class="ident">reg</span>, <span class="kw-2">&amp;</span><span class="ident">rm</span>);
         }
     }
 
@@ -1942,8 +1953,8 @@
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">rm_k</span> {
-            <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="kw-2">*</span><span class="ident">last</span>));
-            <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">last</span>, <span class="ident">expr</span>, <span class="number">7</span>, <span class="number">0</span>), <span class="ident">Size</span>::<span class="ident">BYTE</span>));
+            <span class="kw">let</span> <span class="ident">last</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="kw-2">*</span><span class="ident">last</span>).<span class="ident">into</span>();
+            <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">last</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">7</span>, <span class="number">0</span>), <span class="ident">Size</span>::<span class="ident">BYTE</span>));
         } <span class="kw">else</span> {
             <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u8</span>(<span class="ident">last</span> <span class="op">+</span> (<span class="ident">rm_k</span>.<span class="ident">encode</span>() <span class="op">&amp;</span> <span class="number">7</span>)));
         }
@@ -1960,7 +1971,7 @@
             <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="ident">data</span>.<span class="ident">reg</span>)
         };
 
-        <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">MOD_DIRECT</span>, <span class="ident">reg_k</span>, <span class="ident">rm</span>.<span class="ident">kind</span>);
+        <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">MOD_DIRECT</span>, <span class="ident">reg_k</span>, <span class="ident">rm</span>.<span class="ident">kind</span>);
     <span class="comment">// Indirect ModRM (+SIB) addressing</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">SizedArg</span>::<span class="ident">Indirect</span> {<span class="ident">disp_size</span>, <span class="ident">base</span>, <span class="ident">index</span>, <span class="ident">disp</span>, ..}) <span class="op">=</span> <span class="ident">rm</span> {
         <span class="kw">let</span> <span class="ident">reg_k</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">SizedArg</span>::<span class="ident">Direct</span> {<span class="ident">reg</span>, ..}) <span class="op">=</span> <span class="ident">reg</span> {
@@ -1991,16 +2002,16 @@
             };
 
             <span class="comment">// always need a SIB byte for VSIB addressing</span>
-            <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>));
+            <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>));
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>) <span class="op">=</span> <span class="ident">scale_expr</span> {
-                <span class="ident">compile_sib_dynscale</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">state</span>.<span class="ident">target</span>, <span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">expr</span>, <span class="ident">index</span>, <span class="ident">base</span>);
+                <span class="ident">compile_sib_dynscale</span>(<span class="ident">buffer</span>, <span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">expr</span>, <span class="ident">index</span>, <span class="ident">base</span>);
             } <span class="kw">else</span> {
-                <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">encode_scale</span>(<span class="ident">scale</span>).<span class="ident">unwrap</span>(), <span class="ident">index</span>, <span class="ident">base</span>);
+                <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">encode_scale</span>(<span class="ident">scale</span>).<span class="ident">unwrap</span>(), <span class="ident">index</span>, <span class="ident">base</span>);
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">disp</span>) <span class="op">=</span> <span class="ident">disp</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">disp</span>, <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {<span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="kw">else</span> {<span class="ident">Size</span>::<span class="ident">DWORD</span>}));
+                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">disp</span>), <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {<span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="kw">else</span> {<span class="ident">Size</span>::<span class="ident">DWORD</span>}));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {
                 <span class="comment">// no displacement was asked for, but we have to encode one as there&#39;s a base</span>
                 <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u8</span>(<span class="number">0</span>));
@@ -2020,21 +2031,21 @@
             };
 
             <span class="comment">// only need a mod.r/m byte for 16-bit addressing</span>
-            <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">base_k</span>);
+            <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">base_k</span>);
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">disp</span>) <span class="op">=</span> <span class="ident">disp</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">disp</span>, <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {<span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="kw">else</span> {<span class="ident">Size</span>::<span class="ident">WORD</span>}));
+                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">disp</span>), <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {<span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="kw">else</span> {<span class="ident">Size</span>::<span class="ident">WORD</span>}));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {
                 <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u8</span>(<span class="number">0</span>));
             }
 
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode_rip_relative</span> {
             <span class="comment">// encode the RIP + disp32 or disp32 form</span>
-            <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">MOD_NODISP</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
+            <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">MOD_NODISP</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
 
             <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
                 <span class="ident">X86Mode</span>::<span class="ident">Long</span> <span class="op">=&gt;</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">disp</span>) <span class="op">=</span> <span class="ident">disp</span> {
-                    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">disp</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>));
+                    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">disp</span>), <span class="ident">Size</span>::<span class="ident">DWORD</span>));
                 } <span class="kw">else</span> {
                     <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u32</span>(<span class="number">0</span>))
                 },
@@ -2042,7 +2053,7 @@
                     <span class="comment">// x86 doesn&#39;t actually allow RIP-relative addressing</span>
                     <span class="comment">// but we can work around it with relocations</span>
                     <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u32</span>(<span class="number">0</span>));
-                    <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="ident">disp</span>.<span class="ident">unwrap_or_else</span>(<span class="op">||</span> <span class="ident">serialize</span>::<span class="ident">expr_zero</span>(<span class="ident">ecx</span>));
+                    <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="ident">disp</span>.<span class="ident">unwrap_or_else</span>(<span class="op">||</span> <span class="ident">serialize</span>::<span class="ident">reparse</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">expr_zero</span>()).<span class="ident">expect</span>(<span class="string">&quot;Invalid expression generated&quot;</span>));
                     <span class="ident">relocations</span>.<span class="ident">push</span>((<span class="ident">JumpType</span>::<span class="ident">Bare</span>(<span class="ident">disp</span>), <span class="number">0</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>, <span class="ident">RelocationKind</span>::<span class="ident">Absolute</span>));
                 },
             }
@@ -2073,34 +2084,34 @@
                 };
 
                 <span class="comment">// escape into the SIB byte</span>
-                <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>));
+                <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>));
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>) <span class="op">=</span> <span class="ident">scale_expr</span> {
-                    <span class="ident">compile_sib_dynscale</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">state</span>.<span class="ident">target</span>, <span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">expr</span>, <span class="ident">index</span>.<span class="ident">kind</span>, <span class="ident">base</span>);
+                    <span class="ident">compile_sib_dynscale</span>(<span class="ident">buffer</span>, <span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">expr</span>, <span class="ident">index</span>.<span class="ident">kind</span>, <span class="ident">base</span>);
                 } <span class="kw">else</span> {
-                    <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">encode_scale</span>(<span class="ident">scale</span>).<span class="ident">unwrap</span>(), <span class="ident">index</span>.<span class="ident">kind</span>, <span class="ident">base</span>);
+                    <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">encode_scale</span>(<span class="ident">scale</span>).<span class="ident">unwrap</span>(), <span class="ident">index</span>.<span class="ident">kind</span>, <span class="ident">base</span>);
                 }
 
             <span class="comment">// no index, only a base. RBP at MOD_NODISP is used to encode RIP, but this is already handled</span>
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">base</span>) <span class="op">=</span> <span class="ident">base</span> {
-                <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">base</span>.<span class="ident">kind</span>);
+                <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">base</span>.<span class="ident">kind</span>);
 
             <span class="comment">// no base, no index. only disp. Easy in x86, but in x64 escape, use RBP as base and RSP as index</span>
             } <span class="kw">else</span> {
                 <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
                     <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">=&gt;</span> {
-                        <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
+                        <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
                     },
                     <span class="ident">X86Mode</span>::<span class="ident">Long</span> <span class="op">=&gt;</span> {
-                        <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>));
-                        <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="number">0</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>), <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
+                        <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">mode</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>));
+                        <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="number">0</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RSP</span>), <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
                     }
                 }
             }
 
             <span class="comment">// Disp</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">disp</span>) <span class="op">=</span> <span class="ident">disp</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">disp</span>, <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {<span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="kw">else</span> {<span class="ident">Size</span>::<span class="ident">DWORD</span>}));
+                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">disp</span>), <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {<span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="kw">else</span> {<span class="ident">Size</span>::<span class="ident">DWORD</span>}));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">no_base</span> {
                 <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u32</span>(<span class="number">0</span>));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">MOD_DISP8</span> {
@@ -2115,7 +2126,7 @@
         } <span class="kw">else</span> {
             <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="ident">data</span>.<span class="ident">reg</span>)
         };
-        <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>, <span class="ident">buffer</span>, <span class="ident">MOD_NODISP</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
+        <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>, <span class="ident">MOD_NODISP</span>, <span class="ident">reg_k</span>, <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">RegId</span>::<span class="ident">RBP</span>));
 
         <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u32</span>(<span class="number">0</span>));
         <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">mode</span> {
@@ -2137,15 +2148,15 @@
         <span class="kw">let</span> <span class="ident">ireg</span> <span class="op">=</span> <span class="ident">ireg</span>.<span class="ident">kind</span>;
         <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">ireg</span>.<span class="ident">encode</span>() <span class="op">&lt;&lt;</span> <span class="number">4</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">byte</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">byte</span>).<span class="ident">into</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">ireg</span> {
-            <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte</span>, <span class="ident">expr</span>, <span class="number">0xF</span>, <span class="number">4</span>);
+            <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">0xF</span>, <span class="number">4</span>);
         }
         <span class="comment">// if immediates are present, the register argument will be merged into the</span>
         <span class="comment">// first immediate byte.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">is_empty</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SizedArg</span>::<span class="ident">Immediate</span> {<span class="ident">value</span>, <span class="ident">size</span>: <span class="ident">Size</span>::<span class="ident">BYTE</span>} <span class="op">=</span> <span class="ident">args</span>.<span class="ident">remove</span>(<span class="number">0</span>) {
-                <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte</span>, <span class="ident">value</span>, <span class="number">0xF</span>, <span class="number">0</span>);
+                <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">value</span>), <span class="number">0xF</span>, <span class="number">0</span>);
             } <span class="kw">else</span> {
                 <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;bad formatting data&quot;</span>)
             }
@@ -2160,7 +2171,7 @@
     <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span> {
         <span class="kw">match</span> <span class="ident">arg</span> {
             <span class="ident">SizedArg</span>::<span class="ident">Immediate</span> {<span class="ident">value</span>, <span class="ident">size</span>} <span class="op">=&gt;</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">value</span>, <span class="ident">size</span>));
+                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">value</span>), <span class="ident">size</span>));
 
                 <span class="comment">// bump relocations</span>
                 <span class="ident">relocations</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="number">1</span> <span class="op">+=</span> <span class="ident">size</span>.<span class="ident">in_bytes</span>());
@@ -2195,16 +2206,25 @@
         };
 
         <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="kw">match</span> <span class="ident">target</span> {
-            <span class="ident">JumpType</span>::<span class="ident">Global</span>(<span class="ident">ident</span>)   <span class="op">=&gt;</span> <span class="ident">Stmt</span>::<span class="ident">GlobalJumpTarget</span>(  <span class="ident">ident</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">ecx</span>, <span class="ident">ident</span>.<span class="ident">span</span>, <span class="ident">data</span>)),
-            <span class="ident">JumpType</span>::<span class="ident">Forward</span>(<span class="ident">ident</span>)  <span class="op">=&gt;</span> <span class="ident">Stmt</span>::<span class="ident">ForwardJumpTarget</span>( <span class="ident">ident</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">ecx</span>, <span class="ident">ident</span>.<span class="ident">span</span>, <span class="ident">data</span>)),
-            <span class="ident">JumpType</span>::<span class="ident">Backward</span>(<span class="ident">ident</span>) <span class="op">=&gt;</span> <span class="ident">Stmt</span>::<span class="ident">BackwardJumpTarget</span>(<span class="ident">ident</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">ecx</span>, <span class="ident">ident</span>.<span class="ident">span</span>, <span class="ident">data</span>)),
+            <span class="ident">JumpType</span>::<span class="ident">Global</span>(<span class="ident">ident</span>)   <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">span</span>();
+                <span class="ident">Stmt</span>::<span class="ident">GlobalJumpTarget</span>(<span class="ident">ident</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>, <span class="ident">data</span>))
+            },
+            <span class="ident">JumpType</span>::<span class="ident">Forward</span>(<span class="ident">ident</span>)  <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">span</span>();
+                <span class="ident">Stmt</span>::<span class="ident">ForwardJumpTarget</span>( <span class="ident">ident</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>, <span class="ident">data</span>))
+            },
+            <span class="ident">JumpType</span>::<span class="ident">Backward</span>(<span class="ident">ident</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">span</span>();
+                <span class="ident">Stmt</span>::<span class="ident">BackwardJumpTarget</span>(<span class="ident">ident</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>, <span class="ident">data</span>))
+            },
             <span class="ident">JumpType</span>::<span class="ident">Dynamic</span>(<span class="ident">expr</span>)   <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>;
-                <span class="ident">Stmt</span>::<span class="ident">DynamicJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">ecx</span>, <span class="ident">span</span>, <span class="ident">data</span>))
+                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>();
+                <span class="ident">Stmt</span>::<span class="ident">DynamicJumpTarget</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>, <span class="ident">data</span>))
             },
             <span class="ident">JumpType</span>::<span class="ident">Bare</span>(<span class="ident">expr</span>)      <span class="op">=&gt;</span> {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>;
-                <span class="ident">Stmt</span>::<span class="ident">BareJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">ecx</span>, <span class="ident">span</span>, <span class="ident">data</span>))
+                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>();
+                <span class="ident">Stmt</span>::<span class="ident">BareJumpTarget</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="ident">serialize</span>::<span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>, <span class="ident">data</span>))
             }
         })
     }
@@ -2213,7 +2233,7 @@
 }
 
 <span class="comment">// Folds RawArgs into CleanArgs by analyzing the different raw memoryref variants</span>
-<span class="kw">fn</span> <span class="ident">clean_memoryref</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">arg</span>: <span class="ident">RawArg</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CleanArg</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
+<span class="kw">fn</span> <span class="ident">clean_memoryref</span>(<span class="ident">arg</span>: <span class="ident">RawArg</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CleanArg</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">arg</span> {
         <span class="ident">RawArg</span>::<span class="ident">Direct</span> {<span class="ident">span</span>, <span class="ident">reg</span>} <span class="op">=&gt;</span> <span class="ident">CleanArg</span>::<span class="ident">Direct</span> {<span class="ident">span</span>, <span class="ident">reg</span>},
         <span class="ident">RawArg</span>::<span class="ident">JumpTarget</span> {<span class="ident">type_</span>, <span class="ident">size</span>} <span class="op">=&gt;</span> <span class="ident">CleanArg</span>::<span class="ident">JumpTarget</span> {<span class="ident">type_</span>, <span class="ident">size</span>},
@@ -2282,22 +2302,23 @@
 
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">joined_regs</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible memory argument&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible memory argument&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="comment">// merge disps</span>
-            <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_add_many</span>(<span class="ident">ecx</span>, <span class="ident">span</span>, <span class="ident">disps</span>.<span class="ident">into_iter</span>());
+            <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_add_many</span>(<span class="ident">span</span>, <span class="ident">disps</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>));
+            <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="ident">disp</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serialize</span>::<span class="ident">reparse</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid expression generated internally&quot;</span>));
 
             <span class="comment">// finalize the memoryref</span>
             <span class="ident">CleanArg</span>::<span class="ident">Indirect</span> {
-                <span class="ident">span</span>: <span class="ident">span</span>,
-                <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
+                <span class="ident">span</span>,
+                <span class="ident">nosplit</span>,
                 <span class="ident">size</span>: <span class="ident">value_size</span>,
-                <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
-                <span class="ident">base</span>: <span class="ident">base</span>,
+                <span class="ident">disp_size</span>,
+                <span class="ident">base</span>,
                 <span class="ident">index</span>: <span class="ident">index</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">r</span>, <span class="ident">s</span>)<span class="op">|</span> (<span class="ident">r</span>, <span class="ident">s</span>, <span class="prelude-val">None</span>)),
-                <span class="ident">disp</span>: <span class="ident">disp</span>,
+                <span class="ident">disp</span>,
             }
         },
         <span class="ident">RawArg</span>::<span class="ident">TypeMappedRaw</span> {<span class="ident">span</span>, <span class="ident">base_reg</span>, <span class="ident">scale</span>, <span class="ident">value_size</span>, <span class="ident">nosplit</span>, <span class="ident">disp_size</span>, <span class="ident">scaled_items</span>, <span class="ident">attribute</span>} <span class="op">=&gt;</span> {
@@ -2329,7 +2350,7 @@
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">joined_regs</span>.<span class="ident">pop</span>();
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">joined_regs</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible memory argument&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible memory argument&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
@@ -2345,18 +2366,18 @@
             <span class="kw">let</span> <span class="ident">true_disp_size</span> <span class="op">=</span> <span class="ident">disp_size</span>.<span class="ident">unwrap_or</span>(<span class="ident">Size</span>::<span class="ident">DWORD</span>);
 
             <span class="comment">// merge disps [a, b, c] into (a + b + c)</span>
-            <span class="kw">let</span> <span class="ident">scaled_disp</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_add_many</span>(<span class="ident">ecx</span>, <span class="ident">span</span>, <span class="ident">disps</span>.<span class="ident">into_iter</span>());
+            <span class="kw">let</span> <span class="ident">scaled_disp</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_add_many</span>(<span class="ident">span</span>, <span class="ident">disps</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">serialize</span>::<span class="ident">delimited</span>));
 
             <span class="comment">// scale disps (a + b + c) * size_of&lt;scale&gt; as disp_size</span>
-            <span class="kw">let</span> <span class="ident">scaled_disp</span> <span class="op">=</span> <span class="ident">scaled_disp</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">disp</span><span class="op">|</span> <span class="ident">serialize</span>::<span class="ident">expr_size_of_scale</span>(<span class="ident">ecx</span>, <span class="ident">scale</span>.<span class="ident">clone</span>(), <span class="ident">disp</span>, <span class="ident">true_disp_size</span>));
+            <span class="kw">let</span> <span class="ident">scaled_disp</span> <span class="op">=</span> <span class="ident">scaled_disp</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">disp</span><span class="op">|</span> <span class="ident">serialize</span>::<span class="ident">expr_size_of_scale</span>(<span class="kw-2">&amp;</span><span class="ident">scale</span>, <span class="kw-2">&amp;</span><span class="ident">disp</span>, <span class="ident">true_disp_size</span>));
 
             <span class="comment">// attribute displacement offset_of(scale, attr) as disp_size</span>
-            <span class="kw">let</span> <span class="ident">attr_disp</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">serialize</span>::<span class="ident">expr_offset_of</span>(<span class="ident">ecx</span>, <span class="ident">scale</span>.<span class="ident">clone</span>(), <span class="ident">attr</span>, <span class="ident">true_disp_size</span>));
+            <span class="kw">let</span> <span class="ident">attr_disp</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">serialize</span>::<span class="ident">expr_offset_of</span>(<span class="kw-2">&amp;</span><span class="ident">scale</span>, <span class="kw-2">&amp;</span><span class="ident">attr</span>, <span class="ident">true_disp_size</span>));
 
             <span class="comment">// add displacement sources together</span>
             <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">scaled_disp</span>) <span class="op">=</span> <span class="ident">scaled_disp</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr_disp</span>) <span class="op">=</span> <span class="ident">attr_disp</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">ecx</span>.<span class="ident">expr_binary</span>(<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Add</span>, <span class="ident">attr_disp</span>, <span class="ident">scaled_disp</span>))
+                    <span class="ident">serialize</span>::<span class="ident">expr_add_many</span>(<span class="ident">span</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">attr_disp</span>, <span class="ident">scaled_disp</span>].<span class="ident">into_iter</span>())
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">scaled_disp</span>)
                 }
@@ -2364,15 +2385,22 @@
                 <span class="ident">attr_disp</span>
             };
 
+            <span class="kw">let</span> <span class="ident">disp</span> <span class="op">=</span> <span class="ident">disp</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serialize</span>::<span class="ident">reparse</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid expression generated internally&quot;</span>));
+
+            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">r</span>, <span class="ident">s</span>)<span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">scale_expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">reparse</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">expr_size_of</span>(<span class="kw-2">&amp;</span><span class="ident">scale</span>)).<span class="ident">expect</span>(<span class="string">&quot;Invalid expression generated internally&quot;</span>);
+                (<span class="ident">r</span>, <span class="ident">s</span>, <span class="prelude-val">Some</span>(<span class="ident">scale_expr</span>))
+            });
+
             <span class="comment">// finalize the memoryref</span>
             <span class="ident">CleanArg</span>::<span class="ident">Indirect</span> {
-                <span class="ident">span</span>: <span class="ident">span</span>,
-                <span class="ident">nosplit</span>: <span class="ident">nosplit</span>,
+                <span class="ident">span</span>,
+                <span class="ident">nosplit</span>,
                 <span class="ident">size</span>: <span class="ident">value_size</span>,
-                <span class="ident">disp_size</span>: <span class="ident">disp_size</span>,
+                <span class="ident">disp_size</span>,
                 <span class="ident">base</span>: <span class="prelude-val">Some</span>(<span class="ident">base</span>),
-                <span class="ident">index</span>: <span class="ident">index</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">r</span>, <span class="ident">s</span>)<span class="op">|</span> (<span class="ident">r</span>, <span class="ident">s</span>, <span class="prelude-val">Some</span>(<span class="ident">serialize</span>::<span class="ident">expr_size_of</span>(<span class="ident">ecx</span>, <span class="ident">scale</span>)))),
-                <span class="ident">disp</span>: <span class="ident">disp</span>,
+                <span class="ident">index</span>,
+                <span class="ident">disp</span>,
             }
         },
     })
@@ -2380,7 +2408,7 @@
 
 <span class="comment">// Go through the CleanArgs, check for impossible to encode indirect arguments, fill in immediate/displacement size information</span>
 <span class="comment">// and return the effective address size</span>
-<span class="kw">fn</span> <span class="ident">sanitize_indirects_and_sizes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">CleanArg</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
+<span class="kw">fn</span> <span class="ident">sanitize_indirects_and_sizes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">CleanArg</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
     <span class="comment">// determine if an address size prefix is necessary, and sanitize the register choice for memoryrefs</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addr_size</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encountered_indirect</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -2390,48 +2418,44 @@
             <span class="ident">CleanArg</span>::<span class="ident">Indirect</span> {<span class="ident">span</span>, <span class="ident">nosplit</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">disp_size</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">base</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">index</span>, <span class="kw-2">ref</span> <span class="ident">disp</span>, ..} <span class="op">=&gt;</span> {
 
                 <span class="kw">if</span> <span class="ident">encountered_indirect</span> {
-                    <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Multiple memory references in a single instruction&quot;</span>)
+                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Multiple memory references in a single instruction&quot;</span>.<span class="ident">into</span>())
                 }
                 <span class="ident">encountered_indirect</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
                 <span class="comment">// figure out the effective address size and error on impossible combinations</span>
-                <span class="ident">addr_size</span> <span class="op">=</span> <span class="ident">sanitize_indirect</span>(<span class="ident">ctx</span>, <span class="ident">ecx</span>, <span class="ident">span</span>, <span class="ident">nosplit</span>, <span class="ident">base</span>, <span class="ident">index</span>)<span class="question-mark">?</span>;
+                <span class="ident">addr_size</span> <span class="op">=</span> <span class="ident">sanitize_indirect</span>(<span class="ident">ctx</span>, <span class="ident">span</span>, <span class="ident">nosplit</span>, <span class="ident">base</span>, <span class="ident">index</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">scale</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">index</span> {
                     <span class="kw">if</span> <span class="ident">encode_scale</span>(<span class="ident">scale</span>).<span class="ident">is_none</span>() {
-                        <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible scale&quot;</span>);
+                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible scale&quot;</span>.<span class="ident">into</span>());
                     }
                 }
 
-                <span class="comment">// fif specified, sanitize the displacement size. Else, derive one</span>
+                <span class="comment">// if specified, sanitize the displacement size. Else, derive one</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">size</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">disp_size</span> {
                     <span class="kw">if</span> <span class="ident">disp</span>.<span class="ident">is_none</span>() {
-                        <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Displacement size without displacement&quot;</span>);
+                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Displacement size without displacement&quot;</span>.<span class="ident">into</span>());
                     }
 
                     <span class="comment">// 16-bit addressing has smaller displacements</span>
                     <span class="kw">if</span> <span class="ident">addr_size</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>) {
                         <span class="kw">if</span> <span class="ident">size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">BYTE</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">WORD</span> {
-                            <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Invalid displacement size, only BYTE or WORD are possible&quot;</span>);
+                            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Invalid displacement size, only BYTE or WORD are possible&quot;</span>.<span class="ident">into</span>());
                         }
-                    } <span class="kw">else</span> {
-                        <span class="kw">if</span> <span class="ident">size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">BYTE</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">DWORD</span> {
-                            <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Invalid displacement size, only BYTE or DWORD are possible&quot;</span>);
-                        }
+                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">BYTE</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span> <span class="op">!=</span> <span class="ident">Size</span>::<span class="ident">DWORD</span> {
+                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Invalid displacement size, only BYTE or DWORD are possible&quot;</span>.<span class="ident">into</span>());
                     }
-                } <span class="kw">else</span>  {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">disp</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">disp</span> {
-                        <span class="kw">match</span> <span class="ident">derive_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">disp</span>) {
-                            <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>)                         <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>),
-                            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">addr_size</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>) <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>),
-                            <span class="prelude-val">Some</span>(<span class="kw">_</span>)                                  <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">DWORD</span>),
-                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> ()
-                        }
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">disp</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">disp</span> {
+                    <span class="kw">match</span> <span class="ident">derive_size</span>(<span class="ident">disp</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>)                         <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>),
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">addr_size</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>) <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>),
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>)                                  <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">disp_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">DWORD</span>),
+                        <span class="prelude-val">None</span> <span class="op">=&gt;</span> ()
                     }
                 }
             },
             <span class="ident">CleanArg</span>::<span class="ident">Immediate</span> {<span class="kw-2">ref</span> <span class="ident">value</span>, <span class="ident">size</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span> @ <span class="prelude-val">None</span>} <span class="op">=&gt;</span> {
-                <span class="kw-2">*</span><span class="ident">size</span> <span class="op">=</span> <span class="ident">derive_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">value</span>);
+                <span class="kw-2">*</span><span class="ident">size</span> <span class="op">=</span> <span class="ident">derive_size</span>(<span class="ident">value</span>);
             },
             <span class="kw">_</span> <span class="op">=&gt;</span> ()
         }
@@ -2441,31 +2465,35 @@
 }
 
 <span class="comment">// Tries to find the maximum size necessary to hold the result of an expression.</span>
-<span class="kw">fn</span> <span class="ident">derive_size</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ast</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">syntax</span>::<span class="ident">ast</span>::<span class="ident">ExprKind</span>;
+<span class="kw">fn</span> <span class="ident">derive_size</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Expr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
+    <span class="comment">// strip any wrapping Group nodes due to delimiting</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">expr</span>;
+    <span class="kw">while</span> <span class="kw">let</span> <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Group</span>(<span class="ident">syn</span>::<span class="ident">ExprGroup</span> { <span class="ident">expr</span>, .. }) <span class="op">=</span> <span class="ident">inner</span> {
+        <span class="ident">inner</span> <span class="op">=</span> <span class="ident">expr</span>;
+    }
 
-    <span class="kw">match</span> <span class="ident">expr</span>.<span class="ident">node</span> {
-        <span class="ident">ExprKind</span>::<span class="ident">Lit</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">lit</span>.<span class="ident">node</span> {
-            <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>),
-            <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="number">0x80</span> {
+    <span class="kw">match</span> <span class="ident">inner</span> {
+        <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Lit</span>(<span class="ident">syn</span>::<span class="ident">ExprLit</span> { <span class="kw-2">ref</span> <span class="ident">lit</span>, .. } ) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">lit</span> {
+            <span class="ident">syn</span>::<span class="ident">Lit</span>::<span class="ident">Byte</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>),
+            <span class="ident">syn</span>::<span class="ident">Lit</span>::<span class="ident">Int</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">value</span>() <span class="op">&lt;</span> <span class="number">0x80</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="number">0x8000</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">value</span>() <span class="op">&lt;</span> <span class="number">0x8000</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="number">0x8000_0000</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">value</span>() <span class="op">&lt;</span> <span class="number">0x8000_0000</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">DWORD</span>)
             } <span class="kw">else</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">QWORD</span>)
             },
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>
         },
-        <span class="ident">ExprKind</span>::<span class="ident">Unary</span>(<span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Neg</span>, <span class="kw-2">ref</span> <span class="ident">expr</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">expr</span>.<span class="ident">node</span> {
-            <span class="ident">ExprKind</span>::<span class="ident">Lit</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">lit</span>.<span class="ident">node</span> {
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>),
-                <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;=</span> <span class="number">0x80</span> {
+        <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Unary</span>(<span class="ident">syn</span>::<span class="ident">ExprUnary</span> { <span class="ident">op</span>: <span class="ident">syn</span>::<span class="ident">UnOp</span>::<span class="ident">Neg</span>(<span class="kw">_</span>), <span class="kw-2">ref</span> <span class="ident">expr</span>, .. } ) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">expr</span> {
+            <span class="ident">syn</span>::<span class="ident">Expr</span>::<span class="ident">Lit</span>(<span class="ident">syn</span>::<span class="ident">ExprLit</span> { <span class="kw-2">ref</span> <span class="ident">lit</span>, .. } ) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">lit</span> {
+                <span class="ident">syn</span>::<span class="ident">Lit</span>::<span class="ident">Byte</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>),
+                <span class="ident">syn</span>::<span class="ident">Lit</span>::<span class="ident">Int</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">value</span>() <span class="op">&lt;=</span> <span class="number">0x80</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">BYTE</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;=</span> <span class="number">0x8000</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">value</span>() <span class="op">&lt;=</span> <span class="number">0x8000</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">WORD</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;=</span> <span class="number">0x8000_0000</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">value</span>() <span class="op">&lt;=</span> <span class="number">0x8000_0000</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">DWORD</span>)
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">Size</span>::<span class="ident">QWORD</span>)
@@ -2480,8 +2508,8 @@
 
 <span class="doccomment">/// Validates that the base/index combination can actually be encoded and returns the effective address size.</span>
 <span class="doccomment">/// If the address size can&#39;t be determined (purely displacement, or VSIB without base), the result is None.</span>
-<span class="kw">fn</span> <span class="ident">sanitize_indirect</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">nosplit</span>: <span class="ident">bool</span>, <span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span>,
-                     <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Register</span>, <span class="ident">isize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> 
+<span class="kw">fn</span> <span class="ident">sanitize_indirect</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">nosplit</span>: <span class="ident">bool</span>, <span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span>,
+                     <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Register</span>, <span class="ident">isize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> 
 {
 
     <span class="comment">// figure out the addressing size/mode used.</span>
@@ -2505,51 +2533,50 @@
         },
         (<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>((<span class="ident">f1</span>, <span class="ident">s1</span>)), <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>((<span class="ident">f2</span>, <span class="ident">s2</span>))) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">f1</span> <span class="op">==</span> <span class="ident">f2</span> {
             <span class="kw">if</span> <span class="ident">s1</span> <span class="op">!=</span> <span class="ident">s2</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Registers of differing sizes&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Registers of differing sizes&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
             <span class="ident">size</span> <span class="op">=</span> <span class="ident">s1</span>;
             <span class="ident">family</span> <span class="op">=</span> <span class="ident">f1</span>;
+
+        <span class="comment">// allow only vsib addressing</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">f1</span> <span class="op">==</span> <span class="ident">RegFamily</span>::<span class="ident">XMM</span> {
+            <span class="ident">vsib_mode</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="ident">size</span> <span class="op">=</span> <span class="ident">s2</span>;
+            <span class="ident">family</span> <span class="op">=</span> <span class="ident">f2</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">f2</span> <span class="op">==</span> <span class="ident">RegFamily</span>::<span class="ident">XMM</span> {
+            <span class="ident">vsib_mode</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="ident">size</span> <span class="op">=</span> <span class="ident">s1</span>;
+            <span class="ident">family</span> <span class="op">=</span> <span class="ident">f1</span>;
         } <span class="kw">else</span> {
-            <span class="comment">// allow only vsib addressing</span>
-            <span class="kw">if</span> <span class="ident">f1</span> <span class="op">==</span> <span class="ident">RegFamily</span>::<span class="ident">XMM</span> {
-                <span class="ident">vsib_mode</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">size</span> <span class="op">=</span> <span class="ident">s2</span>;
-                <span class="ident">family</span> <span class="op">=</span> <span class="ident">f2</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">f2</span> <span class="op">==</span> <span class="ident">RegFamily</span>::<span class="ident">XMM</span> {
-                <span class="ident">vsib_mode</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">size</span> <span class="op">=</span> <span class="ident">s1</span>;
-                <span class="ident">family</span> <span class="op">=</span> <span class="ident">f1</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Register type combination not supported&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
-            }
+            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Register type combination not supported&quot;</span>.<span class="ident">into</span>());
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
     }
     
     <span class="comment">// filter out combinations that are impossible to encode</span>
     <span class="kw">match</span> <span class="ident">family</span> {
         <span class="ident">RegFamily</span>::<span class="ident">RIP</span> <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_some</span>() {
-            <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Register type combination not supported&quot;</span>);
+            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Register type combination not supported&quot;</span>.<span class="ident">into</span>());
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         },
         <span class="ident">RegFamily</span>::<span class="ident">LEGACY</span> <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">size</span> {
             <span class="ident">Size</span>::<span class="ident">DWORD</span> <span class="op">=&gt;</span> (),
             <span class="ident">Size</span>::<span class="ident">QWORD</span> <span class="op">=&gt;</span> (), <span class="comment">// only valid in long mode, but should only be possible in long mode</span>
             <span class="ident">Size</span>::<span class="ident">WORD</span>  <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">mode</span> <span class="op">==</span> <span class="ident">X86Mode</span>::<span class="ident">Protected</span> <span class="op">||</span> <span class="ident">vsib_mode</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;16-bit addressing is not supported in this mode&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;16-bit addressing is not supported in this mode&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="kw">_</span> <span class="op">=&gt;</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Register type not supported&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Register type not supported&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         },
         <span class="ident">RegFamily</span>::<span class="ident">XMM</span> <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_some</span>() {
-            <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Register type combination not supported&quot;</span>);
+            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Register type combination not supported&quot;</span>.<span class="ident">into</span>());
         },
         <span class="kw">_</span> <span class="op">=&gt;</span> {
-            <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Register type not supported&quot;</span>);
+            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Register type not supported&quot;</span>.<span class="ident">into</span>());
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
     }
@@ -2560,7 +2587,7 @@
         <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">take</span>() {
             <span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="number">1</span>, <span class="prelude-val">None</span>)) <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">base</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>),
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;RIP cannot be scaled&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;RIP cannot be scaled&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> ()
@@ -2587,7 +2614,7 @@
             <span class="kw">if</span> <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">i</span>, <span class="number">1</span>, <span class="prelude-val">None</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>() {
                 <span class="ident">swap</span>(<span class="ident">i</span>, <span class="ident">base</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>())
             } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;vsib addressing requires a general purpose register as base&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;vsib addressing requires a general purpose register as base&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         }
@@ -2603,7 +2630,7 @@
             <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="number">1</span>, <span class="prelude-val">None</span>)) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
             <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;16-bit addressing with scaled index&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;16-bit addressing with scaled index&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
         };
@@ -2626,7 +2653,7 @@
             (<span class="ident">r</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">RegId</span>::<span class="ident">RBP</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">from_number</span>(<span class="number">6</span>),
             (<span class="ident">r</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">RegId</span>::<span class="ident">RBX</span> <span class="op">=&gt;</span> <span class="ident">RegId</span>::<span class="ident">from_number</span>(<span class="number">7</span>),
             <span class="kw">_</span> <span class="op">=&gt;</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible register combination&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Impossible register combination&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         };
@@ -2657,7 +2684,7 @@
                 <span class="kw-2">*</span><span class="ident">index</span> <span class="op">=</span> <span class="ident">base</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">reg</span><span class="op">|</span> (<span class="ident">reg</span>, <span class="number">1</span>, <span class="prelude-val">None</span>));
                 <span class="kw-2">*</span><span class="ident">base</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
             } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">span</span>, <span class="string">&quot;&#39;rsp&#39; cannot be used as index field&quot;</span>);
+                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;&#39;rsp&#39; cannot be used as index field&quot;</span>.<span class="ident">into</span>());
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         } <span class="kw">else</span> {
@@ -2674,13 +2701,14 @@
     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">size</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">match_op_format</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">ident</span>: <span class="ident">Ident</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">CleanArg</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Opdata</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ident</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
+<span class="kw">fn</span> <span class="ident">match_op_format</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ident</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">CleanArg</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Opdata</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">to_string</span>();
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_str</span>();
 
     <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">get_mnemnonic_data</span>(<span class="ident">name</span>) {
         <span class="ident">data</span>
     } <span class="kw">else</span> {
-        <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">ident</span>.<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid instruction&quot;</span>, <span class="ident">name</span>));
+        <span class="ident">emit_error_at</span>(<span class="ident">ident</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid instruction&quot;</span>, <span class="ident">name</span>));
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
     };
 
@@ -2850,7 +2878,7 @@
     }
 
     <span class="comment">// match found</span>
-    <span class="kw">return</span> <span class="prelude-val">Ok</span>(())
+    <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">fn</span> <span class="ident">size_operands</span>(<span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="ident">Opdata</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CleanArg</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
@@ -2948,52 +2976,52 @@
 
         <span class="ident">new_args</span>.<span class="ident">push</span>(<span class="kw">match</span> <span class="ident">arg</span> {
             <span class="ident">CleanArg</span>::<span class="ident">Direct</span> {<span class="ident">span</span>, <span class="ident">reg</span>} <span class="op">=&gt;</span>
-                <span class="ident">SizedArg</span>::<span class="ident">Direct</span> {<span class="ident">span</span>: <span class="ident">span</span>, <span class="ident">reg</span>: <span class="ident">reg</span>},
+                <span class="ident">SizedArg</span>::<span class="ident">Direct</span> {<span class="ident">span</span>, <span class="ident">reg</span>},
             <span class="ident">CleanArg</span>::<span class="ident">JumpTarget</span> {<span class="ident">type_</span>, ..} <span class="op">=&gt;</span>
-                <span class="ident">SizedArg</span>::<span class="ident">JumpTarget</span> {<span class="ident">type_</span>: <span class="ident">type_</span>, <span class="ident">size</span>: <span class="ident">size</span>},
+                <span class="ident">SizedArg</span>::<span class="ident">JumpTarget</span> {<span class="ident">type_</span>, <span class="ident">size</span>},
             <span class="ident">CleanArg</span>::<span class="ident">IndirectJumpTarget</span> {<span class="ident">type_</span>, ..} <span class="op">=&gt;</span>
-                <span class="ident">SizedArg</span>::<span class="ident">IndirectJumpTarget</span> {<span class="ident">type_</span>: <span class="ident">type_</span>},
+                <span class="ident">SizedArg</span>::<span class="ident">IndirectJumpTarget</span> {<span class="ident">type_</span>},
             <span class="ident">CleanArg</span>::<span class="ident">Immediate</span> {<span class="ident">value</span>, ..} <span class="op">=&gt;</span>
-                <span class="ident">SizedArg</span>::<span class="ident">Immediate</span> {<span class="ident">value</span>: <span class="ident">value</span>, <span class="ident">size</span>: <span class="ident">size</span>},
+                <span class="ident">SizedArg</span>::<span class="ident">Immediate</span> {<span class="ident">value</span>, <span class="ident">size</span>},
             <span class="ident">CleanArg</span>::<span class="ident">Indirect</span> {<span class="ident">span</span>, <span class="ident">disp_size</span>, <span class="ident">base</span>, <span class="ident">index</span>, <span class="ident">disp</span>, ..} <span class="op">=&gt;</span> 
-                <span class="ident">SizedArg</span>::<span class="ident">Indirect</span> {<span class="ident">span</span>: <span class="ident">span</span>, <span class="ident">disp_size</span>: <span class="ident">disp_size</span>, <span class="ident">base</span>: <span class="ident">base</span>, <span class="ident">index</span>: <span class="ident">index</span>, <span class="ident">disp</span>: <span class="ident">disp</span>},
+                <span class="ident">SizedArg</span>::<span class="ident">Indirect</span> {<span class="ident">span</span>, <span class="ident">disp_size</span>, <span class="ident">base</span>, <span class="ident">index</span>, <span class="ident">disp</span>},
         });
     }
 
     <span class="prelude-val">Ok</span>((<span class="ident">op_size</span>, <span class="ident">new_args</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">get_legacy_prefixes</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Opdata</span>, <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_legacy_prefixes</span>(<span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Opdata</span>, <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group1</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group2</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
     <span class="kw">for</span> <span class="ident">prefix</span> <span class="kw">in</span> <span class="ident">idents</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">prefix</span>.<span class="ident">node</span>.<span class="ident">name</span>.<span class="ident">as_str</span>();
-        <span class="kw">let</span> (<span class="ident">group</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> (<span class="ident">group</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
             <span class="string">&quot;rep&quot;</span>   <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">REP</span>) {
                 (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group1</span>, <span class="number">0xF3</span>)
             } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">prefix</span>.<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
+                <span class="ident">emit_error_at</span>(<span class="ident">prefix</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="string">&quot;repe&quot;</span>  <span class="op">|</span>
             <span class="string">&quot;repz&quot;</span>  <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">REPE</span>) {
                 (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group1</span>, <span class="number">0xF3</span>)
             } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">prefix</span>.<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
+                <span class="ident">emit_error_at</span>(<span class="ident">prefix</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="string">&quot;repnz&quot;</span> <span class="op">|</span>
             <span class="string">&quot;repne&quot;</span> <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">REP</span>) {
                 (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group1</span>, <span class="number">0xF2</span>)
             } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">prefix</span>.<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
+                <span class="ident">emit_error_at</span>(<span class="ident">prefix</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="string">&quot;lock&quot;</span>  <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">LOCK</span>) {
                 (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group1</span>, <span class="number">0xF0</span>)
             } <span class="kw">else</span> {
-                <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">prefix</span>.<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
+                <span class="ident">emit_error_at</span>(<span class="ident">prefix</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>));
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="string">&quot;ss&quot;</span>    <span class="op">=&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group2</span>, <span class="number">0x36</span>),
@@ -3005,7 +3033,7 @@
             <span class="kw">_</span>       <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unimplemented prefix&quot;</span>)
         };
         <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">is_some</span>() {
-            <span class="ident">ecx</span>.<span class="ident">span_err</span>(<span class="ident">prefix</span>.<span class="ident">span</span>, <span class="string">&quot;Duplicate prefix group&quot;</span>);
+            <span class="ident">emit_error_at</span>(<span class="ident">prefix</span>.<span class="ident">span</span>(), <span class="string">&quot;Duplicate prefix group&quot;</span>.<span class="ident">into</span>());
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
         <span class="kw-2">*</span><span class="ident">group</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
@@ -3171,7 +3199,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">compile_rex</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">rex_w</span>: <span class="ident">bool</span>, <span class="ident">reg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>, <span class="ident">rm</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">compile_rex</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">rex_w</span>: <span class="ident">bool</span>, <span class="ident">reg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>, <span class="ident">rm</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reg_k</span>   <span class="op">=</span> <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="number">0</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_k</span> <span class="op">=</span> <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="number">0</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">base_k</span>  <span class="op">=</span> <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="number">0</span>);
@@ -3200,21 +3228,21 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rex</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">rex</span>));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rex</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">rex</span>).<span class="ident">into</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg_k</span> {
-        <span class="ident">rex</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">rex</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="op">-</span><span class="number">1</span>);
+        <span class="ident">rex</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">rex</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">8</span>, <span class="op">-</span><span class="number">1</span>);
     }
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">index_k</span> {
-        <span class="ident">rex</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">rex</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="op">-</span><span class="number">2</span>);
+        <span class="ident">rex</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">rex</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">8</span>, <span class="op">-</span><span class="number">2</span>);
     }
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">base_k</span> {
-        <span class="ident">rex</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">rex</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="op">-</span><span class="number">3</span>);
+        <span class="ident">rex</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">rex</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">8</span>, <span class="op">-</span><span class="number">3</span>);
     }
     <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">rex</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
 }
 
-<span class="kw">fn</span> <span class="ident">compile_vex_xop</span>(<span class="ident">mode</span>: <span class="ident">X86Mode</span>, <span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Opdata</span>, <span class="ident">reg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>,
+<span class="kw">fn</span> <span class="ident">compile_vex_xop</span>(<span class="ident">mode</span>: <span class="ident">X86Mode</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Opdata</span>, <span class="ident">reg</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>,
 <span class="ident">rm</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>, <span class="ident">map_sel</span>: <span class="ident">u8</span>, <span class="ident">rex_w</span>: <span class="ident">bool</span>, <span class="ident">vvvv</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SizedArg</span><span class="op">&gt;</span>, <span class="ident">vex_l</span>: <span class="ident">bool</span>, <span class="ident">prefix</span>: <span class="ident">u8</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reg_k</span>   <span class="op">=</span> <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="number">0</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_k</span> <span class="op">=</span> <span class="ident">RegKind</span>::<span class="ident">from_number</span>(<span class="number">0</span>);
@@ -3268,10 +3296,10 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">byte1</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte1</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">byte1</span>).<span class="ident">into</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg_k</span> {
-            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_unary</span>(<span class="ident">expr</span>.<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Not</span>, <span class="ident">expr</span>);
-            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte1</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="number">4</span>)
+            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">inverted</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>));
+            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte1</span>, <span class="kw-2">&amp;</span><span class="ident">expr</span>, <span class="number">8</span>, <span class="number">4</span>)
         }
         <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">byte1</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
         <span class="kw">return</span>;
@@ -3280,19 +3308,19 @@
     <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">u8</span>(<span class="kw">if</span> <span class="ident">data</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags</span>::<span class="ident">VEX_OP</span>) {<span class="number">0xC4</span>} <span class="kw">else</span> {<span class="number">0x8F</span>}));
 
     <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">X86Mode</span>::<span class="ident">Long</span> <span class="op">&amp;&amp;</span> (<span class="ident">reg_k</span>.<span class="ident">is_dynamic</span>() <span class="op">||</span> <span class="ident">index_k</span>.<span class="ident">is_dynamic</span>() <span class="op">||</span> <span class="ident">base_k</span>.<span class="ident">is_dynamic</span>()) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">byte1</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte1</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">byte1</span>).<span class="ident">into</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg_k</span> {
-            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_unary</span>(<span class="ident">expr</span>.<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Not</span>, <span class="ident">expr</span>);
-            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte1</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="number">4</span>);
+            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">inverted</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>));
+            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte1</span>, <span class="kw-2">&amp;</span><span class="ident">expr</span>, <span class="number">8</span>, <span class="number">4</span>);
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">index_k</span> {
-            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_unary</span>(<span class="ident">expr</span>.<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Not</span>, <span class="ident">expr</span>);
-            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte1</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="number">3</span>);
+            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">inverted</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>));
+            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte1</span>, <span class="kw-2">&amp;</span><span class="ident">expr</span>, <span class="number">8</span>, <span class="number">3</span>);
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">base_k</span> {
-            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_unary</span>(<span class="ident">expr</span>.<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Not</span>, <span class="ident">expr</span>);
-            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte1</span>, <span class="ident">expr</span>, <span class="number">8</span>, <span class="number">2</span>);
+            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">inverted</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>));
+            <span class="ident">byte1</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte1</span>, <span class="kw-2">&amp;</span><span class="ident">expr</span>, <span class="number">8</span>, <span class="number">2</span>);
         }
         <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">byte1</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
     } <span class="kw">else</span> {
@@ -3300,11 +3328,11 @@
     }
 
     <span class="kw">if</span> <span class="ident">vvvv_k</span>.<span class="ident">is_dynamic</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte2</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">byte2</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte2</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">byte2</span>).<span class="ident">into</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">vvvv_k</span> {
-            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_unary</span>(<span class="ident">expr</span>.<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">UnOp</span>::<span class="ident">Not</span>, <span class="ident">expr</span>);
-            <span class="ident">byte2</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte2</span>, <span class="ident">expr</span>, <span class="number">0xF</span>, <span class="number">3</span>)
+            <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">inverted</span>(<span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>));
+            <span class="ident">byte2</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte2</span>, <span class="kw-2">&amp;</span><span class="ident">expr</span>, <span class="number">0xF</span>, <span class="number">3</span>)
         }
         <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">byte2</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
     } <span class="kw">else</span> {
@@ -3312,7 +3340,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">compile_modrm_sib</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">mode</span>: <span class="ident">u8</span>, <span class="ident">reg1</span>: <span class="ident">RegKind</span>, <span class="ident">reg2</span>: <span class="ident">RegKind</span>) {
+<span class="kw">fn</span> <span class="ident">compile_modrm_sib</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">mode</span>: <span class="ident">u8</span>, <span class="ident">reg1</span>: <span class="ident">RegKind</span>, <span class="ident">reg2</span>: <span class="ident">RegKind</span>) {
     <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">mode</span>                <span class="op">&lt;&lt;</span> <span class="number">6</span> <span class="op">|</span>
               (<span class="ident">reg1</span>.<span class="ident">encode</span>()  <span class="op">&amp;</span> <span class="number">7</span>) <span class="op">&lt;&lt;</span> <span class="number">3</span> <span class="op">|</span>
               (<span class="ident">reg2</span>.<span class="ident">encode</span>()  <span class="op">&amp;</span> <span class="number">7</span>)      ;
@@ -3322,42 +3350,42 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">byte</span>));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">byte</span>).<span class="ident">into</span>();
+
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg1</span> {
-        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte</span>, <span class="ident">expr</span>, <span class="number">7</span>, <span class="number">3</span>);
+        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">7</span>, <span class="number">3</span>);
     }
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg2</span> {
-        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte</span>, <span class="ident">expr</span>, <span class="number">7</span>, <span class="number">0</span>);
+        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">7</span>, <span class="number">0</span>);
     }
     <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">byte</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
 }
 
-<span class="kw">fn</span> <span class="ident">compile_sib_dynscale</span>(<span class="ident">ecx</span>: <span class="kw-2">&amp;</span><span class="ident">ExtCtxt</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">scale</span>: <span class="ident">u8</span>, <span class="ident">scale_expr</span>: <span class="ident">P</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">reg1</span>: <span class="ident">RegKind</span>, <span class="ident">reg2</span>: <span class="ident">RegKind</span>) {
+<span class="kw">fn</span> <span class="ident">compile_sib_dynscale</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">scale</span>: <span class="ident">u8</span>, <span class="ident">scale_expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span>, <span class="ident">reg1</span>: <span class="ident">RegKind</span>, <span class="ident">reg2</span>: <span class="ident">RegKind</span>) {
     <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> (<span class="ident">reg1</span>.<span class="ident">encode</span>()  <span class="op">&amp;</span> <span class="number">7</span>) <span class="op">&lt;&lt;</span> <span class="number">3</span> <span class="op">|</span>
                (<span class="ident">reg2</span>.<span class="ident">encode</span>()  <span class="op">&amp;</span> <span class="number">7</span>)      ;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">ecx</span>.<span class="ident">call_site</span>(), <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Byte</span>(<span class="ident">byte</span>));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_suffixed</span>(<span class="ident">byte</span>).<span class="ident">into</span>();
+    <span class="kw">let</span> <span class="ident">scale</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_unsuffixed</span>(<span class="ident">scale</span>).<span class="ident">into</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg1</span> {
-        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte</span>, <span class="ident">expr</span>, <span class="number">7</span>, <span class="number">3</span>);
+        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">7</span>, <span class="number">3</span>);
     }
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">reg2</span> {
-        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="ident">ecx</span>, <span class="ident">byte</span>, <span class="ident">expr</span>, <span class="number">7</span>, <span class="number">0</span>);
+        <span class="ident">byte</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_mask_shift_or</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>, <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>), <span class="number">7</span>, <span class="number">0</span>);
     }
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">scale_expr</span>.<span class="ident">span</span>;
-    <span class="kw">let</span> (<span class="ident">stmt</span>, <span class="ident">expr</span>) <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_dynscale</span>(
-        <span class="ident">ecx</span>, 
-        <span class="ident">target</span>,
-        <span class="ident">ecx</span>.<span class="ident">expr_binary</span>(
-            <span class="ident">span</span>,
-            <span class="ident">ast</span>::<span class="ident">BinOpKind</span>::<span class="ident">Mul</span>,
-            <span class="ident">scale_expr</span>,
-            <span class="ident">ecx</span>.<span class="ident">expr_lit</span>(<span class="ident">span</span>, <span class="ident">ast</span>::<span class="ident">LitKind</span>::<span class="ident">Int</span>(<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="ident">ast</span>::<span class="ident">LitIntType</span>::<span class="ident">Unsuffixed</span>)),
-        ),
-        <span class="ident">byte</span>
+
+    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">scale_expr</span>.<span class="ident">span</span>();
+    <span class="kw">let</span> <span class="ident">scale_expr</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="ident">scale_expr</span>);
+
+    <span class="kw">let</span> (<span class="ident">expr1</span>, <span class="ident">expr2</span>) <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">expr_dynscale</span>(
+        <span class="kw-2">&amp;</span><span class="ident">serialize</span>::<span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span>{ <span class="ident">span</span><span class="op">=&gt;</span>
+            #<span class="ident">scale_expr</span> <span class="op">*</span> #<span class="ident">scale</span>
+        }),
+        <span class="kw-2">&amp;</span><span class="ident">byte</span>
     );
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Stmt</span>(<span class="ident">stmt</span>));
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
+    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Stmt</span>(<span class="ident">expr1</span>));
+    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr2</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>));
 }
-</pre>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
