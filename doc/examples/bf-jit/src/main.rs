@@ -263,8 +263,3 @@ fn main() {
         return;
     }
 }
-#[test]
-fn ex_bf_jit()
-{
-    main();
-}

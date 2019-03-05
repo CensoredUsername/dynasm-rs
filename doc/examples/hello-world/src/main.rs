@@ -41,8 +41,3 @@ pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
         .write_all(unsafe { slice::from_raw_parts(buffer, length as usize) })
         .is_ok()
 }
-#[test]
-fn ex_hello_world()
-{
-    main();
-}
