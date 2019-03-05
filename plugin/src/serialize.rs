@@ -282,7 +282,7 @@ pub fn expr_mask_shift_or(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: 
     } else {
         let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(-shift).into();
         quote_spanned! { span=>
-            #orig | ((#expr & #mask) << #shift)
+            #orig | ((#expr & #mask) >> #shift)
         }
     })
 }
