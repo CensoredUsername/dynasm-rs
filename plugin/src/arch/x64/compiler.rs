@@ -1596,15 +1596,17 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         buffer.push(Stmt::u8(0xC5));
 
         let byte1 = (byte1 & 0x80) | (byte2 & 0x7F);
-        if !reg_k.is_dynamic() {
+        if !reg_k.is_dynamic() && !vvvv_k.is_dynamic() {
             buffer.push(Stmt::u8(byte1));
             return;
         }
 
         let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
         if let RegKind::Dynamic(_, expr) = reg_k {
-            let expr = serialize::inverted(&serialize::delimited(expr));
-            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 4)
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 4)
+        }
+        if let RegKind::Dynamic(_, expr) = vvvv_k {
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 0xF, 3)
         }
         buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
         return;
@@ -1616,16 +1618,13 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
-            let expr = serialize::inverted(&serialize::delimited(expr));
-            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 4);
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 4);
         }
         if let RegKind::Dynamic(_, expr) = index_k {
-            let expr = serialize::inverted(&serialize::delimited(expr));
-            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 3);
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 3);
         }
         if let RegKind::Dynamic(_, expr) = base_k {
-            let expr = serialize::inverted(&serialize::delimited(expr));
-            byte1 = serialize::expr_mask_shift_or(&byte1, &expr, 8, 2);
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 2);
         }
         buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
     } else {
@@ -1636,8 +1635,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         let mut byte2: TokenTree = proc_macro2::Literal::u8_suffixed(byte2).into();
 
         if let RegKind::Dynamic(_, expr) = vvvv_k {
-            let expr = serialize::inverted(&serialize::delimited(expr));
-            byte2 = serialize::expr_mask_shift_or(&byte2, &expr, 0xF, 3)
+            byte2 = serialize::expr_mask_shift_inverted_and(&byte2, &serialize::delimited(expr), 0xF, 3)
         }
         buffer.push(Stmt::ExprUnsigned(byte2, Size::BYTE));
     } else {

@@ -223,13 +223,6 @@ pub fn expr_string_from_ident(i: &syn::Ident) -> TokenTree {
     proc_macro2::Literal::string(&name).into()
 }
 
-// given an expression, turns it into a negate expression
-pub fn inverted(expr: &TokenTree) -> TokenTree {
-    delimited(quote! {
-        ! #expr
-    })
-}
-
 // 
 pub fn expr_dynscale(scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
     let tempval = expr_encode_x64_sib_scale(&scale);
@@ -283,6 +276,26 @@ pub fn expr_mask_shift_or(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: 
         let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(-shift).into();
         quote_spanned! { span=>
             #orig | ((#expr & #mask) >> #shift)
+        }
+    })
+}
+
+
+/// returns orig & !((expr & mask) << shift)
+pub fn expr_mask_shift_inverted_and(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: i8) -> TokenTree {
+    let span = expr.span();
+
+    let mask: TokenTree = proc_macro2::Literal::u64_unsuffixed(mask).into();
+
+    delimited(if shift >= 0 {
+        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(shift).into();
+        quote_spanned! { span=>
+            #orig & !((#expr & #mask) << #shift)
+        }
+    } else {
+        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(-shift).into();
+        quote_spanned! { span=>
+            #orig & !((#expr & #mask) >> #shift)
         }
     })
 }
