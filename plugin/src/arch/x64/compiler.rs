@@ -289,7 +289,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
         let mode_vsib = index.as_ref().map_or(false, |&(ref i, _, _)| i.kind.family() == RegFamily::XMM);
         let mode_16bit = addr_size == Size::WORD;
         let mode_rip_relative = base.as_ref().map_or(false, |b| b.kind.family() == RegFamily::RIP);
-        let mode_rbp_base = base.as_ref().map_or(false, |b| b == &RegId::RBP || b == &RegId::R13);
+        let mode_rbp_base = base.as_ref().map_or(false, |b| b == &RegId::RBP || b == &RegId::R13 || b.kind.is_dynamic());
 
         if mode_vsib {
             let (index, scale, scale_expr) = index.unwrap();
@@ -997,8 +997,8 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
         }
     }
 
-    // RSP or R12 as base without index (add an index so we escape into SIB)
-    if (*base == RegId::RSP || *base == RegId::R12) && index.is_none() {
+    // RSP, R12 or a dynamic register as base without index (add an index so we escape into SIB)
+    if index.is_none() && (*base == RegId::RSP || *base == RegId::R12 || base.as_ref().map_or(false, |r| r.kind.is_dynamic())) {
         *index = Some((Register::new_static(size, RegId::RSP), 1, None));
     }
 
