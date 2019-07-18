@@ -257,7 +257,7 @@ impl Assembler {
 
             for (&offset, &ManagedRelocation(size, absolute)) in absolute_relocs.iter() {
                 // slice the part that needs to be relocated
-                let mut slice = &mut buffer[offset .. offset + size.in_bytes()];
+                let slice = &mut buffer[offset .. offset + size.in_bytes()];
                 let mut val = match size {
                     RelocationSize::Byte  => slice[0] as u32,
                     RelocationSize::Word  => LittleEndian::read_u16(slice) as u32,
