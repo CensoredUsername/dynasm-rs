@@ -1,5 +1,6 @@
 #![feature(proc_macro_diagnostic)]
 #![feature(proc_macro_span)]
+#![allow(dead_code)]
 
 // token/ast manipulation
 extern crate proc_macro;
@@ -31,6 +32,8 @@ mod arch;
 mod directive;
 /// Module containing utility functions for creating TokenTrees from assembler / directive output
 mod serialize;
+/// Module containing utility functions for parsing
+mod parse_helpers;
 
 /// The whole point
 #[proc_macro]
@@ -216,7 +219,7 @@ struct State<'a> {
 type DynasmStorage = HashMap<PathBuf, Mutex<DynasmData>>;
 
 struct DynasmData {
-    pub current_arch: Box<arch::Arch>,
+    pub current_arch: Box<dyn arch::Arch>,
     pub aliases: HashMap<String, String>,
 }
 
