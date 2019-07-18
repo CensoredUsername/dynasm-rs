@@ -5,9 +5,10 @@ use proc_macro2::Span;
 use lazy_static::lazy_static;
 
 use ::emit_error_at;
+use ::parse_helpers::{eat_pseudo_keyword, parse_ident_or_rust_keyword, as_ident, ParseOptExt};
 use serialize::Size;
 use super::{Context, X86Mode};
-use super::ast::{Instruction, RawArg, JumpType, Register, RegId, RegFamily, MemoryRefItem};
+use super::ast::{Instruction, RawArg, Register, RegId, RegFamily, MemoryRefItem};
 
 use std::collections::HashMap;
 
@@ -103,69 +104,6 @@ fn eat_size_hint(ctx: &Context, input: parse::ParseStream) -> Option<Size> {
     None
 }
 
-/// Tries to parse an ident that has a specific name as a keyword. Returns true if it worked.
-fn eat_pseudo_keyword(input: parse::ParseStream, kw: &str) -> bool {
-    input.step(|cursor| {
-        if let Some((ident, rest)) = cursor.ident() {
-            if ident == kw {
-                return Ok((ident, rest));
-            }
-        }
-        Err(cursor.error("expected identifier"))
-    }).is_ok()
-}
-
-/// parses an ident, but instead of syn's Parse impl it does also parse keywords as idents
-fn parse_ident_or_rust_keyword(input: parse::ParseStream) -> parse::Result<syn::Ident> {
-    input.step(|cursor| {
-        if let Some((ident, rest)) = cursor.ident() {
-            return Ok((ident, rest));
-        }
-        Err(cursor.error("expected identifier"))
-    })
-}
-
-/// Parses a label (jump target) declaration. Returns Some(JumpType) if a jump was present
-fn parse_label(input: parse::ParseStream) -> parse::Result<Option<JumpType>> {
-    // -> global_label
-    Ok(if input.peek(Token![->]) {
-        let _: Token![->] = input.parse()?;
-        let name: syn::Ident = input.parse()?;
-
-        Some(JumpType::Global(name))
-
-    // > forward_label
-    } else if input.peek(Token![>]) {
-        let _: Token![>] = input.parse()?;
-        let name: syn::Ident = input.parse()?;
-
-        Some(JumpType::Forward(name))
-
-    // < backwards_label
-    } else if input.peek(Token![<]) {
-        let _: Token![<] = input.parse()?;
-        let name: syn::Ident = input.parse()?;
-
-        Some(JumpType::Backward(name))
-        
-    // => dynamic_label
-    } else if input.peek(Token![=>]) {
-        let _: Token![=>] = input.parse()?;
-        let expr: syn::Expr = input.parse()?;
-
-        Some(JumpType::Dynamic(expr))
-
-    // extern label
-    } else if eat_pseudo_keyword(input, "extern") {
-        let expr: syn::Expr = input.parse()?;
-
-        Some(JumpType::Bare(expr))
-
-    } else {
-        None
-    })
-}
-
 /// tries to parse a full arg definition
 fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawArg> {
     // sizehint
@@ -174,7 +112,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     let _start = input.cursor().span(); // FIXME can't join spans yet
 
     // bare label
-    if let Some(jump) = parse_label(input)? {
+    if let Some(jump) = input.parse_opt()? {
         return Ok(RawArg::JumpTarget {
             type_: jump,
             size
@@ -189,7 +127,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
         let inner = &inner;
 
         // label
-        if let Some(jump) = parse_label(inner)? {
+        if let Some(jump) = inner.parse_opt()? {
             return Ok(RawArg::IndirectJumpTarget {
                 type_: jump,
                 size
@@ -285,28 +223,9 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     })
 }
 
-/// checks if an expression is simply an ident, and if so, returns a clone of it.
-pub fn as_simple_name(expr: &syn::Expr) -> Option<syn::Ident> {
-    let path = match *expr {
-        syn::Expr::Path(syn::ExprPath {ref path, qself: None, ..}) => path,
-        _ => return None
-    };
-
-    if path.leading_colon.is_some() || path.segments.len() != 1 {
-        return None;
-    }
-
-    let segment = &path.segments[0];
-    if segment.arguments != syn::PathArguments::None {
-        return None;
-    }
-
-    Some(segment.ident.clone())
-}
-
 /// checks if an expression is interpretable as a register reference.
 fn parse_reg(ctx: &Context, expr: &syn::Expr) -> Option<(Span, Register)> {
-    if let Some(path) = as_simple_name(expr) {
+    if let Some(path) = as_ident(expr) {
         // static register names
 
         let name = path.to_string();
@@ -331,7 +250,7 @@ fn parse_reg(ctx: &Context, expr: &syn::Expr) -> Option<(Span, Register)> {
             return None;
         }
 
-        let called = if let Some(called) = as_simple_name(&&*func) {
+        let called = if let Some(called) = as_ident(&&*func) {
             called
         } else {
             return None;
@@ -405,7 +324,7 @@ fn collect_adds(node: syn::Expr, collection: &mut Vec<syn::Expr>) {
     }
 }
 
-/// why
+// why
 lazy_static!{
     static ref X64_REGISTERS: HashMap<&'static str, (RegId, Size)> = {
         use self::RegId::*;

@@ -1058,8 +1058,8 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
     // u : x and m
     // w : y and m
 
-    // A ... P: match rax - r15
-    // Q ... V: match es, cs, ss, ds, fs, gs
+    // A ..= P: match rax - r15
+    // Q ..= V: match es, cs, ss, ds, fs, gs
     // W: matches CR8
     // X: matches st0
 
@@ -1080,12 +1080,12 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
             (b'o', &CleanArg::JumpTarget{size, ..}) => size,
 
             // specific legacy regs
-            (x @ b'A' ... b'P', &CleanArg::Direct{ref reg, ..}) if
+            (x @ b'A' ..= b'P', &CleanArg::Direct{ref reg, ..}) if
                 reg.kind.family() == RegFamily::LEGACY &&
                 reg.kind.code() == Some(x - b'A') => Some(reg.size()),
 
             // specific segment regs
-            (x @ b'Q' ... b'V', &CleanArg::Direct{ref reg, ..}) if
+            (x @ b'Q' ..= b'V', &CleanArg::Direct{ref reg, ..}) if
                 reg.kind.family() == RegFamily::SEGMENT &&
                 reg.kind.code() == Some(x - b'Q') => Some(reg.size()),
 
@@ -1125,11 +1125,11 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
 
             // memory offsets
             (b'm',          &CleanArg::Indirect {size, ref index, ..}) |
-            (b'u' ... b'w', &CleanArg::Indirect {size, ref index, ..}) if
+            (b'u' ..= b'w', &CleanArg::Indirect {size, ref index, ..}) if
                 index.is_none() || index.as_ref().unwrap().0.kind.family() != RegFamily::XMM => size,
 
             (b'm',          &CleanArg::IndirectJumpTarget {size, ..}) |
-            (b'u' ... b'w', &CleanArg::IndirectJumpTarget {size, ..}) => size,
+            (b'u' ..= b'w', &CleanArg::IndirectJumpTarget {size, ..}) => size,
 
             // vsib addressing. as they have two sizes that must be checked they check one of the sizes here
             (b'k', &CleanArg::Indirect {size, index: Some((ref index, _, _)), ..}) if
@@ -1164,7 +1164,7 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
                 (b'*', b'y') |
                 (b'*', b'w') => size == Size::OWORD || size == Size::HWORD,
                 (b'*', b'r') |
-                (b'*', b'A' ... b'P') |
+                (b'*', b'A' ..= b'P') |
                 (b'*', b'v') => size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
                 (b'*', b'm') => true,
                 (b'*', _)    => panic!("Invalid size wildcard"),

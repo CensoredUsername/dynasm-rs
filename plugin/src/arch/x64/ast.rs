@@ -2,6 +2,7 @@ use syn;
 use proc_macro2::Span;
 
 use serialize::Size;
+pub use parse_helpers::JumpType;
 
 use std::cmp::PartialEq;
 
@@ -234,23 +235,6 @@ impl RegId {
             _ => panic!("invalid register code {:?}", id)
         }
     }
-}
-
-
-/**
- * Jump types
- */
-
-#[derive(Debug)]
-pub enum JumpType {
-    // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
-    // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
-    // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
-    Global(syn::Ident),         // -> label
-    Backward(syn::Ident),       //  > label
-    Forward(syn::Ident),        //  < label
-    Dynamic(syn::Expr), // => expr
-    Bare(syn::Expr)     // jump to this address
 }
 
 /**
