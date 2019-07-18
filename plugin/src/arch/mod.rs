@@ -6,6 +6,7 @@ use ::emit_error_at;
 use std::fmt::Debug;
 
 pub mod x64;
+pub mod aarch64;
 
 pub(crate) trait Arch : Debug + Send {
     fn name(&self) -> &str;
@@ -41,10 +42,11 @@ impl Arch for DummyArch {
     }
 }
 
-pub(crate) fn from_str(s: &str) -> Option<Box<Arch>> {
+pub(crate) fn from_str(s: &str) -> Option<Box<dyn Arch>> {
     match s {
         "x64" => Some(Box::new(x64::Archx64::default())),
         "x86" => Some(Box::new(x64::Archx86::default())),
+        "aarch64" => Some(Box::new(aarch64::ArchAarch64::default())),
         "unknown" => Some(Box::new(DummyArch::new("unknown"))),
         _ => None
     }
