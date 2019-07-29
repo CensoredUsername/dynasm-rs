@@ -391,6 +391,7 @@ impl parse::Parse for Modifier {
                     "UXTW" => Modifier::UXTW,
                     "UXTH" => Modifier::UXTH,
                     "UXTB" => Modifier::UXTB,
+                    "MSL"  => Modifier::MSL,
                     _ => return Err(cursor.error("Unknown modifier"))
                 };
 

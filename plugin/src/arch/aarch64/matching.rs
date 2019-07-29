@@ -62,8 +62,8 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 return Err(None);
             },
             RawArg::Modifier { span, modifier } => {
-                if modifier.expr.is_none() && (modifier.op == Modifier::LSL || modifier.op == Modifier::LSR || modifier.op == Modifier::ASR || modifier.op == Modifier::ROR) {
-                    emit_error_at(span, "LSL, LSR, ASR and ROR modifiers require a shift immediate.".into());
+                if modifier.expr.is_none() && (modifier.op == Modifier::LSL || modifier.op == Modifier::LSR || modifier.op == Modifier::ASR || modifier.op == Modifier::ROR || modifier.op == Modifier::MSL) {
+                    emit_error_at(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.".into());
                     return Err(None);
                 }
 
@@ -350,7 +350,7 @@ impl Matcher {
             },
             CleanArg::RegList { amount, element, first, .. } => {
                 match self {
-                    Matcher::RegList(a) => a == amount && element.is_none(),
+                    Matcher::RegList(a, e) => a == amount && element.is_none() && first.size() == *e,
                     Matcher::RegListSized(a, e, s) => a == amount && element.is_none() && first.size() == *e && first.assume_vector().lanes == Some(*s),
                     Matcher::RegListLanes(a, e) => a == amount && element.is_some() && first.size() == *e,
                     _ => false
@@ -444,7 +444,7 @@ impl Matcher {
             Matcher::VSizedStatic(_, _) |
             Matcher::VLanes(_) |
             Matcher::VLanesStatic(_, _) => false,
-            Matcher::RegList(_) |
+            Matcher::RegList(_, _) |
             Matcher::RegListLanes(_, _) |
             Matcher::RegListSized(_, _, _) => false,
             Matcher::Offset => false,
@@ -456,7 +456,6 @@ impl Matcher {
 
             // this is special anyway
             Matcher::End => panic!("Should never query if End is a consuming matcher"),
-            Matcher::Unimp => panic!("Should never query if Unimp is a consuming matcher")
         }
     }
 

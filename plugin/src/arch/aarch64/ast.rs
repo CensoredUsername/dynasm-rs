@@ -223,6 +223,7 @@ pub enum Modifier {
     UXTW,
     UXTH,
     UXTB,
+    MSL,
 }
 
 #[derive(Debug, Clone)]

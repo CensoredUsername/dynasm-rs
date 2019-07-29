@@ -2,7 +2,7 @@
 tlentry(['MOVI'],
     '<Dd>,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'D, Imm',
-    processor = 'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5)',
+    processor = 'R(0), Special(5, "stretched imm")', # stretched 64-bit immediate
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FRECPE', 'FRECPX', 'FRSQRTE', 'SCVTF', 'UCVTF'],
@@ -26,7 +26,7 @@ tlentry(['FABD', 'FACGE', 'FACGT', 'FCMEQ', 'FCMGE', 'FCMGT', 'FMULX', 'FRECPS',
 tlentry(['FMLA', 'FMLS', 'FMUL', 'FMULX'],
     '<Hd>,<Hn>,<Vm>.H[<index>]', (('L', 1, 21), ('M', 1, 20), ('Rm', 4, 16), ('H', 1, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'H, H, VLanes(WORD)',
-    processor = 'R(0), R(5), R4(16), Ufields(&[11, 21, 20])', # LIMITED REGISTER RANGE
+    processor = 'R(0), R(5), R4(16), Ufields(&[11, 21, 20])',
 )
 
 tlentry(['SHA512H', 'SHA512H2'],
@@ -220,8 +220,8 @@ tlentry(['SQDMULH', 'SQRDMLAH', 'SQRDMLSH', 'SQRDMULH'],
         'S, S, VLanes(DWORD)',
     ],
     processors = [
-        'R(0), R(5), R4(16), Ufields(&[11, 21, 20), Static(22, 0b01)',
-        'R(0), R(5), R(16), Ufields(&[11, 21), Static(22, 0b10)',
+        'R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Static(22, 0b01)',
+        'R(0), R(5), R(16), Ufields(&[11, 21]), Static(22, 0b10)',
     ],
 )
 
@@ -243,7 +243,7 @@ tlentry(['FMAXNMV', 'FMAXV', 'FMINNMV', 'FMINV'],
         'H, VSized(WORD)',
     ],
     processors = [
-        'R(0), R(5), Rwidth(30)', # 4H or 8H
+        'R(0), R(5), Rwidth(30)',
     ],
 )
 
@@ -255,9 +255,9 @@ tlentry(['ADDV', 'SADDLV', 'SMAXV', 'SMINV', 'UADDLV', 'UMAXV', 'UMINV'],
         'S, VSizedStatic(DWORD, 4)',
     ],
     processors = [
-        'R(0), R(5), Rwidth(30), Static(22, 0b00)', # 8B or 16B
-        'R(0), R(5), Rwidth(30), Static(22, 0b01)', # 4H or 8H
-        'R(0), R(5), Rwidth(30), Static(22, 0b10)', # 4S
+        'R(0), R(5), Rwidth(30), Static(22, 0b00)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b10)',
     ],
 )
 
@@ -267,7 +267,7 @@ tlentry(['FMAXNMV', 'FMAXV', 'FMINNMV', 'FMINV'],
         'S, VSizedStatic(DWORD, 4)',
     ],
     processors = [
-        'R(0), R(5), Rwidth(30), Static(22, 0b0)', # 4S
+        'R(0), R(5), Rwidth(30), Static(22, 0b0)',
     ],
 )
 
@@ -393,10 +393,16 @@ tlentry(['BCAX', 'EOR3'],
     processor = 'R(0), R(5), R(16), R(10)',
 )
 
-tlentry(['FMOV', 'MOVI'],
+tlentry(['FMOV'],
     '<Vd>.2D,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'VSizedStatic(QWORD, 2), Imm',
-    processor = 'R(0), Unimp',
+    processor = 'R(0), Special(5, "split float")', # split floating-point immediate
+)
+
+tlentry(['MOVI'],
+    '<Vd>.2D,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
+    matcher   = 'VSizedStatic(QWORD, 2), Imm',
+    processor = 'R(0), Special(5, "stretched imm")', # stretched 64-bit immediate
 )
 
 tlentry(['SHA512SU0'],
@@ -443,35 +449,94 @@ tlentry(['SM3TT1A', 'SM3TT1B', 'SM3TT2A', 'SM3TT2B'],
 
 tlentry(['MOVI', 'MVNI'],
     '<Vd>.<T>,#<imm8>,MSL#<amount>', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matcher   = 'VSized(DWORD), Imm, Mod(&[MSL])',
+    processor = 'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)',
 )
 
 tlentry(['MOVI'],
     '<Vd>.<T>,#<imm8>{,LSL#0}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matcher   = 'VSized(BYTE), Imm, End, Mod(&[LSL])',
+    processor = 'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)',
 )
 
-tlentry(['MOVI', 'MVNI'],
+tlentry(['MVNI'],
     '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
-    # DUPLICATE ENTRY FOR BOTH MOVI AND MVNI
+    matchers = [
+        'VSized(WORD), Imm, End, Mod(&[LSL])',
+        'VSized(DWORD), Imm, End, Mod(&[LSL])',
+    ],
+    processors = [
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+    ],
+    bits = [
+        '0x10111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
+        '0x10111100000xxx0xx001xxxxxxxxxx', # 32-bit shifted immediate 
+    ],
 )
 
-tlentry(['BIC', 'ORR'],
+tlentry(['MOVI'],
+    '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
+    matchers = [
+        'VSized(WORD), Imm, End, Mod(&[LSL])',
+        'VSized(DWORD), Imm, End, Mod(&[LSL])',
+    ],
+    processors = [
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+    ],
+    bits = [
+        '0x00111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
+        '0x00111100000xxx0xx001xxxxxxxxxx', # 32-bit shifted immediate 
+    ],
+)
+
+tlentry(['ORR'],
     '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
-    # DUPLICATE ENTRY FOR BOTH BIC AND ORR
+    matchers = [
+        'VSized(WORD), Imm, End, Mod(&[LSL])',
+        'VSized(DWORD), Imm, End, Mod(&[LSL])',
+    ],
+    processors = [
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
+    ],
+    bits = [
+        '0x00111100000xxx10x101xxxxxxxxxx', # 16-bit variant
+        '0x00111100000xxx0xx101xxxxxxxxxx', # 32-bit variant
+    ],
+)
+
+tlentry(['BIC'],
+    '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
+    matchers = [
+        'VSized(WORD), Imm, End, Mod(&[LSL])',
+        'VSized(DWORD), Imm, End, Mod(&[LSL])',
+    ],
+    processors = [
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
+        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
+    ],
+    bits = [
+        '0x10111100000xxx10x101xxxxxxxxxx', # 16-bit variant
+        '0x10111100000xxx0xx101xxxxxxxxxx', # 32-bit variant
+    ],
 )
 
 tlentry(['FMOV'],
     '<Vd>.<T>,#<imm>', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
-    # DUPLICATE ENTRY FOR FMOV
+    matchers = [
+        'VSized(WORD), Imm',
+        'VSized(DWORD), Imm',
+    ],
+    processors = [
+        'R(0), Special(5, "split float"), Rwidth(30)', # split floating-point immediate
+        'R(0), Special(5, "split float"), Rwidth(30)', # split floating-point immediate
+    ],
+    bits = [
+        '0x00111100000xxx111111xxxxxxxxxx', # 16-bit variant
+        '0x00111100000xxx111101xxxxxxxxxx', # 32-bit variant
+    ],
 )
 
 tlentry(['DUP'],
@@ -578,105 +643,270 @@ tlentry(['REV64'],
 
 tlentry(['FABS', 'FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FNEG', 'FRECPE', 'FRINTA', 'FRINTI', 'FRINTM', 'FRINTN', 'FRINTP', 'FRINTX', 'FRINTZ', 'FRSQRTE', 'FSQRT', 'SCVTF', 'UCVTF', 'URECPE', 'URSQRTE'],
     '<Vd>.<T>,<Vn>.<T>', (('Q', 1, 30), ('sz', 1, 22), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(DWORD), VSized(DWORD)',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)',
+    ],
+    processors = [
+        'R(0), R(5), Rwidth(30), Static(22, 0b0)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b1)',
+    ],
 )
 
 tlentry(['CMEQ', 'CMGE', 'CMGT', 'CMLE', 'CMLT'],
     '<Vd>.<T>,<Vn>.<T>,#0', (('Q', 1, 30), ('size', 2, 22), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(BYTE), VSized(BYTE), LitInt(0)',
+        'VSized(WORD), VSized(WORD), LitInt(0)',
+        'VSized(DWORD), VSized(DWORD), LitInt(0)',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitInt(0)',
+    ],
+    processors = [
+        'R(0), R(5), Rwidth(30), Static(22, 0b00)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b10)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b11)',
+    ],
 )
 
 tlentry(['FCMEQ', 'FCMGE', 'FCMGT', 'FCMLE', 'FCMLT'],
     '<Vd>.<T>,<Vn>.<T>,#0.0', (('Q', 1, 30), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(WORD), VSized(WORD), LitFloat(0.0)',
+    ],
+    processors = [
+        'R(0), R(5), Rwidth(30)',
+    ],
 )
 
 tlentry(['FCMEQ', 'FCMGE', 'FCMGT', 'FCMLE', 'FCMLT'],
     '<Vd>.<T>,<Vn>.<T>,#0.0', (('Q', 1, 30), ('sz', 1, 22), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(DWORD), VSized(DWORD), LitFloat(0.0)',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitFloat(0.0)',
+    ],
+    processors = [
+        'R(0), R(5), Rwidth(30), Static(22, 0b0)',
+        'R(0), R(5), Rwidth(30), Static(22, 0b1)',
+    ],
 )
 
 tlentry(['FCVTZS', 'FCVTZU', 'SCVTF', 'UCVTF'],
     '<Vd>.<T>,<Vn>.<T>,#<fbits>', (('Q', 1, 30), ('immh', 4, 19), ('immb', 3, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(WORD), VSized(WORD), Imm',
+        'VSized(DWORD), VSized(DWORD), Imm',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30), Static(19, 0b0010)',
+        'R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30), Static(19, 0b0100)',
+        'R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30), Static(19, 0b1000)',
+    ],
 )
 
-tlentry(['SHL', 'SLI', 'SQSHL', 'SQSHLU', 'SRI', 'SRSHR', 'SRSRA', 'SSHR', 'SSRA', 'UQSHL', 'URSHR', 'URSRA', 'USHR', 'USRA'],
+tlentry(['SHL', 'SLI', 'SQSHL', 'SQSHLU', 'UQSHL'],
     '<Vd>.<T>,<Vn>.<T>,#<shift>', (('Q', 1, 30), ('immh', 4, 19), ('immb', 3, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(BYTE), VSized(BYTE), Imm',
+        'VSized(WORD), VSized(WORD), Imm',
+        'VSized(DWORD), VSized(DWORD), Imm',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm',
+    ],
+    processors = [
+        'R(0), R(5), Ubits(16, 3), Rwidth(30), Static(19, 0b0001)',
+        'R(0), R(5), Ubits(16, 4), Rwidth(30), Static(19, 0b0010)',
+        'R(0), R(5), Ubits(16, 5), Rwidth(30), Static(19, 0b0100)',
+        'R(0), R(5), Ubits(16, 6), Rwidth(30), Static(19, 0b1000)',
+    ],
 )
 
-tlentry(['AND', 'BIC', 'BIF', 'BIT', 'BSL', 'EOR', 'FABD', 'FACGE', 'FACGT', 'FADD', 'FADDP', 'FCMEQ', 'FCMGE', 'FCMGT', 'FDIV', 'FMAX', 'FMAXNM', 'FMAXNMP', 'FMAXP', 'FMIN', 'FMINNM', 'FMINNMP', 'FMINP', 'FMLA', 'FMLS', 'FMUL', 'FMULX', 'FRECPS', 'FRSQRTS', 'FSUB', 'ORN', 'ORR'],
+tlentry(['SRI', 'SRSHR', 'SRSRA', 'SSHR', 'SSRA', 'URSHR', 'URSRA', 'USHR', 'USRA'],
+    '<Vd>.<T>,<Vn>.<T>,#<shift>', (('Q', 1, 30), ('immh', 4, 19), ('immb', 3, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
+    matchers = [
+        'VSized(BYTE), VSized(BYTE), Imm',
+        'VSized(WORD), VSized(WORD), Imm',
+        'VSized(DWORD), VSized(DWORD), Imm',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm',
+    ],
+    processors = [
+        'R(0), R(5), Usub(16, 3, 8), Rwidth(30), Static(19, 0b0001)',
+        'R(0), R(5), Usub(16, 4, 16), Rwidth(30), Static(19, 0b0010)',
+        'R(0), R(5), Usub(16, 5, 32), Rwidth(30), Static(19, 0b0100)',
+        'R(0), R(5), Usub(16, 6, 64), Rwidth(30), Static(19, 0b1000)',
+    ],
+)
+
+tlentry(['AND', 'BIC', 'BIF', 'BIT', 'BSL', 'EOR', 'ORN', 'ORR'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matcher   = 'VSized(BYTE), VSized(BYTE), VSized(BYTE)',
+    processor = 'R(0), R(5), R(16), Rwidth(30)',
 )
 
-tlentry(['ADD', 'ADDP', 'CMEQ', 'CMGE', 'CMGT', 'CMHI', 'CMHS', 'CMTST', 'MLA', 'MLS', 'MUL', 'PMUL', 'SABA', 'SABD', 'SHADD', 'SHSUB', 'SMAX', 'SMAXP', 'SMIN', 'SMINP', 'SQADD', 'SQDMULH', 'SQRDMLAH', 'SQRDMLSH', 'SQRDMULH', 'SQRSHL', 'SQSHL', 'SQSUB', 'SRHADD', 'SRSHL', 'SSHL', 'SUB', 'TRN1', 'TRN2', 'UABA', 'UABD', 'UHADD', 'UHSUB', 'UMAX', 'UMAXP', 'UMIN', 'UMINP', 'UQADD', 'UQRSHL', 'UQSHL', 'UQSUB', 'URHADD', 'URSHL', 'USHL', 'UZP1', 'UZP2', 'ZIP1', 'ZIP2'],
+tlentry(['FABD', 'FACGE', 'FACGT', 'FADD', 'FADDP', 'FCMEQ', 'FCMGE', 'FCMGT', 'FDIV', 'FMAX', 'FMAXNM', 'FMAXNMP', 'FMAXP', 'FMIN', 'FMINNM', 'FMINNMP', 'FMINP', 'FMLA', 'FMLS', 'FMUL', 'FMULX', 'FRECPS', 'FRSQRTS', 'FSUB'],
+    '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
+    matcher   = 'VSized(WORD), VSized(WORD), VSized(WORD)',
+    processor = 'R(0), R(5), R(16), Rwidth(30)',
+)
+
+tlentry(['ADD', 'ADDP', 'CMEQ', 'CMGE', 'CMGT', 'CMHI', 'CMHS', 'CMTST', 'SQADD', 'SQRSHL', 'SQSHL', 'SQSUB', 'SRSHL', 'SSHL', 'SUB', 'TRN1', 'TRN2', 'UQADD', 'UQRSHL', 'UQSHL', 'UQSUB', 'URSHL', 'USHL', 'UZP1', 'UZP2', 'ZIP1', 'ZIP2'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('size', 2, 22), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(BYTE), VSized(BYTE), VSized(BYTE)',
+        'VSized(WORD), VSized(WORD), VSized(WORD)',
+        'VSized(DWORD), VSized(DWORD), VSized(DWORD)',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b00)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b10)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b11)',
+    ],
+)
+
+tlentry(['MLA', 'MLS', 'MUL', 'SABA', 'SABD', 'SHADD', 'SHSUB', 'SMAX', 'SMAXP', 'SMIN', 'SMINP', 'SRHADD', 'UABA', 'UABD', 'UHADD', 'UHSUB', 'UMAX', 'UMAXP', 'UMIN', 'UMINP', 'URHADD'],
+    '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('size', 2, 22), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
+    matchers = [
+        'VSized(BYTE), VSized(BYTE), VSized(BYTE)',
+        'VSized(WORD), VSized(WORD), VSized(WORD)',
+        'VSized(DWORD), VSized(DWORD), VSized(DWORD)',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b00)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b10)',
+    ],
+)
+
+tlentry(['SQDMULH', 'SQRDMLAH', 'SQRDMLSH', 'SQRDMULH'],
+    '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('size', 2, 22), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
+    matchers = [
+        'VSized(WORD), VSized(WORD), VSized(WORD)',
+        'VSized(DWORD), VSized(DWORD), VSized(DWORD)',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b10)',
+    ],
+)
+
+tlentry(['PMUL'],
+    '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('size', 2, 22), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
+    matchers = [
+        'VSized(BYTE), VSized(BYTE), VSized(BYTE)',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b00)',
+    ],
 )
 
 tlentry(['FABD', 'FACGE', 'FACGT', 'FADD', 'FADDP', 'FCMEQ', 'FCMGE', 'FCMGT', 'FDIV', 'FMAX', 'FMAXNM', 'FMAXNMP', 'FMAXP', 'FMIN', 'FMINNM', 'FMINNMP', 'FMINP', 'FMLA', 'FMLS', 'FMUL', 'FMULX', 'FRECPS', 'FRSQRTS', 'FSUB'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>', (('Q', 1, 30), ('sz', 1, 22), ('Rm', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(DWORD), VSized(DWORD), VSized(DWORD)',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b0)',
+        'R(0), R(5), R(16), Rwidth(30), Static(22, 0b1)', # TODO check all ops
+    ]
 )
 
 tlentry(['EXT'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>,#<index>', (('Q', 1, 30), ('Rm', 5, 16), ('imm4', 4, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8), Imm',
+        'VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), Imm',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Ubits(11, 3), Static(30, 0b0)',
+        'R(0), R(5), R(16), Ubits(11, 4), Static(30, 0b1)',
+    ],
 )
 
 tlentry(['FCADD'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>,#<rotate>', (('Q', 1, 30), ('size', 2, 22), ('Rm', 5, 16), ('rot', 1, 12), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(WORD), VSized(WORD), VSized(WORD), Imm',
+        'VSized(DWORD), VSized(DWORD), VSized(DWORD), Imm',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSized(QWORD), Imm',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30), Static(22, 0b10)',
+        'R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30), Static(22, 0b11)',
+    ],
 )
 
 tlentry(['FCMLA'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<T>,#<rotate>', (('Q', 1, 30), ('size', 2, 22), ('Rm', 5, 16), ('rot', 2, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(WORD), VSized(WORD), VSized(WORD), Imm',
+        'VSized(DWORD), VSized(DWORD), VSized(DWORD), Imm',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSized(QWORD), Imm',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30), Static(22, 0b10)',
+        'R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30), Static(22, 0b11)',
+    ],
 )
 
 tlentry(['MLA', 'MLS', 'MUL', 'SQDMULH', 'SQRDMLAH', 'SQRDMLSH', 'SQRDMULH'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<Ts>[<index>]', (('Q', 1, 30), ('size', 2, 22), ('L', 1, 21), ('M', 1, 20), ('Rm', 4, 16), ('H', 1, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(WORD), VSized(WORD), VLanes(WORD)',
+        'VSized(DWORD), VSized(DWORD), VLanes(DWORD)',
+    ],
+    processors = [
+        'R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30), Static(22, 0b01)',
+        'R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30), Static(22, 0b10)',
+    ],
 )
 
 tlentry(['FMLA', 'FMLS', 'FMUL', 'FMULX'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<Ts>[<index>]', (('Q', 1, 30), ('sz', 1, 22), ('L', 1, 21), ('M', 1, 20), ('Rm', 4, 16), ('H', 1, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(DWORD), VSized(DWORD), VLanes(DWORD)',
+        'VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VLanes(QWORD)',
+    ],
+    processors = [
+        'R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30), Static(22, 0b0)',
+        'R(0), R(5), R(16), Ufields(&[11]), Rwidth(30), Static(22, 0b1)',
+    ],
 )
 
-tlentry(['FCMLA'],
+tlentry(['FCMLA'], # duplicate definition
     '<Vd>.<T>,<Vn>.<T>,<Vm>.<Ts>[<index>],#<rotate>', (('Q', 1, 30), ('L', 1, 21), ('M', 1, 20), ('Rm', 4, 16), ('rot', 2, 13), ('H', 1, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
-    # DUPLICATE FOR FCMLA
+    matchers = [
+        'VSized(WORD), VSized(WORD), VLanes(WORD), Imm',
+        'VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VLanes(DWORD), Imm',
+    ],
+    processors = [
+        'R(0), R(5), R4(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)',
+        'R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)',
+    ],
+    bits = [
+        '0x10111101xxxxxx0xx1x0xxxxxxxxxx',
+        '0x10111110xxxxxx0xx1x0xxxxxxxxxx',
+    ],
 )
 
 tlentry(['FMLA', 'FMLS', 'FMUL', 'FMULX'],
     '<Vd>.<T>,<Vn>.<T>,<Vm>.H[<index>]', (('Q', 1, 30), ('L', 1, 21), ('M', 1, 20), ('Rm', 4, 16), ('H', 1, 11), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'Unimp',
-    processor = 'Unimp',
+    matchers = [
+        'VSized(WORD), VSized(WORD), VLanes(WORD)',
+    ],
+    processors = [
+        'R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)',
+    ],
 )
 
 tlentry(['DUP'],
     '<Vd>.<T>,<Vn>.<Ts>[<index>]', (('Q', 1, 30), ('imm5', 5, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
     matchers = [
-        'VSized(BYTE), VLanes(BYTE)'
+        'VSized(BYTE), VLanes(BYTE)',
         'VSized(WORD), VLanes(BYTE)',
         'VSized(DWORD), VLanes(WORD)',
         'VSizedStatic(QWORD, 2), VLanes(DWORD)',
@@ -1141,7 +1371,7 @@ tlentry(['FCVTN2', 'FCVTXN2'],
     ],
 )
 
-tlentry(['RSHRN', 'SHRN', 'SQRSHRN', 'SQRSHRUN', 'SQSHRN', 'SQSHRUN', 'UQRSHRN', 'UQRSHRN2', 'UQSHRN'],
+tlentry(['RSHRN', 'SHRN', 'SQRSHRN', 'SQRSHRUN', 'SQSHRN', 'SQSHRUN', 'UQRSHRN', 'UQSHRN'],
     '<Vd>.<Tb>,<Vn>.<Ta>,#<shift>', (('immh', 4, 19), ('immb', 3, 16), ('Rn', 5, 5), ('Rd', 5, 0)),
     matchers = [
         'VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm',
@@ -1149,9 +1379,9 @@ tlentry(['RSHRN', 'SHRN', 'SQRSHRN', 'SQRSHRUN', 'SQSHRN', 'SQSHRUN', 'UQRSHRN',
         'VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), USub(16, 3, 8), Static(19, 0b0001)',
-        'R(0), R(5), USub(16, 4, 16), Static(19, 0b0010)',
-        'R(0), R(5), USub(16, 5, 32), Static(19, 0b0100)',
+        'R(0), R(5), Usub(16, 3, 8), Static(19, 0b0001)',
+        'R(0), R(5), Usub(16, 4, 16), Static(19, 0b0010)',
+        'R(0), R(5), Usub(16, 5, 32), Static(19, 0b0100)',
     ],
 )
 
@@ -1163,9 +1393,9 @@ tlentry(['RSHRN2', 'SHRN2', 'SQRSHRN2', 'SQRSHRUN2', 'SQSHRN2', 'SQSHRUN2', 'UQR
         'VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), USub(16, 3, 8), Static(19, 0b0001)',
-        'R(0), R(5), USub(16, 4, 16), Static(19, 0b0010)',
-        'R(0), R(5), USub(16, 5, 32), Static(19, 0b0100)',
+        'R(0), R(5), Usub(16, 3, 8), Static(19, 0b0001)',
+        'R(0), R(5), Usub(16, 4, 16), Static(19, 0b0010)',
+        'R(0), R(5), Usub(16, 5, 32), Static(19, 0b0100)',
     ],
 )
 

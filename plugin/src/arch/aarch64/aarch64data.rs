@@ -52,7 +52,7 @@ pub enum Matcher {
     VLanes(Size), // element specifier i.e. V.S4?[lane]
     VLanesStatic(Size, u8), // static element specifier i.e. V.S4?[lane]
 
-    // register lists with .0 items, with the registers of a variable size class
+    // register lists with .0 items, with the registers of size class .1
     RegList(u8, Size),
     // register list of a specific register size
     RegListSized(u8, Size, u8),
@@ -73,9 +73,6 @@ pub enum Matcher {
 
     // possible op mnemnonic end (everything after this point uses the default encoding)
     End,
-
-    // not yet matchable
-    Unimp
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -87,7 +84,7 @@ pub enum Command {
     // unsigned immediate encodings
     Ubits(u8, u8), // encodes an unsigned immediate starting at bit .0, .1 bits long
     Uscaled(u8, u8, u8), // encodes an unsigned immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
-    Ulist(u8, &'static [u8]), // encodes an immediate that can only be a limited amount of options
+    Ulist(u8, &'static [u16]), // encodes an immediate that can only be a limited amount of options
     Urange(u8, u8, u8), // (loc, min, max) asserts the immediate is below or equal to max, encodes the value of (imm-min)
     UlogicalW(u8), // logical immediate encoding, 32-bit
     UlogicalX(u8), // logical immediate encoding, 64-bit
@@ -109,6 +106,12 @@ pub enum Command {
     BUslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
     BSslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
 
+    // special immediate encodings
+    Special(u8, &'static str),
+
+    // SIMD 128-bit indicator
+    Rwidth(u8),
+
     // Extend/Shift fields
     Rotates(u8), // 2-bits field encoding [LSL, LSR, ASR, ROR]
     ExtendsW(u8), // 3-bits field encoding [UXTB, UXTH, UXTW, UXTX, SXTB, SXTH, SXTW, SXTX]. Additionally, LSL is interpreted as UXTW
@@ -124,9 +127,7 @@ pub enum Command {
     // special commands
     A, // advances the argument pointer, only needed to skip over an argument.
     C, // moves the argument pointer back.
-    Static(u8, u32), // just insert these bits at this location.
-    Unimp, // unimplemented
-
+    Static(u8, u32) // just insert these bits at this location.
 }
 
 #[derive(Debug, Clone, Copy)]

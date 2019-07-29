@@ -46,9 +46,9 @@ tlentry(['TBNZ', 'TBZ'],
 tlentry(['MOV'],
     '<Wd>,#<imm>', (('hw', 2, 21), ('imm16', 16, 5), ('Rd', 5, 0)),
     matcher   = 'W, Imm',
-    processor = 'R(0), Unimp', # wide immediate
+    processor = 'R(0), Special(5, "wide imm")', # wide immediate
     matchers  =['Dot, Lit("inverted"), W, Imm'],
-    processors=['R(0), Unimp'], # inverted wide immediate
+    processors=['R(0), Special(5, "inverted wide imm")'], # inverted wide immediate
     names = ["MOV (wide immediate)", "MOV (inverted wide immediate)"]
 )
 
@@ -274,7 +274,7 @@ tlentry(['CMN', 'CMP'],
 tlentry(['CASP', 'CASPA', 'CASPAL', 'CASPL'],
     '<Ws>,<W(s+1)>,<Wt>,<W(t+1)>,[<Xn|SP>{,#0}]', (('Rs', 5, 16), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'W, W, W, W, RefBase',
-    processor = 'R(16), Unimp, R(0), Unimp, R(5)',
+    processor = 'R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)',
 )
 
 tlentry(['STLXP', 'STXP'],
@@ -429,9 +429,9 @@ tlentry(['AUTDZA', 'AUTDZB', 'AUTIZA', 'AUTIZB', 'PACDZA', 'PACDZB', 'PACIZA', '
 tlentry(['MOV'],
     '<Xd>,#<imm>', (('hw', 2, 21), ('imm16', 16, 5), ('Rd', 5, 0)),
     matcher   = 'X, Imm',
-    processor = 'R(0), Unimp', # wide immediate
+    processor = 'R(0), Special(5, "wide imm")', # wide immediate
     matchers  =['Dot, Lit("inverted"), X, Imm'],
-    processors=['R(0), Unimp'], # inverted wide immediate
+    processors=['R(0), Special(5, "inverted wide imm")'], # inverted wide immediate
     names = ["MOV (wide immediate)", "MOV (inverted wide immediate)"]
 )
 
@@ -711,7 +711,7 @@ tlentry(['CMN', 'CMP'],
 tlentry(['CASP', 'CASPA', 'CASPAL', 'CASPL'],
     '<Xs>,<X(s+1)>,<Xt>,<X(t+1)>,[<Xn|SP>{,#0}]', (('Rs', 5, 16), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, X, X, X, RefBase',
-    processor = 'R(16), Unimp, R(0), Unimp, R(5)', # register-next-to-register constraint
+    processor = 'R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)', # register-next-to-register constraint
 )
 
 tlentry(['LDADD', 'LDADDA', 'LDADDAL', 'LDADDL', 'LDCLR', 'LDCLRA', 'LDCLRAL', 'LDCLRL', 'LDEOR', 'LDEORA', 'LDEORAL', 'LDEORL', 'LDSET', 'LDSETA', 'LDSETAL', 'LDSETL', 'LDSMAX', 'LDSMAXA', 'LDSMAXAL', 'LDSMAXL', 'LDSMIN', 'LDSMINA', 'LDSMINAL', 'LDSMINL', 'LDUMAX', 'LDUMAXA', 'LDUMAXAL', 'LDUMAXL', 'LDUMIN', 'LDUMINA', 'LDUMINAL', 'LDUMINL', 'SWP', 'SWPA', 'SWPAL', 'SWPL'],
@@ -862,5 +862,5 @@ tlentry(['RET'],
     matcher   = 'X',
     processor = 'R(5)', # weird default
     matchers  =[''],
-    processors=['Static(5, 30)'],
+    processors=['Static(5, 0b11110)'],
 )

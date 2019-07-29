@@ -307,17 +307,18 @@ tlentry({},
         )
 
 class TranslationEntry:
-    def __init__(self, ops, template, fields, matcher_processors, forget, names, priority):
+    def __init__(self, ops, template, fields, matcher_processors, forget, names, bits, priority):
         self.ops = ops
         self.template = template
         self.fields = fields
         self.matcher_processors = matcher_processors
         self.forget = forget
         self.names = names
+        self.bits = bits
         self.priority = priority
 
     @classmethod
-    def entry(cls, ops, template, fields, matcher=None, processor=None, matchers=None, processors=None, forget=False, names=None, priority=0):
+    def entry(cls, ops, template, fields, matcher=None, processor=None, matchers=None, processors=None, forget=False, names=None, bits=None, priority=0):
         m = []
         p = []
         if matcher is not None:
@@ -329,26 +330,31 @@ class TranslationEntry:
         if processors is not None:
             p.extend(processors)
 
+        assert not (names and bits), "both names and bits set"
+
         if not forget:
             assert m, "No matchers"
             assert p, "No processors"
             assert len(m) == len(p), "Amount of matchers and processors does not match"
             if names:
                 assert len(names) == len(m), "wrong amount of names"
-        return cls(ops, template, fields, list(zip(m, p)), forget, names, priority)
+        return cls(ops, template, fields, list(zip(m, p)), forget, names, bits, priority)
 
 class TranslationMap:
     def __init__(self):
         self.map = []
         self.table = {}
 
-    def load_file(self, f):
+    def load_file(self, f, name):
         def entry(*args, **kwargs):
             self.map.append(TranslationEntry.entry(*args, **kwargs))
 
         g = {"tlentry": entry}
         code = f.read()
-        exec(code, g) # dirty but works
+        try:
+            exec(code, g) # dirty but works
+        except Exception as e:
+            raise Exception("In {}".format(name)) from e
 
     def build_lookup_table(self):
         self.table = {}
@@ -388,6 +394,17 @@ def tl_assign_matchers(ops, map):
                         found = True
                 assert found, "Never encountered a specific title during title lookup"
 
+            elif tlentry.bits:
+                found = False
+                for (matcher, processor), bits in zip(tlentry.matcher_processors, tlentry.bits):
+                    if bits == op.bits:
+                        new = copy.deepcopy(op)
+                        new.matcher = matcher
+                        new.processor = processor
+                        newgroup.append((new, tlentry.priority))
+                        found = True
+                assert found, "Never encountered a specific bits during bits lookup: {}".format(bits)
+
             else:
                 for matcher, processor in tlentry.matcher_processors:
                     new = copy.deepcopy(op)
@@ -398,6 +415,22 @@ def tl_assign_matchers(ops, map):
         newgroup.sort(key=lambda x: x[1], reverse=True) # sort by priority
 
         group[:] = [i for i, _ in newgroup]
+
+def tl_merge_statics(ops):
+    for m, group in ops:
+        for op in group:
+            statics = re.findall(r"(?:, )?\bStatic\(([0-9]+), 0b([01]+)\)", op.processor)
+            if statics:
+                bits = list(op.bits)
+                for offset, static in statics:
+                    op.processor = re.sub(r"((?:, )?\bStatic\([0-9]+, 0b[01]+\))", "", op.processor)
+                    for i, s in enumerate(reversed(static)):
+                        bitpos = 31 - (i + int(offset))
+                        bits[bitpos] = s
+
+                bits = "".join(bits)
+                print("found statics: {}, merged with {} into {}".format(statics, op.bits, bits))
+                op.bits = bits
 
 def main():
     import sys
@@ -434,15 +467,15 @@ def main():
     # load translation files
     tlmap = TranslationMap()
     with open("tl_general.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f)
+        tlmap.load_file(f, "tl_general.py")
     with open("tl_system.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f)
+        tlmap.load_file(f, "tl_system.py")
     with open("tl_float.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f)
+        tlmap.load_file(f, "tl_float.py")
     with open("tl_fpsimd.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f)
+        tlmap.load_file(f, "tl_fpsimd.py")
     with open("tl_advsimd.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f)
+        tlmap.load_file(f, "tl_advsimd.py")
 
     tlmap.build_lookup_table()
 
@@ -451,6 +484,9 @@ def main():
     tl_assign_matchers(ops, tlmap)
     #assign_matchers(ops)
     #merge_matchers(ops)
+
+    # compile static data into bits
+    tl_merge_statics(ops)
 
     #emit the actual opmap
 
