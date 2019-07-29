@@ -53,7 +53,7 @@ pub enum Matcher {
     VLanesStatic(Size, u8), // static element specifier i.e. V.S4?[lane]
 
     // register lists with .0 items, with the registers of a variable size class
-    RegList(u8),
+    RegList(u8, Size),
     // register list of a specific register size
     RegListSized(u8, Size, u8),
     // register list with lane specifier. element_size, amount
@@ -82,6 +82,7 @@ pub enum Matcher {
 pub enum Command {
     // commands that advance the argument pointer
     R(u8), // encode a register, or reference base, into a 5-bit bitfield.
+    R4(u8), // encode a register in the range 0-15 into a 4-bit bitfield
 
     // unsigned immediate encodings
     Ubits(u8, u8), // encodes an unsigned immediate starting at bit .0, .1 bits long
