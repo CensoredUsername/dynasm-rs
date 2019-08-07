@@ -426,7 +426,10 @@ def tl_merge_statics(ops):
                     op.processor = re.sub(r"((?:, )?\bStatic\([0-9]+, 0b[01]+\))", "", op.processor)
                     for i, s in enumerate(reversed(static)):
                         bitpos = 31 - (i + int(offset))
-                        bits[bitpos] = s
+                        if s == "1":
+                            bits[bitpos] = "1"
+                        elif s == "0" and bits[bitpos] != "1":
+                            bits[bitpos] = "0"
 
                 bits = "".join(bits)
                 print("found statics: {}, merged with {} into {}".format(statics, op.bits, bits))

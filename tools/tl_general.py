@@ -219,7 +219,7 @@ tlentry(['ADD', 'SUB'],
 tlentry(['ADD', 'SUB'],
     '<Wd|WSP>,<Wn|WSP>,<Wm>{,<extend>{#<amount>}}', (('Rm', 5, 16), ('option', 3, 13), ('imm3', 3, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'WSP, WSP, W, End, Mod(EXTENDS)',
-    processor = 'R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)',
+    processor = 'R(0), R(5), R(16), ExtendsW(13), Urange(10, 0, 4)',
 )
 
 tlentry(['SETF16', 'SETF8'],
@@ -268,7 +268,7 @@ tlentry(['CMN', 'CMP'],
 tlentry(['CMN', 'CMP'],
     '<Wn|WSP>,<Wm>{,<extend>{#<amount>}}', (('Rm', 5, 16), ('option', 3, 13), ('imm3', 3, 10), ('Rn', 5, 5)),
     matcher   = 'WSP, W, End, Mod(EXTENDS)',
-    processor = 'R(5), R(16), ExtendsX(13), Urange(10, 0, 4)',
+    processor = 'R(5), R(16), ExtendsW(13), Urange(10, 0, 4)',
 )
 
 tlentry(['CASP', 'CASPA', 'CASPAL', 'CASPL'],
@@ -703,7 +703,7 @@ tlentry(['CMN', 'CMP'],
 tlentry(['CMN', 'CMP'],
     '<Xn|SP>,<R><m>{,<extend>{#<amount>}}', (('Rm', 5, 16), ('option', 3, 13), ('imm3', 3, 10), ('Rn', 5, 5)),
     matcher   = 'XSP, W, End, Mod(EXTENDS_W)',
-    processor = 'R(0), R(5), R(16), ExtendsW(13), Urange(10, 0, 4)',
+    processor = 'R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)',
     matchers  =['XSP, X, End, Mod(EXTENDS_X)'],
     processors=['R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)'],
 )

@@ -253,7 +253,7 @@ tlentry(['FCCMP', 'FCCMPE'],
 
 tlentry(['FMOV'],
     '<Vd>.D[1],<Xn>', (('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'VLanesStatic(QWORD, 1), X',
+    matcher   = 'VElementStatic(QWORD, 1), X',
     processor = 'R(0), R(5)',
 )
 
@@ -331,6 +331,6 @@ tlentry(['FCVTZS', 'FCVTZU'],
 
 tlentry(['FMOV'],
     '<Xd>,<Vn>.D[1]', (('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'X, VLanesStatic(QWORD, 1)',
+    matcher   = 'X, VElementStatic(QWORD, 1)',
     processor = 'R(0), R(5)',
 )
