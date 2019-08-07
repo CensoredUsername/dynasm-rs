@@ -2,8 +2,9 @@ use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenTree};
 use quote::{quote_spanned};
 
-use ::emit_error_at;
-use serialize::{self, Stmt, Size};
+use crate::emit_error_at;
+use crate::serialize::{self, Stmt, Size};
+
 use super::{Context, X86Mode};
 use super::ast::{RawArg, CleanArg, SizedArg, Instruction, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
 use super::x64data::get_mnemnonic_data;

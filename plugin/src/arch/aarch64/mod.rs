@@ -5,9 +5,9 @@ mod parser;
 mod matching;
 mod aarch64data;
 
-use ::State;
-use ::emit_error_at;
-use arch::Arch;
+use crate::State;
+use crate::emit_error_at;
+use crate::arch::Arch;
 
 
 struct Context<'a, 'b: 'a> {
@@ -44,7 +44,7 @@ impl Arch for ArchAarch64 {
         let (instruction, args) = parser::parse_instruction(&mut ctx, input)?;
         let span = instruction.span;
 
-        let (opdata, args) = match matching::match_instruction(&mut ctx, &instruction, args) {
+        let match_data = match matching::match_instruction(&mut ctx, &instruction, args) {
             Err(None) => return Ok(()),
             Err(Some(e)) => {
                 emit_error_at(span, e);
@@ -54,8 +54,8 @@ impl Arch for ArchAarch64 {
         };
 
         println!("{:?}", instruction);
-        println!("{:?}", opdata);
-        println!("{:?}", args);
+        println!("{:?}", match_data);
+
 
         Ok(())
     }

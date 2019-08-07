@@ -1,22 +1,25 @@
 use syn;
 use proc_macro2::Span;
 
-use serialize::Size;
-pub use parse_helpers::JumpType;
+use crate::serialize::Size;
+pub use crate::parse_helpers::JumpType;
 
 
+/// A complete abstraction of an aarch64 register access.
 #[derive(Debug, Clone)]
 pub enum Register {
     Scalar(RegScalar),
     Vector(RegVector)
 }
 
+/// A vcalar register. Can be either of the integer or simd families. 
 #[derive(Debug, Clone)]
 pub struct RegScalar {
     pub kind: RegKind,
     pub size: Size
 }
 
+/// A vector register. Can only be of the simd family
 #[derive(Debug, Clone)]
 pub struct RegVector {
     pub kind: RegKind,
@@ -25,15 +28,14 @@ pub struct RegVector {
     pub element: Option<syn::Expr>
 }
 
-// Register id without indication of its usage.
+// Register id without indication of its usage. Either a static Regid or a family identifier + expression to choose the register
 #[derive(Debug, Clone)]
 pub enum RegKind {
     Static(RegId),
     Dynamic(RegFamily, syn::Expr)
 }
 
-// map identifying all architecturally defined registers. Registers that overlap with different sizes
-// are given the same ID. the upper 2 bits of the RegId match the RegFamily of said register.
+// a register identifier. This identifies an architecturally completely separate register.
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum RegId {
     // regular registers. Either 4 or 8 bytes
@@ -64,30 +66,33 @@ pub enum RegId {
     V28= 0x5C, V29= 0x5D, V30= 0x5E, V31= 0x5F
 }
 
-// what family is this regid of (Scalar = Xn/Wn, Vector = Bn/Hn/Sn/Dn/Qn)
+// register family. INTEGER = Xn/Wn including XZR/WZR. INTEGERSP is just SP or XSP. SIMD = Bn/Hn/Sn/Dn/Qn
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum RegFamily {
-    SCALAR   = 0,
-    SCALARSP = 1,
-    VECTOR   = 2,
+    INTEGER   = 0,
+    INTEGERSP = 1,
+    SIMD      = 2,
 }
 
 impl RegId {
+    /// Encode this RegId in a 5-bit value
     pub fn code(self) -> u8 {
         self as u8 & 0x1F
     }
 
+    /// Returns what family this Regid is from
     pub fn family(self) -> RegFamily {
         match self as u8 >> 5 {
-            0 => RegFamily::SCALAR,
-            1 => RegFamily::SCALARSP,
-            2 => RegFamily::VECTOR,
+            0 => RegFamily::INTEGER,
+            1 => RegFamily::INTEGERSP,
+            2 => RegFamily::SIMD,
             _ => unreachable!()
         }
     }
 }
 
 impl RegKind {
+    /// Get the 5-bit code of this RegKind. Returns None if it was dynamic
     pub fn code(&self) -> Option<u8> {
         match self {
             RegKind::Static(code) => Some(code.code()),
@@ -95,10 +100,12 @@ impl RegKind {
         }
     }
 
+    /// Encode this RegKind into a 5-bit value, returning 0 if it was dynamic
     pub fn encode(&self) -> u8 {
         self.code().unwrap_or(0)
     }
 
+    /// Returns the family that this regkind is of
     pub fn family(&self) -> RegFamily {
         match *self {
             RegKind::Static(code) => code.family(),
@@ -106,10 +113,19 @@ impl RegKind {
         }
     }
 
+    /// Returns true if this RegKind is dynamic
     pub fn is_dynamic(&self) -> bool {
         match self {
             RegKind::Static(_) => false,
             RegKind::Dynamic(_, _) => true
+        }
+    }
+
+    /// Returns true if this RegKind is static and identifies the zero register
+    pub fn is_zero_reg(&self) -> bool {
+        match self {
+            RegKind::Static(ref id) => *id == RegId::XZR,
+            RegKind::Dynamic(_, _) => false,
         }
     }
 }
@@ -146,11 +162,22 @@ impl RegVector {
     }
 
     pub fn new_dynamic(id: syn::Expr, element_size: Size, lanes: Option<u8>, element: Option<syn::Expr>) -> RegVector {
-        RegVector {kind: RegKind::Dynamic(RegFamily::VECTOR, id), element_size, lanes, element}
+        RegVector {kind: RegKind::Dynamic(RegFamily::SIMD, id), element_size, lanes, element}
     }
 
-    pub fn size(&self) -> Size {
+    /// Returns the size of individual elements in this vector register
+    pub fn element_size(&self) -> Size {
         self.element_size
+    }
+
+    /// Returns the full size of this vector register (element size * lanecount).
+    /// Returns None if lanes was not set
+    pub fn full_size(&self) -> Option<u16> {
+        if let Some(lanes) = self.lanes {
+            Some(lanes as u16 * self.element_size.in_bytes() as u16)
+        } else { 
+            None
+        }
     }
 }
 
@@ -158,7 +185,7 @@ impl Register {
     pub fn size(&self) -> Size {
         match self {
             Register::Scalar(s) => s.size(),
-            Register::Vector(v) => v.size()
+            Register::Vector(v) => v.element_size()
         }
     }
 
@@ -169,10 +196,17 @@ impl Register {
         }
     }
 
+    pub fn kind_owned(self) -> RegKind {
+        match self {
+            Register::Scalar(s) => s.kind,
+            Register::Vector(v) => v.kind
+        }
+    }
+
     pub fn family(&self) -> RegFamily {
         match self {
             Register::Scalar(s) => s.kind.family(),
-            Register::Vector(v) => v.kind.family()
+            Register::Vector(_) => RegFamily::SIMD,
         }
     }
 
@@ -200,7 +234,7 @@ impl Register {
     pub fn assume_scalar(&self) -> &RegScalar {
         match self {
             Register::Scalar(s) => s,
-            Register::Vector(_) => panic!("That wasn't a vector register"),
+            Register::Vector(_) => panic!("That wasn't a scalar register"),
         }
     }
 }
@@ -346,13 +380,6 @@ pub struct Instruction {
     pub ident: syn::Ident
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum IndexMethod {
-    None,
-    PreIndexed,
-    PostIndexed,
-}
-
 #[derive(Debug)]
 pub enum RefKind {
     Base,
@@ -400,7 +427,7 @@ pub enum CleanArg {
 pub enum FlatArg {
     Direct {
         span: Span,
-        reg: Register
+        reg: RegKind
     },
     Immediate {
         value: syn::Expr,
@@ -411,5 +438,6 @@ pub enum FlatArg {
     },
     JumpTarget {
         type_: JumpType
-    }
+    },
+    Default
 }

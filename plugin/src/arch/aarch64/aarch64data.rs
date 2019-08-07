@@ -1,4 +1,4 @@
-use serialize::Size;
+use crate::serialize::Size;
 use super::ast::Modifier;
 
 use lazy_static::lazy_static;
@@ -42,22 +42,22 @@ pub enum Matcher {
     D,
     Q,
 
-    // scalar simd reg, generic over size
-    V,
-
     // vector simd regs
-    VWild, // matches any vector reg without element specifier
-    VSized(Size), // certain data type size, and indeterminate but present lane count, without element.
-    VSizedStatic(Size, u8), // certain data type size and lane count, without element. (i.e. V.S4)
-    VLanes(Size), // element specifier i.e. V.S4?[lane]
-    VLanesStatic(Size, u8), // static element specifier i.e. V.S4?[lane]
+    /// vector register with elements of the specified size. Accepts a lane count of either 64 or 128 total bits
+    V(Size),
+    /// vector register with elements of the specifized size, with the specified lane count
+    VStatic(Size, u8),
+    /// vector register with element specifier, with the element of the specified size. The lane count is unchecked.
+    VElement(Size),
+    /// vector register with element specifier, with the element of the specified size and the element index set to the provided value
+    VElementStatic(Size, u8),
 
-    // register lists with .0 items, with the registers of size class .1
+    // register list with .0 items, with the elements of size .1
     RegList(u8, Size),
-    // register list of a specific register size
-    RegListSized(u8, Size, u8),
-    // register list with lane specifier. element_size, amount
-    RegListLanes(u8, Size),
+    // register list with .0 items, with the elements of size .1 and a lane count of .2
+    RegListStatic(u8, Size, u8),
+    // register list with element specifier. It has .0 items with a size of .1
+    RegListElement(u8, Size),
 
     // jump offsets
     Offset,
@@ -118,7 +118,9 @@ pub enum Command {
     ExtendsX(u8), // 3-bits field encoding [UXTB, UXTH, UXTW, UXTX, SXTB, SXTH, SXTW, SXTX]. Additionally, LSL is interpreted as UXTX
 
     // Condition encodings.
+    /// Normal condition code 4-bit encoding
     Cond(u8),
+    /// Condition 4-bit encoding, but the last bit is inverted
     CondInv(u8),
 
     // Mapping of literal -> bitvalue
@@ -143,14 +145,14 @@ pub struct Opdata {
 macro_rules! SingleOp {
     ( $base:expr, [ $( $matcher:expr ),* ], [ $( $command:expr ),* ] ) => {
         {
-            static MATCHERS: &'static [Matcher] = {
+            const MATCHERS: &'static [Matcher] = {
                 #[allow(unused_imports)]
                 use self::Matcher::*;
                 &[ $(
                     $matcher
                 ),* ]
             };
-            static COMMANDS: &'static [Command] = {
+            const COMMANDS: &'static [Command] = {
                 #[allow(unused_imports)]
                 use self::Command::*;
                 &[ $(
@@ -170,7 +172,7 @@ macro_rules! Ops {
     ( $bind:ident; $( $name:tt $(| $more:tt)* = [ $( $base:tt = [ $( $matcher:expr ),* ] => [ $( $command:expr ),* ] ; )+ ] )* ) => {
         {
             $({
-                static DATA: &'static [Opdata] = &[ $(
+                const DATA: &'static [Opdata] = &[ $(
                     SingleOp!( $base, [ $( $matcher ),* ], [ $( $command ),* ] )
                 ),+ ];
                 $bind.insert($name, DATA);
@@ -191,7 +193,7 @@ lazy_static! {
         let mut map = HashMap::new();
 
         use super::ast::Modifier::*;
-        use serialize::Size::*;
+        use crate::serialize::Size::*;
 
         const EXTENDS: &'static [super::ast::Modifier] = &[UXTB, UXTH, UXTW, UXTX, SXTB, SXTH, SXTW, SXTX, LSL];
         const EXTENDS_W: &'static [super::ast::Modifier] = &[UXTB, UXTH, UXTW, SXTB, SXTH, SXTW];

@@ -1,7 +1,7 @@
 use syn::parse;
 
-use ::State;
-use ::emit_error_at;
+use crate::State;
+use crate::emit_error_at;
 
 use std::fmt::Debug;
 

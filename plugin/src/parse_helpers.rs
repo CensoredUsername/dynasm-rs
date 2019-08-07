@@ -1,5 +1,6 @@
 //! This file contains parsing helpers used by multiple parsing backends
 use syn::{parse, Token};
+use std::convert::TryInto;
 
 /**
  * Jump types
@@ -130,6 +131,26 @@ pub fn as_lit(expr: &syn::Expr) -> Option<&syn::Lit> {
     }
 }
 
+/// checks if an expression is a literal with possible negation
+pub fn as_lit_with_negation(expr: &syn::Expr) -> Option<(&syn::Lit, bool)> {
+    // strip any wrapping Group nodes due to delimiting
+    let mut inner = expr;
+    while let syn::Expr::Group(syn::ExprGroup { expr, .. }) = inner {
+        inner = expr;
+    }
+
+    match inner {
+        syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => Some((lit, false)),
+        syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(_), ref expr, .. } ) => {
+            match &**expr {
+                syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => Some((lit, true)),
+                _ => None
+            }
+        }
+        _ => None
+    }
+}
+
 /// checks if an expression is a constant number literal
 pub fn as_number(expr: &syn::Expr) -> Option<u64> {
     match as_lit(expr)?  {
@@ -138,10 +159,23 @@ pub fn as_number(expr: &syn::Expr) -> Option<u64> {
     }
 }
 
+/// checks if an expression is a signed number literal
+pub fn as_signed_number(expr: &syn::Expr) -> Option<i64> {
+    let (expr, negated) = as_lit_with_negation(expr)?;
+    match expr {
+        syn::Lit::Int(i) => {
+            let value: i64 = i.value().try_into().ok()?;
+            Some (if negated {-value} else {value})
+        },
+        _ => None
+    }
+}
+
 /// checks if an expression is a constant float literal
 pub fn as_float(expr: &syn::Expr) -> Option<f64> {
-    match as_lit(expr)?  {
-        syn::Lit::Float(i) => Some(i.value()),
+    let (expr, negated) = as_lit_with_negation(expr)?;
+    match expr {
+        syn::Lit::Float(i) => Some(if negated { -i.value() } else { i.value() } ),
         _ => None
     }
 }

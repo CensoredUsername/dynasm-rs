@@ -6,9 +6,9 @@ mod parser;
 pub mod debug;
 pub mod x64data;
 
-use ::State;
-use ::emit_error_at;
-use arch::Arch;
+use crate::State;
+use crate::emit_error_at;
+use crate::arch::Arch;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum X86Mode {

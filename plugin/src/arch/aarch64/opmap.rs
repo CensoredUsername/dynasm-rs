@@ -3,10 +3,10 @@ Ops!(map ;
 
 "abs" = [
     0b01011110_11100000_10111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_00100000_10111000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_10111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_10111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_10111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_10111000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_10111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_10111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_10111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "adc" = [
     0b00011010_00000000_00000000_00000000 = [W, W, W] => [R(0), R(5), R(16)];
@@ -29,29 +29,29 @@ Ops!(map ;
     0b10010001_00000000_00000000_00000000 = [XSP, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
     // ADD (vector)
     0b01011110_11100000_10000100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_10000100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_10000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_10000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "addhn" = [
-    0b00001110_00100000_01000000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_01000000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_01000000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_01000000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_01000000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_01000000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "addhn2" = [
-    0b01001110_00100000_01000000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_01000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_01000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_01000000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_01000000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_01000000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "addp" = [
     // ADDP (scalar)
-    0b01011110_11110001_10111000_00000000 = [D, VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01011110_11110001_10111000_00000000 = [D, VStatic(QWORD, 2)] => [R(0), R(5)];
     // ADDP (vector)
-    0b00001110_00100000_10111100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_10111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10111100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_10111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "adds" = [
     // ADDS (shifted register)
@@ -66,9 +66,9 @@ Ops!(map ;
     0b10110001_00000000_00000000_00000000 = [X, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
 ]
 "addv" = [
-    0b00001110_00110001_10111000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01110001_10111000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10110001_10111000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110001_10111000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01110001_10111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110001_10111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "adr" = [
     0b00010000_00000000_00000000_00000000 = [X, Offset] => [R(0), BSbits(21), BSslice(29, 2, 0), BSslice(5, 19, 2), A];
@@ -77,20 +77,20 @@ Ops!(map ;
     0b10010000_00000000_00000000_00000000 = [X, Offset] => [R(0), BSscaled(21, 12), BSslice(29, 2, 12), BSslice(5, 19, 14), A];
 ]
 "aesd" = [
-    0b01001110_00101000_01011000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5)];
+    0b01001110_00101000_01011000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5)];
 ]
 "aese" = [
-    0b01001110_00101000_01001000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5)];
+    0b01001110_00101000_01001000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5)];
 ]
 "aesimc" = [
-    0b01001110_00101000_01111000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5)];
+    0b01001110_00101000_01111000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5)];
 ]
 "aesmc" = [
-    0b01001110_00101000_01101000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5)];
+    0b01001110_00101000_01101000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5)];
 ]
 "and" = [
     // AND (vector)
-    0b00001110_00100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // AND (immediate)
     0b00010010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), UlogicalW(10)];
     0b10010010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), UlogicalX(10)];
@@ -170,7 +170,7 @@ Ops!(map ;
     0b00010100_00000000_00000000_00000000 = [Offset] => [Sscaled(0, 26, 2)];
 ]
 "bcax" = [
-    0b11001110_00100000_00000000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16), R(10)];
+    0b11001110_00100000_00000000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16), R(10)];
 ]
 "bfc" = [
     0b00110011_00000000_00000011_11100000 = [W, Imm, Imm] => [R(0), Usub(16, 5, 32), Urange(10, 1, 32)];
@@ -190,10 +190,10 @@ Ops!(map ;
 ]
 "bic" = [
     // BIC (vector, immediate)
-    0b00101111_00000000_10010100_00000000 = [VSized(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
-    0b00101111_00000000_00010100_00000000 = [VSized(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
+    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
+    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
     // BIC (vector, register)
-    0b00001110_01100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // BIC (shifted register)
     0b00001010_00100000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b10001010_00100000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
@@ -203,10 +203,10 @@ Ops!(map ;
     0b11101010_00100000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
 ]
 "bif" = [
-    0b00101110_11100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "bit" = [
-    0b00101110_10100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "bl" = [
     0b10010100_00000000_00000000_00000000 = [Offset] => [Sscaled(0, 26, 2)];
@@ -245,7 +245,7 @@ Ops!(map ;
     0b11010100_00100000_00000000_00000000 = [Imm] => [Ubits(5, 16)];
 ]
 "bsl" = [
-    0b00101110_01100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "cas" = [
     0b10001000_10100000_01111100_00000000 = [W, W, RefBase] => [R(16), R(0), R(5)];
@@ -346,18 +346,18 @@ Ops!(map ;
 ]
 "cls" = [
     // CLS (vector)
-    0b00001110_00100000_01001000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_01001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_01001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_01001000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_01001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_01001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
     // CLS
     0b01011010_11000000_00010100_00000000 = [W, W] => [R(0), R(5)];
     0b11011010_11000000_00010100_00000000 = [X, X] => [R(0), R(5)];
 ]
 "clz" = [
     // CLZ (vector)
-    0b00101110_00100000_01001000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_01001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_01001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01001000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_01001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_01001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
     // CLZ
     0b01011010_11000000_00010000_00000000 = [W, W] => [R(0), R(5)];
     0b11011010_11000000_00010000_00000000 = [X, X] => [R(0), R(5)];
@@ -365,72 +365,72 @@ Ops!(map ;
 "cmeq" = [
     // CMEQ (register)
     0b01111110_11100000_10001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_10001100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_10001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_10001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_10001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_10001100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_10001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_10001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_10001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // CMEQ (zero)
     0b01011110_11100000_10011000_00000000 = [D, D, LitInt(0)] => [R(0), R(5)];
-    0b00001110_00100000_10011000_00000000 = [VSized(BYTE), VSized(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_10011000_00000000 = [VSized(WORD), VSized(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_10011000_00000000 = [VSized(DWORD), VSized(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_10011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_10011000_00000000 = [V(BYTE), V(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_10011000_00000000 = [V(WORD), V(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_10011000_00000000 = [V(DWORD), V(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_10011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
 ]
 "cmge" = [
     // CMGE (register)
     0b01011110_11100000_00111100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_00111100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_00111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00111100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_00111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // CMGE (zero)
     0b01111110_11100000_10001000_00000000 = [D, D, LitInt(0)] => [R(0), R(5)];
-    0b00101110_00100000_10001000_00000000 = [VSized(BYTE), VSized(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_10001000_00000000 = [VSized(WORD), VSized(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_10001000_00000000 = [VSized(DWORD), VSized(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_10001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_10001000_00000000 = [V(BYTE), V(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_10001000_00000000 = [V(WORD), V(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_10001000_00000000 = [V(DWORD), V(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_10001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
 ]
 "cmgt" = [
     // CMGT (register)
     0b01011110_11100000_00110100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_00110100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_00110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00110100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_00110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // CMGT (zero)
     0b01011110_11100000_10001000_00000000 = [D, D, LitInt(0)] => [R(0), R(5)];
-    0b00001110_00100000_10001000_00000000 = [VSized(BYTE), VSized(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_10001000_00000000 = [VSized(WORD), VSized(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_10001000_00000000 = [VSized(DWORD), VSized(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_10001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_10001000_00000000 = [V(BYTE), V(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_10001000_00000000 = [V(WORD), V(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_10001000_00000000 = [V(DWORD), V(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_10001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
 ]
 "cmhi" = [
     0b01111110_11100000_00110100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_00110100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_00110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00110100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_00110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "cmhs" = [
     0b01111110_11100000_00111100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_00111100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_00111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00111100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_00111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "cmle" = [
     0b01111110_11100000_10011000_00000000 = [D, D, LitInt(0)] => [R(0), R(5)];
-    0b00101110_00100000_10011000_00000000 = [VSized(BYTE), VSized(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_10011000_00000000 = [VSized(WORD), VSized(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_10011000_00000000 = [VSized(DWORD), VSized(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_10011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_10011000_00000000 = [V(BYTE), V(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_10011000_00000000 = [V(WORD), V(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_10011000_00000000 = [V(DWORD), V(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_10011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
 ]
 "cmlt" = [
     0b01011110_11100000_10101000_00000000 = [D, D, LitInt(0)] => [R(0), R(5)];
-    0b00001110_00100000_10101000_00000000 = [VSized(BYTE), VSized(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_10101000_00000000 = [VSized(WORD), VSized(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_10101000_00000000 = [VSized(DWORD), VSized(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_10101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_10101000_00000000 = [V(BYTE), V(BYTE), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_10101000_00000000 = [V(WORD), V(WORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_10101000_00000000 = [V(DWORD), V(DWORD), LitInt(0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_10101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitInt(0)] => [R(0), R(5), Rwidth(30)];
 ]
 "cmn" = [
     // CMN (shifted register)
@@ -458,17 +458,17 @@ Ops!(map ;
 ]
 "cmtst" = [
     0b01011110_11100000_10001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_10001100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_10001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10001100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_10001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "cneg" = [
     0b01011010_10000000_00000100_00000000 = [W, W, Cond] => [R(0), R(5), C, R(16), CondInv(12)];
     0b11011010_10000000_00000100_00000000 = [X, X, Cond] => [R(0), R(5), C, R(16), CondInv(12)];
 ]
 "cnt" = [
-    0b00001110_00100000_01011000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_01011000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
 ]
 "cpp" = [
     0b11010101_00001011_01110011_11100000 = [Lit("RCTX"), X] => [R(0)];
@@ -549,19 +549,19 @@ Ops!(map ;
 ]
 "dup" = [
     // DUP (element)
-    0b01011110_00000001_00000100_00000000 = [B, VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b01011110_00000010_00000100_00000000 = [H, VLanes(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01011110_00000100_00000100_00000000 = [S, VLanes(DWORD)] => [R(0), R(5), Ubits(19, 2)];
-    0b01011110_00001000_00000100_00000000 = [D, VLanes(QWORD)] => [R(0), R(5), Ubits(20, 1)];
-    0b00001110_00000001_00000100_00000000 = [VSized(BYTE), VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4), Rwidth(30)];
-    0b00001110_00000010_00000100_00000000 = [VSized(WORD), VLanes(BYTE)] => [R(0), R(5), Ubits(18, 3), Rwidth(30)];
-    0b00001110_00000100_00000100_00000000 = [VSized(DWORD), VLanes(WORD)] => [R(0), R(5), Ubits(19, 2), Rwidth(30)];
-    0b00001110_00001000_00000100_00000000 = [VSizedStatic(QWORD, 2), VLanes(DWORD)] => [R(0), R(5), Ubits(20, 1), Rwidth(30)];
+    0b01011110_00000001_00000100_00000000 = [B, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
+    0b01011110_00000010_00000100_00000000 = [H, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
+    0b01011110_00000100_00000100_00000000 = [S, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b01011110_00001000_00000100_00000000 = [D, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
+    0b00001110_00000001_00000100_00000000 = [V(BYTE), VElement(BYTE)] => [R(0), R(5), Ubits(17, 4), Rwidth(30)];
+    0b00001110_00000010_00000100_00000000 = [V(WORD), VElement(BYTE)] => [R(0), R(5), Ubits(18, 3), Rwidth(30)];
+    0b00001110_00000100_00000100_00000000 = [V(DWORD), VElement(WORD)] => [R(0), R(5), Ubits(19, 2), Rwidth(30)];
+    0b00001110_00001000_00000100_00000000 = [VStatic(QWORD, 2), VElement(DWORD)] => [R(0), R(5), Ubits(20, 1), Rwidth(30)];
     // DUP (general)
-    0b00001110_00000001_00001100_00000000 = [VSized(BYTE), W] => [R(0), Rwidth(30), R(5)];
-    0b00001110_00000010_00001100_00000000 = [VSized(WORD), W] => [R(0), Rwidth(30), R(5)];
-    0b00001110_00000100_00001100_00000000 = [VSized(DWORD), W] => [R(0), Rwidth(30), R(5)];
-    0b00001110_00001000_00001100_00000000 = [VSizedStatic(QWORD, 2), X] => [R(0), Rwidth(30), R(5)];
+    0b00001110_00000001_00001100_00000000 = [V(BYTE), W] => [R(0), Rwidth(30), R(5)];
+    0b00001110_00000010_00001100_00000000 = [V(WORD), W] => [R(0), Rwidth(30), R(5)];
+    0b00001110_00000100_00001100_00000000 = [V(DWORD), W] => [R(0), Rwidth(30), R(5)];
+    0b00001110_00001000_00001100_00000000 = [VStatic(QWORD, 2), X] => [R(0), Rwidth(30), R(5)];
 ]
 "dvp" = [
     0b11010101_00001011_01110011_10100000 = [Lit("RCTX"), X] => [R(0)];
@@ -572,7 +572,7 @@ Ops!(map ;
 ]
 "eor" = [
     // EOR (vector)
-    0b00101110_00100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // EOR (immediate)
     0b01010010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), UlogicalW(10)];
     0b11010010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), UlogicalX(10)];
@@ -581,7 +581,7 @@ Ops!(map ;
     0b11001010_00000000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
 ]
 "eor3" = [
-    0b11001110_00000000_00000000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16), R(10)];
+    0b11001110_00000000_00000000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16), R(10)];
 ]
 "eret" = [
     0b11010110_10011111_00000011_11100000 = [] => [];
@@ -596,8 +596,8 @@ Ops!(map ;
     0b11010101_00000011_00100010_00011111 = [] => [];
 ]
 "ext" = [
-    0b00101110_00000000_00000000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8), Imm] => [R(0), R(5), R(16), Ubits(11, 3)];
-    0b01101110_00000000_00000000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16), Imm] => [R(0), R(5), R(16), Ubits(11, 4)];
+    0b00101110_00000000_00000000_00000000 = [VStatic(BYTE, 8), VStatic(BYTE, 8), VStatic(BYTE, 8), Imm] => [R(0), R(5), R(16), Ubits(11, 3)];
+    0b01101110_00000000_00000000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16), Imm] => [R(0), R(5), R(16), Ubits(11, 4)];
 ]
 "extr" = [
     0b00010011_10000000_00000000_00000000 = [W, W, W, Imm] => [R(0), R(5), R(16), Ubits(10, 5)];
@@ -607,15 +607,15 @@ Ops!(map ;
     0b01111110_11000000_00010100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_11010100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_11010100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_11000000_00010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_11010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_11010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11000000_00010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_11010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_11010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fabs" = [
     // FABS (vector)
-    0b00001110_11111000_11111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_11111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_11111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111000_11111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_11111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_11111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FABS (scalar)
     0b00011110_11100000_11000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100000_11000000_00000000 = [S, S] => [R(0), R(5)];
@@ -625,23 +625,23 @@ Ops!(map ;
     0b01111110_01000000_00101100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_00100000_11101100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_01100000_11101100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_01000000_00101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11101100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11101100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "facgt" = [
     0b01111110_11000000_00101100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_11101100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_11101100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_11000000_00101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_11101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_11101100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11000000_00101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_11101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_11101100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fadd" = [
     // FADD (vector)
-    0b00001110_01000000_00010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FADD (scalar)
     0b00011110_11100000_00101000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_00101000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -649,18 +649,18 @@ Ops!(map ;
 ]
 "faddp" = [
     // FADDP (scalar)
-    0b01011110_00110000_11011000_00000000 = [H, VSizedStatic(WORD, 2)] => [R(0), R(5)];
-    0b01111110_00110000_11011000_00000000 = [S, VSizedStatic(DWORD, 2)] => [R(0), R(5)];
-    0b01111110_01110000_11011000_00000000 = [D, VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01011110_00110000_11011000_00000000 = [H, VStatic(WORD, 2)] => [R(0), R(5)];
+    0b01111110_00110000_11011000_00000000 = [S, VStatic(DWORD, 2)] => [R(0), R(5)];
+    0b01111110_01110000_11011000_00000000 = [D, VStatic(QWORD, 2)] => [R(0), R(5)];
     // FADDP (vector)
-    0b00101110_01000000_00010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fcadd" = [
-    0b00101110_01000000_11100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
-    0b00101110_10000000_11100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
-    0b00101110_11000000_11100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSized(QWORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
+    0b00101110_01000000_11100100_00000000 = [V(WORD), V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
+    0b00101110_10000000_11100100_00000000 = [V(DWORD), V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
+    0b00101110_11000000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), V(QWORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
 ]
 "fccmp" = [
     0b00011110_11100000_00000100_00000000 = [H, H, Imm, Cond] => [R(5), R(16), Ubits(0, 4), Cond(12)];
@@ -677,73 +677,73 @@ Ops!(map ;
     0b01011110_01000000_00100100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_00100000_11100100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_01100000_11100100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_01000000_00100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FCMEQ (zero)
     0b01011110_11111000_11011000_00000000 = [H, H, LitFloat(0.0)] => [R(0), R(5)];
     0b01011110_10100000_11011000_00000000 = [S, S, LitFloat(0.0)] => [R(0), R(5)];
     0b01011110_11100000_11011000_00000000 = [D, D, LitFloat(0.0)] => [R(0), R(5)];
-    0b00001110_11111000_11011000_00000000 = [VSized(WORD), VSized(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_11011000_00000000 = [VSized(DWORD), VSized(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_11011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111000_11011000_00000000 = [V(WORD), V(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_11011000_00000000 = [V(DWORD), V(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
 ]
 "fcmge" = [
     // FCMGE (register)
     0b01111110_01000000_00100100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_00100000_11100100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_01100000_11100100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_01000000_00100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FCMGE (zero)
     0b01111110_11111000_11001000_00000000 = [H, H, LitFloat(0.0)] => [R(0), R(5)];
     0b01111110_10100000_11001000_00000000 = [S, S, LitFloat(0.0)] => [R(0), R(5)];
     0b01111110_11100000_11001000_00000000 = [D, D, LitFloat(0.0)] => [R(0), R(5)];
-    0b00101110_11111000_11001000_00000000 = [VSized(WORD), VSized(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_11001000_00000000 = [VSized(DWORD), VSized(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_11001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111000_11001000_00000000 = [V(WORD), V(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_11001000_00000000 = [V(DWORD), V(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
 ]
 "fcmgt" = [
     // FCMGT (register)
     0b01111110_11000000_00100100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_11100100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_11100100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_11000000_00100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_11100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_11100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11000000_00100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_11100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FCMGT (zero)
     0b01011110_11111000_11001000_00000000 = [H, H, LitFloat(0.0)] => [R(0), R(5)];
     0b01011110_10100000_11001000_00000000 = [S, S, LitFloat(0.0)] => [R(0), R(5)];
     0b01011110_11100000_11001000_00000000 = [D, D, LitFloat(0.0)] => [R(0), R(5)];
-    0b00001110_11111000_11001000_00000000 = [VSized(WORD), VSized(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_11001000_00000000 = [VSized(DWORD), VSized(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_11001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111000_11001000_00000000 = [V(WORD), V(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_11001000_00000000 = [V(DWORD), V(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
 ]
 "fcmla" = [
     // FCMLA (by element)
-    0b00101111_01000000_00010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD), Imm] => [R(0), R(5), R4(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
-    0b00101111_10000000_00010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VLanes(DWORD), Imm] => [R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101111_01000000_00010000_00000000 = [V(WORD), V(WORD), VElement(WORD), Imm] => [R(0), R(5), R4(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101111_10000000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD), Imm] => [R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
     // FCMLA
-    0b00101110_01000000_11000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
-    0b00101110_10000000_11000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
-    0b00101110_11000000_11000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSized(QWORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101110_01000000_11000100_00000000 = [V(WORD), V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101110_10000000_11000100_00000000 = [V(DWORD), V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101110_11000000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), V(QWORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
 ]
 "fcmle" = [
     0b01111110_11111000_11011000_00000000 = [H, H, LitFloat(0.0)] => [R(0), R(5)];
     0b01111110_10100000_11011000_00000000 = [S, S, LitFloat(0.0)] => [R(0), R(5)];
     0b01111110_11100000_11011000_00000000 = [D, D, LitFloat(0.0)] => [R(0), R(5)];
-    0b00101110_11111000_11011000_00000000 = [VSized(WORD), VSized(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_11011000_00000000 = [VSized(DWORD), VSized(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_11011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111000_11011000_00000000 = [V(WORD), V(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_11011000_00000000 = [V(DWORD), V(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
 ]
 "fcmlt" = [
     0b01011110_11111000_11101000_00000000 = [H, H, LitFloat(0.0)] => [R(0), R(5)];
     0b01011110_10100000_11101000_00000000 = [S, S, LitFloat(0.0)] => [R(0), R(5)];
     0b01011110_11100000_11101000_00000000 = [D, D, LitFloat(0.0)] => [R(0), R(5)];
-    0b00001110_11111000_11101000_00000000 = [VSized(WORD), VSized(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_11101000_00000000 = [VSized(DWORD), VSized(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_11101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111000_11101000_00000000 = [V(WORD), V(WORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_11101000_00000000 = [V(DWORD), V(DWORD), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_11101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), LitFloat(0.0)] => [R(0), R(5), Rwidth(30)];
 ]
 "fcmp" = [
     0b00011110_11100000_00100000_00000000 = [H, H] => [R(5), R(16)];
@@ -779,9 +779,9 @@ Ops!(map ;
     0b01011110_01111001_11001000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_00100001_11001000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_01100001_11001000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_01111001_11001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_00100001_11001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100001_11001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01111001_11001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100001_11001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100001_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTAS (scalar)
     0b00011110_11100100_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11100100_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -795,9 +795,9 @@ Ops!(map ;
     0b01111110_01111001_11001000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_00100001_11001000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_01100001_11001000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_01111001_11001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00100001_11001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100001_11001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01111001_11001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100001_11001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100001_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTAU (scalar)
     0b00011110_11100101_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11100101_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -807,21 +807,21 @@ Ops!(map ;
     0b10011110_01100101_00000000_00000000 = [X, D] => [R(0), R(5)];
 ]
 "fcvtl" = [
-    0b00001110_00100001_01111000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5)];
-    0b00001110_01100001_01111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5)];
+    0b00001110_00100001_01111000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5)];
+    0b00001110_01100001_01111000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtl2" = [
-    0b01001110_00100001_01111000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01001110_01100001_01111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01001110_00100001_01111000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01001110_01100001_01111000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5)];
 ]
 "fcvtms" = [
     // FCVTMS (vector)
     0b01011110_01111001_10111000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_00100001_10111000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_01100001_10111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_01111001_10111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_00100001_10111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100001_10111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01111001_10111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100001_10111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100001_10111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTMS (scalar)
     0b00011110_11110000_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11110000_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -835,9 +835,9 @@ Ops!(map ;
     0b01111110_01111001_10111000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_00100001_10111000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_01100001_10111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_01111001_10111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00100001_10111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100001_10111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01111001_10111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100001_10111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100001_10111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTMU (scalar)
     0b00011110_11110001_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11110001_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -847,21 +847,21 @@ Ops!(map ;
     0b10011110_01110001_00000000_00000000 = [X, D] => [R(0), R(5)];
 ]
 "fcvtn" = [
-    0b00001110_00100001_01101000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b00001110_01100001_01101000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b00001110_00100001_01101000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b00001110_01100001_01101000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtn2" = [
-    0b01001110_00100001_01101000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b01001110_01100001_01101000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01001110_00100001_01101000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01001110_01100001_01101000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtns" = [
     // FCVTNS (vector)
     0b01011110_01111001_10101000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_00100001_10101000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_01100001_10101000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_01111001_10101000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_00100001_10101000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100001_10101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01111001_10101000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100001_10101000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100001_10101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTNS (scalar)
     0b00011110_11100000_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11100000_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -875,9 +875,9 @@ Ops!(map ;
     0b01111110_01111001_10101000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_00100001_10101000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_01100001_10101000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_01111001_10101000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00100001_10101000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100001_10101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01111001_10101000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100001_10101000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100001_10101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTNU (scalar)
     0b00011110_11100001_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11100001_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -891,9 +891,9 @@ Ops!(map ;
     0b01011110_11111001_10101000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_10100001_10101000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_11100001_10101000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_11111001_10101000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100001_10101000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_10101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111001_10101000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100001_10101000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100001_10101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTPS (scalar)
     0b00011110_11101000_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11101000_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -907,9 +907,9 @@ Ops!(map ;
     0b01111110_11111001_10101000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_10100001_10101000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_11100001_10101000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_11111001_10101000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100001_10101000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_10101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111001_10101000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100001_10101000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100001_10101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTPU (scalar)
     0b00011110_11101001_00000000_00000000 = [W, H] => [R(0), R(5)];
     0b10011110_11101001_00000000_00000000 = [X, H] => [R(0), R(5)];
@@ -920,28 +920,28 @@ Ops!(map ;
 ]
 "fcvtxn" = [
     0b01111110_01100001_01101000_00000000 = [S, D] => [R(0), R(5)];
-    0b00101110_00100001_01101000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b00101110_01100001_01101000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b00101110_00100001_01101000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b00101110_01100001_01101000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtxn2" = [
-    0b01101110_00100001_01101000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b01101110_01100001_01101000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01101110_00100001_01101000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01101110_01100001_01101000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtzs" = [
     // FCVTZS (vector, fixed-point)
     0b01011111_00000000_11111100_00000000 = [H, H, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01011111_00000000_11111100_00000000 = [S, S, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
     0b01011111_00000000_11111100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00001111_00010000_11111100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
-    0b00001111_00100000_11111100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
-    0b00001111_01000000_11111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
+    0b00001111_00010000_11111100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
+    0b00001111_00100000_11111100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
+    0b00001111_01000000_11111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
     // FCVTZS (vector, integer)
     0b01011110_11111001_10111000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_10100001_10111000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_11100001_10111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_11111001_10111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100001_10111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_10111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111001_10111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100001_10111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100001_10111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTZS (scalar, fixed-point)
     0b00011110_11011000_00000000_00000000 = [W, H, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b10011110_11011000_00000000_00000000 = [X, H, Imm] => [R(0), R(5), Usub(10, 6, 64)];
@@ -962,16 +962,16 @@ Ops!(map ;
     0b01111111_00000000_11111100_00000000 = [H, H, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01111111_00000000_11111100_00000000 = [S, S, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
     0b01111111_00000000_11111100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00010000_11111100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_11111100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_11111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00010000_11111100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_11111100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_11111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
     // FCVTZU (vector, integer)
     0b01111110_11111001_10111000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_10100001_10111000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_11100001_10111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_11111001_10111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100001_10111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_10111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111001_10111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100001_10111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100001_10111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FCVTZU (scalar, fixed-point)
     0b00011110_11011001_00000000_00000000 = [W, H, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b10011110_11011001_00000000_00000000 = [X, H, Imm] => [R(0), R(5), Usub(10, 6, 64)];
@@ -989,9 +989,9 @@ Ops!(map ;
 ]
 "fdiv" = [
     // FDIV (vector)
-    0b00101110_01000000_00111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FDIV (scalar)
     0b00011110_11100000_00011000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_00011000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1007,9 +1007,9 @@ Ops!(map ;
 ]
 "fmax" = [
     // FMAX (vector)
-    0b00001110_01000000_00110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FMAX (scalar)
     0b00011110_11100000_01001000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_01001000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1017,9 +1017,9 @@ Ops!(map ;
 ]
 "fmaxnm" = [
     // FMAXNM (vector)
-    0b00001110_01000000_00000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FMAXNM (scalar)
     0b00011110_11100000_01101000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_01101000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1027,37 +1027,37 @@ Ops!(map ;
 ]
 "fmaxnmp" = [
     // FMAXNMP (scalar)
-    0b01011110_00110000_11001000_00000000 = [H, VSizedStatic(WORD, 2)] => [R(0), R(5)];
-    0b01111110_00110000_11001000_00000000 = [S, VSizedStatic(DWORD, 2)] => [R(0), R(5)];
-    0b01111110_01110000_11001000_00000000 = [D, VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01011110_00110000_11001000_00000000 = [H, VStatic(WORD, 2)] => [R(0), R(5)];
+    0b01111110_00110000_11001000_00000000 = [S, VStatic(DWORD, 2)] => [R(0), R(5)];
+    0b01111110_01110000_11001000_00000000 = [D, VStatic(QWORD, 2)] => [R(0), R(5)];
     // FMAXNMP (vector)
-    0b00101110_01000000_00000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fmaxnmv" = [
-    0b00001110_00110000_11001000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00110000_11001000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110000_11001000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00110000_11001000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "fmaxp" = [
     // FMAXP (scalar)
-    0b01011110_00110000_11111000_00000000 = [H, VSizedStatic(WORD, 2)] => [R(0), R(5)];
-    0b01111110_00110000_11111000_00000000 = [S, VSizedStatic(DWORD, 2)] => [R(0), R(5)];
-    0b01111110_01110000_11111000_00000000 = [D, VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01011110_00110000_11111000_00000000 = [H, VStatic(WORD, 2)] => [R(0), R(5)];
+    0b01111110_00110000_11111000_00000000 = [S, VStatic(DWORD, 2)] => [R(0), R(5)];
+    0b01111110_01110000_11111000_00000000 = [D, VStatic(QWORD, 2)] => [R(0), R(5)];
     // FMAXP (vector)
-    0b00101110_01000000_00110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fmaxv" = [
-    0b00001110_00110000_11111000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00110000_11111000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110000_11111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00110000_11111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "fmin" = [
     // FMIN (vector)
-    0b00001110_11000000_00110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_11110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_11110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_11110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_11110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FMIN (scalar)
     0b00011110_11100000_01011000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_01011000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1065,9 +1065,9 @@ Ops!(map ;
 ]
 "fminnm" = [
     // FMINNM (vector)
-    0b00001110_11000000_00000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_11000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_11000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_11000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FMINNM (scalar)
     0b00011110_11100000_01111000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_01111000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1075,95 +1075,95 @@ Ops!(map ;
 ]
 "fminnmp" = [
     // FMINNMP (scalar)
-    0b01011110_10110000_11001000_00000000 = [H, VSizedStatic(WORD, 2)] => [R(0), R(5)];
-    0b01111110_10110000_11001000_00000000 = [S, VSizedStatic(DWORD, 2)] => [R(0), R(5)];
-    0b01111110_11110000_11001000_00000000 = [D, VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01011110_10110000_11001000_00000000 = [H, VStatic(WORD, 2)] => [R(0), R(5)];
+    0b01111110_10110000_11001000_00000000 = [S, VStatic(DWORD, 2)] => [R(0), R(5)];
+    0b01111110_11110000_11001000_00000000 = [D, VStatic(QWORD, 2)] => [R(0), R(5)];
     // FMINNMP (vector)
-    0b00101110_11000000_00000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_11000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_11000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11000000_00000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_11000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fminnmv" = [
-    0b00001110_10110000_11001000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10110000_11001000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110000_11001000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10110000_11001000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "fminp" = [
     // FMINP (scalar)
-    0b01011110_10110000_11111000_00000000 = [H, VSizedStatic(WORD, 2)] => [R(0), R(5)];
-    0b01111110_10110000_11111000_00000000 = [S, VSizedStatic(DWORD, 2)] => [R(0), R(5)];
-    0b01111110_11110000_11111000_00000000 = [D, VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01011110_10110000_11111000_00000000 = [H, VStatic(WORD, 2)] => [R(0), R(5)];
+    0b01111110_10110000_11111000_00000000 = [S, VStatic(DWORD, 2)] => [R(0), R(5)];
+    0b01111110_11110000_11111000_00000000 = [D, VStatic(QWORD, 2)] => [R(0), R(5)];
     // FMINP (vector)
-    0b00101110_11000000_00110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_11110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_11110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11000000_00110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_11110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_11110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fminv" = [
-    0b00001110_10110000_11111000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10110000_11111000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110000_11111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10110000_11111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "fmla" = [
     // FMLA (by element)
-    0b01011111_00000000_00010000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_00010000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01011111_11000000_00010000_00000000 = [D, D, VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
-    0b00001111_00000000_00010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00001111_10000000_00010000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
-    0b00001111_11000000_00010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
+    0b01011111_00000000_00010000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_00010000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01011111_11000000_00010000_00000000 = [D, D, VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
+    0b00001111_00000000_00010000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00001111_10000000_00010000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00001111_11000000_00010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
     // FMLA (vector)
-    0b00001110_01000000_00001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fmlal" = [
     // FMLAL, FMLAL2 (by element)
-    0b00001111_10000000_00000000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_00000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_00000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
     // FMLAL, FMLAL2 (vector)
-    0b00001110_00100000_11101100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VSizedStatic(WORD, 2)] => [R(0), R(5), R(16)];
-    0b01001110_00100000_11101100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_11101100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_11101100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
 ]
 "fmlal2" = [
     // FMLAL, FMLAL2 (by element)
-    0b00101111_10000000_10000000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_10000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_10000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
     // FMLAL, FMLAL2 (vector)
-    0b00101110_00100000_11001100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VSizedStatic(WORD, 2)] => [R(0), R(5), R(16)];
-    0b01101110_00100000_11001100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_11001100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_11001100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
 ]
 "fmls" = [
     // FMLS (by element)
-    0b01011111_00000000_01010000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_01010000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01011111_11000000_01010000_00000000 = [D, D, VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
-    0b00001111_00000000_01010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00001111_10000000_01010000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
-    0b00001111_11000000_01010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
+    0b01011111_00000000_01010000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_01010000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01011111_11000000_01010000_00000000 = [D, D, VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
+    0b00001111_00000000_01010000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00001111_10000000_01010000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00001111_11000000_01010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
     // FMLS (vector)
-    0b00001110_11000000_00001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_11001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_11001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_11001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_11001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fmlsl" = [
     // FMLSL, FMLSL2 (by element)
-    0b00001111_10000000_01000000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_01000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_01000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_01000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
     // FMLSL, FMLSL2 (vector)
-    0b00001110_10100000_11101100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VSizedStatic(WORD, 2)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_11101100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_11101100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_11101100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
 ]
 "fmlsl2" = [
     // FMLSL, FMLSL2 (by element)
-    0b00101111_10000000_11000000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_11000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_11000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
     // FMLSL, FMLSL2 (vector)
-    0b00101110_10100000_11001100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(WORD, 2), VSizedStatic(WORD, 2)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_11001100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_11001100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_11001100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
 ]
 "fmov" = [
     // FMOV (vector, immediate)
-    0b00001111_00000000_11111100_00000000 = [VSized(WORD), Imm] => [R(0), Special(5, "split float"), Rwidth(30)];
-    0b00001111_00000000_11110100_00000000 = [VSized(DWORD), Imm] => [R(0), Special(5, "split float"), Rwidth(30)];
-    0b01101111_00000000_11110100_00000000 = [VSizedStatic(QWORD, 2), Imm] => [R(0), Special(5, "split float")];
+    0b00001111_00000000_11111100_00000000 = [V(WORD), Imm] => [R(0), Special(5, "split float"), Rwidth(30)];
+    0b00001111_00000000_11110100_00000000 = [V(DWORD), Imm] => [R(0), Special(5, "split float"), Rwidth(30)];
+    0b01101111_00000000_11110100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, "split float")];
     // FMOV (register)
     0b00011110_11100000_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100000_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1176,9 +1176,9 @@ Ops!(map ;
     0b00011110_00100110_00000000_00000000 = [W, S] => [R(0), R(5)];
     0b10011110_11100111_00000000_00000000 = [H, X] => [R(0), R(5)];
     0b10011110_01100111_00000000_00000000 = [D, X] => [R(0), R(5)];
-    0b10011110_10101111_00000000_00000000 = [VLanesStatic(QWORD, 1), X] => [R(0), R(5)];
+    0b10011110_10101111_00000000_00000000 = [VElementStatic(QWORD, 1), X] => [R(0), R(5)];
     0b10011110_01100110_00000000_00000000 = [X, D] => [R(0), R(5)];
-    0b10011110_10101110_00000000_00000000 = [X, VLanesStatic(QWORD, 1)] => [R(0), R(5)];
+    0b10011110_10101110_00000000_00000000 = [X, VElementStatic(QWORD, 1)] => [R(0), R(5)];
     // FMOV (scalar, immediate)
     0b00011110_11100000_00010000_00000000 = [H, Imm] => [R(0), Sfloat(13)];
     0b00011110_00100000_00010000_00000000 = [S, Imm] => [R(0), Sfloat(13)];
@@ -1191,16 +1191,16 @@ Ops!(map ;
 ]
 "fmul" = [
     // FMUL (by element)
-    0b01011111_00000000_10010000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_10010000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01011111_11000000_10010000_00000000 = [D, D, VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
-    0b00001111_00000000_10010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00001111_10000000_10010000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
-    0b00001111_11000000_10010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
+    0b01011111_00000000_10010000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_10010000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01011111_11000000_10010000_00000000 = [D, D, VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
+    0b00001111_00000000_10010000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00001111_10000000_10010000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00001111_11000000_10010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
     // FMUL (vector)
-    0b00101110_01000000_00011100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_00100000_11011100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_11011100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_00011100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_11011100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_11011100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FMUL (scalar)
     0b00011110_11100000_00001000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_00001000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1208,25 +1208,25 @@ Ops!(map ;
 ]
 "fmulx" = [
     // FMULX (by element)
-    0b01111111_00000000_10010000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01111111_10000000_10010000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01111111_11000000_10010000_00000000 = [D, D, VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
-    0b00101111_00000000_10010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00101111_10000000_10010000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
-    0b00101111_11000000_10010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VLanes(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
+    0b01111111_00000000_10010000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01111111_10000000_10010000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01111111_11000000_10010000_00000000 = [D, D, VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11])];
+    0b00101111_00000000_10010000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00101111_10000000_10010000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00101111_11000000_10010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VElement(QWORD)] => [R(0), R(5), R(16), Ufields(&[11]), Rwidth(30)];
     // FMULX
     0b01011110_01000000_00011100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_00100000_11011100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_01100000_11011100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_01000000_00011100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11011100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11011100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00011100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11011100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11011100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fneg" = [
     // FNEG (vector)
-    0b00101110_11111000_11111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_11111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_11111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111000_11111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_11111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_11111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FNEG (scalar)
     0b00011110_11100001_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100001_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1251,17 +1251,17 @@ Ops!(map ;
     0b01011110_11111001_11011000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_10100001_11011000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_11100001_11011000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_11111001_11011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100001_11011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_11011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111001_11011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100001_11011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100001_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "frecps" = [
     0b01011110_01000000_00111100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_00100000_11111100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_01100000_11111100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_01000000_00111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00100000_11111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_11111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_11111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_11111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "frecpx" = [
     0b01011110_11111001_11111000_00000000 = [H, H] => [R(0), R(5)];
@@ -1270,9 +1270,9 @@ Ops!(map ;
 ]
 "frinta" = [
     // FRINTA (vector)
-    0b00101110_01111001_10001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00100001_10001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100001_10001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01111001_10001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100001_10001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100001_10001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTA (scalar)
     0b00011110_11100110_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100110_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1280,9 +1280,9 @@ Ops!(map ;
 ]
 "frinti" = [
     // FRINTI (vector)
-    0b00101110_11111001_10011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100001_10011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_10011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111001_10011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100001_10011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100001_10011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTI (scalar)
     0b00011110_11100111_11000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100111_11000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1290,9 +1290,9 @@ Ops!(map ;
 ]
 "frintm" = [
     // FRINTM (vector)
-    0b00001110_01111001_10011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_00100001_10011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100001_10011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01111001_10011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100001_10011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100001_10011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTM (scalar)
     0b00011110_11100101_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100101_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1300,9 +1300,9 @@ Ops!(map ;
 ]
 "frintn" = [
     // FRINTN (vector)
-    0b00001110_01111001_10001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_00100001_10001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100001_10001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01111001_10001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100001_10001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100001_10001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTN (scalar)
     0b00011110_11100100_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100100_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1310,9 +1310,9 @@ Ops!(map ;
 ]
 "frintp" = [
     // FRINTP (vector)
-    0b00001110_11111001_10001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100001_10001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_10001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111001_10001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100001_10001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100001_10001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTP (scalar)
     0b00011110_11100100_11000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100100_11000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1320,9 +1320,9 @@ Ops!(map ;
 ]
 "frintx" = [
     // FRINTX (vector)
-    0b00101110_01111001_10011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00100001_10011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100001_10011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01111001_10011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100001_10011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100001_10011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTX (scalar)
     0b00011110_11100111_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100111_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1330,9 +1330,9 @@ Ops!(map ;
 ]
 "frintz" = [
     // FRINTZ (vector)
-    0b00001110_11111001_10011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100001_10011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_10011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11111001_10011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100001_10011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100001_10011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FRINTZ (scalar)
     0b00011110_11100101_11000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100101_11000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1342,23 +1342,23 @@ Ops!(map ;
     0b01111110_11111001_11011000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_10100001_11011000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_11100001_11011000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_11111001_11011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100001_11011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_11011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111001_11011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100001_11011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100001_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "frsqrts" = [
     0b01011110_11000000_00111100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_11111100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_11100000_11111100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_11000000_00111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_11111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_11111100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_11111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_11111100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "fsqrt" = [
     // FSQRT (vector)
-    0b00101110_11111001_11111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100001_11111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_11111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11111001_11111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100001_11111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100001_11111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // FSQRT (scalar)
     0b00011110_11100001_11000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100001_11000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1366,9 +1366,9 @@ Ops!(map ;
 ]
 "fsub" = [
     // FSUB (vector)
-    0b00001110_11000000_00010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_11010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_11010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_11010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_11010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
     // FSUB (scalar)
     0b00011110_11100000_00111000_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b00011110_00100000_00111000_00000000 = [S, S, S] => [R(0), R(5), R(16)];
@@ -1388,15 +1388,15 @@ Ops!(map ;
 ]
 "ins" = [
     // INS (element)
-    0b01101110_00000001_00000100_00000000 = [VLanes(BYTE), VLanes(BYTE)] => [R(0), Ubits(17, 4), R(5), Ubits(11, 4)];
-    0b01101110_00000010_00000100_00000000 = [VLanes(WORD), VLanes(WORD)] => [R(0), Ubits(18, 3), R(5), Ubits(12, 3)];
-    0b01101110_00000100_00000100_00000000 = [VLanes(DWORD), VLanes(DWORD)] => [R(0), Ubits(19, 2), R(5), Ubits(13, 2)];
-    0b01101110_00001000_00000100_00000000 = [VLanes(QWORD), VLanes(QWORD)] => [R(0), Ubits(20, 1), R(5), Ubits(14, 1)];
+    0b01101110_00000001_00000100_00000000 = [VElement(BYTE), VElement(BYTE)] => [R(0), Ubits(17, 4), R(5), Ubits(11, 4)];
+    0b01101110_00000010_00000100_00000000 = [VElement(WORD), VElement(WORD)] => [R(0), Ubits(18, 3), R(5), Ubits(12, 3)];
+    0b01101110_00000100_00000100_00000000 = [VElement(DWORD), VElement(DWORD)] => [R(0), Ubits(19, 2), R(5), Ubits(13, 2)];
+    0b01101110_00001000_00000100_00000000 = [VElement(QWORD), VElement(QWORD)] => [R(0), Ubits(20, 1), R(5), Ubits(14, 1)];
     // INS (general)
-    0b01001110_00000001_00011100_00000000 = [VLanes(BYTE), W] => [R(0), Ubits(17, 4), R(5)];
-    0b01001110_00000010_00011100_00000000 = [VLanes(WORD), W] => [R(0), Ubits(18, 3), R(5)];
-    0b01001110_00000100_00011100_00000000 = [VLanes(DWORD), W] => [R(0), Ubits(19, 2), R(5)];
-    0b01001110_00001000_00011100_00000000 = [VLanes(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
+    0b01001110_00000001_00011100_00000000 = [VElement(BYTE), W] => [R(0), Ubits(17, 4), R(5)];
+    0b01001110_00000010_00011100_00000000 = [VElement(WORD), W] => [R(0), Ubits(18, 3), R(5)];
+    0b01001110_00000100_00011100_00000000 = [VElement(DWORD), W] => [R(0), Ubits(19, 2), R(5)];
+    0b01001110_00001000_00011100_00000000 = [VElement(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
 ]
 "isb" = [
     0b11010101_00000011_00111111_11011111 = [Lit("SY")] => [];
@@ -1421,67 +1421,67 @@ Ops!(map ;
     0b00001100_01000000_00100100_00000000 = [RegList(4, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_00101000_00000000 = [RegList(4, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_00101100_00000000 = [RegList(4, QWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_11011111_01110000_00000000 = [RegListSized(1, BYTE, 8), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b00001100_11011111_01110100_00000000 = [RegListSized(1, WORD, 4), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b00001100_11011111_01111000_00000000 = [RegListSized(1, DWORD, 2), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b00001100_11011111_01111100_00000000 = [RegListSized(1, QWORD, 1), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b01001100_11011111_01110000_00000000 = [RegListSized(1, BYTE, 16), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_11011111_01110100_00000000 = [RegListSized(1, WORD, 8), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_11011111_01111000_00000000 = [RegListSized(1, DWORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_11011111_01111100_00000000 = [RegListSized(1, QWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_11011111_01110000_00000000 = [RegListStatic(1, BYTE, 8), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b00001100_11011111_01110100_00000000 = [RegListStatic(1, WORD, 4), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b00001100_11011111_01111000_00000000 = [RegListStatic(1, DWORD, 2), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b00001100_11011111_01111100_00000000 = [RegListStatic(1, QWORD, 1), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b01001100_11011111_01110000_00000000 = [RegListStatic(1, BYTE, 16), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_11011111_01110100_00000000 = [RegListStatic(1, WORD, 8), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_11011111_01111000_00000000 = [RegListStatic(1, DWORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_11011111_01111100_00000000 = [RegListStatic(1, QWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
     0b00001100_11000000_01110000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01110100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01111000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01111100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11011111_10100000_00000000 = [RegListSized(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_11011111_10100100_00000000 = [RegListSized(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_11011111_10101000_00000000 = [RegListSized(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_11011111_10101100_00000000 = [RegListSized(2, QWORD, 1), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_11011111_10100000_00000000 = [RegListSized(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_10100100_00000000 = [RegListSized(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_10101000_00000000 = [RegListSized(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_10101100_00000000 = [RegListSized(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_11011111_10100000_00000000 = [RegListStatic(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_11011111_10100100_00000000 = [RegListStatic(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_11011111_10101000_00000000 = [RegListStatic(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_11011111_10101100_00000000 = [RegListStatic(2, QWORD, 1), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_11011111_10100000_00000000 = [RegListStatic(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_10100100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_10101000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_10101100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_11000000_10100000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_10100100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_10101000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_10101100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11011111_01100000_00000000 = [RegListSized(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_11011111_01100100_00000000 = [RegListSized(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_11011111_01101000_00000000 = [RegListSized(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_11011111_01101100_00000000 = [RegListSized(3, QWORD, 1), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b01001100_11011111_01100000_00000000 = [RegListSized(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_11011111_01100100_00000000 = [RegListSized(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_11011111_01101000_00000000 = [RegListSized(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_11011111_01101100_00000000 = [RegListSized(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b00001100_11011111_01100000_00000000 = [RegListStatic(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_11011111_01100100_00000000 = [RegListStatic(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_11011111_01101000_00000000 = [RegListStatic(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_11011111_01101100_00000000 = [RegListStatic(3, QWORD, 1), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b01001100_11011111_01100000_00000000 = [RegListStatic(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_11011111_01100100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_11011111_01101000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_11011111_01101100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
     0b00001100_11000000_01100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11011111_00100000_00000000 = [RegListSized(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11011111_00100100_00000000 = [RegListSized(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11011111_00101000_00000000 = [RegListSized(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11011111_00101100_00000000 = [RegListSized(4, QWORD, 1), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_00100000_00000000 = [RegListSized(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_11011111_00100100_00000000 = [RegListSized(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_11011111_00101000_00000000 = [RegListSized(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_11011111_00101100_00000000 = [RegListSized(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b00001100_11011111_00100000_00000000 = [RegListStatic(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_11011111_00100100_00000000 = [RegListStatic(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_11011111_00101000_00000000 = [RegListStatic(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_11011111_00101100_00000000 = [RegListStatic(4, QWORD, 1), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_00100000_00000000 = [RegListStatic(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_11011111_00100100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_11011111_00101000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_11011111_00101100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
     0b00001100_11000000_00100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_00100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_00101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_00101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // LD1 (single structure)
-    0b00001101_01000000_00000000_00000000 = [RegListLanes(1, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_01000000_01000000_00000000 = [RegListLanes(1, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_01000000_10000000_00000000 = [RegListLanes(1, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_01000000_10000100_00000000 = [RegListLanes(1, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11011111_00000000_00000000 = [RegListLanes(1, BYTE), RefBase, LitInt(1)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11000000_00000000_00000000 = [RegListLanes(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_11011111_01000000_00000000 = [RegListLanes(1, WORD), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11000000_01000000_00000000 = [RegListLanes(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_11011111_10000000_00000000 = [RegListLanes(1, DWORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11000000_10000000_00000000 = [RegListLanes(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_11011111_10000100_00000000 = [RegListLanes(1, QWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11000000_10000100_00000000 = [RegListLanes(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_01000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_01000000_01000000_00000000 = [RegListElement(1, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_01000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_01000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11011111_00000000_00000000 = [RegListElement(1, BYTE), RefBase, LitInt(1)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_11000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11011111_01000000_00000000 = [RegListElement(1, WORD), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_11000000_01000000_00000000 = [RegListElement(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11011111_10000000_00000000 = [RegListElement(1, DWORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_11000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11011111_10000100_00000000 = [RegListElement(1, QWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "ld1r" = [
     0b00001101_01000000_11000000_00000000 = [RegList(1, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1502,31 +1502,31 @@ Ops!(map ;
     0b00001100_01000000_10000000_00000000 = [RegList(2, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_10000100_00000000 = [RegList(2, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_10001000_00000000 = [RegList(2, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_01000000_10001100_00000000 = [RegListSized(2, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_11011111_10000000_00000000 = [RegListSized(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_11011111_10000100_00000000 = [RegListSized(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_11011111_10001000_00000000 = [RegListSized(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_11011111_10000000_00000000 = [RegListSized(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_10000100_00000000 = [RegListSized(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_10001000_00000000 = [RegListSized(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_10001100_00000000 = [RegListSized(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_01000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
+    0b00001100_11011111_10000000_00000000 = [RegListStatic(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_11011111_10000100_00000000 = [RegListStatic(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_11011111_10001000_00000000 = [RegListStatic(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_11011111_10000000_00000000 = [RegListStatic(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_10000100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_10001000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_11000000_10000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_10000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_10001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10001100_00000000 = [RegListSized(2, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // LD2 (single structure)
-    0b00001101_01100000_00000000_00000000 = [RegListLanes(2, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_01100000_01000000_00000000 = [RegListLanes(2, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_01100000_10000000_00000000 = [RegListLanes(2, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_01100000_10000100_00000000 = [RegListLanes(2, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11111111_00000000_00000000 = [RegListLanes(2, BYTE), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11100000_00000000_00000000 = [RegListLanes(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_11111111_01000000_00000000 = [RegListLanes(2, WORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11100000_01000000_00000000 = [RegListLanes(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_11111111_10000000_00000000 = [RegListLanes(2, DWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11100000_10000000_00000000 = [RegListLanes(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_11111111_10000100_00000000 = [RegListLanes(2, QWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11100000_10000100_00000000 = [RegListLanes(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_01100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_01100000_01000000_00000000 = [RegListElement(2, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_01100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_01100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11111111_00000000_00000000 = [RegListElement(2, BYTE), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_11100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11111111_01000000_00000000 = [RegListElement(2, WORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_11100000_01000000_00000000 = [RegListElement(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11111111_10000000_00000000 = [RegListElement(2, DWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_11100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11111111_10000100_00000000 = [RegListElement(2, QWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "ld2r" = [
     0b00001101_01100000_11000000_00000000 = [RegList(2, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1547,31 +1547,31 @@ Ops!(map ;
     0b00001100_01000000_01000000_00000000 = [RegList(3, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_01000100_00000000 = [RegList(3, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_01001000_00000000 = [RegList(3, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_01000000_01001100_00000000 = [RegListSized(3, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_11011111_01000000_00000000 = [RegListSized(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_11011111_01000100_00000000 = [RegListSized(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_11011111_01001000_00000000 = [RegListSized(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b01001100_11011111_01000000_00000000 = [RegListSized(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_11011111_01000100_00000000 = [RegListSized(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_11011111_01001000_00000000 = [RegListSized(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_11011111_01001100_00000000 = [RegListSized(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b00001100_01000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
+    0b00001100_11011111_01000000_00000000 = [RegListStatic(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_11011111_01000100_00000000 = [RegListStatic(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_11011111_01001000_00000000 = [RegListStatic(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b01001100_11011111_01000000_00000000 = [RegListStatic(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_11011111_01000100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_11011111_01001000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_11011111_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
     0b00001100_11000000_01000000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01000100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_01001000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01001100_00000000 = [RegListSized(3, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // LD3 (single structure)
-    0b00001101_01000000_00100000_00000000 = [RegListLanes(3, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_01000000_01100000_00000000 = [RegListLanes(3, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_01000000_10100000_00000000 = [RegListLanes(3, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_01000000_10100100_00000000 = [RegListLanes(3, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11011111_00100000_00000000 = [RegListLanes(3, BYTE), RefBase, LitInt(3)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11000000_00100000_00000000 = [RegListLanes(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_11011111_01100000_00000000 = [RegListLanes(3, WORD), RefBase, LitInt(6)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11000000_01100000_00000000 = [RegListLanes(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_11011111_10100000_00000000 = [RegListLanes(3, DWORD), RefBase, LitInt(12)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11000000_10100000_00000000 = [RegListLanes(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_11011111_10100100_00000000 = [RegListLanes(3, QWORD), RefBase, LitInt(24)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11000000_10100100_00000000 = [RegListLanes(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_01000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_01000000_01100000_00000000 = [RegListElement(3, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_01000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_01000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11011111_00100000_00000000 = [RegListElement(3, BYTE), RefBase, LitInt(3)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_11000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11011111_01100000_00000000 = [RegListElement(3, WORD), RefBase, LitInt(6)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_11000000_01100000_00000000 = [RegListElement(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11011111_10100000_00000000 = [RegListElement(3, DWORD), RefBase, LitInt(12)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_11000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11011111_10100100_00000000 = [RegListElement(3, QWORD), RefBase, LitInt(24)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "ld3r" = [
     0b00001101_01000000_11100000_00000000 = [RegList(3, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1592,31 +1592,31 @@ Ops!(map ;
     0b00001100_01000000_00000000_00000000 = [RegList(4, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_00000100_00000000 = [RegList(4, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_01000000_00001000_00000000 = [RegList(4, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_01000000_00001100_00000000 = [RegListSized(4, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_11011111_00000000_00000000 = [RegListSized(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11011111_00000100_00000000 = [RegListSized(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11011111_00001000_00000000 = [RegListSized(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_11011111_00000000_00000000 = [RegListSized(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_11011111_00000100_00000000 = [RegListSized(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_11011111_00001000_00000000 = [RegListSized(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_11011111_00001100_00000000 = [RegListSized(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b00001100_01000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
+    0b00001100_11011111_00000000_00000000 = [RegListStatic(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_11011111_00000100_00000000 = [RegListStatic(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_11011111_00001000_00000000 = [RegListStatic(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_11011111_00000000_00000000 = [RegListStatic(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_11011111_00000100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_11011111_00001000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_11011111_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
     0b00001100_11000000_00000000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_00000100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_11000000_00001000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00001100_00000000 = [RegListSized(4, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // LD4 (single structure)
-    0b00001101_01100000_00100000_00000000 = [RegListLanes(4, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_01100000_01100000_00000000 = [RegListLanes(4, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_01100000_10100000_00000000 = [RegListLanes(4, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_01100000_10100100_00000000 = [RegListLanes(4, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11111111_00100000_00000000 = [RegListLanes(4, BYTE), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11100000_00100000_00000000 = [RegListLanes(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_11111111_01100000_00000000 = [RegListLanes(4, WORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11100000_01100000_00000000 = [RegListLanes(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_11111111_10100000_00000000 = [RegListLanes(4, DWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11100000_10100000_00000000 = [RegListLanes(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_11111111_10100100_00000000 = [RegListLanes(4, QWORD), RefBase, LitInt(32)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11100000_10100100_00000000 = [RegListLanes(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_01100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_01100000_01100000_00000000 = [RegListElement(4, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_01100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_01100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11111111_00100000_00000000 = [RegListElement(4, BYTE), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_11100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11111111_01100000_00000000 = [RegListElement(4, WORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_11100000_01100000_00000000 = [RegListElement(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11111111_10100000_00000000 = [RegListElement(4, DWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_11100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11111111_10100100_00000000 = [RegListElement(4, QWORD), RefBase, LitInt(32)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_11100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "ld4r" = [
     0b00001101_01100000_11100000_00000000 = [RegList(4, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -2242,21 +2242,21 @@ Ops!(map ;
 ]
 "mla" = [
     // MLA (by element)
-    0b00101111_01000000_00000000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00101111_10000000_00000000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00101111_01000000_00000000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00101111_10000000_00000000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // MLA (vector)
-    0b00001110_00100000_10010100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "mls" = [
     // MLS (by element)
-    0b00101111_01000000_01000000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00101111_10000000_01000000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00101111_01000000_01000000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00101111_10000000_01000000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // MLS (vector)
-    0b00101110_00100000_10010100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_10010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_10010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_10010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_10010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_10010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "mneg" = [
     0b00011011_00000000_11111100_00000000 = [W, W, W] => [R(0), R(5), R(16)];
@@ -2267,20 +2267,20 @@ Ops!(map ;
     0b00010001_00000000_00000000_00000000 = [WSP, WSP] => [R(0), R(5)];
     0b10010001_00000000_00000000_00000000 = [XSP, XSP] => [R(0), R(5)];
     // MOV (scalar)
-    0b01011110_00000001_00000100_00000000 = [B, VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b01011110_00000010_00000100_00000000 = [H, VLanes(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01011110_00000100_00000100_00000000 = [S, VLanes(DWORD)] => [R(0), R(5), Ubits(19, 2)];
-    0b01011110_00001000_00000100_00000000 = [D, VLanes(QWORD)] => [R(0), R(5), Ubits(20, 1)];
+    0b01011110_00000001_00000100_00000000 = [B, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
+    0b01011110_00000010_00000100_00000000 = [H, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
+    0b01011110_00000100_00000100_00000000 = [S, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b01011110_00001000_00000100_00000000 = [D, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
     // MOV (element)
-    0b01101110_00000001_00000100_00000000 = [VLanes(BYTE), VLanes(BYTE)] => [R(0), Ubits(17, 4), R(5), Ubits(11, 4)];
-    0b01101110_00000010_00000100_00000000 = [VLanes(WORD), VLanes(WORD)] => [R(0), Ubits(18, 3), R(5), Ubits(12, 3)];
-    0b01101110_00000100_00000100_00000000 = [VLanes(DWORD), VLanes(DWORD)] => [R(0), Ubits(19, 2), R(5), Ubits(13, 2)];
-    0b01101110_00001000_00000100_00000000 = [VLanes(QWORD), VLanes(QWORD)] => [R(0), Ubits(20, 1), R(5), Ubits(14, 1)];
+    0b01101110_00000001_00000100_00000000 = [VElement(BYTE), VElement(BYTE)] => [R(0), Ubits(17, 4), R(5), Ubits(11, 4)];
+    0b01101110_00000010_00000100_00000000 = [VElement(WORD), VElement(WORD)] => [R(0), Ubits(18, 3), R(5), Ubits(12, 3)];
+    0b01101110_00000100_00000100_00000000 = [VElement(DWORD), VElement(DWORD)] => [R(0), Ubits(19, 2), R(5), Ubits(13, 2)];
+    0b01101110_00001000_00000100_00000000 = [VElement(QWORD), VElement(QWORD)] => [R(0), Ubits(20, 1), R(5), Ubits(14, 1)];
     // MOV (from general)
-    0b01001110_00000001_00011100_00000000 = [VLanes(BYTE), W] => [R(0), Ubits(17, 4), R(5)];
-    0b01001110_00000010_00011100_00000000 = [VLanes(WORD), W] => [R(0), Ubits(18, 3), R(5)];
-    0b01001110_00000100_00011100_00000000 = [VLanes(DWORD), W] => [R(0), Ubits(19, 2), R(5)];
-    0b01001110_00001000_00011100_00000000 = [VLanes(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
+    0b01001110_00000001_00011100_00000000 = [VElement(BYTE), W] => [R(0), Ubits(17, 4), R(5)];
+    0b01001110_00000010_00011100_00000000 = [VElement(WORD), W] => [R(0), Ubits(18, 3), R(5)];
+    0b01001110_00000100_00011100_00000000 = [VElement(DWORD), W] => [R(0), Ubits(19, 2), R(5)];
+    0b01001110_00001000_00011100_00000000 = [VElement(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
     // MOV (inverted wide immediate)
     0b00010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), W, Imm] => [R(0), Special(5, "inverted wide imm")];
     0b10010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), X, Imm] => [R(0), Special(5, "inverted wide imm")];
@@ -2288,7 +2288,7 @@ Ops!(map ;
     0b01010010_10000000_00000000_00000000 = [W, Imm] => [R(0), Special(5, "wide imm")];
     0b11010010_10000000_00000000_00000000 = [X, Imm] => [R(0), Special(5, "wide imm")];
     // MOV (vector)
-    0b00001110_10100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), C, R(16), Rwidth(30)];
+    0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), C, R(16), Rwidth(30)];
     // MOV (bitmask immediate)
     0b00110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), WSP, Imm] => [R(0), UlogicalW(10)];
     0b10110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), XSP, Imm] => [R(0), UlogicalX(10)];
@@ -2296,16 +2296,16 @@ Ops!(map ;
     0b00101010_00000000_00000011_11100000 = [W, W] => [R(0), R(16)];
     0b10101010_00000000_00000011_11100000 = [X, X] => [R(0), R(16)];
     // MOV (to general)
-    0b00001110_00000100_00111100_00000000 = [W, VLanes(DWORD)] => [R(0), R(5), Ubits(19, 2)];
-    0b01001110_00001000_00111100_00000000 = [X, VLanes(QWORD)] => [R(0), R(5), Ubits(20, 1)];
+    0b00001110_00000100_00111100_00000000 = [W, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b01001110_00001000_00111100_00000000 = [X, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
 ]
 "movi" = [
-    0b00001111_00000000_11100100_00000000 = [VSized(BYTE), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)];
-    0b00001111_00000000_10000100_00000000 = [VSized(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
-    0b00001111_00000000_00000100_00000000 = [VSized(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
-    0b00001111_00000000_11000100_00000000 = [VSized(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
+    0b00001111_00000000_11100100_00000000 = [V(BYTE), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)];
+    0b00001111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00001111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
+    0b00001111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
     0b00101111_00000000_11100100_00000000 = [D, Imm] => [R(0), Special(5, "stretched imm")];
-    0b01101111_00000000_11100100_00000000 = [VSizedStatic(QWORD, 2), Imm] => [R(0), Special(5, "stretched imm")];
+    0b01101111_00000000_11100100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, "stretched imm")];
 ]
 "movk" = [
     0b01110010_10000000_00000000_00000000 = [W, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])];
@@ -2334,12 +2334,12 @@ Ops!(map ;
 ]
 "mul" = [
     // MUL (by element)
-    0b00001111_01000000_10000000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00001111_10000000_10000000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b00001111_01000000_10000000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00001111_10000000_10000000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // MUL (vector)
-    0b00001110_00100000_10011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10011100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10011100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10011100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10011100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
     // MUL
     0b00011011_00000000_01111100_00000000 = [W, W, W] => [R(0), R(5), R(16)];
     0b10011011_00000000_01111100_00000000 = [X, X, X] => [R(0), R(5), R(16)];
@@ -2347,12 +2347,12 @@ Ops!(map ;
 "mvn" = [
     0b00101010_00100000_00000011_11100000 = [W, W, End, Mod(SHIFTS)] => [R(0), R(16), Rotates(22), Ubits(10, 5)];
     0b10101010_00100000_00000011_11100000 = [X, X, End, Mod(SHIFTS)] => [R(0), R(16), Rotates(22), Ubits(10, 6)];
-    0b00101110_00100000_01011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "mvni" = [
-    0b00101111_00000000_10000100_00000000 = [VSized(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
-    0b00101111_00000000_00000100_00000000 = [VSized(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
-    0b00101111_00000000_11000100_00000000 = [VSized(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
+    0b00101111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00101111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
+    0b00101111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
 ]
 "neg" = [
     // NEG (shifted register)
@@ -2360,10 +2360,10 @@ Ops!(map ;
     0b11001011_00000000_00000011_11100000 = [X, X, End, Mod(SHIFTS)] => [R(0), R(16), Rotates(22), Ubits(10, 6)];
     // NEG (vector)
     0b01111110_11100000_10111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_00100000_10111000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_10111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_10111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_10111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_10111000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_10111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_10111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_10111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "negs" = [
     0b01101011_00000000_00000011_11100000 = [W, W, End, Mod(SHIFTS)] => [R(0), R(16), Rotates(22), Ubits(10, 5)];
@@ -2381,21 +2381,21 @@ Ops!(map ;
     0b11010101_00000011_00100000_00011111 = [] => [];
 ]
 "not" = [
-    0b00101110_00100000_01011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "orn" = [
     // ORN (vector)
-    0b00001110_11100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // ORN (shifted register)
     0b00101010_00100000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b10101010_00100000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
 ]
 "orr" = [
     // ORR (vector, immediate)
-    0b00001111_00000000_10010100_00000000 = [VSized(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
-    0b00001111_00000000_00010100_00000000 = [VSized(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
+    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
+    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
     // ORR (vector, register)
-    0b00001110_10100000_00011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // ORR (immediate)
     0b00110010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), UlogicalW(10)];
     0b10110010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), UlogicalX(10)];
@@ -2449,15 +2449,15 @@ Ops!(map ;
     0b11011010_11000001_00100111_11100000 = [X] => [R(0)];
 ]
 "pmul" = [
-    0b00101110_00100000_10011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_10011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "pmull" = [
-    0b00001110_00100000_11100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_11100000_11100000_00000000 = [VSizedStatic(OWORD, 1), VSizedStatic(QWORD, 1), VSizedStatic(QWORD, 1)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_11100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_11100000_11100000_00000000 = [VStatic(OWORD, 1), VStatic(QWORD, 1), VStatic(QWORD, 1)] => [R(0), R(5), R(16)];
 ]
 "pmull2" = [
-    0b01001110_00100000_11100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_11100000_11100000_00000000 = [VSizedStatic(OWORD, 1), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_11100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_11100000_11100000_00000000 = [VStatic(OWORD, 1), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "prfm" = [
     // PRFM (literal)
@@ -2475,21 +2475,21 @@ Ops!(map ;
     0b11010101_00000011_00110100_10011111 = [] => [];
 ]
 "raddhn" = [
-    0b00101110_00100000_01000000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_01000000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_01000000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_01000000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_01000000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_01000000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "raddhn2" = [
-    0b01101110_00100000_01000000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_01000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_01000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_01000000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_01000000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_01000000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "rax1" = [
-    0b11001110_01100000_10001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_10001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "rbit" = [
     // RBIT (vector)
-    0b00101110_01100000_01011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
     // RBIT
     0b01011010_11000000_00000000_00000000 = [W, W] => [R(0), R(5)];
     0b11011010_11000000_00000000_00000000 = [X, X] => [R(0), R(5)];
@@ -2510,22 +2510,22 @@ Ops!(map ;
 ]
 "rev16" = [
     // REV16 (vector)
-    0b00001110_00100000_00011000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_00011000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
     // REV16
     0b01011010_11000000_00000100_00000000 = [W, W] => [R(0), R(5)];
     0b11011010_11000000_00000100_00000000 = [X, X] => [R(0), R(5)];
 ]
 "rev32" = [
     // REV32 (vector)
-    0b00101110_00100000_00001000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_00001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_00001000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_00001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
     // REV32
     0b11011010_11000000_00001000_00000000 = [X, X] => [R(0), R(5)];
 ]
 "rev64" = [
-    0b00001110_00100000_00001000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_00001000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_00001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_00001000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_00001000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_00001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
     0b11011010_11000000_00001100_00000000 = [X, X] => [R(0), R(5)];
 ]
 "rmif" = [
@@ -2544,89 +2544,89 @@ Ops!(map ;
     0b10011010_11000000_00101100_00000000 = [X, X, X] => [R(0), R(5), R(16)];
 ]
 "rshrn" = [
-    0b00001111_00001000_10001100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00001111_00010000_10001100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00001111_00100000_10001100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00001111_00001000_10001100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00001111_00010000_10001100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00001111_00100000_10001100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "rshrn2" = [
-    0b01001111_00001000_10001100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01001111_00010000_10001100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01001111_00100000_10001100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01001111_00001000_10001100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01001111_00010000_10001100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01001111_00100000_10001100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "rsubhn" = [
-    0b00101110_00100000_01100000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_01100000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_01100000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_01100000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_01100000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_01100000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "rsubhn2" = [
-    0b01101110_00100000_01100000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_01100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_01100000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_01100000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "saba" = [
-    0b00001110_00100000_01111100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01111100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sabal" = [
-    0b00001110_00100000_01010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_01010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_01010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_01010000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_01010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_01010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sabal2" = [
-    0b01001110_00100000_01010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_01010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_01010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_01010000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_01010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_01010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sabd" = [
-    0b00001110_00100000_01110100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01110100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sabdl" = [
-    0b00001110_00100000_01110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_01110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_01110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_01110000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_01110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_01110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sabdl2" = [
-    0b01001110_00100000_01110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_01110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_01110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_01110000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_01110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_01110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sadalp" = [
-    0b00001110_00100000_01101000_00000000 = [VSized(WORD), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_01101000_00000000 = [VSized(DWORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_01101000_00000000 = [VSized(QWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_01101000_00000000 = [V(WORD), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_01101000_00000000 = [V(DWORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_01101000_00000000 = [V(QWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "saddl" = [
-    0b00001110_00100000_00000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_00000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_00000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_00000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_00000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "saddl2" = [
-    0b01001110_00100000_00000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_00000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_00000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_00000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_00000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "saddlp" = [
-    0b00001110_00100000_00101000_00000000 = [VSized(WORD), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_00101000_00000000 = [VSized(DWORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_00101000_00000000 = [VSized(QWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_00101000_00000000 = [V(WORD), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_00101000_00000000 = [V(DWORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_00101000_00000000 = [V(QWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "saddlv" = [
-    0b00001110_00110000_00111000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01110000_00111000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10110000_00111000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110000_00111000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01110000_00111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110000_00111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "saddw" = [
-    0b00001110_00100000_00010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_00010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_00010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_00010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "saddw2" = [
-    0b01001110_00100000_00010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_00010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_00010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_00010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sb" = [
     0b11010101_00000011_00110000_11111111 = [] => [];
@@ -2656,16 +2656,16 @@ Ops!(map ;
     0b01011111_00000000_11100100_00000000 = [H, H, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01011111_00000000_11100100_00000000 = [S, S, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
     0b01011111_00000000_11100100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00001111_00010000_11100100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
-    0b00001111_00100000_11100100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
-    0b00001111_01000000_11100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
+    0b00001111_00010000_11100100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
+    0b00001111_00100000_11100100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
+    0b00001111_01000000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
     // SCVTF (vector, integer)
     0b01011110_01111001_11011000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_00100001_11011000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_01100001_11011000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_01111001_11011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_00100001_11011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100001_11011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01111001_11011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100001_11011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100001_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // SCVTF (scalar, fixed-point)
     0b00011110_11000010_00000000_00000000 = [H, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b00011110_00000010_00000000_00000000 = [S, W, Imm] => [R(0), R(5), Usub(10, 6, 64)];
@@ -2687,11 +2687,11 @@ Ops!(map ;
 ]
 "sdot" = [
     // SDOT (by element)
-    0b00001111_10000000_11100000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(BYTE, 8), VLanes(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01001111_10000000_11100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(BYTE, 16), VLanes(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_10000000_11100000_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_10000000_11100000_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SDOT (vector)
-    0b00001110_10000000_10010100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10000000_10010100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b00001110_10000000_10010100_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10000000_10010100_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
 ]
 "setf16" = [
     0b00111010_00000000_01001000_00001101 = [W] => [R(5)];
@@ -2706,199 +2706,199 @@ Ops!(map ;
     0b11010101_00000011_00100000_10111111 = [] => [];
 ]
 "sha1c" = [
-    0b01011110_00000000_00000000_00000000 = [Q, S, VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_00000000_00000000 = [Q, S, VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha1h" = [
     0b01011110_00101000_00001000_00000000 = [S, S] => [R(0), R(5)];
 ]
 "sha1m" = [
-    0b01011110_00000000_00100000_00000000 = [Q, S, VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_00100000_00000000 = [Q, S, VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha1p" = [
-    0b01011110_00000000_00010000_00000000 = [Q, S, VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_00010000_00000000 = [Q, S, VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha1su0" = [
-    0b01011110_00000000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha1su1" = [
-    0b01011110_00101000_00011000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01011110_00101000_00011000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
 ]
 "sha256h" = [
-    0b01011110_00000000_01000000_00000000 = [Q, Q, VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_01000000_00000000 = [Q, Q, VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha256h2" = [
-    0b01011110_00000000_01010000_00000000 = [Q, Q, VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_01010000_00000000 = [Q, Q, VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha256su0" = [
-    0b01011110_00101000_00101000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01011110_00101000_00101000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
 ]
 "sha256su1" = [
-    0b01011110_00000000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01011110_00000000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sha512h" = [
-    0b11001110_01100000_10000000_00000000 = [Q, Q, VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_10000000_00000000 = [Q, Q, VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sha512h2" = [
-    0b11001110_01100000_10000100_00000000 = [Q, Q, VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_10000100_00000000 = [Q, Q, VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sha512su0" = [
-    0b11001110_11000000_10000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b11001110_11000000_10000000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "sha512su1" = [
-    0b11001110_01100000_10001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_10001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "shadd" = [
-    0b00001110_00100000_00000100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "shl" = [
     0b01011111_01000000_01010100_00000000 = [D, D, Imm] => [R(0), R(5), Ubits(16, 6)];
-    0b00001111_00001000_01010100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
-    0b00001111_00010000_01010100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
-    0b00001111_00100000_01010100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
-    0b00001111_01000000_01010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
+    0b00001111_00001000_01010100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
+    0b00001111_00010000_01010100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
+    0b00001111_00100000_01010100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
+    0b00001111_01000000_01010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
 ]
 "shll" = [
-    0b00101110_00100001_00111000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), LitInt(8)] => [R(0), R(5)];
-    0b00101110_01100001_00111000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), LitInt(16)] => [R(0), R(5)];
-    0b00101110_10100001_00111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), LitInt(32)] => [R(0), R(5)];
+    0b00101110_00100001_00111000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), LitInt(8)] => [R(0), R(5)];
+    0b00101110_01100001_00111000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), LitInt(16)] => [R(0), R(5)];
+    0b00101110_10100001_00111000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), LitInt(32)] => [R(0), R(5)];
 ]
 "shll2" = [
-    0b01101110_00100001_00111000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), LitInt(8)] => [R(0), R(5)];
-    0b01101110_01100001_00111000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), LitInt(16)] => [R(0), R(5)];
-    0b01101110_10100001_00111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), LitInt(32)] => [R(0), R(5)];
+    0b01101110_00100001_00111000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), LitInt(8)] => [R(0), R(5)];
+    0b01101110_01100001_00111000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), LitInt(16)] => [R(0), R(5)];
+    0b01101110_10100001_00111000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), LitInt(32)] => [R(0), R(5)];
 ]
 "shrn" = [
-    0b00001111_00001000_10000100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00001111_00010000_10000100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00001111_00100000_10000100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00001111_00001000_10000100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00001111_00010000_10000100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00001111_00100000_10000100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "shrn2" = [
-    0b01001111_00001000_10000100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01001111_00010000_10000100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01001111_00100000_10000100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01001111_00001000_10000100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01001111_00010000_10000100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01001111_00100000_10000100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "shsub" = [
-    0b00001110_00100000_00100100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00100100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sli" = [
     0b01111111_01000000_01010100_00000000 = [D, D, Imm] => [R(0), R(5), Ubits(16, 6)];
-    0b00101111_00001000_01010100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
-    0b00101111_00010000_01010100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
-    0b00101111_00100000_01010100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
-    0b00101111_01000000_01010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
+    0b00101111_00001000_01010100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
+    0b00101111_00010000_01010100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
+    0b00101111_00100000_01010100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
+    0b00101111_01000000_01010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
 ]
 "sm3partw1" = [
-    0b11001110_01100000_11000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sm3partw2" = [
-    0b11001110_01100000_11000100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_11000100_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sm3ss1" = [
-    0b11001110_01000000_00000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16), R(10)];
+    0b11001110_01000000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16), R(10)];
 ]
 "sm3tt1a" = [
-    0b11001110_01000000_10000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
+    0b11001110_01000000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
 ]
 "sm3tt1b" = [
-    0b11001110_01000000_10000100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
+    0b11001110_01000000_10000100_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
 ]
 "sm3tt2a" = [
-    0b11001110_01000000_10001000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
+    0b11001110_01000000_10001000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
 ]
 "sm3tt2b" = [
-    0b11001110_01000000_10001100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
+    0b11001110_01000000_10001100_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ubits(12, 2)];
 ]
 "sm4e" = [
-    0b11001110_11000000_10000100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
+    0b11001110_11000000_10000100_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
 ]
 "sm4ekey" = [
-    0b11001110_01100000_11001000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b11001110_01100000_11001000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "smaddl" = [
     0b10011011_00100000_00000000_00000000 = [X, W, W, X] => [R(0), R(5), R(16), R(10)];
 ]
 "smax" = [
-    0b00001110_00100000_01100100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01100100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "smaxp" = [
-    0b00001110_00100000_10100100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10100100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "smaxv" = [
-    0b00001110_00110000_10101000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01110000_10101000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10110000_10101000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110000_10101000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01110000_10101000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110000_10101000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "smc" = [
     0b11010100_00000000_00000000_00000011 = [Imm] => [Ubits(5, 16)];
 ]
 "smin" = [
-    0b00001110_00100000_01101100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01101100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sminp" = [
-    0b00001110_00100000_10101100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_10101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_10101100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sminv" = [
-    0b00001110_00110001_10101000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01110001_10101000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10110001_10101000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110001_10101000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01110001_10101000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110001_10101000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "smlal" = [
     // SMLAL, SMLAL2 (by element)
-    0b00001111_01000000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00001111_10000000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SMLAL, SMLAL2 (vector)
-    0b00001110_00100000_10000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_10000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_10000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_10000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_10000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "smlal2" = [
     // SMLAL, SMLAL2 (by element)
-    0b01001111_01000000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_01000000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SMLAL, SMLAL2 (vector)
-    0b01001110_00100000_10000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_10000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_10000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_10000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_10000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "smlsl" = [
     // SMLSL, SMLSL2 (by element)
-    0b00001111_01000000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00001111_10000000_01100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_01100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SMLSL, SMLSL2 (vector)
-    0b00001110_00100000_10100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_10100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "smlsl2" = [
     // SMLSL, SMLSL2 (by element)
-    0b01001111_01000000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_01100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_01000000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_01100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SMLSL, SMLSL2 (vector)
-    0b01001110_00100000_10100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_10100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "smnegl" = [
     0b10011011_00100000_11111100_00000000 = [X, W, W] => [R(0), R(5), R(16)];
 ]
 "smov" = [
-    0b00001110_00000001_00101100_00000000 = [W, VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b00001110_00000010_00101100_00000000 = [W, VLanes(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01001110_00000001_00101100_00000000 = [X, VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b01001110_00000010_00101100_00000000 = [X, VLanes(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01001110_00000100_00101100_00000000 = [X, VLanes(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b00001110_00000001_00101100_00000000 = [W, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
+    0b00001110_00000010_00101100_00000000 = [W, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
+    0b01001110_00000001_00101100_00000000 = [X, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
+    0b01001110_00000010_00101100_00000000 = [X, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
+    0b01001110_00000100_00101100_00000000 = [X, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
 ]
 "smsubl" = [
     0b10011011_00100000_10000000_00000000 = [X, W, W, X] => [R(0), R(5), R(16), R(10)];
@@ -2908,197 +2908,197 @@ Ops!(map ;
 ]
 "smull" = [
     // SMULL, SMULL2 (by element)
-    0b00001111_01000000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00001111_10000000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SMULL, SMULL2 (vector)
-    0b00001110_00100000_11000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_11000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_11000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_11000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_11000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
     // SMULL
     0b10011011_00100000_01111100_00000000 = [X, W, W] => [R(0), R(5), R(16)];
 ]
 "smull2" = [
     // SMULL, SMULL2 (by element)
-    0b01001111_01000000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_01000000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SMULL, SMULL2 (vector)
-    0b01001110_00100000_11000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_11000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_11000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_11000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_11000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sqabs" = [
     0b01011110_00100000_01111000_00000000 = [B, B] => [R(0), R(5)];
     0b01011110_01100000_01111000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_10100000_01111000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_11100000_01111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_00100000_01111000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_01111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_01111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_01111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_01111000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_01111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_01111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_01111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "sqadd" = [
     0b01011110_00100000_00001100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01011110_01100000_00001100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_00001100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_11100000_00001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_00001100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_00001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00001100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_00001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqdmlal" = [
     // SQDMLAL, SQDMLAL2 (by element)
-    0b01011111_01000000_00110000_00000000 = [S, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_00110000_00000000 = [D, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00001111_01000000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00001111_10000000_00110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01011111_01000000_00110000_00000000 = [S, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_00110000_00000000 = [D, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_00110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SQDMLAL, SQDMLAL2 (vector)
     0b01011110_01100000_10010000_00000000 = [S, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_10010000_00000000 = [D, S, S] => [R(0), R(5), R(16)];
-    0b00001110_01100000_10010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_10010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_10010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_10010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sqdmlal2" = [
     // SQDMLAL, SQDMLAL2 (by element)
-    0b01001111_01000000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_00110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_01000000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_00110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SQDMLAL, SQDMLAL2 (vector)
-    0b01001110_01100000_10010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_10010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_10010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_10010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sqdmlsl" = [
     // SQDMLSL, SQDMLSL2 (by element)
-    0b01011111_01000000_01110000_00000000 = [S, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_01110000_00000000 = [D, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00001111_01000000_01110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00001111_10000000_01110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01011111_01000000_01110000_00000000 = [S, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_01110000_00000000 = [D, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_01110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_01110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SQDMLSL, SQDMLSL2 (vector)
     0b01011110_01100000_10110000_00000000 = [S, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_10110000_00000000 = [D, S, S] => [R(0), R(5), R(16)];
-    0b00001110_01100000_10110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_10110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_10110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_10110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sqdmlsl2" = [
     // SQDMLSL, SQDMLSL2 (by element)
-    0b01001111_01000000_01110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_01110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_01000000_01110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_01110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SQDMLSL, SQDMLSL2 (vector)
-    0b01001110_01100000_10110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_10110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_10110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_10110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sqdmulh" = [
     // SQDMULH (by element)
-    0b01011111_01000000_11000000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_11000000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00001111_01000000_11000000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00001111_10000000_11000000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b01011111_01000000_11000000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_11000000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_11000000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00001111_10000000_11000000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // SQDMULH (vector)
     0b01011110_01100000_10110100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_10110100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
-    0b00001110_01100000_10110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_10110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_10110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_10110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqdmull" = [
     // SQDMULL, SQDMULL2 (by element)
-    0b01011111_01000000_10110000_00000000 = [S, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_10110000_00000000 = [D, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00001111_01000000_10110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00001111_10000000_10110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01011111_01000000_10110000_00000000 = [S, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_10110000_00000000 = [D, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_10110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_10110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SQDMULL, SQDMULL2 (vector)
     0b01011110_01100000_11010000_00000000 = [S, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_11010000_00000000 = [D, S, S] => [R(0), R(5), R(16)];
-    0b00001110_01100000_11010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_11010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_11010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_11010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "sqdmull2" = [
     // SQDMULL, SQDMULL2 (by element)
-    0b01001111_01000000_10110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_10110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_01000000_10110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_10110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SQDMULL, SQDMULL2 (vector)
-    0b01001110_01100000_11010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_11010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_11010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_11010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "sqneg" = [
     0b01111110_00100000_01111000_00000000 = [B, B] => [R(0), R(5)];
     0b01111110_01100000_01111000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_10100000_01111000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_11100000_01111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_00100000_01111000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_01111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_01111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_01111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01111000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_01111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_01111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_01111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "sqrdmlah" = [
     // SQRDMLAH (by element)
-    0b01111111_01000000_11010000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01111111_10000000_11010000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00101111_01000000_11010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00101111_10000000_11010000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b01111111_01000000_11010000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01111111_10000000_11010000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_01000000_11010000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00101111_10000000_11010000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // SQRDMLAH (vector)
     0b01111110_01000000_10000100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10000000_10000100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
-    0b00101110_01000000_10000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10000000_10000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_10000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10000000_10000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqrdmlsh" = [
     // SQRDMLSH (by element)
-    0b01111111_01000000_11110000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01111111_10000000_11110000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00101111_01000000_11110000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00101111_10000000_11110000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b01111111_01000000_11110000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01111111_10000000_11110000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_01000000_11110000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00101111_10000000_11110000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // SQRDMLSH (vector)
     0b01111110_01000000_10001100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10000000_10001100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
-    0b00101110_01000000_10001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10000000_10001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01000000_10001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10000000_10001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqrdmulh" = [
     // SQRDMULH (by element)
-    0b01011111_01000000_11010000_00000000 = [H, H, VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01011111_10000000_11010000_00000000 = [S, S, VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b00001111_01000000_11010000_00000000 = [VSized(WORD), VSized(WORD), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
-    0b00001111_10000000_11010000_00000000 = [VSized(DWORD), VSized(DWORD), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
+    0b01011111_01000000_11010000_00000000 = [H, H, VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01011111_10000000_11010000_00000000 = [S, S, VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_01000000_11010000_00000000 = [V(WORD), V(WORD), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20]), Rwidth(30)];
+    0b00001111_10000000_11010000_00000000 = [V(DWORD), V(DWORD), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21]), Rwidth(30)];
     // SQRDMULH (vector)
     0b01111110_01100000_10110100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_10110100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
-    0b00101110_01100000_10110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_10110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_10110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_10110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqrshl" = [
     0b01011110_00100000_01011100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01011110_01100000_01011100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_01011100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_11100000_01011100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_01011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01011100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01011100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_01011100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01011100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01011100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_01011100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqrshrn" = [
     0b01011111_00000000_10011100_00000000 = [B, H, Imm] => [R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)];
     0b01011111_00000000_10011100_00000000 = [H, S, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01011111_00000000_10011100_00000000 = [S, D, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
-    0b00001111_00001000_10011100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00001111_00010000_10011100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00001111_00100000_10011100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00001111_00001000_10011100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00001111_00010000_10011100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00001111_00100000_10011100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqrshrn2" = [
-    0b01001111_00001000_10011100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01001111_00010000_10011100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01001111_00100000_10011100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01001111_00001000_10011100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01001111_00010000_10011100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01001111_00100000_10011100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqrshrun" = [
     0b01111111_00000000_10001100_00000000 = [B, H, Imm] => [R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)];
     0b01111111_00000000_10001100_00000000 = [H, S, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01111111_00000000_10001100_00000000 = [S, D, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
-    0b00101111_00001000_10001100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00101111_00010000_10001100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00101111_00100000_10001100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00101111_00001000_10001100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00101111_00010000_10001100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00101111_00100000_10001100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqrshrun2" = [
-    0b01101111_00001000_10001100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01101111_00010000_10001100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01101111_00100000_10001100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01101111_00001000_10001100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01101111_00010000_10001100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01101111_00100000_10001100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqshl" = [
     // SQSHL (immediate)
@@ -3106,178 +3106,178 @@ Ops!(map ;
     0b01011111_00010000_01110100_00000000 = [H, H, Imm] => [R(0), R(5), Ubits(16, 4)];
     0b01011111_00100000_01110100_00000000 = [S, S, Imm] => [R(0), R(5), Ubits(16, 5)];
     0b01011111_01000000_01110100_00000000 = [D, D, Imm] => [R(0), R(5), Ubits(16, 6)];
-    0b00001111_00001000_01110100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
-    0b00001111_00010000_01110100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
-    0b00001111_00100000_01110100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
-    0b00001111_01000000_01110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
+    0b00001111_00001000_01110100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
+    0b00001111_00010000_01110100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
+    0b00001111_00100000_01110100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
+    0b00001111_01000000_01110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
     // SQSHL (register)
     0b01011110_00100000_01001100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01011110_01100000_01001100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_01001100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_11100000_01001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_01001100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_01001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01001100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_01001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqshlu" = [
     0b01111111_00001000_01100100_00000000 = [B, B, Imm] => [R(0), R(5), Ubits(16, 3)];
     0b01111111_00010000_01100100_00000000 = [H, H, Imm] => [R(0), R(5), Ubits(16, 4)];
     0b01111111_00100000_01100100_00000000 = [S, S, Imm] => [R(0), R(5), Ubits(16, 5)];
     0b01111111_01000000_01100100_00000000 = [D, D, Imm] => [R(0), R(5), Ubits(16, 6)];
-    0b00101111_00001000_01100100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
-    0b00101111_00010000_01100100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
-    0b00101111_00100000_01100100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
-    0b00101111_01000000_01100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
+    0b00101111_00001000_01100100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
+    0b00101111_00010000_01100100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
+    0b00101111_00100000_01100100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
+    0b00101111_01000000_01100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
 ]
 "sqshrn" = [
     0b01011111_00000000_10010100_00000000 = [B, H, Imm] => [R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)];
     0b01011111_00000000_10010100_00000000 = [H, S, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01011111_00000000_10010100_00000000 = [S, D, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
-    0b00001111_00001000_10010100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00001111_00010000_10010100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00001111_00100000_10010100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00001111_00001000_10010100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00001111_00010000_10010100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00001111_00100000_10010100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqshrn2" = [
-    0b01001111_00001000_10010100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01001111_00010000_10010100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01001111_00100000_10010100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01001111_00001000_10010100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01001111_00010000_10010100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01001111_00100000_10010100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqshrun" = [
     0b01111111_00000000_10000100_00000000 = [B, H, Imm] => [R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)];
     0b01111111_00000000_10000100_00000000 = [H, S, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01111111_00000000_10000100_00000000 = [S, D, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
-    0b00101111_00001000_10000100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00101111_00010000_10000100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00101111_00100000_10000100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00101111_00001000_10000100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00101111_00010000_10000100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00101111_00100000_10000100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqshrun2" = [
-    0b01101111_00001000_10000100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01101111_00010000_10000100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01101111_00100000_10000100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01101111_00001000_10000100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01101111_00010000_10000100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01101111_00100000_10000100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "sqsub" = [
     0b01011110_00100000_00101100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01011110_01100000_00101100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01011110_10100000_00101100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01011110_11100000_00101100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_00101100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_00101100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00101100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_00101100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sqxtn" = [
     0b01011110_00100001_01001000_00000000 = [B, H] => [R(0), R(5)];
     0b01011110_01100001_01001000_00000000 = [H, S] => [R(0), R(5)];
     0b01011110_10100001_01001000_00000000 = [S, D] => [R(0), R(5)];
-    0b00001110_00100001_01001000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b00001110_01100001_01001000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b00001110_10100001_01001000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b00001110_00100001_01001000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b00001110_01100001_01001000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b00001110_10100001_01001000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "sqxtn2" = [
-    0b01001110_00100001_01001000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01001110_01100001_01001000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b01001110_10100001_01001000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01001110_00100001_01001000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01001110_01100001_01001000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01001110_10100001_01001000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "sqxtun" = [
     0b01111110_00100001_00101000_00000000 = [B, H] => [R(0), R(5)];
     0b01111110_01100001_00101000_00000000 = [H, S] => [R(0), R(5)];
     0b01111110_10100001_00101000_00000000 = [S, D] => [R(0), R(5)];
-    0b00101110_00100001_00101000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b00101110_01100001_00101000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b00101110_10100001_00101000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b00101110_00100001_00101000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b00101110_01100001_00101000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b00101110_10100001_00101000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "sqxtun2" = [
-    0b01101110_00100001_00101000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01101110_01100001_00101000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b01101110_10100001_00101000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01101110_00100001_00101000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01101110_01100001_00101000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01101110_10100001_00101000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "srhadd" = [
-    0b00001110_00100000_00010100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_00010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_00010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_00010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_00010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_00010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sri" = [
     0b01111111_00000000_01000100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00001000_01000100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00101111_00010000_01000100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_01000100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_01000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00001000_01000100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00101111_00010000_01000100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_01000100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_01000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "srshl" = [
     0b01011110_11100000_01010100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_01010100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_01010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_01010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "srshr" = [
     0b01011111_00000000_00100100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00001111_00001000_00100100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00001111_00010000_00100100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00001111_00100000_00100100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00001111_01000000_00100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00001111_00001000_00100100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00001111_00010000_00100100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00001111_00100000_00100100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00001111_01000000_00100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "srsra" = [
     0b01011111_00000000_00110100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00001111_00001000_00110100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00001111_00010000_00110100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00001111_00100000_00110100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00001111_01000000_00110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00001111_00001000_00110100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00001111_00010000_00110100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00001111_00100000_00110100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00001111_01000000_00110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "ssbb" = [
     0b11010101_00000011_00110000_10011111 = [] => [];
 ]
 "sshl" = [
     0b01011110_11100000_01000100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00001110_00100000_01000100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01100000_01000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10100000_01000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11100000_01000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00100000_01000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01100000_01000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10100000_01000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11100000_01000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "sshll" = [
-    0b00001111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), Imm] => [R(0), R(5), Ubits(16, 3)];
-    0b00001111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), Imm] => [R(0), R(5), Ubits(16, 4)];
-    0b00001111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), Imm] => [R(0), R(5), Ubits(16, 5)];
+    0b00001111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), Imm] => [R(0), R(5), Ubits(16, 3)];
+    0b00001111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), Imm] => [R(0), R(5), Ubits(16, 4)];
+    0b00001111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), Imm] => [R(0), R(5), Ubits(16, 5)];
 ]
 "sshll2" = [
-    0b01001111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), Imm] => [R(0), R(5), Ubits(16, 3)];
-    0b01001111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Ubits(16, 4)];
-    0b01001111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Ubits(16, 5)];
+    0b01001111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), Imm] => [R(0), R(5), Ubits(16, 3)];
+    0b01001111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), Imm] => [R(0), R(5), Ubits(16, 4)];
+    0b01001111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), Imm] => [R(0), R(5), Ubits(16, 5)];
 ]
 "sshr" = [
     0b01011111_00000000_00000100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00001111_00001000_00000100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00001111_00010000_00000100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00001111_00100000_00000100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00001111_01000000_00000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00001111_00001000_00000100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00001111_00010000_00000100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00001111_00100000_00000100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00001111_01000000_00000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "ssra" = [
     0b01011111_00000000_00010100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00001111_00001000_00010100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00001111_00010000_00010100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00001111_00100000_00010100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00001111_01000000_00010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00001111_00001000_00010100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00001111_00010000_00010100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00001111_00100000_00010100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00001111_01000000_00010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "ssubl" = [
-    0b00001110_00100000_00100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_00100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "ssubl2" = [
-    0b01001110_00100000_00100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_00100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "ssubw" = [
-    0b00001110_00100000_00110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_00110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_00110000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_00110000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "ssubw2" = [
-    0b01001110_00100000_00110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_00110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_00110000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_00110000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "st1" = [
     // ST1 (multiple structures)
@@ -3297,160 +3297,160 @@ Ops!(map ;
     0b00001100_00000000_00100100_00000000 = [RegList(4, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_00101000_00000000 = [RegList(4, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_00101100_00000000 = [RegList(4, QWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_10011111_01110000_00000000 = [RegListSized(1, BYTE, 8), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b00001100_10011111_01110100_00000000 = [RegListSized(1, WORD, 4), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b00001100_10011111_01111000_00000000 = [RegListSized(1, DWORD, 2), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b00001100_10011111_01111100_00000000 = [RegListSized(1, QWORD, 1), RefBase, LitInt(8)] => [R(0), R(5)];
-    0b01001100_10011111_01110000_00000000 = [RegListSized(1, BYTE, 16), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_10011111_01110100_00000000 = [RegListSized(1, WORD, 8), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_10011111_01111000_00000000 = [RegListSized(1, DWORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_10011111_01111100_00000000 = [RegListSized(1, QWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_10011111_01110000_00000000 = [RegListStatic(1, BYTE, 8), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b00001100_10011111_01110100_00000000 = [RegListStatic(1, WORD, 4), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b00001100_10011111_01111000_00000000 = [RegListStatic(1, DWORD, 2), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b00001100_10011111_01111100_00000000 = [RegListStatic(1, QWORD, 1), RefBase, LitInt(8)] => [R(0), R(5)];
+    0b01001100_10011111_01110000_00000000 = [RegListStatic(1, BYTE, 16), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_10011111_01110100_00000000 = [RegListStatic(1, WORD, 8), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_10011111_01111000_00000000 = [RegListStatic(1, DWORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_10011111_01111100_00000000 = [RegListStatic(1, QWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
     0b00001100_10000000_01110000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01110100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01111000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01111100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10011111_10100000_00000000 = [RegListSized(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_10011111_10100100_00000000 = [RegListSized(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_10011111_10101000_00000000 = [RegListSized(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_10011111_10101100_00000000 = [RegListSized(2, QWORD, 1), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_10011111_10100000_00000000 = [RegListSized(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_10100100_00000000 = [RegListSized(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_10101000_00000000 = [RegListSized(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_10101100_00000000 = [RegListSized(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_10011111_10100000_00000000 = [RegListStatic(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_10011111_10100100_00000000 = [RegListStatic(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_10011111_10101000_00000000 = [RegListStatic(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_10011111_10101100_00000000 = [RegListStatic(2, QWORD, 1), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_10011111_10100000_00000000 = [RegListStatic(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_10100100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_10101000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_10101100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_10000000_10100000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_10100100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_10101000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_10101100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10011111_01100000_00000000 = [RegListSized(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_10011111_01100100_00000000 = [RegListSized(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_10011111_01101000_00000000 = [RegListSized(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_10011111_01101100_00000000 = [RegListSized(3, QWORD, 1), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b01001100_10011111_01100000_00000000 = [RegListSized(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_10011111_01100100_00000000 = [RegListSized(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_10011111_01101000_00000000 = [RegListSized(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_10011111_01101100_00000000 = [RegListSized(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b00001100_10011111_01100000_00000000 = [RegListStatic(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_10011111_01100100_00000000 = [RegListStatic(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_10011111_01101000_00000000 = [RegListStatic(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_10011111_01101100_00000000 = [RegListStatic(3, QWORD, 1), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b01001100_10011111_01100000_00000000 = [RegListStatic(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_10011111_01100100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_10011111_01101000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_10011111_01101100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
     0b00001100_10000000_01100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10011111_00100000_00000000 = [RegListSized(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10011111_00100100_00000000 = [RegListSized(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10011111_00101000_00000000 = [RegListSized(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10011111_00101100_00000000 = [RegListSized(4, QWORD, 1), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_00100000_00000000 = [RegListSized(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_10011111_00100100_00000000 = [RegListSized(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_10011111_00101000_00000000 = [RegListSized(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_10011111_00101100_00000000 = [RegListSized(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b00001100_10011111_00100000_00000000 = [RegListStatic(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_10011111_00100100_00000000 = [RegListStatic(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_10011111_00101000_00000000 = [RegListStatic(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_10011111_00101100_00000000 = [RegListStatic(4, QWORD, 1), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_00100000_00000000 = [RegListStatic(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_10011111_00100100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_10011111_00101000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_10011111_00101100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
     0b00001100_10000000_00100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_00100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_00101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_00101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // ST1 (single structure)
-    0b00001101_00000000_00000000_00000000 = [RegListLanes(1, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_00000000_01000000_00000000 = [RegListLanes(1, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_00000000_10000000_00000000 = [RegListLanes(1, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_00000000_10000100_00000000 = [RegListLanes(1, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10011111_00000000_00000000 = [RegListLanes(1, BYTE), RefBase, LitInt(1)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10000000_00000000_00000000 = [RegListLanes(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_10011111_01000000_00000000 = [RegListLanes(1, WORD), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10000000_01000000_00000000 = [RegListLanes(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_10011111_10000000_00000000 = [RegListLanes(1, DWORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10000000_10000000_00000000 = [RegListLanes(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_10011111_10000100_00000000 = [RegListLanes(1, QWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10000000_10000100_00000000 = [RegListLanes(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_00000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_00000000_01000000_00000000 = [RegListElement(1, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_00000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_00000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10011111_00000000_00000000 = [RegListElement(1, BYTE), RefBase, LitInt(1)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_10000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10011111_01000000_00000000 = [RegListElement(1, WORD), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_10000000_01000000_00000000 = [RegListElement(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10011111_10000000_00000000 = [RegListElement(1, DWORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_10000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10011111_10000100_00000000 = [RegListElement(1, QWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "st2" = [
     // ST2 (multiple structures)
     0b00001100_00000000_10000000_00000000 = [RegList(2, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_10000100_00000000 = [RegList(2, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_10001000_00000000 = [RegList(2, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_00000000_10001100_00000000 = [RegListSized(2, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_10011111_10000000_00000000 = [RegListSized(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_10011111_10000100_00000000 = [RegListSized(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_10011111_10001000_00000000 = [RegListSized(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b01001100_10011111_10000000_00000000 = [RegListSized(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_10000100_00000000 = [RegListSized(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_10001000_00000000 = [RegListSized(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_10001100_00000000 = [RegListSized(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_00000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
+    0b00001100_10011111_10000000_00000000 = [RegListStatic(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_10011111_10000100_00000000 = [RegListStatic(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b00001100_10011111_10001000_00000000 = [RegListStatic(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
+    0b01001100_10011111_10000000_00000000 = [RegListStatic(2, BYTE, 16), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_10000100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_10001000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_10000000_10000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_10000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_10001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10001100_00000000 = [RegListSized(2, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // ST2 (single structure)
-    0b00001101_00100000_00000000_00000000 = [RegListLanes(2, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_00100000_01000000_00000000 = [RegListLanes(2, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_00100000_10000000_00000000 = [RegListLanes(2, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_00100000_10000100_00000000 = [RegListLanes(2, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10111111_00000000_00000000 = [RegListLanes(2, BYTE), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10100000_00000000_00000000 = [RegListLanes(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_10111111_01000000_00000000 = [RegListLanes(2, WORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10100000_01000000_00000000 = [RegListLanes(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_10111111_10000000_00000000 = [RegListLanes(2, DWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10100000_10000000_00000000 = [RegListLanes(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_10111111_10000100_00000000 = [RegListLanes(2, QWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10100000_10000100_00000000 = [RegListLanes(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_00100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_00100000_01000000_00000000 = [RegListElement(2, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_00100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_00100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10111111_00000000_00000000 = [RegListElement(2, BYTE), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_10100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10111111_01000000_00000000 = [RegListElement(2, WORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_10100000_01000000_00000000 = [RegListElement(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10111111_10000000_00000000 = [RegListElement(2, DWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_10100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10111111_10000100_00000000 = [RegListElement(2, QWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "st3" = [
     // ST3 (multiple structures)
     0b00001100_00000000_01000000_00000000 = [RegList(3, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_01000100_00000000 = [RegList(3, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_01001000_00000000 = [RegList(3, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_00000000_01001100_00000000 = [RegListSized(3, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_10011111_01000000_00000000 = [RegListSized(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_10011111_01000100_00000000 = [RegListSized(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b00001100_10011111_01001000_00000000 = [RegListSized(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
-    0b01001100_10011111_01000000_00000000 = [RegListSized(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_10011111_01000100_00000000 = [RegListSized(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_10011111_01001000_00000000 = [RegListSized(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b01001100_10011111_01001100_00000000 = [RegListSized(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b00001100_00000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
+    0b00001100_10011111_01000000_00000000 = [RegListStatic(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_10011111_01000100_00000000 = [RegListStatic(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b00001100_10011111_01001000_00000000 = [RegListStatic(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
+    0b01001100_10011111_01000000_00000000 = [RegListStatic(3, BYTE, 16), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_10011111_01000100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_10011111_01001000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
+    0b01001100_10011111_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
     0b00001100_10000000_01000000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01000100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_01001000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01001100_00000000 = [RegListSized(3, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // ST3 (single structure)
-    0b00001101_00000000_00100000_00000000 = [RegListLanes(3, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_00000000_01100000_00000000 = [RegListLanes(3, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_00000000_10100000_00000000 = [RegListLanes(3, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_00000000_10100100_00000000 = [RegListLanes(3, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10011111_00100000_00000000 = [RegListLanes(3, BYTE), RefBase, LitInt(3)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10000000_00100000_00000000 = [RegListLanes(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_10011111_01100000_00000000 = [RegListLanes(3, WORD), RefBase, LitInt(6)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10000000_01100000_00000000 = [RegListLanes(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_10011111_10100000_00000000 = [RegListLanes(3, DWORD), RefBase, LitInt(12)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10000000_10100000_00000000 = [RegListLanes(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_10011111_10100100_00000000 = [RegListLanes(3, QWORD), RefBase, LitInt(24)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10000000_10100100_00000000 = [RegListLanes(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_00000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_00000000_01100000_00000000 = [RegListElement(3, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_00000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_00000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10011111_00100000_00000000 = [RegListElement(3, BYTE), RefBase, LitInt(3)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_10000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10011111_01100000_00000000 = [RegListElement(3, WORD), RefBase, LitInt(6)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_10000000_01100000_00000000 = [RegListElement(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10011111_10100000_00000000 = [RegListElement(3, DWORD), RefBase, LitInt(12)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_10000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10011111_10100100_00000000 = [RegListElement(3, QWORD), RefBase, LitInt(24)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "st4" = [
     // ST4 (multiple structures)
     0b00001100_00000000_00000000_00000000 = [RegList(4, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_00000100_00000000 = [RegList(4, WORD), RefBase] => [R(0), R(5), Rwidth(30)];
     0b00001100_00000000_00001000_00000000 = [RegList(4, DWORD), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_00000000_00001100_00000000 = [RegListSized(4, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
-    0b00001100_10011111_00000000_00000000 = [RegListSized(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10011111_00000100_00000000 = [RegListSized(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10011111_00001000_00000000 = [RegListSized(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b01001100_10011111_00000000_00000000 = [RegListSized(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_10011111_00000100_00000000 = [RegListSized(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_10011111_00001000_00000000 = [RegListSized(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b01001100_10011111_00001100_00000000 = [RegListSized(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b00001100_00000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase] => [R(0), R(5), Rwidth(30)];
+    0b00001100_10011111_00000000_00000000 = [RegListStatic(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_10011111_00000100_00000000 = [RegListStatic(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b00001100_10011111_00001000_00000000 = [RegListStatic(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
+    0b01001100_10011111_00000000_00000000 = [RegListStatic(4, BYTE, 16), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_10011111_00000100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_10011111_00001000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
+    0b01001100_10011111_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
     0b00001100_10000000_00000000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_00000100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     0b00001100_10000000_00001000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00001100_00000000 = [RegListSized(4, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
     // ST4 (single structure)
-    0b00001101_00100000_00100000_00000000 = [RegListLanes(4, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_00100000_01100000_00000000 = [RegListLanes(4, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_00100000_10100000_00000000 = [RegListLanes(4, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_00100000_10100100_00000000 = [RegListLanes(4, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10111111_00100000_00000000 = [RegListLanes(4, BYTE), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10100000_00100000_00000000 = [RegListLanes(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
-    0b00001101_10111111_01100000_00000000 = [RegListLanes(4, WORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10100000_01100000_00000000 = [RegListLanes(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
-    0b00001101_10111111_10100000_00000000 = [RegListLanes(4, DWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10100000_10100000_00000000 = [RegListLanes(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
-    0b00001101_10111111_10100100_00000000 = [RegListLanes(4, QWORD), RefBase, LitInt(32)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10100000_10100100_00000000 = [RegListLanes(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_00100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_00100000_01100000_00000000 = [RegListElement(4, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_00100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_00100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10111111_00100000_00000000 = [RegListElement(4, BYTE), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
+    0b00001101_10100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10111111_01100000_00000000 = [RegListElement(4, WORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
+    0b00001101_10100000_01100000_00000000 = [RegListElement(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10111111_10100000_00000000 = [RegListElement(4, DWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30, 12]), R(5)];
+    0b00001101_10100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10111111_10100100_00000000 = [RegListElement(4, QWORD), RefBase, LitInt(32)] => [R(0), Ufields(&[30]), R(5)];
+    0b00001101_10100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
 ]
 "stadd" = [
     0b10111000_00100000_00000000_00011111 = [W, RefBase] => [R(16), R(5)];
@@ -3788,20 +3788,20 @@ Ops!(map ;
     0b11010001_00000000_00000000_00000000 = [XSP, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
     // SUB (vector)
     0b01111110_11100000_10000100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_10000100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_10000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_10000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_10000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_10000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_10000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_10000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_10000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "subhn" = [
-    0b00001110_00100000_01100000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b00001110_01100000_01100000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b00001110_10100000_01100000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b00001110_00100000_01100000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b00001110_01100000_01100000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b00001110_10100000_01100000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "subhn2" = [
-    0b01001110_00100000_01100000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01001110_01100000_01100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
-    0b01001110_10100000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16)];
+    0b01001110_00100000_01100000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01001110_01100000_01100000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01001110_10100000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "subs" = [
     // SUBS (shifted register)
@@ -3820,10 +3820,10 @@ Ops!(map ;
     0b01011110_01100000_00111000_00000000 = [H, H] => [R(0), R(5)];
     0b01011110_10100000_00111000_00000000 = [S, S] => [R(0), R(5)];
     0b01011110_11100000_00111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00001110_00100000_00111000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01100000_00111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10100000_00111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100000_00111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00100000_00111000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01100000_00111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100000_00111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100000_00111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "svc" = [
     0b11010100_00000000_00000000_00000001 = [Imm] => [Ubits(5, 16)];
@@ -3877,14 +3877,14 @@ Ops!(map ;
     0b10010011_01000000_00111100_00000000 = [X, W] => [R(0), R(5)];
 ]
 "sxtl" = [
-    0b00001111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5)];
-    0b00001111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5)];
-    0b00001111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5)];
+    0b00001111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5)];
+    0b00001111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5)];
+    0b00001111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5)];
 ]
 "sxtl2" = [
-    0b01001111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16)] => [R(0), R(5)];
-    0b01001111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01001111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01001111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16)] => [R(0), R(5)];
+    0b01001111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01001111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5)];
 ]
 "sxtw" = [
     0b10010011_01000000_01111100_00000000 = [X, W] => [R(0), R(5)];
@@ -3896,20 +3896,20 @@ Ops!(map ;
     0b11010101_00101000_00000000_00000000 = [X, Imm, Ident, Ident, Imm, End] => [R(0), Ubits(16, 3), LitList(12, "CONTROL_REGS"), LitList(8, "CONTROL_REGS"), Ubits(5, 3)];
 ]
 "tbl" = [
-    0b00001110_00000000_00100000_00000000 = [VSized(BYTE), RegListSized(2, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00000000_01000000_00000000 = [VSized(BYTE), RegListSized(3, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00000000_01100000_00000000 = [VSized(BYTE), RegListSized(4, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00000000_00000000_00000000 = [VSized(BYTE), RegListSized(1, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00100000_00000000 = [V(BYTE), RegListStatic(2, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01000000_00000000 = [V(BYTE), RegListStatic(3, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01100000_00000000 = [V(BYTE), RegListStatic(4, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00000000_00000000 = [V(BYTE), RegListStatic(1, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "tbnz" = [
     0b00110111_00000000_00000000_00000000 = [W, Imm, Offset] => [R(0), Ubits(19, 5), Sscaled(5, 14, 2)];
     0b00110111_00000000_00000000_00000000 = [X, Imm, Offset] => [R(0), BUbits(6), BUslice(19, 5, 0), BUslice(31, 1, 5), A, Sscaled(5, 14, 2)];
 ]
 "tbx" = [
-    0b00001110_00000000_00110000_00000000 = [VSized(BYTE), RegListSized(2, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00000000_01010000_00000000 = [VSized(BYTE), RegListSized(3, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00000000_01110000_00000000 = [VSized(BYTE), RegListSized(4, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_00000000_00010000_00000000 = [VSized(BYTE), RegListSized(1, BYTE, 16), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00110000_00000000 = [V(BYTE), RegListStatic(2, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01010000_00000000 = [V(BYTE), RegListStatic(3, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01110000_00000000 = [V(BYTE), RegListStatic(4, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00010000_00000000 = [V(BYTE), RegListStatic(1, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "tbz" = [
     0b00110110_00000000_00000000_00000000 = [W, Imm, Offset] => [R(0), Ubits(19, 5), Sscaled(5, 14, 2)];
@@ -3919,16 +3919,16 @@ Ops!(map ;
     0b11010101_00001000_10000000_00000000 = [Ident, End, X] => [LitList(5, "TLBI_OPS"), R(0)];
 ]
 "trn1" = [
-    0b00001110_00000000_00101000_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01000000_00101000_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10000000_00101000_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11000000_00101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00101000_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00101000_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10000000_00101000_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "trn2" = [
-    0b00001110_00000000_01101000_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01000000_01101000_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10000000_01101000_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11000000_01101000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01101000_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_01101000_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10000000_01101000_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_01101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "tsb" = [
     0b11010101_00000011_00100010_01011111 = [Lit("CSYNC")] => [];
@@ -3942,69 +3942,69 @@ Ops!(map ;
     0b11101010_00000000_00000000_00011111 = [X, X, End, Mod(ROTATES)] => [R(5), R(16), Rotates(22), Ubits(10, 6)];
 ]
 "uaba" = [
-    0b00101110_00100000_01111100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01111100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01111100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01111100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01111100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01111100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uabal" = [
-    0b00101110_00100000_01010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_01010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_01010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_01010000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_01010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_01010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "uabal2" = [
-    0b01101110_00100000_01010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_01010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_01010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_01010000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_01010000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_01010000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "uabd" = [
-    0b00101110_00100000_01110100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01110100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01110100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01110100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01110100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01110100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uabdl" = [
-    0b00101110_00100000_01110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_01110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_01110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_01110000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_01110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_01110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "uabdl2" = [
-    0b01101110_00100000_01110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_01110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_01110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_01110000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_01110000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_01110000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "uadalp" = [
-    0b00101110_00100000_01101000_00000000 = [VSized(WORD), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_01101000_00000000 = [VSized(DWORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_01101000_00000000 = [VSized(QWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01101000_00000000 = [V(WORD), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_01101000_00000000 = [V(DWORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_01101000_00000000 = [V(QWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "uaddl" = [
-    0b00101110_00100000_00000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_00000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_00000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_00000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_00000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "uaddl2" = [
-    0b01101110_00100000_00000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_00000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_00000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_00000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_00000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "uaddlp" = [
-    0b00101110_00100000_00101000_00000000 = [VSized(WORD), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_00101000_00000000 = [VSized(DWORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_00101000_00000000 = [VSized(QWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_00101000_00000000 = [V(WORD), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_00101000_00000000 = [V(DWORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_00101000_00000000 = [V(QWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "uaddlv" = [
-    0b00101110_00110000_00111000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01110000_00111000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10110000_00111000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00110000_00111000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01110000_00111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10110000_00111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "uaddw" = [
-    0b00101110_00100000_00010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_00010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_00010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_00010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "uaddw2" = [
-    0b01101110_00100000_00010000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_00010000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_00010000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_00010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "ubfiz" = [
     0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Usub(16, 5, 32), Urange(10, 1, 32)];
@@ -4023,16 +4023,16 @@ Ops!(map ;
     0b01111111_00000000_11100100_00000000 = [H, H, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01111111_00000000_11100100_00000000 = [S, S, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
     0b01111111_00000000_11100100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00010000_11100100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_11100100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_11100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00010000_11100100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_11100100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30)];
     // UCVTF (vector, integer)
     0b01111110_01111001_11011000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_00100001_11011000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_01100001_11011000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_01111001_11011000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_00100001_11011000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100001_11011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01111001_11011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100001_11011000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100001_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // UCVTF (scalar, fixed-point)
     0b00011110_11000011_00000000_00000000 = [H, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b00011110_00000011_00000000_00000000 = [S, W, Imm] => [R(0), R(5), Usub(10, 6, 64)];
@@ -4057,100 +4057,100 @@ Ops!(map ;
 ]
 "udot" = [
     // UDOT (by element)
-    0b00101111_10000000_11100000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(BYTE, 8), VLanes(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01101111_10000000_11100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(BYTE, 16), VLanes(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_10000000_11100000_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01101111_10000000_11100000_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UDOT (vector)
-    0b00101110_10000000_10010100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10000000_10010100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b00101110_10000000_10010100_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10000000_10010100_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
 ]
 "uhadd" = [
-    0b00101110_00100000_00000100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uhsub" = [
-    0b00101110_00100000_00100100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00100100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "umaddl" = [
     0b10011011_10100000_00000000_00000000 = [X, W, W, X] => [R(0), R(5), R(16), R(10)];
 ]
 "umax" = [
-    0b00101110_00100000_01100100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01100100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "umaxp" = [
-    0b00101110_00100000_10100100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_10100100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_10100100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_10100100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_10100100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_10100100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "umaxv" = [
-    0b00101110_00110000_10101000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01110000_10101000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10110000_10101000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00110000_10101000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01110000_10101000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10110000_10101000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "umin" = [
-    0b00101110_00100000_01101100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01101100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uminp" = [
-    0b00101110_00100000_10101100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_10101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_10101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_10101100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_10101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_10101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uminv" = [
-    0b00101110_00110001_10101000_00000000 = [B, VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01110001_10101000_00000000 = [H, VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10110001_10101000_00000000 = [S, VSizedStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00110001_10101000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01110001_10101000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10110001_10101000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "umlal" = [
     // UMLAL, UMLAL2 (by element)
-    0b00101111_01000000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00101111_10000000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_01000000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UMLAL, UMLAL2 (vector)
-    0b00101110_00100000_10000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_10000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_10000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_10000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_10000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "umlal2" = [
     // UMLAL, UMLAL2 (by element)
-    0b01101111_01000000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01101111_01000000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UMLAL, UMLAL2 (vector)
-    0b01101110_00100000_10000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_10000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_10000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_10000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_10000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "umlsl" = [
     // UMLSL, UMLSL2 (by element)
-    0b00101111_01000000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00101111_10000000_01100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_01000000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_01100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UMLSL, UMLSL2 (vector)
-    0b00101110_00100000_10100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_10100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "umlsl2" = [
     // UMLSL, UMLSL2 (by element)
-    0b01101111_01000000_01100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_01100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01101111_01000000_01100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_01100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UMLSL, UMLSL2 (vector)
-    0b01101110_00100000_10100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_10100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "umnegl" = [
     0b10011011_10100000_11111100_00000000 = [X, W, W] => [R(0), R(5), R(16)];
 ]
 "umov" = [
-    0b00001110_00000001_00111100_00000000 = [W, VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b00001110_00000010_00111100_00000000 = [W, VLanes(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01001110_00000001_00111100_00000000 = [X, VLanes(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b01001110_00000010_00111100_00000000 = [X, VLanes(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01001110_00000100_00111100_00000000 = [X, VLanes(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b00001110_00000001_00111100_00000000 = [W, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
+    0b00001110_00000010_00111100_00000000 = [W, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
+    0b01001110_00001001_00111100_00000000 = [X, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
+    0b01001110_00001010_00111100_00000000 = [X, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
+    0b01001110_00001100_00111100_00000000 = [X, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
 ]
 "umsubl" = [
     0b10011011_10100000_10000000_00000000 = [X, W, W, X] => [R(0), R(5), R(16), R(10)];
@@ -4160,56 +4160,56 @@ Ops!(map ;
 ]
 "umull" = [
     // UMULL, UMULL2 (by element)
-    0b00101111_01000000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b00101111_10000000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_01000000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UMULL, UMULL2 (vector)
-    0b00101110_00100000_11000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_11000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_11000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_11000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_11000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
     // UMULL
     0b10011011_10100000_01111100_00000000 = [X, W, W] => [R(0), R(5), R(16)];
 ]
 "umull2" = [
     // UMULL, UMULL2 (by element)
-    0b01101111_01000000_10100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VLanes(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_10100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VLanes(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01101111_01000000_10100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_10100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VElement(DWORD)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UMULL, UMULL2 (vector)
-    0b01101110_00100000_11000000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_11000000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_11000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_11000000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_11000000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "uqadd" = [
     0b01111110_00100000_00001100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01111110_01100000_00001100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_00001100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_00001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_00001100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_00001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00001100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_00001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uqrshl" = [
     0b01111110_00100000_01011100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01111110_01100000_01011100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_01011100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_01011100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_01011100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01011100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01011100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_01011100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01011100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01011100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_01011100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uqrshrn" = [
     0b01111111_00000000_10011100_00000000 = [B, H, Imm] => [R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)];
     0b01111111_00000000_10011100_00000000 = [H, S, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01111111_00000000_10011100_00000000 = [S, D, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
-    0b00101111_00001000_10011100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00101111_00010000_10011100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00101111_00100000_10011100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00101111_00001000_10011100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00101111_00010000_10011100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00101111_00100000_10011100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "uqrshrn2" = [
-    0b01101111_00001000_10011100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01101111_00010000_10011100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01101111_00100000_10011100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01101111_00001000_10011100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01101111_00010000_10011100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01101111_00100000_10011100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "uqshl" = [
     // UQSHL (immediate)
@@ -4217,150 +4217,150 @@ Ops!(map ;
     0b01111111_00010000_01110100_00000000 = [H, H, Imm] => [R(0), R(5), Ubits(16, 4)];
     0b01111111_00100000_01110100_00000000 = [S, S, Imm] => [R(0), R(5), Ubits(16, 5)];
     0b01111111_01000000_01110100_00000000 = [D, D, Imm] => [R(0), R(5), Ubits(16, 6)];
-    0b00101111_00001000_01110100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
-    0b00101111_00010000_01110100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
-    0b00101111_00100000_01110100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
-    0b00101111_01000000_01110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
+    0b00101111_00001000_01110100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Ubits(16, 3), Rwidth(30)];
+    0b00101111_00010000_01110100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Ubits(16, 4), Rwidth(30)];
+    0b00101111_00100000_01110100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Ubits(16, 5), Rwidth(30)];
+    0b00101111_01000000_01110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Ubits(16, 6), Rwidth(30)];
     // UQSHL (register)
     0b01111110_00100000_01001100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01111110_01100000_01001100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_01001100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_01001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_01001100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01001100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01001100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_01001100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01001100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01001100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01001100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_01001100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uqshrn" = [
     0b01111111_00000000_10010100_00000000 = [B, H, Imm] => [R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)];
     0b01111111_00000000_10010100_00000000 = [H, S, Imm] => [R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)];
     0b01111111_00000000_10010100_00000000 = [S, D, Imm] => [R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)];
-    0b00101111_00001000_10010100_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b00101111_00010000_10010100_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b00101111_00100000_10010100_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b00101111_00001000_10010100_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b00101111_00010000_10010100_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b00101111_00100000_10010100_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "uqshrn2" = [
-    0b01101111_00001000_10010100_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
-    0b01101111_00010000_10010100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
-    0b01101111_00100000_10010100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
+    0b01101111_00001000_10010100_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8), Imm] => [R(0), R(5), Usub(16, 3, 8)];
+    0b01101111_00010000_10010100_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4), Imm] => [R(0), R(5), Usub(16, 4, 16)];
+    0b01101111_00100000_10010100_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 5, 32)];
 ]
 "uqsub" = [
     0b01111110_00100000_00101100_00000000 = [B, B, B] => [R(0), R(5), R(16)];
     0b01111110_01100000_00101100_00000000 = [H, H, H] => [R(0), R(5), R(16)];
     0b01111110_10100000_00101100_00000000 = [S, S, S] => [R(0), R(5), R(16)];
     0b01111110_11100000_00101100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_00101100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00101100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00101100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_00101100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00101100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00101100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00101100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_00101100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uqxtn" = [
     0b01111110_00100001_01001000_00000000 = [B, H] => [R(0), R(5)];
     0b01111110_01100001_01001000_00000000 = [H, S] => [R(0), R(5)];
     0b01111110_10100001_01001000_00000000 = [S, D] => [R(0), R(5)];
-    0b00101110_00100001_01001000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b00101110_01100001_01001000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b00101110_10100001_01001000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b00101110_00100001_01001000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b00101110_01100001_01001000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b00101110_10100001_01001000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "uqxtn2" = [
-    0b01101110_00100001_01001000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01101110_01100001_01001000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b01101110_10100001_01001000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01101110_00100001_01001000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01101110_01100001_01001000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01101110_10100001_01001000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "urecpe" = [
-    0b00001110_10100001_11001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_11001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10100001_11001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_11100001_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "urhadd" = [
-    0b00101110_00100000_00010100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_00010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_00010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_00010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_00010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_00010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "urshl" = [
     0b01111110_11100000_01010100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_01010100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01010100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01010100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_01010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01010100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01010100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_01010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "urshr" = [
     0b01111111_00000000_00100100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00001000_00100100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00101111_00010000_00100100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_00100100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_00100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00001000_00100100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00101111_00010000_00100100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_00100100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_00100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "ursqrte" = [
-    0b00101110_10100001_11001000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_11001000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100001_11001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100001_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "ursra" = [
     0b01111111_00000000_00110100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00001000_00110100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00101111_00010000_00110100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_00110100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_00110100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00001000_00110100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00101111_00010000_00110100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_00110100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_00110100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "ushl" = [
     0b01111110_11100000_01000100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
-    0b00101110_00100000_01000100_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_01100000_01000100_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_10100000_01000100_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00101110_11100000_01000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_00100000_01000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_01100000_01000100_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_10100000_01000100_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00101110_11100000_01000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "ushll" = [
-    0b00101111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), Imm] => [R(0), R(5), Ubits(16, 3)];
-    0b00101111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), Imm] => [R(0), R(5), Ubits(16, 4)];
-    0b00101111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), Imm] => [R(0), R(5), Ubits(16, 5)];
+    0b00101111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), Imm] => [R(0), R(5), Ubits(16, 3)];
+    0b00101111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), Imm] => [R(0), R(5), Ubits(16, 4)];
+    0b00101111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), Imm] => [R(0), R(5), Ubits(16, 5)];
 ]
 "ushll2" = [
-    0b01101111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), Imm] => [R(0), R(5), Ubits(16, 3)];
-    0b01101111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), Imm] => [R(0), R(5), Ubits(16, 4)];
-    0b01101111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), Imm] => [R(0), R(5), Ubits(16, 5)];
+    0b01101111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), Imm] => [R(0), R(5), Ubits(16, 3)];
+    0b01101111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), Imm] => [R(0), R(5), Ubits(16, 4)];
+    0b01101111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), Imm] => [R(0), R(5), Ubits(16, 5)];
 ]
 "ushr" = [
     0b01111111_00000000_00000100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00001000_00000100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00101111_00010000_00000100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_00000100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_00000100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00001000_00000100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00101111_00010000_00000100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_00000100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_00000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "usqadd" = [
     0b01111110_00100000_00111000_00000000 = [B, B] => [R(0), R(5)];
     0b01111110_01100000_00111000_00000000 = [H, H] => [R(0), R(5)];
     0b01111110_10100000_00111000_00000000 = [S, S] => [R(0), R(5)];
     0b01111110_11100000_00111000_00000000 = [D, D] => [R(0), R(5)];
-    0b00101110_00100000_00111000_00000000 = [VSized(BYTE), VSized(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01100000_00111000_00000000 = [VSized(WORD), VSized(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10100000_00111000_00000000 = [VSized(DWORD), VSized(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100000_00111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_00111000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_00111000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10100000_00111000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_11100000_00111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "usra" = [
     0b01111111_00000000_00010100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];
-    0b00101111_00001000_00010100_00000000 = [VSized(BYTE), VSized(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
-    0b00101111_00010000_00010100_00000000 = [VSized(WORD), VSized(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
-    0b00101111_00100000_00010100_00000000 = [VSized(DWORD), VSized(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
-    0b00101111_01000000_00010100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
+    0b00101111_00001000_00010100_00000000 = [V(BYTE), V(BYTE), Imm] => [R(0), R(5), Usub(16, 3, 8), Rwidth(30)];
+    0b00101111_00010000_00010100_00000000 = [V(WORD), V(WORD), Imm] => [R(0), R(5), Usub(16, 4, 16), Rwidth(30)];
+    0b00101111_00100000_00010100_00000000 = [V(DWORD), V(DWORD), Imm] => [R(0), R(5), Usub(16, 5, 32), Rwidth(30)];
+    0b00101111_01000000_00010100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), Usub(16, 6, 64), Rwidth(30)];
 ]
 "usubl" = [
-    0b00101110_00100000_00100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_00100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "usubl2" = [
-    0b01101110_00100000_00100000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_00100000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_00100000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_00100000_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_00100000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_00100000_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "usubw" = [
-    0b00101110_00100000_00110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5), R(16)];
-    0b00101110_01100000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5), R(16)];
-    0b00101110_10100000_00110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5), R(16)];
+    0b00101110_00100000_00110000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
+    0b00101110_01100000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
+    0b00101110_10100000_00110000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5), R(16)];
 ]
 "usubw2" = [
-    0b01101110_00100000_00110000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16)] => [R(0), R(5), R(16)];
-    0b01101110_01100000_00110000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5), R(16)];
-    0b01101110_10100000_00110000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5), R(16)];
+    0b01101110_00100000_00110000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
+    0b01101110_01100000_00110000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5), R(16)];
+    0b01101110_10100000_00110000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "uxtb" = [
     0b01010011_00000000_00011100_00000000 = [W, W] => [R(0), R(5)];
@@ -4369,26 +4369,26 @@ Ops!(map ;
     0b01010011_00000000_00111100_00000000 = [W, W] => [R(0), R(5)];
 ]
 "uxtl" = [
-    0b00101111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 8)] => [R(0), R(5)];
-    0b00101111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 4)] => [R(0), R(5)];
-    0b00101111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 2)] => [R(0), R(5)];
+    0b00101111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5)];
+    0b00101111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4)] => [R(0), R(5)];
+    0b00101111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 2)] => [R(0), R(5)];
 ]
 "uxtl2" = [
-    0b01101111_00001000_10100100_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(BYTE, 16)] => [R(0), R(5)];
-    0b01101111_00010000_10100100_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01101111_00100000_10100100_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01101111_00001000_10100100_00000000 = [VStatic(WORD, 8), VStatic(BYTE, 16)] => [R(0), R(5)];
+    0b01101111_00010000_10100100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01101111_00100000_10100100_00000000 = [VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5)];
 ]
 "uzp1" = [
-    0b00001110_00000000_00011000_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01000000_00011000_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10000000_00011000_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11000000_00011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00011000_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00011000_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10000000_00011000_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "uzp2" = [
-    0b00001110_00000000_01011000_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01000000_01011000_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10000000_01011000_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11000000_01011000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01011000_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_01011000_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10000000_01011000_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_01011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "wfe" = [
     0b11010101_00000011_00100000_01011111 = [] => [];
@@ -4397,7 +4397,7 @@ Ops!(map ;
     0b11010101_00000011_00100000_01111111 = [] => [];
 ]
 "xar" = [
-    0b11001110_10000000_00000000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Ubits(10, 6)];
+    0b11001110_10000000_00000000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Ubits(10, 6)];
 ]
 "xpacd" = [
     0b11011010_11000001_01000111_11100000 = [X] => [R(0)];
@@ -4409,29 +4409,29 @@ Ops!(map ;
     0b11010101_00000011_00100000_11111111 = [] => [];
 ]
 "xtn" = [
-    0b00001110_00100001_00101000_00000000 = [VSizedStatic(BYTE, 8), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b00001110_01100001_00101000_00000000 = [VSizedStatic(WORD, 4), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b00001110_10100001_00101000_00000000 = [VSizedStatic(DWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b00001110_00100001_00101000_00000000 = [VStatic(BYTE, 8), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b00001110_01100001_00101000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b00001110_10100001_00101000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "xtn2" = [
-    0b01001110_00100001_00101000_00000000 = [VSizedStatic(BYTE, 16), VSizedStatic(WORD, 8)] => [R(0), R(5)];
-    0b01001110_01100001_00101000_00000000 = [VSizedStatic(WORD, 8), VSizedStatic(DWORD, 4)] => [R(0), R(5)];
-    0b01001110_10100001_00101000_00000000 = [VSizedStatic(DWORD, 4), VSizedStatic(QWORD, 2)] => [R(0), R(5)];
+    0b01001110_00100001_00101000_00000000 = [VStatic(BYTE, 16), VStatic(WORD, 8)] => [R(0), R(5)];
+    0b01001110_01100001_00101000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
+    0b01001110_10100001_00101000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "yield" = [
     0b11010101_00000011_00100000_00111111 = [] => [];
 ]
 "zip1" = [
-    0b00001110_00000000_00111000_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01000000_00111000_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10000000_00111000_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11000000_00111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_00111000_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_00111000_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10000000_00111000_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_00111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "zip2" = [
-    0b00001110_00000000_01111000_00000000 = [VSized(BYTE), VSized(BYTE), VSized(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_01000000_01111000_00000000 = [VSized(WORD), VSized(WORD), VSized(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_10000000_01111000_00000000 = [VSized(DWORD), VSized(DWORD), VSized(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001110_11000000_01111000_00000000 = [VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2), VSizedStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_00000000_01111000_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_01000000_01111000_00000000 = [V(WORD), V(WORD), V(WORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_10000000_01111000_00000000 = [V(DWORD), V(DWORD), V(DWORD)] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001110_11000000_01111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 
 );

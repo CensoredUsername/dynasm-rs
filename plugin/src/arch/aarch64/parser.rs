@@ -2,8 +2,8 @@ use syn::{parse, Token};
 
 use lazy_static::lazy_static;
 
-use ::parse_helpers::{parse_ident_or_rust_keyword, ParseOpt, ParseOptExt};
-use serialize::Size;
+use crate::parse_helpers::{parse_ident_or_rust_keyword, ParseOpt, ParseOptExt};
+use crate::serialize::Size;
 
 use super::Context;
 use super::ast::{Instruction, RawArg, Register, RegId, RegKind, RegScalar, RegVector, RegFamily, RefItem, Modifier, ModifyExpr};
@@ -406,7 +406,7 @@ impl parse::Parse for Modifier {
 lazy_static!{
     static ref AARCH64_REGISTERS: HashMap<&'static str, (RegId, Option<Size>)> = {
         use self::RegId::*;
-        use serialize::Size::*;
+        use crate::serialize::Size::*;
         let mut h = HashMap::new();
 
         h.insert("X0" , (X0 , Some(QWORD)));
@@ -681,18 +681,18 @@ lazy_static!{
 
     static ref AARCH64_FAMILIES: HashMap<&'static str, (RegFamily, Option<Size>)> = {
         let mut h = HashMap::new();
-        h.insert("X",   (RegFamily::SCALAR,   Some(Size::QWORD)));
-        h.insert("W",   (RegFamily::SCALAR,   Some(Size::DWORD)));
-        h.insert("XSP", (RegFamily::SCALARSP, Some(Size::QWORD)));
-        h.insert("WSP", (RegFamily::SCALARSP, Some(Size::DWORD)));
+        h.insert("X",   (RegFamily::INTEGER,   Some(Size::QWORD)));
+        h.insert("W",   (RegFamily::INTEGER,   Some(Size::DWORD)));
+        h.insert("XSP", (RegFamily::INTEGERSP, Some(Size::QWORD)));
+        h.insert("WSP", (RegFamily::INTEGERSP, Some(Size::DWORD)));
 
-        h.insert("B", (RegFamily::VECTOR, Some(Size::BYTE)));
-        h.insert("H", (RegFamily::VECTOR, Some(Size::WORD)));
-        h.insert("S", (RegFamily::VECTOR, Some(Size::DWORD)));
-        h.insert("D", (RegFamily::VECTOR, Some(Size::QWORD)));
-        h.insert("Q", (RegFamily::VECTOR, Some(Size::OWORD)));
+        h.insert("B", (RegFamily::SIMD, Some(Size::BYTE)));
+        h.insert("H", (RegFamily::SIMD, Some(Size::WORD)));
+        h.insert("S", (RegFamily::SIMD, Some(Size::DWORD)));
+        h.insert("D", (RegFamily::SIMD, Some(Size::QWORD)));
+        h.insert("Q", (RegFamily::SIMD, Some(Size::OWORD)));
 
-        h.insert("V", (RegFamily::VECTOR, None));
+        h.insert("V", (RegFamily::SIMD, None));
         h
     };
 }

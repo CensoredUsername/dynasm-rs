@@ -4,9 +4,9 @@ use syn::parse;
 use syn::Token;
 
 use super::DynasmData;
-use serialize::{Stmt, Size, delimited};
-use arch;
-use ::emit_error_at;
+use crate::serialize::{Stmt, Size, delimited};
+use crate::arch;
+use crate::emit_error_at;
 
 impl DynasmData {
     pub fn evaluate_directive(&mut self, stmts: &mut Vec<Stmt>, input: parse::ParseStream) -> parse::Result<()> {

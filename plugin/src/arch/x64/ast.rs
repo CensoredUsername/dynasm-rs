@@ -1,8 +1,8 @@
 use syn;
 use proc_macro2::Span;
 
-use serialize::Size;
-pub use parse_helpers::JumpType;
+use crate::serialize::Size;
+pub use crate::parse_helpers::JumpType;
 
 use std::cmp::PartialEq;
 
