@@ -2,7 +2,7 @@
 tlentry(['MOVI'],
     '<Dd>,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'D, Imm',
-    processor = 'R(0), Special(5, "stretched imm")', # stretched 64-bit immediate
+    processor = 'R(0), Special(5, STRETCHED_IMMEDIATE)', # stretched 64-bit immediate
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FRECPE', 'FRECPX', 'FRSQRTE', 'SCVTF', 'UCVTF'],
@@ -396,13 +396,13 @@ tlentry(['BCAX', 'EOR3'],
 tlentry(['FMOV'],
     '<Vd>.2D,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'VStatic(QWORD, 2), Imm',
-    processor = 'R(0), Special(5, "split float")', # split floating-point immediate
+    processor = 'R(0), Special(5, SPLIT_FLOAT_IMMEDIATE)', # split floating-point immediate
 )
 
 tlentry(['MOVI'],
     '<Vd>.2D,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'VStatic(QWORD, 2), Imm',
-    processor = 'R(0), Special(5, "stretched imm")', # stretched 64-bit immediate
+    processor = 'R(0), Special(5, SPLIT_FLOAT_IMMEDIATE)', # stretched 64-bit immediate
 )
 
 tlentry(['SHA512SU0'],
@@ -450,13 +450,13 @@ tlentry(['SM3TT1A', 'SM3TT1B', 'SM3TT2A', 'SM3TT2B'],
 tlentry(['MOVI', 'MVNI'],
     '<Vd>.<T>,#<imm8>,MSL#<amount>', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'V(DWORD), Imm, Mod(&[MSL])',
-    processor = 'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)',
+    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)',
 )
 
 tlentry(['MOVI'],
     '<Vd>.<T>,#<imm8>{,LSL#0}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'V(BYTE), Imm, End, Mod(&[LSL])',
-    processor = 'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)',
+    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)',
 )
 
 tlentry(['MVNI'],
@@ -466,8 +466,8 @@ tlentry(['MVNI'],
         'V(DWORD), Imm, End, Mod(&[LSL])',
     ],
     processors = [
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x10111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
@@ -482,8 +482,8 @@ tlentry(['MOVI'],
         'V(DWORD), Imm, End, Mod(&[LSL])',
     ],
     processors = [
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x00111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
@@ -498,8 +498,8 @@ tlentry(['ORR'],
         'V(DWORD), Imm, End, Mod(&[LSL])',
     ],
     processors = [
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
     ],
     bits = [
         '0x00111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -514,8 +514,8 @@ tlentry(['BIC'],
         'V(DWORD), Imm, End, Mod(&[LSL])',
     ],
     processors = [
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
-        'R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
     ],
     bits = [
         '0x10111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -530,8 +530,8 @@ tlentry(['FMOV'],
         'V(DWORD), Imm',
     ],
     processors = [
-        'R(0), Special(5, "split float"), Rwidth(30)', # split floating-point immediate
-        'R(0), Special(5, "split float"), Rwidth(30)', # split floating-point immediate
+        'R(0), Special(5, SPLIT_FLOAT_IMMEDIATE), Rwidth(30)', # split floating-point immediate
+        'R(0), Special(5, SPLIT_FLOAT_IMMEDIATE), Rwidth(30)', # split floating-point immediate
     ],
     bits = [
         '0x00111100000xxx111111xxxxxxxxxx', # 16-bit variant

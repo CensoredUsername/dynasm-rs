@@ -80,14 +80,13 @@ pub enum Command {
     // commands that advance the argument pointer
     R(u8), // encode a register, or reference base, into a 5-bit bitfield.
     R4(u8), // encode a register in the range 0-15 into a 4-bit bitfield
+    RNext, // encode that this register should be the previous register, plus one
 
     // unsigned immediate encodings
     Ubits(u8, u8), // encodes an unsigned immediate starting at bit .0, .1 bits long
     Uscaled(u8, u8, u8), // encodes an unsigned immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
     Ulist(u8, &'static [u16]), // encodes an immediate that can only be a limited amount of options
     Urange(u8, u8, u8), // (loc, min, max) asserts the immediate is below or equal to max, encodes the value of (imm-min)
-    UlogicalW(u8), // logical immediate encoding, 32-bit
-    UlogicalX(u8), // logical immediate encoding, 64-bit
     Usub(u8, u8, u8), // encodes at .0, .1 bits long, .2 - value. Checks if the value is in range.
     Usumdec(u8, u8), // encodes at .0, .1 bits long, the value of the previous arg + the value of the current arg - 1
     Ufields(&'static [u8]), // an immediate, encoded bitwise with the highest bit going into field 0, up to the lowest going into the last bitfield.
@@ -95,7 +94,6 @@ pub enum Command {
     // signed immediate encodings
     Sbits(u8, u8), // encodes a signed immediate starting at bit .0, .1 bits long
     Sscaled(u8, u8, u8), // encodes a signed immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
-    Sfloat(u8), // 8-bit encoded floating point literal
 
     // bit slice encodings. These don't advance the current argument. Only the slice argument actually encodes anything
     BUbits(u8), // checks if the pointed value fits in the given amount of bits
@@ -103,11 +101,11 @@ pub enum Command {
     BUrange(u8, u8), // check if the pointed value is between min/max
     BUscaled(u8, u8), // check if the pointed value fits in .0 bits, after being shifted .1 bits to the right
     BSscaled(u8, u8), // check if the pointed value fits in .0 bits, after being shifted .1 bits to the right
-    BUslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
-    BSslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
+    Uslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
+    Sslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
 
     // special immediate encodings
-    Special(u8, &'static str),
+    Special(u8, SpecialComm),
 
     // SIMD 128-bit indicator
     Rwidth(u8),
@@ -126,11 +124,51 @@ pub enum Command {
     // Mapping of literal -> bitvalue
     LitList(u8, &'static str),
 
+    // Offsets
+    Offset(Relocation),
+
     // special commands
     A, // advances the argument pointer, only needed to skip over an argument.
     C, // moves the argument pointer back.
     Static(u8, u32) // just insert these bits at this location.
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum SpecialComm {
+    INVERTED_WIDE_IMMEDIATE,
+    WIDE_IMMEDIATE,
+    STRETCHED_IMMEDIATE,
+    LOGICAL_IMMEDIATE_W,
+    LOGICAL_IMMEDIATE_X,
+    FLOAT_IMMEDIATE,
+    SPLIT_FLOAT_IMMEDIATE,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Relocation {
+    // b, bl 26 bits, dword aligned
+    B = 0,
+    // b.cond, cbnz, cbz, ldr, ldrsw, prfm: 19 bits, dword aligned
+    BCOND = 1,
+    // adr split 21 bit, byte aligned
+    ADR = 2,
+    // adrp split 21 bit, 4096-byte aligned
+    ADRP = 3,
+    // tbnz, tbz: 14 bits, dword aligned
+    TBZ = 4,
+    // 32-bit literal
+    LITERAL32 = 5,
+    // 64-bit literal
+    LITERAL64 = 6,
+}
+
+impl Relocation {
+    pub fn to_id(&self) -> u8 {
+        *self as u8
+    }
+}
+
 
 #[derive(Debug, Clone, Copy)]
 pub struct Opdata {
@@ -194,6 +232,8 @@ lazy_static! {
 
         use super::ast::Modifier::*;
         use crate::serialize::Size::*;
+        use self::SpecialComm::*;
+        use self::Relocation::*;
 
         const EXTENDS: &'static [super::ast::Modifier] = &[UXTB, UXTH, UXTW, UXTX, SXTB, SXTH, SXTW, SXTX, LSL];
         const EXTENDS_W: &'static [super::ast::Modifier] = &[UXTB, UXTH, UXTW, SXTB, SXTH, SXTW];
@@ -233,7 +273,7 @@ lazy_static! {
     };
 
     // special ident maps
-    static ref SPECIAL_IDENT_MAP: HashMap<&'static str, HashMap<&'static str, u32>> = {
+    pub static ref SPECIAL_IDENT_MAP: HashMap<&'static str, HashMap<&'static str, u32>> = {
         let mut mapmap = HashMap::new();
         mapmap.insert("AT_OPS", {
             let mut map = HashMap::new();

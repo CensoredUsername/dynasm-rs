@@ -2,7 +2,7 @@
 tlentry(['FMOV'],
     '<Dd>,#<imm>', (('imm8', 8, 13), ('Rd', 5, 0)),
     matcher   = 'D, Imm',
-    processor = 'R(0), Sfloat(13)',
+    processor = 'R(0), Special(13, FLOAT_IMMEDIATE)',
 )
 
 tlentry(['FABS', 'FMOV', 'FNEG', 'FRINTA', 'FRINTI', 'FRINTM', 'FRINTN', 'FRINTP', 'FRINTX', 'FRINTZ', 'FSQRT'],
@@ -86,7 +86,7 @@ tlentry(['FCCMP', 'FCCMPE'],
 tlentry(['FMOV'],
     '<Hd>,#<imm>', (('imm8', 8, 13), ('Rd', 5, 0)),
     matcher   = 'H, Imm',
-    processor = 'R(0), Sfloat(13)',
+    processor = 'R(0), Special(13, FLOAT_IMMEDIATE)',
 )
 
 tlentry(['FCVT'],
@@ -170,7 +170,7 @@ tlentry(['FCCMP', 'FCCMPE'],
 tlentry(['FMOV'],
     '<Sd>,#<imm>', (('imm8', 8, 13), ('Rd', 5, 0)),
     matcher   = 'S, Imm',
-    processor = 'R(0), Sfloat(13)',
+    processor = 'R(0), Special(13, FLOAT_IMMEDIATE)',
 )
 
 tlentry(['FCVT'],

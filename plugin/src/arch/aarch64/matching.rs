@@ -492,7 +492,7 @@ impl Matcher {
             Matcher::RefOffset => 2,
             Matcher::RefPre => 2,
             Matcher::RefIndex => 4,
-            Matcher::Mod(_) => 1,
+            Matcher::Mod(_) => 2,
 
             // this is special anyway
             Matcher::End => 0,

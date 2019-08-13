@@ -22,7 +22,7 @@ impl<'a> ParseOptExt for parse::ParseBuffer<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum JumpType {
     // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
     // in order to allow the full range of expressions to be used. the only currently existing ambiguity is

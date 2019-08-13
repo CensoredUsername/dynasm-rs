@@ -3,7 +3,9 @@ use syn::parse;
 mod ast;
 mod parser;
 mod matching;
+mod compiler;
 mod aarch64data;
+mod encoding_helpers;
 
 use crate::State;
 use crate::emit_error_at;
@@ -56,6 +58,14 @@ impl Arch for ArchAarch64 {
         println!("{:?}", instruction);
         println!("{:?}", match_data);
 
+        match compiler::compile_instruction(&mut ctx, match_data) {
+            Err(None) => return Ok(()),
+            Err(Some(e)) => {
+                emit_error_at(span, e);
+                return Ok(())
+            }
+            Ok(()) => ()
+        }
 
         Ok(())
     }

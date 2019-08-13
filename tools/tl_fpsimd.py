@@ -55,7 +55,7 @@ tlentry(['LDNP', 'LDP', 'STNP', 'STP'],
 tlentry(['LDR'],
     '<Dt>,<label>', (('imm19', 19, 5), ('Rt', 5, 0)),
     matcher   = 'D, Offset',
-    processor = 'R(0), Sscaled(5, 19, 2)',
+    processor = 'R(0), Offset(BCOND)',
 )
 
 tlentry(['LDR', 'STR'],
@@ -140,7 +140,7 @@ tlentry(['LDNP', 'LDP', 'STNP', 'STP'],
 tlentry(['LDR'],
     '<Qt>,<label>', (('imm19', 19, 5), ('Rt', 5, 0)),
     matcher   = 'Q, Offset',
-    processor = 'R(0), Sscaled(5, 19, 2)',
+    processor = 'R(0), Offset(BCOND)',
 )
 
 tlentry(['LDR', 'STR'],
@@ -194,7 +194,7 @@ tlentry(['LDNP', 'LDP', 'STNP', 'STP'],
 tlentry(['LDR'],
     '<St>,<label>', (('imm19', 19, 5), ('Rt', 5, 0)),
     matcher   = 'S, Offset',
-    processor = 'R(0), Sscaled(5, 19, 2)',
+    processor = 'R(0), Offset(BCOND)',
 )
 
 tlentry(['LDR', 'STR'],

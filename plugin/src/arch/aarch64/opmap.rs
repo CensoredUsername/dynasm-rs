@@ -21,7 +21,7 @@ Ops!(map ;
     0b00001011_00000000_00000000_00000000 = [W, W, W, End, Mod(SHIFTS)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b10001011_00000000_00000000_00000000 = [X, X, X, End, Mod(SHIFTS)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
     // ADD (extended register)
-    0b00001011_00100000_00000000_00000000 = [WSP, WSP, W, End, Mod(EXTENDS)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
+    0b00001011_00100000_00000000_00000000 = [WSP, WSP, W, End, Mod(EXTENDS)] => [R(0), R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
     0b10001011_00100000_00000000_00000000 = [XSP, XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b10001011_00100000_00000000_00000000 = [XSP, XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // ADD (immediate)
@@ -71,10 +71,10 @@ Ops!(map ;
     0b00001110_10110001_10111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "adr" = [
-    0b00010000_00000000_00000000_00000000 = [X, Offset] => [R(0), BSbits(21), BSslice(29, 2, 0), BSslice(5, 19, 2), A];
+    0b00010000_00000000_00000000_00000000 = [X, Offset] => [R(0), Offset(ADR)];
 ]
 "adrp" = [
-    0b10010000_00000000_00000000_00000000 = [X, Offset] => [R(0), BSscaled(21, 12), BSslice(29, 2, 12), BSslice(5, 19, 14), A];
+    0b10010000_00000000_00000000_00000000 = [X, Offset] => [R(0), Offset(ADRP)];
 ]
 "aesd" = [
     0b01001110_00101000_01011000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5)];
@@ -92,16 +92,16 @@ Ops!(map ;
     // AND (vector)
     0b00001110_00100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // AND (immediate)
-    0b00010010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), UlogicalW(10)];
-    0b10010010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), UlogicalX(10)];
+    0b00010010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b10010010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_X)];
     // AND (shifted register)
     0b00001010_00000000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b10001010_00000000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
 ]
 "ands" = [
     // ANDS (immediate)
-    0b01110010_00000000_00000000_00000000 = [W, W, Imm] => [R(0), R(5), UlogicalW(5)];
-    0b11110010_00000000_00000000_00000000 = [X, X, Imm] => [R(0), R(5), UlogicalX(5)];
+    0b01110010_00000000_00000000_00000000 = [W, W, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b11110010_00000000_00000000_00000000 = [X, X, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_X)];
     // ANDS (shifted register)
     0b01101010_00000000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b11101010_00000000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
@@ -165,9 +165,9 @@ Ops!(map ;
 ]
 "b" = [
     // B.cond
-    0b01010100_00000000_00000000_00000000 = [Dot, Cond, Offset] => [Cond(0), Sscaled(5, 19, 2)];
+    0b01010100_00000000_00000000_00000000 = [Dot, Cond, Offset] => [Cond(0), Offset(BCOND)];
     // B
-    0b00010100_00000000_00000000_00000000 = [Offset] => [Sscaled(0, 26, 2)];
+    0b00010100_00000000_00000000_00000000 = [Offset] => [Offset(B)];
 ]
 "bcax" = [
     0b11001110_00100000_00000000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16), R(10)];
@@ -190,8 +190,8 @@ Ops!(map ;
 ]
 "bic" = [
     // BIC (vector, immediate)
-    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
-    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
+    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
+    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
     // BIC (vector, register)
     0b00001110_01100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // BIC (shifted register)
@@ -209,7 +209,7 @@ Ops!(map ;
     0b00101110_10100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "bl" = [
-    0b10010100_00000000_00000000_00000000 = [Offset] => [Sscaled(0, 26, 2)];
+    0b10010100_00000000_00000000_00000000 = [Offset] => [Offset(B)];
 ]
 "blr" = [
     0b11010110_00111111_00000000_00000000 = [X] => [R(5)];
@@ -288,28 +288,28 @@ Ops!(map ;
     0b01001000_10100000_11111100_00000000 = [W, W, RefBase] => [R(16), R(0), R(5)];
 ]
 "casp" = [
-    0b00001000_00100000_01111100_00000000 = [W, W, W, W, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
-    0b01001000_00100000_01111100_00000000 = [X, X, X, X, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
+    0b00001000_00100000_01111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b01001000_00100000_01111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
 ]
 "caspa" = [
-    0b00001000_01100000_01111100_00000000 = [W, W, W, W, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
-    0b01001000_01100000_01111100_00000000 = [X, X, X, X, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
+    0b00001000_01100000_01111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b01001000_01100000_01111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
 ]
 "caspal" = [
-    0b00001000_01100000_11111100_00000000 = [W, W, W, W, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
-    0b01001000_01100000_11111100_00000000 = [X, X, X, X, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
+    0b00001000_01100000_11111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b01001000_01100000_11111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
 ]
 "caspl" = [
-    0b00001000_00100000_11111100_00000000 = [W, W, W, W, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
-    0b01001000_00100000_11111100_00000000 = [X, X, X, X, RefBase] => [R(16), Special(0, "previous reg incremented"), R(0), Special(0, "previous reg incremented"), R(5)];
+    0b00001000_00100000_11111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b01001000_00100000_11111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
 ]
 "cbnz" = [
-    0b00110101_00000000_00000000_00000000 = [W, Offset] => [R(0), Sscaled(5, 19, 2)];
-    0b10110101_00000000_00000000_00000000 = [X, Offset] => [R(0), Sscaled(5, 19, 2)];
+    0b00110101_00000000_00000000_00000000 = [W, Offset] => [R(0), Offset(BCOND)];
+    0b10110101_00000000_00000000_00000000 = [X, Offset] => [R(0), Offset(BCOND)];
 ]
 "cbz" = [
-    0b00110100_00000000_00000000_00000000 = [W, Offset] => [R(0), Sscaled(5, 19, 2)];
-    0b10110100_00000000_00000000_00000000 = [X, Offset] => [R(0), Sscaled(5, 19, 2)];
+    0b00110100_00000000_00000000_00000000 = [W, Offset] => [R(0), Offset(BCOND)];
+    0b10110100_00000000_00000000_00000000 = [X, Offset] => [R(0), Offset(BCOND)];
 ]
 "ccmn" = [
     // CCMN (immediate)
@@ -437,8 +437,8 @@ Ops!(map ;
     0b00101011_00000000_00000000_00011111 = [W, W, End, Mod(SHIFTS)] => [R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b10101011_00000000_00000000_00011111 = [X, X, End, Mod(SHIFTS)] => [R(5), R(16), Rotates(22), Ubits(10, 6)];
     // CMN (extended register)
-    0b00101011_00100000_00000000_00011111 = [WSP, W, End, Mod(EXTENDS)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
-    0b10101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
+    0b00101011_00100000_00000000_00011111 = [WSP, W, End, Mod(EXTENDS)] => [R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
+    0b10101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b10101011_00100000_00000000_00011111 = [XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // CMN (immediate)
     0b00110001_00000000_00000000_00011111 = [WSP, Imm, End, Mod(&[LSL]), Imm] => [R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
@@ -449,8 +449,8 @@ Ops!(map ;
     0b01101011_00000000_00000000_00011111 = [W, W, End, Mod(SHIFTS)] => [R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b11101011_00000000_00000000_00011111 = [X, X, End, Mod(SHIFTS)] => [R(5), R(16), Rotates(22), Ubits(10, 6)];
     // CMP (extended register)
-    0b01101011_00100000_00000000_00011111 = [WSP, W, End, Mod(EXTENDS)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
-    0b11101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
+    0b01101011_00100000_00000000_00011111 = [WSP, W, End, Mod(EXTENDS)] => [R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
+    0b11101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b11101011_00100000_00000000_00011111 = [XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // CMP (immediate)
     0b01110001_00000000_00000000_00011111 = [WSP, Imm, End, Mod(&[LSL]), Imm] => [R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
@@ -574,8 +574,8 @@ Ops!(map ;
     // EOR (vector)
     0b00101110_00100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // EOR (immediate)
-    0b01010010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), UlogicalW(10)];
-    0b11010010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), UlogicalX(10)];
+    0b01010010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b11010010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_X)];
     // EOR (shifted register)
     0b01001010_00000000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b11001010_00000000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
@@ -1161,9 +1161,9 @@ Ops!(map ;
 ]
 "fmov" = [
     // FMOV (vector, immediate)
-    0b00001111_00000000_11111100_00000000 = [V(WORD), Imm] => [R(0), Special(5, "split float"), Rwidth(30)];
-    0b00001111_00000000_11110100_00000000 = [V(DWORD), Imm] => [R(0), Special(5, "split float"), Rwidth(30)];
-    0b01101111_00000000_11110100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, "split float")];
+    0b00001111_00000000_11111100_00000000 = [V(WORD), Imm] => [R(0), Special(5, SPLIT_FLOAT_IMMEDIATE), Rwidth(30)];
+    0b00001111_00000000_11110100_00000000 = [V(DWORD), Imm] => [R(0), Special(5, SPLIT_FLOAT_IMMEDIATE), Rwidth(30)];
+    0b01101111_00000000_11110100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, SPLIT_FLOAT_IMMEDIATE)];
     // FMOV (register)
     0b00011110_11100000_01000000_00000000 = [H, H] => [R(0), R(5)];
     0b00011110_00100000_01000000_00000000 = [S, S] => [R(0), R(5)];
@@ -1180,9 +1180,9 @@ Ops!(map ;
     0b10011110_01100110_00000000_00000000 = [X, D] => [R(0), R(5)];
     0b10011110_10101110_00000000_00000000 = [X, VElementStatic(QWORD, 1)] => [R(0), R(5)];
     // FMOV (scalar, immediate)
-    0b00011110_11100000_00010000_00000000 = [H, Imm] => [R(0), Sfloat(13)];
-    0b00011110_00100000_00010000_00000000 = [S, Imm] => [R(0), Sfloat(13)];
-    0b00011110_01100000_00010000_00000000 = [D, Imm] => [R(0), Sfloat(13)];
+    0b00011110_11100000_00010000_00000000 = [H, Imm] => [R(0), Special(13, FLOAT_IMMEDIATE)];
+    0b00011110_00100000_00010000_00000000 = [S, Imm] => [R(0), Special(13, FLOAT_IMMEDIATE)];
+    0b00011110_01100000_00010000_00000000 = [D, Imm] => [R(0), Special(13, FLOAT_IMMEDIATE)];
 ]
 "fmsub" = [
     0b00011111_11000000_10000000_00000000 = [H, H, H, H] => [R(0), R(5), R(16), R(10)];
@@ -1875,12 +1875,12 @@ Ops!(map ;
     0b10111001_01000000_00000000_00000000 = [W, RefOffset] => [R(0), R(5), Uscaled(10, 12, 2)];
     0b11111001_01000000_00000000_00000000 = [X, RefOffset] => [R(0), R(5), Uscaled(10, 12, 3)];
     // LDR (literal, SIMD&FP)
-    0b00011100_00000000_00000000_00000000 = [S, Offset] => [R(0), Sscaled(5, 19, 2)];
-    0b01011100_00000000_00000000_00000000 = [D, Offset] => [R(0), Sscaled(5, 19, 2)];
-    0b10011100_00000000_00000000_00000000 = [Q, Offset] => [R(0), Sscaled(5, 19, 2)];
+    0b00011100_00000000_00000000_00000000 = [S, Offset] => [R(0), Offset(BCOND)];
+    0b01011100_00000000_00000000_00000000 = [D, Offset] => [R(0), Offset(BCOND)];
+    0b10011100_00000000_00000000_00000000 = [Q, Offset] => [R(0), Offset(BCOND)];
     // LDR (literal)
-    0b00011000_00000000_00000000_00000000 = [W, Offset] => [R(0), Sscaled(5, 19, 2)];
-    0b01011000_00000000_00000000_00000000 = [X, Offset] => [R(0), Sscaled(5, 19, 2)];
+    0b00011000_00000000_00000000_00000000 = [W, Offset] => [R(0), Offset(BCOND)];
+    0b01011000_00000000_00000000_00000000 = [X, Offset] => [R(0), Offset(BCOND)];
     // LDR (register, SIMD&FP)
     0b00111100_01100000_00001000_00000000 = [B, RefIndex] => [R(0), R(5), R(16), ExtendsX(13), Ulist(12, &[0, 0])];
     0b01111100_01100000_00001000_00000000 = [H, RefIndex] => [R(0), R(5), R(16), ExtendsX(13), Ulist(12, &[0, 1])];
@@ -1892,12 +1892,12 @@ Ops!(map ;
     0b11111000_01100000_00001000_00000000 = [X, RefIndex] => [R(0), R(5), R(16), ExtendsX(13), Ulist(12, &[0, 3])];
 ]
 "ldraa" = [
-    0b11111000_00100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSbits(10), BSslice(12, 9, 0), BSslice(22, 1, 9), A];
-    0b11111000_00100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSbits(10), BSslice(12, 9, 0), BSslice(22, 1, 9), A];
+    0b11111000_00100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
+    0b11111000_00100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
 ]
 "ldrab" = [
-    0b11111000_10100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSbits(10), BSslice(12, 9, 0), BSslice(22, 1, 9), A];
-    0b11111000_10100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSbits(10), BSslice(12, 9, 0), BSslice(22, 1, 9), A];
+    0b11111000_10100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
+    0b11111000_10100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
 ]
 "ldrb" = [
     // LDRB (immediate)
@@ -1945,7 +1945,7 @@ Ops!(map ;
     0b10111000_10000000_00001100_00000000 = [X, RefPre] => [R(0), R(5), Sbits(12, 9)];
     0b10111001_10000000_00000000_00000000 = [X, RefOffset] => [R(0), R(5), Uscaled(10, 12, 2)];
     // LDRSW (literal)
-    0b10011000_00000000_00000000_00000000 = [X, Offset] => [R(0), Sscaled(5, 19, 2)];
+    0b10011000_00000000_00000000_00000000 = [X, Offset] => [R(0), Offset(BCOND)];
     // LDRSW (register)
     0b10111000_10100000_00001000_00000000 = [X, RefIndex] => [R(0), R(5), R(16), ExtendsX(13), Ulist(12, &[0, 2])];
 ]
@@ -2282,16 +2282,16 @@ Ops!(map ;
     0b01001110_00000100_00011100_00000000 = [VElement(DWORD), W] => [R(0), Ubits(19, 2), R(5)];
     0b01001110_00001000_00011100_00000000 = [VElement(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
     // MOV (inverted wide immediate)
-    0b00010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), W, Imm] => [R(0), Special(5, "inverted wide imm")];
-    0b10010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), X, Imm] => [R(0), Special(5, "inverted wide imm")];
+    0b00010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), W, Imm] => [R(0), Special(5, INVERTED_WIDE_IMMEDIATE)];
+    0b10010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), X, Imm] => [R(0), Special(5, INVERTED_WIDE_IMMEDIATE)];
     // MOV (wide immediate)
-    0b01010010_10000000_00000000_00000000 = [W, Imm] => [R(0), Special(5, "wide imm")];
-    0b11010010_10000000_00000000_00000000 = [X, Imm] => [R(0), Special(5, "wide imm")];
+    0b01010010_10000000_00000000_00000000 = [W, Imm] => [R(0), Special(5, WIDE_IMMEDIATE)];
+    0b11010010_10000000_00000000_00000000 = [X, Imm] => [R(0), Special(5, WIDE_IMMEDIATE)];
     // MOV (vector)
     0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), C, R(16), Rwidth(30)];
     // MOV (bitmask immediate)
-    0b00110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), WSP, Imm] => [R(0), UlogicalW(10)];
-    0b10110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), XSP, Imm] => [R(0), UlogicalX(10)];
+    0b00110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), WSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b10110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), XSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_X)];
     // MOV (register)
     0b00101010_00000000_00000011_11100000 = [W, W] => [R(0), R(16)];
     0b10101010_00000000_00000011_11100000 = [X, X] => [R(0), R(16)];
@@ -2300,12 +2300,12 @@ Ops!(map ;
     0b01001110_00001000_00111100_00000000 = [X, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
 ]
 "movi" = [
-    0b00001111_00000000_11100100_00000000 = [V(BYTE), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)];
-    0b00001111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
-    0b00001111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
-    0b00001111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
-    0b00101111_00000000_11100100_00000000 = [D, Imm] => [R(0), Special(5, "stretched imm")];
-    0b01101111_00000000_11100100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, "stretched imm")];
+    0b00001111_00000000_11100100_00000000 = [V(BYTE), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)];
+    0b00001111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00001111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
+    0b00001111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
+    0b00101111_00000000_11100100_00000000 = [D, Imm] => [R(0), Special(5, STRETCHED_IMMEDIATE)];
+    0b01101111_00000000_11100100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, SPLIT_FLOAT_IMMEDIATE)];
 ]
 "movk" = [
     0b01110010_10000000_00000000_00000000 = [W, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])];
@@ -2350,9 +2350,9 @@ Ops!(map ;
     0b00101110_00100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "mvni" = [
-    0b00101111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
-    0b00101111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
-    0b00101111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
+    0b00101111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00101111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
+    0b00101111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
 ]
 "neg" = [
     // NEG (shifted register)
@@ -2392,13 +2392,13 @@ Ops!(map ;
 ]
 "orr" = [
     // ORR (vector, immediate)
-    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
-    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), BUslice(5, 5, 0), BUslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
+    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
+    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
     // ORR (vector, register)
     0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // ORR (immediate)
-    0b00110010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), UlogicalW(10)];
-    0b10110010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), UlogicalX(10)];
+    0b00110010_00000000_00000000_00000000 = [WSP, W, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b10110010_00000000_00000000_00000000 = [XSP, X, Imm] => [R(0), R(5), Special(10, LOGICAL_IMMEDIATE_X)];
     // ORR (shifted register)
     0b00101010_00000000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b10101010_00000000_00000000_00000000 = [X, X, X, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
@@ -2461,7 +2461,7 @@ Ops!(map ;
 ]
 "prfm" = [
     // PRFM (literal)
-    0b11011000_00000000_00000000_00000000 = [Imm, Offset] => [Ubits(0, 5), Sscaled(5, 19, 2)];
+    0b11011000_00000000_00000000_00000000 = [Imm, Offset] => [Ubits(0, 5), Offset(BCOND)];
     // PRFM (register)
     0b11111000_10100000_00001000_00000000 = [Imm, RefIndex] => [Ubits(0, 5), R(5), R(16), ExtendsX(13), Ulist(12, &[0, 3])];
 ]
@@ -3780,7 +3780,7 @@ Ops!(map ;
     0b01001011_00000000_00000000_00000000 = [W, W, W, End, Mod(SHIFTS)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b11001011_00000000_00000000_00000000 = [X, X, X, End, Mod(SHIFTS)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 6)];
     // SUB (extended register)
-    0b01001011_00100000_00000000_00000000 = [WSP, WSP, W, End, Mod(EXTENDS)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
+    0b01001011_00100000_00000000_00000000 = [WSP, WSP, W, End, Mod(EXTENDS)] => [R(0), R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
     0b11001011_00100000_00000000_00000000 = [XSP, XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b11001011_00100000_00000000_00000000 = [XSP, XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // SUB (immediate)
@@ -3902,8 +3902,8 @@ Ops!(map ;
     0b00001110_00000000_00000000_00000000 = [V(BYTE), RegListStatic(1, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "tbnz" = [
-    0b00110111_00000000_00000000_00000000 = [W, Imm, Offset] => [R(0), Ubits(19, 5), Sscaled(5, 14, 2)];
-    0b00110111_00000000_00000000_00000000 = [X, Imm, Offset] => [R(0), BUbits(6), BUslice(19, 5, 0), BUslice(31, 1, 5), A, Sscaled(5, 14, 2)];
+    0b00110111_00000000_00000000_00000000 = [W, Imm, Offset] => [R(0), Ubits(19, 5), Offset(TBZ)];
+    0b00110111_00000000_00000000_00000000 = [X, Imm, Offset] => [R(0), BUbits(6), Uslice(19, 5, 0), Uslice(31, 1, 5), A, Offset(TBZ)];
 ]
 "tbx" = [
     0b00001110_00000000_00110000_00000000 = [V(BYTE), RegListStatic(2, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
@@ -3912,8 +3912,8 @@ Ops!(map ;
     0b00001110_00000000_00010000_00000000 = [V(BYTE), RegListStatic(1, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "tbz" = [
-    0b00110110_00000000_00000000_00000000 = [W, Imm, Offset] => [R(0), Ubits(19, 5), Sscaled(5, 14, 2)];
-    0b00110110_00000000_00000000_00000000 = [X, Imm, Offset] => [R(0), BUbits(6), BUslice(19, 5, 0), BUslice(31, 1, 5), A, Sscaled(5, 14, 2)];
+    0b00110110_00000000_00000000_00000000 = [W, Imm, Offset] => [R(0), Ubits(19, 5), Offset(TBZ)];
+    0b00110110_00000000_00000000_00000000 = [X, Imm, Offset] => [R(0), BUbits(6), Uslice(19, 5, 0), Uslice(31, 1, 5), A, Offset(TBZ)];
 ]
 "tlbi" = [
     0b11010101_00001000_10000000_00000000 = [Ident, End, X] => [LitList(5, "TLBI_OPS"), R(0)];
@@ -3935,8 +3935,8 @@ Ops!(map ;
 ]
 "tst" = [
     // TST (immediate)
-    0b01110010_00000000_00000000_00011111 = [W, Imm] => [R(5), UlogicalW(10)];
-    0b11110010_00000000_00000000_00011111 = [X, Imm] => [R(5), UlogicalX(10)];
+    0b01110010_00000000_00000000_00011111 = [W, Imm] => [R(5), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b11110010_00000000_00000000_00011111 = [X, Imm] => [R(5), Special(10, LOGICAL_IMMEDIATE_X)];
     // TST (shifted register)
     0b01101010_00000000_00000000_00011111 = [W, W, End, Mod(ROTATES)] => [R(5), R(16), Rotates(22), Ubits(10, 5)];
     0b11101010_00000000_00000000_00011111 = [X, X, End, Mod(ROTATES)] => [R(5), R(16), Rotates(22), Ubits(10, 6)];
