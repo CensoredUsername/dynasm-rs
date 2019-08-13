@@ -6,91 +6,8 @@ use quote::{quote, quote_spanned, ToTokens};
 
 use byteorder::{ByteOrder, LittleEndian};
 
-/// Enum representing the result size of a value/expression/register/etc in bytes.
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
-pub enum Size {
-    BYTE  = 1,
-    WORD  = 2,
-    DWORD = 4,
-    FWORD = 6,
-    QWORD = 8,
-    PWORD = 10,
-    OWORD = 16,
-    HWORD = 32,
-}
+use crate::common::{Size, Stmt, delimited};
 
-impl Size {
-    pub fn in_bytes(self) -> u8 {
-        self as u8
-    }
-
-    pub fn as_literal(self) -> syn::Ident {
-        syn::Ident::new(match self {
-            Size::BYTE  => "i8",
-            Size::WORD  => "i16",
-            Size::DWORD => "i32",
-            Size::FWORD => "i48",
-            Size::QWORD => "i64",
-            Size::PWORD => "i80",
-            Size::OWORD => "i128",
-            Size::HWORD => "i256"
-        }, Span::call_site())
-    }
-}
-
-/// An abstract representation of a dynasm runtime statement to be emitted
-#[derive(Debug, Clone)]
-pub enum Stmt {
-    // simply push data into the instruction stream. unsigned
-    Const(u64, Size),
-    // push data that is stored inside of an expression. unsigned
-    ExprUnsigned(TokenTree, Size),
-    // push signed data into the instruction stream. signed
-    ExprSigned(TokenTree, Size),
-
-    // extend the instruction stream with unsigned bytes
-    Extend(Vec<u8>),
-    // extend the instruction stream with unsigned bytes
-    ExprExtend(TokenTree),
-    // align the instruction stream to some alignment
-    Align(TokenTree),
-
-    // label declarations
-    GlobalLabel(syn::Ident),
-    LocalLabel(syn::Ident),
-    DynamicLabel(TokenTree),
-
-    // and their respective relocations (as expressions as they differ per assembler)
-    GlobalJumpTarget(  syn::Ident,    TokenTree),
-    ForwardJumpTarget( syn::Ident,    TokenTree),
-    BackwardJumpTarget(syn::Ident,    TokenTree),
-    DynamicJumpTarget(TokenTree, TokenTree),
-    BareJumpTarget(   TokenTree, TokenTree),
-
-    // a random statement that has to be inserted between assembly hunks
-    Stmt(TokenTree)
-}
-
-// convenience methods
-impl Stmt {
-    #![allow(dead_code)]
-
-    pub fn u8(value: u8) -> Stmt {
-        Stmt::Const(u64::from(value), Size::BYTE)
-    }
-
-    pub fn u16(value: u16) -> Stmt {
-        Stmt::Const(u64::from(value), Size::WORD)
-    }
-
-    pub fn u32(value: u32) -> Stmt {
-        Stmt::Const(u64::from(value), Size::DWORD)
-    }
-
-    pub fn u64(value: u64) -> Stmt {
-        Stmt::Const(value, Size::QWORD)
-    }
-}
 
 /// Converts a sequence of abstract Statements to actual tokens
 pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
@@ -200,17 +117,6 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
 // this collection is arbitrary and purely based on what special things are needed for assembler
 // codegen implementations
 
-// Makes a None-delimited TokenTree item out of anything that can be converted to tokens.
-// This is a useful shortcut to escape issues around not-properly delimited tokenstreams
-// because it is guaranteed to be parsed back properly to its source ast at type-level.
-pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
-    let span = expr.span();
-    let mut group = proc_macro2::Group::new(
-        proc_macro2::Delimiter::None, expr.into_token_stream()
-    );
-    group.set_span(span);
-    proc_macro2::TokenTree::Group(group)
-}
 
 // expression of value 0. sometimes needed.
 pub fn expr_zero() -> TokenTree {

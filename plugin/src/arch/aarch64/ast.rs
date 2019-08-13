@@ -1,8 +1,7 @@
 use syn;
 use proc_macro2::Span;
 
-use crate::serialize::Size;
-pub use crate::parse_helpers::JumpType;
+use crate::common::{Size, JumpType};
 
 
 /// A complete abstraction of an aarch64 register access.

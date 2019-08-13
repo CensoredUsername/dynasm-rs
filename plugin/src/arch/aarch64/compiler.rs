@@ -1,11 +1,12 @@
 use super::matching::MatchData;
 use super::aarch64data::{Command, COND_MAP, SPECIAL_IDENT_MAP, SpecialComm};
 use super::Context;
-use super::ast::{FlatArg, RegKind, RegId, Modifier, JumpType};
+use super::ast::{FlatArg, RegKind, RegId, Modifier, };
 use super::encoding_helpers;
-use crate::serialize::{self, Stmt, delimited, Size};
-use crate::emit_error_at;
+
+use crate::common::{Stmt, Size, delimited, emit_error_at};
 use crate::parse_helpers::{as_ident, as_number, as_float, as_signed_number};
+
 use syn::spanned::Spanned;
 use quote::{quote, quote_spanned};
 use proc_macro2::TokenStream;
@@ -362,25 +363,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let data = [relocation.to_id()];
 
                     // encode the complete relocation
-                    let stmt = match target.clone() {
-                        JumpType::Global(ident)   => {
-                            let span = ident.span();
-                            Stmt::GlobalJumpTarget(ident, serialize::expr_tuple_of_u8s(span, &data))
-                        },
-                        JumpType::Forward(ident)  => {
-                            let span = ident.span();
-                            Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_u8s(span, &data))
-                        },
-                        JumpType::Backward(ident) => {
-                            let span = ident.span();
-                            Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_u8s(span, &data))
-                        },
-                        JumpType::Dynamic(expr)   => {
-                            let span = expr.span();
-                            Stmt::DynamicJumpTarget(serialize::delimited(expr), serialize::expr_tuple_of_u8s(span, &data))
-                        },
-                        JumpType::Bare(_expr)      => unreachable!("Should have filtered out bare jumps beforehand")
-                    };
+                    let stmt = target.clone().encode(&data);
+
                     relocations.push(stmt);
                 }
                 _ => panic!("Invalid argument processor")

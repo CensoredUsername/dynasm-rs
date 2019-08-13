@@ -1,5 +1,5 @@
 //! This file contains parsing helpers used by multiple parsing backends
-use syn::{parse, Token};
+use syn::parse;
 use std::convert::TryInto;
 
 /**
@@ -19,60 +19,6 @@ pub trait ParseOptExt {
 impl<'a> ParseOptExt for parse::ParseBuffer<'a> {
     fn parse_opt<T: ParseOpt>(&self) -> parse::Result<Option<T>> {
         T::parse(self)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum JumpType {
-    // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
-    // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
-    // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
-    Global(syn::Ident),   // -> label
-    Backward(syn::Ident), //  > label
-    Forward(syn::Ident),  //  < label
-    Dynamic(syn::Expr),   // => expr
-    Bare(syn::Expr)       // jump to this address
-}
-
-impl ParseOpt for JumpType {
-    fn parse(input: parse::ParseStream) -> parse::Result<Option<JumpType>> {
-        // -> global_label
-        Ok(if input.peek(Token![->]) {
-            let _: Token![->] = input.parse()?;
-            let name: syn::Ident = input.parse()?;
-
-            Some(JumpType::Global(name))
-
-        // > forward_label
-        } else if input.peek(Token![>]) {
-            let _: Token![>] = input.parse()?;
-            let name: syn::Ident = input.parse()?;
-
-            Some(JumpType::Forward(name))
-
-        // < backwards_label
-        } else if input.peek(Token![<]) {
-            let _: Token![<] = input.parse()?;
-            let name: syn::Ident = input.parse()?;
-
-            Some(JumpType::Backward(name))
-            
-        // => dynamic_label
-        } else if input.peek(Token![=>]) {
-            let _: Token![=>] = input.parse()?;
-            let expr: syn::Expr = input.parse()?;
-
-            Some(JumpType::Dynamic(expr))
-
-        // extern label
-        } else if eat_pseudo_keyword(input, "extern") {
-            let expr: syn::Expr = input.parse()?;
-
-            Some(JumpType::Bare(expr))
-
-        } else {
-            None
-        })
     }
 }
 

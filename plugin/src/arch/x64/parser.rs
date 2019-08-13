@@ -4,9 +4,8 @@ use proc_macro2::Span;
 
 use lazy_static::lazy_static;
 
-use crate::emit_error_at;
+use crate::common::{Size, emit_error_at};
 use crate::parse_helpers::{eat_pseudo_keyword, parse_ident_or_rust_keyword, as_ident, ParseOptExt};
-use crate::serialize::Size;
 
 use super::{Context, X86Mode};
 use super::ast::{Instruction, RawArg, Register, RegId, RegFamily, MemoryRefItem};
@@ -329,7 +328,7 @@ fn collect_adds(node: syn::Expr, collection: &mut Vec<syn::Expr>) {
 lazy_static!{
     static ref X64_REGISTERS: HashMap<&'static str, (RegId, Size)> = {
         use self::RegId::*;
-        use crate::serialize::Size::*;
+        use crate::common::Size::*;
 
         let mut h = HashMap::new();
         h.insert("rax", (RAX, QWORD));
@@ -541,7 +540,7 @@ lazy_static!{
     };
     static ref X86_REGISTERS: HashMap<&'static str, (RegId, Size)> = {
         use self::RegId::*;
-        use crate::serialize::Size::*;
+        use crate::common::Size::*;
 
         let mut h = HashMap::new();
         h.insert("eax", (RAX, DWORD));

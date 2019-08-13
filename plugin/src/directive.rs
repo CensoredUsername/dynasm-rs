@@ -3,10 +3,9 @@ use std::collections::hash_map::Entry;
 use syn::parse;
 use syn::Token;
 
-use crate::serialize::{Stmt, Size, delimited};
+use crate::common::{Stmt, Size, delimited, emit_error_at};
 use crate::arch;
 use crate::DynasmData;
-use crate::emit_error_at;
 use crate::parse_helpers::ParseOptExt;
 
 pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stmt>, input: parse::ParseStream) -> parse::Result<()> {

@@ -26,6 +26,8 @@ use std::sync::{RwLock, RwLockReadGuard, Mutex};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+/// Module with common infrastructure across assemblers
+mod common;
 /// Module with architecture-specific assembler implementations
 mod arch;
 /// Module contaning the implementation of directives
@@ -52,7 +54,7 @@ pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
 /// invocation.
 struct Dynasm {
     target: TokenTree,
-    stmts: Vec<serialize::Stmt>
+    stmts: Vec<common::Stmt>
 }
 
 /// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
@@ -64,7 +66,7 @@ impl parse::Parse for Dynasm {
         // parse the assembler target declaration
         let target: syn::Expr = input.parse()?;
         // and just convert it back to a tokentree since that's how we'll always be using it.
-        let target = serialize::delimited(target);
+        let target = common::delimited(target);
 
         // get file-local data (alias definitions, current architecture)
         let file_data = file_local_data();
@@ -92,7 +94,7 @@ impl parse::Parse for Dynasm {
                 if !buffer.is_empty() {
                     // ensure that the statement is actually a proper statement and then emit it for serialization
                     let stmt: syn::Stmt = syn::parse2(buffer)?;
-                    stmts.push(serialize::Stmt::Stmt(serialize::delimited(stmt)));
+                    stmts.push(common::Stmt::Stmt(common::delimited(stmt)));
                 }
                 continue;
             }
@@ -104,7 +106,7 @@ impl parse::Parse for Dynasm {
                 let name: syn::Ident = input.parse()?;
                 let _: Token![:] = input.parse()?;
 
-                stmts.push(serialize::Stmt::GlobalLabel(name));
+                stmts.push(common::Stmt::GlobalLabel(name));
                 continue;
             }
 
@@ -114,7 +116,7 @@ impl parse::Parse for Dynasm {
 
                 let expr: syn::Expr = input.parse()?;
 
-                stmts.push(serialize::Stmt::DynamicLabel(serialize::delimited(expr)));
+                stmts.push(common::Stmt::DynamicLabel(common::delimited(expr)));
                 continue;
             }
 
@@ -124,7 +126,7 @@ impl parse::Parse for Dynasm {
                 let name: syn::Ident = input.parse()?;
                 let _: Token![:] = input.parse()?;
 
-                stmts.push(serialize::Stmt::LocalLabel(name));
+                stmts.push(common::Stmt::LocalLabel(name));
                 continue;
             }
 
@@ -210,7 +212,7 @@ impl parse::Parse for DynasmOpmap {
 
 /// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
 struct State<'a> {
-    pub stmts: &'a mut Vec<serialize::Stmt>,
+    pub stmts: &'a mut Vec<common::Stmt>,
     pub target: &'a TokenTree,
     pub file_data: &'a DynasmData,
 }
@@ -261,10 +263,4 @@ fn file_local_data() -> FileLocalData {
 // this is where the actual storage resides.
 lazy_static! {
     static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
-}
-
-// FIXME: temporary till Diagnostic gets stabilized
-fn emit_error_at(span: Span, msg: String) {
-    let span: proc_macro::Span = span.unstable();
-    span.error(msg).emit();
 }

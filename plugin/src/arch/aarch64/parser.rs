@@ -3,7 +3,7 @@ use syn::{parse, Token};
 use lazy_static::lazy_static;
 
 use crate::parse_helpers::{parse_ident_or_rust_keyword, ParseOpt, ParseOptExt};
-use crate::serialize::Size;
+use crate::common::Size;
 
 use super::Context;
 use super::ast::{Instruction, RawArg, Register, RegId, RegKind, RegScalar, RegVector, RegFamily, RefItem, Modifier, ModifyExpr};
@@ -406,7 +406,7 @@ impl parse::Parse for Modifier {
 lazy_static!{
     static ref AARCH64_REGISTERS: HashMap<&'static str, (RegId, Option<Size>)> = {
         use self::RegId::*;
-        use crate::serialize::Size::*;
+        use crate::common::Size::*;
         let mut h = HashMap::new();
 
         h.insert("X0" , (X0 , Some(QWORD)));

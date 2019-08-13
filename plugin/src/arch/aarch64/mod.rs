@@ -1,5 +1,4 @@
 use syn::parse;
-use syn::spanned::Spanned;
 
 mod ast;
 mod parser;
@@ -9,10 +8,8 @@ mod aarch64data;
 mod encoding_helpers;
 
 use crate::State;
-use crate::emit_error_at;
+use crate::common::{Size, Stmt, JumpType, emit_error_at};
 use crate::arch::Arch;
-use crate::parse_helpers::JumpType;
-use crate::serialize::{self, Size, Stmt};
 use self::aarch64data::Relocation;
 
 
@@ -43,13 +40,7 @@ impl Arch for ArchAarch64 {
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size) {
-        let span = match &reloc {
-            JumpType::Global(ident) |
-            JumpType::Backward(ident) |
-            JumpType::Forward(ident) => ident.span(),
-            JumpType::Dynamic(expr) |
-            JumpType::Bare(expr) => expr.span(),
-        };
+        let span = reloc.span();
 
         let relocation = match size {
             Size::DWORD => Relocation::LITERAL32,
@@ -62,16 +53,7 @@ impl Arch for ArchAarch64 {
         let data = [relocation.to_id()];
 
         stmts.push(Stmt::Const(0, size));
-        stmts.push(match reloc {
-            JumpType::Global(ident) => Stmt::GlobalJumpTarget(ident, serialize::expr_tuple_of_u8s(span, &data)),
-            JumpType::Forward(ident) => Stmt::ForwardJumpTarget(ident, serialize::expr_tuple_of_u8s(span, &data)),
-            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_u8s(span, &data)),
-            JumpType::Dynamic(expr) => Stmt::DynamicJumpTarget(serialize::delimited(expr), serialize::expr_tuple_of_u8s(span, &data)),
-            JumpType::Bare(_ident) => {
-                emit_error_at(span, "Extern relocations in statics are not supported".into());
-                return;
-            }
-        });
+        stmts.push(reloc.encode(&data));
     }
 
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {

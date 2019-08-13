@@ -1,4 +1,4 @@
-use crate::serialize::Size;
+use crate::common::Size;
 use super::ast::Modifier;
 
 use lazy_static::lazy_static;
@@ -231,7 +231,7 @@ lazy_static! {
         let mut map = HashMap::new();
 
         use super::ast::Modifier::*;
-        use crate::serialize::Size::*;
+        use crate::common::Size::*;
         use self::SpecialComm::*;
         use self::Relocation::*;
 

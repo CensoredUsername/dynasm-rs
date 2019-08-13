@@ -2,11 +2,11 @@ use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenTree};
 use quote::{quote_spanned};
 
-use crate::emit_error_at;
-use crate::serialize::{self, Stmt, Size};
+use crate::common::{Stmt, Size, JumpType, delimited, emit_error_at};
+use crate::serialize;
 
 use super::{Context, X86Mode};
-use super::ast::{RawArg, CleanArg, SizedArg, Instruction, MemoryRefItem, Register, RegKind, RegFamily, RegId, JumpType};
+use super::ast::{RawArg, CleanArg, SizedArg, Instruction, MemoryRefItem, Register, RegKind, RegFamily, RegId};
 use super::x64data::get_mnemnonic_data;
 use super::x64data::Flags;
 use super::x64data::Features;
@@ -260,7 +260,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         if let RegKind::Dynamic(_, expr) = rm_k {
             let last: TokenTree = proc_macro2::Literal::u8_suffixed(*last).into();
-            buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(&last, &serialize::delimited(expr), 7, 0), Size::BYTE));
+            buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(&last, &delimited(expr), 7, 0), Size::BYTE));
         } else {
             buffer.push(Stmt::u8(last + (rm_k.encode() & 7)));
         }
@@ -317,7 +317,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             }
 
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(serialize::delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
             } else if mode == MOD_DISP8 {
                 // no displacement was asked for, but we have to encode one as there's a base
                 buffer.push(Stmt::u8(0));
@@ -340,7 +340,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             compile_modrm_sib(buffer, mode, reg_k, base_k);
 
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(serialize::delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::WORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::WORD}));
             } else if mode == MOD_DISP8 {
                 buffer.push(Stmt::u8(0));
             }
@@ -351,7 +351,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
             match ctx.mode {
                 X86Mode::Long => if let Some(disp) = disp {
-                    buffer.push(Stmt::ExprSigned(serialize::delimited(disp), Size::DWORD));
+                    buffer.push(Stmt::ExprSigned(delimited(disp), Size::DWORD));
                 } else {
                     buffer.push(Stmt::u32(0))
                 },
@@ -417,7 +417,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
             // Disp
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(serialize::delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
             } else if no_base {
                 buffer.push(Stmt::u32(0));
             } else if mode == MOD_DISP8 {
@@ -456,13 +456,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
         if let RegKind::Dynamic(_, expr) = ireg {
-            byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 0xF, 4);
+            byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 0xF, 4);
         }
         // if immediates are present, the register argument will be merged into the
         // first immediate byte.
         if !args.is_empty() {
             if let SizedArg::Immediate {value, size: Size::BYTE} = args.remove(0) {
-                byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(value), 0xF, 0);
+                byte = serialize::expr_mask_shift_or(&byte, &delimited(value), 0xF, 0);
             } else {
                 panic!("bad formatting data")
             }
@@ -477,7 +477,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
     for arg in args {
         match arg {
             SizedArg::Immediate {value, size} => {
-                buffer.push(Stmt::ExprSigned(serialize::delimited(value), size));
+                buffer.push(Stmt::ExprSigned(delimited(value), size));
 
                 // bump relocations
                 relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
@@ -511,28 +511,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             X86Mode::Long      => &data[..2],
         };
 
-        buffer.push(match target {
-            JumpType::Global(ident)   => {
-                let span = ident.span();
-                Stmt::GlobalJumpTarget(ident, serialize::expr_tuple_of_u8s(span, data))
-            },
-            JumpType::Forward(ident)  => {
-                let span = ident.span();
-                Stmt::ForwardJumpTarget( ident, serialize::expr_tuple_of_u8s(span, data))
-            },
-            JumpType::Backward(ident) => {
-                let span = ident.span();
-                Stmt::BackwardJumpTarget(ident, serialize::expr_tuple_of_u8s(span, data))
-            },
-            JumpType::Dynamic(expr)   => {
-                let span = expr.span();
-                Stmt::DynamicJumpTarget(serialize::delimited(expr), serialize::expr_tuple_of_u8s(span, data))
-            },
-            JumpType::Bare(expr)      => {
-                let span = expr.span();
-                Stmt::BareJumpTarget(serialize::delimited(expr), serialize::expr_tuple_of_u8s(span, data))
-            }
-        })
+        buffer.push(target.encode(data));
     }
 
     Ok(())
@@ -613,7 +592,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             }
 
             // merge disps
-            let disp = serialize::expr_add_many(span, disps.into_iter().map(serialize::delimited));
+            let disp = serialize::expr_add_many(span, disps.into_iter().map(delimited));
             let disp = disp.map(|d| serialize::reparse(&d).expect("Invalid expression generated internally"));
 
             // finalize the memoryref
@@ -672,7 +651,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             let true_disp_size = disp_size.unwrap_or(Size::DWORD);
 
             // merge disps [a, b, c] into (a + b + c)
-            let scaled_disp = serialize::expr_add_many(span, disps.into_iter().map(serialize::delimited));
+            let scaled_disp = serialize::expr_add_many(span, disps.into_iter().map(delimited));
 
             // scale disps (a + b + c) * size_of<scale> as disp_size
             let scaled_disp = scaled_disp.map(|disp| serialize::expr_size_of_scale(&scale, &disp, true_disp_size));
@@ -1537,13 +1516,13 @@ fn compile_rex(buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<SizedArg>, rm: 
     let mut rex: TokenTree = proc_macro2::Literal::u8_suffixed(rex).into();
 
     if let RegKind::Dynamic(_, expr) = reg_k {
-        rex = serialize::expr_mask_shift_or(&rex, &serialize::delimited(expr), 8, -1);
+        rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -1);
     }
     if let RegKind::Dynamic(_, expr) = index_k {
-        rex = serialize::expr_mask_shift_or(&rex, &serialize::delimited(expr), 8, -2);
+        rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -2);
     }
     if let RegKind::Dynamic(_, expr) = base_k {
-        rex = serialize::expr_mask_shift_or(&rex, &serialize::delimited(expr), 8, -3);
+        rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -3);
     }
     buffer.push(Stmt::ExprUnsigned(rex, Size::BYTE));
 }
@@ -1604,10 +1583,10 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
 
         let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
         if let RegKind::Dynamic(_, expr) = reg_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 4)
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 4)
         }
         if let RegKind::Dynamic(_, expr) = vvvv_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 0xF, 3)
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 0xF, 3)
         }
         buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
         return;
@@ -1619,13 +1598,13 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 4);
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 4);
         }
         if let RegKind::Dynamic(_, expr) = index_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 3);
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 3);
         }
         if let RegKind::Dynamic(_, expr) = base_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &serialize::delimited(expr), 8, 2);
+            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 2);
         }
         buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
     } else {
@@ -1636,7 +1615,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         let mut byte2: TokenTree = proc_macro2::Literal::u8_suffixed(byte2).into();
 
         if let RegKind::Dynamic(_, expr) = vvvv_k {
-            byte2 = serialize::expr_mask_shift_inverted_and(&byte2, &serialize::delimited(expr), 0xF, 3)
+            byte2 = serialize::expr_mask_shift_inverted_and(&byte2, &delimited(expr), 0xF, 3)
         }
         buffer.push(Stmt::ExprUnsigned(byte2, Size::BYTE));
     } else {
@@ -1657,10 +1636,10 @@ fn compile_modrm_sib(buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegK
     let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 3);
+        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 3);
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 0);
+        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 0);
     }
     buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
 }
@@ -1673,17 +1652,17 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr
     let scale: TokenTree = proc_macro2::Literal::u8_unsuffixed(scale).into();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 3);
+        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 3);
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = serialize::expr_mask_shift_or(&byte, &serialize::delimited(expr), 7, 0);
+        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 0);
     }
 
     let span = scale_expr.span();
-    let scale_expr = serialize::delimited(scale_expr);
+    let scale_expr = delimited(scale_expr);
 
     let (expr1, expr2) = serialize::expr_dynscale(
-        &serialize::delimited(quote_spanned!{ span=>
+        &delimited(quote_spanned!{ span=>
             #scale_expr * #scale
         }),
         &byte

@@ -2,10 +2,10 @@
 use proc_macro2::Span;
 
 use super::Context;
-use super::ast::{Instruction, RawArg, CleanArg, FlatArg, JumpType, RefItem, Register, RegFamily, RefKind, Modifier};
+use super::ast::{Instruction, RawArg, CleanArg, FlatArg, RefItem, Register, RegFamily, RefKind, Modifier};
 use super::aarch64data::{Opdata, Matcher, COND_MAP, get_mnemonic_data};
-use crate::emit_error_at;
-use crate::serialize::Size;
+
+use crate::common::{Size, JumpType, emit_error_at};
 use crate::parse_helpers::{as_ident, as_number, as_float};
 
 /// Try finding an appropriate definition that matches the given instruction / arguments. 
@@ -54,7 +54,8 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             // offsets: validate that only relative jumps are allowed (no extern relocations)
             RawArg::JumpTarget { type_ } => {
                 if let JumpType::Bare(_) = type_ {
-                    return Err(Some("Extern relocations are not allowed in aarch64".into()));
+                    emit_error_at(type_.span(), "Extern relocations are not allowed in aarch64".into());
+                    return Err(None);
                 }
                 res.push(CleanArg::JumpTarget { type_ });
             },
