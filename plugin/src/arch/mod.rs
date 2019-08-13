@@ -1,7 +1,10 @@
 use syn::parse;
+use syn::spanned::Spanned;
 
+use crate::serialize::{Size, Stmt};
 use crate::State;
 use crate::emit_error_at;
+use crate::parse_helpers::JumpType;
 
 use std::fmt::Debug;
 
@@ -11,6 +14,7 @@ pub mod aarch64;
 pub(crate) trait Arch : Debug + Send {
     fn name(&self) -> &str;
     fn set_features(&mut self, features: &[syn::Ident]);
+    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size);
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()>;
 }
 
@@ -34,6 +38,17 @@ impl Arch for DummyArch {
         if let Some(feature) = features.first() {
             emit_error_at(feature.span(), "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive".into());
         }
+    }
+
+    fn handle_static_reloc(&self, _stmts: &mut Vec<Stmt>, reloc: JumpType, _size: Size) {
+        let span = match reloc {
+            JumpType::Global(ident) |
+            JumpType::Backward(ident) |
+            JumpType::Forward(ident) => ident.span(),
+            JumpType::Dynamic(expr) |
+            JumpType::Bare(expr) => expr.span(),
+        };
+        emit_error_at(span, "Current assembling architecture is undefined. Define it using a .arch directive".into());
     }
 
     fn compile_instruction(&self, _state: &mut State, input: parse::ParseStream) -> parse::Result<()> {

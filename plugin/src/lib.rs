@@ -97,14 +97,6 @@ impl parse::Parse for Dynasm {
                 continue;
             }
 
-            // ; . directive
-            if input.peek(Token![.]) {
-                let _: Token![.] = input.parse()?;
-
-                file_data.evaluate_directive(&mut stmts, input)?;
-                continue;
-            }
-
             // ; -> label :
             if input.peek(Token![->]) {
                 let _: Token![->] = input.parse()?;
@@ -136,13 +128,22 @@ impl parse::Parse for Dynasm {
                 continue;
             }
 
-            // anything else is an assembly instruction which should be in current_arch
-            let mut state = State {
-                stmts: &mut stmts,
-                target: &target,
-                file_data: &*file_data,
-            };
-            file_data.current_arch.compile_instruction(&mut state, input)?;
+
+            // ; . directive
+            if input.peek(Token![.]) {
+                let _: Token![.] = input.parse()?;
+
+                directive::evaluate_directive(&mut file_data, &mut stmts, input)?;
+            } else {
+                // anything else is an assembly instruction which should be in current_arch
+
+                let mut state = State {
+                    stmts: &mut stmts,
+                    target: &target,
+                    file_data: &*file_data,
+                };
+                file_data.current_arch.compile_instruction(&mut state, input)?;
+            }
 
         }
 
