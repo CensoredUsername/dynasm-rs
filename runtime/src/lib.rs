@@ -1,10 +1,11 @@
 extern crate memmap;
-extern crate byteorder;
 extern crate take_mut;
+extern crate byteorder;
 
 pub mod common;
 pub mod x64;
 pub mod x86;
+pub mod aarch64;
 
 use std::ops::{Deref, DerefMut};
 use std::iter::Extend;
@@ -14,7 +15,6 @@ use std::error;
 use std::fmt;
 
 use memmap::{Mmap, MmapMut};
-use byteorder::{ByteOrder, LittleEndian};
 
 /// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
@@ -157,44 +157,32 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     /// Push a signed word into the assembling target
     #[inline]
     fn push_i16(&mut self, value: i16) {
-        let mut buf = [0u8; 2];
-        LittleEndian::write_i16(&mut buf, value);
-        self.extend(&buf);
+        self.extend(&value.to_le_bytes());
     }
     /// Push a signed doubleword into the assembling target
     #[inline]
     fn push_i32(&mut self, value: i32) {
-        let mut buf = [0u8; 4];
-        LittleEndian::write_i32(&mut buf, value);
-        self.extend(&buf);
+        self.extend(&value.to_le_bytes());
     }
     /// Push a signed quadword into the assembling target
     #[inline]
     fn push_i64(&mut self, value: i64) {
-        let mut buf = [0u8; 8];
-        LittleEndian::write_i64(&mut buf, value);
-        self.extend(&buf);
+        self.extend(&value.to_le_bytes());
     }
     /// Push an usigned word into the assembling target
     #[inline]
     fn push_u16(&mut self, value: u16) {
-        let mut buf = [0u8; 2];
-        LittleEndian::write_u16(&mut buf, value);
-        self.extend(&buf);
+        self.extend(&value.to_le_bytes());
     }
     /// Push an usigned doubleword into the assembling target
     #[inline]
     fn push_u32(&mut self, value: u32) {
-        let mut buf = [0u8; 4];
-        LittleEndian::write_u32(&mut buf, value);
-        self.extend(&buf);
+        self.extend(&value.to_le_bytes());
     }
     /// Push an usigned quadword into the assembling target
     #[inline]
     fn push_u64(&mut self, value: u64) {
-        let mut buf = [0u8; 8];
-        LittleEndian::write_u64(&mut buf, value);
-        self.extend(&buf);
+        self.extend(&value.to_le_bytes());
     }
     /// This function is called in when a runtime error has to be generated. It panics.
     #[inline]
