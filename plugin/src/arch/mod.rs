@@ -69,5 +69,7 @@ pub(crate) fn from_str(s: &str) -> Option<Box<dyn Arch>> {
 pub const CURRENT_ARCH: &str = "x64";
 #[cfg(target_arch="x86")]
 pub const CURRENT_ARCH: &str = "x86";
+#[cfg(target_arch="aarch64")]
+pub const CURRENT_ARCH: &str = "aarch64";
 #[cfg(not(any(target_arch="x86", target_arch="x86_64")))]
 pub const CURRENT_ARCH: &str = "unknown";
