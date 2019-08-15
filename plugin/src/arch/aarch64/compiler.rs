@@ -533,13 +533,23 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
                     statics.push((offset, encoded as u32));
                     return Ok(());
                 }
-            } // TODO: no dynamic logical immediate handling yet
+            }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                dynasmrt::aarch64::encode_logical_immediate_32bit(#imm).expect("Impossible logical immediate") as u32
+            }));
+            return Ok(());
         },
         SpecialComm::LOGICAL_IMMEDIATE_X => if let Some(number) = as_number(imm) {
             if let Some(encoded) = encoding_helpers::encode_logical_immediate_64bit(number) {
                 statics.push((offset, encoded as u32));
                 return Ok(());
-            } // TODO: no dynamic logical immediate handling yet
+            }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                dynasmrt::aarch64::encode_logical_immediate_64bit(#imm).expect("Impossible logical immediate") as u32
+            }));
+            return Ok(());
         },
         SpecialComm::FLOAT_IMMEDIATE => if let Some(number) = as_float(imm) {
             if let Some(encoded) = encoding_helpers::encode_floating_point_immediate(number as f32) {
