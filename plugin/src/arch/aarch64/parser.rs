@@ -682,8 +682,8 @@ lazy_static!{
         let mut h = HashMap::new();
         h.insert("x",   (RegFamily::INTEGER,   Some(Size::QWORD)));
         h.insert("w",   (RegFamily::INTEGER,   Some(Size::DWORD)));
-        h.insert("xsp", (RegFamily::INTEGERSP, Some(Size::QWORD)));
-        h.insert("wsp", (RegFamily::INTEGERSP, Some(Size::DWORD)));
+        h.insert("xs",  (RegFamily::INTEGERSP, Some(Size::QWORD)));
+        h.insert("ws",  (RegFamily::INTEGERSP, Some(Size::DWORD)));
 
         h.insert("b", (RegFamily::SIMD, Some(Size::BYTE)));
         h.insert("h", (RegFamily::SIMD, Some(Size::WORD)));
