@@ -368,6 +368,10 @@ pub enum RawArg {
     Dot {
         span: Span
     },
+    // an ident, not intended to be parsed as an expression
+    Lit {
+        ident: syn::Ident
+    },
     // used to not block the parser on a parsing error in a single arg
     Invalid
 }
@@ -418,6 +422,9 @@ pub enum CleanArg {
     },
     Dot {
         span: Span
+    },
+    Lit {
+        ident: syn::Ident
     }
 }
 
@@ -437,6 +444,9 @@ pub enum FlatArg {
     },
     JumpTarget {
         type_: JumpType
+    },
+    Lit {
+        ident: syn::Ident
     },
     Default
 }

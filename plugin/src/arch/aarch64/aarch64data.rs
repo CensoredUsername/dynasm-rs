@@ -136,8 +136,10 @@ pub enum Command {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 pub enum SpecialComm {
-    INVERTED_WIDE_IMMEDIATE,
-    WIDE_IMMEDIATE,
+    INVERTED_WIDE_IMMEDIATE_W,
+    INVERTED_WIDE_IMMEDIATE_X,
+    WIDE_IMMEDIATE_W,
+    WIDE_IMMEDIATE_X,
     STRETCHED_IMMEDIATE,
     LOGICAL_IMMEDIATE_W,
     LOGICAL_IMMEDIATE_X,

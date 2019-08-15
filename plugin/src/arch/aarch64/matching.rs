@@ -81,6 +81,10 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             RawArg::Dot { span } => {
                 res.push(CleanArg::Dot { span } );
             },
+            // lit: passthrough
+            RawArg::Lit { ident } => {
+                res.push(CleanArg::Lit { ident } );
+            },
             // immediate: pass through
             RawArg::Immediate { value, prefixed } => {
                 res.push(CleanArg::Immediate { value, prefixed })
@@ -377,13 +381,34 @@ impl Matcher {
                 }
             },
             CleanArg::RegList { amount, element, first, .. } => {
+                let first = first.assume_vector();
                 match self {
-                    Matcher::RegList(m_amount, element_size) =>
-                        m_amount == amount && *element_size == first.size() && element.is_none(),
+                    Matcher::RegList(m_amount, element_size) => {
+                        if m_amount != amount || *element_size != first.element_size() || element.is_some() {
+                            return false;
+                        }
+
+                        if let Some(bytes) = first.full_size() {
+                            let full_width = match bytes {
+                                8 => false,
+                                16 => true,
+                                _ => return false
+                            };
+                            match ctx.simd_full_width {
+                                None => {
+                                    ctx.simd_full_width = Some(full_width);
+                                    true
+                                }
+                                Some(f) => f == full_width
+                            }
+                        } else {
+                            false
+                        }
+                    },
                     Matcher::RegListStatic(m_amount, element_size, lanecount) =>
-                        m_amount == amount && *element_size == first.size() && element.is_none() && first.assume_vector().lanes == Some(*lanecount),
+                        m_amount == amount && *element_size == first.element_size() && element.is_none() && first.lanes == Some(*lanecount),
                     Matcher::RegListElement(m_amount, element_size) =>
-                        m_amount == amount && *element_size == first.size() && element.is_some(),
+                        m_amount == amount && *element_size == first.element_size() && element.is_some(),
                     _ => false
                 }
             },
@@ -459,7 +484,13 @@ impl Matcher {
                     false
                 }
             },
-            CleanArg::Dot { .. } => *self == Matcher::Dot
+            CleanArg::Dot { .. } => *self == Matcher::Dot,
+            CleanArg::Lit { ident } => match self {
+                Matcher::Ident => true,
+                Matcher::Cond => COND_MAP.contains_key(&&*ident.to_string()),
+                Matcher::Lit(s) => ident.to_string() == *s,
+                _ => false
+            }
         }
     }
 
@@ -578,7 +609,17 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
                     }
                 },
                 CleanArg::Direct { span, reg } => {
-                    new_args.push(FlatArg::Direct { span, reg: reg.kind_owned() } );
+                    match reg {
+                        Register::Scalar(s) => {
+                            new_args.push(FlatArg::Direct { span, reg: s.kind });
+                        },
+                        Register::Vector(v) => {
+                            new_args.push(FlatArg::Direct { span, reg: v.kind });
+                            if let Some(element) = v.element {
+                                new_args.push(FlatArg::Immediate { value: element });
+                            }
+                        }
+                    }
                 },
                 CleanArg::JumpTarget { type_ } => {
                     new_args.push(FlatArg::JumpTarget { type_ } );
@@ -592,7 +633,10 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
                         new_args.push(FlatArg::Immediate { value: expr });
                     }
                 },
-                CleanArg::Dot { .. } => ()
+                CleanArg::Dot { .. } => (),
+                CleanArg::Lit { ident } => {
+                    new_args.push(FlatArg::Lit { ident });
+                }
             }
         }
 

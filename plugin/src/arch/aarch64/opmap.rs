@@ -2282,16 +2282,16 @@ Ops!(map ;
     0b01001110_00000100_00011100_00000000 = [VElement(DWORD), W] => [R(0), Ubits(19, 2), R(5)];
     0b01001110_00001000_00011100_00000000 = [VElement(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
     // MOV (inverted wide immediate)
-    0b00010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), W, Imm] => [R(0), Special(5, INVERTED_WIDE_IMMEDIATE)];
-    0b10010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), X, Imm] => [R(0), Special(5, INVERTED_WIDE_IMMEDIATE)];
+    0b00010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), W, Imm] => [R(0), Special(5, INVERTED_WIDE_IMMEDIATE_W)];
+    0b10010010_10000000_00000000_00000000 = [Dot, Lit("inverted"), X, Imm] => [R(0), Special(5, INVERTED_WIDE_IMMEDIATE_X)];
     // MOV (wide immediate)
-    0b01010010_10000000_00000000_00000000 = [W, Imm] => [R(0), Special(5, WIDE_IMMEDIATE)];
-    0b11010010_10000000_00000000_00000000 = [X, Imm] => [R(0), Special(5, WIDE_IMMEDIATE)];
+    0b01010010_10000000_00000000_00000000 = [W, Imm] => [R(0), Special(5, WIDE_IMMEDIATE_W)];
+    0b11010010_10000000_00000000_00000000 = [X, Imm] => [R(0), Special(5, WIDE_IMMEDIATE_X)];
     // MOV (vector)
     0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), C, R(16), Rwidth(30)];
     // MOV (bitmask immediate)
-    0b00110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), WSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_W)];
-    0b10110010_00000000_00000011_11100000 = [Dot, Lit("Logical"), XSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_X)];
+    0b00110010_00000000_00000011_11100000 = [Dot, Lit("logical"), WSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_W)];
+    0b10110010_00000000_00000011_11100000 = [Dot, Lit("logical"), XSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_X)];
     // MOV (register)
     0b00101010_00000000_00000011_11100000 = [W, W] => [R(0), R(16)];
     0b10101010_00000000_00000011_11100000 = [X, X] => [R(0), R(16)];
@@ -2305,7 +2305,7 @@ Ops!(map ;
     0b00001111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
     0b00001111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
     0b00101111_00000000_11100100_00000000 = [D, Imm] => [R(0), Special(5, STRETCHED_IMMEDIATE)];
-    0b01101111_00000000_11100100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, SPLIT_FLOAT_IMMEDIATE)];
+    0b01101111_00000000_11100100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, STRETCHED_IMMEDIATE)];
 ]
 "movk" = [
     0b01110010_10000000_00000000_00000000 = [W, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])];

@@ -202,3 +202,8 @@ pub fn emit_error_at(span: Span, msg: String) {
     span.error(msg).emit();
 }
 
+
+/// Create a bitmask with `scale` bits set
+pub fn bitmask(scale: u8) -> u32 {
+    1u32.checked_shl(scale as u32).unwrap_or(0).wrapping_sub(1)
+}

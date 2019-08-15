@@ -26,10 +26,9 @@ pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) ->
         let _: Token![.] = input.parse()?;
         args.push(RawArg::Dot { span } );
 
-        let arg: syn::Expr = input.parse()?;
-        args.push(RawArg::Immediate {
-            prefixed: false,
-            value: arg
+        let arg: syn::Ident = input.parse()?;
+        args.push(RawArg::Lit {
+            ident: arg
         });
     }
 

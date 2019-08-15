@@ -4,7 +4,7 @@ use super::Context;
 use super::ast::{FlatArg, RegKind, RegId, Modifier, };
 use super::encoding_helpers;
 
-use crate::common::{Stmt, Size, delimited, emit_error_at};
+use crate::common::{Stmt, Size, delimited, emit_error_at, bitmask};
 use crate::parse_helpers::{as_ident, as_number, as_float, as_signed_number};
 
 use syn::spanned::Spanned;
@@ -146,7 +146,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     if let Some(&bits) = list.get(&&*name) {
                         statics.push((offset, bits));
                     } else {
-                        emit_error_at(value.span(), "Unknonwn literal".into());
+                        emit_error_at(value.span(), "Unknown literal".into());
                         return Err(None);
                     }
                 },
@@ -369,6 +369,31 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 }
                 _ => panic!("Invalid argument processor")
             },
+            FlatArg::Lit { ref ident } => match *command {
+
+                // Condition codes, literals
+                Command::Cond(offset) => {
+                    let name = ident.to_string();
+                    let bits = *COND_MAP.get(&&*name).expect("bad command data");
+                    statics.push((offset, bits as u32))
+                },
+                Command::CondInv(offset) => {
+                    let name = ident.to_string();
+                    let bits = *COND_MAP.get(&&*name).expect("bad command data");
+                    statics.push((offset, bits as u32 ^ 1))
+                },
+                Command::LitList(offset, listname) => {
+                    let name = ident.to_string();
+                    let list = SPECIAL_IDENT_MAP.get(listname).expect("bad command data");
+                    if let Some(&bits) = list.get(&&*name) {
+                        statics.push((offset, bits));
+                    } else {
+                        emit_error_at(ident.span(), "Unknown literal".into());
+                        return Err(None);
+                    }
+                },
+                _ => panic!("Invalid argument processor")
+            }
         }
 
         // figure out how far the cursor has to be advanced.
@@ -418,52 +443,89 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
 fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, statics: &mut Vec<(u8, u32)>, dynamics: &mut Vec<(u8, TokenStream)>) -> Result<(), Option<String>> {
     match special {
-        SpecialComm::INVERTED_WIDE_IMMEDIATE => if let Some(number) = as_number(imm) {
-            if let Some(encoded) = encoding_helpers::encode_inverted_wide_immediate(number) {
+        SpecialComm::INVERTED_WIDE_IMMEDIATE_X => if let Some(number) = as_number(imm) {
+            if let Some(encoded) = encoding_helpers::encode_wide_immediate_64bit(!number) {
                 statics.push((offset, encoded as u32));
                 return Ok(());
-            } else {
-                dynamics.push((offset, quote_spanned!{ imm.span()=>
-                    {
-                        let value: u64 = !#imm;
-                        let offset = value.leading_zeros() & 0b110000;
-                        ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
-                    }
-                }));
             }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: u64 = !#imm;
+                    let offset = value.trailing_zeros() & 0b110000;
+                    ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
+                }
+            }));
+            return Ok(());
         },
-        SpecialComm::WIDE_IMMEDIATE => if let Some(number) = as_number(imm) {
-            if let Some(encoded) = encoding_helpers::encode_wide_immediate(number) {
+        SpecialComm::INVERTED_WIDE_IMMEDIATE_W => if let Some(number) = as_number(imm) {
+            if number <= std::u32::MAX as u64 {
+                if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(!(number as u32)) {
+                    statics.push((offset, encoded as u32));
+                    return Ok(());
+                }
+            }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: u64 = !#imm;
+                    let offset = value.trailing_zeros() & 0b10000;
+                    ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
+                }
+            }));
+            return Ok(());
+        },
+        SpecialComm::WIDE_IMMEDIATE_X => if let Some(number) = as_number(imm) {
+            if let Some(encoded) = encoding_helpers::encode_wide_immediate_64bit(number) {
                 statics.push((offset, encoded as u32));
                 return Ok(());
-            } else {
-                dynamics.push((offset, quote_spanned!{ imm.span()=>
-                    {
-                        let value: u64 = #imm;
-                        let offset = value.leading_zeros() & 0b110000;
-                        ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
-                    }
-                }));
             }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: u64 = #imm;
+                    let offset = value.trailing_zeros() & 0b110000;
+                    ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
+                }
+            }));
+            return Ok(());
+        },
+        SpecialComm::WIDE_IMMEDIATE_W => if let Some(number) = as_number(imm) {
+            if number <= std::u32::MAX as u64 {
+                if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(number as u32) {
+                    statics.push((offset, encoded as u32));
+                    return Ok(());
+                }
+            }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: u64 = #imm;
+                    let offset = value.trailing_zeros() & 0b10000;
+                    ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
+                }
+            }));
+            return Ok(());
         },
         SpecialComm::STRETCHED_IMMEDIATE => if let Some(number) = as_number(imm) {
             if let Some(encoded) = encoding_helpers::encode_stretched_immediate(number) {
                 statics.push((offset, encoded & 0x1F as u32));
                 statics.push((offset + 6, encoded & 0xE0 as u32));
                 return Ok(());
-            } else {
-                dynamics.push((offset, quote_spanned!{ imm.span()=>
-                    {
-                        let value: u64 = #imm;
-                        let mut masked = value & 0x8040201008040201;
-                        masked |= masked >> 32;
-                        masked |= masked >> 16;
-                        masked |= masked >> 8;
-                        let masked = masked as u32;
-                        ((masked & 0xE0) << 6) | (masked & 0x1F) 
-                    }
-                }));
             }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: u64 = #imm;
+                    let mut masked = value & 0x8040201008040201;
+                    masked |= masked >> 32;
+                    masked |= masked >> 16;
+                    masked |= masked >> 8;
+                    let masked = masked as u32;
+                    ((masked & 0xE0) << 6) | (masked & 0x1F) 
+                }
+            }));
+            return Ok(());
         },
         SpecialComm::LOGICAL_IMMEDIATE_W => if let Some(number) = as_number(imm) {
             if number <= std::u32::MAX as u64 {
@@ -483,39 +545,37 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             if let Some(encoded) = encoding_helpers::encode_floating_point_immediate(number as f32) {
                 statics.push((offset, encoded as u32));
                 return Ok(());
-            } else {
-                dynamics.push((offset, quote_spanned!{ imm.span()=>
-                    {
-                        let value: f32 = #imm;
-                        let bits = value.to_bits();
-                        ((bits >> 24) & 0x80) | ((bits >> 19) & 0x7F)
-                    }
-                }));
             }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: f32 = #imm;
+                    let bits = value.to_bits();
+                    ((bits >> 24) & 0x80) | ((bits >> 19) & 0x7F)
+                }
+            }));
+            return Ok(());
         },
         SpecialComm::SPLIT_FLOAT_IMMEDIATE => if let Some(number) = as_float(imm) {
             if let Some(encoded) = encoding_helpers::encode_floating_point_immediate(number as f32) {
                 statics.push((offset, (encoded & 0x1F) as u32));
                 statics.push((offset + 6, (encoded & 0xE0) as u32));
                 return Ok(());
-            } else {
-                dynamics.push((offset, quote_spanned!{ imm.span()=>
-                    {
-                        let value: f32 = #imm;
-                        let bits = value.to_bits();
-                        ((bits >> 18) & 0x80) | ((bits >> 13) & 0x60) | ((bits >> 19) & 0x1F)
-                    }
-                }));
             }
+        } else {
+            dynamics.push((offset, quote_spanned!{ imm.span()=>
+                {
+                    let value: f32 = #imm;
+                    let bits = value.to_bits();
+                    ((bits >> 18) & 0x80) | ((bits >> 13) & 0x60) | ((bits >> 19) & 0x1F)
+                }
+            }));
+            return Ok(());
         },
     }
 
     emit_error_at(imm.span(), "Impossible to encode immediate".into());
     return Err(None);
-}
-
-fn bitmask(scale: u8) -> u32 {
-    (1u32 << scale).wrapping_sub(1)
 }
 
 fn unsigned_rangecheck(expr: &syn::Expr, min: u32, max: u32, scale: u8) -> Option<Result<u32, Option<String>>> {

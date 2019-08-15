@@ -64,6 +64,9 @@ impl Arch for ArchAarch64 {
         let (instruction, args) = parser::parse_instruction(&mut ctx, input)?;
         let span = instruction.span;
 
+
+        println!("{:#?}", args);
+
         let match_data = match matching::match_instruction(&mut ctx, &instruction, args) {
             Err(None) => return Ok(()),
             Err(Some(e)) => {
@@ -73,8 +76,8 @@ impl Arch for ArchAarch64 {
             Ok(m) => m
         };
 
-        println!("{:?}", instruction);
-        println!("{:?}", match_data);
+        println!("{:#?}", instruction);
+        println!("{:#?}", match_data);
 
         match compiler::compile_instruction(&mut ctx, match_data) {
             Err(None) => return Ok(()),

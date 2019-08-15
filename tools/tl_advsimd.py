@@ -402,7 +402,7 @@ tlentry(['FMOV'],
 tlentry(['MOVI'],
     '<Vd>.2D,#<imm>', (('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'VStatic(QWORD, 2), Imm',
-    processor = 'R(0), Special(5, SPLIT_FLOAT_IMMEDIATE)', # stretched 64-bit immediate
+    processor = 'R(0), Special(5, STRETCHED_IMMEDIATE)', # stretched 64-bit immediate
 )
 
 tlentry(['SHA512SU0'],

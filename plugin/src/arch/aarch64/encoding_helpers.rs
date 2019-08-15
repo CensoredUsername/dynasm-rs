@@ -26,15 +26,15 @@ pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
 
     let element = value & (1u32 << element_size).wrapping_sub(1);
     let ones = element.count_ones();
-    let imms = (!(element_size - 1) & 0x3F) | ones;
+    let imms = (!((element_size << 1) - 1) & 0x3F) | (ones - 1);
 
     let immr = if (element & 1) != 0 {
-        ones - (!element).leading_zeros()
+        ones - (!element).trailing_zeros()
     } else {
-        element_size - element.leading_zeros()
+        element_size - element.trailing_zeros()
     };
 
-    Some(((imms as u16) << 6) | (immr as u16))
+    Some(((immr as u16) << 6) | (imms as u16))
 }
 
 pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
@@ -48,15 +48,18 @@ pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
 
     let element = value & (1u64 << element_size).wrapping_sub(1);
     let ones = element.count_ones();
-    let imms = ((!(element_size - 1) & 0x7F) ^ 0x40) | ones;
+    let imms = (!((element_size << 1) - 1) & 0x7F) | (ones - 1);
 
     let immr = if (element & 1) != 0 {
-        ones - (!element).leading_zeros()
+        ones - (!element).trailing_zeros()
     } else {
-        element_size - element.leading_zeros()
+        element_size - element.trailing_zeros()
     };
 
-    Some(((imms as u16) << 6) | (immr as u16))
+    let n = imms & 0x40 == 0;
+    let imms = imms & 0x3F;
+
+    Some(((n as u16) << 12) | ((immr as u16) << 6) | (imms as u16))
 }
 
 pub fn encode_stretched_immediate(value: u64) -> Option<u32> {
@@ -78,8 +81,8 @@ pub fn encode_stretched_immediate(value: u64) -> Option<u32> {
     Some(masked & 0xFF)
 }
 
-pub fn encode_wide_immediate(value: u64) -> Option<u32> {
-    let offset = value.leading_zeros() & 0b110000;
+pub fn encode_wide_immediate_64bit(value: u64) -> Option<u32> {
+    let offset = value.trailing_zeros() & 0b110000;
     let masked = 0xFFFF & (value >> offset);
     if (masked << offset) == value {
         Some((masked as u32) | (offset << 12))
@@ -88,6 +91,12 @@ pub fn encode_wide_immediate(value: u64) -> Option<u32> {
     }
 }
 
-pub fn encode_inverted_wide_immediate(value: u64) -> Option<u32> {
-    encode_wide_immediate(!value)
+pub fn encode_wide_immediate_32bit(value: u32) -> Option<u32> {
+    let offset = value.trailing_zeros() & 0b10000;
+    let masked = 0xFFFF & (value >> offset);
+    if (masked << offset) == value {
+        Some((masked as u32) | (offset << 12))
+    } else {
+        None
+    }
 }

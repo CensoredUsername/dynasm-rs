@@ -142,7 +142,7 @@ pub fn expr_dynscale(scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTr
 // makes (a, b)
 pub fn expr_tuple_of_u8s(span: Span, data: &[u8]) -> TokenTree {
     delimited(quote_spanned! {span=>
-        (#(#data),*)
+        (#(#data)*,)
     })
 }
 

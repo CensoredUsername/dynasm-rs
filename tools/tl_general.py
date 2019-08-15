@@ -46,9 +46,9 @@ tlentry(['TBNZ', 'TBZ'],
 tlentry(['MOV'],
     '<Wd>,#<imm>', (('hw', 2, 21), ('imm16', 16, 5), ('Rd', 5, 0)),
     matcher   = 'W, Imm',
-    processor = 'R(0), Special(5, WIDE_IMMEDIATE)', # wide immediate
+    processor = 'R(0), Special(5, WIDE_IMMEDIATE_W)', # wide immediate
     matchers  =['Dot, Lit("inverted"), W, Imm'],
-    processors=['R(0), Special(5, INVERTED_WIDE_IMMEDIATE)'], # inverted wide immediate
+    processors=['R(0), Special(5, INVERTED_WIDE_IMMEDIATE_W)'], # inverted wide immediate
     names = ["MOV (wide immediate)", "MOV (inverted wide immediate)"]
 )
 
@@ -194,7 +194,7 @@ tlentry(['CSET', 'CSETM'],
 
 tlentry(['MOV'],
     '<Wd|WSP>,#<imm>', (('immr', 6, 16), ('imms', 6, 10), ('Rd', 5, 0)),
-    matcher   = 'Dot, Lit("Logical"), WSP, Imm',
+    matcher   = 'Dot, Lit("logical"), WSP, Imm',
     processor = 'R(0), Special(10, LOGICAL_IMMEDIATE_W)',
 )
 
@@ -429,9 +429,9 @@ tlentry(['AUTDZA', 'AUTDZB', 'AUTIZA', 'AUTIZB', 'PACDZA', 'PACDZB', 'PACIZA', '
 tlentry(['MOV'],
     '<Xd>,#<imm>', (('hw', 2, 21), ('imm16', 16, 5), ('Rd', 5, 0)),
     matcher   = 'X, Imm',
-    processor = 'R(0), Special(5, WIDE_IMMEDIATE)', # wide immediate
+    processor = 'R(0), Special(5, WIDE_IMMEDIATE_X)', # wide immediate
     matchers  =['Dot, Lit("inverted"), X, Imm'],
-    processors=['R(0), Special(5, INVERTED_WIDE_IMMEDIATE)'], # inverted wide immediate
+    processors=['R(0), Special(5, INVERTED_WIDE_IMMEDIATE_X)'], # inverted wide immediate
     names = ["MOV (wide immediate)", "MOV (inverted wide immediate)"]
 )
 
@@ -615,7 +615,7 @@ tlentry(['ADRP'],
 
 tlentry(['MOV'],
     '<Xd|SP>,#<imm>', (('N', 1, 22), ('immr', 6, 16), ('imms', 6, 10), ('Rd', 5, 0)),
-    matcher   = 'Dot, Lit("Logical"), XSP, Imm',
+    matcher   = 'Dot, Lit("logical"), XSP, Imm',
     processor = 'R(0), Special(10, LOGICAL_IMMEDIATE_X)',
 )
 
