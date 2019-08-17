@@ -680,18 +680,18 @@ lazy_static!{
 
     static ref AARCH64_FAMILIES: HashMap<&'static str, (RegFamily, Option<Size>)> = {
         let mut h = HashMap::new();
-        h.insert("x",   (RegFamily::INTEGER,   Some(Size::QWORD)));
-        h.insert("w",   (RegFamily::INTEGER,   Some(Size::DWORD)));
-        h.insert("xs",  (RegFamily::INTEGERSP, Some(Size::QWORD)));
-        h.insert("ws",  (RegFamily::INTEGERSP, Some(Size::DWORD)));
+        h.insert("X",   (RegFamily::INTEGER,   Some(Size::QWORD)));
+        h.insert("W",   (RegFamily::INTEGER,   Some(Size::DWORD)));
+        h.insert("XSP", (RegFamily::INTEGERSP, Some(Size::QWORD)));
+        h.insert("WSP", (RegFamily::INTEGERSP, Some(Size::DWORD)));
 
-        h.insert("b", (RegFamily::SIMD, Some(Size::BYTE)));
-        h.insert("h", (RegFamily::SIMD, Some(Size::WORD)));
-        h.insert("s", (RegFamily::SIMD, Some(Size::DWORD)));
-        h.insert("d", (RegFamily::SIMD, Some(Size::QWORD)));
-        h.insert("q", (RegFamily::SIMD, Some(Size::OWORD)));
+        h.insert("B", (RegFamily::SIMD, Some(Size::BYTE)));
+        h.insert("H", (RegFamily::SIMD, Some(Size::WORD)));
+        h.insert("S", (RegFamily::SIMD, Some(Size::DWORD)));
+        h.insert("D", (RegFamily::SIMD, Some(Size::QWORD)));
+        h.insert("Q", (RegFamily::SIMD, Some(Size::OWORD)));
 
-        h.insert("v", (RegFamily::SIMD, None));
+        h.insert("V", (RegFamily::SIMD, None));
         h
     };
 }
