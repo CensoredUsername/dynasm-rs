@@ -155,23 +155,46 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     buf.push_str(&format!("[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]", name1, name2, name2, imm));
                 },
                 Matcher::Mod(mods) => {
-                    let mut optional = true;
-                    let mods: Vec<_> = mods.iter().map(|m| match m {
-                        Modifier::LSL => {optional = false; "LSL"},
-                        Modifier::LSR => {optional = false; "LSR"},
-                        Modifier::ASR => {optional = false; "ASR"},
-                        Modifier::ROR => {optional = false; "ROR"},
-                        Modifier::SXTX => "SXTX",
-                        Modifier::SXTW => "SXTW",
-                        Modifier::SXTH => "SXTH",
-                        Modifier::SXTB => "SXTB",
-                        Modifier::UXTX => "UXTX",
-                        Modifier::UXTW => "UXTW",
-                        Modifier::UXTH => "UXTH",
-                        Modifier::UXTB => "UXTB",
-                        Modifier::MSL => {optional = false; "MSL"},
-                    }).collect();
-                    buf.push_str(&mods.join("|"));
+                    let mut optional = false;
+                    let mut unsigned_extends = String::new();
+                    let mut signed_extends   = String::new();
+                    let mut rest = Vec::new();
+                    for m in *mods {
+                        match m {
+                            Modifier::LSL => rest.push("LSL"),
+                            Modifier::LSR => rest.push("LSR"),
+                            Modifier::ASR => rest.push("ASR"),
+                            Modifier::ROR => rest.push("ROR"),
+                            Modifier::SXTX => signed_extends.push('X'),
+                            Modifier::SXTW => signed_extends.push('W'),
+                            Modifier::SXTH => signed_extends.push('H'),
+                            Modifier::SXTB => signed_extends.push('B'),
+                            Modifier::UXTX => unsigned_extends.push('X'),
+                            Modifier::UXTW => unsigned_extends.push('W'),
+                            Modifier::UXTH => unsigned_extends.push('H'),
+                            Modifier::UXTB => unsigned_extends.push('B'),
+                            Modifier::MSL => rest.push("MSL"),
+                        }
+                    }
+                    if !unsigned_extends.is_empty() {
+                        if unsigned_extends.len() > 1 {
+                            unsigned_extends = format!("UXT[{}]", unsigned_extends);
+                        } else {
+                            unsigned_extends = format!("UXT{}", unsigned_extends);
+                        }
+                        rest.push(&unsigned_extends);
+                        optional = true;
+                    }
+                    if !signed_extends.is_empty() {
+                        if signed_extends.len() > 1 {
+                            signed_extends = format!("SXT[{}]", signed_extends);
+                        } else {
+                            signed_extends = format!("SXT{}", signed_extends);
+                        }
+                        rest.push(&signed_extends);
+                        optional = true;
+                    }
+                    buf.push_str(&rest.join("|"));
 
                     let name = names.next().unwrap();
                     if optional {
@@ -188,11 +211,18 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
         for _ in 0 .. end_count {
             buf.push_str(" }");
         }
+        let mut buf = buf.replace(" ., ", ".");
 
-        let buf = buf.replace(" ., ", ".");
+        if let Some(c) = constraints {
+            let mut len = c.len() + buf.len();
+            while len < 100 {
+                buf.push(' ');
+                len += 1;
+            }
+            buf.push_str(&c);
+        }
 
         forms.push(buf);
-        forms.extend(constraints);
     }
 
     forms
@@ -449,7 +479,7 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Ubits(_, _)
                 | Command::Uscaled(_, _, _)
                 | Command::Uslice(_, _, _)
-                | Command::Urange(_, 0, _)
+                | Command::Urange(_, _, _)
                 | Command::Ulist(_, _)
                 | Command::Ufields(_)
                 | Command::Sbits(_, _)
@@ -462,7 +492,6 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::ExtendsX(_) => true,
                 Command::R4(_)
                 | Command::RNext
-                | Command::Urange(_, _, _)
                 | Command::Usub(_, _, _)
                 | Command::Usumdec(_, _)
                 | Command::BUrange(_, _)
@@ -557,7 +586,7 @@ fn name_args(args: &mut [ArgWithCommands]) {
 
 fn format_constraints(args: &[ArgWithCommands]) -> Option<String> {
     let mut constraints = Vec::new();
-    let mut prevname = "???";
+    let mut prevname = "?";
 
     for arg in args {
         if let Some(ref name) = arg.name {
@@ -569,29 +598,29 @@ fn format_constraints(args: &[ArgWithCommands]) -> Option<String> {
     if constraints.is_empty() {
         None
     } else {
-        Some(format!("    where {}", constraints.join(", ")))
+        Some(format!(" ({})", constraints.join(", ")))
     }
 }
 
 fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut Vec<String>) {
     for command in commands {
         buf.push(match command {
-            Command::R4(_) => format!("{} is register number 0-15", name),
+            Command::R4(_) => format!("{} is 0-15", name),
             Command::Ubits(_, bits)
-            | Command::BUbits(bits) => format!("0 <= #{} < {}", name, 1u32 << bits),
-            Command::Uscaled(_, bits, scale) => format!("0 <= #{} < {} and #{} is a multiple of {}", name, 1u32 << (bits + scale), name, 1u32 << scale),
+            | Command::BUbits(bits) => format!("#{} < {}", name, 1u32 << bits),
+            Command::Uscaled(_, bits, scale) => format!("#{} < {}, #{} = {} * N", name, 1u32 << (bits + scale), name, 1u32 << scale),
             Command::Ulist(_, list) => {
                 let numbers = list.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(", ");
-                format!("#{} is one of [{}]", name, numbers)
+                format!("#{} = [{}]", name, numbers)
             },
             Command::Urange(_, min, max)
             | Command::BUrange(min, max) => format!("{} <= #{} <= {}", min, name, max),
-            Command::Usub(_, bits, addval) => format!("0 <= #{} - {} < {}", addval, name, 1u32 << bits),
-            Command::Usumdec(_, bits) => format!("0 < #{} + #{} <= {}", name, prevname, 1u32 << bits),
-            Command::Ufields(fields) => format!("0 <= #{} < {}", name, 1u32 << fields.len()),
+            Command::Usub(_, bits, addval) => format!("{} <= #{} <= {}", *addval as u32 - (1u32 << bits) + 1, name, addval),
+            Command::Usumdec(_, bits) => format!("1 <= #{} + #{} <= {}", prevname, name, (1u32 << bits)),
+            Command::Ufields(fields) => format!("#{} < {}", name, 1u32 << fields.len()),
             Command::Sbits(_, bits)
             | Command::BSbits(bits) => format!("-{} <= #{} < {}", 1u32 << (bits - 1), name, 1u32 << (bits - 1)),
-            Command::Sscaled(_, bits, scale) => format!("-{} <= #{} < {} and #{} is a multiple of {}", 1u32 << (bits + scale - 1), name, 1u32 << (bits + scale - 1), name, 1u32 << scale),
+            Command::Sscaled(_, bits, scale) => format!("-{} <= #{} < {}, #{} = {} * N", 1u32 << (bits + scale - 1), name, 1u32 << (bits + scale - 1), name, 1u32 << scale),
             Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W)
             | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X)
             | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W)
@@ -603,7 +632,7 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => format!("#{} is a stretched immediate", name),
             Command::Offset(Relocation::B) => format!("offset is 26 bit, 4-byte aligned"),
             Command::Offset(Relocation::BCOND) => format!("offset is 19 bit, 4-byte aligned"),
-            Command::Offset(Relocation::ADR) => format!("offset is a 21 bit"),
+            Command::Offset(Relocation::ADR) => format!("offset is 21 bit"),
             Command::Offset(Relocation::ADRP) => format!("offset is 21 bit, 4K-page aligned"),
             Command::Offset(Relocation::TBZ) => format!("offset is 14 bit, 4-byte aligned"),
             Command::Offset(Relocation::LITERAL32) => format!("offset is 32 bit>"),

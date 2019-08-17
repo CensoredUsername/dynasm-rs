@@ -326,6 +326,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::Ubits(_, _) |
                 Command::Uscaled(_, _, _) |
                 Command::Uslice(_, _, _) |
+                Command::Urange(_, _, _) |
                 Command::Ulist(_, _) |
                 Command::Ufields(_) |
                 Command::Sbits(_, _) |
