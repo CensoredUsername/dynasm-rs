@@ -4,9 +4,6 @@ import sys
 import re
 import copy
 
-
-OPCODE_FOLDER = "../temp/A64_v85A_ISA_xml_00bet10.tar/ISA_v85A_A64_xml_00bet10/ISA_v85A_A64_xml_00bet10"
-
 class IClass:
     def __init__(self, mnemonic, fields, bits, name, template, instrclass, arch_variant):
         self.mnemonic = mnemonic
@@ -146,16 +143,16 @@ def analyse_file(fname):
                 yield IClass(mnemonic, enc_fields, enc_bits, heading, template, instrclass, arch_variant)
 
 
-def read_op_defs():
+def read_op_defs(opcode_folder):
     import os
 
-    files = os.listdir(OPCODE_FOLDER)
+    files = os.listdir(opcode_folder)
 
     ops = []
     for fname in files:
         if fname.endswith(".xml") and not fname.startswith("onebigfile"):
             try:
-                ops.extend(analyse_file(os.path.join(OPCODE_FOLDER, fname)))
+                ops.extend(analyse_file(os.path.join(opcode_folder, fname)))
             except Exception as e:
                 print(fname, e)
 
@@ -438,7 +435,7 @@ def tl_merge_statics(ops):
 def main():
     import sys
 
-    ops = read_op_defs()
+    ops = read_op_defs("../temp/A64_v85A_ISA_xml_00bet10.tar/ISA_v85A_A64_xml_00bet10/ISA_v85A_A64_xml_00bet10")
 
     # filter out variants we don't care about
     # print(determine_instr_classes(ops))
@@ -469,16 +466,9 @@ def main():
 
     # load translation files
     tlmap = TranslationMap()
-    with open("tl_general.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f, "tl_general.py")
-    with open("tl_system.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f, "tl_system.py")
-    with open("tl_float.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f, "tl_float.py")
-    with open("tl_fpsimd.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f, "tl_fpsimd.py")
-    with open("tl_advsimd.py", "r", encoding="utf-8") as f:
-        tlmap.load_file(f, "tl_advsimd.py")
+    for file in ("tl_general.py", "tl_system.py", "tl_float.py", "tl_fpsimd.py", "tl_advsimd.py"):
+        with open(os.path.join("aarch64_data", file), "r", encoding="utf-8") as f:
+            tlmap.load_file(f, file)
 
     tlmap.build_lookup_table()
 

@@ -15,3 +15,5 @@ Cargo.lock
 testing/tests/bf_interpreter.rs
 testing/tests/bf_jit.rs
 testing/tests/hello_world.rs
+
+__pycache__
