@@ -1,5 +1,5 @@
 use super::ast::Modifier;
-use super::aarch64data::{Opdata, Matcher, Command, SpecialComm};
+use super::aarch64data::{Opdata, Matcher, Command, Relocation, SpecialComm};
 use crate::common::Size;
 
 pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
@@ -133,7 +133,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     let imm = names.next().unwrap();
                     buf.push_str(&format!("{{V{}.{} * {}}}[#{}]", name, size_to_string(s), a, imm));
                 },
-                Matcher::Offset => buf.push_str("<offset>"),
+                Matcher::Offset => buf.push_str(&names.next().unwrap()),
                 Matcher::RefBase => {
                     let name = names.next().unwrap();
                     buf.push_str(&format!("[X{}|SP]", name));
@@ -540,8 +540,11 @@ fn name_args(args: &mut [ArgWithCommands]) {
                     _ => unreachable!()
                 }
             },
-            FlatArgTy::Modifier
-            | FlatArgTy::JumpTarget => arg.name = None,
+            FlatArgTy::Modifier => arg.name = None,
+            FlatArgTy::JumpTarget => match &arg.commands[0] {
+                Command::Offset(_) => arg.name = Some("<offset>".to_string()),
+                _ => unreachable!()
+            },
             FlatArgTy::Lit => match &arg.commands[0] {
                 Command::Cond(_)
                 | Command::CondInv(_) => arg.name = None,
@@ -598,6 +601,13 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::Special(_, SpecialComm::FLOAT_IMMEDIATE)
             | Command::Special(_, SpecialComm::SPLIT_FLOAT_IMMEDIATE) => format!("#{} is a floating point immediate", name),
             Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => format!("#{} is a stretched immediate", name),
+            Command::Offset(Relocation::B) => format!("offset is 26 bit, 4-byte aligned"),
+            Command::Offset(Relocation::BCOND) => format!("offset is 19 bit, 4-byte aligned"),
+            Command::Offset(Relocation::ADR) => format!("offset is a 21 bit"),
+            Command::Offset(Relocation::ADRP) => format!("offset is 21 bit, 4K-page aligned"),
+            Command::Offset(Relocation::TBZ) => format!("offset is 14 bit, 4-byte aligned"),
+            Command::Offset(Relocation::LITERAL32) => format!("offset is 32 bit>"),
+            Command::Offset(Relocation::LITERAL64) => format!("offset is 64 bit>"),
             _ => continue
         });
         break;
