@@ -31,7 +31,7 @@ tlentry(['MSR'],
 
 tlentry(['SYSL'],
     '<Xt>,#<op1>,<Cn>,<Cm>,#<op2>', (('op1', 3, 16), ('CRn', 4, 12), ('CRm', 4, 8), ('op2', 3, 5), ('Rt', 5, 0)),
-    matcher   = 'X, Imm, Ident, Ident, Imm, End',
+    matcher   = 'X, Imm, Ident, Ident, Imm',
     processor = 'R(0), Ubits(16, 3), LitList(12, "CONTROL_REGS"), LitList(8, "CONTROL_REGS"), Ubits(5, 3)',
 )
 

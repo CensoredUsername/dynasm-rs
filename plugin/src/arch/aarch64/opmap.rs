@@ -3893,7 +3893,7 @@ Ops!(map ;
     0b11010101_00001000_00000000_00000000 = [Imm, Ident, Ident, Imm, End, X] => [Ubits(16, 3), LitList(12, "CONTROL_REGS"), LitList(8, "CONTROL_REGS"), Ubits(5, 3), R(0)];
 ]
 "sysl" = [
-    0b11010101_00101000_00000000_00000000 = [X, Imm, Ident, Ident, Imm, End] => [R(0), Ubits(16, 3), LitList(12, "CONTROL_REGS"), LitList(8, "CONTROL_REGS"), Ubits(5, 3)];
+    0b11010101_00101000_00000000_00000000 = [X, Imm, Ident, Ident, Imm] => [R(0), Ubits(16, 3), LitList(12, "CONTROL_REGS"), LitList(8, "CONTROL_REGS"), Ubits(5, 3)];
 ]
 "tbl" = [
     0b00001110_00000000_00100000_00000000 = [V(BYTE), RegListStatic(2, BYTE, 16), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
