@@ -152,7 +152,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     let name1 = names.next().unwrap();
                     let name2 = names.next().unwrap();
                     let imm = names.next().unwrap();
-                    buf.push_str(&format!("[X{}|SP, W{}|X{} {{ , (UXTW|LSL|SXTW|SXTX) {{ #{} }} }} ]", name1, name2, name2, imm));
+                    buf.push_str(&format!("[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]", name1, name2, name2, imm));
                 },
                 Matcher::Mod(mods) => {
                     let mut optional = true;
