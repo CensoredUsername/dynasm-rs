@@ -2,7 +2,7 @@ use crate::common::Size;
 use super::ast::Modifier;
 
 use lazy_static::lazy_static;
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Matcher {
@@ -99,8 +99,6 @@ pub enum Command {
     BUbits(u8), // checks if the pointed value fits in the given amount of bits
     BSbits(u8), // checks if the pointed value fits in the given amount of bits
     BUrange(u8, u8), // check if the pointed value is between min/max
-    BUscaled(u8, u8), // check if the pointed value fits in .0 bits, after being shifted .1 bits to the right
-    BSscaled(u8, u8), // check if the pointed value fits in .0 bits, after being shifted .1 bits to the right
     Uslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
     Sslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
 
@@ -130,7 +128,6 @@ pub enum Command {
     // special commands
     A, // advances the argument pointer, only needed to skip over an argument.
     C, // moves the argument pointer back.
-    Static(u8, u32) // just insert these bits at this location.
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -226,6 +223,11 @@ macro_rules! Ops {
 
 pub fn get_mnemonic_data(name: &str) -> Option<&'static [Opdata]> {
     OPMAP.get(&name).cloned()
+}
+
+#[allow(dead_code)]
+pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> {
+    OPMAP.keys()
 }
 
 lazy_static! {

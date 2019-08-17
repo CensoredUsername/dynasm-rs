@@ -18,7 +18,7 @@ mkdir ./build_docs/plugin
 mkdir ./build_docs/runtime
 
 echo "create instruction reference markdown file"
-(cd doc/insref && cargo update && cargo run > ../instructionref.md)
+(cd doc/insref && cargo update && cargo run -- x64 > ../instructionref_x64.md && cargo run -- aarch64 > ../instructionref_aarch64.md)
 
 echo "build plugin docs"
 for f in ./doc/*.md; do

@@ -3,12 +3,15 @@ use syn::parse;
 mod ast;
 mod compiler;
 mod parser;
-pub mod debug;
-pub mod x64data;
+mod debug;
+mod x64data;
 
 use crate::State;
 use crate::arch::Arch;
 use crate::common::{Size, Stmt, JumpType, emit_error_at};
+
+#[cfg(feature = "dynasm_opmap")]
+pub use debug::create_opmap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum X86Mode {

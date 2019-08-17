@@ -6,12 +6,15 @@ mod matching;
 mod compiler;
 mod aarch64data;
 mod encoding_helpers;
+mod debug;
 
 use crate::State;
 use crate::common::{Size, Stmt, JumpType, emit_error_at};
 use crate::arch::Arch;
 use self::aarch64data::Relocation;
 
+#[cfg(feature = "dynasm_opmap")]
+pub use debug::create_opmap;
 
 struct Context<'a, 'b: 'a> {
     pub state: &'a mut State<'b>

@@ -1,6 +1,5 @@
 #![feature(proc_macro_diagnostic)]
 #![feature(proc_macro_span)]
-#![allow(dead_code)]
 
 // token/ast manipulation
 extern crate proc_macro;
@@ -163,33 +162,16 @@ impl parse::Parse for Dynasm {
 pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
     // parse to ensure that no macro arguments were provided
-    let _ = parse_macro_input!(tokens as DynasmOpmap);
+    let opmap = parse_macro_input!(tokens as DynasmOpmap);
 
     let mut s = String::new();
     s.push_str("% Instruction Reference\n\n");
 
-    let mut mnemnonics: Vec<_> = arch::x64::x64data::mnemnonics().cloned().collect();
-    mnemnonics.sort();
-    for mnemnonic in mnemnonics {
-        // get the data for this mnemnonic
-        let data = arch::x64::x64data::get_mnemnonic_data(mnemnonic).unwrap();
-        // format the data for the opmap docs
-        let mut formats = data.into_iter()
-            .map(|x| arch::x64::debug::format_opdata(mnemnonic, x))
-            .flat_map(|x| x)
-            .map(|x| x.replace(">>> ", ""))
-            .collect::<Vec<_>>();
-        formats.sort();
-
-        // push mnemnonic name as title
-        s.push_str("### ");
-        s.push_str(mnemnonic);
-        s.push_str("\n```\n");
-
-        // push the formats
-        s.push_str(&formats.join("\n"));
-        s.push_str("\n```\n");
-    }
+    s.push_str(&match opmap.arch.as_str() {
+        "x64" | "x86" => arch::x64::create_opmap(),
+        "aarch64" => arch::aarch64::create_opmap(),
+        x => panic!("Unknown architecture {}", x)
+    });
 
     let token = quote::quote! {
         #s
@@ -199,14 +181,18 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
 
 /// As dynasm_opmap takes no args it doesn't parse to anything
 struct DynasmOpmap {
-
+    pub arch: String
 }
 
 /// As dynasm_opmap takes no args it doesn't parse to anything.
 /// This just exists so syn will give an error when no args are present.
 impl parse::Parse for DynasmOpmap {
-    fn parse(_input: parse::ParseStream) -> parse::Result<Self> {
-        Ok(DynasmOpmap {})
+    fn parse(input: parse::ParseStream) -> parse::Result<Self> {
+        let arch: syn::Ident = input.parse()?;
+
+        Ok(DynasmOpmap {
+            arch: arch.to_string()
+        })
     }
 }
 

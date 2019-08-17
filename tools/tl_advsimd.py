@@ -699,9 +699,9 @@ tlentry(['FCVTZS', 'FCVTZU', 'SCVTF', 'UCVTF'],
         'VStatic(QWORD, 2), VStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), R(16), Usub(16, 4, 16), Rwidth(30), Static(19, 0b0010)',
-        'R(0), R(5), R(16), Usub(16, 5, 32), Rwidth(30), Static(19, 0b0100)',
-        'R(0), R(5), R(16), Usub(16, 6, 64), Rwidth(30), Static(19, 0b1000)',
+        'R(0), R(5), Usub(16, 4, 16), Rwidth(30), Static(19, 0b0010)',
+        'R(0), R(5), Usub(16, 5, 32), Rwidth(30), Static(19, 0b0100)',
+        'R(0), R(5), Usub(16, 6, 64), Rwidth(30), Static(19, 0b1000)',
     ],
 )
 

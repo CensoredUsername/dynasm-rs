@@ -32,10 +32,6 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 cursor -= 1;
                 continue
             },
-            Command::Static(offset, staticbits) => {
-                statics.push((offset, staticbits));
-                continue
-            },
             Command::Rwidth(offset) => {
                 statics.push((offset, data.simd_full_width.unwrap_or(true) as u32));
                 continue
@@ -302,19 +298,6 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         value?;
                     }
                 },
-                Command::BUscaled(bitlen, shift) => {
-                    let mask = bitmask(bitlen);
-                    if let Some(value) = unsigned_rangecheck(value, 0, mask, shift) {
-                        value?;
-                    }
-                },
-                Command::BSscaled(bitlen, shift) =>  {
-                    let mask = bitmask(bitlen);
-                    let half = -1i32 << (bitlen - 1);
-                    if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, shift) {
-                        value?;
-                    }
-                },
 
                 // specials. These have some more involved code.
                 Command::Special(offset, special) => handle_special_immediates(offset, special, value, &mut statics, &mut dynamics)?,
@@ -351,9 +334,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                 // integer checks don't have anything to check
                 Command::BUbits(_) |
-                Command::BSbits(_) |
-                Command::BUscaled(_, _) |
-                Command::BSscaled(_, _) => (),
+                Command::BSbits(_) => (),
 
                 _ => panic!("Invalid argument processor")
             },
@@ -402,9 +383,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             Command::Sslice(_, _, _) => (),
             Command::BUbits(_) |
             Command::BSbits(_) |
-            Command::BUrange(_, _) |
-            Command::BUscaled(_, _) |
-            Command::BSscaled(_, _) => (),
+            Command::BUrange(_, _) => (),
             _ => cursor += 1
         }
     }

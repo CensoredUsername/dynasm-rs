@@ -4,6 +4,7 @@ use proc_macro2::Span;
 use super::Context;
 use super::ast::{Instruction, RawArg, CleanArg, FlatArg, RefItem, Register, RegFamily, RefKind, Modifier};
 use super::aarch64data::{Opdata, Matcher, COND_MAP, get_mnemonic_data};
+use super::debug::format_opdata_list;
 
 use crate::common::{Size, JumpType, emit_error_at};
 use crate::parse_helpers::{as_ident, as_number, as_float};
@@ -32,7 +33,9 @@ pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, a
         }
     }
 
-    Err(Some("Unknown instruction format".into()))
+    Err(Some(
+        format!("'{}': instruction format mismatch, expected one of the following forms:\n{}", &name, format_opdata_list(&name, opdata))
+    ))
 }
 
 /// Sanitizes arguments, ensuring that:
@@ -58,10 +61,6 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     return Err(None);
                 }
                 res.push(CleanArg::JumpTarget { type_ });
-            },
-            // parsing error: just raise it
-            RawArg::Invalid => {
-                return Err(None);
             },
             // modifier: LSL LSR ASR ROR and MSL require an immediate.
             RawArg::Modifier { span, modifier } => {
@@ -528,14 +527,6 @@ impl Matcher {
 
             // this is special anyway
             Matcher::End => 0,
-        }
-    }
-
-    /// Returns if this matcher is the End matcher
-    pub fn is_end(&self) -> bool {
-        match self {
-            Matcher::End => true,
-            _ => false,
         }
     }
 }

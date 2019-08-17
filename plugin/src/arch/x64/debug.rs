@@ -118,3 +118,33 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
         _ => panic!("invalid formatting data")
     }
 }
+
+#[cfg(feature = "dynasm_opmap")]
+pub fn create_opmap() -> String {
+    let mut s = String::new();
+
+    let mut mnemnonics: Vec<_> = super::x64data::mnemnonics().cloned().collect();
+    mnemnonics.sort();
+
+    for mnemnonic in mnemnonics {
+        // get the data for this mnemnonic
+        let data = super::x64data::get_mnemnonic_data(mnemnonic).unwrap();
+        // format the data for the opmap docs
+        let mut formats = data.into_iter()
+            .map(|x| format_opdata(mnemnonic, x))
+            .flat_map(|x| x)
+            .map(|x| x.replace(">>> ", ""))
+            .collect::<Vec<_>>();
+        formats.sort();
+
+        // push mnemnonic name as title
+        s.push_str("### ");
+        s.push_str(mnemnonic);
+        s.push_str("\n```insref\n");
+
+        // push the formats
+        s.push_str(&formats.join("\n"));
+        s.push_str("\n```\n");
+    }
+    s
+}

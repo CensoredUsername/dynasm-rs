@@ -142,28 +142,12 @@ impl PartialEq<RegKind> for RegKind {
 }
 
 impl RegScalar {
-    pub fn new_static(size: Size, id: RegId) -> RegScalar {
-        RegScalar {size, kind: RegKind::Static(id) }
-    }
-
-    pub fn new_dynamic(size: Size, family: RegFamily, id: syn::Expr) -> RegScalar {
-        RegScalar {size, kind: RegKind::Dynamic(family, id) }
-    }
-
     pub fn size(&self) -> Size {
         self.size
     }
 }
 
 impl RegVector {
-    pub fn new_static(id: RegId, element_size: Size, lanes: Option<u8>, element: Option<syn::Expr>) -> RegVector {
-        RegVector {kind: RegKind::Static(id), element_size, lanes, element}
-    }
-
-    pub fn new_dynamic(id: syn::Expr, element_size: Size, lanes: Option<u8>, element: Option<syn::Expr>) -> RegVector {
-        RegVector {kind: RegKind::Dynamic(RegFamily::SIMD, id), element_size, lanes, element}
-    }
-
     /// Returns the size of individual elements in this vector register
     pub fn element_size(&self) -> Size {
         self.element_size
@@ -209,31 +193,10 @@ impl Register {
         }
     }
 
-    pub fn is_dynamic(&self) -> bool {
-        match self {
-            Register::Scalar(s) => s.kind.is_dynamic(),
-            Register::Vector(v) => v.kind.is_dynamic()
-        }
-    }
-
-    pub fn is_vector(&self) -> bool {
-        match self {
-            Register::Scalar(_) => false,
-            Register::Vector(_) => true
-        }
-    }
-
     pub fn assume_vector(&self) -> &RegVector {
         match self {
             Register::Scalar(_) => panic!("That wasn't a vector register"),
             Register::Vector(v) => v
-        }
-    }
-
-    pub fn assume_scalar(&self) -> &RegScalar {
-        match self {
-            Register::Scalar(s) => s,
-            Register::Vector(_) => panic!("That wasn't a scalar register"),
         }
     }
 }
@@ -272,30 +235,6 @@ impl ModifyExpr {
             expr
         }
     }
-}
-
-/**
- * Condition codes
- */
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Condition {
-    EQ,
-    NE,
-    CS,
-    CC,
-    MI,
-    PL,
-    VS,
-    VC,
-    HI,
-    LS,
-    GE,
-    LT,
-    GT,
-    LE,
-    AL,
-    NV,
 }
 
 /**
@@ -371,9 +310,7 @@ pub enum RawArg {
     // an ident, not intended to be parsed as an expression
     Lit {
         ident: syn::Ident
-    },
-    // used to not block the parser on a parsing error in a single arg
-    Invalid
+    }
 }
 
 // Contains the actual instruction mnemnonic.
