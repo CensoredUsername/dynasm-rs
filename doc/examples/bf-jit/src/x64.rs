@@ -18,8 +18,8 @@ use std::u8;
 
 const TAPE_SIZE: usize = 30000;
 
-#[cfg(target_arch = "x86_64")]
 dynasm!(ops
+    ; .arch x64
     ; .alias a_state, rcx
     ; .alias a_current, rdx
     ; .alias a_begin, r8
@@ -61,8 +61,8 @@ macro_rules! call_extern {
 }
 
 struct State<'a> {
-    pub input: Box<BufRead + 'a>,
-    pub output: Box<Write + 'a>,
+    pub input: Box<dyn BufRead + 'a>,
+    pub output: Box<dyn Write + 'a>,
     tape: [u8; TAPE_SIZE],
 }
 
@@ -101,7 +101,7 @@ impl Program {
                         ; sub a_current, TAPE_SIZE as _
                         ;wrap:
                     );
-                }
+                },
                 b'+' => {
                     let amount = code.take_while_ref(|x| *x == b'+').count() + 1;
                     if amount > u8::MAX as usize {
@@ -111,7 +111,7 @@ impl Program {
                         ; add BYTE [a_current], amount as _
                         ; jo ->overflow
                     );
-                }
+                },
                 b'-' => {
                     let amount = code.take_while_ref(|x| *x == b'-').count() + 1;
                     if amount > u8::MAX as usize {
@@ -121,21 +121,21 @@ impl Program {
                         ; sub BYTE [a_current], amount as _
                         ; jo ->overflow
                     );
-                }
+                },
                 b',' => {
                     dynasm!(ops
                         ;; call_extern!(ops, State::getchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
-                }
+                },
                 b'.' => {
                     dynasm!(ops
                         ;; call_extern!(ops, State::putchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
-                }
+                },
                 b'[' => {
                     let first = code.peek() == Some(&b'-');
                     if first && code.peek() == Some(&b']') {
@@ -154,7 +154,7 @@ impl Program {
                             ;=>backward_label
                         );
                     }
-                }
+                },
                 b']' => {
                     if let Some((backward_label, forward_label)) = loops.pop() {
                         dynasm!(ops
@@ -165,7 +165,7 @@ impl Program {
                     } else {
                         return Err("] without matching [");
                     }
-                }
+                },
                 _ => (),
             }
         }
@@ -218,7 +218,7 @@ impl<'a> State<'a> {
         state.output.write_all(slice::from_raw_parts(cell, 1)).is_err() as u8
     }
 
-    fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> State<'a> {
+    fn new(input: Box<dyn BufRead + 'a>, output: Box<dyn Write + 'a>) -> State<'a> {
         State {
             input: input,
             output: output,

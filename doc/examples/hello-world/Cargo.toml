@@ -3,6 +3,14 @@ name = "hello-world"
 version = "0.1.0"
 authors = ["CensoredUsername <cens.username@gmail.com>"]
 
+[[bin]]
+name = "x64"
+path = "src/x64.rs"
+
+[[bin]]
+name = "aarch64"
+path = "src/aarch64.rs"
+
 [dependencies]
 
 [dependencies.dynasm]
