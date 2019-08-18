@@ -187,8 +187,9 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             return Err(None);
                         }
                     } else {
-                        emit_error_at(value.span(), "Immediate has to be known at compile time".into());
-                        return Err(None);
+                        dynamics.push((offset, quote_spanned!{ value.span()=>
+                            [#(#options),*].iter().rposition(|&n| n as u32 == #value).expect("impossible value") as u32
+                        }));
                     }
                 },
                 Command::Urange(offset, min, max) => {
