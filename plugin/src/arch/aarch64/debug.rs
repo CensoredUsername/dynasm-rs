@@ -113,7 +113,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::VElement(s) => {
                     let name = names.next().unwrap();
                     let imm = names.next().unwrap();
-                    buf.push_str(&format!("V{}.{}[#{}]", name, size_to_string(s), imm));
+                    buf.push_str(&format!("V{}.{}[{}]", name, size_to_string(s), imm));
                 },
                 Matcher::VElementStatic(s, element) => {
                     let name = names.next().unwrap();
@@ -131,7 +131,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::RegListElement(a, s) => {
                     let name = names.next().unwrap();
                     let imm = names.next().unwrap();
-                    buf.push_str(&format!("{{V{}.{} * {}}}[#{}]", name, size_to_string(s), a, imm));
+                    buf.push_str(&format!("{{V{}.{} * {}}}[{}]", name, size_to_string(s), a, imm));
                 },
                 Matcher::Offset => buf.push_str(&names.next().unwrap()),
                 Matcher::RefBase => {

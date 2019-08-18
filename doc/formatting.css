@@ -8,3 +8,7 @@ code.language-diffnew {
 code.language-diffold {
     background-color: rgb(255, 203, 203);
 }
+
+.block h4 {
+    text-align: center;
+}
