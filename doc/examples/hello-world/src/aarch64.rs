@@ -16,6 +16,7 @@ fn main() {
         ; .arch aarch64
         ; ->hello:
         ; .bytes string.as_bytes()
+        ; .align 4
         ; ->print:
         ; .qword print as _
     );
@@ -28,18 +29,17 @@ fn main() {
         ; str x30, [sp, #-16]!
         ; blr x9
         ; ldr x30, [sp], #16
-        ; add sp, sp, #16
         ; ret
     );
 
     let buf = ops.finalize().unwrap();
 
-    let hello_fn: extern "aapcs" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
+    let hello_fn: extern "C" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 
     assert!(hello_fn());
 }
 
-pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
+pub extern "C" fn print(buffer: *const u8, length: u64) -> bool {
     io::stdout()
         .write_all(unsafe { slice::from_raw_parts(buffer, length as usize) })
         .is_ok()

@@ -71,5 +71,5 @@ pub const CURRENT_ARCH: &str = "x64";
 pub const CURRENT_ARCH: &str = "x86";
 #[cfg(target_arch="aarch64")]
 pub const CURRENT_ARCH: &str = "aarch64";
-#[cfg(not(any(target_arch="x86", target_arch="x86_64")))]
+#[cfg(not(any(target_arch="x86", target_arch="x86_64", target_arch="aarch64")))]
 pub const CURRENT_ARCH: &str = "unknown";
