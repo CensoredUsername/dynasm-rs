@@ -51,8 +51,9 @@ macro_rules! epilogue {
 macro_rules! call_extern {
     ($ops:ident, $addr:ident) => {dynasm!($ops
         ; str x1, [sp, #24]
-        ; ldr x9, ->addr
+        ; ldr x9, ->$addr
         ; blr x9
+        ; mov x9, x0
         ; ldp x0, x1, [sp, #16]
         ; ldp x2, x3, [sp]
     );};
@@ -76,8 +77,6 @@ impl Program {
         let mut loops = Vec::new();
         let mut code = multipeek(program.iter().cloned());
 
-        let start = prologue!(ops);
-
         // literal pool
         dynasm!(ops
             ; ->getchar:
@@ -85,6 +84,8 @@ impl Program {
             ; ->putchar:
             ; .qword State::putchar as _
         );
+
+        let start = prologue!(ops);
 
         while let Some(c) = code.next() {
             match c {
@@ -120,7 +121,7 @@ impl Program {
                     dynasm!(ops
                         ; ldrb w9, [a_current]
                         ; add w9, w9, amount as u32
-                        ; tbnz w9, 8, >fine
+                        ; tbz w9, 8, >fine
                         ; b ->overflow
                         ;fine:
                         ; strb w9, [a_current]
@@ -134,7 +135,7 @@ impl Program {
                     dynasm!(ops
                         ; ldrb w9, [a_current]
                         ; sub w9, w9, amount as u32
-                        ; tbnz w9, 8, >fine
+                        ; tbz w9, 8, >fine
                         ; b ->overflow
                         ;fine:
                         ; strb w9, [a_current]
@@ -143,13 +144,13 @@ impl Program {
                 b',' => {
                     dynasm!(ops
                         ;; call_extern!(ops, getchar)
-                        ; cbnz x0, ->io_failure
+                        ; cbnz x9, ->io_failure
                     );
                 },
                 b'.' => {
                     dynasm!(ops
                         ;; call_extern!(ops, putchar)
-                        ; cbnz x0, ->io_failure
+                        ; cbnz x9, ->io_failure
                     );
                 },
                 b'[' => {
@@ -205,7 +206,7 @@ impl Program {
     }
 
     fn run(self, state: &mut State) -> Result<(), &'static str> {
-        let f: extern "aapcs" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 =
+        let f: extern "C" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 =
             unsafe { mem::transmute(self.code.ptr(self.start)) };
         let start = state.tape.as_mut_ptr();
         let end = unsafe { start.offset(TAPE_SIZE as isize) };
@@ -223,13 +224,13 @@ impl Program {
 }
 
 impl<'a> State<'a> {
-    unsafe extern "aapcs" fn getchar(state: *mut State, cell: *mut u8) -> u8 {
+    unsafe extern "C" fn getchar(state: *mut State, cell: *mut u8) -> u8 {
         let state = &mut *state;
         let err = state.output.flush().is_err();
         (state.input.read_exact(slice::from_raw_parts_mut(cell, 1)).is_err() || err) as u8
     }
 
-    unsafe extern "aapcs" fn putchar(state: *mut State, cell: *mut u8) -> u8 {
+    unsafe extern "C" fn putchar(state: *mut State, cell: *mut u8) -> u8 {
         let state = &mut *state;
         state.output.write_all(slice::from_raw_parts(cell, 1)).is_err() as u8
     }
@@ -247,7 +248,7 @@ impl<'a> State<'a> {
 fn main() {
     let mut args: Vec<_> = env::args().collect();
     if args.len() != 2 {
-        println!("Expected 1 argument, got {}", args.len());
+        println!("Expected 2 argument, got {}", args.len());
         return;
     }
     let path = args.pop().unwrap();
