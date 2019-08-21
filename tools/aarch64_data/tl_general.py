@@ -54,8 +54,8 @@ tlentry(['MOV'],
 
 tlentry(['MOVK', 'MOVN', 'MOVZ'],
     '<Wd>,#<imm>{,LSL#<shift>}', (('hw', 2, 21), ('imm16', 16, 5), ('Rd', 5, 0)),
-    matcher   = 'W, Imm, End, Mod(&[LSL])',
-    processor = 'R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])',
+    matcher   = 'W, Imm, End, LitMod(LSL)',
+    processor = 'R(0), Ubits(5, 16), Ulist(21, &[0, 16])',
 )
 
 tlentry(['BFC'],
@@ -170,8 +170,8 @@ tlentry(['CINC', 'CINV', 'CNEG'],
 
 tlentry(['ADDS', 'SUBS'],
     '<Wd>,<Wn|WSP>,#<imm>{,<shift>}', (('sh', 1, 22), ('imm12', 12, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'W, WSP, Imm, End, Mod(&[LSL])',
-    processor = 'R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])',
+    matcher   = 'W, WSP, Imm, End, LitMod(LSL)',
+    processor = 'R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])',
 )
 
 tlentry(['ADDS', 'SUBS'],
@@ -212,8 +212,8 @@ tlentry(['MOV'],
 
 tlentry(['ADD', 'SUB'],
     '<Wd|WSP>,<Wn|WSP>,#<imm>{,<shift>}', (('sh', 1, 22), ('imm12', 12, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'WSP, WSP, Imm, End, Mod(&[LSL])',
-    processor = 'R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])',
+    matcher   = 'WSP, WSP, Imm, End, LitMod(LSL)',
+    processor = 'R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])',
 )
 
 tlentry(['ADD', 'SUB'],
@@ -261,8 +261,8 @@ tlentry(['TST'],
 
 tlentry(['CMN', 'CMP'],
     '<Wn|WSP>,#<imm>{,<shift>}', (('sh', 1, 22), ('imm12', 12, 10), ('Rn', 5, 5)),
-    matcher   = 'WSP, Imm, End, Mod(&[LSL])',
-    processor = 'R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])',
+    matcher   = 'WSP, Imm, End, LitMod(LSL)',
+    processor = 'R(5), Ubits(10, 12), Ulist(22, &[0, 12])',
 )
 
 tlentry(['CMN', 'CMP'],
@@ -437,8 +437,8 @@ tlentry(['MOV'],
 
 tlentry(['MOVK', 'MOVN', 'MOVZ'],
     '<Xd>,#<imm>{,LSL#<shift>}', (('hw', 2, 21), ('imm16', 16, 5), ('Rd', 5, 0)),
-    matcher   = 'X, Imm, End, Mod(&[LSL])',
-    processor = 'R(0), Ubits(5, 16), A, Ulist(21, &[0, 16, 32, 48])',
+    matcher   = 'X, Imm, End, LitMod(LSL)',
+    processor = 'R(0), Ubits(5, 16), Ulist(21, &[0, 16, 32, 48])',
 )
 
 tlentry(['BFC'],
@@ -577,8 +577,8 @@ tlentry(['AUTDA', 'AUTDB', 'AUTIA', 'AUTIB', 'PACDA', 'PACDB', 'PACIA', 'PACIB']
 
 tlentry(['ADDS', 'SUBS'],
     '<Xd>,<Xn|SP>,#<imm>{,<shift>}', (('sh', 1, 22), ('imm12', 12, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'X, XSP, Imm, End, Mod(&[LSL])',
-    processor = 'R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])',
+    matcher   = 'X, XSP, Imm, End, LitMod(LSL)',
+    processor = 'R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])',
 )
 
 tlentry(['ADDS', 'SUBS'],
@@ -633,8 +633,8 @@ tlentry(['MOV'],
 
 tlentry(['ADD', 'SUB'],
     '<Xd|SP>,<Xn|SP>,#<imm>{,<shift>}', (('sh', 1, 22), ('imm12', 12, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
-    matcher   = 'XSP, XSP, Imm, End, Mod(&[LSL])',
-    processor = 'R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])',
+    matcher   = 'XSP, XSP, Imm, End, LitMod(LSL)',
+    processor = 'R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])',
 )
 
 tlentry(['ADD', 'SUB'],
@@ -696,8 +696,8 @@ tlentry(['BLRAA', 'BLRAB', 'BRAA', 'BRAB'],
 
 tlentry(['CMN', 'CMP'],
     '<Xn|SP>,#<imm>{,<shift>}', (('sh', 1, 22), ('imm12', 12, 10), ('Rn', 5, 5)),
-    matcher   = 'XSP, Imm, End, Mod(&[LSL])',
-    processor = 'R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])',
+    matcher   = 'XSP, Imm, End, LitMod(LSL)',
+    processor = 'R(5), Ubits(10, 12), Ulist(22, &[0, 12])',
 )
 
 tlentry(['CMN', 'CMP'],

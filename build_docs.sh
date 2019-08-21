@@ -35,11 +35,11 @@ cat ./doc/hack.js >> ./build_docs/plugin/search-index.js
 cat ./doc/hack.js >> ./build_docs/runtime/search-index.js
 
 echo "copy docs examples to tests"
-declare -a examples=("bf-interpreter" "bf-jit" "hello-world")
+declare -a examples=("bf-jit" "hello-world")
 for EX in "${examples[@]}"
 do
     TARGET=$(echo $EX | tr - _)
-    cp "./doc/examples/${EX}/src/main.rs" "./testing/tests/${TARGET}.rs"
+    cp "./doc/examples/${EX}/src/x64.rs" "./testing/tests/${TARGET}.rs"
     echo -n -e "#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
          "./testing/tests/${TARGET}.rs"
 done

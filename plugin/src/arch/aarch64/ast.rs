@@ -222,6 +222,44 @@ pub enum Modifier {
     MSL,
 }
 
+impl Modifier {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Modifier::LSL => "LSL",
+            Modifier::LSR => "LSR",
+            Modifier::ASR => "ASR",
+            Modifier::ROR => "ROR",
+            Modifier::SXTX => "SXTX",
+            Modifier::SXTW => "SXTW",
+            Modifier::SXTH => "SXTH",
+            Modifier::SXTB => "SXTB",
+            Modifier::UXTX => "UXTX",
+            Modifier::UXTW => "UXTW",
+            Modifier::UXTH => "UXTH",
+            Modifier::UXTB => "UXTB",
+            Modifier::MSL => "MSL",
+        }
+    }
+
+    pub fn expr_required(&self) -> bool {
+        match self {
+            Modifier::LSL
+            | Modifier::LSR
+            | Modifier::ASR
+            | Modifier::ROR
+            | Modifier::MSL => true,
+            Modifier::SXTX
+            | Modifier::SXTW
+            | Modifier::SXTH
+            | Modifier::SXTB
+            | Modifier::UXTX
+            | Modifier::UXTW
+            | Modifier::UXTH
+            | Modifier::UXTB => false,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ModifyExpr {
     pub op: Modifier,

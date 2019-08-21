@@ -449,25 +449,25 @@ tlentry(['SM3TT1A', 'SM3TT1B', 'SM3TT2A', 'SM3TT2B'],
 
 tlentry(['MOVI', 'MVNI'],
     '<Vd>.<T>,#<imm8>,MSL#<amount>', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'V(DWORD), Imm, Mod(&[MSL])',
-    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)',
+    matcher   = 'V(DWORD), Imm, LitMod(MSL)',
+    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(12, &[8, 16]), Rwidth(30)',
 )
 
 tlentry(['MOVI'],
     '<Vd>.<T>,#<imm8>{,LSL#0}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
-    matcher   = 'V(BYTE), Imm, End, Mod(&[LSL])',
-    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)',
+    matcher   = 'V(BYTE), Imm, End, LitMod(LSL)',
+    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, BUbits(0), A, Rwidth(30)',
 )
 
 tlentry(['MVNI'],
     '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matchers = [
-        'V(WORD), Imm, End, Mod(&[LSL])',
-        'V(DWORD), Imm, End, Mod(&[LSL])',
+        'V(WORD), Imm, End, LitMod(LSL)',
+        'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x10111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
@@ -478,12 +478,12 @@ tlentry(['MVNI'],
 tlentry(['MOVI'],
     '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matchers = [
-        'V(WORD), Imm, End, Mod(&[LSL])',
-        'V(DWORD), Imm, End, Mod(&[LSL])',
+        'V(WORD), Imm, End, LitMod(LSL)',
+        'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x00111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
@@ -494,12 +494,12 @@ tlentry(['MOVI'],
 tlentry(['ORR'],
     '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matchers = [
-        'V(WORD), Imm, End, Mod(&[LSL])',
-        'V(DWORD), Imm, End, Mod(&[LSL])',
+        'V(WORD), Imm, End, LitMod(LSL)',
+        'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])',
     ],
     bits = [
         '0x00111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -510,12 +510,12 @@ tlentry(['ORR'],
 tlentry(['BIC'],
     '<Vd>.<T>,#<imm8>{,LSL#<amount>}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matchers = [
-        'V(WORD), Imm, End, Mod(&[LSL])',
-        'V(DWORD), Imm, End, Mod(&[LSL])',
+        'V(WORD), Imm, End, LitMod(LSL)',
+        'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])',
     ],
     bits = [
         '0x10111100000xxx10x101xxxxxxxxxx', # 16-bit variant

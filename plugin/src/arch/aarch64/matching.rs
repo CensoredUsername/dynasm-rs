@@ -65,12 +65,9 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             // modifier: LSL LSR ASR ROR and MSL require an immediate.
             RawArg::Modifier { span, modifier } => {
                 if modifier.expr.is_none() {
-                    match modifier.op {
-                        Modifier::LSL | Modifier::LSR | Modifier::ASR | Modifier::ROR | Modifier::MSL => {
-                            emit_error_at(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.".into());
-                            return Err(None);
-                        }
-                        _ => ()
+                    if modifier.op.expr_required() {
+                        emit_error_at(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.".into());
+                        return Err(None);
                     }
                 }
 
@@ -174,7 +171,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                         }
 
                         // LSL requires a stated immediate
-                        if m.op == Modifier::LSL && m.expr.is_none() {
+                        if m.op.expr_required() && m.expr.is_none() {
                             emit_error_at(span, "LSL reference modifier requires an immediate".into());
                             return Err(None);
                         }
@@ -479,6 +476,8 @@ impl Matcher {
             CleanArg::Modifier { modifier, .. } => {
                 if let Matcher::Mod(list) = self {
                     list.iter().any(|m| m == &modifier.op)
+                } else if let Matcher::LitMod(m) = self {
+                    m == &modifier.op
                 } else {
                     false
                 }
@@ -524,6 +523,7 @@ impl Matcher {
             Matcher::RefPre => 2,
             Matcher::RefIndex => 4,
             Matcher::Mod(_) => 2,
+            Matcher::LitMod(_) => 1,
 
             // this is special anyway
             Matcher::End => 0,
@@ -619,7 +619,9 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
                     new_args.push(FlatArg::Immediate { value } );
                 },
                 CleanArg::Modifier { span, modifier } => {
-                    new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                    if arg_count >= 2 {
+                        new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                    }
                     if let Some(expr) = modifier.expr {
                         new_args.push(FlatArg::Immediate { value: expr });
                     }

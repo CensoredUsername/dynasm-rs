@@ -68,6 +68,9 @@ pub enum Matcher {
     RefPre,
     RefIndex,
 
+    // a single modifier
+    LitMod(Modifier),
+
     // a set of allowed modifiers
     Mod(&'static [Modifier]),
 

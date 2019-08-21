@@ -25,8 +25,8 @@ Ops!(map ;
     0b10001011_00100000_00000000_00000000 = [XSP, XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b10001011_00100000_00000000_00000000 = [XSP, XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // ADD (immediate)
-    0b00010001_00000000_00000000_00000000 = [WSP, WSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
-    0b10010001_00000000_00000000_00000000 = [XSP, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
+    0b00010001_00000000_00000000_00000000 = [WSP, WSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
+    0b10010001_00000000_00000000_00000000 = [XSP, XSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
     // ADD (vector)
     0b01011110_11100000_10000100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
     0b00001110_00100000_10000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
@@ -62,8 +62,8 @@ Ops!(map ;
     0b10101011_00100000_00000000_00000000 = [X, XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b10101011_00100000_00000000_00000000 = [X, XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // ADDS (immediate)
-    0b00110001_00000000_00000000_00000000 = [W, WSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
-    0b10110001_00000000_00000000_00000000 = [X, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
+    0b00110001_00000000_00000000_00000000 = [W, WSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
+    0b10110001_00000000_00000000_00000000 = [X, XSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
 ]
 "addv" = [
     0b00001110_00110001_10111000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
@@ -190,8 +190,8 @@ Ops!(map ;
 ]
 "bic" = [
     // BIC (vector, immediate)
-    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
-    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
+    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])];
+    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])];
     // BIC (vector, register)
     0b00001110_01100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // BIC (shifted register)
@@ -441,8 +441,8 @@ Ops!(map ;
     0b10101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b10101011_00100000_00000000_00011111 = [XSP, X, End, Mod(EXTENDS_X)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // CMN (immediate)
-    0b00110001_00000000_00000000_00011111 = [WSP, Imm, End, Mod(&[LSL])] => [R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
-    0b10110001_00000000_00000000_00011111 = [XSP, Imm, End, Mod(&[LSL])] => [R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
+    0b00110001_00000000_00000000_00011111 = [WSP, Imm, End, LitMod(LSL)] => [R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
+    0b10110001_00000000_00000000_00011111 = [XSP, Imm, End, LitMod(LSL)] => [R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
 ]
 "cmp" = [
     // CMP (shifted register)
@@ -453,8 +453,8 @@ Ops!(map ;
     0b11101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b11101011_00100000_00000000_00011111 = [XSP, X, End, Mod(EXTENDS_X)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // CMP (immediate)
-    0b01110001_00000000_00000000_00011111 = [WSP, Imm, End, Mod(&[LSL])] => [R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
-    0b11110001_00000000_00000000_00011111 = [XSP, Imm, End, Mod(&[LSL])] => [R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
+    0b01110001_00000000_00000000_00011111 = [WSP, Imm, End, LitMod(LSL)] => [R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
+    0b11110001_00000000_00000000_00011111 = [XSP, Imm, End, LitMod(LSL)] => [R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
 ]
 "cmtst" = [
     0b01011110_11100000_10001100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
@@ -2300,24 +2300,24 @@ Ops!(map ;
     0b01001110_00001000_00111100_00000000 = [X, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
 ]
 "movi" = [
-    0b00001111_00000000_11100100_00000000 = [V(BYTE), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, BUbits(0), A, Rwidth(30)];
-    0b00001111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
-    0b00001111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
-    0b00001111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
+    0b00001111_00000000_11100100_00000000 = [V(BYTE), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, BUbits(0), A, Rwidth(30)];
+    0b00001111_00000000_10000100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00001111_00000000_00000100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
+    0b00001111_00000000_11000100_00000000 = [V(DWORD), Imm, LitMod(MSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(12, &[8, 16]), Rwidth(30)];
     0b00101111_00000000_11100100_00000000 = [D, Imm] => [R(0), Special(5, STRETCHED_IMMEDIATE)];
     0b01101111_00000000_11100100_00000000 = [VStatic(QWORD, 2), Imm] => [R(0), Special(5, STRETCHED_IMMEDIATE)];
 ]
 "movk" = [
-    0b01110010_10000000_00000000_00000000 = [W, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])];
-    0b11110010_10000000_00000000_00000000 = [X, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16, 32, 48])];
+    0b01110010_10000000_00000000_00000000 = [W, Imm, End, LitMod(LSL)] => [R(0), Ubits(5, 16), Ulist(21, &[0, 16])];
+    0b11110010_10000000_00000000_00000000 = [X, Imm, End, LitMod(LSL)] => [R(0), Ubits(5, 16), Ulist(21, &[0, 16, 32, 48])];
 ]
 "movn" = [
-    0b00010010_10000000_00000000_00000000 = [W, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])];
-    0b10010010_10000000_00000000_00000000 = [X, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16, 32, 48])];
+    0b00010010_10000000_00000000_00000000 = [W, Imm, End, LitMod(LSL)] => [R(0), Ubits(5, 16), Ulist(21, &[0, 16])];
+    0b10010010_10000000_00000000_00000000 = [X, Imm, End, LitMod(LSL)] => [R(0), Ubits(5, 16), Ulist(21, &[0, 16, 32, 48])];
 ]
 "movz" = [
-    0b01010010_10000000_00000000_00000000 = [W, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16])];
-    0b11010010_10000000_00000000_00000000 = [X, Imm, End, Mod(&[LSL])] => [R(0), Ubits(5, 16), A, Ulist(21, &[0, 16, 32, 48])];
+    0b01010010_10000000_00000000_00000000 = [W, Imm, End, LitMod(LSL)] => [R(0), Ubits(5, 16), Ulist(21, &[0, 16])];
+    0b11010010_10000000_00000000_00000000 = [X, Imm, End, LitMod(LSL)] => [R(0), Ubits(5, 16), Ulist(21, &[0, 16, 32, 48])];
 ]
 "mrs" = [
     0b11010101_00110000_00000000_00000000 = [X, Imm] => [R(0), Ubits(5, 15)];
@@ -2350,9 +2350,9 @@ Ops!(map ;
     0b00101110_00100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "mvni" = [
-    0b00101111_00000000_10000100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8]), Rwidth(30)];
-    0b00101111_00000000_00000100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
-    0b00101111_00000000_11000100_00000000 = [V(DWORD), Imm, Mod(&[MSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(12, &[8, 16]), Rwidth(30)];
+    0b00101111_00000000_10000100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00101111_00000000_00000100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
+    0b00101111_00000000_11000100_00000000 = [V(DWORD), Imm, LitMod(MSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(12, &[8, 16]), Rwidth(30)];
 ]
 "neg" = [
     // NEG (shifted register)
@@ -2392,8 +2392,8 @@ Ops!(map ;
 ]
 "orr" = [
     // ORR (vector, immediate)
-    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8])];
-    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, Mod(&[LSL])] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, A, Ulist(13, &[0, 8, 16, 24])];
+    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])];
+    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])];
     // ORR (vector, register)
     0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // ORR (immediate)
@@ -3784,8 +3784,8 @@ Ops!(map ;
     0b11001011_00100000_00000000_00000000 = [XSP, XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b11001011_00100000_00000000_00000000 = [XSP, XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // SUB (immediate)
-    0b01010001_00000000_00000000_00000000 = [WSP, WSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
-    0b11010001_00000000_00000000_00000000 = [XSP, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
+    0b01010001_00000000_00000000_00000000 = [WSP, WSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
+    0b11010001_00000000_00000000_00000000 = [XSP, XSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
     // SUB (vector)
     0b01111110_11100000_10000100_00000000 = [D, D, D] => [R(0), R(5), R(16)];
     0b00101110_00100000_10000100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
@@ -3812,8 +3812,8 @@ Ops!(map ;
     0b11101011_00100000_00000000_00000000 = [X, XSP, W, End, Mod(EXTENDS_W)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b11101011_00100000_00000000_00000000 = [X, XSP, X, End, Mod(EXTENDS_X)] => [R(0), R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // SUBS (immediate)
-    0b01110001_00000000_00000000_00000000 = [W, WSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
-    0b11110001_00000000_00000000_00000000 = [X, XSP, Imm, End, Mod(&[LSL])] => [R(0), R(5), Ubits(10, 12), A, Ulist(22, &[0, 12])];
+    0b01110001_00000000_00000000_00000000 = [W, WSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
+    0b11110001_00000000_00000000_00000000 = [X, XSP, Imm, End, LitMod(LSL)] => [R(0), R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
 ]
 "suqadd" = [
     0b01011110_00100000_00111000_00000000 = [B, B] => [R(0), R(5)];
