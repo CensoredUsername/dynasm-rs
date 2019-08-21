@@ -4,6 +4,53 @@ use crate::common::Size;
 
 use std::fmt::Write;
 
+
+#[cfg(feature = "dynasm_opmap")]
+pub fn create_opmap() -> String {
+    let mut s = String::new();
+
+    let mut mnemnonics: Vec<_> = super::aarch64data::mnemnonics().cloned().collect();
+    mnemnonics.sort();
+
+    for mnemnonic in mnemnonics {
+        // get the data for this mnemnonic
+        let data = super::aarch64data::get_mnemonic_data(mnemnonic).unwrap();
+        // format the data for the opmap docs
+        let formats = data.into_iter()
+            .map(|x| format_opdata(mnemnonic, x))
+            .flat_map(|x| x)
+            .map(|x| x.replace(">>> ", ""))
+            .collect::<Vec<_>>();
+
+        // push mnemnonic name as title
+        write!(s, "### {}\n```insref\n{}\n```\n", mnemnonic, formats.join("\n")).unwrap();
+    }
+    s
+}
+
+
+#[cfg(feature = "dynasm_extract")]
+pub fn extract_opmap() -> String {
+    let mut buf = Vec::new();
+
+    let mut mnemnonics: Vec<_> = super::aarch64data::mnemnonics().cloned().collect();
+    mnemnonics.sort();
+
+    for mnemnonic in mnemnonics {
+        // get the data for this mnemnonic
+        let data = super::aarch64data::get_mnemonic_data(mnemnonic).unwrap();
+
+        buf.extend(
+            data.into_iter()
+            .map(|x| extract_opdata(mnemnonic, x))
+            .flat_map(|x| x)
+        );
+    }
+
+    buf.join("\n")
+}
+
+
 pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
     let mut forms = Vec::new();
 
@@ -25,143 +72,83 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
     let mut forms = Vec::new();
 
     for i in 0 .. form_count {
-        let mut buf = String::new();
-        buf.push_str(">>> ");
-        buf.push_str(name);
-
-        let mut end_count = 0;
+        let mut buf = format!(">>> {}", name);
 
         let (constraints, names) = match constraints_and_names(data) {
             Ok(o) => o,
             Err(e) => panic!("Encountered a faulty op listing for {}: {}", name, e)
         };
-        let mut names = names.into_iter();
 
         let mut first = true;
+        let mut after_dot = false;
+        let mut end_count = 0;
+        let mut names = &names[..];
+
         for matcher in data.matchers {
             if let Matcher::End = matcher {
                 end_count += 1;
                 buf.push_str(" {");
                 continue;
+            } else if let Matcher::Dot = matcher {
+                after_dot = true;
+                buf.push_str(".");
+                continue;
             }
 
             if first {
-                buf.push_str(" ");
-                first = false;
+                if !after_dot {
+                    buf.push_str(" ");
+                    first = false;
+                }
+                after_dot = false;
             } else {
                 buf.push_str(", ");
             }
 
+            let (arg_names, rest) = names.split_at(matcher.flatarg_count());
+            names = rest;
+
             match matcher {
-                Matcher::Dot => write!(buf, ".").unwrap(),
+                Matcher::Dot => (),
                 Matcher::Lit(s) => write!(buf, "{}", s).unwrap(),
                 Matcher::LitInt(v) => write!(buf, "{}", v).unwrap(),
                 Matcher::LitFloat(v) => write!(buf, "{}", v).unwrap(),
-                Matcher::Ident => {
-                    let name = names.next().unwrap();
-                    write!(buf, "{}", name).unwrap();
-                },
+                Matcher::Ident => write!(buf, "{}", arg_names[0]).unwrap(),
                 Matcher::Cond => write!(buf, "<cond>").unwrap(),
-                Matcher::Imm => {
-                    let name = names.next().unwrap();
-                    write!(buf, "#{}", name).unwrap();
-                },
-                Matcher::W => {
-                    let name = names.next().unwrap();
-                    write!(buf, "W{}", name).unwrap();
-                },
-                Matcher::X => {
-                    let name = names.next().unwrap();
-                    write!(buf, "X{}", name).unwrap();
-                },
-                Matcher::WSP => {
-                    let name = names.next().unwrap();
-                    write!(buf, "W{}|WSP", name).unwrap();
-                },
-                Matcher::XSP => {
-                    let name = names.next().unwrap();
-                    write!(buf, "X{}|SP", name).unwrap();
-                },
-                Matcher::B => {
-                    let name = names.next().unwrap();
-                    write!(buf, "B{}", name).unwrap();
-                },
-                Matcher::H => {
-                    let name = names.next().unwrap();
-                    write!(buf, "H{}", name).unwrap();
-                },
-                Matcher::S => {
-                    let name = names.next().unwrap();
-                    write!(buf, "S{}", name).unwrap();
-                },
-                Matcher::D => {
-                    let name = names.next().unwrap();
-                    write!(buf, "D{}", name).unwrap();
-                },
-                Matcher::Q => {
-                    let name = names.next().unwrap();
-                    write!(buf, "Q{}", name).unwrap();
-                },
+                Matcher::Imm => write!(buf, "#{}", arg_names[0]).unwrap(),
+                Matcher::W =>   write!(buf, "W{}", arg_names[0]).unwrap(),
+                Matcher::X =>   write!(buf, "X{}", arg_names[0]).unwrap(),
+                Matcher::WSP => write!(buf, "W{}|WSP", arg_names[0]).unwrap(),
+                Matcher::XSP => write!(buf, "X{}|SP", arg_names[0]).unwrap(),
+                Matcher::B =>   write!(buf, "B{}", arg_names[0]).unwrap(),
+                Matcher::H =>   write!(buf, "H{}", arg_names[0]).unwrap(),
+                Matcher::S =>   write!(buf, "S{}", arg_names[0]).unwrap(),
+                Matcher::D =>   write!(buf, "D{}", arg_names[0]).unwrap(),
+                Matcher::Q =>   write!(buf, "Q{}", arg_names[0]).unwrap(),
                 Matcher::V(s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    let name = names.next().unwrap();
-                    write!(buf, "V{}.{}{}", name, size_to_string(s), width / s.in_bytes()).unwrap();
+                    write!(buf, "V{}.{}{}", arg_names[0], size_to_string(s), width / s.in_bytes()).unwrap();
                 },
-                Matcher::VStatic(s, c) => {
-                    let name = names.next().unwrap();
-                    write!(buf, "V{}.{}{}", name, size_to_string(s), c).unwrap();
-                },
-                Matcher::VElement(s) => {
-                    let name = names.next().unwrap();
-                    let imm = names.next().unwrap();
-                    write!(buf, "V{}.{}[{}]", name, size_to_string(s), imm).unwrap();
-                },
-                Matcher::VElementStatic(s, element) => {
-                    let name = names.next().unwrap();
-                    write!(buf, "V{}.{}[{}]", name, size_to_string(s), element).unwrap();
-                },
+                Matcher::VStatic(s, c) => write!(buf, "V{}.{}{}", arg_names[0], size_to_string(s), c).unwrap(),
+                Matcher::VElement(s) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(s), arg_names[1]).unwrap(),
+                Matcher::VElementStatic(s, element) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(s), element).unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    let name = names.next().unwrap();
-                    write!(buf, "{{V{}.{}{} * {}}}", name, size_to_string(s), width / s.in_bytes(), a).unwrap();
+                    write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(s), width / s.in_bytes(), a).unwrap();
                 },
-                Matcher::RegListStatic(a, s, c) => {
-                    let name = names.next().unwrap();
-                    write!(buf, "{{V{}.{}{} * {}}}", name, size_to_string(s), c, a).unwrap();
-                },
-                Matcher::RegListElement(a, s) => {
-                    let name = names.next().unwrap();
-                    let imm = names.next().unwrap();
-                    write!(buf, "{{V{}.{} * {}}}[{}]", name, size_to_string(s), a, imm).unwrap();
-                },
-                Matcher::Offset => buf.push_str(&names.next().unwrap()),
-                Matcher::RefBase => {
-                    let name = names.next().unwrap();
-                    write!(buf, "[X{}|SP]", name).unwrap();
-                },
-                Matcher::RefOffset => {
-                    let name = names.next().unwrap();
-                    let imm = names.next().unwrap();
-                    write!(buf, "[X{}|SP {{, #{} }} ]", name, imm).unwrap();
-                },
-                Matcher::RefPre => {
-                    let name = names.next().unwrap();
-                    let imm = names.next().unwrap();
-                    write!(buf, "[X{}|SP, #{}]!", name, imm).unwrap();
-                },
-                Matcher::RefIndex => {
-                    let name1 = names.next().unwrap();
-                    let name2 = names.next().unwrap();
-                    let imm = names.next().unwrap();
-                    write!(buf, "[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]", name1, name2, name2, imm).unwrap();
-                },
+                Matcher::RegListStatic(a, s, c) => write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(s), c, a).unwrap(),
+                Matcher::RegListElement(a, s) =>   write!(buf, "{{V{}.{} * {}}}[{}]", arg_names[0], size_to_string(s), a, arg_names[1]).unwrap(),
+                Matcher::Offset => buf.push_str(&arg_names[0]),
+                Matcher::RefBase =>   write!(buf, "[X{}|SP]", arg_names[0]).unwrap(),
+                Matcher::RefOffset => write!(buf, "[X{}|SP {{, #{} }} ]", arg_names[0], arg_names[1]).unwrap(),
+                Matcher::RefPre =>    write!(buf, "[X{}|SP, #{}]!", arg_names[0], arg_names[1]).unwrap(),
+                Matcher::RefIndex =>  write!(buf, "[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]", arg_names[0], arg_names[1], arg_names[1], arg_names[3]).unwrap(),
                 Matcher::LitMod(m) => {
                     buf.push_str(m.as_str());
-                    let name = names.next().unwrap();
                     if !m.expr_required() {
-                        write!(buf, " {{ #{} }}", name).unwrap();
+                        write!(buf, " {{ #{} }}", arg_names[0]).unwrap();
                     } else {
-                        write!(buf, " #{}", name).unwrap();
+                        write!(buf, " #{}", arg_names[0]).unwrap();
                     }
                 },
                 Matcher::Mod(mods) => {
@@ -172,19 +159,9 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     for m in *mods {
                         required = required || m.expr_required();
                         match m {
-                            Modifier::LSL
-                            | Modifier::LSR
-                            | Modifier::ASR
-                            | Modifier::ROR
-                            | Modifier::MSL => rest.push(m.as_str()),
-                            Modifier::SXTX
-                            | Modifier::SXTW
-                            | Modifier::SXTH
-                            | Modifier::SXTB => signed_extends.push(m.as_str().chars().nth(3).unwrap()),
-                            Modifier::UXTX
-                            | Modifier::UXTW
-                            | Modifier::UXTH
-                            | Modifier::UXTB => unsigned_extends.push(m.as_str().chars().nth(3).unwrap()),
+                            Modifier::LSL | Modifier::LSR | Modifier::ASR | Modifier::ROR | Modifier::MSL => rest.push(m.as_str()),
+                            Modifier::SXTX | Modifier::SXTW | Modifier::SXTH | Modifier::SXTB => signed_extends.push(m.as_str().chars().nth(3).unwrap()),
+                            Modifier::UXTX | Modifier::UXTW | Modifier::UXTH | Modifier::UXTB => unsigned_extends.push(m.as_str().chars().nth(3).unwrap()),
                         }
                     }
                     if !unsigned_extends.is_empty() {
@@ -205,11 +182,10 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     }
                     buf.push_str(&rest.join("|"));
 
-                    let name = names.next().unwrap();
                     if !required {
-                        write!(buf, " {{ #{} }}", name).unwrap();
+                        write!(buf, " {{ #{} }}", arg_names[1]).unwrap();
                     } else {
-                        write!(buf, " #{}", name).unwrap();
+                        write!(buf, " #{}", arg_names[1]).unwrap();
                     }
                 },
                 Matcher::End => ()
@@ -220,7 +196,6 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
         for _ in 0 .. end_count {
             buf.push_str(" }");
         }
-        let mut buf = buf.replace(" ., ", ".");
 
         if let Some(c) = constraints {
             let mut len = c.len() + buf.len();
@@ -248,33 +223,10 @@ pub fn size_to_string(size: &Size) -> &'static str {
     }
 }
 
-#[cfg(feature = "dynasm_opmap")]
-pub fn create_opmap() -> String {
-    let mut s = String::new();
-
-    let mut mnemnonics: Vec<_> = super::aarch64data::mnemnonics().cloned().collect();
-    mnemnonics.sort();
-
-    for mnemnonic in mnemnonics {
-        // get the data for this mnemnonic
-        let data = super::aarch64data::get_mnemonic_data(mnemnonic).unwrap();
-        // format the data for the opmap docs
-        let formats = data.into_iter()
-            .map(|x| format_opdata(mnemnonic, x))
-            .flat_map(|x| x)
-            .map(|x| x.replace(">>> ", ""))
-            .collect::<Vec<_>>();
-
-        // push mnemnonic name as title
-        write!(s, "### {}\n```insref\n{}\n```\n", mnemnonic, formats.join("\n")).unwrap();
-    }
-    s
-}
-
 fn constraints_and_names(opdata: &Opdata) -> Result<(Option<String>, Vec<String>), &'static str> {
     let data = group_opdata(opdata)?;
     let constraints = format_constraints(&data);
-    let names = data.into_iter().flat_map(|a| a.name).collect();
+    let names = data.into_iter().map(|a| a.name.unwrap_or_else(|| "?".into())).collect();
     Ok((constraints, names))
 }
 
@@ -619,7 +571,7 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             },
             Command::Urange(_, min, max)
             | Command::BUrange(min, max) => write!(buf, "{} <= #{} <= {}", min, name, max),
-            Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", *addval as u32 - (1u32 << bits) + 1, name, addval),
+            Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", *addval as u32 + 1 - (1u32 << bits), name, addval),
             Command::Usumdec(_, bits) => write!(buf, "1 <= #{} + #{} <= {}", prevname, name, (1u32 << bits)),
             Command::Ufields(fields) => write!(buf, "#{} < {}", name, 1u32 << fields.len()),
             Command::Sbits(_, bits)
@@ -647,4 +599,188 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
         write!(buf, ", ").unwrap();
         break;
     }
+}
+
+#[cfg(feature = "dynasm_extract")]
+pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
+
+    let has_simd_full_width = data.matchers.iter().any(|m| match m {
+        Matcher::V(_) | Matcher::RegList(_, _) => true,
+        _ => false
+    });
+
+    let form_count = 1 + has_simd_full_width as u8;
+    let mut forms = Vec::new();
+
+    for i in 0 .. form_count {
+        let mut buf = format!("\"{}", name);
+
+        let mut first = true;
+        let mut after_dot = false;
+        let mut end_count = 0;
+        let mut arg_idx = 0;
+
+        let grouped = group_opdata(data).unwrap();
+        let mut constraints = extract_constraints(&grouped);
+
+        for matcher in data.matchers {
+            if let Matcher::End = matcher {
+                end_count += 1;
+                buf.push_str(" <");
+                continue;
+            } else if let Matcher::Dot = matcher {
+                after_dot = true;
+                buf.push_str(".");
+                continue;
+            }
+
+            if first {
+                if !after_dot {
+                    buf.push_str(" ");
+                    first = false;
+                }
+                after_dot = false;
+            } else {
+                buf.push_str(", ");
+            }
+
+            match matcher {
+                Matcher::Dot => (),
+                Matcher::Lit(s) => write!(buf, "{}", s).unwrap(),
+                Matcher::LitInt(v) => write!(buf, "{}", v).unwrap(),
+                Matcher::LitFloat(v) => write!(buf, "{}", v).unwrap(),
+                Matcher::Ident
+                | Matcher::Cond => write!(buf, "<Ident,{}>", arg_idx).unwrap(),
+                Matcher::Imm => write!(buf, "<Imm,{}>", arg_idx).unwrap(),
+                Matcher::W =>   write!(buf, "<W,{}>", arg_idx).unwrap(),
+                Matcher::X =>   write!(buf, "<X,{}>", arg_idx).unwrap(),
+                Matcher::WSP => write!(buf, "<WSP,{}>", arg_idx).unwrap(),
+                Matcher::XSP => write!(buf, "<XSP,{}>", arg_idx).unwrap(),
+                Matcher::B =>   write!(buf, "<B,{}>", arg_idx).unwrap(),
+                Matcher::H =>   write!(buf, "<H,{}>", arg_idx).unwrap(),
+                Matcher::S =>   write!(buf, "<S,{}>", arg_idx).unwrap(),
+                Matcher::D =>   write!(buf, "<D,{}>", arg_idx).unwrap(),
+                Matcher::Q =>   write!(buf, "<Q,{}>", arg_idx).unwrap(),
+                Matcher::V(s) => {
+                    let width = if i == 0 { 16 } else { 8 };
+                    write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(s), width / s.in_bytes()).unwrap();
+                },
+                Matcher::VStatic(s, c) => write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(s), c).unwrap(),
+                Matcher::VElement(s) => write!(buf, "<V,{}>.{}[<Imm,{}>]", arg_idx, size_to_string(s), arg_idx + 1).unwrap(),
+                Matcher::VElementStatic(s, element) => write!(buf, "<V,{}>.{}[{}]", arg_idx, size_to_string(s), element).unwrap(),
+                Matcher::RegList(a, s) => {
+                    let width = if i == 0 { 16 } else { 8 };
+                    write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(s), width / s.in_bytes(), a).unwrap();
+                },
+                Matcher::RegListStatic(a, s, c) => write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(s), c, a).unwrap(),
+                Matcher::RegListElement(a, s) =>   write!(buf, "{{<V,{}>.{} * {}}}[<Imm,{}>]", arg_idx, size_to_string(s), a, arg_idx + 1).unwrap(),
+                Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
+                Matcher::RefBase =>   write!(buf, "[<XSP,{}>]", arg_idx).unwrap(),
+                Matcher::RefOffset => write!(buf, "[<XSP,{}> <, #{} > ]", arg_idx, arg_idx + 1).unwrap(),
+                Matcher::RefPre =>    write!(buf, "[<XSP,{}>, #{}]!", arg_idx, arg_idx + 1).unwrap(),
+                Matcher::RefIndex => {
+                    constraints.push(format!("{}: ModWX()", arg_idx + 2));
+                    write!(buf, "[<XSP,{}>, <WX,{}> < , <Mod,{}> < <Imm,{}> > > ]", arg_idx, arg_idx + 1, arg_idx + 2, arg_idx + 3).unwrap();
+                },
+                Matcher::LitMod(m) => {
+                    buf.push_str(m.as_str());
+                    if !m.expr_required() {
+                        write!(buf, " {{ <Imm,{}> }}", arg_idx).unwrap();
+                    } else {
+                        write!(buf, " <Imm,{}>", arg_idx).unwrap();
+                    }
+                },
+                Matcher::Mod(mods) => {
+                    let mut required = false;
+                    let mut options = Vec::new();
+                    for m in *mods {
+                        required = required || m.expr_required();
+                        options.push(format!("\"{}\"", m.as_str()));
+                    }
+
+                    constraints.push(format!("{}: List({})", arg_idx, options.join(", ")));
+
+                    if !required {
+                        write!(buf, "<Mod,{}> < <Imm,{}> >", arg_idx, arg_idx + 1).unwrap();
+                    } else {
+                        write!(buf, "<Mod,{}> <Imm,{}>", arg_idx, arg_idx + 1).unwrap();
+                    }
+                },
+                Matcher::End => ()
+            }
+
+            arg_idx += matcher.flatarg_count();
+        }
+
+        for _ in 0 .. end_count {
+            buf.push_str(" >");
+        }
+
+        write!(buf, "\"\t {{{}}}", constraints.join(", ")).unwrap();
+
+        forms.push(buf);
+    }
+
+    forms
+}
+
+#[cfg(feature = "dynasm_extract")]
+fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
+    use super::aarch64data::{COND_MAP, SPECIAL_IDENT_MAP};
+
+    let mut constraints = Vec::new();
+    for (i, arg) in args.iter().enumerate() {
+        for command in &arg.commands {
+            let constraint = match command {
+                Command::R(_) => format!("R(32)"),
+                Command::R4(_) => format!("R(16)"),
+                Command::RNext => format!("RNext()"),
+                Command::Ubits(_, bits)
+                | Command::BUbits(bits) => format!("Range(0, {}, 1)", 1u32 << bits),
+                Command::Uscaled(_, bits, scale) => format!("Range(0, {}, {})", 1u32 << (bits + scale), 1u32 << scale),
+                Command::Ulist(_, list) => {
+                    let numbers = list.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(", ");
+                    format!("List({})", numbers)
+                },
+                Command::Urange(_, min, max)
+                | Command::BUrange(min, max) => format!("Range({}, {}+1, 1)", min, max),
+                Command::Usub(_, bits, addval) => format!("Range({}, {}+1, 1)", *addval as u32 + 1 - (1u32 << bits), addval),
+                Command::Usumdec(_, bits) => format!("Range2(1, {}+1, 1)", (1u32 << bits)),
+                Command::Ufields(fields) => format!("Range(0, {}, 1)", 1u32 << fields.len()),
+                Command::Sbits(_, bits)
+                | Command::BSbits(bits) => format!("Range(-{}, {}, 1)", 1u32 << (bits - 1), 1u32 << (bits - 1)),
+                Command::Sscaled(_, bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits + scale - 1), 1u32 << (bits + scale - 1), 1u32 << scale),
+                Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W) => format!("Special('wide_w')"),
+                | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X) => format!("Special('wide_x')"),
+                | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) => format!("Special('inverted_w')"),
+                | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) => format!("Special('inverted_x')"),
+                Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_W) => format!("Special('logical_w')"),
+                | Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_X) => format!("Special('logical_x')"),
+                Command::Special(_, SpecialComm::FLOAT_IMMEDIATE)
+                | Command::Special(_, SpecialComm::SPLIT_FLOAT_IMMEDIATE) => format!("Special('float')"),
+                Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => format!("Special('stretched')"),
+                Command::Offset(Relocation::B) => format!("Range(-{}, {}, {})", 1<<27, 1<<27, 4),
+                Command::Offset(Relocation::BCOND) => format!("Range(-{}, {}, {})", 1<<18, 1<<18, 4),
+                Command::Offset(Relocation::ADR) => format!("Range(-{}, {}, {})", 1<<20, 1<<20, 1),
+                Command::Offset(Relocation::ADRP) => format!("Range(-{}, {}, {})", 1u64<<32, 1u64<<32, 4096),
+                Command::Offset(Relocation::TBZ) => format!("Range(-{}, {}, {})", 1<<15, 1<<15, 4),
+                Command::Offset(Relocation::LITERAL32) => format!("Range(-{}, {}, {})", 1<<31, 1<<31, 1),
+                Command::Offset(Relocation::LITERAL64) => format!("Range(-{}, {}, {})", 1u64<<63, 1u64<<63, 1),
+                Command::Cond(_)
+                | Command::CondInv(_) => {
+                    let keys: Vec<_> = COND_MAP.keys().map(|k| format!("\"{}\"", k)).collect();
+                    format!("List({})", keys.join(", "))
+                },
+                Command::LitList(_, name) => {
+                    let keys: Vec<_> = SPECIAL_IDENT_MAP[name].keys().map(|k| format!("\"{}\"", k)).collect();
+                    format!("List({})", keys.join(", "))
+                }
+                _ => continue
+            };
+            constraints.push(format!("{}: {}", i, constraint));
+
+            break;
+        }
+    }
+    constraints
 }

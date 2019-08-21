@@ -15,6 +15,8 @@ use self::aarch64data::Relocation;
 
 #[cfg(feature = "dynasm_opmap")]
 pub use debug::create_opmap;
+#[cfg(feature = "dynasm_extract")]
+pub use debug::extract_opmap;
 
 struct Context<'a, 'b: 'a> {
     pub state: &'a mut State<'b>

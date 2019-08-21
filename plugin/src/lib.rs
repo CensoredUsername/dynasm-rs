@@ -179,6 +179,27 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
     token.into()
 }
 
+/// This is only compiled when the dynasm_extract feature is used. It exports the internal assembly listings
+/// into a string that can then be included into the documentation for dynasm.
+#[cfg(feature = "dynasm_extract")]
+#[proc_macro]
+pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+
+    // parse to ensure that no macro arguments were provided
+    let opmap = parse_macro_input!(tokens as DynasmOpmap);
+
+    let s = match opmap.arch.as_str() {
+        "x64" | "x86" => unimplemented!(),
+        "aarch64" => arch::aarch64::extract_opmap(),
+        x => panic!("Unknown architecture {}", x)
+    };
+
+    let token = quote::quote! {
+        #s
+    };
+    token.into()
+}
+
 /// As dynasm_opmap takes no args it doesn't parse to anything
 struct DynasmOpmap {
     pub arch: String
