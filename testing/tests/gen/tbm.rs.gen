@@ -3,6 +3,7 @@
 fn enc_tbm_blcfill5979() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcfill rbx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_tbm_blcfill5979() {
 fn enc_tbm_blcfill5980() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcfill rdx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_tbm_blcfill5980() {
 fn enc_tbm_blcfill5981() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcfill rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_tbm_blcfill5981() {
 fn enc_tbm_blcfill5982() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcfill rdx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -59,6 +63,7 @@ fn enc_tbm_blcfill5982() {
 fn enc_tbm_blcfill5983() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcfill rcx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -73,6 +78,7 @@ fn enc_tbm_blcfill5983() {
 fn enc_tbm_blci5984() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blci rdx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -87,6 +93,7 @@ fn enc_tbm_blci5984() {
 fn enc_tbm_blci5985() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blci rdx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -101,6 +108,7 @@ fn enc_tbm_blci5985() {
 fn enc_tbm_blci5986() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blci rcx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -115,6 +123,7 @@ fn enc_tbm_blci5986() {
 fn enc_tbm_blci5987() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blci rax, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -129,6 +138,7 @@ fn enc_tbm_blci5987() {
 fn enc_tbm_blcic5988() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcic rax, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -143,6 +153,7 @@ fn enc_tbm_blcic5988() {
 fn enc_tbm_blcic5989() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcic rbx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -157,6 +168,7 @@ fn enc_tbm_blcic5989() {
 fn enc_tbm_blcic5990() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcic rbx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -171,6 +183,7 @@ fn enc_tbm_blcic5990() {
 fn enc_tbm_blcic5991() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcic rax, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -185,6 +198,7 @@ fn enc_tbm_blcic5991() {
 fn enc_tbm_blcic5992() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcic rbx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -199,6 +213,7 @@ fn enc_tbm_blcic5992() {
 fn enc_tbm_blcmsk5993() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcmsk rax, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -213,6 +228,7 @@ fn enc_tbm_blcmsk5993() {
 fn enc_tbm_blcmsk5994() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcmsk rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -227,6 +243,7 @@ fn enc_tbm_blcmsk5994() {
 fn enc_tbm_blcmsk5995() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcmsk rbx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -241,6 +258,7 @@ fn enc_tbm_blcmsk5995() {
 fn enc_tbm_blcmsk5996() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcmsk rax, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -255,6 +273,7 @@ fn enc_tbm_blcmsk5996() {
 fn enc_tbm_blcmsk5997() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcmsk rbx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -269,6 +288,7 @@ fn enc_tbm_blcmsk5997() {
 fn enc_tbm_blcs5998() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcs rcx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -283,6 +303,7 @@ fn enc_tbm_blcs5998() {
 fn enc_tbm_blcs5999() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcs rdx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -297,6 +318,7 @@ fn enc_tbm_blcs5999() {
 fn enc_tbm_blcs6000() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcs rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -311,6 +333,7 @@ fn enc_tbm_blcs6000() {
 fn enc_tbm_blcs6001() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcs rax, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -325,6 +348,7 @@ fn enc_tbm_blcs6001() {
 fn enc_tbm_blcs6002() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blcs rcx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -339,6 +363,7 @@ fn enc_tbm_blcs6002() {
 fn enc_tbm_blsfill6003() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsfill rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -353,6 +378,7 @@ fn enc_tbm_blsfill6003() {
 fn enc_tbm_blsfill6004() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsfill rcx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -367,6 +393,7 @@ fn enc_tbm_blsfill6004() {
 fn enc_tbm_blsfill6005() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsfill rax, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -381,6 +408,7 @@ fn enc_tbm_blsfill6005() {
 fn enc_tbm_blsfill6006() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsfill rdx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -395,6 +423,7 @@ fn enc_tbm_blsfill6006() {
 fn enc_tbm_blsfill6007() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsfill rcx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -409,6 +438,7 @@ fn enc_tbm_blsfill6007() {
 fn enc_tbm_blsic6008() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsic rdx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -423,6 +453,7 @@ fn enc_tbm_blsic6008() {
 fn enc_tbm_blsic6009() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsic rbx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -437,6 +468,7 @@ fn enc_tbm_blsic6009() {
 fn enc_tbm_blsic6010() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsic rcx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -451,6 +483,7 @@ fn enc_tbm_blsic6010() {
 fn enc_tbm_blsic6011() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; blsic rcx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -465,6 +498,7 @@ fn enc_tbm_blsic6011() {
 fn enc_tbm_t1mskc6012() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; t1mskc rcx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -479,6 +513,7 @@ fn enc_tbm_t1mskc6012() {
 fn enc_tbm_t1mskc6013() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; t1mskc rdx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -493,6 +528,7 @@ fn enc_tbm_t1mskc6013() {
 fn enc_tbm_t1mskc6014() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; t1mskc rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -507,6 +543,7 @@ fn enc_tbm_t1mskc6014() {
 fn enc_tbm_t1mskc6015() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; t1mskc rdx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -521,6 +558,7 @@ fn enc_tbm_t1mskc6015() {
 fn enc_tbm_tzmsk6016() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; tzmsk rcx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -535,6 +573,7 @@ fn enc_tbm_tzmsk6016() {
 fn enc_tbm_tzmsk6017() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; tzmsk rbx, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -549,6 +588,7 @@ fn enc_tbm_tzmsk6017() {
 fn enc_tbm_tzmsk6018() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; tzmsk rcx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -563,6 +603,7 @@ fn enc_tbm_tzmsk6018() {
 fn enc_tbm_tzmsk6019() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; tzmsk rbx, rcx
      );
      let buf = ops.finalize().unwrap();

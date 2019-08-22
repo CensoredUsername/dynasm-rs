@@ -3,6 +3,7 @@
 fn enc_sse5_vfmaddsd5401() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm1, xmm15, QWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_sse5_vfmaddsd5401() {
 fn enc_sse5_vfmaddsd5402() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm11, xmm3, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_sse5_vfmaddsd5402() {
 fn enc_sse5_vfmaddsd5403() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm15, xmm3, QWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_sse5_vfmaddsd5403() {
 fn enc_sse5_vfmaddsd5404() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm11, xmm4, QWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -59,6 +63,7 @@ fn enc_sse5_vfmaddsd5404() {
 fn enc_sse5_vfmaddsd5405() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm15, xmm3, QWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -73,6 +78,7 @@ fn enc_sse5_vfmaddsd5405() {
 fn enc_sse5_vfmaddsd5406() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm15, xmm15, xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -87,6 +93,7 @@ fn enc_sse5_vfmaddsd5406() {
 fn enc_sse5_vfmaddsd5407() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm12, xmm4, xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -101,6 +108,7 @@ fn enc_sse5_vfmaddsd5407() {
 fn enc_sse5_vfmaddsd5408() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm11, xmm3, xmm15, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -115,6 +123,7 @@ fn enc_sse5_vfmaddsd5408() {
 fn enc_sse5_vfmaddsd5409() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm11, xmm4, xmm2, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -129,6 +138,7 @@ fn enc_sse5_vfmaddsd5409() {
 fn enc_sse5_vfmaddsd5410() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm15, xmm15, xmm1, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -143,6 +153,7 @@ fn enc_sse5_vfmaddsd5410() {
 fn enc_sse5_vfmaddsd5411() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm4, xmm1, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -157,6 +168,7 @@ fn enc_sse5_vfmaddsd5411() {
 fn enc_sse5_vfmaddsd5412() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm12, xmm3, xmm0, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -171,6 +183,7 @@ fn enc_sse5_vfmaddsd5412() {
 fn enc_sse5_vfmaddsd5413() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm12, xmm11, xmm15, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -185,6 +198,7 @@ fn enc_sse5_vfmaddsd5413() {
 fn enc_sse5_vfmaddsd5414() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm1, xmm15, QWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -199,6 +213,7 @@ fn enc_sse5_vfmaddsd5414() {
 fn enc_sse5_vfmaddsd5415() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddsd xmm1, xmm15, xmm2, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -213,6 +228,7 @@ fn enc_sse5_vfmaddsd5415() {
 fn enc_sse5_vfmaddss5416() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm2, xmm0, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -227,6 +243,7 @@ fn enc_sse5_vfmaddss5416() {
 fn enc_sse5_vfmaddss5417() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm4, xmm0, DWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -241,6 +258,7 @@ fn enc_sse5_vfmaddss5417() {
 fn enc_sse5_vfmaddss5418() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm0, xmm0, xmm11, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -255,6 +273,7 @@ fn enc_sse5_vfmaddss5418() {
 fn enc_sse5_vfmaddss5419() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm1, xmm0, xmm4, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -269,6 +288,7 @@ fn enc_sse5_vfmaddss5419() {
 fn enc_sse5_vfmaddss5420() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm15, xmm1, DWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -283,6 +303,7 @@ fn enc_sse5_vfmaddss5420() {
 fn enc_sse5_vfmaddss5421() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm3, xmm4, xmm1, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -297,6 +318,7 @@ fn enc_sse5_vfmaddss5421() {
 fn enc_sse5_vfmaddss5422() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm12, xmm0, xmm3, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -311,6 +333,7 @@ fn enc_sse5_vfmaddss5422() {
 fn enc_sse5_vfmaddss5423() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm3, xmm15, xmm12, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -325,6 +348,7 @@ fn enc_sse5_vfmaddss5423() {
 fn enc_sse5_vfmaddss5424() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm15, xmm12, xmm2, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -339,6 +363,7 @@ fn enc_sse5_vfmaddss5424() {
 fn enc_sse5_vfmaddss5425() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm15, xmm0, xmm3, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -353,6 +378,7 @@ fn enc_sse5_vfmaddss5425() {
 fn enc_sse5_vfmaddss5426() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm0, xmm3, xmm11, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -367,6 +393,7 @@ fn enc_sse5_vfmaddss5426() {
 fn enc_sse5_vfmaddss5427() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm2, xmm2, xmm3, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -381,6 +408,7 @@ fn enc_sse5_vfmaddss5427() {
 fn enc_sse5_vfmaddss5428() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm4, xmm0, DWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -395,6 +423,7 @@ fn enc_sse5_vfmaddss5428() {
 fn enc_sse5_vfmaddss5429() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm0, xmm0, DWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -409,6 +438,7 @@ fn enc_sse5_vfmaddss5429() {
 fn enc_sse5_vfmaddss5430() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmaddss xmm2, xmm2, xmm3, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -423,6 +453,7 @@ fn enc_sse5_vfmaddss5430() {
 fn enc_sse5_vfmsubsd5431() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm1, xmm11, QWORD [rax], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -437,6 +468,7 @@ fn enc_sse5_vfmsubsd5431() {
 fn enc_sse5_vfmsubsd5432() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm1, xmm2, QWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -451,6 +483,7 @@ fn enc_sse5_vfmsubsd5432() {
 fn enc_sse5_vfmsubsd5433() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm1, xmm2, QWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -465,6 +498,7 @@ fn enc_sse5_vfmsubsd5433() {
 fn enc_sse5_vfmsubsd5434() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm3, xmm15, xmm15, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -479,6 +513,7 @@ fn enc_sse5_vfmsubsd5434() {
 fn enc_sse5_vfmsubsd5435() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm12, xmm1, xmm2, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -493,6 +528,7 @@ fn enc_sse5_vfmsubsd5435() {
 fn enc_sse5_vfmsubsd5436() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm11, xmm2, xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -507,6 +543,7 @@ fn enc_sse5_vfmsubsd5436() {
 fn enc_sse5_vfmsubsd5437() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm12, xmm0, xmm11, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -521,6 +558,7 @@ fn enc_sse5_vfmsubsd5437() {
 fn enc_sse5_vfmsubsd5438() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm4, xmm15, xmm4, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -535,6 +573,7 @@ fn enc_sse5_vfmsubsd5438() {
 fn enc_sse5_vfmsubsd5439() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm12, xmm11, xmm3, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -549,6 +588,7 @@ fn enc_sse5_vfmsubsd5439() {
 fn enc_sse5_vfmsubsd5440() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm2, xmm11, xmm15, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -563,6 +603,7 @@ fn enc_sse5_vfmsubsd5440() {
 fn enc_sse5_vfmsubsd5441() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm3, xmm15, xmm15, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -577,6 +618,7 @@ fn enc_sse5_vfmsubsd5441() {
 fn enc_sse5_vfmsubsd5442() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm1, xmm11, QWORD [rax], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -591,6 +633,7 @@ fn enc_sse5_vfmsubsd5442() {
 fn enc_sse5_vfmsubsd5443() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm1, xmm2, QWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -605,6 +648,7 @@ fn enc_sse5_vfmsubsd5443() {
 fn enc_sse5_vfmsubsd5444() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubsd xmm1, xmm11, QWORD [rax], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -619,6 +663,7 @@ fn enc_sse5_vfmsubsd5444() {
 fn enc_sse5_vfmsubss5445() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm2, xmm0, xmm3, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -633,6 +678,7 @@ fn enc_sse5_vfmsubss5445() {
 fn enc_sse5_vfmsubss5446() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm1, xmm3, xmm0, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -647,6 +693,7 @@ fn enc_sse5_vfmsubss5446() {
 fn enc_sse5_vfmsubss5447() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm12, xmm4, xmm1, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -661,6 +708,7 @@ fn enc_sse5_vfmsubss5447() {
 fn enc_sse5_vfmsubss5448() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm0, xmm3, xmm0, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -675,6 +723,7 @@ fn enc_sse5_vfmsubss5448() {
 fn enc_sse5_vfmsubss5449() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm1, xmm3, xmm12, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -689,6 +738,7 @@ fn enc_sse5_vfmsubss5449() {
 fn enc_sse5_vfmsubss5450() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm1, xmm11, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -703,6 +753,7 @@ fn enc_sse5_vfmsubss5450() {
 fn enc_sse5_vfmsubss5451() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm12, xmm0, DWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -717,6 +768,7 @@ fn enc_sse5_vfmsubss5451() {
 fn enc_sse5_vfmsubss5452() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm2, xmm1, xmm3, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -731,6 +783,7 @@ fn enc_sse5_vfmsubss5452() {
 fn enc_sse5_vfmsubss5453() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm1, xmm11, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -745,6 +798,7 @@ fn enc_sse5_vfmsubss5453() {
 fn enc_sse5_vfmsubss5454() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm2, xmm2, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -759,6 +813,7 @@ fn enc_sse5_vfmsubss5454() {
 fn enc_sse5_vfmsubss5455() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm12, xmm0, DWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -773,6 +828,7 @@ fn enc_sse5_vfmsubss5455() {
 fn enc_sse5_vfmsubss5456() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm11, xmm0, xmm4, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -787,6 +843,7 @@ fn enc_sse5_vfmsubss5456() {
 fn enc_sse5_vfmsubss5457() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm2, xmm2, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -801,6 +858,7 @@ fn enc_sse5_vfmsubss5457() {
 fn enc_sse5_vfmsubss5458() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm12, xmm0, DWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -815,6 +873,7 @@ fn enc_sse5_vfmsubss5458() {
 fn enc_sse5_vfmsubss5459() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfmsubss xmm1, xmm11, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -829,6 +888,7 @@ fn enc_sse5_vfmsubss5459() {
 fn enc_sse5_vfnmaddsd5460() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm3, xmm2, xmm12, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -843,6 +903,7 @@ fn enc_sse5_vfnmaddsd5460() {
 fn enc_sse5_vfnmaddsd5461() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm11, xmm3, xmm0, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -857,6 +918,7 @@ fn enc_sse5_vfnmaddsd5461() {
 fn enc_sse5_vfnmaddsd5462() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm2, xmm11, xmm2, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -871,6 +933,7 @@ fn enc_sse5_vfnmaddsd5462() {
 fn enc_sse5_vfnmaddsd5463() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm12, xmm11, xmm11, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -885,6 +948,7 @@ fn enc_sse5_vfnmaddsd5463() {
 fn enc_sse5_vfnmaddsd5464() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm4, xmm4, xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -899,6 +963,7 @@ fn enc_sse5_vfnmaddsd5464() {
 fn enc_sse5_vfnmaddsd5465() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm0, xmm12, QWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -913,6 +978,7 @@ fn enc_sse5_vfnmaddsd5465() {
 fn enc_sse5_vfnmaddsd5466() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm3, xmm4, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -927,6 +993,7 @@ fn enc_sse5_vfnmaddsd5466() {
 fn enc_sse5_vfnmaddsd5467() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm4, xmm4, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -941,6 +1008,7 @@ fn enc_sse5_vfnmaddsd5467() {
 fn enc_sse5_vfnmaddsd5468() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm3, xmm4, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -955,6 +1023,7 @@ fn enc_sse5_vfnmaddsd5468() {
 fn enc_sse5_vfnmaddsd5469() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm3, xmm15, xmm12, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -969,6 +1038,7 @@ fn enc_sse5_vfnmaddsd5469() {
 fn enc_sse5_vfnmaddsd5470() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm0, xmm11, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -983,6 +1053,7 @@ fn enc_sse5_vfnmaddsd5470() {
 fn enc_sse5_vfnmaddsd5471() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm3, xmm12, xmm15, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -997,6 +1068,7 @@ fn enc_sse5_vfnmaddsd5471() {
 fn enc_sse5_vfnmaddsd5472() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm0, xmm11, QWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -1011,6 +1083,7 @@ fn enc_sse5_vfnmaddsd5472() {
 fn enc_sse5_vfnmaddsd5473() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm3, xmm15, xmm12, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1025,6 +1098,7 @@ fn enc_sse5_vfnmaddsd5473() {
 fn enc_sse5_vfnmaddsd5474() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddsd xmm11, xmm1, xmm3, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1039,6 +1113,7 @@ fn enc_sse5_vfnmaddsd5474() {
 fn enc_sse5_vfnmaddss5475() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm0, xmm1, xmm15, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -1053,6 +1128,7 @@ fn enc_sse5_vfnmaddss5475() {
 fn enc_sse5_vfnmaddss5476() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm0, xmm1, xmm12, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -1067,6 +1143,7 @@ fn enc_sse5_vfnmaddss5476() {
 fn enc_sse5_vfnmaddss5477() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm1, xmm11, xmm4, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -1081,6 +1158,7 @@ fn enc_sse5_vfnmaddss5477() {
 fn enc_sse5_vfnmaddss5478() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm0, xmm3, xmm2, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1095,6 +1173,7 @@ fn enc_sse5_vfnmaddss5478() {
 fn enc_sse5_vfnmaddss5479() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm2, xmm2, xmm1, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1109,6 +1188,7 @@ fn enc_sse5_vfnmaddss5479() {
 fn enc_sse5_vfnmaddss5480() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm12, xmm2, DWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -1123,6 +1203,7 @@ fn enc_sse5_vfnmaddss5480() {
 fn enc_sse5_vfnmaddss5481() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm2, xmm4, xmm1, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1137,6 +1218,7 @@ fn enc_sse5_vfnmaddss5481() {
 fn enc_sse5_vfnmaddss5482() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm0, xmm12, DWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -1151,6 +1233,7 @@ fn enc_sse5_vfnmaddss5482() {
 fn enc_sse5_vfnmaddss5483() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm15, xmm15, xmm15, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1165,6 +1248,7 @@ fn enc_sse5_vfnmaddss5483() {
 fn enc_sse5_vfnmaddss5484() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm12, xmm2, DWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -1179,6 +1263,7 @@ fn enc_sse5_vfnmaddss5484() {
 fn enc_sse5_vfnmaddss5485() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm2, xmm2, DWORD [rax], xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -1193,6 +1278,7 @@ fn enc_sse5_vfnmaddss5485() {
 fn enc_sse5_vfnmaddss5486() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm4, xmm0, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1207,6 +1293,7 @@ fn enc_sse5_vfnmaddss5486() {
 fn enc_sse5_vfnmaddss5487() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm4, xmm0, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1221,6 +1308,7 @@ fn enc_sse5_vfnmaddss5487() {
 fn enc_sse5_vfnmaddss5488() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm4, xmm0, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1235,6 +1323,7 @@ fn enc_sse5_vfnmaddss5488() {
 fn enc_sse5_vfnmaddss5489() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmaddss xmm0, xmm12, DWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -1249,6 +1338,7 @@ fn enc_sse5_vfnmaddss5489() {
 fn enc_sse5_vfnmsubsd5490() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm3, xmm4, xmm15, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1263,6 +1353,7 @@ fn enc_sse5_vfnmsubsd5490() {
 fn enc_sse5_vfnmsubsd5491() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm4, xmm11, xmm4, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1277,6 +1368,7 @@ fn enc_sse5_vfnmsubsd5491() {
 fn enc_sse5_vfnmsubsd5492() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm0, xmm12, xmm0, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1291,6 +1383,7 @@ fn enc_sse5_vfnmsubsd5492() {
 fn enc_sse5_vfnmsubsd5493() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm3, xmm2, xmm4, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1305,6 +1398,7 @@ fn enc_sse5_vfnmsubsd5493() {
 fn enc_sse5_vfnmsubsd5494() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm0, xmm15, xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1319,6 +1413,7 @@ fn enc_sse5_vfnmsubsd5494() {
 fn enc_sse5_vfnmsubsd5495() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm4, xmm15, QWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -1333,6 +1428,7 @@ fn enc_sse5_vfnmsubsd5495() {
 fn enc_sse5_vfnmsubsd5496() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm4, xmm15, QWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -1347,6 +1443,7 @@ fn enc_sse5_vfnmsubsd5496() {
 fn enc_sse5_vfnmsubsd5497() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm4, xmm4, xmm1, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1361,6 +1458,7 @@ fn enc_sse5_vfnmsubsd5497() {
 fn enc_sse5_vfnmsubsd5498() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm4, xmm15, QWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -1375,6 +1473,7 @@ fn enc_sse5_vfnmsubsd5498() {
 fn enc_sse5_vfnmsubsd5499() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm0, xmm0, xmm4, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1389,6 +1488,7 @@ fn enc_sse5_vfnmsubsd5499() {
 fn enc_sse5_vfnmsubsd5500() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm12, xmm3, QWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1403,6 +1503,7 @@ fn enc_sse5_vfnmsubsd5500() {
 fn enc_sse5_vfnmsubsd5501() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm4, xmm4, xmm1, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1417,6 +1518,7 @@ fn enc_sse5_vfnmsubsd5501() {
 fn enc_sse5_vfnmsubsd5502() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm1, xmm4, xmm0, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1431,6 +1533,7 @@ fn enc_sse5_vfnmsubsd5502() {
 fn enc_sse5_vfnmsubsd5503() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm2, xmm4, QWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -1445,6 +1548,7 @@ fn enc_sse5_vfnmsubsd5503() {
 fn enc_sse5_vfnmsubsd5504() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubsd xmm0, xmm0, xmm4, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1459,6 +1563,7 @@ fn enc_sse5_vfnmsubsd5504() {
 fn enc_sse5_vfnmsubss5505() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm4, xmm11, xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1473,6 +1578,7 @@ fn enc_sse5_vfnmsubss5505() {
 fn enc_sse5_vfnmsubss5506() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm15, xmm1, xmm12, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -1487,6 +1593,7 @@ fn enc_sse5_vfnmsubss5506() {
 fn enc_sse5_vfnmsubss5507() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm3, xmm11, xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1501,6 +1608,7 @@ fn enc_sse5_vfnmsubss5507() {
 fn enc_sse5_vfnmsubss5508() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm1, xmm0, xmm2, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -1515,6 +1623,7 @@ fn enc_sse5_vfnmsubss5508() {
 fn enc_sse5_vfnmsubss5509() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm3, xmm3, xmm11, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1529,6 +1638,7 @@ fn enc_sse5_vfnmsubss5509() {
 fn enc_sse5_vfnmsubss5510() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm0, xmm11, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1543,6 +1653,7 @@ fn enc_sse5_vfnmsubss5510() {
 fn enc_sse5_vfnmsubss5511() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm12, xmm11, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1557,6 +1668,7 @@ fn enc_sse5_vfnmsubss5511() {
 fn enc_sse5_vfnmsubss5512() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm15, xmm12, xmm1, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1571,6 +1683,7 @@ fn enc_sse5_vfnmsubss5512() {
 fn enc_sse5_vfnmsubss5513() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm12, xmm15, xmm0, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1585,6 +1698,7 @@ fn enc_sse5_vfnmsubss5513() {
 fn enc_sse5_vfnmsubss5514() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm15, xmm11, DWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1599,6 +1713,7 @@ fn enc_sse5_vfnmsubss5514() {
 fn enc_sse5_vfnmsubss5515() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm3, xmm4, xmm15, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1613,6 +1728,7 @@ fn enc_sse5_vfnmsubss5515() {
 fn enc_sse5_vfnmsubss5516() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm15, xmm2, DWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -1627,6 +1743,7 @@ fn enc_sse5_vfnmsubss5516() {
 fn enc_sse5_vfnmsubss5517() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm12, xmm11, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1641,6 +1758,7 @@ fn enc_sse5_vfnmsubss5517() {
 fn enc_sse5_vfnmsubss5518() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm12, xmm11, DWORD [rax], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -1655,6 +1773,7 @@ fn enc_sse5_vfnmsubss5518() {
 fn enc_sse5_vfnmsubss5519() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfnmsubss xmm15, xmm12, xmm1, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1669,6 +1788,7 @@ fn enc_sse5_vfnmsubss5519() {
 fn enc_sse5_vfrczsd5520() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm3, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -1683,6 +1803,7 @@ fn enc_sse5_vfrczsd5520() {
 fn enc_sse5_vfrczsd5521() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm3, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1697,6 +1818,7 @@ fn enc_sse5_vfrczsd5521() {
 fn enc_sse5_vfrczsd5522() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm3, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -1711,6 +1833,7 @@ fn enc_sse5_vfrczsd5522() {
 fn enc_sse5_vfrczsd5523() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm11, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1725,6 +1848,7 @@ fn enc_sse5_vfrczsd5523() {
 fn enc_sse5_vfrczsd5524() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm0, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1739,6 +1863,7 @@ fn enc_sse5_vfrczsd5524() {
 fn enc_sse5_vfrczsd5525() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm2, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -1753,6 +1878,7 @@ fn enc_sse5_vfrczsd5525() {
 fn enc_sse5_vfrczsd5526() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm1, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1767,6 +1893,7 @@ fn enc_sse5_vfrczsd5526() {
 fn enc_sse5_vfrczsd5527() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm15, QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1781,6 +1908,7 @@ fn enc_sse5_vfrczsd5527() {
 fn enc_sse5_vfrczsd5528() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczsd xmm12, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -1795,6 +1923,7 @@ fn enc_sse5_vfrczsd5528() {
 fn enc_sse5_vfrczss5529() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm12, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -1809,6 +1938,7 @@ fn enc_sse5_vfrczss5529() {
 fn enc_sse5_vfrczss5530() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -1823,6 +1953,7 @@ fn enc_sse5_vfrczss5530() {
 fn enc_sse5_vfrczss5531() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm11, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -1837,6 +1968,7 @@ fn enc_sse5_vfrczss5531() {
 fn enc_sse5_vfrczss5532() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm12, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -1851,6 +1983,7 @@ fn enc_sse5_vfrczss5532() {
 fn enc_sse5_vfrczss5533() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm1, DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1865,6 +1998,7 @@ fn enc_sse5_vfrczss5533() {
 fn enc_sse5_vfrczss5534() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm15, DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1879,6 +2013,7 @@ fn enc_sse5_vfrczss5534() {
 fn enc_sse5_vfrczss5535() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm12, DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1893,6 +2028,7 @@ fn enc_sse5_vfrczss5535() {
 fn enc_sse5_vfrczss5536() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm3, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1907,6 +2043,7 @@ fn enc_sse5_vfrczss5536() {
 fn enc_sse5_vfrczss5537() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vfrczss xmm2, DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1921,6 +2058,7 @@ fn enc_sse5_vfrczss5537() {
 fn enc_sse5_vpcomb5538() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomb xmm11, xmm1, OWORD [rax], 125
      );
      let buf = ops.finalize().unwrap();
@@ -1935,6 +2073,7 @@ fn enc_sse5_vpcomb5538() {
 fn enc_sse5_vpcomb5539() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomb xmm15, xmm3, xmm15, 59
      );
      let buf = ops.finalize().unwrap();
@@ -1949,6 +2088,7 @@ fn enc_sse5_vpcomb5539() {
 fn enc_sse5_vpcomb5540() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomb xmm0, xmm3, OWORD [rax], 59
      );
      let buf = ops.finalize().unwrap();
@@ -1963,6 +2103,7 @@ fn enc_sse5_vpcomb5540() {
 fn enc_sse5_vpcomb5541() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomb xmm3, xmm15, xmm11, 110
      );
      let buf = ops.finalize().unwrap();
@@ -1977,6 +2118,7 @@ fn enc_sse5_vpcomb5541() {
 fn enc_sse5_vpcomb5542() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomb xmm0, xmm0, xmm2, 100
      );
      let buf = ops.finalize().unwrap();
@@ -1991,6 +2133,7 @@ fn enc_sse5_vpcomb5542() {
 fn enc_sse5_vpcomd5543() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomd xmm11, xmm2, OWORD [rax * 2 + rdx], 47
      );
      let buf = ops.finalize().unwrap();
@@ -2005,6 +2148,7 @@ fn enc_sse5_vpcomd5543() {
 fn enc_sse5_vpcomd5544() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomd xmm11, xmm1, xmm12, 51
      );
      let buf = ops.finalize().unwrap();
@@ -2019,6 +2163,7 @@ fn enc_sse5_vpcomd5544() {
 fn enc_sse5_vpcomd5545() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomd xmm2, xmm4, xmm12, 64
      );
      let buf = ops.finalize().unwrap();
@@ -2033,6 +2178,7 @@ fn enc_sse5_vpcomd5545() {
 fn enc_sse5_vpcomd5546() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomd xmm2, xmm4, OWORD [rax], 36
      );
      let buf = ops.finalize().unwrap();
@@ -2047,6 +2193,7 @@ fn enc_sse5_vpcomd5546() {
 fn enc_sse5_vpcomd5547() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomd xmm15, xmm1, xmm12, 82
      );
      let buf = ops.finalize().unwrap();
@@ -2061,6 +2208,7 @@ fn enc_sse5_vpcomd5547() {
 fn enc_sse5_vpcomq5548() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomq xmm4, xmm1, xmm12, 10
      );
      let buf = ops.finalize().unwrap();
@@ -2075,6 +2223,7 @@ fn enc_sse5_vpcomq5548() {
 fn enc_sse5_vpcomq5549() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomq xmm0, xmm12, xmm2, 62
      );
      let buf = ops.finalize().unwrap();
@@ -2089,6 +2238,7 @@ fn enc_sse5_vpcomq5549() {
 fn enc_sse5_vpcomq5550() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomq xmm12, xmm12, xmm1, 43
      );
      let buf = ops.finalize().unwrap();
@@ -2103,6 +2253,7 @@ fn enc_sse5_vpcomq5550() {
 fn enc_sse5_vpcomq5551() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomq xmm15, xmm11, xmm2, 123
      );
      let buf = ops.finalize().unwrap();
@@ -2117,6 +2268,7 @@ fn enc_sse5_vpcomq5551() {
 fn enc_sse5_vpcomq5552() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomq xmm4, xmm1, xmm11, 32
      );
      let buf = ops.finalize().unwrap();
@@ -2131,6 +2283,7 @@ fn enc_sse5_vpcomq5552() {
 fn enc_sse5_vpcomub5553() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomub xmm4, xmm11, xmm12, 59
      );
      let buf = ops.finalize().unwrap();
@@ -2145,6 +2298,7 @@ fn enc_sse5_vpcomub5553() {
 fn enc_sse5_vpcomub5554() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomub xmm3, xmm3, xmm11, 65
      );
      let buf = ops.finalize().unwrap();
@@ -2159,6 +2313,7 @@ fn enc_sse5_vpcomub5554() {
 fn enc_sse5_vpcomub5555() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomub xmm1, xmm11, OWORD [rdx], 17
      );
      let buf = ops.finalize().unwrap();
@@ -2173,6 +2328,7 @@ fn enc_sse5_vpcomub5555() {
 fn enc_sse5_vpcomub5556() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomub xmm12, xmm4, OWORD [rax], 40
      );
      let buf = ops.finalize().unwrap();
@@ -2187,6 +2343,7 @@ fn enc_sse5_vpcomub5556() {
 fn enc_sse5_vpcomub5557() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomub xmm12, xmm0, xmm0, 42
      );
      let buf = ops.finalize().unwrap();
@@ -2201,6 +2358,7 @@ fn enc_sse5_vpcomub5557() {
 fn enc_sse5_vpcomud5558() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomud xmm3, xmm4, xmm2, 75
      );
      let buf = ops.finalize().unwrap();
@@ -2215,6 +2373,7 @@ fn enc_sse5_vpcomud5558() {
 fn enc_sse5_vpcomud5559() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomud xmm11, xmm4, xmm11, 39
      );
      let buf = ops.finalize().unwrap();
@@ -2229,6 +2388,7 @@ fn enc_sse5_vpcomud5559() {
 fn enc_sse5_vpcomud5560() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomud xmm2, xmm2, xmm2, 41
      );
      let buf = ops.finalize().unwrap();
@@ -2243,6 +2403,7 @@ fn enc_sse5_vpcomud5560() {
 fn enc_sse5_vpcomud5561() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomud xmm4, xmm0, xmm11, 107
      );
      let buf = ops.finalize().unwrap();
@@ -2257,6 +2418,7 @@ fn enc_sse5_vpcomud5561() {
 fn enc_sse5_vpcomud5562() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomud xmm1, xmm0, xmm3, 40
      );
      let buf = ops.finalize().unwrap();
@@ -2271,6 +2433,7 @@ fn enc_sse5_vpcomud5562() {
 fn enc_sse5_vpcomuq5563() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuq xmm4, xmm2, xmm15, 103
      );
      let buf = ops.finalize().unwrap();
@@ -2285,6 +2448,7 @@ fn enc_sse5_vpcomuq5563() {
 fn enc_sse5_vpcomuq5564() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuq xmm12, xmm1, xmm1, 107
      );
      let buf = ops.finalize().unwrap();
@@ -2299,6 +2463,7 @@ fn enc_sse5_vpcomuq5564() {
 fn enc_sse5_vpcomuq5565() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuq xmm4, xmm11, OWORD [rax], 56
      );
      let buf = ops.finalize().unwrap();
@@ -2313,6 +2478,7 @@ fn enc_sse5_vpcomuq5565() {
 fn enc_sse5_vpcomuq5566() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuq xmm2, xmm0, xmm2, 105
      );
      let buf = ops.finalize().unwrap();
@@ -2327,6 +2493,7 @@ fn enc_sse5_vpcomuq5566() {
 fn enc_sse5_vpcomuq5567() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuq xmm2, xmm2, xmm1, 80
      );
      let buf = ops.finalize().unwrap();
@@ -2341,6 +2508,7 @@ fn enc_sse5_vpcomuq5567() {
 fn enc_sse5_vpcomuw5568() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuw xmm15, xmm15, xmm3, 12
      );
      let buf = ops.finalize().unwrap();
@@ -2355,6 +2523,7 @@ fn enc_sse5_vpcomuw5568() {
 fn enc_sse5_vpcomuw5569() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuw xmm12, xmm3, xmm1, 99
      );
      let buf = ops.finalize().unwrap();
@@ -2369,6 +2538,7 @@ fn enc_sse5_vpcomuw5569() {
 fn enc_sse5_vpcomuw5570() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuw xmm12, xmm12, xmm15, 82
      );
      let buf = ops.finalize().unwrap();
@@ -2383,6 +2553,7 @@ fn enc_sse5_vpcomuw5570() {
 fn enc_sse5_vpcomuw5571() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuw xmm1, xmm2, xmm0, 10
      );
      let buf = ops.finalize().unwrap();
@@ -2397,6 +2568,7 @@ fn enc_sse5_vpcomuw5571() {
 fn enc_sse5_vpcomuw5572() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomuw xmm3, xmm3, OWORD [rdx], 3
      );
      let buf = ops.finalize().unwrap();
@@ -2411,6 +2583,7 @@ fn enc_sse5_vpcomuw5572() {
 fn enc_sse5_vpcomw5573() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomw xmm11, xmm15, xmm2, 68
      );
      let buf = ops.finalize().unwrap();
@@ -2425,6 +2598,7 @@ fn enc_sse5_vpcomw5573() {
 fn enc_sse5_vpcomw5574() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomw xmm4, xmm15, OWORD [rdx], 114
      );
      let buf = ops.finalize().unwrap();
@@ -2439,6 +2613,7 @@ fn enc_sse5_vpcomw5574() {
 fn enc_sse5_vpcomw5575() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomw xmm0, xmm12, xmm15, 42
      );
      let buf = ops.finalize().unwrap();
@@ -2453,6 +2628,7 @@ fn enc_sse5_vpcomw5575() {
 fn enc_sse5_vpcomw5576() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomw xmm12, xmm15, OWORD [rax * 2 + rdx], 95
      );
      let buf = ops.finalize().unwrap();
@@ -2467,6 +2643,7 @@ fn enc_sse5_vpcomw5576() {
 fn enc_sse5_vpcomw5577() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpcomw xmm11, xmm15, xmm1, 10
      );
      let buf = ops.finalize().unwrap();
@@ -2481,6 +2658,7 @@ fn enc_sse5_vpcomw5577() {
 fn enc_sse5_vphaddbd5578() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbd xmm12, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -2495,6 +2673,7 @@ fn enc_sse5_vphaddbd5578() {
 fn enc_sse5_vphaddbd5579() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbd xmm2, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -2509,6 +2688,7 @@ fn enc_sse5_vphaddbd5579() {
 fn enc_sse5_vphaddbd5580() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbd xmm3, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -2523,6 +2703,7 @@ fn enc_sse5_vphaddbd5580() {
 fn enc_sse5_vphaddbd5581() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbd xmm4, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -2537,6 +2718,7 @@ fn enc_sse5_vphaddbd5581() {
 fn enc_sse5_vphaddbd5582() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbd xmm1, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -2551,6 +2733,7 @@ fn enc_sse5_vphaddbd5582() {
 fn enc_sse5_vphaddbq5583() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbq xmm0, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -2565,6 +2748,7 @@ fn enc_sse5_vphaddbq5583() {
 fn enc_sse5_vphaddbq5584() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbq xmm1, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2579,6 +2763,7 @@ fn enc_sse5_vphaddbq5584() {
 fn enc_sse5_vphaddbq5585() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbq xmm11, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2593,6 +2778,7 @@ fn enc_sse5_vphaddbq5585() {
 fn enc_sse5_vphaddbq5586() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbq xmm4, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -2607,6 +2793,7 @@ fn enc_sse5_vphaddbq5586() {
 fn enc_sse5_vphaddbq5587() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbq xmm1, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -2621,6 +2808,7 @@ fn enc_sse5_vphaddbq5587() {
 fn enc_sse5_vphaddbw5588() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbw xmm0, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -2635,6 +2823,7 @@ fn enc_sse5_vphaddbw5588() {
 fn enc_sse5_vphaddbw5589() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbw xmm2, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -2649,6 +2838,7 @@ fn enc_sse5_vphaddbw5589() {
 fn enc_sse5_vphaddbw5590() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbw xmm11, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2663,6 +2853,7 @@ fn enc_sse5_vphaddbw5590() {
 fn enc_sse5_vphaddbw5591() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbw xmm4, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2677,6 +2868,7 @@ fn enc_sse5_vphaddbw5591() {
 fn enc_sse5_vphaddbw5592() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddbw xmm0, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2691,6 +2883,7 @@ fn enc_sse5_vphaddbw5592() {
 fn enc_sse5_vphadddq5593() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadddq xmm1, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -2705,6 +2898,7 @@ fn enc_sse5_vphadddq5593() {
 fn enc_sse5_vphadddq5594() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadddq xmm4, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2719,6 +2913,7 @@ fn enc_sse5_vphadddq5594() {
 fn enc_sse5_vphadddq5595() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadddq xmm1, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -2733,6 +2928,7 @@ fn enc_sse5_vphadddq5595() {
 fn enc_sse5_vphadddq5596() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadddq xmm1, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2747,6 +2943,7 @@ fn enc_sse5_vphadddq5596() {
 fn enc_sse5_vphadddq5597() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadddq xmm4, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -2761,6 +2958,7 @@ fn enc_sse5_vphadddq5597() {
 fn enc_sse5_vphaddubd5598() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubd xmm15, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2775,6 +2973,7 @@ fn enc_sse5_vphaddubd5598() {
 fn enc_sse5_vphaddubd5599() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubd xmm4, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -2789,6 +2988,7 @@ fn enc_sse5_vphaddubd5599() {
 fn enc_sse5_vphaddubd5600() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubd xmm1, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -2803,6 +3003,7 @@ fn enc_sse5_vphaddubd5600() {
 fn enc_sse5_vphaddubd5601() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubd xmm12, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -2817,6 +3018,7 @@ fn enc_sse5_vphaddubd5601() {
 fn enc_sse5_vphaddubd5602() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubd xmm0, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2831,6 +3033,7 @@ fn enc_sse5_vphaddubd5602() {
 fn enc_sse5_vphaddubq5603() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubq xmm2, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2845,6 +3048,7 @@ fn enc_sse5_vphaddubq5603() {
 fn enc_sse5_vphaddubq5604() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubq xmm12, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2859,6 +3063,7 @@ fn enc_sse5_vphaddubq5604() {
 fn enc_sse5_vphaddubq5605() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubq xmm11, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2873,6 +3078,7 @@ fn enc_sse5_vphaddubq5605() {
 fn enc_sse5_vphaddubq5606() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubq xmm2, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2887,6 +3093,7 @@ fn enc_sse5_vphaddubq5606() {
 fn enc_sse5_vphaddubq5607() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubq xmm4, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -2901,6 +3108,7 @@ fn enc_sse5_vphaddubq5607() {
 fn enc_sse5_vphaddubw5608() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubw xmm4, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -2915,6 +3123,7 @@ fn enc_sse5_vphaddubw5608() {
 fn enc_sse5_vphaddubw5609() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubw xmm11, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2929,6 +3138,7 @@ fn enc_sse5_vphaddubw5609() {
 fn enc_sse5_vphaddubw5610() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubw xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -2943,6 +3153,7 @@ fn enc_sse5_vphaddubw5610() {
 fn enc_sse5_vphaddubw5611() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubw xmm1, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2957,6 +3168,7 @@ fn enc_sse5_vphaddubw5611() {
 fn enc_sse5_vphaddubw5612() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddubw xmm0, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2971,6 +3183,7 @@ fn enc_sse5_vphaddubw5612() {
 fn enc_sse5_vphaddudq5613() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddudq xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -2985,6 +3198,7 @@ fn enc_sse5_vphaddudq5613() {
 fn enc_sse5_vphaddudq5614() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddudq xmm0, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -2999,6 +3213,7 @@ fn enc_sse5_vphaddudq5614() {
 fn enc_sse5_vphaddudq5615() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddudq xmm11, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3013,6 +3228,7 @@ fn enc_sse5_vphaddudq5615() {
 fn enc_sse5_vphaddudq5616() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddudq xmm3, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3027,6 +3243,7 @@ fn enc_sse5_vphaddudq5616() {
 fn enc_sse5_vphaddudq5617() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddudq xmm15, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3041,6 +3258,7 @@ fn enc_sse5_vphaddudq5617() {
 fn enc_sse5_vphadduwd5618() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwd xmm11, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3055,6 +3273,7 @@ fn enc_sse5_vphadduwd5618() {
 fn enc_sse5_vphadduwd5619() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwd xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3069,6 +3288,7 @@ fn enc_sse5_vphadduwd5619() {
 fn enc_sse5_vphadduwd5620() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwd xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -3083,6 +3303,7 @@ fn enc_sse5_vphadduwd5620() {
 fn enc_sse5_vphadduwd5621() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwd xmm1, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3097,6 +3318,7 @@ fn enc_sse5_vphadduwd5621() {
 fn enc_sse5_vphadduwd5622() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwd xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3111,6 +3333,7 @@ fn enc_sse5_vphadduwd5622() {
 fn enc_sse5_vphadduwq5623() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwq xmm0, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3125,6 +3348,7 @@ fn enc_sse5_vphadduwq5623() {
 fn enc_sse5_vphadduwq5624() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwq xmm1, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3139,6 +3363,7 @@ fn enc_sse5_vphadduwq5624() {
 fn enc_sse5_vphadduwq5625() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwq xmm15, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3153,6 +3378,7 @@ fn enc_sse5_vphadduwq5625() {
 fn enc_sse5_vphadduwq5626() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwq xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3167,6 +3393,7 @@ fn enc_sse5_vphadduwq5626() {
 fn enc_sse5_vphadduwq5627() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphadduwq xmm0, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3181,6 +3408,7 @@ fn enc_sse5_vphadduwq5627() {
 fn enc_sse5_vphaddwd5628() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwd xmm2, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3195,6 +3423,7 @@ fn enc_sse5_vphaddwd5628() {
 fn enc_sse5_vphaddwd5629() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwd xmm2, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -3209,6 +3438,7 @@ fn enc_sse5_vphaddwd5629() {
 fn enc_sse5_vphaddwd5630() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwd xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3223,6 +3453,7 @@ fn enc_sse5_vphaddwd5630() {
 fn enc_sse5_vphaddwd5631() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwd xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3237,6 +3468,7 @@ fn enc_sse5_vphaddwd5631() {
 fn enc_sse5_vphaddwq5632() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwq xmm0, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3251,6 +3483,7 @@ fn enc_sse5_vphaddwq5632() {
 fn enc_sse5_vphaddwq5633() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwq xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3265,6 +3498,7 @@ fn enc_sse5_vphaddwq5633() {
 fn enc_sse5_vphaddwq5634() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwq xmm11, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -3279,6 +3513,7 @@ fn enc_sse5_vphaddwq5634() {
 fn enc_sse5_vphaddwq5635() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwq xmm11, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3293,6 +3528,7 @@ fn enc_sse5_vphaddwq5635() {
 fn enc_sse5_vphaddwq5636() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphaddwq xmm2, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -3307,6 +3543,7 @@ fn enc_sse5_vphaddwq5636() {
 fn enc_sse5_vphsubbw5637() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubbw xmm4, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3321,6 +3558,7 @@ fn enc_sse5_vphsubbw5637() {
 fn enc_sse5_vphsubbw5638() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubbw xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3335,6 +3573,7 @@ fn enc_sse5_vphsubbw5638() {
 fn enc_sse5_vphsubbw5639() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubbw xmm2, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3349,6 +3588,7 @@ fn enc_sse5_vphsubbw5639() {
 fn enc_sse5_vphsubbw5640() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubbw xmm15, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3363,6 +3603,7 @@ fn enc_sse5_vphsubbw5640() {
 fn enc_sse5_vphsubbw5641() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubbw xmm12, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3377,6 +3618,7 @@ fn enc_sse5_vphsubbw5641() {
 fn enc_sse5_vphsubdq5642() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubdq xmm15, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3391,6 +3633,7 @@ fn enc_sse5_vphsubdq5642() {
 fn enc_sse5_vphsubdq5643() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubdq xmm0, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -3405,6 +3648,7 @@ fn enc_sse5_vphsubdq5643() {
 fn enc_sse5_vphsubdq5644() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubdq xmm12, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -3419,6 +3663,7 @@ fn enc_sse5_vphsubdq5644() {
 fn enc_sse5_vphsubdq5645() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubdq xmm0, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3433,6 +3678,7 @@ fn enc_sse5_vphsubdq5645() {
 fn enc_sse5_vphsubdq5646() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubdq xmm11, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3447,6 +3693,7 @@ fn enc_sse5_vphsubdq5646() {
 fn enc_sse5_vphsubwd5647() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubwd xmm0, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3461,6 +3708,7 @@ fn enc_sse5_vphsubwd5647() {
 fn enc_sse5_vphsubwd5648() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubwd xmm4, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -3475,6 +3723,7 @@ fn enc_sse5_vphsubwd5648() {
 fn enc_sse5_vphsubwd5649() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubwd xmm4, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3489,6 +3738,7 @@ fn enc_sse5_vphsubwd5649() {
 fn enc_sse5_vphsubwd5650() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vphsubwd xmm1, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -3503,6 +3753,7 @@ fn enc_sse5_vphsubwd5650() {
 fn enc_sse5_vpmacsdd5651() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdd xmm1, xmm15, OWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3517,6 +3768,7 @@ fn enc_sse5_vpmacsdd5651() {
 fn enc_sse5_vpmacsdd5652() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdd xmm15, xmm1, OWORD [rax * 2 + rdx], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -3531,6 +3783,7 @@ fn enc_sse5_vpmacsdd5652() {
 fn enc_sse5_vpmacsdd5653() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdd xmm2, xmm12, xmm1, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -3545,6 +3798,7 @@ fn enc_sse5_vpmacsdd5653() {
 fn enc_sse5_vpmacsdd5654() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdd xmm15, xmm3, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3559,6 +3813,7 @@ fn enc_sse5_vpmacsdd5654() {
 fn enc_sse5_vpmacsdd5655() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdd xmm1, xmm4, OWORD [rax * 2 + rdx], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3573,6 +3828,7 @@ fn enc_sse5_vpmacsdd5655() {
 fn enc_sse5_vpmacsdqh5656() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdqh xmm4, xmm0, OWORD [rax * 2 + rdx], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3587,6 +3843,7 @@ fn enc_sse5_vpmacsdqh5656() {
 fn enc_sse5_vpmacsdqh5657() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdqh xmm12, xmm11, xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3601,6 +3858,7 @@ fn enc_sse5_vpmacsdqh5657() {
 fn enc_sse5_vpmacsdqh5658() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdqh xmm2, xmm15, OWORD [rdx], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3615,6 +3873,7 @@ fn enc_sse5_vpmacsdqh5658() {
 fn enc_sse5_vpmacsdqh5659() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdqh xmm0, xmm11, OWORD [rax], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -3629,6 +3888,7 @@ fn enc_sse5_vpmacsdqh5659() {
 fn enc_sse5_vpmacsdqh5660() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdqh xmm2, xmm12, OWORD [rax * 2 + rdx], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3643,6 +3903,7 @@ fn enc_sse5_vpmacsdqh5660() {
 fn enc_sse5_vpmacsdql5661() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdql xmm11, xmm1, OWORD [rax * 2 + rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3657,6 +3918,7 @@ fn enc_sse5_vpmacsdql5661() {
 fn enc_sse5_vpmacsdql5662() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdql xmm4, xmm4, xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3671,6 +3933,7 @@ fn enc_sse5_vpmacsdql5662() {
 fn enc_sse5_vpmacsdql5663() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdql xmm11, xmm4, xmm12, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3685,6 +3948,7 @@ fn enc_sse5_vpmacsdql5663() {
 fn enc_sse5_vpmacsdql5664() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdql xmm3, xmm3, xmm1, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -3699,6 +3963,7 @@ fn enc_sse5_vpmacsdql5664() {
 fn enc_sse5_vpmacsdql5665() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsdql xmm12, xmm4, OWORD [rdx], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3713,6 +3978,7 @@ fn enc_sse5_vpmacsdql5665() {
 fn enc_sse5_vpmacssdd5666() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdd xmm11, xmm2, xmm12, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3727,6 +3993,7 @@ fn enc_sse5_vpmacssdd5666() {
 fn enc_sse5_vpmacssdd5667() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdd xmm11, xmm2, xmm1, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -3741,6 +4008,7 @@ fn enc_sse5_vpmacssdd5667() {
 fn enc_sse5_vpmacssdd5668() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdd xmm12, xmm4, xmm15, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3755,6 +4023,7 @@ fn enc_sse5_vpmacssdd5668() {
 fn enc_sse5_vpmacssdd5669() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdd xmm4, xmm3, xmm11, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3769,6 +4038,7 @@ fn enc_sse5_vpmacssdd5669() {
 fn enc_sse5_vpmacssdd5670() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdd xmm0, xmm2, xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3783,6 +4053,7 @@ fn enc_sse5_vpmacssdd5670() {
 fn enc_sse5_vpmacssdqh5671() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdqh xmm4, xmm15, OWORD [rax], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -3797,6 +4068,7 @@ fn enc_sse5_vpmacssdqh5671() {
 fn enc_sse5_vpmacssdqh5672() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdqh xmm0, xmm12, xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3811,6 +4083,7 @@ fn enc_sse5_vpmacssdqh5672() {
 fn enc_sse5_vpmacssdqh5673() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdqh xmm4, xmm4, xmm0, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3825,6 +4098,7 @@ fn enc_sse5_vpmacssdqh5673() {
 fn enc_sse5_vpmacssdqh5674() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdqh xmm4, xmm11, xmm2, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3839,6 +4113,7 @@ fn enc_sse5_vpmacssdqh5674() {
 fn enc_sse5_vpmacssdqh5675() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdqh xmm4, xmm3, OWORD [rax * 2 + rdx], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3853,6 +4128,7 @@ fn enc_sse5_vpmacssdqh5675() {
 fn enc_sse5_vpmacssdql5676() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdql xmm1, xmm0, xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3867,6 +4143,7 @@ fn enc_sse5_vpmacssdql5676() {
 fn enc_sse5_vpmacssdql5677() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdql xmm3, xmm11, OWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3881,6 +4158,7 @@ fn enc_sse5_vpmacssdql5677() {
 fn enc_sse5_vpmacssdql5678() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdql xmm0, xmm2, xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3895,6 +4173,7 @@ fn enc_sse5_vpmacssdql5678() {
 fn enc_sse5_vpmacssdql5679() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdql xmm3, xmm0, OWORD [rax * 2 + rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3909,6 +4188,7 @@ fn enc_sse5_vpmacssdql5679() {
 fn enc_sse5_vpmacssdql5680() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssdql xmm3, xmm11, xmm2, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -3923,6 +4203,7 @@ fn enc_sse5_vpmacssdql5680() {
 fn enc_sse5_vpmacsswd5681() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsswd xmm0, xmm0, OWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3937,6 +4218,7 @@ fn enc_sse5_vpmacsswd5681() {
 fn enc_sse5_vpmacsswd5682() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsswd xmm1, xmm1, xmm3, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -3951,6 +4233,7 @@ fn enc_sse5_vpmacsswd5682() {
 fn enc_sse5_vpmacsswd5683() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsswd xmm4, xmm12, xmm3, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -3965,6 +4248,7 @@ fn enc_sse5_vpmacsswd5683() {
 fn enc_sse5_vpmacsswd5684() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsswd xmm2, xmm11, xmm15, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -3979,6 +4263,7 @@ fn enc_sse5_vpmacsswd5684() {
 fn enc_sse5_vpmacsswd5685() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsswd xmm4, xmm15, xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -3993,6 +4278,7 @@ fn enc_sse5_vpmacsswd5685() {
 fn enc_sse5_vpmacssww5686() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssww xmm15, xmm11, OWORD [rdx], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -4007,6 +4293,7 @@ fn enc_sse5_vpmacssww5686() {
 fn enc_sse5_vpmacssww5687() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssww xmm12, xmm2, xmm1, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4021,6 +4308,7 @@ fn enc_sse5_vpmacssww5687() {
 fn enc_sse5_vpmacssww5688() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssww xmm4, xmm0, xmm3, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4035,6 +4323,7 @@ fn enc_sse5_vpmacssww5688() {
 fn enc_sse5_vpmacssww5689() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssww xmm11, xmm12, OWORD [rax], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4049,6 +4338,7 @@ fn enc_sse5_vpmacssww5689() {
 fn enc_sse5_vpmacssww5690() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacssww xmm12, xmm2, xmm0, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4063,6 +4353,7 @@ fn enc_sse5_vpmacssww5690() {
 fn enc_sse5_vpmacswd5691() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacswd xmm15, xmm3, xmm15, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4077,6 +4368,7 @@ fn enc_sse5_vpmacswd5691() {
 fn enc_sse5_vpmacswd5692() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacswd xmm12, xmm15, xmm0, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4091,6 +4383,7 @@ fn enc_sse5_vpmacswd5692() {
 fn enc_sse5_vpmacswd5693() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacswd xmm4, xmm0, xmm12, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4105,6 +4398,7 @@ fn enc_sse5_vpmacswd5693() {
 fn enc_sse5_vpmacswd5694() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacswd xmm15, xmm11, OWORD [rax], xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4119,6 +4413,7 @@ fn enc_sse5_vpmacswd5694() {
 fn enc_sse5_vpmacswd5695() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacswd xmm11, xmm12, xmm3, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4133,6 +4428,7 @@ fn enc_sse5_vpmacswd5695() {
 fn enc_sse5_vpmacsww5696() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsww xmm11, xmm12, xmm0, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4147,6 +4443,7 @@ fn enc_sse5_vpmacsww5696() {
 fn enc_sse5_vpmacsww5697() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsww xmm0, xmm1, OWORD [rdx], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4161,6 +4458,7 @@ fn enc_sse5_vpmacsww5697() {
 fn enc_sse5_vpmacsww5698() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsww xmm15, xmm15, xmm11, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4175,6 +4473,7 @@ fn enc_sse5_vpmacsww5698() {
 fn enc_sse5_vpmacsww5699() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsww xmm11, xmm1, xmm0, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4189,6 +4488,7 @@ fn enc_sse5_vpmacsww5699() {
 fn enc_sse5_vpmacsww5700() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmacsww xmm11, xmm12, xmm0, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4203,6 +4503,7 @@ fn enc_sse5_vpmacsww5700() {
 fn enc_sse5_vpmadcsswd5701() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcsswd xmm3, xmm4, OWORD [rax], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -4217,6 +4518,7 @@ fn enc_sse5_vpmadcsswd5701() {
 fn enc_sse5_vpmadcsswd5702() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcsswd xmm3, xmm4, xmm2, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4231,6 +4533,7 @@ fn enc_sse5_vpmadcsswd5702() {
 fn enc_sse5_vpmadcsswd5703() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcsswd xmm15, xmm2, xmm11, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -4245,6 +4548,7 @@ fn enc_sse5_vpmadcsswd5703() {
 fn enc_sse5_vpmadcsswd5704() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcsswd xmm1, xmm15, OWORD [rax], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4259,6 +4563,7 @@ fn enc_sse5_vpmadcsswd5704() {
 fn enc_sse5_vpmadcsswd5705() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcsswd xmm15, xmm3, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4273,6 +4578,7 @@ fn enc_sse5_vpmadcsswd5705() {
 fn enc_sse5_vpmadcswd5706() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcswd xmm4, xmm1, xmm4, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4287,6 +4593,7 @@ fn enc_sse5_vpmadcswd5706() {
 fn enc_sse5_vpmadcswd5707() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcswd xmm3, xmm3, xmm4, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4301,6 +4608,7 @@ fn enc_sse5_vpmadcswd5707() {
 fn enc_sse5_vpmadcswd5708() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcswd xmm0, xmm11, xmm0, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -4315,6 +4623,7 @@ fn enc_sse5_vpmadcswd5708() {
 fn enc_sse5_vpmadcswd5709() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcswd xmm0, xmm2, xmm2, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4329,6 +4638,7 @@ fn enc_sse5_vpmadcswd5709() {
 fn enc_sse5_vpmadcswd5710() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpmadcswd xmm15, xmm11, xmm2, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4343,6 +4653,7 @@ fn enc_sse5_vpmadcswd5710() {
 fn enc_sse5_vpperm5711() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm11, xmm1, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4357,6 +4668,7 @@ fn enc_sse5_vpperm5711() {
 fn enc_sse5_vpperm5712() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm3, xmm12, OWORD [rdx], xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4371,6 +4683,7 @@ fn enc_sse5_vpperm5712() {
 fn enc_sse5_vpperm5713() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm12, xmm3, xmm2, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4385,6 +4698,7 @@ fn enc_sse5_vpperm5713() {
 fn enc_sse5_vpperm5714() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm3, xmm12, OWORD [rdx], xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4399,6 +4713,7 @@ fn enc_sse5_vpperm5714() {
 fn enc_sse5_vpperm5715() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm11, xmm1, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4413,6 +4728,7 @@ fn enc_sse5_vpperm5715() {
 fn enc_sse5_vpperm5716() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm11, xmm1, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4427,6 +4743,7 @@ fn enc_sse5_vpperm5716() {
 fn enc_sse5_vpperm5717() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm11, xmm1, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4441,6 +4758,7 @@ fn enc_sse5_vpperm5717() {
 fn enc_sse5_vpperm5718() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm1, xmm0, xmm0, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -4455,6 +4773,7 @@ fn enc_sse5_vpperm5718() {
 fn enc_sse5_vpperm5719() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm4, xmm12, xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4469,6 +4788,7 @@ fn enc_sse5_vpperm5719() {
 fn enc_sse5_vpperm5720() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpperm xmm11, xmm11, xmm0, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4483,6 +4803,7 @@ fn enc_sse5_vpperm5720() {
 fn enc_sse5_vprotb5721() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm2, xmm11, 116
      );
      let buf = ops.finalize().unwrap();
@@ -4497,6 +4818,7 @@ fn enc_sse5_vprotb5721() {
 fn enc_sse5_vprotb5722() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm11, xmm3, 82
      );
      let buf = ops.finalize().unwrap();
@@ -4511,6 +4833,7 @@ fn enc_sse5_vprotb5722() {
 fn enc_sse5_vprotb5723() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm12, xmm2, 120
      );
      let buf = ops.finalize().unwrap();
@@ -4525,6 +4848,7 @@ fn enc_sse5_vprotb5723() {
 fn enc_sse5_vprotb5724() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm3, xmm0, 67
      );
      let buf = ops.finalize().unwrap();
@@ -4539,6 +4863,7 @@ fn enc_sse5_vprotb5724() {
 fn enc_sse5_vprotb5725() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm11, xmm11, 82
      );
      let buf = ops.finalize().unwrap();
@@ -4553,6 +4878,7 @@ fn enc_sse5_vprotb5725() {
 fn enc_sse5_vprotb5726() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm15, xmm12, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -4567,6 +4893,7 @@ fn enc_sse5_vprotb5726() {
 fn enc_sse5_vprotb5727() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm15, xmm0, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4581,6 +4908,7 @@ fn enc_sse5_vprotb5727() {
 fn enc_sse5_vprotb5728() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm11, xmm3, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4595,6 +4923,7 @@ fn enc_sse5_vprotb5728() {
 fn enc_sse5_vprotb5729() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm11, xmm15, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4609,6 +4938,7 @@ fn enc_sse5_vprotb5729() {
 fn enc_sse5_vprotb5730() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm0, OWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4623,6 +4953,7 @@ fn enc_sse5_vprotb5730() {
 fn enc_sse5_vprotb5731() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm11, xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4637,6 +4968,7 @@ fn enc_sse5_vprotb5731() {
 fn enc_sse5_vprotb5732() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm0, xmm3, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4651,6 +4983,7 @@ fn enc_sse5_vprotb5732() {
 fn enc_sse5_vprotb5733() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm0, xmm2, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4665,6 +4998,7 @@ fn enc_sse5_vprotb5733() {
 fn enc_sse5_vprotb5734() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm4, xmm15, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4679,6 +5013,7 @@ fn enc_sse5_vprotb5734() {
 fn enc_sse5_vprotb5735() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotb xmm3, xmm1, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4693,6 +5028,7 @@ fn enc_sse5_vprotb5735() {
 fn enc_sse5_vprotd5736() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm11, xmm11, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4707,6 +5043,7 @@ fn enc_sse5_vprotd5736() {
 fn enc_sse5_vprotd5737() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm0, xmm3, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4721,6 +5058,7 @@ fn enc_sse5_vprotd5737() {
 fn enc_sse5_vprotd5738() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm4, OWORD [rax * 2 + rdx], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4735,6 +5073,7 @@ fn enc_sse5_vprotd5738() {
 fn enc_sse5_vprotd5739() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm12, xmm3, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4749,6 +5088,7 @@ fn enc_sse5_vprotd5739() {
 fn enc_sse5_vprotd5740() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm1, xmm0, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -4763,6 +5103,7 @@ fn enc_sse5_vprotd5740() {
 fn enc_sse5_vprotd5741() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm11, xmm4, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4777,6 +5118,7 @@ fn enc_sse5_vprotd5741() {
 fn enc_sse5_vprotd5742() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm15, xmm15, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4791,6 +5133,7 @@ fn enc_sse5_vprotd5742() {
 fn enc_sse5_vprotd5743() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm12, xmm0, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4805,6 +5148,7 @@ fn enc_sse5_vprotd5743() {
 fn enc_sse5_vprotd5744() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm3, xmm15, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -4819,6 +5163,7 @@ fn enc_sse5_vprotd5744() {
 fn enc_sse5_vprotd5745() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm4, xmm11, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4833,6 +5178,7 @@ fn enc_sse5_vprotd5745() {
 fn enc_sse5_vprotd5746() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm15, xmm3, 106
      );
      let buf = ops.finalize().unwrap();
@@ -4847,6 +5193,7 @@ fn enc_sse5_vprotd5746() {
 fn enc_sse5_vprotd5747() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm0, xmm12, 64
      );
      let buf = ops.finalize().unwrap();
@@ -4861,6 +5208,7 @@ fn enc_sse5_vprotd5747() {
 fn enc_sse5_vprotd5748() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm11, xmm12, 84
      );
      let buf = ops.finalize().unwrap();
@@ -4875,6 +5223,7 @@ fn enc_sse5_vprotd5748() {
 fn enc_sse5_vprotd5749() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm11, xmm12, 17
      );
      let buf = ops.finalize().unwrap();
@@ -4889,6 +5238,7 @@ fn enc_sse5_vprotd5749() {
 fn enc_sse5_vprotd5750() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotd xmm4, xmm1, 98
      );
      let buf = ops.finalize().unwrap();
@@ -4903,6 +5253,7 @@ fn enc_sse5_vprotd5750() {
 fn enc_sse5_vprotq5751() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm12, xmm2, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4917,6 +5268,7 @@ fn enc_sse5_vprotq5751() {
 fn enc_sse5_vprotq5752() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm0, xmm11, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -4931,6 +5283,7 @@ fn enc_sse5_vprotq5752() {
 fn enc_sse5_vprotq5753() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm15, xmm3, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -4945,6 +5298,7 @@ fn enc_sse5_vprotq5753() {
 fn enc_sse5_vprotq5754() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm2, xmm2, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -4959,6 +5313,7 @@ fn enc_sse5_vprotq5754() {
 fn enc_sse5_vprotq5755() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm11, xmm12, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -4973,6 +5328,7 @@ fn enc_sse5_vprotq5755() {
 fn enc_sse5_vprotq5756() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm1, xmm15, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -4987,6 +5343,7 @@ fn enc_sse5_vprotq5756() {
 fn enc_sse5_vprotq5757() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm3, xmm11, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5001,6 +5358,7 @@ fn enc_sse5_vprotq5757() {
 fn enc_sse5_vprotq5758() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm15, xmm2, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5015,6 +5373,7 @@ fn enc_sse5_vprotq5758() {
 fn enc_sse5_vprotq5759() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm3, xmm3, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5029,6 +5388,7 @@ fn enc_sse5_vprotq5759() {
 fn enc_sse5_vprotq5760() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm0, OWORD [rax * 2 + rdx], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5043,6 +5403,7 @@ fn enc_sse5_vprotq5760() {
 fn enc_sse5_vprotq5761() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm12, xmm15, 66
      );
      let buf = ops.finalize().unwrap();
@@ -5057,6 +5418,7 @@ fn enc_sse5_vprotq5761() {
 fn enc_sse5_vprotq5762() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm12, xmm15, 68
      );
      let buf = ops.finalize().unwrap();
@@ -5071,6 +5433,7 @@ fn enc_sse5_vprotq5762() {
 fn enc_sse5_vprotq5763() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm12, xmm11, 87
      );
      let buf = ops.finalize().unwrap();
@@ -5085,6 +5448,7 @@ fn enc_sse5_vprotq5763() {
 fn enc_sse5_vprotq5764() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm15, xmm2, 112
      );
      let buf = ops.finalize().unwrap();
@@ -5099,6 +5463,7 @@ fn enc_sse5_vprotq5764() {
 fn enc_sse5_vprotq5765() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotq xmm12, xmm15, 30
      );
      let buf = ops.finalize().unwrap();
@@ -5113,6 +5478,7 @@ fn enc_sse5_vprotq5765() {
 fn enc_sse5_vprotw5766() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm4, xmm15, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5127,6 +5493,7 @@ fn enc_sse5_vprotw5766() {
 fn enc_sse5_vprotw5767() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm3, xmm15, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5141,6 +5508,7 @@ fn enc_sse5_vprotw5767() {
 fn enc_sse5_vprotw5768() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm4, xmm4, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5155,6 +5523,7 @@ fn enc_sse5_vprotw5768() {
 fn enc_sse5_vprotw5769() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm12, xmm15, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5169,6 +5538,7 @@ fn enc_sse5_vprotw5769() {
 fn enc_sse5_vprotw5770() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm1, xmm11, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -5183,6 +5553,7 @@ fn enc_sse5_vprotw5770() {
 fn enc_sse5_vprotw5771() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm2, OWORD [rax * 2 + rdx], 4
      );
      let buf = ops.finalize().unwrap();
@@ -5197,6 +5568,7 @@ fn enc_sse5_vprotw5771() {
 fn enc_sse5_vprotw5772() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm4, xmm12, 29
      );
      let buf = ops.finalize().unwrap();
@@ -5211,6 +5583,7 @@ fn enc_sse5_vprotw5772() {
 fn enc_sse5_vprotw5773() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm12, xmm3, 13
      );
      let buf = ops.finalize().unwrap();
@@ -5225,6 +5598,7 @@ fn enc_sse5_vprotw5773() {
 fn enc_sse5_vprotw5774() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm0, xmm1, 81
      );
      let buf = ops.finalize().unwrap();
@@ -5239,6 +5613,7 @@ fn enc_sse5_vprotw5774() {
 fn enc_sse5_vprotw5775() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm3, xmm3, 60
      );
      let buf = ops.finalize().unwrap();
@@ -5253,6 +5628,7 @@ fn enc_sse5_vprotw5775() {
 fn enc_sse5_vprotw5776() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm4, xmm4, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5267,6 +5643,7 @@ fn enc_sse5_vprotw5776() {
 fn enc_sse5_vprotw5777() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm1, xmm2, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5281,6 +5658,7 @@ fn enc_sse5_vprotw5777() {
 fn enc_sse5_vprotw5778() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm4, xmm3, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5295,6 +5673,7 @@ fn enc_sse5_vprotw5778() {
 fn enc_sse5_vprotw5779() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm4, xmm2, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -5309,6 +5688,7 @@ fn enc_sse5_vprotw5779() {
 fn enc_sse5_vprotw5780() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vprotw xmm12, xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5323,6 +5703,7 @@ fn enc_sse5_vprotw5780() {
 fn enc_sse5_vpshab5781() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm0, xmm3, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5337,6 +5718,7 @@ fn enc_sse5_vpshab5781() {
 fn enc_sse5_vpshab5782() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm3, OWORD [rdx], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5351,6 +5733,7 @@ fn enc_sse5_vpshab5782() {
 fn enc_sse5_vpshab5783() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm15, xmm4, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5365,6 +5748,7 @@ fn enc_sse5_vpshab5783() {
 fn enc_sse5_vpshab5784() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm4, xmm3, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5379,6 +5763,7 @@ fn enc_sse5_vpshab5784() {
 fn enc_sse5_vpshab5785() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm4, xmm4, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -5393,6 +5778,7 @@ fn enc_sse5_vpshab5785() {
 fn enc_sse5_vpshab5786() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm0, xmm4, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5407,6 +5793,7 @@ fn enc_sse5_vpshab5786() {
 fn enc_sse5_vpshab5787() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm3, xmm4, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5421,6 +5808,7 @@ fn enc_sse5_vpshab5787() {
 fn enc_sse5_vpshab5788() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm12, xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5435,6 +5823,7 @@ fn enc_sse5_vpshab5788() {
 fn enc_sse5_vpshab5789() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm15, xmm12, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -5449,6 +5838,7 @@ fn enc_sse5_vpshab5789() {
 fn enc_sse5_vpshab5790() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshab xmm4, xmm3, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -5463,6 +5853,7 @@ fn enc_sse5_vpshab5790() {
 fn enc_sse5_vpshad5791() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm11, xmm0, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5477,6 +5868,7 @@ fn enc_sse5_vpshad5791() {
 fn enc_sse5_vpshad5792() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm2, xmm3, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5491,6 +5883,7 @@ fn enc_sse5_vpshad5792() {
 fn enc_sse5_vpshad5793() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm15, xmm2, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5505,6 +5898,7 @@ fn enc_sse5_vpshad5793() {
 fn enc_sse5_vpshad5794() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm4, xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -5519,6 +5913,7 @@ fn enc_sse5_vpshad5794() {
 fn enc_sse5_vpshad5795() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm3, xmm12, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5533,6 +5928,7 @@ fn enc_sse5_vpshad5795() {
 fn enc_sse5_vpshad5796() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm0, xmm1, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5547,6 +5943,7 @@ fn enc_sse5_vpshad5796() {
 fn enc_sse5_vpshad5797() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm4, xmm12, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5561,6 +5958,7 @@ fn enc_sse5_vpshad5797() {
 fn enc_sse5_vpshad5798() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm12, xmm12, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5575,6 +5973,7 @@ fn enc_sse5_vpshad5798() {
 fn enc_sse5_vpshad5799() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm4, xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5589,6 +5988,7 @@ fn enc_sse5_vpshad5799() {
 fn enc_sse5_vpshad5800() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshad xmm1, xmm2, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -5603,6 +6003,7 @@ fn enc_sse5_vpshad5800() {
 fn enc_sse5_vpshaq5801() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm2, OWORD [rax], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5617,6 +6018,7 @@ fn enc_sse5_vpshaq5801() {
 fn enc_sse5_vpshaq5802() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm12, OWORD [rax * 2 + rdx], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -5631,6 +6033,7 @@ fn enc_sse5_vpshaq5802() {
 fn enc_sse5_vpshaq5803() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm11, OWORD [rdx], xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5645,6 +6048,7 @@ fn enc_sse5_vpshaq5803() {
 fn enc_sse5_vpshaq5804() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm4, xmm11, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5659,6 +6063,7 @@ fn enc_sse5_vpshaq5804() {
 fn enc_sse5_vpshaq5805() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm1, xmm4, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5673,6 +6078,7 @@ fn enc_sse5_vpshaq5805() {
 fn enc_sse5_vpshaq5806() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm2, xmm11, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5687,6 +6093,7 @@ fn enc_sse5_vpshaq5806() {
 fn enc_sse5_vpshaq5807() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm11, xmm15, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5701,6 +6108,7 @@ fn enc_sse5_vpshaq5807() {
 fn enc_sse5_vpshaq5808() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm4, xmm15, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5715,6 +6123,7 @@ fn enc_sse5_vpshaq5808() {
 fn enc_sse5_vpshaq5809() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm15, xmm0, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5729,6 +6138,7 @@ fn enc_sse5_vpshaq5809() {
 fn enc_sse5_vpshaq5810() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaq xmm4, xmm4, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5743,6 +6153,7 @@ fn enc_sse5_vpshaq5810() {
 fn enc_sse5_vpshaw5811() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm3, xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5757,6 +6168,7 @@ fn enc_sse5_vpshaw5811() {
 fn enc_sse5_vpshaw5812() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm4, OWORD [rax], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5771,6 +6183,7 @@ fn enc_sse5_vpshaw5812() {
 fn enc_sse5_vpshaw5813() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm1, OWORD [rdx], xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5785,6 +6198,7 @@ fn enc_sse5_vpshaw5813() {
 fn enc_sse5_vpshaw5814() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm2, xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5799,6 +6213,7 @@ fn enc_sse5_vpshaw5814() {
 fn enc_sse5_vpshaw5815() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm15, OWORD [rax * 2 + rdx], xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -5813,6 +6228,7 @@ fn enc_sse5_vpshaw5815() {
 fn enc_sse5_vpshaw5816() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm15, xmm1, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5827,6 +6243,7 @@ fn enc_sse5_vpshaw5816() {
 fn enc_sse5_vpshaw5817() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm2, xmm12, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5841,6 +6258,7 @@ fn enc_sse5_vpshaw5817() {
 fn enc_sse5_vpshaw5818() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm15, xmm0, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5855,6 +6273,7 @@ fn enc_sse5_vpshaw5818() {
 fn enc_sse5_vpshaw5819() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm0, xmm3, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -5869,6 +6288,7 @@ fn enc_sse5_vpshaw5819() {
 fn enc_sse5_vpshaw5820() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshaw xmm12, xmm1, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -5883,6 +6303,7 @@ fn enc_sse5_vpshaw5820() {
 fn enc_sse5_vpshlb5821() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm4, xmm2, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -5897,6 +6318,7 @@ fn enc_sse5_vpshlb5821() {
 fn enc_sse5_vpshlb5822() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm12, OWORD [rax * 2 + rdx], xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5911,6 +6333,7 @@ fn enc_sse5_vpshlb5822() {
 fn enc_sse5_vpshlb5823() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm15, xmm4, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5925,6 +6348,7 @@ fn enc_sse5_vpshlb5823() {
 fn enc_sse5_vpshlb5824() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm12, xmm12, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -5939,6 +6363,7 @@ fn enc_sse5_vpshlb5824() {
 fn enc_sse5_vpshlb5825() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm12, xmm4, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -5953,6 +6378,7 @@ fn enc_sse5_vpshlb5825() {
 fn enc_sse5_vpshlb5826() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm12, xmm3, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5967,6 +6393,7 @@ fn enc_sse5_vpshlb5826() {
 fn enc_sse5_vpshlb5827() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm15, xmm4, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -5981,6 +6408,7 @@ fn enc_sse5_vpshlb5827() {
 fn enc_sse5_vpshlb5828() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm11, xmm4, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -5995,6 +6423,7 @@ fn enc_sse5_vpshlb5828() {
 fn enc_sse5_vpshlb5829() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm0, xmm4, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -6009,6 +6438,7 @@ fn enc_sse5_vpshlb5829() {
 fn enc_sse5_vpshlb5830() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlb xmm4, xmm3, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -6023,6 +6453,7 @@ fn enc_sse5_vpshlb5830() {
 fn enc_sse5_vpshld5831() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm3, xmm1, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -6037,6 +6468,7 @@ fn enc_sse5_vpshld5831() {
 fn enc_sse5_vpshld5832() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm4, xmm1, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -6051,6 +6483,7 @@ fn enc_sse5_vpshld5832() {
 fn enc_sse5_vpshld5833() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm12, xmm15, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -6065,6 +6498,7 @@ fn enc_sse5_vpshld5833() {
 fn enc_sse5_vpshld5834() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm3, OWORD [rdx], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -6079,6 +6513,7 @@ fn enc_sse5_vpshld5834() {
 fn enc_sse5_vpshld5835() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm0, xmm3, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -6093,6 +6528,7 @@ fn enc_sse5_vpshld5835() {
 fn enc_sse5_vpshld5836() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm0, xmm1, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -6107,6 +6543,7 @@ fn enc_sse5_vpshld5836() {
 fn enc_sse5_vpshld5837() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm0, xmm12, xmm15
      );
      let buf = ops.finalize().unwrap();
@@ -6121,6 +6558,7 @@ fn enc_sse5_vpshld5837() {
 fn enc_sse5_vpshld5838() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm0, xmm12, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -6135,6 +6573,7 @@ fn enc_sse5_vpshld5838() {
 fn enc_sse5_vpshld5839() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm0, xmm2, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -6149,6 +6588,7 @@ fn enc_sse5_vpshld5839() {
 fn enc_sse5_vpshld5840() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshld xmm1, xmm11, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -6163,6 +6603,7 @@ fn enc_sse5_vpshld5840() {
 fn enc_sse5_vpshlq5841() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm4, xmm3, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -6177,6 +6618,7 @@ fn enc_sse5_vpshlq5841() {
 fn enc_sse5_vpshlq5842() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm12, xmm12, xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -6191,6 +6633,7 @@ fn enc_sse5_vpshlq5842() {
 fn enc_sse5_vpshlq5843() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm12, xmm15, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -6205,6 +6648,7 @@ fn enc_sse5_vpshlq5843() {
 fn enc_sse5_vpshlq5844() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm11, xmm3, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -6219,6 +6663,7 @@ fn enc_sse5_vpshlq5844() {
 fn enc_sse5_vpshlq5845() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm2, xmm1, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -6233,6 +6678,7 @@ fn enc_sse5_vpshlq5845() {
 fn enc_sse5_vpshlq5846() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm15, xmm11, xmm0
      );
      let buf = ops.finalize().unwrap();
@@ -6247,6 +6693,7 @@ fn enc_sse5_vpshlq5846() {
 fn enc_sse5_vpshlq5847() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm0, OWORD [rdx], xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -6261,6 +6708,7 @@ fn enc_sse5_vpshlq5847() {
 fn enc_sse5_vpshlq5848() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm4, xmm1, xmm2
      );
      let buf = ops.finalize().unwrap();
@@ -6275,6 +6723,7 @@ fn enc_sse5_vpshlq5848() {
 fn enc_sse5_vpshlq5849() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm11, OWORD [rax], xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -6289,6 +6738,7 @@ fn enc_sse5_vpshlq5849() {
 fn enc_sse5_vpshlq5850() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlq xmm2, xmm12, xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -6303,6 +6753,7 @@ fn enc_sse5_vpshlq5850() {
 fn enc_sse5_vpshlw5851() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm0, xmm1, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -6317,6 +6768,7 @@ fn enc_sse5_vpshlw5851() {
 fn enc_sse5_vpshlw5852() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm0, xmm11, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -6331,6 +6783,7 @@ fn enc_sse5_vpshlw5852() {
 fn enc_sse5_vpshlw5853() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm11, xmm1, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -6345,6 +6798,7 @@ fn enc_sse5_vpshlw5853() {
 fn enc_sse5_vpshlw5854() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm4, xmm0, xmm3
      );
      let buf = ops.finalize().unwrap();
@@ -6359,6 +6813,7 @@ fn enc_sse5_vpshlw5854() {
 fn enc_sse5_vpshlw5855() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm0, xmm3, OWORD [rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -6373,6 +6828,7 @@ fn enc_sse5_vpshlw5855() {
 fn enc_sse5_vpshlw5856() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm0, xmm4, xmm4
      );
      let buf = ops.finalize().unwrap();
@@ -6387,6 +6843,7 @@ fn enc_sse5_vpshlw5856() {
 fn enc_sse5_vpshlw5857() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm11, xmm0, xmm1
      );
      let buf = ops.finalize().unwrap();
@@ -6401,6 +6858,7 @@ fn enc_sse5_vpshlw5857() {
 fn enc_sse5_vpshlw5858() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm2, OWORD [rax * 2 + rdx], xmm11
      );
      let buf = ops.finalize().unwrap();
@@ -6415,6 +6873,7 @@ fn enc_sse5_vpshlw5858() {
 fn enc_sse5_vpshlw5859() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm4, OWORD [rax * 2 + rdx], xmm12
      );
      let buf = ops.finalize().unwrap();
@@ -6429,6 +6888,7 @@ fn enc_sse5_vpshlw5859() {
 fn enc_sse5_vpshlw5860() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vpshlw xmm1, OWORD [rax * 2 + rdx], xmm2
      );
      let buf = ops.finalize().unwrap();

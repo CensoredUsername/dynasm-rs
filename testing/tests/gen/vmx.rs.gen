@@ -3,6 +3,7 @@
 fn enc_vmx_clgi4770() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; clgi
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_vmx_clgi4770() {
 fn enc_vmx_invept4771() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invept rdx, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_vmx_invept4771() {
 fn enc_vmx_invept4772() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invept rdx, OWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_vmx_invept4772() {
 fn enc_vmx_invept4773() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invept rcx, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -59,6 +63,7 @@ fn enc_vmx_invept4773() {
 fn enc_vmx_invvpid4774() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invvpid rdx, OWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -73,6 +78,7 @@ fn enc_vmx_invvpid4774() {
 fn enc_vmx_invvpid4775() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invvpid rax, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -87,6 +93,7 @@ fn enc_vmx_invvpid4775() {
 fn enc_vmx_invvpid4776() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invvpid rdx, OWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -101,6 +108,7 @@ fn enc_vmx_invvpid4776() {
 fn enc_vmx_invvpid4777() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invvpid rax, OWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -115,6 +123,7 @@ fn enc_vmx_invvpid4777() {
 fn enc_vmx_stgi4778() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; stgi
      );
      let buf = ops.finalize().unwrap();
@@ -129,6 +138,7 @@ fn enc_vmx_stgi4778() {
 fn enc_vmx_vmcall4779() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmcall
      );
      let buf = ops.finalize().unwrap();
@@ -143,6 +153,7 @@ fn enc_vmx_vmcall4779() {
 fn enc_vmx_vmclear4780() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmclear [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -157,6 +168,7 @@ fn enc_vmx_vmclear4780() {
 fn enc_vmx_vmfunc4781() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmfunc
      );
      let buf = ops.finalize().unwrap();
@@ -171,6 +183,7 @@ fn enc_vmx_vmfunc4781() {
 fn enc_vmx_vmlaunch4782() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmlaunch
      );
      let buf = ops.finalize().unwrap();
@@ -185,6 +198,7 @@ fn enc_vmx_vmlaunch4782() {
 fn enc_vmx_vmload4783() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmload
      );
      let buf = ops.finalize().unwrap();
@@ -199,6 +213,7 @@ fn enc_vmx_vmload4783() {
 fn enc_vmx_vmmcall4784() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmmcall
      );
      let buf = ops.finalize().unwrap();
@@ -213,6 +228,7 @@ fn enc_vmx_vmmcall4784() {
 fn enc_vmx_vmptrld4785() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmptrld [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -227,6 +243,7 @@ fn enc_vmx_vmptrld4785() {
 fn enc_vmx_vmptrst4786() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmptrst [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -241,6 +258,7 @@ fn enc_vmx_vmptrst4786() {
 fn enc_vmx_vmread4787() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmread [rax], rcx
      );
      let buf = ops.finalize().unwrap();
@@ -255,6 +273,7 @@ fn enc_vmx_vmread4787() {
 fn enc_vmx_vmread4788() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmread rax, rdx
      );
      let buf = ops.finalize().unwrap();
@@ -269,6 +288,7 @@ fn enc_vmx_vmread4788() {
 fn enc_vmx_vmread4789() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmread [rax], rdx
      );
      let buf = ops.finalize().unwrap();
@@ -283,6 +303,7 @@ fn enc_vmx_vmread4789() {
 fn enc_vmx_vmread4790() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmread rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -297,6 +318,7 @@ fn enc_vmx_vmread4790() {
 fn enc_vmx_vmresume4791() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmresume
      );
      let buf = ops.finalize().unwrap();
@@ -311,6 +333,7 @@ fn enc_vmx_vmresume4791() {
 fn enc_vmx_vmrun4792() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmrun
      );
      let buf = ops.finalize().unwrap();
@@ -325,6 +348,7 @@ fn enc_vmx_vmrun4792() {
 fn enc_vmx_vmsave4793() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmsave
      );
      let buf = ops.finalize().unwrap();
@@ -339,6 +363,7 @@ fn enc_vmx_vmsave4793() {
 fn enc_vmx_vmwrite4794() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmwrite rdx, rax
      );
      let buf = ops.finalize().unwrap();
@@ -353,6 +378,7 @@ fn enc_vmx_vmwrite4794() {
 fn enc_vmx_vmwrite4795() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmwrite rdx, [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -367,6 +393,7 @@ fn enc_vmx_vmwrite4795() {
 fn enc_vmx_vmwrite4796() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmwrite rax, [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -381,6 +408,7 @@ fn enc_vmx_vmwrite4796() {
 fn enc_vmx_vmxoff4797() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmxoff
      );
      let buf = ops.finalize().unwrap();
@@ -395,6 +423,7 @@ fn enc_vmx_vmxoff4797() {
 fn enc_vmx_vmxon4798() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; vmxon [rax]
      );
      let buf = ops.finalize().unwrap();

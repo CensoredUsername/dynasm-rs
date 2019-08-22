@@ -3,6 +3,7 @@
 fn enc_cyrix_cpu_read1788() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; cpu_read
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_cyrix_cpu_read1788() {
 fn enc_cyrix_cpu_write1789() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; cpu_write
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_cyrix_cpu_write1789() {
 fn enc_cyrix_dmint1790() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; dmint
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_cyrix_dmint1790() {
 fn enc_cyrix_montmul1791() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; montmul
      );
      let buf = ops.finalize().unwrap();
@@ -59,6 +63,7 @@ fn enc_cyrix_montmul1791() {
 fn enc_cyrix_rdm1792() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rdm
      );
      let buf = ops.finalize().unwrap();
@@ -73,6 +78,7 @@ fn enc_cyrix_rdm1792() {
 fn enc_cyrix_rdshr1793() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rdshr eax
      );
      let buf = ops.finalize().unwrap();
@@ -87,6 +93,7 @@ fn enc_cyrix_rdshr1793() {
 fn enc_cyrix_rdshr1794() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rdshr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -101,6 +108,7 @@ fn enc_cyrix_rdshr1794() {
 fn enc_cyrix_rsldt1795() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rsldt TWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -115,6 +123,7 @@ fn enc_cyrix_rsldt1795() {
 fn enc_cyrix_rsldt1796() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rsldt TWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -129,6 +138,7 @@ fn enc_cyrix_rsldt1796() {
 fn enc_cyrix_rsts1797() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rsts TWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -143,6 +153,7 @@ fn enc_cyrix_rsts1797() {
 fn enc_cyrix_rsts1798() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rsts TWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -157,6 +168,7 @@ fn enc_cyrix_rsts1798() {
 fn enc_cyrix_rsts1799() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; rsts TWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -171,6 +183,7 @@ fn enc_cyrix_rsts1799() {
 fn enc_cyrix_smint1800() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; smint
      );
      let buf = ops.finalize().unwrap();
@@ -185,6 +198,7 @@ fn enc_cyrix_smint1800() {
 fn enc_cyrix_svldt1801() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; svldt TWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -199,6 +213,7 @@ fn enc_cyrix_svldt1801() {
 fn enc_cyrix_svldt1802() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; svldt TWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -213,6 +228,7 @@ fn enc_cyrix_svldt1802() {
 fn enc_cyrix_svts1803() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; svts TWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -227,6 +243,7 @@ fn enc_cyrix_svts1803() {
 fn enc_cyrix_svts1804() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; svts TWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -241,6 +258,7 @@ fn enc_cyrix_svts1804() {
 fn enc_cyrix_wrshr1805() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; wrshr eax
      );
      let buf = ops.finalize().unwrap();
@@ -255,6 +273,7 @@ fn enc_cyrix_wrshr1805() {
 fn enc_cyrix_wrshr1806() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; wrshr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -269,6 +288,7 @@ fn enc_cyrix_wrshr1806() {
 fn enc_cyrix_xcryptcbc1807() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xcryptcbc
      );
      let buf = ops.finalize().unwrap();
@@ -283,6 +303,7 @@ fn enc_cyrix_xcryptcbc1807() {
 fn enc_cyrix_xcryptcfb1808() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xcryptcfb
      );
      let buf = ops.finalize().unwrap();
@@ -297,6 +318,7 @@ fn enc_cyrix_xcryptcfb1808() {
 fn enc_cyrix_xcryptctr1809() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xcryptctr
      );
      let buf = ops.finalize().unwrap();
@@ -311,6 +333,7 @@ fn enc_cyrix_xcryptctr1809() {
 fn enc_cyrix_xcryptecb1810() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xcryptecb
      );
      let buf = ops.finalize().unwrap();
@@ -325,6 +348,7 @@ fn enc_cyrix_xcryptecb1810() {
 fn enc_cyrix_xcryptofb1811() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xcryptofb
      );
      let buf = ops.finalize().unwrap();
@@ -339,6 +363,7 @@ fn enc_cyrix_xcryptofb1811() {
 fn enc_cyrix_xsha11812() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xsha1
      );
      let buf = ops.finalize().unwrap();
@@ -353,6 +378,7 @@ fn enc_cyrix_xsha11812() {
 fn enc_cyrix_xsha2561813() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xsha256
      );
      let buf = ops.finalize().unwrap();
@@ -367,6 +393,7 @@ fn enc_cyrix_xsha2561813() {
 fn enc_cyrix_xstore1814() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; xstore
      );
      let buf = ops.finalize().unwrap();

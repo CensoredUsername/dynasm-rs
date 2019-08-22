@@ -3,6 +3,7 @@
 fn enc_invpcid_invpcid5908() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invpcid rcx, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_invpcid_invpcid5908() {
 fn enc_invpcid_invpcid5909() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invpcid rcx, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_invpcid_invpcid5909() {
 fn enc_invpcid_invpcid5910() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invpcid rcx, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_invpcid_invpcid5910() {
 fn enc_invpcid_invpcid5911() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invpcid rax, OWORD [rax]
      );
      let buf = ops.finalize().unwrap();

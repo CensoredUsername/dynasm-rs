@@ -3,6 +3,7 @@
 fn enc_amd_clzero4137() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; clzero
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_amd_clzero4137() {
 fn enc_amd_invlpga4138() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invlpga
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_amd_invlpga4138() {
 fn enc_amd_invlpga4139() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; invlpga rax, ecx
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_amd_invlpga4139() {
 fn enc_amd_lfence4140() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; lfence
      );
      let buf = ops.finalize().unwrap();
@@ -59,6 +63,7 @@ fn enc_amd_lfence4140() {
 fn enc_amd_llwpcb4141() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; llwpcb rax
      );
      let buf = ops.finalize().unwrap();
@@ -73,6 +78,7 @@ fn enc_amd_llwpcb4141() {
 fn enc_amd_llwpcb4142() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; llwpcb rbx
      );
      let buf = ops.finalize().unwrap();
@@ -87,6 +93,7 @@ fn enc_amd_llwpcb4142() {
 fn enc_amd_llwpcb4143() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; llwpcb rcx
      );
      let buf = ops.finalize().unwrap();
@@ -101,6 +108,7 @@ fn enc_amd_llwpcb4143() {
 fn enc_amd_lzcnt4144() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; lzcnt rdx, QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -115,6 +123,7 @@ fn enc_amd_lzcnt4144() {
 fn enc_amd_lzcnt4145() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; lzcnt rcx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -129,6 +138,7 @@ fn enc_amd_lzcnt4145() {
 fn enc_amd_lzcnt4146() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; lzcnt rdx, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -143,6 +153,7 @@ fn enc_amd_lzcnt4146() {
 fn enc_amd_lzcnt4147() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; lzcnt rax, rcx
      );
      let buf = ops.finalize().unwrap();
@@ -157,6 +168,7 @@ fn enc_amd_lzcnt4147() {
 fn enc_amd_mfence4148() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; mfence
      );
      let buf = ops.finalize().unwrap();
@@ -171,6 +183,7 @@ fn enc_amd_mfence4148() {
 fn enc_amd_monitorx4149() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; monitorx rax, ecx, edx
      );
      let buf = ops.finalize().unwrap();
@@ -185,6 +198,7 @@ fn enc_amd_monitorx4149() {
 fn enc_amd_monitorx4150() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; monitorx ax, ecx, edx
      );
      let buf = ops.finalize().unwrap();
@@ -199,6 +213,7 @@ fn enc_amd_monitorx4150() {
 fn enc_amd_monitorx4151() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; monitorx
      );
      let buf = ops.finalize().unwrap();
@@ -213,6 +228,7 @@ fn enc_amd_monitorx4151() {
 fn enc_amd_mwaitx4152() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; mwaitx
      );
      let buf = ops.finalize().unwrap();
@@ -227,6 +243,7 @@ fn enc_amd_mwaitx4152() {
 fn enc_amd_mwaitx4153() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; mwaitx eax, ecx
      );
      let buf = ops.finalize().unwrap();
@@ -241,6 +258,7 @@ fn enc_amd_mwaitx4153() {
 fn enc_amd_sfence4154() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; sfence
      );
      let buf = ops.finalize().unwrap();
@@ -255,6 +273,7 @@ fn enc_amd_sfence4154() {
 fn enc_amd_slwpcb4155() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; slwpcb rdx
      );
      let buf = ops.finalize().unwrap();
@@ -269,6 +288,7 @@ fn enc_amd_slwpcb4155() {
 fn enc_amd_slwpcb4156() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; slwpcb rbx
      );
      let buf = ops.finalize().unwrap();
@@ -283,6 +303,7 @@ fn enc_amd_slwpcb4156() {
 fn enc_amd_slwpcb4157() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; slwpcb rcx
      );
      let buf = ops.finalize().unwrap();
@@ -297,6 +318,7 @@ fn enc_amd_slwpcb4157() {
 fn enc_amd_slwpcb4158() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; slwpcb rax
      );
      let buf = ops.finalize().unwrap();
@@ -311,6 +333,7 @@ fn enc_amd_slwpcb4158() {
 fn enc_amd_syscall4159() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; syscall
      );
      let buf = ops.finalize().unwrap();
@@ -325,6 +348,7 @@ fn enc_amd_syscall4159() {
 fn enc_amd_sysret4160() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; sysret
      );
      let buf = ops.finalize().unwrap();

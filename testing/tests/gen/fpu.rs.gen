@@ -3,6 +3,7 @@
 fn enc_fpu_f2xm10() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; f2xm1
      );
      let buf = ops.finalize().unwrap();
@@ -17,6 +18,7 @@ fn enc_fpu_f2xm10() {
 fn enc_fpu_fabs1() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fabs
      );
      let buf = ops.finalize().unwrap();
@@ -31,6 +33,7 @@ fn enc_fpu_fabs1() {
 fn enc_fpu_fadd2() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -45,6 +48,7 @@ fn enc_fpu_fadd2() {
 fn enc_fpu_fadd3() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -59,6 +63,7 @@ fn enc_fpu_fadd3() {
 fn enc_fpu_fadd4() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -73,6 +78,7 @@ fn enc_fpu_fadd4() {
 fn enc_fpu_fadd5() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -87,6 +93,7 @@ fn enc_fpu_fadd5() {
 fn enc_fpu_fadd6() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -101,6 +108,7 @@ fn enc_fpu_fadd6() {
 fn enc_fpu_fadd7() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -115,6 +123,7 @@ fn enc_fpu_fadd7() {
 fn enc_fpu_fadd8() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -129,6 +138,7 @@ fn enc_fpu_fadd8() {
 fn enc_fpu_fadd9() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -143,6 +153,7 @@ fn enc_fpu_fadd9() {
 fn enc_fpu_fadd10() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -157,6 +168,7 @@ fn enc_fpu_fadd10() {
 fn enc_fpu_fadd11() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -171,6 +183,7 @@ fn enc_fpu_fadd11() {
 fn enc_fpu_fadd12() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st1
      );
      let buf = ops.finalize().unwrap();
@@ -185,6 +198,7 @@ fn enc_fpu_fadd12() {
 fn enc_fpu_fadd13() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st2
      );
      let buf = ops.finalize().unwrap();
@@ -199,6 +213,7 @@ fn enc_fpu_fadd13() {
 fn enc_fpu_fadd14() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -213,6 +228,7 @@ fn enc_fpu_fadd14() {
 fn enc_fpu_fadd15() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -227,6 +243,7 @@ fn enc_fpu_fadd15() {
 fn enc_fpu_fadd16() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -241,6 +258,7 @@ fn enc_fpu_fadd16() {
 fn enc_fpu_fadd17() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd
      );
      let buf = ops.finalize().unwrap();
@@ -255,6 +273,7 @@ fn enc_fpu_fadd17() {
 fn enc_fpu_fadd18() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -269,6 +288,7 @@ fn enc_fpu_fadd18() {
 fn enc_fpu_fadd19() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -283,6 +303,7 @@ fn enc_fpu_fadd19() {
 fn enc_fpu_fadd20() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fadd st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -297,6 +318,7 @@ fn enc_fpu_fadd20() {
 fn enc_fpu_faddp21() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp
      );
      let buf = ops.finalize().unwrap();
@@ -311,6 +333,7 @@ fn enc_fpu_faddp21() {
 fn enc_fpu_faddp22() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st2
      );
      let buf = ops.finalize().unwrap();
@@ -325,6 +348,7 @@ fn enc_fpu_faddp22() {
 fn enc_fpu_faddp23() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st5
      );
      let buf = ops.finalize().unwrap();
@@ -339,6 +363,7 @@ fn enc_fpu_faddp23() {
 fn enc_fpu_faddp24() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st6
      );
      let buf = ops.finalize().unwrap();
@@ -353,6 +378,7 @@ fn enc_fpu_faddp24() {
 fn enc_fpu_faddp25() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st7
      );
      let buf = ops.finalize().unwrap();
@@ -367,6 +393,7 @@ fn enc_fpu_faddp25() {
 fn enc_fpu_faddp26() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st4
      );
      let buf = ops.finalize().unwrap();
@@ -381,6 +408,7 @@ fn enc_fpu_faddp26() {
 fn enc_fpu_faddp27() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -395,6 +423,7 @@ fn enc_fpu_faddp27() {
 fn enc_fpu_faddp28() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -409,6 +438,7 @@ fn enc_fpu_faddp28() {
 fn enc_fpu_faddp29() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; faddp st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -423,6 +453,7 @@ fn enc_fpu_faddp29() {
 fn enc_fpu_fbld30() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fbld [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -437,6 +468,7 @@ fn enc_fpu_fbld30() {
 fn enc_fpu_fbstp31() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fbstp [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -451,6 +483,7 @@ fn enc_fpu_fbstp31() {
 fn enc_fpu_fchs32() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fchs
      );
      let buf = ops.finalize().unwrap();
@@ -465,6 +498,7 @@ fn enc_fpu_fchs32() {
 fn enc_fpu_fclex33() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fclex
      );
      let buf = ops.finalize().unwrap();
@@ -479,6 +513,7 @@ fn enc_fpu_fclex33() {
 fn enc_fpu_fcmovb34() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -493,6 +528,7 @@ fn enc_fpu_fcmovb34() {
 fn enc_fpu_fcmovb35() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -507,6 +543,7 @@ fn enc_fpu_fcmovb35() {
 fn enc_fpu_fcmovb36() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -521,6 +558,7 @@ fn enc_fpu_fcmovb36() {
 fn enc_fpu_fcmovb37() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -535,6 +573,7 @@ fn enc_fpu_fcmovb37() {
 fn enc_fpu_fcmovb38() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st1
      );
      let buf = ops.finalize().unwrap();
@@ -549,6 +588,7 @@ fn enc_fpu_fcmovb38() {
 fn enc_fpu_fcmovb39() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st7
      );
      let buf = ops.finalize().unwrap();
@@ -563,6 +603,7 @@ fn enc_fpu_fcmovb39() {
 fn enc_fpu_fcmovb40() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st5
      );
      let buf = ops.finalize().unwrap();
@@ -577,6 +618,7 @@ fn enc_fpu_fcmovb40() {
 fn enc_fpu_fcmovb41() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb st2
      );
      let buf = ops.finalize().unwrap();
@@ -591,6 +633,7 @@ fn enc_fpu_fcmovb41() {
 fn enc_fpu_fcmovb42() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovb
      );
      let buf = ops.finalize().unwrap();
@@ -605,6 +648,7 @@ fn enc_fpu_fcmovb42() {
 fn enc_fpu_fcmovbe43() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -619,6 +663,7 @@ fn enc_fpu_fcmovbe43() {
 fn enc_fpu_fcmovbe44() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -633,6 +678,7 @@ fn enc_fpu_fcmovbe44() {
 fn enc_fpu_fcmovbe45() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -647,6 +693,7 @@ fn enc_fpu_fcmovbe45() {
 fn enc_fpu_fcmovbe46() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -661,6 +708,7 @@ fn enc_fpu_fcmovbe46() {
 fn enc_fpu_fcmovbe47() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st3
      );
      let buf = ops.finalize().unwrap();
@@ -675,6 +723,7 @@ fn enc_fpu_fcmovbe47() {
 fn enc_fpu_fcmovbe48() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st7
      );
      let buf = ops.finalize().unwrap();
@@ -689,6 +738,7 @@ fn enc_fpu_fcmovbe48() {
 fn enc_fpu_fcmovbe49() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st1
      );
      let buf = ops.finalize().unwrap();
@@ -703,6 +753,7 @@ fn enc_fpu_fcmovbe49() {
 fn enc_fpu_fcmovbe50() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe st6
      );
      let buf = ops.finalize().unwrap();
@@ -717,6 +768,7 @@ fn enc_fpu_fcmovbe50() {
 fn enc_fpu_fcmovbe51() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovbe
      );
      let buf = ops.finalize().unwrap();
@@ -731,6 +783,7 @@ fn enc_fpu_fcmovbe51() {
 fn enc_fpu_fcmove52() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove st3
      );
      let buf = ops.finalize().unwrap();
@@ -745,6 +798,7 @@ fn enc_fpu_fcmove52() {
 fn enc_fpu_fcmove53() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove st7
      );
      let buf = ops.finalize().unwrap();
@@ -759,6 +813,7 @@ fn enc_fpu_fcmove53() {
 fn enc_fpu_fcmove54() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove st6
      );
      let buf = ops.finalize().unwrap();
@@ -773,6 +828,7 @@ fn enc_fpu_fcmove54() {
 fn enc_fpu_fcmove55() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove
      );
      let buf = ops.finalize().unwrap();
@@ -787,6 +843,7 @@ fn enc_fpu_fcmove55() {
 fn enc_fpu_fcmove56() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -801,6 +858,7 @@ fn enc_fpu_fcmove56() {
 fn enc_fpu_fcmove57() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -815,6 +873,7 @@ fn enc_fpu_fcmove57() {
 fn enc_fpu_fcmove58() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmove st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -829,6 +888,7 @@ fn enc_fpu_fcmove58() {
 fn enc_fpu_fcmovnb59() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st7
      );
      let buf = ops.finalize().unwrap();
@@ -843,6 +903,7 @@ fn enc_fpu_fcmovnb59() {
 fn enc_fpu_fcmovnb60() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st1
      );
      let buf = ops.finalize().unwrap();
@@ -857,6 +918,7 @@ fn enc_fpu_fcmovnb60() {
 fn enc_fpu_fcmovnb61() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st6
      );
      let buf = ops.finalize().unwrap();
@@ -871,6 +933,7 @@ fn enc_fpu_fcmovnb61() {
 fn enc_fpu_fcmovnb62() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st2
      );
      let buf = ops.finalize().unwrap();
@@ -885,6 +948,7 @@ fn enc_fpu_fcmovnb62() {
 fn enc_fpu_fcmovnb63() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -899,6 +963,7 @@ fn enc_fpu_fcmovnb63() {
 fn enc_fpu_fcmovnb64() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -913,6 +978,7 @@ fn enc_fpu_fcmovnb64() {
 fn enc_fpu_fcmovnb65() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -927,6 +993,7 @@ fn enc_fpu_fcmovnb65() {
 fn enc_fpu_fcmovnb66() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -941,6 +1008,7 @@ fn enc_fpu_fcmovnb66() {
 fn enc_fpu_fcmovnb67() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnb
      );
      let buf = ops.finalize().unwrap();
@@ -955,6 +1023,7 @@ fn enc_fpu_fcmovnb67() {
 fn enc_fpu_fcmovnbe68() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st5
      );
      let buf = ops.finalize().unwrap();
@@ -969,6 +1038,7 @@ fn enc_fpu_fcmovnbe68() {
 fn enc_fpu_fcmovnbe69() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st4
      );
      let buf = ops.finalize().unwrap();
@@ -983,6 +1053,7 @@ fn enc_fpu_fcmovnbe69() {
 fn enc_fpu_fcmovnbe70() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st6
      );
      let buf = ops.finalize().unwrap();
@@ -997,6 +1068,7 @@ fn enc_fpu_fcmovnbe70() {
 fn enc_fpu_fcmovnbe71() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st7
      );
      let buf = ops.finalize().unwrap();
@@ -1011,6 +1083,7 @@ fn enc_fpu_fcmovnbe71() {
 fn enc_fpu_fcmovnbe72() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st2
      );
      let buf = ops.finalize().unwrap();
@@ -1025,6 +1098,7 @@ fn enc_fpu_fcmovnbe72() {
 fn enc_fpu_fcmovnbe73() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe
      );
      let buf = ops.finalize().unwrap();
@@ -1039,6 +1113,7 @@ fn enc_fpu_fcmovnbe73() {
 fn enc_fpu_fcmovnbe74() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -1053,6 +1128,7 @@ fn enc_fpu_fcmovnbe74() {
 fn enc_fpu_fcmovnbe75() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -1067,6 +1143,7 @@ fn enc_fpu_fcmovnbe75() {
 fn enc_fpu_fcmovnbe76() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -1081,6 +1158,7 @@ fn enc_fpu_fcmovnbe76() {
 fn enc_fpu_fcmovnbe77() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -1095,6 +1173,7 @@ fn enc_fpu_fcmovnbe77() {
 fn enc_fpu_fcmovnbe78() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnbe st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -1109,6 +1188,7 @@ fn enc_fpu_fcmovnbe78() {
 fn enc_fpu_fcmovne79() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne
      );
      let buf = ops.finalize().unwrap();
@@ -1123,6 +1203,7 @@ fn enc_fpu_fcmovne79() {
 fn enc_fpu_fcmovne80() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st7
      );
      let buf = ops.finalize().unwrap();
@@ -1137,6 +1218,7 @@ fn enc_fpu_fcmovne80() {
 fn enc_fpu_fcmovne81() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st5
      );
      let buf = ops.finalize().unwrap();
@@ -1151,6 +1233,7 @@ fn enc_fpu_fcmovne81() {
 fn enc_fpu_fcmovne82() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st3
      );
      let buf = ops.finalize().unwrap();
@@ -1165,6 +1248,7 @@ fn enc_fpu_fcmovne82() {
 fn enc_fpu_fcmovne83() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st2
      );
      let buf = ops.finalize().unwrap();
@@ -1179,6 +1263,7 @@ fn enc_fpu_fcmovne83() {
 fn enc_fpu_fcmovne84() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st1
      );
      let buf = ops.finalize().unwrap();
@@ -1193,6 +1278,7 @@ fn enc_fpu_fcmovne84() {
 fn enc_fpu_fcmovne85() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -1207,6 +1293,7 @@ fn enc_fpu_fcmovne85() {
 fn enc_fpu_fcmovne86() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -1221,6 +1308,7 @@ fn enc_fpu_fcmovne86() {
 fn enc_fpu_fcmovne87() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -1235,6 +1323,7 @@ fn enc_fpu_fcmovne87() {
 fn enc_fpu_fcmovne88() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovne st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -1249,6 +1338,7 @@ fn enc_fpu_fcmovne88() {
 fn enc_fpu_fcmovnu89() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st5
      );
      let buf = ops.finalize().unwrap();
@@ -1263,6 +1353,7 @@ fn enc_fpu_fcmovnu89() {
 fn enc_fpu_fcmovnu90() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st1
      );
      let buf = ops.finalize().unwrap();
@@ -1277,6 +1368,7 @@ fn enc_fpu_fcmovnu90() {
 fn enc_fpu_fcmovnu91() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st6
      );
      let buf = ops.finalize().unwrap();
@@ -1291,6 +1383,7 @@ fn enc_fpu_fcmovnu91() {
 fn enc_fpu_fcmovnu92() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st3
      );
      let buf = ops.finalize().unwrap();
@@ -1305,6 +1398,7 @@ fn enc_fpu_fcmovnu92() {
 fn enc_fpu_fcmovnu93() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -1319,6 +1413,7 @@ fn enc_fpu_fcmovnu93() {
 fn enc_fpu_fcmovnu94() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -1333,6 +1428,7 @@ fn enc_fpu_fcmovnu94() {
 fn enc_fpu_fcmovnu95() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -1347,6 +1443,7 @@ fn enc_fpu_fcmovnu95() {
 fn enc_fpu_fcmovnu96() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovnu
      );
      let buf = ops.finalize().unwrap();
@@ -1361,6 +1458,7 @@ fn enc_fpu_fcmovnu96() {
 fn enc_fpu_fcmovu97() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovu
      );
      let buf = ops.finalize().unwrap();
@@ -1375,6 +1473,7 @@ fn enc_fpu_fcmovu97() {
 fn enc_fpu_fcmovu98() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovu st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -1389,6 +1488,7 @@ fn enc_fpu_fcmovu98() {
 fn enc_fpu_fcmovu99() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovu st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -1403,6 +1503,7 @@ fn enc_fpu_fcmovu99() {
 fn enc_fpu_fcmovu100() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovu st1
      );
      let buf = ops.finalize().unwrap();
@@ -1417,6 +1518,7 @@ fn enc_fpu_fcmovu100() {
 fn enc_fpu_fcmovu101() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovu st5
      );
      let buf = ops.finalize().unwrap();
@@ -1431,6 +1533,7 @@ fn enc_fpu_fcmovu101() {
 fn enc_fpu_fcmovu102() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcmovu st4
      );
      let buf = ops.finalize().unwrap();
@@ -1445,6 +1548,7 @@ fn enc_fpu_fcmovu102() {
 fn enc_fpu_fcom103() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st2
      );
      let buf = ops.finalize().unwrap();
@@ -1459,6 +1563,7 @@ fn enc_fpu_fcom103() {
 fn enc_fpu_fcom104() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st7
      );
      let buf = ops.finalize().unwrap();
@@ -1473,6 +1578,7 @@ fn enc_fpu_fcom104() {
 fn enc_fpu_fcom105() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st5
      );
      let buf = ops.finalize().unwrap();
@@ -1487,6 +1593,7 @@ fn enc_fpu_fcom105() {
 fn enc_fpu_fcom106() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1501,6 +1608,7 @@ fn enc_fpu_fcom106() {
 fn enc_fpu_fcom107() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -1515,6 +1623,7 @@ fn enc_fpu_fcom107() {
 fn enc_fpu_fcom108() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1529,6 +1638,7 @@ fn enc_fpu_fcom108() {
 fn enc_fpu_fcom109() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -1543,6 +1653,7 @@ fn enc_fpu_fcom109() {
 fn enc_fpu_fcom110() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -1557,6 +1668,7 @@ fn enc_fpu_fcom110() {
 fn enc_fpu_fcom111() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -1571,6 +1683,7 @@ fn enc_fpu_fcom111() {
 fn enc_fpu_fcom112() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -1585,6 +1698,7 @@ fn enc_fpu_fcom112() {
 fn enc_fpu_fcom113() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom
      );
      let buf = ops.finalize().unwrap();
@@ -1599,6 +1713,7 @@ fn enc_fpu_fcom113() {
 fn enc_fpu_fcom114() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1613,6 +1728,7 @@ fn enc_fpu_fcom114() {
 fn enc_fpu_fcom115() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1627,6 +1743,7 @@ fn enc_fpu_fcom115() {
 fn enc_fpu_fcom116() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcom DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -1641,6 +1758,7 @@ fn enc_fpu_fcom116() {
 fn enc_fpu_fcomi117() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -1655,6 +1773,7 @@ fn enc_fpu_fcomi117() {
 fn enc_fpu_fcomi118() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -1669,6 +1788,7 @@ fn enc_fpu_fcomi118() {
 fn enc_fpu_fcomi119() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -1683,6 +1803,7 @@ fn enc_fpu_fcomi119() {
 fn enc_fpu_fcomi120() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi
      );
      let buf = ops.finalize().unwrap();
@@ -1697,6 +1818,7 @@ fn enc_fpu_fcomi120() {
 fn enc_fpu_fcomi121() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi st1
      );
      let buf = ops.finalize().unwrap();
@@ -1711,6 +1833,7 @@ fn enc_fpu_fcomi121() {
 fn enc_fpu_fcomi122() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi st7
      );
      let buf = ops.finalize().unwrap();
@@ -1725,6 +1848,7 @@ fn enc_fpu_fcomi122() {
 fn enc_fpu_fcomi123() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomi st4
      );
      let buf = ops.finalize().unwrap();
@@ -1739,6 +1863,7 @@ fn enc_fpu_fcomi123() {
 fn enc_fpu_fcomip124() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip st5
      );
      let buf = ops.finalize().unwrap();
@@ -1753,6 +1878,7 @@ fn enc_fpu_fcomip124() {
 fn enc_fpu_fcomip125() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip st1
      );
      let buf = ops.finalize().unwrap();
@@ -1767,6 +1893,7 @@ fn enc_fpu_fcomip125() {
 fn enc_fpu_fcomip126() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip st2
      );
      let buf = ops.finalize().unwrap();
@@ -1781,6 +1908,7 @@ fn enc_fpu_fcomip126() {
 fn enc_fpu_fcomip127() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip
      );
      let buf = ops.finalize().unwrap();
@@ -1795,6 +1923,7 @@ fn enc_fpu_fcomip127() {
 fn enc_fpu_fcomip128() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -1809,6 +1938,7 @@ fn enc_fpu_fcomip128() {
 fn enc_fpu_fcomip129() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -1823,6 +1953,7 @@ fn enc_fpu_fcomip129() {
 fn enc_fpu_fcomip130() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomip st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -1837,6 +1968,7 @@ fn enc_fpu_fcomip130() {
 fn enc_fpu_fcomp131() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1851,6 +1983,7 @@ fn enc_fpu_fcomp131() {
 fn enc_fpu_fcomp132() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -1865,6 +1998,7 @@ fn enc_fpu_fcomp132() {
 fn enc_fpu_fcomp133() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1879,6 +2013,7 @@ fn enc_fpu_fcomp133() {
 fn enc_fpu_fcomp134() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -1893,6 +2028,7 @@ fn enc_fpu_fcomp134() {
 fn enc_fpu_fcomp135() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -1907,6 +2043,7 @@ fn enc_fpu_fcomp135() {
 fn enc_fpu_fcomp136() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -1921,6 +2058,7 @@ fn enc_fpu_fcomp136() {
 fn enc_fpu_fcomp137() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -1935,6 +2073,7 @@ fn enc_fpu_fcomp137() {
 fn enc_fpu_fcomp138() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp
      );
      let buf = ops.finalize().unwrap();
@@ -1949,6 +2088,7 @@ fn enc_fpu_fcomp138() {
 fn enc_fpu_fcomp139() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -1963,6 +2103,7 @@ fn enc_fpu_fcomp139() {
 fn enc_fpu_fcomp140() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -1977,6 +2118,7 @@ fn enc_fpu_fcomp140() {
 fn enc_fpu_fcomp141() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -1991,6 +2133,7 @@ fn enc_fpu_fcomp141() {
 fn enc_fpu_fcomp142() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st7
      );
      let buf = ops.finalize().unwrap();
@@ -2005,6 +2148,7 @@ fn enc_fpu_fcomp142() {
 fn enc_fpu_fcomp143() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st5
      );
      let buf = ops.finalize().unwrap();
@@ -2019,6 +2163,7 @@ fn enc_fpu_fcomp143() {
 fn enc_fpu_fcomp144() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcomp st6
      );
      let buf = ops.finalize().unwrap();
@@ -2033,6 +2178,7 @@ fn enc_fpu_fcomp144() {
 fn enc_fpu_fcompp145() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcompp
      );
      let buf = ops.finalize().unwrap();
@@ -2047,6 +2193,7 @@ fn enc_fpu_fcompp145() {
 fn enc_fpu_fcos146() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fcos
      );
      let buf = ops.finalize().unwrap();
@@ -2061,6 +2208,7 @@ fn enc_fpu_fcos146() {
 fn enc_fpu_fdecstp147() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdecstp
      );
      let buf = ops.finalize().unwrap();
@@ -2075,6 +2223,7 @@ fn enc_fpu_fdecstp147() {
 fn enc_fpu_fdisi148() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdisi
      );
      let buf = ops.finalize().unwrap();
@@ -2089,6 +2238,7 @@ fn enc_fpu_fdisi148() {
 fn enc_fpu_fdiv149() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -2103,6 +2253,7 @@ fn enc_fpu_fdiv149() {
 fn enc_fpu_fdiv150() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -2117,6 +2268,7 @@ fn enc_fpu_fdiv150() {
 fn enc_fpu_fdiv151() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -2131,6 +2283,7 @@ fn enc_fpu_fdiv151() {
 fn enc_fpu_fdiv152() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -2145,6 +2298,7 @@ fn enc_fpu_fdiv152() {
 fn enc_fpu_fdiv153() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st4, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2159,6 +2313,7 @@ fn enc_fpu_fdiv153() {
 fn enc_fpu_fdiv154() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st7, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2173,6 +2328,7 @@ fn enc_fpu_fdiv154() {
 fn enc_fpu_fdiv155() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2187,6 +2343,7 @@ fn enc_fpu_fdiv155() {
 fn enc_fpu_fdiv156() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2201,6 +2358,7 @@ fn enc_fpu_fdiv156() {
 fn enc_fpu_fdiv157() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st7, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2215,6 +2373,7 @@ fn enc_fpu_fdiv157() {
 fn enc_fpu_fdiv158() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2229,6 +2388,7 @@ fn enc_fpu_fdiv158() {
 fn enc_fpu_fdiv159() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2243,6 +2403,7 @@ fn enc_fpu_fdiv159() {
 fn enc_fpu_fdiv160() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2257,6 +2418,7 @@ fn enc_fpu_fdiv160() {
 fn enc_fpu_fdiv161() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2271,6 +2433,7 @@ fn enc_fpu_fdiv161() {
 fn enc_fpu_fdiv162() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2285,6 +2448,7 @@ fn enc_fpu_fdiv162() {
 fn enc_fpu_fdiv163() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -2299,6 +2463,7 @@ fn enc_fpu_fdiv163() {
 fn enc_fpu_fdiv164() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2313,6 +2478,7 @@ fn enc_fpu_fdiv164() {
 fn enc_fpu_fdiv165() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2327,6 +2493,7 @@ fn enc_fpu_fdiv165() {
 fn enc_fpu_fdiv166() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -2341,6 +2508,7 @@ fn enc_fpu_fdiv166() {
 fn enc_fpu_fdiv167() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv
      );
      let buf = ops.finalize().unwrap();
@@ -2355,6 +2523,7 @@ fn enc_fpu_fdiv167() {
 fn enc_fpu_fdiv168() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st5
      );
      let buf = ops.finalize().unwrap();
@@ -2369,6 +2538,7 @@ fn enc_fpu_fdiv168() {
 fn enc_fpu_fdiv169() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st6
      );
      let buf = ops.finalize().unwrap();
@@ -2383,6 +2553,7 @@ fn enc_fpu_fdiv169() {
 fn enc_fpu_fdiv170() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st7
      );
      let buf = ops.finalize().unwrap();
@@ -2397,6 +2568,7 @@ fn enc_fpu_fdiv170() {
 fn enc_fpu_fdiv171() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st2
      );
      let buf = ops.finalize().unwrap();
@@ -2411,6 +2583,7 @@ fn enc_fpu_fdiv171() {
 fn enc_fpu_fdiv172() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdiv st4
      );
      let buf = ops.finalize().unwrap();
@@ -2425,6 +2598,7 @@ fn enc_fpu_fdiv172() {
 fn enc_fpu_fdivp173() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp
      );
      let buf = ops.finalize().unwrap();
@@ -2439,6 +2613,7 @@ fn enc_fpu_fdivp173() {
 fn enc_fpu_fdivp174() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2453,6 +2628,7 @@ fn enc_fpu_fdivp174() {
 fn enc_fpu_fdivp175() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2467,6 +2643,7 @@ fn enc_fpu_fdivp175() {
 fn enc_fpu_fdivp176() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2481,6 +2658,7 @@ fn enc_fpu_fdivp176() {
 fn enc_fpu_fdivp177() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2495,6 +2673,7 @@ fn enc_fpu_fdivp177() {
 fn enc_fpu_fdivp178() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st5
      );
      let buf = ops.finalize().unwrap();
@@ -2509,6 +2688,7 @@ fn enc_fpu_fdivp178() {
 fn enc_fpu_fdivp179() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st4
      );
      let buf = ops.finalize().unwrap();
@@ -2523,6 +2703,7 @@ fn enc_fpu_fdivp179() {
 fn enc_fpu_fdivp180() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st1
      );
      let buf = ops.finalize().unwrap();
@@ -2537,6 +2718,7 @@ fn enc_fpu_fdivp180() {
 fn enc_fpu_fdivp181() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivp st6
      );
      let buf = ops.finalize().unwrap();
@@ -2551,6 +2733,7 @@ fn enc_fpu_fdivp181() {
 fn enc_fpu_fdivr182() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -2565,6 +2748,7 @@ fn enc_fpu_fdivr182() {
 fn enc_fpu_fdivr183() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -2579,6 +2763,7 @@ fn enc_fpu_fdivr183() {
 fn enc_fpu_fdivr184() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st3
      );
      let buf = ops.finalize().unwrap();
@@ -2593,6 +2778,7 @@ fn enc_fpu_fdivr184() {
 fn enc_fpu_fdivr185() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st5
      );
      let buf = ops.finalize().unwrap();
@@ -2607,6 +2793,7 @@ fn enc_fpu_fdivr185() {
 fn enc_fpu_fdivr186() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st7
      );
      let buf = ops.finalize().unwrap();
@@ -2621,6 +2808,7 @@ fn enc_fpu_fdivr186() {
 fn enc_fpu_fdivr187() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st2
      );
      let buf = ops.finalize().unwrap();
@@ -2635,6 +2823,7 @@ fn enc_fpu_fdivr187() {
 fn enc_fpu_fdivr188() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st4, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2649,6 +2838,7 @@ fn enc_fpu_fdivr188() {
 fn enc_fpu_fdivr189() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2663,6 +2853,7 @@ fn enc_fpu_fdivr189() {
 fn enc_fpu_fdivr190() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st7, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2677,6 +2868,7 @@ fn enc_fpu_fdivr190() {
 fn enc_fpu_fdivr191() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr
      );
      let buf = ops.finalize().unwrap();
@@ -2691,6 +2883,7 @@ fn enc_fpu_fdivr191() {
 fn enc_fpu_fdivr192() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2705,6 +2898,7 @@ fn enc_fpu_fdivr192() {
 fn enc_fpu_fdivr193() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -2719,6 +2913,7 @@ fn enc_fpu_fdivr193() {
 fn enc_fpu_fdivr194() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2733,6 +2928,7 @@ fn enc_fpu_fdivr194() {
 fn enc_fpu_fdivr195() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -2747,6 +2943,7 @@ fn enc_fpu_fdivr195() {
 fn enc_fpu_fdivr196() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -2761,6 +2958,7 @@ fn enc_fpu_fdivr196() {
 fn enc_fpu_fdivr197() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -2775,6 +2973,7 @@ fn enc_fpu_fdivr197() {
 fn enc_fpu_fdivr198() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2789,6 +2988,7 @@ fn enc_fpu_fdivr198() {
 fn enc_fpu_fdivr199() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2803,6 +3003,7 @@ fn enc_fpu_fdivr199() {
 fn enc_fpu_fdivr200() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2817,6 +3018,7 @@ fn enc_fpu_fdivr200() {
 fn enc_fpu_fdivr201() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivr st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2831,6 +3033,7 @@ fn enc_fpu_fdivr201() {
 fn enc_fpu_fdivrp202() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st7
      );
      let buf = ops.finalize().unwrap();
@@ -2845,6 +3048,7 @@ fn enc_fpu_fdivrp202() {
 fn enc_fpu_fdivrp203() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st2
      );
      let buf = ops.finalize().unwrap();
@@ -2859,6 +3063,7 @@ fn enc_fpu_fdivrp203() {
 fn enc_fpu_fdivrp204() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st1
      );
      let buf = ops.finalize().unwrap();
@@ -2873,6 +3078,7 @@ fn enc_fpu_fdivrp204() {
 fn enc_fpu_fdivrp205() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st7, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2887,6 +3093,7 @@ fn enc_fpu_fdivrp205() {
 fn enc_fpu_fdivrp206() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2901,6 +3108,7 @@ fn enc_fpu_fdivrp206() {
 fn enc_fpu_fdivrp207() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2915,6 +3123,7 @@ fn enc_fpu_fdivrp207() {
 fn enc_fpu_fdivrp208() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -2929,6 +3138,7 @@ fn enc_fpu_fdivrp208() {
 fn enc_fpu_fdivrp209() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fdivrp
      );
      let buf = ops.finalize().unwrap();
@@ -2943,6 +3153,7 @@ fn enc_fpu_fdivrp209() {
 fn enc_fpu_feni210() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; feni
      );
      let buf = ops.finalize().unwrap();
@@ -2957,6 +3168,7 @@ fn enc_fpu_feni210() {
 fn enc_fpu_ffree211() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ffree
      );
      let buf = ops.finalize().unwrap();
@@ -2971,6 +3183,7 @@ fn enc_fpu_ffree211() {
 fn enc_fpu_ffree212() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ffree st3
      );
      let buf = ops.finalize().unwrap();
@@ -2985,6 +3198,7 @@ fn enc_fpu_ffree212() {
 fn enc_fpu_ffree213() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ffree st6
      );
      let buf = ops.finalize().unwrap();
@@ -2999,6 +3213,7 @@ fn enc_fpu_ffree213() {
 fn enc_fpu_ffree214() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ffree st1
      );
      let buf = ops.finalize().unwrap();
@@ -3013,6 +3228,7 @@ fn enc_fpu_ffree214() {
 fn enc_fpu_ffree215() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ffree st2
      );
      let buf = ops.finalize().unwrap();
@@ -3027,6 +3243,7 @@ fn enc_fpu_ffree215() {
 fn enc_fpu_fiadd216() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fiadd DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3041,6 +3258,7 @@ fn enc_fpu_fiadd216() {
 fn enc_fpu_fiadd217() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fiadd DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3055,6 +3273,7 @@ fn enc_fpu_fiadd217() {
 fn enc_fpu_fiadd218() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fiadd WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3069,6 +3288,7 @@ fn enc_fpu_fiadd218() {
 fn enc_fpu_fiadd219() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fiadd WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3083,6 +3303,7 @@ fn enc_fpu_fiadd219() {
 fn enc_fpu_fiadd220() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fiadd WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3097,6 +3318,7 @@ fn enc_fpu_fiadd220() {
 fn enc_fpu_ficom221() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficom DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3111,6 +3333,7 @@ fn enc_fpu_ficom221() {
 fn enc_fpu_ficom222() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficom DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3125,6 +3348,7 @@ fn enc_fpu_ficom222() {
 fn enc_fpu_ficom223() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficom DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3139,6 +3363,7 @@ fn enc_fpu_ficom223() {
 fn enc_fpu_ficom224() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficom WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3153,6 +3378,7 @@ fn enc_fpu_ficom224() {
 fn enc_fpu_ficom225() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficom WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3167,6 +3393,7 @@ fn enc_fpu_ficom225() {
 fn enc_fpu_ficom226() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficom WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3181,6 +3408,7 @@ fn enc_fpu_ficom226() {
 fn enc_fpu_ficomp227() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficomp DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3195,6 +3423,7 @@ fn enc_fpu_ficomp227() {
 fn enc_fpu_ficomp228() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficomp DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3209,6 +3438,7 @@ fn enc_fpu_ficomp228() {
 fn enc_fpu_ficomp229() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficomp WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3223,6 +3453,7 @@ fn enc_fpu_ficomp229() {
 fn enc_fpu_ficomp230() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ficomp WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3237,6 +3468,7 @@ fn enc_fpu_ficomp230() {
 fn enc_fpu_fidiv231() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidiv WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3251,6 +3483,7 @@ fn enc_fpu_fidiv231() {
 fn enc_fpu_fidiv232() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidiv WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3265,6 +3498,7 @@ fn enc_fpu_fidiv232() {
 fn enc_fpu_fidiv233() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidiv WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3279,6 +3513,7 @@ fn enc_fpu_fidiv233() {
 fn enc_fpu_fidiv234() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidiv DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3293,6 +3528,7 @@ fn enc_fpu_fidiv234() {
 fn enc_fpu_fidiv235() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidiv DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3307,6 +3543,7 @@ fn enc_fpu_fidiv235() {
 fn enc_fpu_fidivr236() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidivr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3321,6 +3558,7 @@ fn enc_fpu_fidivr236() {
 fn enc_fpu_fidivr237() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidivr DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3335,6 +3573,7 @@ fn enc_fpu_fidivr237() {
 fn enc_fpu_fidivr238() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidivr WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3349,6 +3588,7 @@ fn enc_fpu_fidivr238() {
 fn enc_fpu_fidivr239() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidivr WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3363,6 +3603,7 @@ fn enc_fpu_fidivr239() {
 fn enc_fpu_fidivr240() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fidivr WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3377,6 +3618,7 @@ fn enc_fpu_fidivr240() {
 fn enc_fpu_fild241() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3391,6 +3633,7 @@ fn enc_fpu_fild241() {
 fn enc_fpu_fild242() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3405,6 +3648,7 @@ fn enc_fpu_fild242() {
 fn enc_fpu_fild243() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3419,6 +3663,7 @@ fn enc_fpu_fild243() {
 fn enc_fpu_fild244() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3433,6 +3678,7 @@ fn enc_fpu_fild244() {
 fn enc_fpu_fild245() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3447,6 +3693,7 @@ fn enc_fpu_fild245() {
 fn enc_fpu_fild246() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3461,6 +3708,7 @@ fn enc_fpu_fild246() {
 fn enc_fpu_fild247() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fild DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3475,6 +3723,7 @@ fn enc_fpu_fild247() {
 fn enc_fpu_fimul248() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fimul WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3489,6 +3738,7 @@ fn enc_fpu_fimul248() {
 fn enc_fpu_fimul249() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fimul WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3503,6 +3753,7 @@ fn enc_fpu_fimul249() {
 fn enc_fpu_fimul250() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fimul DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3517,6 +3768,7 @@ fn enc_fpu_fimul250() {
 fn enc_fpu_fimul251() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fimul DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3531,6 +3783,7 @@ fn enc_fpu_fimul251() {
 fn enc_fpu_fimul252() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fimul DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3545,6 +3798,7 @@ fn enc_fpu_fimul252() {
 fn enc_fpu_fincstp253() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fincstp
      );
      let buf = ops.finalize().unwrap();
@@ -3559,6 +3813,7 @@ fn enc_fpu_fincstp253() {
 fn enc_fpu_finit254() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; finit
      );
      let buf = ops.finalize().unwrap();
@@ -3573,6 +3828,7 @@ fn enc_fpu_finit254() {
 fn enc_fpu_fist255() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fist DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3587,6 +3843,7 @@ fn enc_fpu_fist255() {
 fn enc_fpu_fist256() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fist DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3601,6 +3858,7 @@ fn enc_fpu_fist256() {
 fn enc_fpu_fist257() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fist DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3615,6 +3873,7 @@ fn enc_fpu_fist257() {
 fn enc_fpu_fist258() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fist WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3629,6 +3888,7 @@ fn enc_fpu_fist258() {
 fn enc_fpu_fist259() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fist WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3643,6 +3903,7 @@ fn enc_fpu_fist259() {
 fn enc_fpu_fistp260() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3657,6 +3918,7 @@ fn enc_fpu_fistp260() {
 fn enc_fpu_fistp261() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3671,6 +3933,7 @@ fn enc_fpu_fistp261() {
 fn enc_fpu_fistp262() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3685,6 +3948,7 @@ fn enc_fpu_fistp262() {
 fn enc_fpu_fistp263() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3699,6 +3963,7 @@ fn enc_fpu_fistp263() {
 fn enc_fpu_fistp264() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3713,6 +3978,7 @@ fn enc_fpu_fistp264() {
 fn enc_fpu_fistp265() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3727,6 +3993,7 @@ fn enc_fpu_fistp265() {
 fn enc_fpu_fistp266() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3741,6 +4008,7 @@ fn enc_fpu_fistp266() {
 fn enc_fpu_fistp267() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3755,6 +4023,7 @@ fn enc_fpu_fistp267() {
 fn enc_fpu_fistp268() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fistp WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3769,6 +4038,7 @@ fn enc_fpu_fistp268() {
 fn enc_fpu_fisttp269() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3783,6 +4053,7 @@ fn enc_fpu_fisttp269() {
 fn enc_fpu_fisttp270() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3797,6 +4068,7 @@ fn enc_fpu_fisttp270() {
 fn enc_fpu_fisttp271() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3811,6 +4083,7 @@ fn enc_fpu_fisttp271() {
 fn enc_fpu_fisttp272() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3825,6 +4098,7 @@ fn enc_fpu_fisttp272() {
 fn enc_fpu_fisttp273() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3839,6 +4113,7 @@ fn enc_fpu_fisttp273() {
 fn enc_fpu_fisttp274() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3853,6 +4128,7 @@ fn enc_fpu_fisttp274() {
 fn enc_fpu_fisttp275() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3867,6 +4143,7 @@ fn enc_fpu_fisttp275() {
 fn enc_fpu_fisttp276() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3881,6 +4158,7 @@ fn enc_fpu_fisttp276() {
 fn enc_fpu_fisttp277() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisttp QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3895,6 +4173,7 @@ fn enc_fpu_fisttp277() {
 fn enc_fpu_fisub278() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisub WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3909,6 +4188,7 @@ fn enc_fpu_fisub278() {
 fn enc_fpu_fisub279() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisub WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3923,6 +4203,7 @@ fn enc_fpu_fisub279() {
 fn enc_fpu_fisub280() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisub WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3937,6 +4218,7 @@ fn enc_fpu_fisub280() {
 fn enc_fpu_fisub281() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisub DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3951,6 +4233,7 @@ fn enc_fpu_fisub281() {
 fn enc_fpu_fisub282() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisub DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -3965,6 +4248,7 @@ fn enc_fpu_fisub282() {
 fn enc_fpu_fisub283() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisub DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -3979,6 +4263,7 @@ fn enc_fpu_fisub283() {
 fn enc_fpu_fisubr284() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisubr DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -3993,6 +4278,7 @@ fn enc_fpu_fisubr284() {
 fn enc_fpu_fisubr285() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisubr DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4007,6 +4293,7 @@ fn enc_fpu_fisubr285() {
 fn enc_fpu_fisubr286() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisubr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4021,6 +4308,7 @@ fn enc_fpu_fisubr286() {
 fn enc_fpu_fisubr287() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisubr WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4035,6 +4323,7 @@ fn enc_fpu_fisubr287() {
 fn enc_fpu_fisubr288() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisubr WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4049,6 +4338,7 @@ fn enc_fpu_fisubr288() {
 fn enc_fpu_fisubr289() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fisubr WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4063,6 +4353,7 @@ fn enc_fpu_fisubr289() {
 fn enc_fpu_fld290() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld TWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4077,6 +4368,7 @@ fn enc_fpu_fld290() {
 fn enc_fpu_fld291() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld TWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4091,6 +4383,7 @@ fn enc_fpu_fld291() {
 fn enc_fpu_fld292() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld
      );
      let buf = ops.finalize().unwrap();
@@ -4105,6 +4398,7 @@ fn enc_fpu_fld292() {
 fn enc_fpu_fld293() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4119,6 +4413,7 @@ fn enc_fpu_fld293() {
 fn enc_fpu_fld294() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4133,6 +4428,7 @@ fn enc_fpu_fld294() {
 fn enc_fpu_fld295() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4147,6 +4443,7 @@ fn enc_fpu_fld295() {
 fn enc_fpu_fld296() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld st2
      );
      let buf = ops.finalize().unwrap();
@@ -4161,6 +4458,7 @@ fn enc_fpu_fld296() {
 fn enc_fpu_fld297() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld st4
      );
      let buf = ops.finalize().unwrap();
@@ -4175,6 +4473,7 @@ fn enc_fpu_fld297() {
 fn enc_fpu_fld298() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld st7
      );
      let buf = ops.finalize().unwrap();
@@ -4189,6 +4488,7 @@ fn enc_fpu_fld298() {
 fn enc_fpu_fld299() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld st5
      );
      let buf = ops.finalize().unwrap();
@@ -4203,6 +4503,7 @@ fn enc_fpu_fld299() {
 fn enc_fpu_fld300() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4217,6 +4518,7 @@ fn enc_fpu_fld300() {
 fn enc_fpu_fld301() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4231,6 +4533,7 @@ fn enc_fpu_fld301() {
 fn enc_fpu_fld302() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4245,6 +4548,7 @@ fn enc_fpu_fld302() {
 fn enc_fpu_fld1303() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fld1
      );
      let buf = ops.finalize().unwrap();
@@ -4259,6 +4563,7 @@ fn enc_fpu_fld1303() {
 fn enc_fpu_fldcw304() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldcw WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4273,6 +4578,7 @@ fn enc_fpu_fldcw304() {
 fn enc_fpu_fldcw305() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldcw WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4287,6 +4593,7 @@ fn enc_fpu_fldcw305() {
 fn enc_fpu_fldcw306() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldcw WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4301,6 +4608,7 @@ fn enc_fpu_fldcw306() {
 fn enc_fpu_fldenv307() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldenv [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4315,6 +4623,7 @@ fn enc_fpu_fldenv307() {
 fn enc_fpu_fldl2e308() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldl2e
      );
      let buf = ops.finalize().unwrap();
@@ -4329,6 +4638,7 @@ fn enc_fpu_fldl2e308() {
 fn enc_fpu_fldl2t309() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldl2t
      );
      let buf = ops.finalize().unwrap();
@@ -4343,6 +4653,7 @@ fn enc_fpu_fldl2t309() {
 fn enc_fpu_fldlg2310() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldlg2
      );
      let buf = ops.finalize().unwrap();
@@ -4357,6 +4668,7 @@ fn enc_fpu_fldlg2310() {
 fn enc_fpu_fldln2311() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldln2
      );
      let buf = ops.finalize().unwrap();
@@ -4371,6 +4683,7 @@ fn enc_fpu_fldln2311() {
 fn enc_fpu_fldpi312() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldpi
      );
      let buf = ops.finalize().unwrap();
@@ -4385,6 +4698,7 @@ fn enc_fpu_fldpi312() {
 fn enc_fpu_fldz313() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fldz
      );
      let buf = ops.finalize().unwrap();
@@ -4399,6 +4713,7 @@ fn enc_fpu_fldz313() {
 fn enc_fpu_fmul314() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st5
      );
      let buf = ops.finalize().unwrap();
@@ -4413,6 +4728,7 @@ fn enc_fpu_fmul314() {
 fn enc_fpu_fmul315() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st2
      );
      let buf = ops.finalize().unwrap();
@@ -4427,6 +4743,7 @@ fn enc_fpu_fmul315() {
 fn enc_fpu_fmul316() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st3
      );
      let buf = ops.finalize().unwrap();
@@ -4441,6 +4758,7 @@ fn enc_fpu_fmul316() {
 fn enc_fpu_fmul317() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4455,6 +4773,7 @@ fn enc_fpu_fmul317() {
 fn enc_fpu_fmul318() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4469,6 +4788,7 @@ fn enc_fpu_fmul318() {
 fn enc_fpu_fmul319() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st4, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4483,6 +4803,7 @@ fn enc_fpu_fmul319() {
 fn enc_fpu_fmul320() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4497,6 +4818,7 @@ fn enc_fpu_fmul320() {
 fn enc_fpu_fmul321() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul
      );
      let buf = ops.finalize().unwrap();
@@ -4511,6 +4833,7 @@ fn enc_fpu_fmul321() {
 fn enc_fpu_fmul322() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4525,6 +4848,7 @@ fn enc_fpu_fmul322() {
 fn enc_fpu_fmul323() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4539,6 +4863,7 @@ fn enc_fpu_fmul323() {
 fn enc_fpu_fmul324() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4553,6 +4878,7 @@ fn enc_fpu_fmul324() {
 fn enc_fpu_fmul325() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st4, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4567,6 +4893,7 @@ fn enc_fpu_fmul325() {
 fn enc_fpu_fmul326() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4581,6 +4908,7 @@ fn enc_fpu_fmul326() {
 fn enc_fpu_fmul327() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4595,6 +4923,7 @@ fn enc_fpu_fmul327() {
 fn enc_fpu_fmul328() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -4609,6 +4938,7 @@ fn enc_fpu_fmul328() {
 fn enc_fpu_fmul329() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -4623,6 +4953,7 @@ fn enc_fpu_fmul329() {
 fn enc_fpu_fmul330() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -4637,6 +4968,7 @@ fn enc_fpu_fmul330() {
 fn enc_fpu_fmul331() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -4651,6 +4983,7 @@ fn enc_fpu_fmul331() {
 fn enc_fpu_fmul332() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4665,6 +4998,7 @@ fn enc_fpu_fmul332() {
 fn enc_fpu_fmul333() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4679,6 +5013,7 @@ fn enc_fpu_fmul333() {
 fn enc_fpu_fmul334() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmul DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4693,6 +5028,7 @@ fn enc_fpu_fmul334() {
 fn enc_fpu_fmulp335() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp
      );
      let buf = ops.finalize().unwrap();
@@ -4707,6 +5043,7 @@ fn enc_fpu_fmulp335() {
 fn enc_fpu_fmulp336() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4721,6 +5058,7 @@ fn enc_fpu_fmulp336() {
 fn enc_fpu_fmulp337() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4735,6 +5073,7 @@ fn enc_fpu_fmulp337() {
 fn enc_fpu_fmulp338() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st4, st0
      );
      let buf = ops.finalize().unwrap();
@@ -4749,6 +5088,7 @@ fn enc_fpu_fmulp338() {
 fn enc_fpu_fmulp339() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st2
      );
      let buf = ops.finalize().unwrap();
@@ -4763,6 +5103,7 @@ fn enc_fpu_fmulp339() {
 fn enc_fpu_fmulp340() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st1
      );
      let buf = ops.finalize().unwrap();
@@ -4777,6 +5118,7 @@ fn enc_fpu_fmulp340() {
 fn enc_fpu_fmulp341() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st6
      );
      let buf = ops.finalize().unwrap();
@@ -4791,6 +5133,7 @@ fn enc_fpu_fmulp341() {
 fn enc_fpu_fmulp342() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fmulp st5
      );
      let buf = ops.finalize().unwrap();
@@ -4805,6 +5148,7 @@ fn enc_fpu_fmulp342() {
 fn enc_fpu_fnclex343() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnclex
      );
      let buf = ops.finalize().unwrap();
@@ -4819,6 +5163,7 @@ fn enc_fpu_fnclex343() {
 fn enc_fpu_fndisi344() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fndisi
      );
      let buf = ops.finalize().unwrap();
@@ -4833,6 +5178,7 @@ fn enc_fpu_fndisi344() {
 fn enc_fpu_fneni345() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fneni
      );
      let buf = ops.finalize().unwrap();
@@ -4847,6 +5193,7 @@ fn enc_fpu_fneni345() {
 fn enc_fpu_fninit346() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fninit
      );
      let buf = ops.finalize().unwrap();
@@ -4861,6 +5208,7 @@ fn enc_fpu_fninit346() {
 fn enc_fpu_fnop347() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnop
      );
      let buf = ops.finalize().unwrap();
@@ -4875,6 +5223,7 @@ fn enc_fpu_fnop347() {
 fn enc_fpu_fnsave348() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnsave [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4889,6 +5238,7 @@ fn enc_fpu_fnsave348() {
 fn enc_fpu_fnstcw349() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstcw WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4903,6 +5253,7 @@ fn enc_fpu_fnstcw349() {
 fn enc_fpu_fnstcw350() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstcw WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4917,6 +5268,7 @@ fn enc_fpu_fnstcw350() {
 fn enc_fpu_fnstcw351() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstcw WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4931,6 +5283,7 @@ fn enc_fpu_fnstcw351() {
 fn enc_fpu_fnstenv352() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstenv [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -4945,6 +5298,7 @@ fn enc_fpu_fnstenv352() {
 fn enc_fpu_fnstsw353() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstsw ax
      );
      let buf = ops.finalize().unwrap();
@@ -4959,6 +5313,7 @@ fn enc_fpu_fnstsw353() {
 fn enc_fpu_fnstsw354() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstsw WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -4973,6 +5328,7 @@ fn enc_fpu_fnstsw354() {
 fn enc_fpu_fnstsw355() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstsw WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -4987,6 +5343,7 @@ fn enc_fpu_fnstsw355() {
 fn enc_fpu_fnstsw356() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fnstsw WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5001,6 +5358,7 @@ fn enc_fpu_fnstsw356() {
 fn enc_fpu_fpatan357() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fpatan
      );
      let buf = ops.finalize().unwrap();
@@ -5015,6 +5373,7 @@ fn enc_fpu_fpatan357() {
 fn enc_fpu_fprem358() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fprem
      );
      let buf = ops.finalize().unwrap();
@@ -5029,6 +5388,7 @@ fn enc_fpu_fprem358() {
 fn enc_fpu_fprem1359() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fprem1
      );
      let buf = ops.finalize().unwrap();
@@ -5043,6 +5403,7 @@ fn enc_fpu_fprem1359() {
 fn enc_fpu_fptan360() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fptan
      );
      let buf = ops.finalize().unwrap();
@@ -5057,6 +5418,7 @@ fn enc_fpu_fptan360() {
 fn enc_fpu_frndint361() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; frndint
      );
      let buf = ops.finalize().unwrap();
@@ -5071,6 +5433,7 @@ fn enc_fpu_frndint361() {
 fn enc_fpu_frstor362() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; frstor [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5085,6 +5448,7 @@ fn enc_fpu_frstor362() {
 fn enc_fpu_fsave363() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsave [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5099,6 +5463,7 @@ fn enc_fpu_fsave363() {
 fn enc_fpu_fscale364() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fscale
      );
      let buf = ops.finalize().unwrap();
@@ -5113,6 +5478,7 @@ fn enc_fpu_fscale364() {
 fn enc_fpu_fsetpm365() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsetpm
      );
      let buf = ops.finalize().unwrap();
@@ -5127,6 +5493,7 @@ fn enc_fpu_fsetpm365() {
 fn enc_fpu_fsin366() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsin
      );
      let buf = ops.finalize().unwrap();
@@ -5141,6 +5508,7 @@ fn enc_fpu_fsin366() {
 fn enc_fpu_fsincos367() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsincos
      );
      let buf = ops.finalize().unwrap();
@@ -5155,6 +5523,7 @@ fn enc_fpu_fsincos367() {
 fn enc_fpu_fsqrt368() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsqrt
      );
      let buf = ops.finalize().unwrap();
@@ -5169,6 +5538,7 @@ fn enc_fpu_fsqrt368() {
 fn enc_fpu_fst369() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst st6
      );
      let buf = ops.finalize().unwrap();
@@ -5183,6 +5553,7 @@ fn enc_fpu_fst369() {
 fn enc_fpu_fst370() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst st7
      );
      let buf = ops.finalize().unwrap();
@@ -5197,6 +5568,7 @@ fn enc_fpu_fst370() {
 fn enc_fpu_fst371() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst st3
      );
      let buf = ops.finalize().unwrap();
@@ -5211,6 +5583,7 @@ fn enc_fpu_fst371() {
 fn enc_fpu_fst372() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst
      );
      let buf = ops.finalize().unwrap();
@@ -5225,6 +5598,7 @@ fn enc_fpu_fst372() {
 fn enc_fpu_fst373() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5239,6 +5613,7 @@ fn enc_fpu_fst373() {
 fn enc_fpu_fst374() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5253,6 +5628,7 @@ fn enc_fpu_fst374() {
 fn enc_fpu_fst375() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5267,6 +5643,7 @@ fn enc_fpu_fst375() {
 fn enc_fpu_fst376() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5281,6 +5658,7 @@ fn enc_fpu_fst376() {
 fn enc_fpu_fst377() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5295,6 +5673,7 @@ fn enc_fpu_fst377() {
 fn enc_fpu_fst378() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fst QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5309,6 +5688,7 @@ fn enc_fpu_fst378() {
 fn enc_fpu_fstcw379() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstcw WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5323,6 +5703,7 @@ fn enc_fpu_fstcw379() {
 fn enc_fpu_fstcw380() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstcw WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5337,6 +5718,7 @@ fn enc_fpu_fstcw380() {
 fn enc_fpu_fstenv381() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstenv [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5351,6 +5733,7 @@ fn enc_fpu_fstenv381() {
 fn enc_fpu_fstp382() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5365,6 +5748,7 @@ fn enc_fpu_fstp382() {
 fn enc_fpu_fstp383() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5379,6 +5763,7 @@ fn enc_fpu_fstp383() {
 fn enc_fpu_fstp384() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5393,6 +5778,7 @@ fn enc_fpu_fstp384() {
 fn enc_fpu_fstp385() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5407,6 +5793,7 @@ fn enc_fpu_fstp385() {
 fn enc_fpu_fstp386() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp TWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5421,6 +5808,7 @@ fn enc_fpu_fstp386() {
 fn enc_fpu_fstp387() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp TWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5435,6 +5823,7 @@ fn enc_fpu_fstp387() {
 fn enc_fpu_fstp388() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp TWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5449,6 +5838,7 @@ fn enc_fpu_fstp388() {
 fn enc_fpu_fstp389() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp st1
      );
      let buf = ops.finalize().unwrap();
@@ -5463,6 +5853,7 @@ fn enc_fpu_fstp389() {
 fn enc_fpu_fstp390() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp st4
      );
      let buf = ops.finalize().unwrap();
@@ -5477,6 +5868,7 @@ fn enc_fpu_fstp390() {
 fn enc_fpu_fstp391() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp st3
      );
      let buf = ops.finalize().unwrap();
@@ -5491,6 +5883,7 @@ fn enc_fpu_fstp391() {
 fn enc_fpu_fstp392() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp st6
      );
      let buf = ops.finalize().unwrap();
@@ -5505,6 +5898,7 @@ fn enc_fpu_fstp392() {
 fn enc_fpu_fstp393() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstp
      );
      let buf = ops.finalize().unwrap();
@@ -5519,6 +5913,7 @@ fn enc_fpu_fstp393() {
 fn enc_fpu_fstsw394() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstsw ax
      );
      let buf = ops.finalize().unwrap();
@@ -5533,6 +5928,7 @@ fn enc_fpu_fstsw394() {
 fn enc_fpu_fstsw395() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstsw WORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5547,6 +5943,7 @@ fn enc_fpu_fstsw395() {
 fn enc_fpu_fstsw396() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstsw WORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5561,6 +5958,7 @@ fn enc_fpu_fstsw396() {
 fn enc_fpu_fstsw397() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fstsw WORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5575,6 +5973,7 @@ fn enc_fpu_fstsw397() {
 fn enc_fpu_fsub398() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -5589,6 +5988,7 @@ fn enc_fpu_fsub398() {
 fn enc_fpu_fsub399() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -5603,6 +6003,7 @@ fn enc_fpu_fsub399() {
 fn enc_fpu_fsub400() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -5617,6 +6018,7 @@ fn enc_fpu_fsub400() {
 fn enc_fpu_fsub401() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -5631,6 +6033,7 @@ fn enc_fpu_fsub401() {
 fn enc_fpu_fsub402() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st3
      );
      let buf = ops.finalize().unwrap();
@@ -5645,6 +6048,7 @@ fn enc_fpu_fsub402() {
 fn enc_fpu_fsub403() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st7
      );
      let buf = ops.finalize().unwrap();
@@ -5659,6 +6063,7 @@ fn enc_fpu_fsub403() {
 fn enc_fpu_fsub404() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st5
      );
      let buf = ops.finalize().unwrap();
@@ -5673,6 +6078,7 @@ fn enc_fpu_fsub404() {
 fn enc_fpu_fsub405() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st1
      );
      let buf = ops.finalize().unwrap();
@@ -5687,6 +6093,7 @@ fn enc_fpu_fsub405() {
 fn enc_fpu_fsub406() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5701,6 +6108,7 @@ fn enc_fpu_fsub406() {
 fn enc_fpu_fsub407() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5715,6 +6123,7 @@ fn enc_fpu_fsub407() {
 fn enc_fpu_fsub408() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -5729,6 +6138,7 @@ fn enc_fpu_fsub408() {
 fn enc_fpu_fsub409() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -5743,6 +6153,7 @@ fn enc_fpu_fsub409() {
 fn enc_fpu_fsub410() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -5757,6 +6168,7 @@ fn enc_fpu_fsub410() {
 fn enc_fpu_fsub411() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5771,6 +6183,7 @@ fn enc_fpu_fsub411() {
 fn enc_fpu_fsub412() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st4, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5785,6 +6198,7 @@ fn enc_fpu_fsub412() {
 fn enc_fpu_fsub413() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5799,6 +6213,7 @@ fn enc_fpu_fsub413() {
 fn enc_fpu_fsub414() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5813,6 +6228,7 @@ fn enc_fpu_fsub414() {
 fn enc_fpu_fsub415() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5827,6 +6243,7 @@ fn enc_fpu_fsub415() {
 fn enc_fpu_fsub416() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st7, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5841,6 +6258,7 @@ fn enc_fpu_fsub416() {
 fn enc_fpu_fsub417() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5855,6 +6273,7 @@ fn enc_fpu_fsub417() {
 fn enc_fpu_fsub418() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5869,6 +6288,7 @@ fn enc_fpu_fsub418() {
 fn enc_fpu_fsub419() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5883,6 +6303,7 @@ fn enc_fpu_fsub419() {
 fn enc_fpu_fsub420() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsub
      );
      let buf = ops.finalize().unwrap();
@@ -5897,6 +6318,7 @@ fn enc_fpu_fsub420() {
 fn enc_fpu_fsubp421() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp st5
      );
      let buf = ops.finalize().unwrap();
@@ -5911,6 +6333,7 @@ fn enc_fpu_fsubp421() {
 fn enc_fpu_fsubp422() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp st7
      );
      let buf = ops.finalize().unwrap();
@@ -5925,6 +6348,7 @@ fn enc_fpu_fsubp422() {
 fn enc_fpu_fsubp423() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp st6
      );
      let buf = ops.finalize().unwrap();
@@ -5939,6 +6363,7 @@ fn enc_fpu_fsubp423() {
 fn enc_fpu_fsubp424() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp st1
      );
      let buf = ops.finalize().unwrap();
@@ -5953,6 +6378,7 @@ fn enc_fpu_fsubp424() {
 fn enc_fpu_fsubp425() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp
      );
      let buf = ops.finalize().unwrap();
@@ -5967,6 +6393,7 @@ fn enc_fpu_fsubp425() {
 fn enc_fpu_fsubp426() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5981,6 +6408,7 @@ fn enc_fpu_fsubp426() {
 fn enc_fpu_fsubp427() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubp st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -5995,6 +6423,7 @@ fn enc_fpu_fsubp427() {
 fn enc_fpu_fsubr428() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6009,6 +6438,7 @@ fn enc_fpu_fsubr428() {
 fn enc_fpu_fsubr429() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6023,6 +6453,7 @@ fn enc_fpu_fsubr429() {
 fn enc_fpu_fsubr430() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6037,6 +6468,7 @@ fn enc_fpu_fsubr430() {
 fn enc_fpu_fsubr431() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6051,6 +6483,7 @@ fn enc_fpu_fsubr431() {
 fn enc_fpu_fsubr432() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st2
      );
      let buf = ops.finalize().unwrap();
@@ -6065,6 +6498,7 @@ fn enc_fpu_fsubr432() {
 fn enc_fpu_fsubr433() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st4
      );
      let buf = ops.finalize().unwrap();
@@ -6079,6 +6513,7 @@ fn enc_fpu_fsubr433() {
 fn enc_fpu_fsubr434() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st7
      );
      let buf = ops.finalize().unwrap();
@@ -6093,6 +6528,7 @@ fn enc_fpu_fsubr434() {
 fn enc_fpu_fsubr435() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st3
      );
      let buf = ops.finalize().unwrap();
@@ -6107,6 +6543,7 @@ fn enc_fpu_fsubr435() {
 fn enc_fpu_fsubr436() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st5
      );
      let buf = ops.finalize().unwrap();
@@ -6121,6 +6558,7 @@ fn enc_fpu_fsubr436() {
 fn enc_fpu_fsubr437() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6135,6 +6573,7 @@ fn enc_fpu_fsubr437() {
 fn enc_fpu_fsubr438() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st7, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6149,6 +6588,7 @@ fn enc_fpu_fsubr438() {
 fn enc_fpu_fsubr439() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6163,6 +6603,7 @@ fn enc_fpu_fsubr439() {
 fn enc_fpu_fsubr440() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6177,6 +6618,7 @@ fn enc_fpu_fsubr440() {
 fn enc_fpu_fsubr441() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6191,6 +6633,7 @@ fn enc_fpu_fsubr441() {
 fn enc_fpu_fsubr442() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr QWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -6205,6 +6648,7 @@ fn enc_fpu_fsubr442() {
 fn enc_fpu_fsubr443() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr QWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -6219,6 +6663,7 @@ fn enc_fpu_fsubr443() {
 fn enc_fpu_fsubr444() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr QWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -6233,6 +6678,7 @@ fn enc_fpu_fsubr444() {
 fn enc_fpu_fsubr445() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -6247,6 +6693,7 @@ fn enc_fpu_fsubr445() {
 fn enc_fpu_fsubr446() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -6261,6 +6708,7 @@ fn enc_fpu_fsubr446() {
 fn enc_fpu_fsubr447() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -6275,6 +6723,7 @@ fn enc_fpu_fsubr447() {
 fn enc_fpu_fsubr448() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -6289,6 +6738,7 @@ fn enc_fpu_fsubr448() {
 fn enc_fpu_fsubr449() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr DWORD [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -6303,6 +6753,7 @@ fn enc_fpu_fsubr449() {
 fn enc_fpu_fsubr450() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr DWORD [rax * 2 + rdx]
      );
      let buf = ops.finalize().unwrap();
@@ -6317,6 +6768,7 @@ fn enc_fpu_fsubr450() {
 fn enc_fpu_fsubr451() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr DWORD [rax + 16]
      );
      let buf = ops.finalize().unwrap();
@@ -6331,6 +6783,7 @@ fn enc_fpu_fsubr451() {
 fn enc_fpu_fsubr452() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubr
      );
      let buf = ops.finalize().unwrap();
@@ -6345,6 +6798,7 @@ fn enc_fpu_fsubr452() {
 fn enc_fpu_fsubrp453() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp st6, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6359,6 +6813,7 @@ fn enc_fpu_fsubrp453() {
 fn enc_fpu_fsubrp454() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp st1, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6373,6 +6828,7 @@ fn enc_fpu_fsubrp454() {
 fn enc_fpu_fsubrp455() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6387,6 +6843,7 @@ fn enc_fpu_fsubrp455() {
 fn enc_fpu_fsubrp456() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp st2, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6401,6 +6858,7 @@ fn enc_fpu_fsubrp456() {
 fn enc_fpu_fsubrp457() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp
      );
      let buf = ops.finalize().unwrap();
@@ -6415,6 +6873,7 @@ fn enc_fpu_fsubrp457() {
 fn enc_fpu_fsubrp458() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp st7
      );
      let buf = ops.finalize().unwrap();
@@ -6429,6 +6888,7 @@ fn enc_fpu_fsubrp458() {
 fn enc_fpu_fsubrp459() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fsubrp st6
      );
      let buf = ops.finalize().unwrap();
@@ -6443,6 +6903,7 @@ fn enc_fpu_fsubrp459() {
 fn enc_fpu_ftst460() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; ftst
      );
      let buf = ops.finalize().unwrap();
@@ -6457,6 +6918,7 @@ fn enc_fpu_ftst460() {
 fn enc_fpu_fucom461() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom
      );
      let buf = ops.finalize().unwrap();
@@ -6471,6 +6933,7 @@ fn enc_fpu_fucom461() {
 fn enc_fpu_fucom462() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom st2
      );
      let buf = ops.finalize().unwrap();
@@ -6485,6 +6948,7 @@ fn enc_fpu_fucom462() {
 fn enc_fpu_fucom463() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom st3
      );
      let buf = ops.finalize().unwrap();
@@ -6499,6 +6963,7 @@ fn enc_fpu_fucom463() {
 fn enc_fpu_fucom464() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom st5
      );
      let buf = ops.finalize().unwrap();
@@ -6513,6 +6978,7 @@ fn enc_fpu_fucom464() {
 fn enc_fpu_fucom465() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -6527,6 +6993,7 @@ fn enc_fpu_fucom465() {
 fn enc_fpu_fucom466() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -6541,6 +7008,7 @@ fn enc_fpu_fucom466() {
 fn enc_fpu_fucom467() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucom st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -6555,6 +7023,7 @@ fn enc_fpu_fucom467() {
 fn enc_fpu_fucomi468() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomi
      );
      let buf = ops.finalize().unwrap();
@@ -6569,6 +7038,7 @@ fn enc_fpu_fucomi468() {
 fn enc_fpu_fucomi469() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomi st0, st4
      );
      let buf = ops.finalize().unwrap();
@@ -6583,6 +7053,7 @@ fn enc_fpu_fucomi469() {
 fn enc_fpu_fucomi470() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomi st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -6597,6 +7068,7 @@ fn enc_fpu_fucomi470() {
 fn enc_fpu_fucomi471() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomi st2
      );
      let buf = ops.finalize().unwrap();
@@ -6611,6 +7083,7 @@ fn enc_fpu_fucomi471() {
 fn enc_fpu_fucomi472() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomi st3
      );
      let buf = ops.finalize().unwrap();
@@ -6625,6 +7098,7 @@ fn enc_fpu_fucomi472() {
 fn enc_fpu_fucomi473() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomi st1
      );
      let buf = ops.finalize().unwrap();
@@ -6639,6 +7113,7 @@ fn enc_fpu_fucomi473() {
 fn enc_fpu_fucomip474() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip
      );
      let buf = ops.finalize().unwrap();
@@ -6653,6 +7128,7 @@ fn enc_fpu_fucomip474() {
 fn enc_fpu_fucomip475() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st4
      );
      let buf = ops.finalize().unwrap();
@@ -6667,6 +7143,7 @@ fn enc_fpu_fucomip475() {
 fn enc_fpu_fucomip476() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st7
      );
      let buf = ops.finalize().unwrap();
@@ -6681,6 +7158,7 @@ fn enc_fpu_fucomip476() {
 fn enc_fpu_fucomip477() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st2
      );
      let buf = ops.finalize().unwrap();
@@ -6695,6 +7173,7 @@ fn enc_fpu_fucomip477() {
 fn enc_fpu_fucomip478() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st6
      );
      let buf = ops.finalize().unwrap();
@@ -6709,6 +7188,7 @@ fn enc_fpu_fucomip478() {
 fn enc_fpu_fucomip479() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st0, st2
      );
      let buf = ops.finalize().unwrap();
@@ -6723,6 +7203,7 @@ fn enc_fpu_fucomip479() {
 fn enc_fpu_fucomip480() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -6737,6 +7218,7 @@ fn enc_fpu_fucomip480() {
 fn enc_fpu_fucomip481() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -6751,6 +7233,7 @@ fn enc_fpu_fucomip481() {
 fn enc_fpu_fucomip482() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomip st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -6765,6 +7248,7 @@ fn enc_fpu_fucomip482() {
 fn enc_fpu_fucomp483() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st0, st5
      );
      let buf = ops.finalize().unwrap();
@@ -6779,6 +7263,7 @@ fn enc_fpu_fucomp483() {
 fn enc_fpu_fucomp484() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -6793,6 +7278,7 @@ fn enc_fpu_fucomp484() {
 fn enc_fpu_fucomp485() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -6807,6 +7293,7 @@ fn enc_fpu_fucomp485() {
 fn enc_fpu_fucomp486() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -6821,6 +7308,7 @@ fn enc_fpu_fucomp486() {
 fn enc_fpu_fucomp487() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st5
      );
      let buf = ops.finalize().unwrap();
@@ -6835,6 +7323,7 @@ fn enc_fpu_fucomp487() {
 fn enc_fpu_fucomp488() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st1
      );
      let buf = ops.finalize().unwrap();
@@ -6849,6 +7338,7 @@ fn enc_fpu_fucomp488() {
 fn enc_fpu_fucomp489() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp st7
      );
      let buf = ops.finalize().unwrap();
@@ -6863,6 +7353,7 @@ fn enc_fpu_fucomp489() {
 fn enc_fpu_fucomp490() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucomp
      );
      let buf = ops.finalize().unwrap();
@@ -6877,6 +7368,7 @@ fn enc_fpu_fucomp490() {
 fn enc_fpu_fucompp491() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fucompp
      );
      let buf = ops.finalize().unwrap();
@@ -6891,6 +7383,7 @@ fn enc_fpu_fucompp491() {
 fn enc_fpu_fxam492() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxam
      );
      let buf = ops.finalize().unwrap();
@@ -6905,6 +7398,7 @@ fn enc_fpu_fxam492() {
 fn enc_fpu_fxch493() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st3, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6919,6 +7413,7 @@ fn enc_fpu_fxch493() {
 fn enc_fpu_fxch494() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st5, st0
      );
      let buf = ops.finalize().unwrap();
@@ -6933,6 +7428,7 @@ fn enc_fpu_fxch494() {
 fn enc_fpu_fxch495() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st0, st7
      );
      let buf = ops.finalize().unwrap();
@@ -6947,6 +7443,7 @@ fn enc_fpu_fxch495() {
 fn enc_fpu_fxch496() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st0, st6
      );
      let buf = ops.finalize().unwrap();
@@ -6961,6 +7458,7 @@ fn enc_fpu_fxch496() {
 fn enc_fpu_fxch497() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st0, st1
      );
      let buf = ops.finalize().unwrap();
@@ -6975,6 +7473,7 @@ fn enc_fpu_fxch497() {
 fn enc_fpu_fxch498() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st0, st3
      );
      let buf = ops.finalize().unwrap();
@@ -6989,6 +7488,7 @@ fn enc_fpu_fxch498() {
 fn enc_fpu_fxch499() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch
      );
      let buf = ops.finalize().unwrap();
@@ -7003,6 +7503,7 @@ fn enc_fpu_fxch499() {
 fn enc_fpu_fxch500() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st3
      );
      let buf = ops.finalize().unwrap();
@@ -7017,6 +7518,7 @@ fn enc_fpu_fxch500() {
 fn enc_fpu_fxch501() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st1
      );
      let buf = ops.finalize().unwrap();
@@ -7031,6 +7533,7 @@ fn enc_fpu_fxch501() {
 fn enc_fpu_fxch502() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st6
      );
      let buf = ops.finalize().unwrap();
@@ -7045,6 +7548,7 @@ fn enc_fpu_fxch502() {
 fn enc_fpu_fxch503() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxch st4
      );
      let buf = ops.finalize().unwrap();
@@ -7059,6 +7563,7 @@ fn enc_fpu_fxch503() {
 fn enc_fpu_fxrstor504() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxrstor [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -7073,6 +7578,7 @@ fn enc_fpu_fxrstor504() {
 fn enc_fpu_fxrstor64505() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxrstor64 [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -7087,6 +7593,7 @@ fn enc_fpu_fxrstor64505() {
 fn enc_fpu_fxsave506() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxsave [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -7101,6 +7608,7 @@ fn enc_fpu_fxsave506() {
 fn enc_fpu_fxsave64507() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxsave64 [rax]
      );
      let buf = ops.finalize().unwrap();
@@ -7115,6 +7623,7 @@ fn enc_fpu_fxsave64507() {
 fn enc_fpu_fxtract508() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fxtract
      );
      let buf = ops.finalize().unwrap();
@@ -7129,6 +7638,7 @@ fn enc_fpu_fxtract508() {
 fn enc_fpu_fyl2x509() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fyl2x
      );
      let buf = ops.finalize().unwrap();
@@ -7143,6 +7653,7 @@ fn enc_fpu_fyl2x509() {
 fn enc_fpu_fyl2xp1510() {
      let mut ops = dynasmrt::x64::Assembler::new().unwrap();
      dynasm!(ops
+             ; .arch x64
              ; fyl2xp1
      );
      let buf = ops.finalize().unwrap();
