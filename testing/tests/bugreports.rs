@@ -12,6 +12,7 @@ use dynasmrt::DynasmApi;
 fn bugreport_1() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     dynasm!(ops
+       ; .arch x64
        ; int 3
        ; mov Rq(8), rdi
        ; add Rq(8), 1
@@ -29,6 +30,7 @@ fn bugreport_1() {
 fn bugreport_2() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     dynasm!(ops
+       ; .arch x64
        ; inc [rsp]
        ; inc [Rq(4)]
        ; inc [Rq(4) + 1]
@@ -61,6 +63,7 @@ fn bugreport_2() {
 fn bugreport_3() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     dynasm!(ops
+       ; .arch x64
        ; vaddsd Rx(1), Rx(2), Rx(3)
        ; vaddsd Rx(10), Rx(9), Rx(11)
     );
