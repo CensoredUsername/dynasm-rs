@@ -47,6 +47,20 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::R(offset) => {
                     statics.push((offset, id.code() as u32));
                 },
+                Command::REven(offset) => {
+                    if id.code() & 1 != 0 {
+                        emit_error_at(span, "Field only supports even registers".into());
+                        return Err(None);
+                    }
+                    statics.push((offset, id.code() as u32));
+                },
+                Command::RNoZr(offset) => {
+                    if id.code() == 31 {
+                        emit_error_at(span, "Field does not support register the zr/sp register".into());
+                        return Err(None);
+                    }
+                    statics.push((offset, id.code() as u32));
+                },
                 Command::R4(offset) => {
                     if id.code() >= 16 {
                         emit_error_at(span, "Field only supports register numbers 0-15".into());
@@ -73,9 +87,15 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 _ => panic!("Invalid argument processor")
             },
             FlatArg::Direct { span, reg: RegKind::Dynamic(_, ref expr) } => match *command {
-                Command::R(offset) => {
+                Command::R(offset)
+                | Command::RNoZr(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
                         #expr & 0x1F
+                    }));
+                },
+                Command::REven(offset) => {
+                    dynamics.push((offset, quote_spanned!{ span=>
+                        #expr & 0x1E
                     }));
                 },
                 Command::R4(offset) => {
@@ -216,11 +236,20 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         }));
                     }
                 },
+                Command::Unegmod(offset, bitlen) => {
+                    let mask = bitmask(bitlen);
+                    let addval = 1u32 << bitlen;
+                    if let Some(value) = unsigned_rangecheck(value, 0, mask, 0) {
+                        statics.push((offset, (addval - value?) & mask));
+                    } else {
+                        dynamics.push((offset, quote_spanned!{ value.span()=> 
+                            (#addval - #value) & #mask
+                        }));
+                    }
+                },
                 Command::Usumdec(offset, bitlen) => {
                     let mask = bitmask(bitlen);
                     if let Some(FlatArg::Immediate {value: leftvalue } ) = data.args.get(cursor - 1) {
-                        // TODO: static checks here?
-
                         dynamics.push((offset, quote_spanned!{ value.span()=> 
                             (#leftvalue + #value - 1) & #mask
                         }));
@@ -285,10 +314,24 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         value?;
                     }
                 },
-                Command::BSbits(bitlen) => {
+                Command::BUsum(bitlen) => {
+                    let prev = if let Some(FlatArg::Immediate {value: leftvalue } ) = data.args.get(cursor - 1) {
+                        leftvalue
+                    } else {
+                        panic!("Bad encoding data, previous argument was not an immediate");
+                    };
+                    let mut max = 1u32 << bitlen;
+                    if let Some(value) = as_number(prev) {
+                        max -= value as u32;
+                    }
+                    if let Some(value) = unsigned_rangecheck(value, 1, max, 0) {
+                        value?;
+                    }
+                },
+                Command::BSscaled(bitlen, shift) => {
                     let mask = bitmask(bitlen);
                     let half = -1i32 << (bitlen - 1);
-                    if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 0) {
+                    if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, shift) {
                         value?;
                     }
                 },
@@ -336,7 +379,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                 // integer checks don't have anything to check
                 Command::BUbits(_) |
-                Command::BSbits(_) => (),
+                Command::BSscaled(_, _) => (),
 
                 _ => panic!("Invalid argument processor")
             },
@@ -384,7 +427,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             Command::Uslice(_, _, _) |
             Command::Sslice(_, _, _) => (),
             Command::BUbits(_) |
-            Command::BSbits(_) |
+            Command::BUsum(_) |
+            Command::BSscaled(_, _) |
             Command::BUrange(_, _) => (),
             _ => cursor += 1
         }

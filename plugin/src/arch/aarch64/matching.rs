@@ -438,6 +438,8 @@ impl Matcher {
                             *size == v.element_size && v.element.is_some(),
                         Matcher::VElementStatic(size, element) =>
                             *size == v.element_size && v.element.as_ref().and_then(as_number) == Some(*element as u64),
+                        Matcher::VStaticElement(size, lanes) =>
+                            *size == v.element_size && v.element.is_some() && v.lanes == Some(*lanes),
                         _ => false
                     },
                     Register::Scalar(ref s) => match self {
@@ -514,6 +516,7 @@ impl Matcher {
             Matcher::VStatic(_, _) => 1,
             Matcher::VElement(_) => 2,
             Matcher::VElementStatic(_, _) => 1,
+            Matcher::VStaticElement(_, _) => 2,
             Matcher::RegList(_, _) |
             Matcher::RegListStatic(_, _, _) => 1,
             Matcher::RegListElement(_, _) => 2,

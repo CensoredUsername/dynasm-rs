@@ -22,9 +22,12 @@ def main():
 
 
 OPTIONAL_RE = re.compile(r"<.*?>")
+FIX_GAS_RE = re.compile(r"\.([BHSDQ])([0-9]+)")
+HAS_WREG_BEFORE_EXTEND = re.compile(r"[wW][^ ]+ <[ ,]")
 class OpTemplate:
     def __init__(self, template, constraints):
         self.template = template
+        self.gas_template = FIX_GAS_RE.sub(lambda m: ".{}{}".format(m.group(2), m.group(1)), template)
         self.constraints = constraints
         self.args = parse_template(template)
 
@@ -40,9 +43,9 @@ class OpTemplate:
             history.gas.append(gas)
 
         dynasm_string = SUBSTITUTION_RE.sub(lambda m: history.emitted[int(m.group(2))], self.template)
-        gas_string = SUBSTITUTION_RE.sub(lambda m: history.gas[int(m.group(2))], self.template)
+        gas_string = SUBSTITUTION_RE.sub(lambda m: history.gas[int(m.group(2))], self.gas_template)
 
-        if not keep_optionals:
+        if not keep_optionals and not HAS_WREG_BEFORE_EXTEND.search(gas_string):
             while "<" in dynasm_string:
                 if random.choice((True, False)):
                     break
@@ -53,7 +56,25 @@ class OpTemplate:
         dynasm_string = dynasm_string.replace("<", "").replace(">", "")
         gas_string = gas_string.replace("<", "").replace(">", "")
 
+        gas_string = gas_string.replace("mov.inverted", "mov")
+        gas_string = gas_string.replace("mov.logical", "mov")
+
+        gas_string = REGLIST_RE.sub(reformat_reglist, gas_string)
+
         return dynasm_string, gas_string
+
+
+REGLIST_RE = re.compile(r"\{v([0-9]+)(\.[^ ]+) *\* *([1234])\}")
+def reformat_reglist(m):
+    start = int(m.group(1))
+    format = m.group(2)
+    amount = int(m.group(3))
+
+    items = []
+    for i in range(amount):
+        items.append("v{}{}".format((start + i) % 32, format))
+
+    return "{{{}}}".format(", ".join(items))
 
 class History:
     def __init__(self):
@@ -140,15 +161,16 @@ class Range2(Range):
 
     def create_value(self, history):
         prev = history.values[-1]
-        return random.randrange(max(0, self.min - prev), self.max - prev, self.scale)
+        return random.randrange(1, self.max - prev, self.scale)
 
 class R(Constraint):
     """A constraint that allows a certain range of registers"""
-    def __init__(self, count):
+    def __init__(self, count, scale=1):
         self.count = count
+        self.scale = scale
 
     def create_value(self, history):
-        return random.randrange(0, self.count)
+        return random.randrange(0, self.count, self.scale)
 
 class RNext(Constraint):
     """A constraint that only allows the register after the previous arg"""
@@ -214,7 +236,7 @@ class Register(Arg):
             return "w{}".format(value)
         elif self.family == "XSP":
             if value == 31:
-                return "xsp"
+                return "sp"
             return "x{}".format(value)
         elif self.family in "BHSDQV":
             return "{}{}".format(self.family.lower(), value)
@@ -250,14 +272,14 @@ class Offset(Immediate):
 
 class Ident(Arg):
     def emit_gas(self, value):
-        return value
+        return value.lower()
 
     def emit_dynasm(self, value):
         return value
 
 
 def make_wide_integer(bit64):
-    return random.randrange(0, 1<<16) << random.randrange(0, 4 if bit64 else 2)
+    return random.randrange(0, 1<<16) << random.randrange(0, 64 if bit64 else 32, 16)
 
 def make_float_imm():
     sign = random.randrange(0, 2)
@@ -281,6 +303,7 @@ def make_stretched_imm():
     imm |= (imm & 0x00000000000000F0) << 28
     imm |= (imm & 0x0000000C0000000C) << 14
     imm |= (imm & 0x0002000200020002) << 7
+    imm &= 0x0101010101010101;
     imm |= imm << 1
     imm |= imm << 2
     imm |= imm << 4

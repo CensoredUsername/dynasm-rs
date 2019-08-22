@@ -132,6 +132,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::VStatic(s, c) => write!(buf, "V{}.{}{}", arg_names[0], size_to_string(s), c).unwrap(),
                 Matcher::VElement(s) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(s), arg_names[1]).unwrap(),
                 Matcher::VElementStatic(s, element) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(s), element).unwrap(),
+                Matcher::VStaticElement(s, c) => write!(buf, "V{}.{}{}[{}]", arg_names[0], size_to_string(s), c, arg_names[1]).unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
                     write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(s), width / s.in_bytes(), a).unwrap();
@@ -303,6 +304,7 @@ fn flatten_matchers(matchers: &[Matcher]) -> Vec<(FlatArgTy, bool)> {
             | Matcher::RegList(_, _)
             | Matcher::RegListStatic(_, _, _) => args.push((FlatArgTy::Direct, default)),
             Matcher::VElement(_)
+            | Matcher::VStaticElement(_, _)
             | Matcher::RegListElement(_, _) => {
                 args.push((FlatArgTy::Direct, default));
                 args.push((FlatArgTy::Immediate, default));
@@ -360,13 +362,16 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
         command_idx.push((command.clone(), cursor));
         match command {
             Command::R(_)
+            | Command::REven(_)
             | Command::R4(_)
+            | Command::RNoZr(_)
             | Command::RNext
             | Command::Ubits(_, _)
             | Command::Uscaled(_, _, _)
             | Command::Ulist(_, _)
             | Command::Urange(_, _, _)
             | Command::Usub(_, _, _)
+            | Command::Unegmod(_, _)
             | Command::Usumdec(_, _)
             | Command::Ufields(_)
             | Command::Sbits(_, _)
@@ -396,19 +401,23 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
         for command in &arg.commands {
             let check = match command {
                 Command::R(_)
+                | Command::REven(_)
                 | Command::R4(_)
+                | Command::RNoZr(_)
                 | Command::RNext => arg.arg == FlatArgTy::Direct,
                 Command::Ubits(_, _)
                 | Command::Uscaled(_, _, _)
                 | Command::Ulist(_, _)
                 | Command::Urange(_, _, _)
                 | Command::Usub(_, _, _)
+                | Command::Unegmod(_, _)
                 | Command::Usumdec(_, _)
                 | Command::Ufields(_)
                 | Command::Sbits(_, _)
                 | Command::Sscaled(_, _,_)
                 | Command::BUbits(_)
-                | Command::BSbits(_)
+                | Command::BUsum(_)
+                | Command::BSscaled(_, _)
                 | Command::BUrange(_, _)
                 | Command::Uslice(_, _, _)
                 | Command::Sslice(_, _, _)
@@ -441,13 +450,17 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Sscaled(_, _, _)
                 | Command::Sslice(_, _, _)
                 | Command::BUbits(_)
-                | Command::BSbits(_)
+                | Command::BUsum(_)
+                | Command::BSscaled(_, _)
                 | Command::Rotates(_)
                 | Command::ExtendsW(_)
                 | Command::ExtendsX(_) => true,
                 Command::R4(_)
+                | Command::RNoZr(_)
+                | Command::REven(_)
                 | Command::RNext
                 | Command::Usub(_, _, _)
+                | Command::Unegmod(_, _)
                 | Command::Usumdec(_, _)
                 | Command::BUrange(_, _)
                 | Command::Special(_, _)
@@ -482,6 +495,8 @@ fn name_args(args: &mut [ArgWithCommands]) {
             FlatArgTy::Direct => {
                 match &arg.commands[0] {
                     Command::R(_)
+                    | Command::REven(_)
+                    | Command::RNoZr(_)
                     | Command::R4(_) => {
                         arg.name = Some(format!("{}", reg_name_list[reg_name_idx]));
                         reg_name_idx += 1;
@@ -502,9 +517,11 @@ fn name_args(args: &mut [ArgWithCommands]) {
                     | Command::Ulist(_, _)
                     | Command::Urange(_, _, _)
                     | Command::Usub(_, _, _)
+                    | Command::Unegmod(_, _)
                     | Command::Usumdec(_, _)
                     | Command::Ufields(_)
                     | Command::BUbits(_)
+                    | Command::BUsum(_)
                     | Command::BUrange(_, _)
                     | Command::Uslice(_, _, _) => {
                         arg.name = Some(format!("uimm{}", imm_name_list[imm_name_idx]));
@@ -512,7 +529,7 @@ fn name_args(args: &mut [ArgWithCommands]) {
                     },
                     Command::Sbits(_, _)
                     | Command::Sscaled(_, _,_)
-                    | Command::BSbits(_)
+                    | Command::BSscaled(_, _)
                     | Command::Sslice(_, _, _) => {
                         arg.name = Some(format!("simm{}", imm_name_list[imm_name_idx]));
                         imm_name_idx += 1;
@@ -562,6 +579,8 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
     for command in commands {
         match command {
             Command::R4(_) => write!(buf, "{} is 0-15", name),
+            Command::RNoZr(_) => write!(buf, "{} is 0-30", name),
+            Command::REven(_) => write!(buf, "{} is even", name),
             Command::Ubits(_, bits)
             | Command::BUbits(bits) => write!(buf, "#{} < {}", name, 1u32 << bits),
             Command::Uscaled(_, bits, scale) => write!(buf, "#{} < {}, #{} = {} * N", name, 1u32 << (bits + scale), name, 1u32 << scale),
@@ -572,11 +591,13 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::Urange(_, min, max)
             | Command::BUrange(min, max) => write!(buf, "{} <= #{} <= {}", min, name, max),
             Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", *addval as u32 + 1 - (1u32 << bits), name, addval),
-            Command::Usumdec(_, bits) => write!(buf, "1 <= #{} + #{} <= {}", prevname, name, (1u32 << bits)),
+            Command::Unegmod(_, bits) => write!(buf, "0 <= #{} < {}", name, 1u32 << bits),
+            Command::Usumdec(_, bits)
+            | Command::BUsum(bits) => write!(buf, "1 <= #{} <= {} - {}", name, 1u32 << bits, prevname),
             Command::Ufields(fields) => write!(buf, "#{} < {}", name, 1u32 << fields.len()),
-            Command::Sbits(_, bits)
-            | Command::BSbits(bits) => write!(buf, "-{} <= #{} < {}", 1u32 << (bits - 1), name, 1u32 << (bits - 1)),
-            Command::Sscaled(_, bits, scale) => write!(buf, "-{} <= #{} < {}, #{} = {} * N", 1u32 << (bits + scale - 1), name, 1u32 << (bits + scale - 1), name, 1u32 << scale),
+            Command::Sbits(_, bits) => write!(buf, "-{} <= #{} < {}", 1u32 << (bits - 1), name, 1u32 << (bits - 1)),
+            Command::Sscaled(_, bits, scale)
+            | Command::BSscaled(bits, scale) => write!(buf, "-{} <= #{} < {}, #{} = {} * N", 1u32 << (bits + scale - 1), name, 1u32 << (bits + scale - 1), name, 1u32 << scale),
             Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W)
             | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X)
             | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W)
@@ -668,6 +689,7 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::VStatic(s, c) => write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(s), c).unwrap(),
                 Matcher::VElement(s) => write!(buf, "<V,{}>.{}[<Imm,{}>]", arg_idx, size_to_string(s), arg_idx + 1).unwrap(),
                 Matcher::VElementStatic(s, element) => write!(buf, "<V,{}>.{}[{}]", arg_idx, size_to_string(s), element).unwrap(),
+                Matcher::VStaticElement(s, c) => write!(buf, "<V,{}>.{}{}[<Imm,{}>]", arg_idx, size_to_string(s), c, arg_idx + 1).unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
                     write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(s), width / s.in_bytes(), a).unwrap();
@@ -676,8 +698,8 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::RegListElement(a, s) =>   write!(buf, "{{<V,{}>.{} * {}}}[<Imm,{}>]", arg_idx, size_to_string(s), a, arg_idx + 1).unwrap(),
                 Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
                 Matcher::RefBase =>   write!(buf, "[<XSP,{}>]", arg_idx).unwrap(),
-                Matcher::RefOffset => write!(buf, "[<XSP,{}> <, #{} > ]", arg_idx, arg_idx + 1).unwrap(),
-                Matcher::RefPre =>    write!(buf, "[<XSP,{}>, #{}]!", arg_idx, arg_idx + 1).unwrap(),
+                Matcher::RefOffset => write!(buf, "[<XSP,{}> <, <Imm,{}> > ]", arg_idx, arg_idx + 1).unwrap(),
+                Matcher::RefPre =>    write!(buf, "[<XSP,{}>, <Imm,{}>]!", arg_idx, arg_idx + 1).unwrap(),
                 Matcher::RefIndex => {
                     constraints.push(format!("{}: ModWX()", arg_idx + 2));
                     write!(buf, "[<XSP,{}>, <WX,{}> < , <Mod,{}> < <Imm,{}> > > ]", arg_idx, arg_idx + 1, arg_idx + 2, arg_idx + 3).unwrap();
@@ -733,6 +755,8 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
         for command in &arg.commands {
             let constraint = match command {
                 Command::R(_) => format!("R(32)"),
+                Command::REven(_) => format!("R(32, 2)"),
+                Command::RNoZr(_) => format!("R(31)"),
                 Command::R4(_) => format!("R(16)"),
                 Command::RNext => format!("RNext()"),
                 Command::Ubits(_, bits)
@@ -745,11 +769,13 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::Urange(_, min, max)
                 | Command::BUrange(min, max) => format!("Range({}, {}+1, 1)", min, max),
                 Command::Usub(_, bits, addval) => format!("Range({}, {}+1, 1)", *addval as u32 + 1 - (1u32 << bits), addval),
-                Command::Usumdec(_, bits) => format!("Range2(1, {}+1, 1)", (1u32 << bits)),
+                Command::Unegmod(_, bits) => format!("Range(0, {}, 1)", 1u32 << bits),
+                Command::Usumdec(_, bits)
+                | Command::BUsum(bits) => format!("Range2(1, {}+1, 1)", 1u32 << bits),
                 Command::Ufields(fields) => format!("Range(0, {}, 1)", 1u32 << fields.len()),
-                Command::Sbits(_, bits)
-                | Command::BSbits(bits) => format!("Range(-{}, {}, 1)", 1u32 << (bits - 1), 1u32 << (bits - 1)),
-                Command::Sscaled(_, bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits + scale - 1), 1u32 << (bits + scale - 1), 1u32 << scale),
+                Command::Sbits(_, bits) => format!("Range(-{}, {}, 1)", 1u32 << (bits - 1), 1u32 << (bits - 1)),
+                Command::Sscaled(_, bits, scale)
+                | Command::BSscaled(bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits + scale - 1), 1u32 << (bits + scale - 1), 1u32 << scale),
                 Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W) => format!("Special('wide_w')"),
                 | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X) => format!("Special('wide_x')"),
                 | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) => format!("Special('inverted_w')"),
@@ -766,9 +792,12 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::Offset(Relocation::TBZ) => format!("Range(-{}, {}, {})", 1<<15, 1<<15, 4),
                 Command::Offset(Relocation::LITERAL32) => format!("Range(-{}, {}, {})", 1<<31, 1<<31, 1),
                 Command::Offset(Relocation::LITERAL64) => format!("Range(-{}, {}, {})", 1u64<<63, 1u64<<63, 1),
-                Command::Cond(_)
-                | Command::CondInv(_) => {
+                Command::Cond(_) => {
                     let keys: Vec<_> = COND_MAP.keys().map(|k| format!("\"{}\"", k)).collect();
+                    format!("List({})", keys.join(", "))
+                },
+                Command::CondInv(_) => {
+                    let keys: Vec<_> = COND_MAP.iter().filter_map(|(k, v)| if *v < 14 { Some(format!("\"{}\"", k)) } else { None }).collect();
                     format!("List({})", keys.join(", "))
                 },
                 Command::LitList(_, name) => {

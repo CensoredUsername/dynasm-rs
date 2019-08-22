@@ -218,7 +218,7 @@ tlentry(['FMOV', 'SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Sd>,<Wn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'S, W, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
 )
 
 tlentry(['SCVTF', 'UCVTF'],
@@ -230,7 +230,7 @@ tlentry(['SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Sd>,<Xn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'S, X, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
 )
 
 tlentry(['FCMP', 'FCMPE'],

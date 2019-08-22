@@ -55,8 +55,10 @@ tlentry(['DC'],
 
 tlentry(['IC'],
     '<ic_op>{,<Xt>}', (('op1', 3, 16), ('CRm', 4, 8), ('op2', 3, 5), ('Rt', 5, 0)),
-    matcher   = 'Ident, End, X',
-    processor = 'LitList(5, "DC_OPS"), R(0)',
+    matcher   = 'Lit("ivau"), X',
+    processor = 'R(0), Static(5, 0b01101110101001)',
+    matchers  =['Ident'],
+    processors=['LitList(5, "IC_OPS"), Static(0, 0b11111)']
 )
 
 tlentry(['DMB', 'DSB'],
@@ -81,13 +83,13 @@ tlentry(['TLBI'],
 
 tlentry(['PSB', 'TSB'],
     'CSYNC', (),
-    matcher   = 'Lit("CSYNC")',
+    matcher   = 'Lit("csync")',
     processor = '',
 )
 
 tlentry(['CFP', 'CPP', 'DVP'],
     'RCTX,<Xt>', (('Rt', 5, 0),),
-    matcher   = 'Lit("RCTX"), X',
+    matcher   = 'Lit("rctx"), X',
     processor = 'R(0)',
 )
 
@@ -105,7 +107,7 @@ tlentry(['DCPS1', 'DCPS2', 'DCPS3'],
 
 tlentry(['ISB'],
     '{<option>|#<imm>}', (('CRm', 4, 8),),
-    matcher   = 'Lit("SY")',
+    matcher   = 'Lit("sy")',
     processor = 'Static(8, 0b1111)',
     matchers  =['Imm',
                 ''],

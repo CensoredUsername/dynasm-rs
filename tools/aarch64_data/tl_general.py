@@ -61,7 +61,7 @@ tlentry(['MOVK', 'MOVN', 'MOVZ'],
 tlentry(['BFC'],
     '<Wd>,#<lsb>,#<width>', (('immr', 6, 16), ('imms', 6, 10), ('Rd', 5, 0)),
     matcher   = 'W, Imm, Imm',
-    processor = 'R(0), Usub(16, 5, 32), Urange(10, 1, 32)', # immr = -lsb % 32, imms = width - 1
+    processor = 'R(0), Unegmod(16, 5), BUsum(5), Urange(10, 1, 32)', # immr = -lsb % 32, imms = width - 1
 )
 
 tlentry(['MOV', 'NGC', 'NGCS'],
@@ -92,19 +92,19 @@ tlentry(['ANDS'],
 tlentry(['BFM', 'SBFM', 'UBFM'],
     '<Wd>,<Wn>,#<immr>,#<imms>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, W, Imm, Imm',
-    processor = 'R(0), R(5), Ubits(16, 5), Ubits(10, 5)',
+    processor = 'R(0), R(5), Ubits(16, 5), BUsum(5), Ubits(10, 5)',
 )
 
 tlentry(['BFI', 'SBFIZ', 'UBFIZ'],
     '<Wd>,<Wn>,#<lsb>,#<width>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, W, Imm, Imm',
-    processor = 'R(0), R(5), Usub(16, 5, 32), Urange(10, 1, 32)', # immr = -lsb % 32, imms = width - 1
+    processor = 'R(0), R(5), Unegmod(16, 5), BUsum(5), Urange(10, 1, 32)', # immr = -lsb % 32, imms = width - 1
 )
 
 tlentry(['BFXIL', 'SBFX', 'UBFX'],
     '<Wd>,<Wn>,#<lsb>,#<width>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, W, Imm, Imm',
-    processor = 'R(0), R(5), Ubits(16, 5), Usumdec(10, 5)', # immr = lsb, imms = lsb + width - 1 
+    processor = 'R(0), R(5), Ubits(16, 5), BUsum(5), Usumdec(10, 5)', # immr = lsb, imms = lsb + width - 1 
 )
 
 tlentry(['ASR', 'LSR'],
@@ -116,7 +116,7 @@ tlentry(['ASR', 'LSR'],
 tlentry(['LSL'],
     '<Wd>,<Wn>,#<shift>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, W, Imm',
-    processor = 'R(0), R(5), Usub(16, 5, 32), C, Usub(16, 5, 31)', # immr = -shift % 32, imms = 31 - shift
+    processor = 'R(0), R(5), Unegmod(16, 5), C, Usub(16, 5, 31)', # immr = -shift % 32, imms = 31 - shift
 )
 
 tlentry(['ADC', 'ADCS', 'ASR', 'ASRV', 'CRC32B', 'CRC32CB', 'CRC32CH', 'CRC32CW', 'CRC32H', 'CRC32W', 'LSL', 'LSLV', 'LSR', 'LSRV', 'MNEG', 'MUL', 'ROR', 'RORV', 'SBC', 'SBCS', 'SDIV', 'UDIV'],
@@ -189,7 +189,7 @@ tlentry(['ROR'],
 tlentry(['CSET', 'CSETM'],
     '<Wd>,<cond>', (('cond', 4, 12), ('Rd', 5, 0)),
     matcher   = 'W, Cond',
-    processor = 'R(0), Cond(12)',
+    processor = 'R(0), CondInv(12)',
 )
 
 tlentry(['MOV'],
@@ -274,7 +274,7 @@ tlentry(['CMN', 'CMP'],
 tlentry(['CASP', 'CASPA', 'CASPAL', 'CASPL'],
     '<Ws>,<W(s+1)>,<Wt>,<W(t+1)>,[<Xn|SP>{,#0}]', (('Rs', 5, 16), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'W, W, W, W, RefBase',
-    processor = 'R(16), RNext, R(0), RNext, R(5)',
+    processor = 'REven(16), RNext, REven(0), RNext, R(5)',
 )
 
 tlentry(['STLXP', 'STXP'],
@@ -444,7 +444,7 @@ tlentry(['MOVK', 'MOVN', 'MOVZ'],
 tlentry(['BFC'],
     '<Xd>,#<lsb>,#<width>', (('immr', 6, 16), ('imms', 6, 10), ('Rd', 5, 0)),
     matcher   = 'X, Imm, Imm',
-    processor = 'R(0), Usub(16, 6, 64), Urange(10, 1, 64)', # immr = -lsb % 64, imms = width - 1
+    processor = 'R(0), Unegmod(16, 6), BUsum(6), Urange(10, 1, 64)', # immr = -lsb % 64, imms = width - 1
 )
 
 tlentry(['SXTB', 'SXTH', 'SXTW'],
@@ -493,19 +493,19 @@ tlentry(['ANDS'],
 tlentry(['BFM', 'SBFM', 'UBFM'],
     '<Xd>,<Xn>,#<immr>,#<imms>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, X, Imm, Imm',
-    processor = 'R(0), R(5), Ubits(16, 6), Ubits(10, 6)',
+    processor = 'R(0), R(5), Ubits(16, 6), BUsum(6), Ubits(10, 6)',
 )
 
 tlentry(['BFI', 'SBFIZ', 'UBFIZ'],
     '<Xd>,<Xn>,#<lsb>,#<width>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, X, Imm, Imm',
-    processor = 'R(0), R(5), Usub(16, 6, 64), Urange(10, 1, 64)',  # immr = -lsb % 64, imms = width - 1
+    processor = 'R(0), R(5), Unegmod(16, 6), BUsum(6), Urange(10, 1, 64)',  # immr = -lsb % 64, imms = width - 1
 )
 
 tlentry(['BFXIL', 'SBFX', 'UBFX'],
     '<Xd>,<Xn>,#<lsb>,#<width>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, X, Imm, Imm',
-    processor = 'R(0), R(5), Ubits(16, 6), Usumdec(10, 6)',  # immr = lsb, imms = lsb + width - 1 
+    processor = 'R(0), R(5), Ubits(16, 6), BUsum(6), Usumdec(10, 6)',  # immr = lsb, imms = lsb + width - 1 
 )
 
 tlentry(['ASR', 'LSR'],
@@ -517,7 +517,7 @@ tlentry(['ASR', 'LSR'],
 tlentry(['LSL'],
     '<Xd>,<Xn>,#<shift>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, X, Imm',
-    processor = 'R(0), R(5), Usub(16, 6, 64), C, Usub(16, 6, 63)', # immr = -shift % 64, imms = 63 - shift
+    processor = 'R(0), R(5), Unegmod(16, 6), C, Usub(16, 6, 63)', # immr = -shift % 64, imms = 63 - shift
 )
 
 tlentry(['ADC', 'ADCS', 'ASR', 'ASRV', 'LSL', 'LSLV', 'LSR', 'LSRV', 'MNEG', 'MUL', 'ROR', 'RORV', 'SBC', 'SBCS', 'SDIV', 'SMULH', 'UDIV', 'UMULH'],
@@ -702,7 +702,7 @@ tlentry(['CMN', 'CMP'],
 
 tlentry(['CMN', 'CMP'],
     '<Xn|SP>,<R><m>{,<extend>{#<amount>}}', (('Rm', 5, 16), ('option', 3, 13), ('imm3', 3, 10), ('Rn', 5, 5)),
-    matcher   = 'XSP, W, End, Mod(EXTENDS_W)',
+    matcher   = 'XSP, W, Mod(EXTENDS_W)',
     processor = 'R(5), R(16), ExtendsX(13), Urange(10, 0, 4)',
     matchers  =['XSP, X, End, Mod(EXTENDS_X)'],
     processors=['R(5), R(16), ExtendsX(13), Urange(10, 0, 4)'],
@@ -711,7 +711,7 @@ tlentry(['CMN', 'CMP'],
 tlentry(['CASP', 'CASPA', 'CASPAL', 'CASPL'],
     '<Xs>,<X(s+1)>,<Xt>,<X(t+1)>,[<Xn|SP>{,#0}]', (('Rs', 5, 16), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, X, X, X, RefBase',
-    processor = 'R(16), RNext, R(0), RNext, R(5)', # register-next-to-register constraint
+    processor = 'REven(16), RNext, REven(0), RNext, R(5)', # register-next-to-register constraint
 )
 
 tlentry(['LDADD', 'LDADDA', 'LDADDAL', 'LDADDL', 'LDCLR', 'LDCLRA', 'LDCLRAL', 'LDCLRL', 'LDEOR', 'LDEORA', 'LDEORAL', 'LDEORL', 'LDSET', 'LDSETA', 'LDSETAL', 'LDSETL', 'LDSMAX', 'LDSMAXA', 'LDSMAXAL', 'LDSMAXL', 'LDSMIN', 'LDSMINA', 'LDSMINAL', 'LDSMINL', 'LDUMAX', 'LDUMAXA', 'LDUMAXAL', 'LDUMAXL', 'LDUMIN', 'LDUMINA', 'LDUMINAL', 'LDUMINL', 'SWP', 'SWPA', 'SWPAL', 'SWPL'],
@@ -732,16 +732,28 @@ tlentry(['STADD', 'STADDL', 'STCLR', 'STCLRL', 'STEOR', 'STEORL', 'STSET', 'STSE
     processor = 'R(16), R(5)',
 )
 
-tlentry(['LDP', 'LDPSW', 'STP'],
+tlentry(['LDP', 'STP'],
     '<Xt1>,<Xt2>,[<Xn|SP>,#<imm>]!', (('imm7', 7, 15), ('Rt2', 5, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, X, RefPre',
     processor = 'R(0), R(10), R(5), Sscaled(15, 7, 3)',
 )
 
-tlentry(['LDP', 'LDPSW', 'STP'],
+tlentry(['LDPSW'],
+    '<Xt1>,<Xt2>,[<Xn|SP>,#<imm>]!', (('imm7', 7, 15), ('Rt2', 5, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
+    matcher   = 'X, X, RefPre',
+    processor = 'R(0), R(10), R(5), Sscaled(15, 7, 2)',
+)
+
+tlentry(['LDP', 'STP'],
     '<Xt1>,<Xt2>,[<Xn|SP>],#<imm>', (('imm7', 7, 15), ('Rt2', 5, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, X, RefBase, Imm',
     processor = 'R(0), R(10), R(5), Sscaled(15, 7, 3)',
+)
+
+tlentry(['LDPSW'],
+    '<Xt1>,<Xt2>,[<Xn|SP>],#<imm>', (('imm7', 7, 15), ('Rt2', 5, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
+    matcher   = 'X, X, RefBase, Imm',
+    processor = 'R(0), R(10), R(5), Sscaled(15, 7, 2)',
 )
 
 tlentry(['LDAXP', 'LDXP'],
@@ -750,10 +762,16 @@ tlentry(['LDAXP', 'LDXP'],
     processor = 'R(0), R(10), R(5)',
 )
 
-tlentry(['LDNP', 'LDP', 'LDPSW', 'STNP', 'STP'],
+tlentry(['LDNP', 'LDP', 'STNP', 'STP'],
     '<Xt1>,<Xt2>,[<Xn|SP>{,#<imm>}]', (('imm7', 7, 15), ('Rt2', 5, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, X, RefOffset',
     processor = 'R(0), R(10), R(5), Sscaled(15, 7, 3)',
+)
+
+tlentry(['LDPSW'],
+    '<Xt1>,<Xt2>,[<Xn|SP>{,#<imm>}]', (('imm7', 7, 15), ('Rt2', 5, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
+    matcher   = 'X, X, RefOffset',
+    processor = 'R(0), R(10), R(5), Sscaled(15, 7, 2)',
 )
 
 tlentry(['CBNZ', 'CBZ', 'LDR', 'LDRSW'],
@@ -836,7 +854,7 @@ tlentry(['LDRSB'],
 tlentry(['LDRAA', 'LDRAB'],
     '<Xt>,[<Xn|SP>{,#<simm>}]', (('S', 1, 22), ('imm9', 9, 12), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, RefOffset',
-    processor = 'R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A', # immediate is sliced S:imm9
+    processor = 'R(0), R(5), BSscaled(10, 3), Sslice(12, 9, 3), Sslice(22, 1, 12), A', # immediate is sliced S:imm9
 )
 
 tlentry(['LDAPUR', 'LDAPURSB', 'LDAPURSH', 'LDAPURSW', 'LDTR', 'LDTRSB', 'LDTRSH', 'LDTRSW', 'LDUR', 'LDURSB', 'LDURSH', 'LDURSW', 'STLUR', 'STTR', 'STUR'],
@@ -848,7 +866,7 @@ tlentry(['LDAPUR', 'LDAPURSB', 'LDAPURSH', 'LDAPURSW', 'LDTR', 'LDTRSB', 'LDTRSH
 tlentry(['LDRAA', 'LDRAB'],
     '<Xt>,[<Xn|SP>{,#<simm>}]!', (('S', 1, 22), ('imm9', 9, 12), ('Rn', 5, 5), ('Rt', 5, 0)),
     matcher   = 'X, RefPre',
-    processor = 'R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A', # immediate is sliced S:imm9
+    processor = 'R(0), R(5), BSscaled(10, 3), Sslice(12, 9, 3), Sslice(22, 1, 12), A', # immediate is sliced S:imm9
 )
 
 tlentry(['B', 'BL'],

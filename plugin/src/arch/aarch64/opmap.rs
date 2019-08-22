@@ -173,20 +173,20 @@ Ops!(map ;
     0b11001110_00100000_00000000_00000000 = [VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16), R(10)];
 ]
 "bfc" = [
-    0b00110011_00000000_00000011_11100000 = [W, Imm, Imm] => [R(0), Usub(16, 5, 32), Urange(10, 1, 32)];
-    0b10110011_01000000_00000011_11100000 = [X, Imm, Imm] => [R(0), Usub(16, 6, 64), Urange(10, 1, 64)];
+    0b00110011_00000000_00000011_11100000 = [W, Imm, Imm] => [R(0), Unegmod(16, 5), BUsum(5), Urange(10, 1, 32)];
+    0b10110011_01000000_00000011_11100000 = [X, Imm, Imm] => [R(0), Unegmod(16, 6), BUsum(6), Urange(10, 1, 64)];
 ]
 "bfi" = [
-    0b00110011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Usub(16, 5, 32), Urange(10, 1, 32)];
-    0b10110011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Usub(16, 6, 64), Urange(10, 1, 64)];
+    0b00110011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Unegmod(16, 5), BUsum(5), Urange(10, 1, 32)];
+    0b10110011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Unegmod(16, 6), BUsum(6), Urange(10, 1, 64)];
 ]
 "bfm" = [
-    0b00110011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), Ubits(10, 5)];
-    0b10110011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), Ubits(10, 6)];
+    0b00110011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), BUsum(5), Ubits(10, 5)];
+    0b10110011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), BUsum(6), Ubits(10, 6)];
 ]
 "bfxil" = [
-    0b00110011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), Usumdec(10, 5)];
-    0b10110011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), Usumdec(10, 6)];
+    0b00110011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), BUsum(5), Usumdec(10, 5)];
+    0b10110011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), BUsum(6), Usumdec(10, 6)];
 ]
 "bic" = [
     // BIC (vector, immediate)
@@ -288,20 +288,20 @@ Ops!(map ;
     0b01001000_10100000_11111100_00000000 = [W, W, RefBase] => [R(16), R(0), R(5)];
 ]
 "casp" = [
-    0b00001000_00100000_01111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
-    0b01001000_00100000_01111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b00001000_00100000_01111100_00000000 = [W, W, W, W, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
+    0b01001000_00100000_01111100_00000000 = [X, X, X, X, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
 ]
 "caspa" = [
-    0b00001000_01100000_01111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
-    0b01001000_01100000_01111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b00001000_01100000_01111100_00000000 = [W, W, W, W, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
+    0b01001000_01100000_01111100_00000000 = [X, X, X, X, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
 ]
 "caspal" = [
-    0b00001000_01100000_11111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
-    0b01001000_01100000_11111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b00001000_01100000_11111100_00000000 = [W, W, W, W, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
+    0b01001000_01100000_11111100_00000000 = [X, X, X, X, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
 ]
 "caspl" = [
-    0b00001000_00100000_11111100_00000000 = [W, W, W, W, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
-    0b01001000_00100000_11111100_00000000 = [X, X, X, X, RefBase] => [R(16), RNext, R(0), RNext, R(5)];
+    0b00001000_00100000_11111100_00000000 = [W, W, W, W, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
+    0b01001000_00100000_11111100_00000000 = [X, X, X, X, RefBase] => [REven(16), RNext, REven(0), RNext, R(5)];
 ]
 "cbnz" = [
     0b00110101_00000000_00000000_00000000 = [W, Offset] => [R(0), Offset(BCOND)];
@@ -331,7 +331,7 @@ Ops!(map ;
     0b11010101_00000000_01000000_00011111 = [] => [];
 ]
 "cfp" = [
-    0b11010101_00001011_01110011_10000000 = [Lit("RCTX"), X] => [R(0)];
+    0b11010101_00001011_01110011_10000000 = [Lit("rctx"), X] => [R(0)];
 ]
 "cinc" = [
     0b00011010_10000000_00000100_00000000 = [W, W, Cond] => [R(0), R(5), C, R(16), CondInv(12)];
@@ -438,7 +438,7 @@ Ops!(map ;
     0b10101011_00000000_00000000_00011111 = [X, X, End, Mod(SHIFTS)] => [R(5), R(16), Rotates(22), Ubits(10, 6)];
     // CMN (extended register)
     0b00101011_00100000_00000000_00011111 = [WSP, W, End, Mod(EXTENDS)] => [R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
-    0b10101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
+    0b10101011_00100000_00000000_00011111 = [XSP, W, Mod(EXTENDS_W)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b10101011_00100000_00000000_00011111 = [XSP, X, End, Mod(EXTENDS_X)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // CMN (immediate)
     0b00110001_00000000_00000000_00011111 = [WSP, Imm, End, LitMod(LSL)] => [R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
@@ -450,7 +450,7 @@ Ops!(map ;
     0b11101011_00000000_00000000_00011111 = [X, X, End, Mod(SHIFTS)] => [R(5), R(16), Rotates(22), Ubits(10, 6)];
     // CMP (extended register)
     0b01101011_00100000_00000000_00011111 = [WSP, W, End, Mod(EXTENDS)] => [R(5), R(16), ExtendsW(13), Urange(10, 0, 4)];
-    0b11101011_00100000_00000000_00011111 = [XSP, W, End, Mod(EXTENDS_W)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
+    0b11101011_00100000_00000000_00011111 = [XSP, W, Mod(EXTENDS_W)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     0b11101011_00100000_00000000_00011111 = [XSP, X, End, Mod(EXTENDS_X)] => [R(5), R(16), ExtendsX(13), Urange(10, 0, 4)];
     // CMP (immediate)
     0b01110001_00000000_00000000_00011111 = [WSP, Imm, End, LitMod(LSL)] => [R(5), Ubits(10, 12), Ulist(22, &[0, 12])];
@@ -471,7 +471,7 @@ Ops!(map ;
     0b00001110_00100000_01011000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
 ]
 "cpp" = [
-    0b11010101_00001011_01110011_11100000 = [Lit("RCTX"), X] => [R(0)];
+    0b11010101_00001011_01110011_11100000 = [Lit("rctx"), X] => [R(0)];
 ]
 "crc32b" = [
     0b00011010_11000000_01000000_00000000 = [W, W, W] => [R(0), R(5), R(16)];
@@ -505,11 +505,11 @@ Ops!(map ;
     0b10011010_10000000_00000000_00000000 = [X, X, X, Cond] => [R(0), R(5), R(16), Cond(12)];
 ]
 "cset" = [
-    0b00011010_10011111_00000111_11100000 = [W, Cond] => [R(0), Cond(12)];
+    0b00011010_10011111_00000111_11100000 = [W, Cond] => [R(0), CondInv(12)];
     0b10011010_10011111_00000111_11100000 = [X, Cond] => [R(0), Cond(12)];
 ]
 "csetm" = [
-    0b01011010_10011111_00000011_11100000 = [W, Cond] => [R(0), Cond(12)];
+    0b01011010_10011111_00000011_11100000 = [W, Cond] => [R(0), CondInv(12)];
     0b11011010_10011111_00000011_11100000 = [X, Cond] => [R(0), Cond(12)];
 ]
 "csinc" = [
@@ -554,9 +554,9 @@ Ops!(map ;
     0b01011110_00000100_00000100_00000000 = [S, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
     0b01011110_00001000_00000100_00000000 = [D, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
     0b00001110_00000001_00000100_00000000 = [V(BYTE), VElement(BYTE)] => [R(0), R(5), Ubits(17, 4), Rwidth(30)];
-    0b00001110_00000010_00000100_00000000 = [V(WORD), VElement(BYTE)] => [R(0), R(5), Ubits(18, 3), Rwidth(30)];
-    0b00001110_00000100_00000100_00000000 = [V(DWORD), VElement(WORD)] => [R(0), R(5), Ubits(19, 2), Rwidth(30)];
-    0b00001110_00001000_00000100_00000000 = [VStatic(QWORD, 2), VElement(DWORD)] => [R(0), R(5), Ubits(20, 1), Rwidth(30)];
+    0b00001110_00000010_00000100_00000000 = [V(WORD), VElement(WORD)] => [R(0), R(5), Ubits(18, 3), Rwidth(30)];
+    0b00001110_00000100_00000100_00000000 = [V(DWORD), VElement(DWORD)] => [R(0), R(5), Ubits(19, 2), Rwidth(30)];
+    0b00001110_00001000_00000100_00000000 = [VStatic(QWORD, 2), VElement(QWORD)] => [R(0), R(5), Ubits(20, 1), Rwidth(30)];
     // DUP (general)
     0b00001110_00000001_00001100_00000000 = [V(BYTE), W] => [R(0), Rwidth(30), R(5)];
     0b00001110_00000010_00001100_00000000 = [V(WORD), W] => [R(0), Rwidth(30), R(5)];
@@ -564,7 +564,7 @@ Ops!(map ;
     0b00001110_00001000_00001100_00000000 = [VStatic(QWORD, 2), X] => [R(0), Rwidth(30), R(5)];
 ]
 "dvp" = [
-    0b11010101_00001011_01110011_10100000 = [Lit("RCTX"), X] => [R(0)];
+    0b11010101_00001011_01110011_10100000 = [Lit("rctx"), X] => [R(0)];
 ]
 "eon" = [
     0b01001010_00100000_00000000_00000000 = [W, W, W, End, Mod(ROTATES)] => [R(0), R(5), R(16), Rotates(22), Ubits(10, 5)];
@@ -660,7 +660,7 @@ Ops!(map ;
 "fcadd" = [
     0b00101110_01000000_11100100_00000000 = [V(WORD), V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
     0b00101110_10000000_11100100_00000000 = [V(DWORD), V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
-    0b00101110_11000000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), V(QWORD), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
+    0b00101110_11000000_11100100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Ulist(12, &[90, 270]), Rwidth(30)];
 ]
 "fccmp" = [
     0b00011110_11100000_00000100_00000000 = [H, H, Imm, Cond] => [R(5), R(16), Ubits(0, 4), Cond(12)];
@@ -722,12 +722,13 @@ Ops!(map ;
 ]
 "fcmla" = [
     // FCMLA (by element)
-    0b00101111_01000000_00010000_00000000 = [V(WORD), V(WORD), VElement(WORD), Imm] => [R(0), R(5), R4(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101111_01000000_00010000_00000000 = [VStatic(WORD, 4), VStatic(WORD, 4), VElement(WORD), Imm] => [R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270])];
+    0b01101111_01000000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VElement(WORD), Imm] => [R(0), R(5), R(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270])];
     0b00101111_10000000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD), Imm] => [R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
     // FCMLA
     0b00101110_01000000_11000100_00000000 = [V(WORD), V(WORD), V(WORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
     0b00101110_10000000_11000100_00000000 = [V(DWORD), V(DWORD), V(DWORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
-    0b00101110_11000000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), V(QWORD), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
+    0b00101110_11000000_11000100_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2), Imm] => [R(0), R(5), R(16), Ulist(11, &[0, 90, 180, 270]), Rwidth(30)];
 ]
 "fcmle" = [
     0b01111110_11111000_11011000_00000000 = [H, H, LitFloat(0.0)] => [R(0), R(5)];
@@ -847,11 +848,9 @@ Ops!(map ;
     0b10011110_01110001_00000000_00000000 = [X, D] => [R(0), R(5)];
 ]
 "fcvtn" = [
-    0b00001110_00100001_01101000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
     0b00001110_01100001_01101000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtn2" = [
-    0b01001110_00100001_01101000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
     0b01001110_01100001_01101000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtns" = [
@@ -920,11 +919,9 @@ Ops!(map ;
 ]
 "fcvtxn" = [
     0b01111110_01100001_01101000_00000000 = [S, D] => [R(0), R(5)];
-    0b00101110_00100001_01101000_00000000 = [VStatic(WORD, 4), VStatic(DWORD, 4)] => [R(0), R(5)];
     0b00101110_01100001_01101000_00000000 = [VStatic(DWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtxn2" = [
-    0b01101110_00100001_01101000_00000000 = [VStatic(WORD, 8), VStatic(DWORD, 4)] => [R(0), R(5)];
     0b01101110_01100001_01101000_00000000 = [VStatic(DWORD, 4), VStatic(QWORD, 2)] => [R(0), R(5)];
 ]
 "fcvtzs" = [
@@ -1116,16 +1113,16 @@ Ops!(map ;
 ]
 "fmlal" = [
     // FMLAL, FMLAL2 (by element)
-    0b00001111_10000000_00000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_00000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_00000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
     // FMLAL, FMLAL2 (vector)
     0b00001110_00100000_11101100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
     0b01001110_00100000_11101100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
 ]
 "fmlal2" = [
     // FMLAL, FMLAL2 (by element)
-    0b00101111_10000000_10000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_10000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_10000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
     // FMLAL, FMLAL2 (vector)
     0b00101110_00100000_11001100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
     0b01101110_00100000_11001100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
@@ -1145,16 +1142,16 @@ Ops!(map ;
 ]
 "fmlsl" = [
     // FMLSL, FMLSL2 (by element)
-    0b00001111_10000000_01000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01001111_10000000_01000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00001111_10000000_01000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01001111_10000000_01000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
     // FMLSL, FMLSL2 (vector)
     0b00001110_10100000_11101100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
     0b01001110_10100000_11101100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
 ]
 "fmlsl2" = [
     // FMLSL, FMLSL2 (by element)
-    0b00101111_10000000_11000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
-    0b01101111_10000000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R(16), Ufields(&[11, 21, 20])];
+    0b00101111_10000000_11000000_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
+    0b01101111_10000000_11000000_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VElement(WORD)] => [R(0), R(5), R4(16), Ufields(&[11, 21, 20])];
     // FMLSL, FMLSL2 (vector)
     0b00101110_10100000_11001100_00000000 = [VStatic(DWORD, 2), VStatic(WORD, 2), VStatic(WORD, 2)] => [R(0), R(5), R(16)];
     0b01101110_10100000_11001100_00000000 = [VStatic(DWORD, 4), VStatic(WORD, 4), VStatic(WORD, 4)] => [R(0), R(5), R(16)];
@@ -1384,7 +1381,8 @@ Ops!(map ;
     0b11010100_00000000_00000000_00000010 = [Imm] => [Ubits(5, 16)];
 ]
 "ic" = [
-    0b11010101_00001000_01110000_00000000 = [Ident, End, X] => [LitList(5, "DC_OPS"), R(0)];
+    0b11010101_00001011_01110101_00100000 = [Lit("ivau"), X] => [R(0)];
+    0b11010101_00001000_01110000_00011111 = [Ident] => [LitList(5, "IC_OPS")];
 ]
 "ins" = [
     // INS (element)
@@ -1399,7 +1397,7 @@ Ops!(map ;
     0b01001110_00001000_00011100_00000000 = [VElement(QWORD), X] => [R(0), Ubits(20, 1), R(5)];
 ]
 "isb" = [
-    0b11010101_00000011_00111111_11011111 = [Lit("SY")] => [];
+    0b11010101_00000011_00111111_11011111 = [Lit("sy")] => [];
     0b11010101_00000011_00110000_11011111 = [Imm] => [Ubits(8, 4)];
     0b11010101_00000011_00111111_11011111 = [] => [];
 ]
@@ -1429,10 +1427,10 @@ Ops!(map ;
     0b01001100_11011111_01110100_00000000 = [RegListStatic(1, WORD, 8), RefBase, LitInt(16)] => [R(0), R(5)];
     0b01001100_11011111_01111000_00000000 = [RegListStatic(1, DWORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
     0b01001100_11011111_01111100_00000000 = [RegListStatic(1, QWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_11000000_01110000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01110100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01111000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01111100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_01110000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01110100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01111000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01111100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     0b00001100_11011111_10100000_00000000 = [RegListStatic(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
     0b00001100_11011111_10100100_00000000 = [RegListStatic(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
     0b00001100_11011111_10101000_00000000 = [RegListStatic(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
@@ -1441,10 +1439,10 @@ Ops!(map ;
     0b01001100_11011111_10100100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_11011111_10101000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_11011111_10101100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11000000_10100000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10100100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10101000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10101100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_10100000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_10100100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_10101000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_10101100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     0b00001100_11011111_01100000_00000000 = [RegListStatic(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
     0b00001100_11011111_01100100_00000000 = [RegListStatic(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
     0b00001100_11011111_01101000_00000000 = [RegListStatic(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
@@ -1453,10 +1451,10 @@ Ops!(map ;
     0b01001100_11011111_01100100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_11011111_01101000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_11011111_01101100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b00001100_11000000_01100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_01100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     0b00001100_11011111_00100000_00000000 = [RegListStatic(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_11011111_00100100_00000000 = [RegListStatic(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_11011111_00101000_00000000 = [RegListStatic(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
@@ -1465,23 +1463,23 @@ Ops!(map ;
     0b01001100_11011111_00100100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_11011111_00101000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_11011111_00101100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b00001100_11000000_00100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_00100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_00100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_00101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_00101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // LD1 (single structure)
     0b00001101_01000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_01000000_01000000_00000000 = [RegListElement(1, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_01000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_01000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_11011111_00000000_00000000 = [RegListElement(1, BYTE), RefBase, LitInt(1)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_11011111_01000000_00000000 = [RegListElement(1, WORD), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11000000_01000000_00000000 = [RegListElement(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11000000_01000000_00000000 = [RegListElement(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_11011111_10000000_00000000 = [RegListElement(1, DWORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_11011111_10000100_00000000 = [RegListElement(1, QWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_11000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "ld1r" = [
     0b00001101_01000000_11000000_00000000 = [RegList(1, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1492,10 +1490,10 @@ Ops!(map ;
     0b00001101_11011111_11000100_00000000 = [RegList(1, WORD), RefBase, LitInt(2)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11011111_11001000_00000000 = [RegList(1, DWORD), RefBase, LitInt(4)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11011111_11001100_00000000 = [RegList(1, QWORD), RefBase, LitInt(8)] => [R(0), R(5), Rwidth(30)];
-    0b00001101_11000000_11000000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11000000_11000100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11000000_11001000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11000000_11001100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001101_11000000_11000000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11000000_11000100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11000000_11001000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11000000_11001100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
 ]
 "ld2" = [
     // LD2 (multiple structures)
@@ -1510,23 +1508,23 @@ Ops!(map ;
     0b01001100_11011111_10000100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_11011111_10001000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_11011111_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_11000000_10000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_10000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_10000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_10001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // LD2 (single structure)
     0b00001101_01100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_01100000_01000000_00000000 = [RegListElement(2, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_01100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_01100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_11111111_00000000_00000000 = [RegListElement(2, BYTE), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_11111111_01000000_00000000 = [RegListElement(2, WORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11100000_01000000_00000000 = [RegListElement(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11100000_01000000_00000000 = [RegListElement(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_11111111_10000000_00000000 = [RegListElement(2, DWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_11111111_10000100_00000000 = [RegListElement(2, QWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_11100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "ld2r" = [
     0b00001101_01100000_11000000_00000000 = [RegList(2, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1537,10 +1535,10 @@ Ops!(map ;
     0b00001101_11111111_11000100_00000000 = [RegList(2, WORD), RefBase, LitInt(4)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11111111_11001000_00000000 = [RegList(2, DWORD), RefBase, LitInt(8)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11111111_11001100_00000000 = [RegList(2, QWORD), RefBase, LitInt(16)] => [R(0), R(5), Rwidth(30)];
-    0b00001101_11100000_11000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11100000_11000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11100000_11001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11100000_11001100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001101_11100000_11000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11100000_11000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11100000_11001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11100000_11001100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
 ]
 "ld3" = [
     // LD3 (multiple structures)
@@ -1555,23 +1553,23 @@ Ops!(map ;
     0b01001100_11011111_01000100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_11011111_01001000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_11011111_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b00001100_11000000_01000000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01000100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01001000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_01000000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01000100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01001000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // LD3 (single structure)
     0b00001101_01000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_01000000_01100000_00000000 = [RegListElement(3, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_01000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_01000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_11011111_00100000_00000000 = [RegListElement(3, BYTE), RefBase, LitInt(3)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_11011111_01100000_00000000 = [RegListElement(3, WORD), RefBase, LitInt(6)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11000000_01100000_00000000 = [RegListElement(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11000000_01100000_00000000 = [RegListElement(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_11011111_10100000_00000000 = [RegListElement(3, DWORD), RefBase, LitInt(12)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_11011111_10100100_00000000 = [RegListElement(3, QWORD), RefBase, LitInt(24)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_11000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "ld3r" = [
     0b00001101_01000000_11100000_00000000 = [RegList(3, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1582,10 +1580,10 @@ Ops!(map ;
     0b00001101_11011111_11100100_00000000 = [RegList(3, WORD), RefBase, LitInt(6)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11011111_11101000_00000000 = [RegList(3, DWORD), RefBase, LitInt(12)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11011111_11101100_00000000 = [RegList(3, QWORD), RefBase, LitInt(24)] => [R(0), R(5), Rwidth(30)];
-    0b00001101_11000000_11100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11000000_11100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11000000_11101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11000000_11101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001101_11000000_11100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11000000_11100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11000000_11101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11000000_11101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
 ]
 "ld4" = [
     // LD4 (multiple structures)
@@ -1600,23 +1598,23 @@ Ops!(map ;
     0b01001100_11011111_00000100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_11011111_00001000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_11011111_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b00001100_11000000_00000000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00000100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00001000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_11000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_11000000_00000000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_00000100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_00001000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_11000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // LD4 (single structure)
     0b00001101_01100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_01100000_01100000_00000000 = [RegListElement(4, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_01100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_01100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_11111111_00100000_00000000 = [RegListElement(4, BYTE), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_11100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_11100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_11111111_01100000_00000000 = [RegListElement(4, WORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_11100000_01100000_00000000 = [RegListElement(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_11100000_01100000_00000000 = [RegListElement(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_11111111_10100000_00000000 = [RegListElement(4, DWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_11100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_11100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_11111111_10100100_00000000 = [RegListElement(4, QWORD), RefBase, LitInt(32)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_11100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_11100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "ld4r" = [
     0b00001101_01100000_11100000_00000000 = [RegList(4, BYTE), RefBase] => [R(0), R(5), Rwidth(30)];
@@ -1627,10 +1625,10 @@ Ops!(map ;
     0b00001101_11111111_11100100_00000000 = [RegList(4, WORD), RefBase, LitInt(8)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11111111_11101000_00000000 = [RegList(4, DWORD), RefBase, LitInt(16)] => [R(0), R(5), Rwidth(30)];
     0b00001101_11111111_11101100_00000000 = [RegList(4, QWORD), RefBase, LitInt(32)] => [R(0), R(5), Rwidth(30)];
-    0b00001101_11100000_11100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11100000_11100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11100000_11101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001101_11100000_11101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001101_11100000_11100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11100000_11100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11100000_11101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001101_11100000_11101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
 ]
 "ldadd" = [
     0b10111000_00100000_00000000_00000000 = [W, W, RefBase] => [R(16), R(0), R(5)];
@@ -1846,16 +1844,16 @@ Ops!(map ;
     0b10101001_01000000_00000000_00000000 = [X, X, RefOffset] => [R(0), R(10), R(5), Sscaled(15, 7, 3)];
 ]
 "ldpsw" = [
-    0b01101000_11000000_00000000_00000000 = [X, X, RefBase, Imm] => [R(0), R(10), R(5), Sscaled(15, 7, 3)];
-    0b01101001_11000000_00000000_00000000 = [X, X, RefPre] => [R(0), R(10), R(5), Sscaled(15, 7, 3)];
-    0b01101001_01000000_00000000_00000000 = [X, X, RefOffset] => [R(0), R(10), R(5), Sscaled(15, 7, 3)];
+    0b01101000_11000000_00000000_00000000 = [X, X, RefBase, Imm] => [R(0), R(10), R(5), Sscaled(15, 7, 2)];
+    0b01101001_11000000_00000000_00000000 = [X, X, RefPre] => [R(0), R(10), R(5), Sscaled(15, 7, 2)];
+    0b01101001_01000000_00000000_00000000 = [X, X, RefOffset] => [R(0), R(10), R(5), Sscaled(15, 7, 2)];
 ]
 "ldr" = [
     // LDR (immediate, SIMD&FP)
     0b00111100_01000000_00000100_00000000 = [B, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b01111100_01000000_00000100_00000000 = [H, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b10111100_01000000_00000100_00000000 = [S, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
-    0b11111100_01000000_00000100_00000000 = [B, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
+    0b11111100_01000000_00000100_00000000 = [D, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b00111100_11000000_00000100_00000000 = [Q, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b00111100_01000000_00001100_00000000 = [B, RefPre] => [R(0), R(5), Sbits(12, 9)];
     0b01111100_01000000_00001100_00000000 = [H, RefPre] => [R(0), R(5), Sbits(12, 9)];
@@ -1864,8 +1862,8 @@ Ops!(map ;
     0b00111100_11000000_00001100_00000000 = [Q, RefPre] => [R(0), R(5), Sbits(12, 9)];
     0b00111101_01000000_00000000_00000000 = [B, RefOffset] => [R(0), R(5), Ubits(10, 12)];
     0b01111101_01000000_00000000_00000000 = [H, RefOffset] => [R(0), R(5), Uscaled(10, 12, 1)];
-    0b10111101_01000000_00000000_00000000 = [Q, RefOffset] => [R(0), R(5), Uscaled(10, 12, 2)];
-    0b11111101_01000000_00000000_00000000 = [B, RefOffset] => [R(0), R(5), Uscaled(10, 12, 3)];
+    0b10111101_01000000_00000000_00000000 = [S, RefOffset] => [R(0), R(5), Uscaled(10, 12, 2)];
+    0b11111101_01000000_00000000_00000000 = [D, RefOffset] => [R(0), R(5), Uscaled(10, 12, 3)];
     0b00111101_11000000_00000000_00000000 = [Q, RefOffset] => [R(0), R(5), Uscaled(10, 12, 4)];
     // LDR (immediate)
     0b10111000_01000000_00000100_00000000 = [W, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
@@ -1892,12 +1890,12 @@ Ops!(map ;
     0b11111000_01100000_00001000_00000000 = [X, RefIndex] => [R(0), R(5), R(16), ExtendsX(13), Ulist(12, &[0, 3])];
 ]
 "ldraa" = [
-    0b11111000_00100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
-    0b11111000_00100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
+    0b11111000_00100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSscaled(10, 3), Sslice(12, 9, 3), Sslice(22, 1, 12), A];
+    0b11111000_00100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSscaled(10, 3), Sslice(12, 9, 3), Sslice(22, 1, 12), A];
 ]
 "ldrab" = [
-    0b11111000_10100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
-    0b11111000_10100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSbits(10), Sslice(12, 9, 0), Sslice(22, 1, 9), A];
+    0b11111000_10100000_00000100_00000000 = [X, RefOffset] => [R(0), R(5), BSscaled(10, 3), Sslice(12, 9, 3), Sslice(22, 1, 12), A];
+    0b11111000_10100000_00001100_00000000 = [X, RefPre] => [R(0), R(5), BSscaled(10, 3), Sslice(12, 9, 3), Sslice(22, 1, 12), A];
 ]
 "ldrb" = [
     // LDRB (immediate)
@@ -2217,8 +2215,8 @@ Ops!(map ;
     0b00011010_11000000_00100000_00000000 = [W, W, W] => [R(0), R(5), R(16)];
     0b10011010_11000000_00100000_00000000 = [X, X, X] => [R(0), R(5), R(16)];
     // LSL (immediate)
-    0b01010011_00000000_00000000_00000000 = [W, W, Imm] => [R(0), R(5), Usub(16, 5, 32), C, Usub(16, 5, 31)];
-    0b11010011_01000000_00000000_00000000 = [X, X, Imm] => [R(0), R(5), Usub(16, 6, 64), C, Usub(16, 6, 63)];
+    0b01010011_00000000_00000000_00000000 = [W, W, Imm] => [R(0), R(5), Unegmod(16, 5), C, Usub(16, 5, 31)];
+    0b11010011_01000000_00000000_00000000 = [X, X, Imm] => [R(0), R(5), Unegmod(16, 6), C, Usub(16, 6, 63)];
 ]
 "lslv" = [
     0b00011010_11000000_00100000_00000000 = [W, W, W] => [R(0), R(5), R(16)];
@@ -2347,7 +2345,7 @@ Ops!(map ;
 "mvn" = [
     0b00101010_00100000_00000011_11100000 = [W, W, End, Mod(SHIFTS)] => [R(0), R(16), Rotates(22), Ubits(10, 5)];
     0b10101010_00100000_00000011_11100000 = [X, X, End, Mod(SHIFTS)] => [R(0), R(16), Rotates(22), Ubits(10, 6)];
-    0b00101110_00100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01011000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
 ]
 "mvni" = [
     0b00101111_00000000_10000100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)];
@@ -2381,7 +2379,7 @@ Ops!(map ;
     0b11010101_00000011_00100000_00011111 = [] => [];
 ]
 "not" = [
-    0b00101110_00100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00100000_01011000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
 ]
 "orn" = [
     // ORN (vector)
@@ -2469,7 +2467,7 @@ Ops!(map ;
     0b11111000_10000000_00000000_00000000 = [Imm, RefOffset] => [Ubits(0, 5), R(5), Sbits(12, 9)];
 ]
 "psb" = [
-    0b11010101_00000011_00100010_00111111 = [Lit("CSYNC")] => [];
+    0b11010101_00000011_00100010_00111111 = [Lit("csync")] => [];
 ]
 "pssbb" = [
     0b11010101_00000011_00110100_10011111 = [] => [];
@@ -2489,7 +2487,7 @@ Ops!(map ;
 ]
 "rbit" = [
     // RBIT (vector)
-    0b00101110_01100000_01011000_00000000 = [V(WORD), V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01100000_01011000_00000000 = [V(BYTE), V(BYTE)] => [R(0), R(5), Rwidth(30)];
     // RBIT
     0b01011010_11000000_00000000_00000000 = [W, W] => [R(0), R(5)];
     0b11011010_11000000_00000000_00000000 = [X, X] => [R(0), R(5)];
@@ -2614,9 +2612,9 @@ Ops!(map ;
     0b00001110_10100000_00101000_00000000 = [V(QWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "saddlv" = [
-    0b00001110_00110000_00111000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_01110000_00111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_10110000_00111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_00110000_00111000_00000000 = [H, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_01110000_00111000_00000000 = [S, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00001110_10110000_00111000_00000000 = [D, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "saddw" = [
     0b00001110_00100000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
@@ -2640,16 +2638,16 @@ Ops!(map ;
     0b11111010_00000000_00000000_00000000 = [X, X, X] => [R(0), R(5), R(16)];
 ]
 "sbfiz" = [
-    0b00010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Usub(16, 5, 32), Urange(10, 1, 32)];
-    0b10010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Usub(16, 6, 64), Urange(10, 1, 64)];
+    0b00010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Unegmod(16, 5), BUsum(5), Urange(10, 1, 32)];
+    0b10010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Unegmod(16, 6), BUsum(6), Urange(10, 1, 64)];
 ]
 "sbfm" = [
-    0b00010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), Ubits(10, 5)];
-    0b10010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), Ubits(10, 6)];
+    0b00010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), BUsum(5), Ubits(10, 5)];
+    0b10010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), BUsum(6), Ubits(10, 6)];
 ]
 "sbfx" = [
-    0b00010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), Usumdec(10, 5)];
-    0b10010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), Usumdec(10, 6)];
+    0b00010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), BUsum(5), Usumdec(10, 5)];
+    0b10010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), BUsum(6), Usumdec(10, 6)];
 ]
 "scvtf" = [
     // SCVTF (vector, fixed-point)
@@ -2668,10 +2666,10 @@ Ops!(map ;
     0b00001110_01100001_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // SCVTF (scalar, fixed-point)
     0b00011110_11000010_00000000_00000000 = [H, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
-    0b00011110_00000010_00000000_00000000 = [S, W, Imm] => [R(0), R(5), Usub(10, 6, 64)];
+    0b00011110_00000010_00000000_00000000 = [S, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b00011110_01000010_00000000_00000000 = [D, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b10011110_11000010_00000000_00000000 = [H, X, Imm] => [R(0), R(5), Usub(10, 6, 64)];
-    0b10011110_00000010_00000000_00000000 = [S, X, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
+    0b10011110_00000010_00000000_00000000 = [S, X, Imm] => [R(0), R(5), Usub(10, 6, 64)];
     0b10011110_01000010_00000000_00000000 = [D, X, Imm] => [R(0), R(5), Usub(10, 6, 64)];
     // SCVTF (scalar, integer)
     0b00011110_11100010_00000000_00000000 = [H, W] => [R(0), R(5)];
@@ -2687,8 +2685,8 @@ Ops!(map ;
 ]
 "sdot" = [
     // SDOT (by element)
-    0b00001111_10000000_11100000_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01001111_10000000_11100000_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00001111_10000000_11100000_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VStaticElement(BYTE, 4)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01001111_10000000_11100000_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VStaticElement(BYTE, 4)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // SDOT (vector)
     0b00001110_10000000_10010100_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
     0b01001110_10000000_10010100_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
@@ -3305,10 +3303,10 @@ Ops!(map ;
     0b01001100_10011111_01110100_00000000 = [RegListStatic(1, WORD, 8), RefBase, LitInt(16)] => [R(0), R(5)];
     0b01001100_10011111_01111000_00000000 = [RegListStatic(1, DWORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
     0b01001100_10011111_01111100_00000000 = [RegListStatic(1, QWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
-    0b00001100_10000000_01110000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01110100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01111000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01111100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_01110000_00000000 = [RegList(1, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01110100_00000000 = [RegList(1, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01111000_00000000 = [RegList(1, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01111100_00000000 = [RegList(1, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     0b00001100_10011111_10100000_00000000 = [RegListStatic(2, BYTE, 8), RefBase, LitInt(16)] => [R(0), R(5)];
     0b00001100_10011111_10100100_00000000 = [RegListStatic(2, WORD, 4), RefBase, LitInt(16)] => [R(0), R(5)];
     0b00001100_10011111_10101000_00000000 = [RegListStatic(2, DWORD, 2), RefBase, LitInt(16)] => [R(0), R(5)];
@@ -3317,10 +3315,10 @@ Ops!(map ;
     0b01001100_10011111_10100100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_10011111_10101000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_10011111_10101100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10000000_10100000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10100100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10101000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10101100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_10100000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_10100100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_10101000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_10101100_00000000 = [RegList(2, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     0b00001100_10011111_01100000_00000000 = [RegListStatic(3, BYTE, 8), RefBase, LitInt(24)] => [R(0), R(5)];
     0b00001100_10011111_01100100_00000000 = [RegListStatic(3, WORD, 4), RefBase, LitInt(24)] => [R(0), R(5)];
     0b00001100_10011111_01101000_00000000 = [RegListStatic(3, DWORD, 2), RefBase, LitInt(24)] => [R(0), R(5)];
@@ -3329,10 +3327,10 @@ Ops!(map ;
     0b01001100_10011111_01100100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_10011111_01101000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_10011111_01101100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b00001100_10000000_01100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_01100000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01100100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01101000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01101100_00000000 = [RegList(3, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     0b00001100_10011111_00100000_00000000 = [RegListStatic(4, BYTE, 8), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_10011111_00100100_00000000 = [RegListStatic(4, WORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
     0b00001100_10011111_00101000_00000000 = [RegListStatic(4, DWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
@@ -3341,23 +3339,23 @@ Ops!(map ;
     0b01001100_10011111_00100100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_10011111_00101000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_10011111_00101100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b00001100_10000000_00100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_00100000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_00100100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_00101000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_00101100_00000000 = [RegList(4, QWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // ST1 (single structure)
     0b00001101_00000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_00000000_01000000_00000000 = [RegListElement(1, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_00000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_00000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_10011111_00000000_00000000 = [RegListElement(1, BYTE), RefBase, LitInt(1)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10000000_00000000_00000000 = [RegListElement(1, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_10011111_01000000_00000000 = [RegListElement(1, WORD), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10000000_01000000_00000000 = [RegListElement(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10000000_01000000_00000000 = [RegListElement(1, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_10011111_10000000_00000000 = [RegListElement(1, DWORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10000000_10000000_00000000 = [RegListElement(1, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_10011111_10000100_00000000 = [RegListElement(1, QWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_10000000_10000100_00000000 = [RegListElement(1, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "st2" = [
     // ST2 (multiple structures)
@@ -3372,23 +3370,23 @@ Ops!(map ;
     0b01001100_10011111_10000100_00000000 = [RegListStatic(2, WORD, 8), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_10011111_10001000_00000000 = [RegListStatic(2, DWORD, 4), RefBase, LitInt(32)] => [R(0), R(5)];
     0b01001100_10011111_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, LitInt(32)] => [R(0), R(5)];
-    0b00001100_10000000_10000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_10000000_00000000 = [RegList(2, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_10000100_00000000 = [RegList(2, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_10001000_00000000 = [RegList(2, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_10001100_00000000 = [RegListStatic(2, QWORD, 2), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // ST2 (single structure)
     0b00001101_00100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_00100000_01000000_00000000 = [RegListElement(2, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_00100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_00100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_10111111_00000000_00000000 = [RegListElement(2, BYTE), RefBase, LitInt(2)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10100000_00000000_00000000 = [RegListElement(2, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_10111111_01000000_00000000 = [RegListElement(2, WORD), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10100000_01000000_00000000 = [RegListElement(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10100000_01000000_00000000 = [RegListElement(2, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_10111111_10000000_00000000 = [RegListElement(2, DWORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10100000_10000000_00000000 = [RegListElement(2, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_10111111_10000100_00000000 = [RegListElement(2, QWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_10100000_10000100_00000000 = [RegListElement(2, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "st3" = [
     // ST3 (multiple structures)
@@ -3403,23 +3401,23 @@ Ops!(map ;
     0b01001100_10011111_01000100_00000000 = [RegListStatic(3, WORD, 8), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_10011111_01001000_00000000 = [RegListStatic(3, DWORD, 4), RefBase, LitInt(48)] => [R(0), R(5)];
     0b01001100_10011111_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, LitInt(48)] => [R(0), R(5)];
-    0b00001100_10000000_01000000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01000100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01001000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_01000000_00000000 = [RegList(3, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01000100_00000000 = [RegList(3, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01001000_00000000 = [RegList(3, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_01001100_00000000 = [RegListStatic(3, QWORD, 2), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // ST3 (single structure)
     0b00001101_00000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_00000000_01100000_00000000 = [RegListElement(3, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_00000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_00000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_10011111_00100000_00000000 = [RegListElement(3, BYTE), RefBase, LitInt(3)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10000000_00100000_00000000 = [RegListElement(3, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_10011111_01100000_00000000 = [RegListElement(3, WORD), RefBase, LitInt(6)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10000000_01100000_00000000 = [RegListElement(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10000000_01100000_00000000 = [RegListElement(3, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_10011111_10100000_00000000 = [RegListElement(3, DWORD), RefBase, LitInt(12)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10000000_10100000_00000000 = [RegListElement(3, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_10011111_10100100_00000000 = [RegListElement(3, QWORD), RefBase, LitInt(24)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_10000000_10100100_00000000 = [RegListElement(3, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "st4" = [
     // ST4 (multiple structures)
@@ -3434,23 +3432,23 @@ Ops!(map ;
     0b01001100_10011111_00000100_00000000 = [RegListStatic(4, WORD, 8), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_10011111_00001000_00000000 = [RegListStatic(4, DWORD, 4), RefBase, LitInt(64)] => [R(0), R(5)];
     0b01001100_10011111_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, LitInt(64)] => [R(0), R(5)];
-    0b00001100_10000000_00000000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00000100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00001000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
-    0b00001100_10000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, X] => [R(0), R(5), R(16), Rwidth(30)];
+    0b00001100_10000000_00000000_00000000 = [RegList(4, BYTE), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_00000100_00000000 = [RegList(4, WORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_00001000_00000000 = [RegList(4, DWORD), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
+    0b00001100_10000000_00001100_00000000 = [RegListStatic(4, QWORD, 2), RefBase, X] => [R(0), R(5), RNoZr(16), Rwidth(30)];
     // ST4 (single structure)
     0b00001101_00100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
     0b00001101_00100000_01100000_00000000 = [RegListElement(4, WORD), RefBase] => [R(0), Ufields(&[30, 12, 11]), R(5)];
     0b00001101_00100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase] => [R(0), Ufields(&[30, 12]), R(5)];
     0b00001101_00100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase] => [R(0), Ufields(&[30]), R(5)];
     0b00001101_10111111_00100000_00000000 = [RegListElement(4, BYTE), RefBase, LitInt(4)] => [R(0), Ufields(&[30, 12, 11, 10]), R(5)];
-    0b00001101_10100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), R(16)];
+    0b00001101_10100000_00100000_00000000 = [RegListElement(4, BYTE), RefBase, X] => [R(0), Ufields(&[30, 12, 11, 10]), R(5), RNoZr(16)];
     0b00001101_10111111_01100000_00000000 = [RegListElement(4, WORD), RefBase, LitInt(8)] => [R(0), Ufields(&[30, 12, 11]), R(5)];
-    0b00001101_10100000_01100000_00000000 = [RegListElement(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), R(16)];
+    0b00001101_10100000_01100000_00000000 = [RegListElement(4, WORD), RefBase, X] => [R(0), Ufields(&[30, 12, 11]), R(5), RNoZr(16)];
     0b00001101_10111111_10100000_00000000 = [RegListElement(4, DWORD), RefBase, LitInt(16)] => [R(0), Ufields(&[30, 12]), R(5)];
-    0b00001101_10100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), R(16)];
+    0b00001101_10100000_10100000_00000000 = [RegListElement(4, DWORD), RefBase, X] => [R(0), Ufields(&[30, 12]), R(5), RNoZr(16)];
     0b00001101_10111111_10100100_00000000 = [RegListElement(4, QWORD), RefBase, LitInt(32)] => [R(0), Ufields(&[30]), R(5)];
-    0b00001101_10100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), R(16)];
+    0b00001101_10100000_10100100_00000000 = [RegListElement(4, QWORD), RefBase, X] => [R(0), Ufields(&[30]), R(5), RNoZr(16)];
 ]
 "stadd" = [
     0b10111000_00100000_00000000_00011111 = [W, RefBase] => [R(16), R(5)];
@@ -3589,7 +3587,7 @@ Ops!(map ;
     0b00111100_00000000_00000100_00000000 = [B, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b01111100_00000000_00000100_00000000 = [H, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b10111100_00000000_00000100_00000000 = [S, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
-    0b11111100_00000000_00000100_00000000 = [B, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
+    0b11111100_00000000_00000100_00000000 = [D, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b00111100_10000000_00000100_00000000 = [Q, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
     0b00111100_00000000_00001100_00000000 = [B, RefPre] => [R(0), R(5), Sbits(12, 9)];
     0b01111100_00000000_00001100_00000000 = [H, RefPre] => [R(0), R(5), Sbits(12, 9)];
@@ -3598,8 +3596,8 @@ Ops!(map ;
     0b00111100_10000000_00001100_00000000 = [Q, RefPre] => [R(0), R(5), Sbits(12, 9)];
     0b00111101_00000000_00000000_00000000 = [B, RefOffset] => [R(0), R(5), Ubits(10, 12)];
     0b01111101_00000000_00000000_00000000 = [H, RefOffset] => [R(0), R(5), Uscaled(10, 12, 1)];
-    0b10111101_00000000_00000000_00000000 = [Q, RefOffset] => [R(0), R(5), Uscaled(10, 12, 2)];
-    0b11111101_00000000_00000000_00000000 = [B, RefOffset] => [R(0), R(5), Uscaled(10, 12, 3)];
+    0b10111101_00000000_00000000_00000000 = [S, RefOffset] => [R(0), R(5), Uscaled(10, 12, 2)];
+    0b11111101_00000000_00000000_00000000 = [D, RefOffset] => [R(0), R(5), Uscaled(10, 12, 3)];
     0b00111101_10000000_00000000_00000000 = [Q, RefOffset] => [R(0), R(5), Uscaled(10, 12, 4)];
     // STR (immediate)
     0b10111000_00000000_00000100_00000000 = [W, RefBase, Imm] => [R(0), R(5), Sbits(12, 9)];
@@ -3931,7 +3929,7 @@ Ops!(map ;
     0b00001110_11000000_01101000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 "tsb" = [
-    0b11010101_00000011_00100010_01011111 = [Lit("CSYNC")] => [];
+    0b11010101_00000011_00100010_01011111 = [Lit("csync")] => [];
 ]
 "tst" = [
     // TST (immediate)
@@ -3992,9 +3990,9 @@ Ops!(map ;
     0b00101110_10100000_00101000_00000000 = [V(QWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
 ]
 "uaddlv" = [
-    0b00101110_00110000_00111000_00000000 = [B, V(BYTE)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_01110000_00111000_00000000 = [H, V(WORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_10110000_00111000_00000000 = [S, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_00110000_00111000_00000000 = [H, V(BYTE)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_01110000_00111000_00000000 = [S, V(WORD)] => [R(0), R(5), Rwidth(30)];
+    0b00101110_10110000_00111000_00000000 = [D, VStatic(DWORD, 4)] => [R(0), R(5), Rwidth(30)];
 ]
 "uaddw" = [
     0b00101110_00100000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
@@ -4007,16 +4005,16 @@ Ops!(map ;
     0b01101110_10100000_00010000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(DWORD, 4)] => [R(0), R(5), R(16)];
 ]
 "ubfiz" = [
-    0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Usub(16, 5, 32), Urange(10, 1, 32)];
-    0b11010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Usub(16, 6, 64), Urange(10, 1, 64)];
+    0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Unegmod(16, 5), BUsum(5), Urange(10, 1, 32)];
+    0b11010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Unegmod(16, 6), BUsum(6), Urange(10, 1, 64)];
 ]
 "ubfm" = [
-    0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), Ubits(10, 5)];
-    0b11010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), Ubits(10, 6)];
+    0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), BUsum(5), Ubits(10, 5)];
+    0b11010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), BUsum(6), Ubits(10, 6)];
 ]
 "ubfx" = [
-    0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), Usumdec(10, 5)];
-    0b11010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), Usumdec(10, 6)];
+    0b01010011_00000000_00000000_00000000 = [W, W, Imm, Imm] => [R(0), R(5), Ubits(16, 5), BUsum(5), Usumdec(10, 5)];
+    0b11010011_01000000_00000000_00000000 = [X, X, Imm, Imm] => [R(0), R(5), Ubits(16, 6), BUsum(6), Usumdec(10, 6)];
 ]
 "ucvtf" = [
     // UCVTF (vector, fixed-point)
@@ -4035,10 +4033,10 @@ Ops!(map ;
     0b00101110_01100001_11011000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
     // UCVTF (scalar, fixed-point)
     0b00011110_11000011_00000000_00000000 = [H, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
-    0b00011110_00000011_00000000_00000000 = [S, W, Imm] => [R(0), R(5), Usub(10, 6, 64)];
+    0b00011110_00000011_00000000_00000000 = [S, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b00011110_01000011_00000000_00000000 = [D, W, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
     0b10011110_11000011_00000000_00000000 = [H, X, Imm] => [R(0), R(5), Usub(10, 6, 64)];
-    0b10011110_00000011_00000000_00000000 = [S, X, Imm] => [R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)];
+    0b10011110_00000011_00000000_00000000 = [S, X, Imm] => [R(0), R(5), Usub(10, 6, 64)];
     0b10011110_01000011_00000000_00000000 = [D, X, Imm] => [R(0), R(5), Usub(10, 6, 64)];
     // UCVTF (scalar, integer)
     0b00011110_11100011_00000000_00000000 = [H, W] => [R(0), R(5)];
@@ -4057,8 +4055,8 @@ Ops!(map ;
 ]
 "udot" = [
     // UDOT (by element)
-    0b00101111_10000000_11100000_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
-    0b01101111_10000000_11100000_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VElement(BYTE)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b00101111_10000000_11100000_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VStaticElement(BYTE, 4)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
+    0b01101111_10000000_11100000_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VStaticElement(BYTE, 4)] => [R(0), R(5), R(16), Ufields(&[11, 21])];
     // UDOT (vector)
     0b00101110_10000000_10010100_00000000 = [VStatic(DWORD, 2), VStatic(BYTE, 8), VStatic(BYTE, 8)] => [R(0), R(5), R(16)];
     0b01101110_10000000_10010100_00000000 = [VStatic(DWORD, 4), VStatic(BYTE, 16), VStatic(BYTE, 16)] => [R(0), R(5), R(16)];
@@ -4148,9 +4146,8 @@ Ops!(map ;
 "umov" = [
     0b00001110_00000001_00111100_00000000 = [W, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
     0b00001110_00000010_00111100_00000000 = [W, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01001110_00001001_00111100_00000000 = [X, VElement(BYTE)] => [R(0), R(5), Ubits(17, 4)];
-    0b01001110_00001010_00111100_00000000 = [X, VElement(WORD)] => [R(0), R(5), Ubits(18, 3)];
-    0b01001110_00001100_00111100_00000000 = [X, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b00001110_00000100_00111100_00000000 = [W, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
+    0b01001110_00001000_00111100_00000000 = [X, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
 ]
 "umsubl" = [
     0b10011011_10100000_10000000_00000000 = [X, W, W, X] => [R(0), R(5), R(16), R(10)];
@@ -4269,7 +4266,6 @@ Ops!(map ;
 ]
 "urecpe" = [
     0b00001110_10100001_11001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00001110_11100001_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "urhadd" = [
     0b00101110_00100000_00010100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
@@ -4292,7 +4288,6 @@ Ops!(map ;
 ]
 "ursqrte" = [
     0b00101110_10100001_11001000_00000000 = [V(DWORD), V(DWORD)] => [R(0), R(5), Rwidth(30)];
-    0b00101110_11100001_11001000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), Rwidth(30)];
 ]
 "ursra" = [
     0b01111111_00000000_00110100_00000000 = [D, D, Imm] => [R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)];

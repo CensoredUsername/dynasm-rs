@@ -51,6 +51,8 @@ pub enum Matcher {
     VElement(Size),
     /// vector register with element specifier, with the element of the specified size and the element index set to the provided value
     VElementStatic(Size, u8),
+    /// vector register with elements of the specified size, with the specified lane count, with an element specifier
+    VStaticElement(Size, u8),
 
     // register list with .0 items, with the elements of size .1
     RegList(u8, Size),
@@ -82,6 +84,8 @@ pub enum Matcher {
 pub enum Command {
     // commands that advance the argument pointer
     R(u8), // encode a register, or reference base, into a 5-bit bitfield.
+    REven(u8), // same as R, but requires that the register is even.
+    RNoZr(u8), // same as R, but does not allow register 31.
     R4(u8), // encode a register in the range 0-15 into a 4-bit bitfield
     RNext, // encode that this register should be the previous register, plus one
 
@@ -90,7 +94,8 @@ pub enum Command {
     Uscaled(u8, u8, u8), // encodes an unsigned immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
     Ulist(u8, &'static [u16]), // encodes an immediate that can only be a limited amount of options
     Urange(u8, u8, u8), // (loc, min, max) asserts the immediate is below or equal to max, encodes the value of (imm-min)
-    Usub(u8, u8, u8), // encodes at .0, .1 bits long, .2 - value. Checks if the value is in range.
+    Usub(u8, u8, u8), // encodes at .0, .1 bits long, .2 - value. Checks if the value is in the range 1 ..= value
+    Unegmod(u8, u8), // encodes at .0, .1 bits long, -value % (1 << .1). Checks if the value is in the range 0 .. value
     Usumdec(u8, u8), // encodes at .0, .1 bits long, the value of the previous arg + the value of the current arg - 1
     Ufields(&'static [u8]), // an immediate, encoded bitwise with the highest bit going into field 0, up to the lowest going into the last bitfield.
 
@@ -100,7 +105,8 @@ pub enum Command {
 
     // bit slice encodings. These don't advance the current argument. Only the slice argument actually encodes anything
     BUbits(u8), // checks if the pointed value fits in the given amount of bits
-    BSbits(u8), // checks if the pointed value fits in the given amount of bits
+    BUsum(u8), // checks that the pointed value fits between 1 and (1 << .0) - prev
+    BSscaled(u8, u8),
     BUrange(u8, u8), // check if the pointed value is between min/max
     Uslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
     Sslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
@@ -119,7 +125,7 @@ pub enum Command {
     // Condition encodings.
     /// Normal condition code 4-bit encoding
     Cond(u8),
-    /// Condition 4-bit encoding, but the last bit is inverted
+    /// Condition 4-bit encoding, but the last bit is inverted. No AL/NV allowed
     CondInv(u8),
 
     // Mapping of literal -> bitvalue
@@ -284,161 +290,167 @@ lazy_static! {
         let mut mapmap = HashMap::new();
         mapmap.insert("AT_OPS", {
             let mut map = HashMap::new();
-            map.insert("S1E1R",  0b00001111000000);
-            map.insert("S1E1W",  0b00001111000001);
-            map.insert("S1E0R",  0b00001111000010);
-            map.insert("S1E0W",  0b00001111000011);
-            map.insert("S1E2R",  0b10001111000000);
-            map.insert("S1E2W",  0b10001111000001);
-            map.insert("S12E1R", 0b10001111000100);
-            map.insert("S12E1W", 0b10001111000101);
-            map.insert("S12E0R", 0b10001111000110);
-            map.insert("S12E0W", 0b10001111000111);
-            map.insert("S1E3R",  0b11001111000000);
-            map.insert("S1E3W",  0b11001111000001);
-            map.insert("S1E1RP", 0b00001111001000);
-            map.insert("S1E1WP", 0b00001111001001);
+            map.insert("s1e1r",  0b00001111000000);
+            map.insert("s1e1w",  0b00001111000001);
+            map.insert("s1e0r",  0b00001111000010);
+            map.insert("s1e0w",  0b00001111000011);
+            map.insert("s1e2r",  0b10001111000000);
+            map.insert("s1e2w",  0b10001111000001);
+            map.insert("s12e1r", 0b10001111000100);
+            map.insert("s12e1w", 0b10001111000101);
+            map.insert("s12e0r", 0b10001111000110);
+            map.insert("s12e0w", 0b10001111000111);
+            map.insert("s1e3r",  0b11001111000000);
+            map.insert("s1e3w",  0b11001111000001);
+            map.insert("s1e1rp", 0b00001111001000);
+            map.insert("s1e1wp", 0b00001111001001);
+            map
+        });
+        mapmap.insert("IC_OPS", {
+            let mut map = HashMap::new();
+            map.insert("ialluis", 0b00001110001000);
+            map.insert("iallu",   0b00001110101000);
             map
         });
         mapmap.insert("DC_OPS", {
             let mut map = HashMap::new();
-            map.insert("IVAC",  0b00001110110001);
-            map.insert("ISW",   0b00001110110010);
-            map.insert("CSW",   0b00001111010010);
-            map.insert("CISW",  0b00001111110010);
-            map.insert("ZVA",   0b01101110100001);
-            map.insert("CVAC",  0b01101111010001);
-            map.insert("CVAU",  0b01101111011001);
-            map.insert("CIVAC", 0b01101111110001);
-            map.insert("CVAP",  0b01101111100001);
+            map.insert("ivac",  0b00001110110001);
+            map.insert("isw",   0b00001110110010);
+            map.insert("csw",   0b00001111010010);
+            map.insert("cisw",  0b00001111110010);
+            map.insert("zva",   0b01101110100001);
+            map.insert("cvac",  0b01101111010001);
+            map.insert("cvau",  0b01101111011001);
+            map.insert("civac", 0b01101111110001);
+            map.insert("cvap",  0b01101111100001);
             map
         });
         mapmap.insert("BARRIER_OPS", {
             let mut map = HashMap::new();
-            map.insert("SY",    0b1111);
-            map.insert("ST",    0b1110);
-            map.insert("LD",    0b1101);
-            map.insert("ISH",   0b1011);
-            map.insert("ISHST", 0b1010);
-            map.insert("ISHLD", 0b1001);
-            map.insert("NSH",   0b0111);
-            map.insert("NSHST", 0b0110);
-            map.insert("NSHLD", 0b0101);
-            map.insert("OSH",   0b0011);
-            map.insert("OSHST", 0b0010);
-            map.insert("OSHLD", 0b0001);
+            map.insert("sy",    0b1111);
+            map.insert("st",    0b1110);
+            map.insert("ld",    0b1101);
+            map.insert("ish",   0b1011);
+            map.insert("ishst", 0b1010);
+            map.insert("ishld", 0b1001);
+            map.insert("nsh",   0b0111);
+            map.insert("nshst", 0b0110);
+            map.insert("nshld", 0b0101);
+            map.insert("osh",   0b0011);
+            map.insert("oshst", 0b0010);
+            map.insert("oshld", 0b0001);
             map
         });
         mapmap.insert("MSR_IMM_OPS", {
             let mut map = HashMap::new();
-            map.insert("SPSel",   0b00001000000101);
-            map.insert("DAIFSet", 0b01101000000110);
-            map.insert("DAIFClr", 0b01101000000111);
-            map.insert("UAO",     0b00001000000011);
-            map.insert("PAN",     0b00001000000100);
-            map.insert("DIT",     0b01101000000010);
+            map.insert("spsel",   0b00001000000101);
+            map.insert("daifset", 0b01101000000110);
+            map.insert("daifclr", 0b01101000000111);
+            map.insert("uao",     0b00001000000011);
+            map.insert("pan",     0b00001000000100);
+            map.insert("dit",     0b01101000000010);
             map
         });
         mapmap.insert("CONTROL_REGS", {
             let mut map = HashMap::new();
-            map.insert("C0",  0);
-            map.insert("C1",  1);
-            map.insert("C2",  2);
-            map.insert("C3",  3);
-            map.insert("C4",  4);
-            map.insert("C5",  5);
-            map.insert("C6",  6);
-            map.insert("C7",  7);
-            map.insert("C8",  8);
-            map.insert("C9",  9);
-            map.insert("C10", 10);
-            map.insert("C11", 11);
-            map.insert("C12", 12);
-            map.insert("C13", 13);
-            map.insert("C14", 14);
-            map.insert("C15", 15);
+            map.insert("c0",  0);
+            map.insert("c1",  1);
+            map.insert("c2",  2);
+            map.insert("c3",  3);
+            map.insert("c4",  4);
+            map.insert("c5",  5);
+            map.insert("c6",  6);
+            map.insert("c7",  7);
+            map.insert("c8",  8);
+            map.insert("c9",  9);
+            map.insert("c10", 10);
+            map.insert("c11", 11);
+            map.insert("c12", 12);
+            map.insert("c13", 13);
+            map.insert("c14", 14);
+            map.insert("c15", 15);
             map
         });
         mapmap.insert("TLBI_OPS", {
             let mut map = HashMap::new();
-            map.insert("VMALLE1IS",    0b00010000011000);
-            map.insert("VAE1IS",       0b00010000011001);
-            map.insert("ASIDE1IS",     0b00010000011010);
-            map.insert("VAAE1IS",      0b00010000011011);
-            map.insert("VALE1IS",      0b00010000011101);
-            map.insert("VAALE1IS",     0b00010000011111);
-            map.insert("VMALLE1",      0b00010000111000);
-            map.insert("VAE1",         0b00010000111001);
-            map.insert("ASIDE1",       0b00010000111010);
-            map.insert("VAAE1",        0b00010000111011);
-            map.insert("VALE1",        0b00010000111101);
-            map.insert("VAALE1",       0b00010000111111);
-            map.insert("IPAS2E1IS",    0b10010000000001);
-            map.insert("IPAS2LE1IS",   0b10010000000101);
-            map.insert("ALLE2IS",      0b10010000011000);
-            map.insert("VAE2IS",       0b10010000011001);
-            map.insert("ALLE1IS",      0b10010000011100);
-            map.insert("VALE2IS",      0b10010000011101);
-            map.insert("VMALLS12E1IS", 0b10010000011110);
-            map.insert("IPAS2E1",      0b10010000100001);
-            map.insert("IPAS2LE1",     0b10010000100101);
-            map.insert("ALLE2",        0b10010000111000);
-            map.insert("VAE2",         0b10010000111001);
-            map.insert("ALLE1",        0b10010000111100);
-            map.insert("VALE2",        0b10010000111101);
-            map.insert("VMALLS12E1",   0b10010000111110);
-            map.insert("ALLE3IS",      0b11010000011000);
-            map.insert("VAE3IS",       0b11010000011001);
-            map.insert("VALE3IS",      0b11010000011101);
-            map.insert("ALLE3",        0b11010000111000);
-            map.insert("VAE3",         0b11010000111001);
-            map.insert("VALE3",        0b11010000111101);
-            map.insert("VMALLE1OS",    0b00010000001000);
-            map.insert("VAE1OS",       0b00010000001001);
-            map.insert("ASIDE1OS",     0b00010000001010);
-            map.insert("VAAE1OS",      0b00010000001011);
-            map.insert("VALE1OS",      0b00010000001101);
-            map.insert("VAALE1OS",     0b00010000001111);
-            map.insert("RVAE1IS",      0b00010000010001);
-            map.insert("RVAAE1IS",     0b00010000010011);
-            map.insert("RVALE1IS",     0b00010000010101);
-            map.insert("RVAALE1IS",    0b00010000010111);
-            map.insert("RVAE1OS",      0b00010000101001);
-            map.insert("RVAAE1OS",     0b00010000101011);
-            map.insert("RVALE1OS",     0b00010000101101);
-            map.insert("RVAALE1OS",    0b00010000101111);
-            map.insert("RVAE1",        0b00010000110001);
-            map.insert("RVAAE1",       0b00010000110011);
-            map.insert("RVALE1",       0b00010000110101);
-            map.insert("RVAALE1",      0b00010000110111);
-            map.insert("RIPAS2E1IS",   0b10010000000010);
-            map.insert("RIPAS2LE1IS",  0b10010000000110);
-            map.insert("ALLE2OS",      0b10010000001000);
-            map.insert("VAE2OS",       0b10010000001001);
-            map.insert("ALLE1OS",      0b10010000001100);
-            map.insert("VALE2OS",      0b10010000001101);
-            map.insert("VMALLS12E1OS", 0b10010000001110);
-            map.insert("RVAE2IS",      0b10010000010001);
-            map.insert("RVALE2IS",     0b10010000010101);
-            map.insert("IPAS2E1OS",    0b10010000100000);
-            map.insert("RIPAS2E1",     0b10010000100010);
-            map.insert("RIPAS2E1OS",   0b10010000100011);
-            map.insert("IPAS2LE1OS",   0b10010000100100);
-            map.insert("RIPAS2LE1",    0b10010000100110);
-            map.insert("RIPAS2LE1OS",  0b10010000100111);
-            map.insert("RVAE2OS",      0b10010000101001);
-            map.insert("RVALE2OS",     0b10010000101101);
-            map.insert("RVAE2",        0b10010000110001);
-            map.insert("RVALE2",       0b10010000110101);
-            map.insert("ALLE3OS",      0b11010000001000);
-            map.insert("VAE3OS",       0b11010000001001);
-            map.insert("VALE3OS",      0b11010000001101);
-            map.insert("RVAE3IS",      0b11010000010001);
-            map.insert("RVALE3IS",     0b11010000010101);
-            map.insert("RVAE3OS",      0b11010000101001);
-            map.insert("RVALE3OS",     0b11010000101101);
-            map.insert("RVAE3",        0b11010000110001);
-            map.insert("RVALE3",       0b11010000110101);
+            map.insert("vmalle1is",    0b00010000011000);
+            map.insert("vae1is",       0b00010000011001);
+            map.insert("aside1is",     0b00010000011010);
+            map.insert("vaae1is",      0b00010000011011);
+            map.insert("vale1is",      0b00010000011101);
+            map.insert("vaale1is",     0b00010000011111);
+            map.insert("vmalle1",      0b00010000111000);
+            map.insert("vae1",         0b00010000111001);
+            map.insert("aside1",       0b00010000111010);
+            map.insert("vaae1",        0b00010000111011);
+            map.insert("vale1",        0b00010000111101);
+            map.insert("vaale1",       0b00010000111111);
+            map.insert("ipas2e1is",    0b10010000000001);
+            map.insert("ipas2le1is",   0b10010000000101);
+            map.insert("alle2is",      0b10010000011000);
+            map.insert("vae2is",       0b10010000011001);
+            map.insert("alle1is",      0b10010000011100);
+            map.insert("vale2is",      0b10010000011101);
+            map.insert("vmalls12e1is", 0b10010000011110);
+            map.insert("ipas2e1",      0b10010000100001);
+            map.insert("ipas2le1",     0b10010000100101);
+            map.insert("alle2",        0b10010000111000);
+            map.insert("vae2",         0b10010000111001);
+            map.insert("alle1",        0b10010000111100);
+            map.insert("vale2",        0b10010000111101);
+            map.insert("vmalls12e1",   0b10010000111110);
+            map.insert("alle3is",      0b11010000011000);
+            map.insert("vae3is",       0b11010000011001);
+            map.insert("vale3is",      0b11010000011101);
+            map.insert("alle3",        0b11010000111000);
+            map.insert("vae3",         0b11010000111001);
+            map.insert("vale3",        0b11010000111101);
+            map.insert("vmalle1os",    0b00010000001000);
+            map.insert("vae1os",       0b00010000001001);
+            map.insert("aside1os",     0b00010000001010);
+            map.insert("vaae1os",      0b00010000001011);
+            map.insert("vale1os",      0b00010000001101);
+            map.insert("vaale1os",     0b00010000001111);
+            map.insert("rvae1is",      0b00010000010001);
+            map.insert("rvaae1is",     0b00010000010011);
+            map.insert("rvale1is",     0b00010000010101);
+            map.insert("rvaale1is",    0b00010000010111);
+            map.insert("rvae1os",      0b00010000101001);
+            map.insert("rvaae1os",     0b00010000101011);
+            map.insert("rvale1os",     0b00010000101101);
+            map.insert("rvaale1os",    0b00010000101111);
+            map.insert("rvae1",        0b00010000110001);
+            map.insert("rvaae1",       0b00010000110011);
+            map.insert("rvale1",       0b00010000110101);
+            map.insert("rvaale1",      0b00010000110111);
+            map.insert("ripas2e1is",   0b10010000000010);
+            map.insert("ripas2le1is",  0b10010000000110);
+            map.insert("alle2os",      0b10010000001000);
+            map.insert("vae2os",       0b10010000001001);
+            map.insert("alle1os",      0b10010000001100);
+            map.insert("vale2os",      0b10010000001101);
+            map.insert("vmalls12e1os", 0b10010000001110);
+            map.insert("rvae2is",      0b10010000010001);
+            map.insert("rvale2is",     0b10010000010101);
+            map.insert("ipas2e1os",    0b10010000100000);
+            map.insert("ripas2e1",     0b10010000100010);
+            map.insert("ripas2e1os",   0b10010000100011);
+            map.insert("ipas2le1os",   0b10010000100100);
+            map.insert("ripas2le1",    0b10010000100110);
+            map.insert("ripas2le1os",  0b10010000100111);
+            map.insert("rvae2os",      0b10010000101001);
+            map.insert("rvale2os",     0b10010000101101);
+            map.insert("rvae2",        0b10010000110001);
+            map.insert("rvale2",       0b10010000110101);
+            map.insert("alle3os",      0b11010000001000);
+            map.insert("vae3os",       0b11010000001001);
+            map.insert("vale3os",      0b11010000001101);
+            map.insert("rvae3is",      0b11010000010001);
+            map.insert("rvale3is",     0b11010000010101);
+            map.insert("rvae3os",      0b11010000101001);
+            map.insert("rvale3os",     0b11010000101101);
+            map.insert("rvae3",        0b11010000110001);
+            map.insert("rvale3",       0b11010000110101);
             map
         });
         mapmap

@@ -72,13 +72,13 @@ tlentry(['LDR', 'STR'],
 
 tlentry(['LDR', 'STR'],
     '<Dt>,[<Xn|SP>],#<simm>', (('imm9', 9, 12), ('Rn', 5, 5), ('Rt', 5, 0)),
-    matcher   = 'B, RefBase, Imm',
+    matcher   = 'D, RefBase, Imm',
     processor = 'R(0), R(5), Sbits(12, 9)',
 )
 
 tlentry(['LDR', 'STR'],
     '<Dt>,[<Xn|SP>{,#<pimm>}]', (('imm12', 12, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
-    matcher   = 'B, RefOffset',
+    matcher   = 'D, RefOffset',
     processor = 'R(0), R(5), Uscaled(10, 12, 3)',
 )
 
@@ -217,7 +217,7 @@ tlentry(['LDR', 'STR'],
 
 tlentry(['LDR', 'STR'],
     '<St>,[<Xn|SP>{,#<pimm>}]', (('imm12', 12, 10), ('Rn', 5, 5), ('Rt', 5, 0)),
-    matcher   = 'Q, RefOffset',
+    matcher   = 'S, RefOffset',
     processor = 'R(0), R(5), Uscaled(10, 12, 2)',
 )
 
