@@ -669,7 +669,7 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::Dot => (),
                 Matcher::Lit(s) => write!(buf, "{}", s).unwrap(),
                 Matcher::LitInt(v) => write!(buf, "{}", v).unwrap(),
-                Matcher::LitFloat(v) => write!(buf, "{}", v).unwrap(),
+                Matcher::LitFloat(v) => write!(buf, "{:.5}", v).unwrap(),
                 Matcher::Ident
                 | Matcher::Cond => write!(buf, "<Ident,{}>", arg_idx).unwrap(),
                 Matcher::Imm => write!(buf, "<Imm,{}>", arg_idx).unwrap(),

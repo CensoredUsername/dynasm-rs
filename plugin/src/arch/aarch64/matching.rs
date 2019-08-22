@@ -457,7 +457,13 @@ impl Matcher {
                 }
             },
             CleanArg::JumpTarget { .. } => *self == Matcher::Offset,
-            CleanArg::Immediate { prefixed: true, .. } => *self == Matcher::Imm || *self == Matcher::Offset,
+            CleanArg::Immediate { prefixed: true, value } => match self {
+                Matcher::Imm
+                | Matcher::Offset => true,
+                Matcher::LitInt(v) => as_number(value) == Some(*v as u64),
+                Matcher::LitFloat(v) => as_float(value) == Some(*v as f64),
+                _ => false,
+            },
             CleanArg::Immediate { prefixed: false, value} => match self {
                 Matcher::Imm => true,
                 Matcher::Offset => true,
