@@ -251,7 +251,7 @@ class Register(Arg):
 
     def emit_dynasm(self, value, allow_dynamic=True):
         # randomly choose dynamic vs static notation
-        if random.choice((True, False)) or not allow_dynamic:
+        if random.choice((True, False)) or not allow_dynamic or ('SP' in self.family and value != 31):
             return self.emit_gas(value)
         else:
             if self.family == "WX":

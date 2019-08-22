@@ -68,6 +68,7 @@ tlentry(['MOV', 'NGC', 'NGCS'],
     '<Wd>,<Wm>', (('Rm', 5, 16), ('Rd', 5, 0)),
     matcher   = 'W, W',
     processor = 'R(0), R(16)',
+    priority = 1
 )
 
 tlentry(['MVN', 'NEG', 'NEGS'],
@@ -116,7 +117,7 @@ tlentry(['ASR', 'LSR'],
 tlentry(['LSL'],
     '<Wd>,<Wn>,#<shift>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, W, Imm',
-    processor = 'R(0), R(5), Unegmod(16, 5), C, Usub(16, 5, 31)', # immr = -shift % 32, imms = 31 - shift
+    processor = 'R(0), R(5), Unegmod(16, 5), C, Usub(10, 5, 31)', # immr = -shift % 32, imms = 31 - shift
 )
 
 tlentry(['ADC', 'ADCS', 'ASR', 'ASRV', 'CRC32B', 'CRC32CB', 'CRC32CH', 'CRC32CW', 'CRC32H', 'CRC32W', 'LSL', 'LSLV', 'LSR', 'LSRV', 'MNEG', 'MUL', 'ROR', 'RORV', 'SBC', 'SBCS', 'SDIV', 'UDIV'],
@@ -469,6 +470,7 @@ tlentry(['MOV', 'NGC', 'NGCS'],
     '<Xd>,<Xm>', (('Rm', 5, 16), ('Rd', 5, 0)),
     matcher   = 'X, X',
     processor = 'R(0), R(16)',
+    priority = 1
 )
 
 tlentry(['MVN', 'NEG', 'NEGS'],
@@ -517,7 +519,7 @@ tlentry(['ASR', 'LSR'],
 tlentry(['LSL'],
     '<Xd>,<Xn>,#<shift>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, X, Imm',
-    processor = 'R(0), R(5), Unegmod(16, 6), C, Usub(16, 6, 63)', # immr = -shift % 64, imms = 63 - shift
+    processor = 'R(0), R(5), Unegmod(16, 6), C, Usub(10, 6, 63)', # immr = -shift % 64, imms = 63 - shift
 )
 
 tlentry(['ADC', 'ADCS', 'ASR', 'ASRV', 'LSL', 'LSLV', 'LSR', 'LSRV', 'MNEG', 'MUL', 'ROR', 'RORV', 'SBC', 'SBCS', 'SDIV', 'SMULH', 'UDIV', 'UMULH'],

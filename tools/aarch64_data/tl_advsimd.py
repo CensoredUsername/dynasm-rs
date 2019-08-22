@@ -512,8 +512,8 @@ tlentry(['ORR'],
         'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x00111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -528,8 +528,8 @@ tlentry(['BIC'],
         'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x10111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -919,7 +919,7 @@ tlentry(['FCMLA'], # duplicate definition
         'VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD), Imm',
     ],
     processors = [
-        'R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Static(30, 0b0)',
+        'R(0), R(5), R(16), Ufields(&[21]), Ulist(13, &[0, 90, 180, 270]), Static(30, 0b0)',
         'R(0), R(5), R(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270]), Static(30, 0b1)',
         'R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)',
     ],

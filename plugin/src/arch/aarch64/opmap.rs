@@ -190,8 +190,8 @@ Ops!(map ;
 ]
 "bic" = [
     // BIC (vector, immediate)
-    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])];
-    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])];
+    0b00101111_00000000_10010100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00101111_00000000_00010100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
     // BIC (vector, register)
     0b00001110_01100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // BIC (shifted register)
@@ -722,7 +722,7 @@ Ops!(map ;
 ]
 "fcmla" = [
     // FCMLA (by element)
-    0b00101111_01000000_00010000_00000000 = [VStatic(WORD, 4), VStatic(WORD, 4), VElement(WORD), Imm] => [R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270])];
+    0b00101111_01000000_00010000_00000000 = [VStatic(WORD, 4), VStatic(WORD, 4), VElement(WORD), Imm] => [R(0), R(5), R(16), Ufields(&[21]), Ulist(13, &[0, 90, 180, 270])];
     0b01101111_01000000_00010000_00000000 = [VStatic(WORD, 8), VStatic(WORD, 8), VElement(WORD), Imm] => [R(0), R(5), R(16), Ufields(&[11, 21]), Ulist(13, &[0, 90, 180, 270])];
     0b00101111_10000000_00010000_00000000 = [VStatic(DWORD, 4), VStatic(DWORD, 4), VElement(DWORD), Imm] => [R(0), R(5), R(16), Ufields(&[11]), Ulist(13, &[0, 90, 180, 270]), Rwidth(30)];
     // FCMLA
@@ -2215,8 +2215,8 @@ Ops!(map ;
     0b00011010_11000000_00100000_00000000 = [W, W, W] => [R(0), R(5), R(16)];
     0b10011010_11000000_00100000_00000000 = [X, X, X] => [R(0), R(5), R(16)];
     // LSL (immediate)
-    0b01010011_00000000_00000000_00000000 = [W, W, Imm] => [R(0), R(5), Unegmod(16, 5), C, Usub(16, 5, 31)];
-    0b11010011_01000000_00000000_00000000 = [X, X, Imm] => [R(0), R(5), Unegmod(16, 6), C, Usub(16, 6, 63)];
+    0b01010011_00000000_00000000_00000000 = [W, W, Imm] => [R(0), R(5), Unegmod(16, 5), C, Usub(10, 5, 31)];
+    0b11010011_01000000_00000000_00000000 = [X, X, Imm] => [R(0), R(5), Unegmod(16, 6), C, Usub(10, 6, 63)];
 ]
 "lslv" = [
     0b00011010_11000000_00100000_00000000 = [W, W, W] => [R(0), R(5), R(16)];
@@ -2261,6 +2261,9 @@ Ops!(map ;
     0b10011011_00000000_11111100_00000000 = [X, X, X] => [R(0), R(5), R(16)];
 ]
 "mov" = [
+    // MOV (register)
+    0b00101010_00000000_00000011_11100000 = [W, W] => [R(0), R(16)];
+    0b10101010_00000000_00000011_11100000 = [X, X] => [R(0), R(16)];
     // MOV (to/from SP)
     0b00010001_00000000_00000000_00000000 = [WSP, WSP] => [R(0), R(5)];
     0b10010001_00000000_00000000_00000000 = [XSP, XSP] => [R(0), R(5)];
@@ -2290,9 +2293,6 @@ Ops!(map ;
     // MOV (bitmask immediate)
     0b00110010_00000000_00000011_11100000 = [Dot, Lit("logical"), WSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_W)];
     0b10110010_00000000_00000011_11100000 = [Dot, Lit("logical"), XSP, Imm] => [R(0), Special(10, LOGICAL_IMMEDIATE_X)];
-    // MOV (register)
-    0b00101010_00000000_00000011_11100000 = [W, W] => [R(0), R(16)];
-    0b10101010_00000000_00000011_11100000 = [X, X] => [R(0), R(16)];
     // MOV (to general)
     0b00001110_00000100_00111100_00000000 = [W, VElement(DWORD)] => [R(0), R(5), Ubits(19, 2)];
     0b01001110_00001000_00111100_00000000 = [X, VElement(QWORD)] => [R(0), R(5), Ubits(20, 1)];
@@ -2390,8 +2390,8 @@ Ops!(map ;
 ]
 "orr" = [
     // ORR (vector, immediate)
-    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8])];
-    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24])];
+    0b00001111_00000000_10010100_00000000 = [V(WORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)];
+    0b00001111_00000000_00010100_00000000 = [V(DWORD), Imm, End, LitMod(LSL)] => [R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)];
     // ORR (vector, register)
     0b00001110_10100000_00011100_00000000 = [V(BYTE), V(BYTE), V(BYTE)] => [R(0), R(5), R(16), Rwidth(30)];
     // ORR (immediate)

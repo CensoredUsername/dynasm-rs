@@ -347,86 +347,84 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::Special(offset, special) => handle_special_immediates(offset, special, value, &mut statics, &mut dynamics)?,
 
                 // jump targets also accept immediates
-                Command::Offset(relocation) => {
-                    match relocation {
-                         // b, bl 26 bits, dword aligned
-                        Relocation::B => {
-                            let bits = 26;
-                            let mask = bitmask(bits);
-                            let half = -1i32 << (bits - 1);
-                            if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 2) {
-                                statics.push((0, ((value? >> 2) as u32) & mask));
-                            } else {
-                                dynamics.push((0, quote_spanned!{ value.span()=>
-                                    ((#value >> 2) as u32) & #mask
-                                }));
-                            }
-                        },
-                        // b.cond, cbnz, cbz, ldr, ldrsw, prfm: 19 bits, dword aligned
-                        Relocation::BCOND => {
-                            let bits = 19;
-                            let mask = bitmask(bits);
-                            let half = -1i32 << (bits - 1);
-                            if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 2) {
-                                statics.push((5, ((value? >> 2) as u32) & mask));
-                            } else {
-                                dynamics.push((5, quote_spanned!{ value.span()=>
-                                    ((#value >> 2) as u32) & #mask
-                                }));
-                            }
-                        },
-                        // adr split 21 bit, byte aligned
-                        Relocation::ADR => {
-                            let bits = 21;
-                            let mask = bitmask(bits);
-                            let half = -1i32 << (bits - 1);
-                            if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 0) {
-                                let value = value?;
-                                statics.push((5, ((value >> 2) as u32) & 0x7FFFF));
-                                statics.push((29, (value as u32) & 3));
-                            } else {
-                                dynamics.push((5, quote_spanned!{ value.span()=>
-                                    ((#value >> 2) as u32) & 0x7FFFF
-                                }));
-                                dynamics.push((29, quote_spanned!{ value.span()=>
-                                    (#value as u32) & 3
-                                }));
-                            }
-                        },
-                        // adrp split 21 bit, 4096-byte aligned
-                        Relocation::ADRP => {
-                            let bits = 21;
-                            let mask = bitmask(bits);
-                            let half = -1i32 << (bits - 1);
-                            if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 12) {
-                                let value = value?;
-                                statics.push((5, ((value >> 2) as u32) & 0x7FFFF));
-                                statics.push((29, (value as u32) & 3));
-                            } else {
-                                dynamics.push((5, quote_spanned!{ value.span()=>
-                                    ((#value >> 14) as u32) & 0x7FFFF
-                                }));
-                                dynamics.push((29, quote_spanned!{ value.span()=>
-                                    ((#value >> 12) as u32) & 3
-                                }));
-                            }
-                        },
-                        // tbnz, tbz: 14 bits, dword aligned
-                        Relocation::TBZ => {
-                            let bits = 14;
-                            let mask = bitmask(bits);
-                            let half = -1i32 << (bits - 1);
-                            if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 2) {
-                                statics.push((5, ((value? >> 2) as u32) & mask));
-                            } else {
-                                dynamics.push((5, quote_spanned!{ value.span()=>
-                                    ((#value >> 2) as u32) & #mask
-                                }));
-                            }
-                        },
-                        Relocation::LITERAL32
-                        | Relocation::LITERAL64 => ()
-                    }
+                Command::Offset(relocation) => match relocation {
+                     // b, bl 26 bits, dword aligned
+                    Relocation::B => {
+                        let bits = 26;
+                        let mask = bitmask(bits);
+                        let half = -1i32 << (bits - 1);
+                        if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 2) {
+                            statics.push((0, (value? as u32) & mask));
+                        } else {
+                            dynamics.push((0, quote_spanned!{ value.span()=>
+                                ((#value >> 2) as u32) & #mask
+                            }));
+                        }
+                    },
+                    // b.cond, cbnz, cbz, ldr, ldrsw, prfm: 19 bits, dword aligned
+                    Relocation::BCOND => {
+                        let bits = 19;
+                        let mask = bitmask(bits);
+                        let half = -1i32 << (bits - 1);
+                        if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 2) {
+                            statics.push((5, (value? as u32) & mask));
+                        } else {
+                            dynamics.push((5, quote_spanned!{ value.span()=>
+                                ((#value >> 2) as u32) & #mask
+                            }));
+                        }
+                    },
+                    // adr split 21 bit, byte aligned
+                    Relocation::ADR => {
+                        let bits = 21;
+                        let mask = bitmask(bits);
+                        let half = -1i32 << (bits - 1);
+                        if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 0) {
+                            let value = value?;
+                            statics.push((5, ((value >> 2) as u32) & 0x7FFFF));
+                            statics.push((29, (value as u32) & 3));
+                        } else {
+                            dynamics.push((5, quote_spanned!{ value.span()=>
+                                ((#value >> 2) as u32) & 0x7FFFF
+                            }));
+                            dynamics.push((29, quote_spanned!{ value.span()=>
+                                (#value as u32) & 3
+                            }));
+                        }
+                    },
+                    // adrp split 21 bit, 4096-byte aligned
+                    Relocation::ADRP => {
+                        let bits = 21;
+                        let mask = bitmask(bits);
+                        let half = -1i32 << (bits - 1);
+                        if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 12) {
+                            let value = value?;
+                            statics.push((5, ((value >> 2) as u32) & 0x7FFFF));
+                            statics.push((29, (value as u32) & 3));
+                        } else {
+                            dynamics.push((5, quote_spanned!{ value.span()=>
+                                ((#value >> 14) as u32) & 0x7FFFF
+                            }));
+                            dynamics.push((29, quote_spanned!{ value.span()=>
+                                ((#value >> 12) as u32) & 3
+                            }));
+                        }
+                    },
+                    // tbnz, tbz: 14 bits, dword aligned
+                    Relocation::TBZ => {
+                        let bits = 14;
+                        let mask = bitmask(bits);
+                        let half = -1i32 << (bits - 1);
+                        if let Some(value) = signed_rangecheck(value, half, mask as i32 + half, 2) {
+                            statics.push((5, (value? as u32) & mask));
+                        } else {
+                            dynamics.push((5, quote_spanned!{ value.span()=>
+                                ((#value >> 2) as u32) & #mask
+                            }));
+                        }
+                    },
+                    Relocation::LITERAL32
+                    | Relocation::LITERAL64 => ()
                 },
 
                 _ => panic!("Invalid argument processor")
