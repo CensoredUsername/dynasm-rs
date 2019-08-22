@@ -211,6 +211,6 @@ pub fn bitmask(scale: u8) -> u32 {
 
 /// Create a bitmask with `scale` bits set
 pub fn bitmask64(scale: u8) -> u64 {
-    1u64.checked_shl(scale as u64).unwrap_or(0).wrapping_sub(1)
+    1u64.checked_shl(scale as u32).unwrap_or(0).wrapping_sub(1)
 }
 

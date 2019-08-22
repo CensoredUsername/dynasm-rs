@@ -25,7 +25,7 @@ pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
         return None;
     }
 
-    let element = value & bitmask(element_size);
+    let element = value & bitmask(element_size as u8);
     let ones = element.count_ones();
     let imms = (!((element_size << 1) - 1) & 0x3F) | (ones - 1);
 
@@ -47,7 +47,7 @@ pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
         return None;
     }
 
-    let element = value & bitmask64(element_size);
+    let element = value & bitmask64(element_size as u8);
     let ones = element.count_ones();
     let imms = (!((element_size << 1) - 1) & 0x7F) | (ones - 1);
 
