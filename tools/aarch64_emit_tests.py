@@ -19,7 +19,7 @@ def main():
 
     tests = [emit_test_case(i, dynasm, gas, bytes) for i, (dynasm, gas, bytes) in enumerate(data)]
 
-    for i, chunk in enumerate(chunks(tests, 1000)):
+    for i, chunk in enumerate(chunks(tests, 400)):
         with open(os.path.join(sys.argv[2], "aarch64_tests_{}.rs.gen".format(i)), "w", encoding="utf-8") as f:
             for test in chunk:
                 f.write(test)
@@ -27,6 +27,7 @@ def main():
 def emit_test_case(i, dynasm, gas, bytes):
     name = dynasm.split(' ', 1)[0].replace(".", "_")
     bytes = ", ".join(chunks(bytes, 2)).upper()
+    error = dynasm.replace("{", "{{").replace("}", "}}")
     return """
 #[test]
 fn {}_{}() {{
@@ -38,9 +39,9 @@ fn {}_{}() {{
     let buf = ops.finalize().unwrap();
     let hex: Vec<String> = buf.iter().map(|x| format!("{{:02X}}", *x)).collect();
     let hex = hex.join(", ");
-    assert_eq(hex, "{}", "{}");
+    assert_eq!(hex, "{}", "{}");
 }}
-""".format(name, i, dynasm, bytes, dynasm)
+""".format(name, i, dynasm, bytes, error)
 
 
 
