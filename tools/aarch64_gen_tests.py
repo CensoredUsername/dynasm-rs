@@ -34,9 +34,15 @@ class OpTemplate:
     def create_entry(self, keep_optionals=False):
         history = History()
         for (arg, i) in self.args:
-            value = self.constraints[i].create_value(history)
+            constraint = self.constraints[i]
+            value = constraint.create_value(history)
             gas = arg.emit_gas(value)
             emitted = arg.emit_dynasm(value)
+            if isinstance(constraint, RNext):
+                if "(" in history.emitted[-1]:
+                    emitted = arg.emit_dynasm(31, False)
+                else:
+                    emitted = arg.emit_dynasm(value, False)
 
             history.values.append(value)
             history.emitted.append(emitted)
@@ -243,9 +249,9 @@ class Register(Arg):
         else:
             raise NotImplementedError(self.family)
 
-    def emit_dynasm(self, value):
+    def emit_dynasm(self, value, allow_dynamic=True):
         # randomly choose dynamic vs static notation
-        if random.choice((True, False)):
+        if random.choice((True, False)) or not allow_dynamic:
             return self.emit_gas(value)
         else:
             if self.family == "WX":
