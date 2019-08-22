@@ -457,9 +457,10 @@ impl Matcher {
                 }
             },
             CleanArg::JumpTarget { .. } => *self == Matcher::Offset,
-            CleanArg::Immediate { prefixed: true, .. } => *self == Matcher::Imm,
+            CleanArg::Immediate { prefixed: true, .. } => *self == Matcher::Imm || *self == Matcher::Offset,
             CleanArg::Immediate { prefixed: false, value} => match self {
                 Matcher::Imm => true,
+                Matcher::Offset => true,
                 Matcher::Ident => as_ident(value).is_some(),
                 Matcher::Cond => if let Some(i) = as_ident(value) {
                     COND_MAP.contains_key(&&*i.to_string())
