@@ -598,7 +598,7 @@ tlentry(['ROR'],
 tlentry(['CSET', 'CSETM'],
     '<Xd>,<cond>', (('cond', 4, 12), ('Rd', 5, 0)),
     matcher   = 'X, Cond',
-    processor = 'R(0), Cond(12)',
+    processor = 'R(0), CondInv(12)',
 )
 
 tlentry(['ADR'],
