@@ -92,7 +92,7 @@ tlentry(['ANDS'],
 tlentry(['BFM', 'SBFM', 'UBFM'],
     '<Wd>,<Wn>,#<immr>,#<imms>', (('immr', 6, 16), ('imms', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, W, Imm, Imm',
-    processor = 'R(0), R(5), Ubits(16, 5), BUsum(5), Ubits(10, 5)',
+    processor = 'R(0), R(5), Ubits(16, 5), Ubits(10, 5)',
 )
 
 tlentry(['BFI', 'SBFIZ', 'UBFIZ'],
