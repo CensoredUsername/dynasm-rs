@@ -1,3 +1,4 @@
+use crate::common::{bitmask, bitmask64};
 
 pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
     // floating point ARM immediates are encoded as
@@ -24,7 +25,7 @@ pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
         return None;
     }
 
-    let element = value & (1u32 << element_size).wrapping_sub(1);
+    let element = value & bitmask(element_size);
     let ones = element.count_ones();
     let imms = (!((element_size << 1) - 1) & 0x3F) | (ones - 1);
 
@@ -46,7 +47,7 @@ pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
         return None;
     }
 
-    let element = value & (1u64 << element_size).wrapping_sub(1);
+    let element = value & bitmask64(element_size);
     let ones = element.count_ones();
     let imms = (!((element_size << 1) - 1) & 0x7F) | (ones - 1);
 
