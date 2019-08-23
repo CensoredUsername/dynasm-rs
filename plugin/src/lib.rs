@@ -189,7 +189,7 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
     let opmap = parse_macro_input!(tokens as DynasmOpmap);
 
     let s = match opmap.arch.as_str() {
-        "x64" | "x86" => unimplemented!(),
+        "x64" | "x86" => "UNIMPLEMENTED".into(),
         "aarch64" => arch::aarch64::extract_opmap(),
         x => panic!("Unknown architecture {}", x)
     };

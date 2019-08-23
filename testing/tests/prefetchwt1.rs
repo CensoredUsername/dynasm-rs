@@ -8,4 +8,4 @@ extern crate dynasm;
 use dynasm::dynasm;
 use dynasmrt::DynasmApi;
 
-include!("gen/prefetchwt1.rs.gen");
+include!("gen_x64/prefetchwt1.rs.gen");

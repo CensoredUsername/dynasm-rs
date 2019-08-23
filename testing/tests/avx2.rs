@@ -8,4 +8,4 @@ extern crate dynasm;
 use dynasm::dynasm;
 use dynasmrt::DynasmApi;
 
-include!("gen/avx2.rs.gen");
+include!("gen_x64/avx2.rs.gen");

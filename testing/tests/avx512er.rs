@@ -7,4 +7,4 @@ extern crate dynasm;
 
 use dynasm::dynasm;
 use dynasmrt::DynasmApi;
-include!("gen/avx512er.rs.gen");
+include!("gen_x64/avx512er.rs.gen");

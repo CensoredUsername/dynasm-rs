@@ -8,4 +8,4 @@ extern crate dynasm;
 use dynasm::dynasm;
 use dynasmrt::DynasmApi;
 
-include!("gen/bmi2.rs.gen");
+include!("gen_x64/bmi2.rs.gen");

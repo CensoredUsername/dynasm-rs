@@ -2,9 +2,18 @@
 name = "insref"
 version = "0.1.0"
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
+default-run = "main"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "export"
+path = "src/export.rs"
 
 [dependencies]
 
 [dependencies.dynasm]
 path = "../../plugin"
-features = ["dynasm_opmap"]
+features = ["dynasm_opmap", "dynasm_extract"]
