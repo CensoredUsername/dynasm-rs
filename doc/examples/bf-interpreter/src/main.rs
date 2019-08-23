@@ -5,8 +5,8 @@ use std::fs::File;
 const TAPE_SIZE: usize = 30000;
 
 struct Interpreter<'a> {
-    pub input: Box<BufRead + 'a>,
-    pub output: Box<Write + 'a>,
+    pub input: Box<dyn BufRead + 'a>,
+    pub output: Box<dyn Write + 'a>,
     pub loops: Vec<usize>,
     pub tape: [u8; TAPE_SIZE],
     pub tape_index: usize,
@@ -14,7 +14,7 @@ struct Interpreter<'a> {
 }
 
 impl<'a> Interpreter<'a> {
-    fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> Interpreter<'a> {
+    fn new(input: Box<dyn BufRead + 'a>, output: Box<dyn Write + 'a>) -> Interpreter<'a> {
         Interpreter {
             input: input,
             output: output,
