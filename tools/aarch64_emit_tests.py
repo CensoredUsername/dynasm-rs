@@ -1,6 +1,10 @@
 import os
 import os.path
 
+BLACKLIST = {
+    "adrp" # assembler emits a bad example for this
+}
+
 def read_input_file(f):
     buf = []
     for line in f:
@@ -19,13 +23,15 @@ def main():
 
     tests = [emit_test_case(i, dynasm, gas, bytes) for i, (dynasm, gas, bytes) in enumerate(data)]
 
-    for i, chunk in enumerate(chunks(tests, 400)):
+    for i, chunk in enumerate(chunks(tests, 800)):
         with open(os.path.join(sys.argv[2], "aarch64_tests_{}.rs.gen".format(i)), "w", encoding="utf-8") as f:
             for test in chunk:
                 f.write(test)
 
 def emit_test_case(i, dynasm, gas, bytes):
     name = dynasm.split(' ', 1)[0].replace(".", "_")
+    if name in BLACKLIST:
+        return ""
     bytes = ", ".join(chunks(bytes, 2)).upper()
     error = dynasm.replace("{", "{{").replace("}", "}}")
     return """

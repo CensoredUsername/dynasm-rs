@@ -95,8 +95,10 @@ tlentry(['CFP', 'CPP', 'DVP'],
 
 tlentry(['CLREX'],
     '{#<imm>}', (('CRm', 4, 8),),
-    matcher   = 'End, Imm',
+    matcher   = 'Imm',
     processor = 'Ubits(8, 4)',
+    matchers  =[''],
+    processors=['Static(8, 0b1111)']
 )
 
 tlentry(['DCPS1', 'DCPS2', 'DCPS3'],
