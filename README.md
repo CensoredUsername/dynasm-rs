@@ -2,7 +2,7 @@
 
 The purpose of this tool is to ease the creation of programs that require run-time assembling.
 
-It is currently in alpha, meaning that while everything should work, a lot of features need to be tested
+It is currently in beta, meaning that everything is operational, but some APIs might change in the future.
 
 [![Build Status](https://travis-ci.org/CensoredUsername/dynasm-rs.svg?branch=master)](https://travis-ci.org/CensoredUsername/dynasm-rs)
 [![](https://img.shields.io/crates/v/dynasm.svg)](https://crates.io/crates/dynasm)
@@ -20,9 +20,10 @@ It is currently in alpha, meaning that while everything should work, a lot of fe
 
 Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/language/index.html).
 
-## Limitations
+## Support
 
-- Currently only supports the x64 and x86 instruction sets in long and protected mode with every AMD/Intel/VIA extension except for AVX-512.
+- Supports the x64/x86 instruction sets in long and protected mode with every AMD/Intel/VIA extension except for AVX-512.
+- Supports the aarch64 instruction set up to ARMv8.4 except for SVE instructions.
 
 ## Example
 
@@ -89,9 +90,8 @@ Copyright 2016 CensoredUsername
 
 ## Guaranteed to be working compiler versions
 
-As this project is a compiler plugin, sometimes new compiler versions tend to break it.
-Here a list is kept of what versions of the compiler are guaranteed to work with specific
-dynasm-rs versions.
+This project used to be a compiler plugin, so for old compilers, here's a list of which version of dynasm was guaranteed to work with which compiler.
+As the project has since transitioned to be a proc macro, this is not relevant for modern versions of the compiler.
 
 - `v0.2.0`: `rustc 1.27.0-nightly (ac3c2288f 2018-04-18)`
 - `v0.2.1`: `rustc 1.28.0-nightly (a1d4a9503 2018-05-20)`
