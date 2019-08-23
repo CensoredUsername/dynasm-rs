@@ -35,13 +35,25 @@ cat ./doc/hack.js >> ./build_docs/plugin/search-index.js
 cat ./doc/hack.js >> ./build_docs/runtime/search-index.js
 
 echo "copy docs examples to tests"
-declare -a examples=("bf-jit" "hello-world")
+declare -a examples=("bf-jit" "hello-world" "bf-interpreter")
 for EX in "${examples[@]}"
 do
     TARGET=$(echo $EX | tr - _)
-    cp "./doc/examples/${EX}/src/x64.rs" "./testing/tests/${TARGET}.rs"
-    echo -n -e "#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
-         "./testing/tests/${TARGET}.rs"
+    if [ -f "./doc/examples/${EX}/src/main.rs" ]; then
+        cp "./doc/examples/${EX}/src/main.rs" "./testing/tests/${TARGET}.rs"
+        echo -n -e "#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
+             "./testing/tests/${TARGET}.rs"
+    fi
+    if [ -f "./doc/examples/${EX}/src/x64.rs" ]; then
+        cp "./doc/examples/${EX}/src/x64.rs" "./testing/tests/${TARGET}_x64.rs"
+        echo -n -e "#[cfg(target_arch=\"x64\")]\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
+             "./testing/tests/${TARGET}_x64.rs"
+    fi
+    if [ -f "./doc/examples/${EX}/src/aarch64.rs" ]; then
+        cp "./doc/examples/${EX}/src/aarch64.rs" "./testing/tests/${TARGET}_aarch64.rs"
+        echo -n -e "#[cfg(target_arch=\"aarch64\")]\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
+             "./testing/tests/${TARGET}_aarch64.rs"
+    fi
 done
 
 if [ "$1" == "commit" ]; then
