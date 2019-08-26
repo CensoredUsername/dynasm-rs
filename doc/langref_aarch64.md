@@ -184,4 +184,4 @@ Immediate type | description
 Wide immediate | A 32 or 64-bit immediate which is encoded by taking 16 bits and shifting them 0, 16, 32, or 48 bits left, with possible inversion afterwards.
 Logical immediate | A 32 or 64-bit bitfield, composed out of repeated 2, 4, 8, 16, 32 or 64-bit elements with the first n bits set to 1, and then rotated afterwards. All 0 or all 1 cannot be encoded. 
 Stretched immediate | A 64-bit immediate encoded in 8 bits `a:b:c:d:e:f:g:h` which encodes the binary value `0baaaaaaaabbbbbbbbccccccccddddddddeeeeeeeeffffffffgggggggghhhhhhhh`.
-Floating point immediate | A short, float or double value encoded into 8 bits. It can represent any value in the format `(-1.0)^s * 2.0^m * (1.0 + e / 16.0)` where `-3 <= m <= 4, 0 <= e <= 15, s = [0, 1]`.
+Floating point immediate | A short, float or double value encoded into 8 bits. It can represent any value in the format `(-1.0)^s * 2.0^e * (1.0 + m / 16.0)` where `-3 <= e <= 4, 0 <= m <= 15, s = [0, 1]`.
