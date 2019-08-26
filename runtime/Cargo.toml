@@ -1,6 +1,6 @@
 [package]
 name = "dynasmrt"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
 
 description = "A simple runtime for assembling code at runtime. Combined with the plugin crate dynasm it can be used to write JIT compilers easily."
@@ -14,6 +14,6 @@ license = "MPL-2.0"
 
 
 [dependencies]
-memmap = "^0.6.2"
+memmap = "^0.7"
 byteorder = "1"
-take_mut = "^0.2.2"
+take_mut = "^0.2"

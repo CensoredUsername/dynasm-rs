@@ -100,7 +100,7 @@ pub fn as_lit_with_negation(expr: &syn::Expr) -> Option<(&syn::Lit, bool)> {
 /// checks if an expression is a constant number literal
 pub fn as_number(expr: &syn::Expr) -> Option<u64> {
     match as_lit(expr)?  {
-        syn::Lit::Int(i) => Some(i.value()),
+        syn::Lit::Int(i) => i.base10_parse().ok(),
         _ => None
     }
 }
@@ -109,9 +109,11 @@ pub fn as_number(expr: &syn::Expr) -> Option<u64> {
 pub fn as_signed_number(expr: &syn::Expr) -> Option<i64> {
     let (expr, negated) = as_lit_with_negation(expr)?;
     match expr {
-        syn::Lit::Int(i) => {
-            let value: i64 = i.value().try_into().ok()?;
+        syn::Lit::Int(i) => if let Ok(value) = i.base10_parse::<u64>() {
+            let value: i64 = value.try_into().ok()?;
             Some (if negated {-value} else {value})
+        } else {
+            None
         },
         _ => None
     }
@@ -121,7 +123,7 @@ pub fn as_signed_number(expr: &syn::Expr) -> Option<i64> {
 pub fn as_float(expr: &syn::Expr) -> Option<f64> {
     let (expr, negated) = as_lit_with_negation(expr)?;
     match expr {
-        syn::Lit::Float(i) => Some(if negated { -i.value() } else { i.value() } ),
+        syn::Lit::Float(i) => i.base10_parse::<f64>().ok().map(|i| if negated { -i } else { i } ),
         _ => None
     }
 }

@@ -760,28 +760,22 @@ fn derive_size(expr: &syn::Expr) -> Option<Size> {
     match inner {
         syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => match lit {
             syn::Lit::Byte(_) => Some(Size::BYTE),
-            syn::Lit::Int(i) => if i.value() < 0x80 {
-                Some(Size::BYTE)
-            } else if i.value() < 0x8000 {
-                Some(Size::WORD)
-            } else if i.value() < 0x8000_0000 {
-                Some(Size::DWORD)
-            } else {
-                Some(Size::QWORD)
+            syn::Lit::Int(i) => match i.base10_parse::<u32>() {
+                Ok(x) if x < 0x80 => Some(Size::BYTE),
+                Ok(x) if x < 0x8000 => Some(Size::WORD),
+                Ok(x) if x < 0x8000_0000 => Some(Size::DWORD),
+                _ => Some(Size::QWORD),
             },
             _ => None
         },
         syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(_), ref expr, .. } ) => match &**expr {
             syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => match lit {
                 syn::Lit::Byte(_) => Some(Size::BYTE),
-                syn::Lit::Int(i) => if i.value() <= 0x80 {
-                    Some(Size::BYTE)
-                } else if i.value() <= 0x8000 {
-                    Some(Size::WORD)
-                } else if i.value() <= 0x8000_0000 {
-                    Some(Size::DWORD)
-                } else {
-                    Some(Size::QWORD)
+                syn::Lit::Int(i) => match i.base10_parse::<u32>() {
+                    Ok(x) if x <= 0x80 => Some(Size::BYTE),
+                    Ok(x) if x <= 0x8000 => Some(Size::WORD),
+                    Ok(x) if x <= 0x8000_0000 => Some(Size::DWORD),
+                    _ => Some(Size::QWORD),
                 },
                 _ => None
             },

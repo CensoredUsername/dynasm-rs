@@ -291,16 +291,20 @@ fn parse_adds(ctx: &Context, expr: syn::Expr) -> Vec<MemoryRefItem> {
             if let Some((_, reg)) = parse_reg(ctx, left) {
                 if let syn::Expr::Lit(syn::ExprLit {ref lit, ..}) = **right {
                     if let syn::Lit::Int(lit) = lit {
-                        items.push(MemoryRefItem::ScaledRegister(reg, lit.value() as isize));
-                        continue;
+                        if let Ok(value) = lit.base10_parse::<isize>() {
+                            items.push(MemoryRefItem::ScaledRegister(reg, value));
+                            continue;
+                        }
                     }
                 }
             } // const * reg
             if let Some((_, reg)) = parse_reg(ctx, right) {
                 if let syn::Expr::Lit(syn::ExprLit {ref lit, ..}) = **left {
                     if let syn::Lit::Int(lit) = lit {
-                        items.push(MemoryRefItem::ScaledRegister(reg, lit.value() as isize));
-                        continue;
+                        if let Ok(value) = lit.base10_parse::<isize>() {
+                            items.push(MemoryRefItem::ScaledRegister(reg, value));
+                            continue;
+                        }
                     }
                 }
             }
