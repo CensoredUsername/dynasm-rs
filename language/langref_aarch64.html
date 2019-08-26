@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>Language Reference</title>
+
+    <link rel="stylesheet" type="text/css" href="./formatting.css">
+
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <nav class="sidebar">
+  <p class="location">
+    <a href="./index.html">dynasm-rs</a>
+  </p>
+  <div class = "block modules">
+    <h3>Components</h3>
+    <ul>
+      <li>
+        <a href="../language/index.html">Syntax</a>
+      </li>
+      <li>
+        <a href="../plugin/dynasm/index.html">Plugin (dynasm)</a>
+      </li>
+      <li>
+        <a href="../runtime/dynasmrt/index.html">Runtime (dynasmrt)</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+    <h3>Syntax</h3>
+    <ul>
+      <li>
+        <a href="./index.html">Home</a>
+      </li>
+      <li>
+        <a href="./tutorial.html">Tutorial</a>
+      </li>
+      <li>
+        <a href="./langref_common.html">Language</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+    <h3>Architectures</h3>
+    <h4>x64/x86</h4>
+    <ul>
+      <li>
+        <a href="./langref_x64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_x64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>aarch64</h4>
+    <ul>
+      <li>
+        <a href="./langref_aarch64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_aarch64.html">Instruction reference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section id="main" class="content mod docblock">
+
+    <h1 class="title">Language Reference</h1>
+    <h1 id="lexical-structure-definition" class="section-header"><a href="#lexical-structure-definition">Lexical structure definition</a></h1>
+<p>Instructions for the <code>x86</code> and <code>x64</code> assembling backend use the following lexical structure</p>
+<h2 id="base-units" class="section-header"><a href="#base-units">Base units</a></h2>
+<p>The following base syntax units are recognized by the parser.</p>
+<ul>
+<li><code>prefix : &quot;cs&quot; | &quot;ds&quot; | &quot;es&quot; | &quot;fs&quot; | &quot;gs&quot; | &quot;ss&quot; | &quot;lock&quot; | &quot;rep&quot; | &quot;repne&quot; | &quot;repe&quot; | &quot;repnz&quot; | &quot;repz&quot; ;</code></li>
+<li><code>static_reg_name</code> matches any valid register name as seen in table 4, or any previously defined alias</li>
+<li><code>dynamic_reg_family</code> matches any valid register family from table 4</li>
+<li><code>vector_reg_name</code> matches <code>v0</code> up to <code>v31</code></li>
+<li><code>modifier : &quot;LSL&quot; | &quot;LSR&quot; | &quot;ASR&quot; | &quot;ROR&quot; | &quot;UXTB&quot; | &quot;UXTH&quot; | &quot;UXTW&quot; | &quot;UXTX&quot; | &quot;SXTB&quot; | &quot;SXTH&quot; | &quot;SXTW&quot; | &quot;SXTX&quot; | &quot;MSL&quot; ;</code></li>
+</ul>
+<h2 id="instruction" class="section-header"><a href="#instruction">Instruction</a></h2>
+<p><code>instruction : ident (&quot;.&quot; ident)* (arg (&quot;,&quot; arg)* )? ;</code></p>
+<h2 id="arguments" class="section-header"><a href="#arguments">Arguments</a></h2>
+<p><code>arg : register | registerlist | labelref | reference | modifier_expr | immediate ;</code></p>
+<p><code>register : scalar_reg | vector_reg ;</code></p>
+<p><code>scalar_reg : static_reg_name | dynamic_reg_family &quot;(&quot; expr &quot;)&quot;</code></p>
+<p><code>vector_reg : ( vector_reg_name | &quot;V&quot; &quot;(&quot; expr &quot;)&quot; ) &quot;.&quot; vector_width_spec element_specifier ? ;</code></p>
+<p><code>register_list : &quot;{ comma_list | dash_list | amount_list &quot;}&quot; element_specifier ? ;</code></p>
+<p><code>comma_list : register (&quot;,&quot; register) * ;</code></p>
+<p><code>dash_list : register &quot;-&quot; register ;</code></p>
+<p><code>amount_list : register &quot;*&quot; expr ;</code></p>
+<p><code>element_specifier : &quot;[&quot; expr &quot;]&quot; ;</code></p>
+<p><code>reference : &quot;[&quot; refitem (&quot;,&quot; refitem)* &quot;]&quot; !&quot;? ;</code></p>
+<p><code>refitem : register | modifier_expr | immediate ;</code></p>
+<p><code>modifier_expr : modifier immediate? ;</code></p>
+<p><code>immediate : &quot;#&quot;? expr ;</code></p>
+<h1 id="reference" class="section-header"><a href="#reference">Reference</a></h1><h2 id="instructions" class="section-header"><a href="#instructions">Instructions</a></h2>
+<p>The language used by dynasm-rs in aarch64 mode is close to the assembly dialect described in official ARM documentation. Several additions have been made to support dynamic registers and to ensure the rust parser can handle parsing the language.</p>
+<p>The largest difference is in the notation of vector registers. In ARM assembly, the lane count comes before the element size as in <code>v1.16b</code>. But in dynasm-rs, this is reversed as bare identifiers cannot start with numbers. So the used notation ends up being <code>v1.b16</code>. Next to this, the register section will describe the syntax used for addressing registers.</p>
+<h3 id="operands" class="section-header"><a href="#operands">Operands</a></h3><h4 id="register" class="section-header"><a href="#register">Register</a></h4>
+<p>There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be made at runtime. Note that this does prevent optimizations to register-specific forms. However, the expression inside a dynamic register reference may be evaluated multiple times.</p>
+<p>The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically.</p>
+<p>Table 1: dynasm-rs registers (aarch64)</p>
+<table><thead><tr><th align="right">Family</th><th align="left">64-bit</th><th align="left">32-bit</th><th align="left">64-bit</th><th align="left">32-bit</th><th align="left">8-bit</th><th align="left">16-bit</th><th align="left">32-bit</th><th align="left">64-bit</th><th align="left">128-bit</th><th align="left">vector</th></tr></thead><tbody>
+<tr><td align="right">Dynamic Encoding</td><td align="left"><code>X</code></td><td align="left"><code>W</code></td><td align="left"><code>XSP</code></td><td align="left"><code>WSP</code></td><td align="left"><code>B</code></td><td align="left"><code>H</code></td><td align="left"><code>S</code></td><td align="left"><code>D</code></td><td align="left"><code>Q</code></td><td align="left"><code>V</code></td></tr>
+<tr><td align="right"><code>0</code></td><td align="left"><code>x0</code></td><td align="left"><code>w0</code></td><td align="left"><code>x0</code></td><td align="left"><code>w0</code></td><td align="left"><code>b0</code></td><td align="left"><code>h0</code></td><td align="left"><code>s0</code></td><td align="left"><code>d0</code></td><td align="left"><code>q0</code></td><td align="left"><code>v0</code></td></tr>
+<tr><td align="right"><code>1</code></td><td align="left"><code>x1</code></td><td align="left"><code>w1</code></td><td align="left"><code>x1</code></td><td align="left"><code>w1</code></td><td align="left"><code>b1</code></td><td align="left"><code>h1</code></td><td align="left"><code>s1</code></td><td align="left"><code>d1</code></td><td align="left"><code>q1</code></td><td align="left"><code>v1</code></td></tr>
+<tr><td align="right"><code>2</code></td><td align="left"><code>x2</code></td><td align="left"><code>w2</code></td><td align="left"><code>x2</code></td><td align="left"><code>w2</code></td><td align="left"><code>b2</code></td><td align="left"><code>h2</code></td><td align="left"><code>s2</code></td><td align="left"><code>d2</code></td><td align="left"><code>q2</code></td><td align="left"><code>v2</code></td></tr>
+<tr><td align="right"><code>3</code></td><td align="left"><code>x3</code></td><td align="left"><code>w3</code></td><td align="left"><code>x3</code></td><td align="left"><code>w3</code></td><td align="left"><code>b3</code></td><td align="left"><code>h3</code></td><td align="left"><code>s3</code></td><td align="left"><code>d3</code></td><td align="left"><code>q3</code></td><td align="left"><code>v3</code></td></tr>
+<tr><td align="right"><code>4</code></td><td align="left"><code>x4</code></td><td align="left"><code>w4</code></td><td align="left"><code>x4</code></td><td align="left"><code>w4</code></td><td align="left"><code>b4</code></td><td align="left"><code>h4</code></td><td align="left"><code>s4</code></td><td align="left"><code>d4</code></td><td align="left"><code>q4</code></td><td align="left"><code>v4</code></td></tr>
+<tr><td align="right"><code>5</code></td><td align="left"><code>x5</code></td><td align="left"><code>w5</code></td><td align="left"><code>x5</code></td><td align="left"><code>w5</code></td><td align="left"><code>b5</code></td><td align="left"><code>h5</code></td><td align="left"><code>s5</code></td><td align="left"><code>d5</code></td><td align="left"><code>q5</code></td><td align="left"><code>v5</code></td></tr>
+<tr><td align="right"><code>6</code></td><td align="left"><code>x6</code></td><td align="left"><code>w6</code></td><td align="left"><code>x6</code></td><td align="left"><code>w6</code></td><td align="left"><code>b6</code></td><td align="left"><code>h6</code></td><td align="left"><code>s6</code></td><td align="left"><code>d6</code></td><td align="left"><code>q6</code></td><td align="left"><code>v6</code></td></tr>
+<tr><td align="right"><code>7</code></td><td align="left"><code>x7</code></td><td align="left"><code>w7</code></td><td align="left"><code>x7</code></td><td align="left"><code>w7</code></td><td align="left"><code>b7</code></td><td align="left"><code>h7</code></td><td align="left"><code>s7</code></td><td align="left"><code>d7</code></td><td align="left"><code>q7</code></td><td align="left"><code>v7</code></td></tr>
+<tr><td align="right"><code>8</code></td><td align="left"><code>x8</code></td><td align="left"><code>w8</code></td><td align="left"><code>x8</code></td><td align="left"><code>w8</code></td><td align="left"><code>b8</code></td><td align="left"><code>h8</code></td><td align="left"><code>s8</code></td><td align="left"><code>d8</code></td><td align="left"><code>q8</code></td><td align="left"><code>v8</code></td></tr>
+<tr><td align="right"><code>9</code></td><td align="left"><code>x9</code></td><td align="left"><code>w9</code></td><td align="left"><code>x9</code></td><td align="left"><code>w9</code></td><td align="left"><code>b9</code></td><td align="left"><code>h9</code></td><td align="left"><code>s9</code></td><td align="left"><code>d9</code></td><td align="left"><code>q9</code></td><td align="left"><code>v9</code></td></tr>
+<tr><td align="right"><code>10</code></td><td align="left"><code>x10</code></td><td align="left"><code>w10</code></td><td align="left"><code>x10</code></td><td align="left"><code>w10</code></td><td align="left"><code>b10</code></td><td align="left"><code>h10</code></td><td align="left"><code>s10</code></td><td align="left"><code>d10</code></td><td align="left"><code>q10</code></td><td align="left"><code>v10</code></td></tr>
+<tr><td align="right"><code>11</code></td><td align="left"><code>x11</code></td><td align="left"><code>w11</code></td><td align="left"><code>x11</code></td><td align="left"><code>w11</code></td><td align="left"><code>b11</code></td><td align="left"><code>h11</code></td><td align="left"><code>s11</code></td><td align="left"><code>d11</code></td><td align="left"><code>q11</code></td><td align="left"><code>v11</code></td></tr>
+<tr><td align="right"><code>12</code></td><td align="left"><code>x12</code></td><td align="left"><code>w12</code></td><td align="left"><code>x12</code></td><td align="left"><code>w12</code></td><td align="left"><code>b12</code></td><td align="left"><code>h12</code></td><td align="left"><code>s12</code></td><td align="left"><code>d12</code></td><td align="left"><code>q12</code></td><td align="left"><code>v12</code></td></tr>
+<tr><td align="right"><code>13</code></td><td align="left"><code>x13</code></td><td align="left"><code>w13</code></td><td align="left"><code>x13</code></td><td align="left"><code>w13</code></td><td align="left"><code>b13</code></td><td align="left"><code>h13</code></td><td align="left"><code>s13</code></td><td align="left"><code>d13</code></td><td align="left"><code>q13</code></td><td align="left"><code>v13</code></td></tr>
+<tr><td align="right"><code>14</code></td><td align="left"><code>x14</code></td><td align="left"><code>w14</code></td><td align="left"><code>x14</code></td><td align="left"><code>w14</code></td><td align="left"><code>b14</code></td><td align="left"><code>h14</code></td><td align="left"><code>s14</code></td><td align="left"><code>d14</code></td><td align="left"><code>q14</code></td><td align="left"><code>v14</code></td></tr>
+<tr><td align="right"><code>15</code></td><td align="left"><code>x15</code></td><td align="left"><code>w15</code></td><td align="left"><code>x15</code></td><td align="left"><code>w15</code></td><td align="left"><code>b15</code></td><td align="left"><code>h15</code></td><td align="left"><code>s15</code></td><td align="left"><code>d15</code></td><td align="left"><code>q15</code></td><td align="left"><code>v15</code></td></tr>
+<tr><td align="right"><code>16</code></td><td align="left"><code>x16</code></td><td align="left"><code>w16</code></td><td align="left"><code>x16</code></td><td align="left"><code>w16</code></td><td align="left"><code>b16</code></td><td align="left"><code>h16</code></td><td align="left"><code>s16</code></td><td align="left"><code>d16</code></td><td align="left"><code>q16</code></td><td align="left"><code>v16</code></td></tr>
+<tr><td align="right"><code>17</code></td><td align="left"><code>x17</code></td><td align="left"><code>w17</code></td><td align="left"><code>x17</code></td><td align="left"><code>w17</code></td><td align="left"><code>b17</code></td><td align="left"><code>h17</code></td><td align="left"><code>s17</code></td><td align="left"><code>d17</code></td><td align="left"><code>q17</code></td><td align="left"><code>v17</code></td></tr>
+<tr><td align="right"><code>18</code></td><td align="left"><code>x18</code></td><td align="left"><code>w18</code></td><td align="left"><code>x18</code></td><td align="left"><code>w18</code></td><td align="left"><code>b18</code></td><td align="left"><code>h18</code></td><td align="left"><code>s18</code></td><td align="left"><code>d18</code></td><td align="left"><code>q18</code></td><td align="left"><code>v18</code></td></tr>
+<tr><td align="right"><code>19</code></td><td align="left"><code>x19</code></td><td align="left"><code>w19</code></td><td align="left"><code>x19</code></td><td align="left"><code>w19</code></td><td align="left"><code>b19</code></td><td align="left"><code>h19</code></td><td align="left"><code>s19</code></td><td align="left"><code>d19</code></td><td align="left"><code>q19</code></td><td align="left"><code>v19</code></td></tr>
+<tr><td align="right"><code>20</code></td><td align="left"><code>x20</code></td><td align="left"><code>w20</code></td><td align="left"><code>x20</code></td><td align="left"><code>w20</code></td><td align="left"><code>b20</code></td><td align="left"><code>h20</code></td><td align="left"><code>s20</code></td><td align="left"><code>d20</code></td><td align="left"><code>q20</code></td><td align="left"><code>v20</code></td></tr>
+<tr><td align="right"><code>21</code></td><td align="left"><code>x21</code></td><td align="left"><code>w21</code></td><td align="left"><code>x21</code></td><td align="left"><code>w21</code></td><td align="left"><code>b21</code></td><td align="left"><code>h21</code></td><td align="left"><code>s21</code></td><td align="left"><code>d21</code></td><td align="left"><code>q21</code></td><td align="left"><code>v21</code></td></tr>
+<tr><td align="right"><code>22</code></td><td align="left"><code>x22</code></td><td align="left"><code>w22</code></td><td align="left"><code>x22</code></td><td align="left"><code>w22</code></td><td align="left"><code>b22</code></td><td align="left"><code>h22</code></td><td align="left"><code>s22</code></td><td align="left"><code>d22</code></td><td align="left"><code>q22</code></td><td align="left"><code>v22</code></td></tr>
+<tr><td align="right"><code>23</code></td><td align="left"><code>x23</code></td><td align="left"><code>w23</code></td><td align="left"><code>x23</code></td><td align="left"><code>w23</code></td><td align="left"><code>b23</code></td><td align="left"><code>h23</code></td><td align="left"><code>s23</code></td><td align="left"><code>d23</code></td><td align="left"><code>q23</code></td><td align="left"><code>v23</code></td></tr>
+<tr><td align="right"><code>24</code></td><td align="left"><code>x24</code></td><td align="left"><code>w24</code></td><td align="left"><code>x24</code></td><td align="left"><code>w24</code></td><td align="left"><code>b24</code></td><td align="left"><code>h24</code></td><td align="left"><code>s24</code></td><td align="left"><code>d24</code></td><td align="left"><code>q24</code></td><td align="left"><code>v24</code></td></tr>
+<tr><td align="right"><code>25</code></td><td align="left"><code>x25</code></td><td align="left"><code>w25</code></td><td align="left"><code>x25</code></td><td align="left"><code>w25</code></td><td align="left"><code>b25</code></td><td align="left"><code>h25</code></td><td align="left"><code>s25</code></td><td align="left"><code>d25</code></td><td align="left"><code>q25</code></td><td align="left"><code>v25</code></td></tr>
+<tr><td align="right"><code>26</code></td><td align="left"><code>x26</code></td><td align="left"><code>w26</code></td><td align="left"><code>x26</code></td><td align="left"><code>w26</code></td><td align="left"><code>b26</code></td><td align="left"><code>h26</code></td><td align="left"><code>s26</code></td><td align="left"><code>d26</code></td><td align="left"><code>q26</code></td><td align="left"><code>v26</code></td></tr>
+<tr><td align="right"><code>27</code></td><td align="left"><code>x27</code></td><td align="left"><code>w27</code></td><td align="left"><code>x27</code></td><td align="left"><code>w27</code></td><td align="left"><code>b27</code></td><td align="left"><code>h27</code></td><td align="left"><code>s27</code></td><td align="left"><code>d27</code></td><td align="left"><code>q27</code></td><td align="left"><code>v27</code></td></tr>
+<tr><td align="right"><code>28</code></td><td align="left"><code>x28</code></td><td align="left"><code>w28</code></td><td align="left"><code>x28</code></td><td align="left"><code>w28</code></td><td align="left"><code>b28</code></td><td align="left"><code>h28</code></td><td align="left"><code>s28</code></td><td align="left"><code>d28</code></td><td align="left"><code>q28</code></td><td align="left"><code>v28</code></td></tr>
+<tr><td align="right"><code>29</code></td><td align="left"><code>x29</code></td><td align="left"><code>w29</code></td><td align="left"><code>x29</code></td><td align="left"><code>w29</code></td><td align="left"><code>b29</code></td><td align="left"><code>h29</code></td><td align="left"><code>s29</code></td><td align="left"><code>d29</code></td><td align="left"><code>q29</code></td><td align="left"><code>v29</code></td></tr>
+<tr><td align="right"><code>30</code></td><td align="left"><code>x30</code></td><td align="left"><code>w30</code></td><td align="left"><code>x30</code></td><td align="left"><code>w30</code></td><td align="left"><code>b30</code></td><td align="left"><code>h30</code></td><td align="left"><code>s30</code></td><td align="left"><code>d30</code></td><td align="left"><code>q30</code></td><td align="left"><code>v30</code></td></tr>
+<tr><td align="right"><code>31</code></td><td align="left"><code>xzr</code></td><td align="left"><code>wzr</code></td><td align="left"><code>sp</code></td><td align="left"><code>wsp</code></td><td align="left"><code>b31</code></td><td align="left"><code>h31</code></td><td align="left"><code>s31</code></td><td align="left"><code>d31</code></td><td align="left"><code>q31</code></td><td align="left"><code>v31</code></td></tr>
+</tbody></table>
+<p>When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: <code>X(reg_number)</code>, where reg_number is one of the given dynamic encodings listed in the table.</p>
+<p>As aarch64 either uses scalar register 31 as the zero register <code>xzr</code> or the stack pointer register <code>sp</code>, two separate families of registers exist to encode this possible difference (as it can influence instruction variant choice).</p>
+<p>A special case are the vector registers. These are never used as bare registers, but need to have the element size they are being accessed with postfixed to the register. This element size can be:</p>
+<ul>
+<li><code>B</code>: 1 byte</li>
+<li><code>H</code>: 2 bytes</li>
+<li><code>S</code>: 4 bytes</li>
+<li><code>D</code>: 8 bytes</li>
+<li><code>Q</code>: 16 bytes</li>
+</ul>
+<p>This means that the base for for adressing a register statically looks like <code>V1.B</code> or <code>V(num).B</code>. Additionally, many instructions also require the lane count to be specified for the vector register access.
+As discussed before, this is appended after the element size specifier like <code>V1.B8</code> or <code>V(num).B16</code>. Finally, vector registers can support a lane element specifier if an instruction aims to only use a certain lane of a vector register. In this case the lane count is always optional. This lane is defined by an index expression postfixed to the vector register like <code>V1.B[1]</code> or <code>V(num).B[lane]</code>.</p>
+<h4 id="register-lists" class="section-header"><a href="#register-lists">Register lists</a></h4>
+<p>Several vector instructions in aarch64 address a list of registers as single operands. There are several syntaxes supported by dynasm-rs for register lists:</p>
+<p>Table 2: dynasm-rs register list types</p>
+<table><thead><tr><th align="right">Type</th><th align="left">Example</th></tr></thead><tbody>
+<tr><td align="right">Comma list</td><td align="left"><code>{ Vn.B, Vn+1.B, Vn+2.B, Vn+3.B }</code></td></tr>
+<tr><td align="right">Dash list</td><td align="left"><code>{ Vn.B - Vn+3.B }</code></td></tr>
+<tr><td align="right">Amount list</td><td align="left"><code>{ Vn.B * 4 }</code></td></tr>
+</tbody></table>
+<p>Each of these list notations is interpreted exactly the same by dynasm-rs. The first two are also standard ARM notation, the third format is added by dynasm-rs to handle dynamic registers in register lists as otherwise the amount could only be calculated at runtime. Just like vector registers, register lists support an optional element specifier after them: <code>{ Vn.B * 4 }[1]</code>.</p>
+<h4 id="jump-targets" class="section-header"><a href="#jump-targets">Jump targets</a></h4>
+<p>All flow control instructions and instructions featuring PC-relative addressing have a jump target as argument. This jump target will feature a label reference as described in the common language reference. Note that this reference must be encoded in a limited amount of bits due to the fixed-width aarch64 instruction set, so check the instruction reference to see what the maximum offset range is.</p>
+<h4 id="memory-references" class="section-header"><a href="#memory-references">Memory references</a></h4>
+<p>As a load-store architecture, the aarch64 instruction set only has a limited amount of instructions capable of addressing memory. Further more, it supports a limited set of addressing modes. The available addressing modes for each instruction are listed directly in the instruction reference. All possible addressing modes are summarized in the table below as well.</p>
+<p>Table 3: dynasm-rs memory reference formats</p>
+<table><thead><tr><th align="left">Syntax</th><th align="left">Explanation</th></tr></thead><tbody>
+<tr><td align="left"><code>[Xn|SP]</code></td><td align="left">A <code>WSP</code> family register is used as the address to be resolved.</td></tr>
+<tr><td align="left"><code>[Xn|SP {, #imm } ]</code></td><td align="left">A <code>WSP</code> family register is used as base with an optional integer offset as the address to be resolved.</td></tr>
+<tr><td align="left"><code>[Xn|SP, #imm ]!</code></td><td align="left">A <code>WSP</code> family register is used as base with an integer offset as the address to be resolved. The final address is written back to the base register.</td></tr>
+<tr><td align="left"><code>[Xn|SP], #imm</code></td><td align="left">A <code>WSP</code> family register is used as the base address to be resolved. Then the immediate is added to the base register and written back.</td></tr>
+<tr><td align="left"><code>[Xn|SP, Wm|Xm {, MOD { #imm } } ]</code></td><td align="left">A <code>WSP</code> family register is used as base with an (optionally shifted) index register to compute the final address to be resolved.</td></tr>
+<tr><td align="left"><code>[Xn|SP], Xm </code></td><td align="left">A <code>WSP</code> family register is used as the base address to be resolved. Then the second register is added to the base register and written back.</td></tr>
+</tbody></table>
+<h4 id="modifiers" class="section-header"><a href="#modifiers">Modifiers</a></h4>
+<p>Several instructions in aarch64, as well as the indexed register addressing mode, support a so-called modifier that change the way the core interprets another argument. The instruction reference shows the supported modifiers for each instruction, and the following table lists all of them:</p>
+<p>Table 4: aarch64 modifiers</p>
+<table><thead><tr><th align="right">Modifier</th><th align="left">immediate required</th><th align="left">description</th></tr></thead><tbody>
+<tr><td align="right">LSL</td><td align="left">yes</td><td align="left">Logical shift left</td></tr>
+<tr><td align="right">LSR</td><td align="left">yes</td><td align="left">Logical shift right</td></tr>
+<tr><td align="right">ASR</td><td align="left">yes</td><td align="left">Arithmetic shift right</td></tr>
+<tr><td align="right">ROR</td><td align="left">yes</td><td align="left">Rotate right</td></tr>
+<tr><td align="right">UXTB</td><td align="left">no</td><td align="left">Unsigned extend byte</td></tr>
+<tr><td align="right">UXTH</td><td align="left">no</td><td align="left">Unsigned extend halfword</td></tr>
+<tr><td align="right">UXTW</td><td align="left">no</td><td align="left">Unsigned extend word</td></tr>
+<tr><td align="right">UXTX</td><td align="left">no</td><td align="left">Unsigned extend doubleword</td></tr>
+<tr><td align="right">SXTB</td><td align="left">no</td><td align="left">Signed extend byte</td></tr>
+<tr><td align="right">SXTH</td><td align="left">no</td><td align="left">Signed extend halfword</td></tr>
+<tr><td align="right">SXTW</td><td align="left">no</td><td align="left">Signed extend word</td></tr>
+<tr><td align="right">SXTX</td><td align="left">no</td><td align="left">Signed extend doubleword</td></tr>
+<tr><td align="right">MSL</td><td align="left">yes</td><td align="left">Shift left, inserting ones</td></tr>
+</tbody></table>
+<p>Modifiers can also take an immediate as argument. For shifting modifiers the immediate is required, for extending modifiers it is optional and acts as an extra shift left if provided.</p>
+<h4 id="immediates" class="section-header"><a href="#immediates">Immediates</a></h4>
+<p>Dynasm-rs supports both ARM immediate notation <code>#1</code> and bare immediate notation <code>1</code>. As a fixed width instruction set, immediates are bitfields in the respective instructions and will have a limited range.
+This range can be found for any immediate in the instruction reference. Additionally. Several special immediate classes are distinguished in the aarch64 instruction set. The following table lists all of these.</p>
+<p>Table 5: aarch64 special immediate types</p>
+<table><thead><tr><th align="left">Immediate type</th><th align="left">description</th></tr></thead><tbody>
+<tr><td align="left">Wide immediate</td><td align="left">A 32 or 64-bit immediate which is encoded by taking 16 bits and shifting them 0, 16, 32, or 48 bits left, with possible inversion afterwards.</td></tr>
+<tr><td align="left">Logical immediate</td><td align="left">A 32 or 64-bit bitfield, composed out of repeated 2, 4, 8, 16, 32 or 64-bit elements with the first n bits set to 1, and then rotated afterwards. All 0 or all 1 cannot be encoded.</td></tr>
+<tr><td align="left">Stretched immediate</td><td align="left">A 64-bit immediate encoded in 8 bits <code>a:b:c:d:e:f:g:h</code> which encodes the binary value <code>0baaaaaaaabbbbbbbbccccccccddddddddeeeeeeeeffffffffgggggggghhhhhhhh</code>.</td></tr>
+<tr><td align="left">Floating point immediate</td><td align="left">A short, float or double value encoded into 8 bits. It can represent any value in the format <code>(-1.0)^s * 2.0^m * (1.0 + e / 16.0)</code> where <code>-3 &lt;= m &lt;= 4, 0 &lt;= e &lt;= 15, s = [0, 1]</code>.</td></tr>
+</tbody></table>
+
+    </section>
+<script src="../plugin/jquery.js"></script>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+var next = $('pre').has('code.language-diffold').next().has('code.language-diffnew');
+var prev = next.prev();
+console.log(next);
+console.log(prev);
+next.css("margin-top", 0);
+next.css("padding-top", 0);
+prev.css("margin-bottom", 0);
+prev.css("padding-bottom", 0);
+</script>
+
+</body>
+</html>

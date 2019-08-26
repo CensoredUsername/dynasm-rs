@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>Language Reference</title>
+
+    <link rel="stylesheet" type="text/css" href="./formatting.css">
+
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <nav class="sidebar">
+  <p class="location">
+    <a href="./index.html">dynasm-rs</a>
+  </p>
+  <div class = "block modules">
+    <h3>Components</h3>
+    <ul>
+      <li>
+        <a href="../language/index.html">Syntax</a>
+      </li>
+      <li>
+        <a href="../plugin/dynasm/index.html">Plugin (dynasm)</a>
+      </li>
+      <li>
+        <a href="../runtime/dynasmrt/index.html">Runtime (dynasmrt)</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+    <h3>Syntax</h3>
+    <ul>
+      <li>
+        <a href="./index.html">Home</a>
+      </li>
+      <li>
+        <a href="./tutorial.html">Tutorial</a>
+      </li>
+      <li>
+        <a href="./langref_common.html">Language</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+    <h3>Architectures</h3>
+    <h4>x64/x86</h4>
+    <ul>
+      <li>
+        <a href="./langref_x64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_x64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>aarch64</h4>
+    <ul>
+      <li>
+        <a href="./langref_aarch64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_aarch64.html">Instruction reference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section id="main" class="content mod docblock">
+
+    <h1 class="title">Language Reference</h1>
+    <h1 id="lexical-structure-definition" class="section-header"><a href="#lexical-structure-definition">Lexical structure definition</a></h1>
+<p>Instructions for the <code>x86</code> and <code>x64</code> assembling backend use the following lexical structure</p>
+<h2 id="base-units" class="section-header"><a href="#base-units">Base units</a></h2>
+<p>The following base syntax units are recognized by the parser.</p>
+<ul>
+<li><code>prefix : &quot;cs&quot; | &quot;ds&quot; | &quot;es&quot; | &quot;fs&quot; | &quot;gs&quot; | &quot;ss&quot; | &quot;lock&quot; | &quot;rep&quot; | &quot;repne&quot; | &quot;repe&quot; | &quot;repnz&quot; | &quot;repz&quot; ;</code></li>
+<li><code>static_reg</code> matches any valid register name as seen in table 4, or any previously defined alias</li>
+<li><code>dynamic_reg_family</code> matches any valid register family from table 4</li>
+<li><code>size : &quot;BYTE&quot; | &quot;WORD&quot; | &quot;DWORD&quot; | &quot;AWORD&quot; | &quot;QWORD&quot; | &quot;OWORD&quot; | &quot;HWORD&quot;</code></li>
+<li><code>nosplit : &quot;NOSPLIT&quot;</code></li>
+</ul>
+<h2 id="instruction" class="section-header"><a href="#instruction">Instruction</a></h2>
+<p><code>instruction : prefix* ident (arg (&quot;,&quot; arg)* )? ;</code></p>
+<h2 id="arguments" class="section-header"><a href="#arguments">Arguments</a></h2>
+<p><code>arg : register | (size? ( memoryref | labelref | typemap | expr ));</code></p>
+<p><code>typemap : register &quot;=&gt;&quot; expr_path (&quot;.&quot; ident | &quot;[&quot; size? regref &quot;]&quot; (&quot;.&quot; ident)?) ;</code></p>
+<p><code>memoryref : &quot;[&quot; nosplit? size? (regref | labelref) &quot;]&quot; ;</code></p>
+<p><code>regref : regrefitem (&quot;+&quot; regrefitem)* ;</code></p>
+<p><code>regrefitem : (register &quot;*&quot; num_lit | num_lit &quot;*&quot; register | register | expr) ;</code></p>
+<p><code>register = static_reg | dynamic_reg ;</code></p>
+<p><code>dynamic_reg = dynamic_reg_family &quot;(&quot; expr &quot;)&quot; ;</code></p>
+<h1 id="reference" class="section-header"><a href="#reference">Reference</a></h1><h2 id="instructions" class="section-header"><a href="#instructions">Instructions</a></h2>
+<p>The language used by dynasm-rs is a nasm-dialect. The largest difference is that instead of prefixing memory operands with segment registers, segment register overrides are prefixed to the entire instruction. Furthermore, it is currently not possible to override the size of the displacement used in memory operands.</p>
+<p>This results in the following syntax for instructions. First, zero or more prefixes can be listed (these prefixes can be found in the base units section). The instruction mnemnonic is then mentioned, followed by zero or more comma separated operands.</p>
+<h3 id="operands" class="section-header"><a href="#operands">Operands</a></h3><h4 id="register" class="section-header"><a href="#register">Register</a></h4>
+<p>There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be postponed to the runtime. Note that this does prevent optimizations to register-specific forms. However, the expression inside a dynamic register reference may be evaluated multiple times by dynasm-rs.</p>
+<p>The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically.</p>
+<p>Table 1: dynasm-rs registers (x64/x86)</p>
+<table><thead><tr><th align="right">Family</th><th align="left">8-bit</th><th align="left">8-bit high</th><th align="left">16-bit</th><th align="left">32-bit</th><th align="left">64-bit (x64 only)</th><th align="left">RIP</th><th align="left">Floating Point</th><th align="left">MMX</th><th align="left">128-bit</th><th align="left">256-bit</th><th align="left">Segment</th><th align="left">Control</th><th align="left">Debug</th><th align="left">Bound</th></tr></thead><tbody>
+<tr><td align="right">Dynamic Encoding</td><td align="left"><code>Rb</code></td><td align="left"><code>Rh</code></td><td align="left"><code>Rw</code></td><td align="left"><code>Rd</code></td><td align="left"><code>Rq</code></td><td align="left"></td><td align="left"><code>Rf</code></td><td align="left"><code>Rm</code></td><td align="left"><code>Rx</code></td><td align="left"><code>Ry</code></td><td align="left"><code>Rs</code></td><td align="left"><code>RC</code></td><td align="left"><code>RD</code></td><td align="left"><code>RB</code></td></tr>
+<tr><td align="right"><code>0</code></td><td align="left"><code>al</code>/<code>r0b</code></td><td align="left"></td><td align="left"><code>ax</code>/<code>r0w</code></td><td align="left"><code>eax</code>/<code>r0d</code></td><td align="left"><code>rax</code>/<code>r0</code></td><td align="left"></td><td align="left"><code>st0</code></td><td align="left"><code>mmx0</code></td><td align="left"><code>xmm0</code></td><td align="left"><code>ymm0</code></td><td align="left"><code>es</code></td><td align="left"><code>cr0</code></td><td align="left"><code>dr0</code></td><td align="left"><code>bnd0</code></td></tr>
+<tr><td align="right"><code>1</code></td><td align="left"><code>cl</code>/<code>r1b</code></td><td align="left"></td><td align="left"><code>cx</code>/<code>r1w</code></td><td align="left"><code>ecx</code>/<code>r1d</code></td><td align="left"><code>rcx</code>/<code>r1</code></td><td align="left"></td><td align="left"><code>st1</code></td><td align="left"><code>mmx1</code></td><td align="left"><code>xmm1</code></td><td align="left"><code>ymm1</code></td><td align="left"><code>cs</code></td><td align="left"><code>cr1</code></td><td align="left"><code>dr1</code></td><td align="left"><code>bnd1</code></td></tr>
+<tr><td align="right"><code>2</code></td><td align="left"><code>dl</code>/<code>r2b</code></td><td align="left"></td><td align="left"><code>dx</code>/<code>r2w</code></td><td align="left"><code>edx</code>/<code>r2d</code></td><td align="left"><code>rdx</code>/<code>r2</code></td><td align="left"></td><td align="left"><code>st2</code></td><td align="left"><code>mmx2</code></td><td align="left"><code>xmm2</code></td><td align="left"><code>ymm2</code></td><td align="left"><code>ss</code></td><td align="left"><code>cr2</code></td><td align="left"><code>dr2</code></td><td align="left"><code>bnd2</code></td></tr>
+<tr><td align="right"><code>3</code></td><td align="left"><code>bl</code>/<code>r3b</code></td><td align="left"></td><td align="left"><code>bx</code>/<code>r3w</code></td><td align="left"><code>ebx</code>/<code>r3d</code></td><td align="left"><code>rbx</code>/<code>r3</code></td><td align="left"></td><td align="left"><code>st3</code></td><td align="left"><code>mmx3</code></td><td align="left"><code>xmm3</code></td><td align="left"><code>ymm3</code></td><td align="left"><code>ds</code></td><td align="left"><code>cr3</code></td><td align="left"><code>dr3</code></td><td align="left"><code>bnd3</code></td></tr>
+<tr><td align="right"><code>4</code></td><td align="left"><code>spl</code>/<code>r4b</code></td><td align="left"><code>ah</code></td><td align="left"><code>sp</code>/<code>r4w</code></td><td align="left"><code>esp</code>/<code>r4d</code></td><td align="left"><code>rsp</code>/<code>r4</code></td><td align="left"></td><td align="left"><code>st4</code></td><td align="left"><code>mmx4</code></td><td align="left"><code>xmm4</code></td><td align="left"><code>ymm4</code></td><td align="left"><code>fs</code></td><td align="left"><code>cr4</code></td><td align="left"><code>dr4</code></td><td align="left"></td></tr>
+<tr><td align="right"><code>5</code></td><td align="left"><code>bpl</code>/<code>r5b</code></td><td align="left"><code>ch</code></td><td align="left"><code>bp</code>/<code>r5w</code></td><td align="left"><code>ebp</code>/<code>r5d</code></td><td align="left"><code>rbp</code>/<code>r5</code></td><td align="left"><code>eip/rip</code></td><td align="left"><code>st5</code></td><td align="left"><code>mmx5</code></td><td align="left"><code>xmm5</code></td><td align="left"><code>ymm5</code></td><td align="left"><code>gs</code></td><td align="left"><code>cr5</code></td><td align="left"><code>dr5</code></td><td align="left"></td></tr>
+<tr><td align="right"><code>6</code></td><td align="left"><code>sil</code>/<code>r6b</code></td><td align="left"><code>dh</code></td><td align="left"><code>si</code>/<code>r6w</code></td><td align="left"><code>esi</code>/<code>r6d</code></td><td align="left"><code>rsi</code>/<code>r6</code></td><td align="left"></td><td align="left"><code>st6</code></td><td align="left"><code>mmx6</code></td><td align="left"><code>xmm6</code></td><td align="left"><code>ymm6</code></td><td align="left"></td><td align="left"><code>cr6</code></td><td align="left"><code>dr6</code></td><td align="left"></td></tr>
+<tr><td align="right"><code>7</code></td><td align="left"><code>dil</code>/<code>r7b</code></td><td align="left"><code>bh</code></td><td align="left"><code>di</code>/<code>r7w</code></td><td align="left"><code>edi</code>/<code>r7d</code></td><td align="left"><code>rdi</code>/<code>r7</code></td><td align="left"></td><td align="left"><code>st7</code></td><td align="left"><code>mmx7</code></td><td align="left"><code>xmm7</code></td><td align="left"><code>ymm7</code></td><td align="left"></td><td align="left"><code>cr7</code></td><td align="left"><code>dr7</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only)  <code>8</code></td><td align="left"><code>r8b</code></td><td align="left"></td><td align="left"><code>r8w</code></td><td align="left"><code>r8d</code></td><td align="left"><code>r8</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm8</code></td><td align="left"><code>ymm8</code></td><td align="left"></td><td align="left"><code>cr8</code></td><td align="left"><code>dr8</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only)  <code>9</code></td><td align="left"><code>r9b</code></td><td align="left"></td><td align="left"><code>r9w</code></td><td align="left"><code>r9d</code></td><td align="left"><code>r9</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm9</code></td><td align="left"><code>ymm9</code></td><td align="left"></td><td align="left"><code>cr9</code></td><td align="left"><code>dr9</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only) <code>10</code></td><td align="left"><code>r10b</code></td><td align="left"></td><td align="left"><code>r10w</code></td><td align="left"><code>r10d</code></td><td align="left"><code>r10</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm10</code></td><td align="left"><code>ymm10</code></td><td align="left"></td><td align="left"><code>cr10</code></td><td align="left"><code>dr10</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only) <code>11</code></td><td align="left"><code>r11b</code></td><td align="left"></td><td align="left"><code>r11w</code></td><td align="left"><code>r11d</code></td><td align="left"><code>r11</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm11</code></td><td align="left"><code>ymm11</code></td><td align="left"></td><td align="left"><code>cr11</code></td><td align="left"><code>dr11</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only) <code>12</code></td><td align="left"><code>r12b</code></td><td align="left"></td><td align="left"><code>r12w</code></td><td align="left"><code>r12d</code></td><td align="left"><code>r12</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm12</code></td><td align="left"><code>ymm12</code></td><td align="left"></td><td align="left"><code>cr12</code></td><td align="left"><code>dr12</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only) <code>13</code></td><td align="left"><code>r13b</code></td><td align="left"></td><td align="left"><code>r13w</code></td><td align="left"><code>r13d</code></td><td align="left"><code>r13</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm13</code></td><td align="left"><code>ymm13</code></td><td align="left"></td><td align="left"><code>cr13</code></td><td align="left"><code>dr13</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only) <code>14</code></td><td align="left"><code>r14b</code></td><td align="left"></td><td align="left"><code>r14w</code></td><td align="left"><code>r14d</code></td><td align="left"><code>r14</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm14</code></td><td align="left"><code>ymm14</code></td><td align="left"></td><td align="left"><code>cr14</code></td><td align="left"><code>dr14</code></td><td align="left"></td></tr>
+<tr><td align="right">(x64 only) <code>15</code></td><td align="left"><code>r15b</code></td><td align="left"></td><td align="left"><code>r15w</code></td><td align="left"><code>r15d</code></td><td align="left"><code>r15</code></td><td align="left"></td><td align="left"></td><td align="left"></td><td align="left"><code>xmm15</code></td><td align="left"><code>ymm15</code></td><td align="left"></td><td align="left"><code>cr15</code></td><td align="left"><code>dr15</code></td><td align="left"></td></tr>
+</tbody></table>
+<h4 id="jump-targets" class="section-header"><a href="#jump-targets">Jump targets</a></h4>
+<p>All flow control instructions have a jump target as argument. A jump target can be either an immediate specifying a relative offset to the end of the current instruction or a label reference. For many instructions, the size of the offset to be encoded is variable, and by default dynasm-rs will pick the largest size possible. This can be overridden using a size prefix on the operand.</p>
+<h4 id="memory-references" class="section-header"><a href="#memory-references">Memory references</a></h4>
+<p>Many x64 instructions can taken an indirect memory reference as operand. Such an operand is denoted as an expression containing registers surrounded by square brackets. Note that, unlike the original dynasm, dynasm-rs is insensitive to the order of the different operands in the expression and can perform rudimentary arithmetic to encode forms like <code>[rax * 5]</code>. However, due to the limitations of x64 assembly, there are of course limitations on what can be encoded. These limitations are detected at compile time, but several of them cannot be checked when dynamic registers are used. The size of the dereferenced value can be determined by a size prefix.</p>
+<p>To give more control to how the operand gets encoded, dynasm-rs features both displacement size overrides and a hinting mechanism similar to NASM. By default dynasm will try to infer the wanted displacement size if the displacement is a constant, and if it fails to it will encode a four-byte displacement. However, this behaviour can be altered using a size override after the opening bracket of the memory reference. </p>
+<p>The hinting mechanism by default tries to select the smallest way for a memory reference to be encoded, and any freedom in this is solved with the following rules:</p>
+<ul>
+<li>The first unscaled register that only appears once can be encoded as base will be used as such.</li>
+<li>If no unscaled register is present, the first register with a total scale of 1 will be used as base.</li>
+</ul>
+<p>One complication in the &quot;smallest encoding&quot; rule is <code>[rax * 2]</code>. As memory references without base require a four-byte displacement, it is shorter to encode this as <code>[rax + rax * 1]</code>. This kind of index splitting is the default behaviour for dynasm-rs, and can be disabled by using the <code>NOSPLIT</code> keyword in the memory reference. This keyword must come before the displacement size specifier if both are used as in <code>[NOSPLIT BYTE rax * 2 + 1]</code>.</p>
+<p>As a final node, the <code>mib</code> addressing mode used by Intel's MPX extensions deserves some attention. Dynasm-rs does not implement special syntax for this addressing mode. Instead, the index and base registers in this addressing mode can simply be specified by the hinting behaviour described above.</p>
+<p>The following are several examples of what can be encoded:</p>
+<p>Table 2: dynasm-rs memory reference formats</p>
+<table><thead><tr><th align="left">Syntax</th><th align="left">Explanation</th></tr></thead><tbody>
+<tr><td align="left"><code>[expr]</code></td><td align="left">An arbitrary expression will be encoded as an immediate</td></tr>
+<tr><td align="left"><code>[rax]</code></td><td align="left">A register can be dereferenced. This can either be a 32-bit or a 64-bit register.</td></tr>
+<tr><td align="left"><code>[rax * 4]</code></td><td align="left">A scaled register can be dereferenced. Possible scales are 8, 4, 2 and 1, although 3, 5 and 9 can also be encoded when it is the only used register.</td></tr>
+<tr><td align="left"><code>[BYTE rax + 77]</code></td><td align="left">The size of the displacement encoded can b e defined using a size override.</td></tr>
+<tr><td align="left"><code>[rax * 1 + rbx]</code></td><td align="left">Which register is encoded as index can be explicitly controlled by multiplying with 1.</td></tr>
+<tr><td align="left"><code>[NOSPLIT rax * 2]</code></td><td align="left">The nosplit keyword forces this to be encoded sub-optimally without a base register.</td></tr>
+<tr><td align="left"><code>[rax * 4 + rbx + expr]</code></td><td align="left">The previously mentioned forms can all be combined. Order is not important.</td></tr>
+<tr><td align="left"><code>[xmm * 4 + rbx + expr]</code></td><td align="left">When VSIB addressing is allowed, an xmm or ymm register can be used as index.</td></tr>
+<tr><td align="left"><code>[rip + expr]</code></td><td align="left">Addresses relative to the instruction pointer at the end of the instruction can also be used, but in this case no scale can be encoded.</td></tr>
+<tr><td align="left"><code>[-&gt;label]</code></td><td align="left">Label references can also be dereferenced. This goes for all label types.</td></tr>
+</tbody></table>
+<h4 id="type-mapped-references" class="section-header"><a href="#type-mapped-references">Type mapped references</a></h4>
+<p>To ease interoperation with rust structures, dynasm-rs supports the following syntax for accessing members of pointers to structs and struct arrays. In this syntax, the scale and displacement in a normal memory reference are derived from the size of the type and the offset of the member in the type. Due to the limitations of procedural macros, invalid scales will unfortunately only panic at runtime. Note that dynasm-rs is unable to infer the size of the attribute and it should therefore be determined by a size prefix.</p>
+<p>Just like memory references, type mapped references support displacement size overrides after the opening square bracket. However, as the first register is always encoded as index, they do not support <code>NOSPLIT</code>.</p>
+<p>The syntax for type maps is as follows:</p>
+<p>Table 3: dynasm-rs type map formats</p>
+<table><thead><tr><th align="left">Syntax</th><th align="left">Equivalent expression</th></tr></thead><tbody>
+<tr><td align="left"><code>rax =&gt; Type.attr</code></td><td align="left"><code>(rax as *mut Type).attr</code></td></tr>
+<tr><td align="left"><code>rax =&gt; Type[expr]</code></td><td align="left"><code>(rax as *mut [Type])[expr]</code></td></tr>
+<tr><td align="left"><code>rax =&gt; Type[rbx]</code></td><td align="left"><code>(rax as *mut [Type])[rbx]</code></td></tr>
+<tr><td align="left"><code>rax =&gt; Type[rbx + expr].attr</code></td><td align="left"><code>(rax as *mut [Type])[rbx + expr].attr </code></td></tr>
+</tbody></table>
+<h4 id="immediates" class="section-header"><a href="#immediates">Immediates</a></h4>
+<p>Any operand which does not match the previously discussed forms will be interpreted as an immediate argument. This operand will be evaluated as an expression at runtime and the resulting value will be encoded. The size of the encoded value can be determined by a size prefix. If such a a prefix is not given, dynasm-rs will try to infer it from the value of the immediate, but this is only possible if the immediate is a simple constant. As this might change in the future, you should use explicit size overrides if the encoded displacement size matters.</p>
+
+    </section>
+<script src="../plugin/jquery.js"></script>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+var next = $('pre').has('code.language-diffold').next().has('code.language-diffnew');
+var prev = next.prev();
+console.log(next);
+console.log(prev);
+next.css("margin-top", 0);
+next.css("padding-top", 0);
+prev.css("margin-bottom", 0);
+prev.css("padding-bottom", 0);
+</script>
+
+</body>
+</html>
