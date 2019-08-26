@@ -406,292 +406,294 @@ lazy_static!{
     static ref AARCH64_REGISTERS: HashMap<&'static str, (RegId, Option<Size>)> = {
         use self::RegId::*;
         use crate::common::Size::*;
-        let mut h = HashMap::new();
 
-        h.insert("x0" , (X0 , Some(QWORD)));
-        h.insert("x1" , (X1 , Some(QWORD)));
-        h.insert("x2" , (X2 , Some(QWORD)));
-        h.insert("x3" , (X3 , Some(QWORD)));
-        h.insert("x4" , (X4 , Some(QWORD)));
-        h.insert("x5" , (X5 , Some(QWORD)));
-        h.insert("x6" , (X6 , Some(QWORD)));
-        h.insert("x7" , (X7 , Some(QWORD)));
-        h.insert("x8" , (X8 , Some(QWORD)));
-        h.insert("x9" , (X9 , Some(QWORD)));
-        h.insert("x10", (X10, Some(QWORD)));
-        h.insert("x11", (X11, Some(QWORD)));
-        h.insert("x12", (X12, Some(QWORD)));
-        h.insert("x13", (X13, Some(QWORD)));
-        h.insert("x14", (X14, Some(QWORD)));
-        h.insert("x15", (X15, Some(QWORD)));
-        h.insert("x16", (X16, Some(QWORD)));
-        h.insert("x17", (X17, Some(QWORD)));
-        h.insert("x18", (X18, Some(QWORD)));
-        h.insert("x19", (X19, Some(QWORD)));
-        h.insert("x20", (X20, Some(QWORD)));
-        h.insert("x21", (X21, Some(QWORD)));
-        h.insert("x22", (X22, Some(QWORD)));
-        h.insert("x23", (X23, Some(QWORD)));
-        h.insert("x24", (X24, Some(QWORD)));
-        h.insert("x25", (X25, Some(QWORD)));
-        h.insert("x26", (X26, Some(QWORD)));
-        h.insert("x27", (X27, Some(QWORD)));
-        h.insert("x28", (X28, Some(QWORD)));
-        h.insert("x29", (X29, Some(QWORD)));
-        h.insert("x30", (X30, Some(QWORD)));
+        static MAP: &[(&str, (RegId, Option<Size>))] = &[
+            ("x0" , (X0 , Some(QWORD))),
+            ("x1" , (X1 , Some(QWORD))),
+            ("x2" , (X2 , Some(QWORD))),
+            ("x3" , (X3 , Some(QWORD))),
+            ("x4" , (X4 , Some(QWORD))),
+            ("x5" , (X5 , Some(QWORD))),
+            ("x6" , (X6 , Some(QWORD))),
+            ("x7" , (X7 , Some(QWORD))),
+            ("x8" , (X8 , Some(QWORD))),
+            ("x9" , (X9 , Some(QWORD))),
+            ("x10", (X10, Some(QWORD))),
+            ("x11", (X11, Some(QWORD))),
+            ("x12", (X12, Some(QWORD))),
+            ("x13", (X13, Some(QWORD))),
+            ("x14", (X14, Some(QWORD))),
+            ("x15", (X15, Some(QWORD))),
+            ("x16", (X16, Some(QWORD))),
+            ("x17", (X17, Some(QWORD))),
+            ("x18", (X18, Some(QWORD))),
+            ("x19", (X19, Some(QWORD))),
+            ("x20", (X20, Some(QWORD))),
+            ("x21", (X21, Some(QWORD))),
+            ("x22", (X22, Some(QWORD))),
+            ("x23", (X23, Some(QWORD))),
+            ("x24", (X24, Some(QWORD))),
+            ("x25", (X25, Some(QWORD))),
+            ("x26", (X26, Some(QWORD))),
+            ("x27", (X27, Some(QWORD))),
+            ("x28", (X28, Some(QWORD))),
+            ("x29", (X29, Some(QWORD))),
+            ("x30", (X30, Some(QWORD))),
 
-        h.insert("w0" , (X0 , Some(DWORD)));
-        h.insert("w1" , (X1 , Some(DWORD)));
-        h.insert("w2" , (X2 , Some(DWORD)));
-        h.insert("w3" , (X3 , Some(DWORD)));
-        h.insert("w4" , (X4 , Some(DWORD)));
-        h.insert("w5" , (X5 , Some(DWORD)));
-        h.insert("w6" , (X6 , Some(DWORD)));
-        h.insert("w7" , (X7 , Some(DWORD)));
-        h.insert("w8" , (X8 , Some(DWORD)));
-        h.insert("w9" , (X9 , Some(DWORD)));
-        h.insert("w10", (X10, Some(DWORD)));
-        h.insert("w11", (X11, Some(DWORD)));
-        h.insert("w12", (X12, Some(DWORD)));
-        h.insert("w13", (X13, Some(DWORD)));
-        h.insert("w14", (X14, Some(DWORD)));
-        h.insert("w15", (X15, Some(DWORD)));
-        h.insert("w16", (X16, Some(DWORD)));
-        h.insert("w17", (X17, Some(DWORD)));
-        h.insert("w18", (X18, Some(DWORD)));
-        h.insert("w19", (X19, Some(DWORD)));
-        h.insert("w20", (X20, Some(DWORD)));
-        h.insert("w21", (X21, Some(DWORD)));
-        h.insert("w22", (X22, Some(DWORD)));
-        h.insert("w23", (X23, Some(DWORD)));
-        h.insert("w24", (X24, Some(DWORD)));
-        h.insert("w25", (X25, Some(DWORD)));
-        h.insert("w26", (X26, Some(DWORD)));
-        h.insert("w27", (X27, Some(DWORD)));
-        h.insert("w28", (X28, Some(DWORD)));
-        h.insert("w29", (X29, Some(DWORD)));
-        h.insert("w30", (X30, Some(DWORD)));
+            ("w0" , (X0 , Some(DWORD))),
+            ("w1" , (X1 , Some(DWORD))),
+            ("w2" , (X2 , Some(DWORD))),
+            ("w3" , (X3 , Some(DWORD))),
+            ("w4" , (X4 , Some(DWORD))),
+            ("w5" , (X5 , Some(DWORD))),
+            ("w6" , (X6 , Some(DWORD))),
+            ("w7" , (X7 , Some(DWORD))),
+            ("w8" , (X8 , Some(DWORD))),
+            ("w9" , (X9 , Some(DWORD))),
+            ("w10", (X10, Some(DWORD))),
+            ("w11", (X11, Some(DWORD))),
+            ("w12", (X12, Some(DWORD))),
+            ("w13", (X13, Some(DWORD))),
+            ("w14", (X14, Some(DWORD))),
+            ("w15", (X15, Some(DWORD))),
+            ("w16", (X16, Some(DWORD))),
+            ("w17", (X17, Some(DWORD))),
+            ("w18", (X18, Some(DWORD))),
+            ("w19", (X19, Some(DWORD))),
+            ("w20", (X20, Some(DWORD))),
+            ("w21", (X21, Some(DWORD))),
+            ("w22", (X22, Some(DWORD))),
+            ("w23", (X23, Some(DWORD))),
+            ("w24", (X24, Some(DWORD))),
+            ("w25", (X25, Some(DWORD))),
+            ("w26", (X26, Some(DWORD))),
+            ("w27", (X27, Some(DWORD))),
+            ("w28", (X28, Some(DWORD))),
+            ("w29", (X29, Some(DWORD))),
+            ("w30", (X30, Some(DWORD))),
 
-        h.insert("sp",  (SP,  Some(QWORD)));
-        h.insert("wsp", (SP,  Some(DWORD)));
+            ("sp",  (SP,  Some(QWORD))),
+            ("wsp", (SP,  Some(DWORD))),
 
-        h.insert("xzr", (XZR, Some(QWORD)));
-        h.insert("wzr", (XZR, Some(DWORD)));
+            ("xzr", (XZR, Some(QWORD))),
+            ("wzr", (XZR, Some(DWORD))),
 
-        h.insert("b0" , (V0 , Some(BYTE)));
-        h.insert("b1" , (V1 , Some(BYTE)));
-        h.insert("b2" , (V2 , Some(BYTE)));
-        h.insert("b3" , (V3 , Some(BYTE)));
-        h.insert("b4" , (V4 , Some(BYTE)));
-        h.insert("b5" , (V5 , Some(BYTE)));
-        h.insert("b6" , (V6 , Some(BYTE)));
-        h.insert("b7" , (V7 , Some(BYTE)));
-        h.insert("b8" , (V8 , Some(BYTE)));
-        h.insert("b9" , (V9 , Some(BYTE)));
-        h.insert("b10", (V10, Some(BYTE)));
-        h.insert("b11", (V11, Some(BYTE)));
-        h.insert("b12", (V12, Some(BYTE)));
-        h.insert("b13", (V13, Some(BYTE)));
-        h.insert("b14", (V14, Some(BYTE)));
-        h.insert("b15", (V15, Some(BYTE)));
-        h.insert("b16", (V16, Some(BYTE)));
-        h.insert("b17", (V17, Some(BYTE)));
-        h.insert("b18", (V18, Some(BYTE)));
-        h.insert("b19", (V19, Some(BYTE)));
-        h.insert("b20", (V20, Some(BYTE)));
-        h.insert("b21", (V21, Some(BYTE)));
-        h.insert("b22", (V22, Some(BYTE)));
-        h.insert("b23", (V23, Some(BYTE)));
-        h.insert("b24", (V24, Some(BYTE)));
-        h.insert("b25", (V25, Some(BYTE)));
-        h.insert("b26", (V26, Some(BYTE)));
-        h.insert("b27", (V27, Some(BYTE)));
-        h.insert("b28", (V28, Some(BYTE)));
-        h.insert("b29", (V29, Some(BYTE)));
-        h.insert("b30", (V30, Some(BYTE)));
-        h.insert("b31", (V31, Some(BYTE)));
+            ("b0" , (V0 , Some(BYTE))),
+            ("b1" , (V1 , Some(BYTE))),
+            ("b2" , (V2 , Some(BYTE))),
+            ("b3" , (V3 , Some(BYTE))),
+            ("b4" , (V4 , Some(BYTE))),
+            ("b5" , (V5 , Some(BYTE))),
+            ("b6" , (V6 , Some(BYTE))),
+            ("b7" , (V7 , Some(BYTE))),
+            ("b8" , (V8 , Some(BYTE))),
+            ("b9" , (V9 , Some(BYTE))),
+            ("b10", (V10, Some(BYTE))),
+            ("b11", (V11, Some(BYTE))),
+            ("b12", (V12, Some(BYTE))),
+            ("b13", (V13, Some(BYTE))),
+            ("b14", (V14, Some(BYTE))),
+            ("b15", (V15, Some(BYTE))),
+            ("b16", (V16, Some(BYTE))),
+            ("b17", (V17, Some(BYTE))),
+            ("b18", (V18, Some(BYTE))),
+            ("b19", (V19, Some(BYTE))),
+            ("b20", (V20, Some(BYTE))),
+            ("b21", (V21, Some(BYTE))),
+            ("b22", (V22, Some(BYTE))),
+            ("b23", (V23, Some(BYTE))),
+            ("b24", (V24, Some(BYTE))),
+            ("b25", (V25, Some(BYTE))),
+            ("b26", (V26, Some(BYTE))),
+            ("b27", (V27, Some(BYTE))),
+            ("b28", (V28, Some(BYTE))),
+            ("b29", (V29, Some(BYTE))),
+            ("b30", (V30, Some(BYTE))),
+            ("b31", (V31, Some(BYTE))),
 
-        h.insert("h0" , (V0 , Some(WORD)));
-        h.insert("h1" , (V1 , Some(WORD)));
-        h.insert("h2" , (V2 , Some(WORD)));
-        h.insert("h3" , (V3 , Some(WORD)));
-        h.insert("h4" , (V4 , Some(WORD)));
-        h.insert("h5" , (V5 , Some(WORD)));
-        h.insert("h6" , (V6 , Some(WORD)));
-        h.insert("h7" , (V7 , Some(WORD)));
-        h.insert("h8" , (V8 , Some(WORD)));
-        h.insert("h9" , (V9 , Some(WORD)));
-        h.insert("h10", (V10, Some(WORD)));
-        h.insert("h11", (V11, Some(WORD)));
-        h.insert("h12", (V12, Some(WORD)));
-        h.insert("h13", (V13, Some(WORD)));
-        h.insert("h14", (V14, Some(WORD)));
-        h.insert("h15", (V15, Some(WORD)));
-        h.insert("h16", (V16, Some(WORD)));
-        h.insert("h17", (V17, Some(WORD)));
-        h.insert("h18", (V18, Some(WORD)));
-        h.insert("h19", (V19, Some(WORD)));
-        h.insert("h20", (V20, Some(WORD)));
-        h.insert("h21", (V21, Some(WORD)));
-        h.insert("h22", (V22, Some(WORD)));
-        h.insert("h23", (V23, Some(WORD)));
-        h.insert("h24", (V24, Some(WORD)));
-        h.insert("h25", (V25, Some(WORD)));
-        h.insert("h26", (V26, Some(WORD)));
-        h.insert("h27", (V27, Some(WORD)));
-        h.insert("h28", (V28, Some(WORD)));
-        h.insert("h29", (V29, Some(WORD)));
-        h.insert("h30", (V30, Some(WORD)));
-        h.insert("h31", (V31, Some(WORD)));
+            ("h0" , (V0 , Some(WORD))),
+            ("h1" , (V1 , Some(WORD))),
+            ("h2" , (V2 , Some(WORD))),
+            ("h3" , (V3 , Some(WORD))),
+            ("h4" , (V4 , Some(WORD))),
+            ("h5" , (V5 , Some(WORD))),
+            ("h6" , (V6 , Some(WORD))),
+            ("h7" , (V7 , Some(WORD))),
+            ("h8" , (V8 , Some(WORD))),
+            ("h9" , (V9 , Some(WORD))),
+            ("h10", (V10, Some(WORD))),
+            ("h11", (V11, Some(WORD))),
+            ("h12", (V12, Some(WORD))),
+            ("h13", (V13, Some(WORD))),
+            ("h14", (V14, Some(WORD))),
+            ("h15", (V15, Some(WORD))),
+            ("h16", (V16, Some(WORD))),
+            ("h17", (V17, Some(WORD))),
+            ("h18", (V18, Some(WORD))),
+            ("h19", (V19, Some(WORD))),
+            ("h20", (V20, Some(WORD))),
+            ("h21", (V21, Some(WORD))),
+            ("h22", (V22, Some(WORD))),
+            ("h23", (V23, Some(WORD))),
+            ("h24", (V24, Some(WORD))),
+            ("h25", (V25, Some(WORD))),
+            ("h26", (V26, Some(WORD))),
+            ("h27", (V27, Some(WORD))),
+            ("h28", (V28, Some(WORD))),
+            ("h29", (V29, Some(WORD))),
+            ("h30", (V30, Some(WORD))),
+            ("h31", (V31, Some(WORD))),
 
-        h.insert("s0" , (V0 , Some(DWORD)));
-        h.insert("s1" , (V1 , Some(DWORD)));
-        h.insert("s2" , (V2 , Some(DWORD)));
-        h.insert("s3" , (V3 , Some(DWORD)));
-        h.insert("s4" , (V4 , Some(DWORD)));
-        h.insert("s5" , (V5 , Some(DWORD)));
-        h.insert("s6" , (V6 , Some(DWORD)));
-        h.insert("s7" , (V7 , Some(DWORD)));
-        h.insert("s8" , (V8 , Some(DWORD)));
-        h.insert("s9" , (V9 , Some(DWORD)));
-        h.insert("s10", (V10, Some(DWORD)));
-        h.insert("s11", (V11, Some(DWORD)));
-        h.insert("s12", (V12, Some(DWORD)));
-        h.insert("s13", (V13, Some(DWORD)));
-        h.insert("s14", (V14, Some(DWORD)));
-        h.insert("s15", (V15, Some(DWORD)));
-        h.insert("s16", (V16, Some(DWORD)));
-        h.insert("s17", (V17, Some(DWORD)));
-        h.insert("s18", (V18, Some(DWORD)));
-        h.insert("s19", (V19, Some(DWORD)));
-        h.insert("s20", (V20, Some(DWORD)));
-        h.insert("s21", (V21, Some(DWORD)));
-        h.insert("s22", (V22, Some(DWORD)));
-        h.insert("s23", (V23, Some(DWORD)));
-        h.insert("s24", (V24, Some(DWORD)));
-        h.insert("s25", (V25, Some(DWORD)));
-        h.insert("s26", (V26, Some(DWORD)));
-        h.insert("s27", (V27, Some(DWORD)));
-        h.insert("s28", (V28, Some(DWORD)));
-        h.insert("s29", (V29, Some(DWORD)));
-        h.insert("s30", (V30, Some(DWORD)));
-        h.insert("s31", (V31, Some(DWORD)));
+            ("s0" , (V0 , Some(DWORD))),
+            ("s1" , (V1 , Some(DWORD))),
+            ("s2" , (V2 , Some(DWORD))),
+            ("s3" , (V3 , Some(DWORD))),
+            ("s4" , (V4 , Some(DWORD))),
+            ("s5" , (V5 , Some(DWORD))),
+            ("s6" , (V6 , Some(DWORD))),
+            ("s7" , (V7 , Some(DWORD))),
+            ("s8" , (V8 , Some(DWORD))),
+            ("s9" , (V9 , Some(DWORD))),
+            ("s10", (V10, Some(DWORD))),
+            ("s11", (V11, Some(DWORD))),
+            ("s12", (V12, Some(DWORD))),
+            ("s13", (V13, Some(DWORD))),
+            ("s14", (V14, Some(DWORD))),
+            ("s15", (V15, Some(DWORD))),
+            ("s16", (V16, Some(DWORD))),
+            ("s17", (V17, Some(DWORD))),
+            ("s18", (V18, Some(DWORD))),
+            ("s19", (V19, Some(DWORD))),
+            ("s20", (V20, Some(DWORD))),
+            ("s21", (V21, Some(DWORD))),
+            ("s22", (V22, Some(DWORD))),
+            ("s23", (V23, Some(DWORD))),
+            ("s24", (V24, Some(DWORD))),
+            ("s25", (V25, Some(DWORD))),
+            ("s26", (V26, Some(DWORD))),
+            ("s27", (V27, Some(DWORD))),
+            ("s28", (V28, Some(DWORD))),
+            ("s29", (V29, Some(DWORD))),
+            ("s30", (V30, Some(DWORD))),
+            ("s31", (V31, Some(DWORD))),
 
-        h.insert("d0" , (V0 , Some(QWORD)));
-        h.insert("d1" , (V1 , Some(QWORD)));
-        h.insert("d2" , (V2 , Some(QWORD)));
-        h.insert("d3" , (V3 , Some(QWORD)));
-        h.insert("d4" , (V4 , Some(QWORD)));
-        h.insert("d5" , (V5 , Some(QWORD)));
-        h.insert("d6" , (V6 , Some(QWORD)));
-        h.insert("d7" , (V7 , Some(QWORD)));
-        h.insert("d8" , (V8 , Some(QWORD)));
-        h.insert("d9" , (V9 , Some(QWORD)));
-        h.insert("d10", (V10, Some(QWORD)));
-        h.insert("d11", (V11, Some(QWORD)));
-        h.insert("d12", (V12, Some(QWORD)));
-        h.insert("d13", (V13, Some(QWORD)));
-        h.insert("d14", (V14, Some(QWORD)));
-        h.insert("d15", (V15, Some(QWORD)));
-        h.insert("d16", (V16, Some(QWORD)));
-        h.insert("d17", (V17, Some(QWORD)));
-        h.insert("d18", (V18, Some(QWORD)));
-        h.insert("d19", (V19, Some(QWORD)));
-        h.insert("d20", (V20, Some(QWORD)));
-        h.insert("d21", (V21, Some(QWORD)));
-        h.insert("d22", (V22, Some(QWORD)));
-        h.insert("d23", (V23, Some(QWORD)));
-        h.insert("d24", (V24, Some(QWORD)));
-        h.insert("d25", (V25, Some(QWORD)));
-        h.insert("d26", (V26, Some(QWORD)));
-        h.insert("d27", (V27, Some(QWORD)));
-        h.insert("d28", (V28, Some(QWORD)));
-        h.insert("d29", (V29, Some(QWORD)));
-        h.insert("d30", (V30, Some(QWORD)));
-        h.insert("d31", (V31, Some(QWORD)));
+            ("d0" , (V0 , Some(QWORD))),
+            ("d1" , (V1 , Some(QWORD))),
+            ("d2" , (V2 , Some(QWORD))),
+            ("d3" , (V3 , Some(QWORD))),
+            ("d4" , (V4 , Some(QWORD))),
+            ("d5" , (V5 , Some(QWORD))),
+            ("d6" , (V6 , Some(QWORD))),
+            ("d7" , (V7 , Some(QWORD))),
+            ("d8" , (V8 , Some(QWORD))),
+            ("d9" , (V9 , Some(QWORD))),
+            ("d10", (V10, Some(QWORD))),
+            ("d11", (V11, Some(QWORD))),
+            ("d12", (V12, Some(QWORD))),
+            ("d13", (V13, Some(QWORD))),
+            ("d14", (V14, Some(QWORD))),
+            ("d15", (V15, Some(QWORD))),
+            ("d16", (V16, Some(QWORD))),
+            ("d17", (V17, Some(QWORD))),
+            ("d18", (V18, Some(QWORD))),
+            ("d19", (V19, Some(QWORD))),
+            ("d20", (V20, Some(QWORD))),
+            ("d21", (V21, Some(QWORD))),
+            ("d22", (V22, Some(QWORD))),
+            ("d23", (V23, Some(QWORD))),
+            ("d24", (V24, Some(QWORD))),
+            ("d25", (V25, Some(QWORD))),
+            ("d26", (V26, Some(QWORD))),
+            ("d27", (V27, Some(QWORD))),
+            ("d28", (V28, Some(QWORD))),
+            ("d29", (V29, Some(QWORD))),
+            ("d30", (V30, Some(QWORD))),
+            ("d31", (V31, Some(QWORD))),
 
-        h.insert("q0" , (V0 , Some(OWORD)));
-        h.insert("q1" , (V1 , Some(OWORD)));
-        h.insert("q2" , (V2 , Some(OWORD)));
-        h.insert("q3" , (V3 , Some(OWORD)));
-        h.insert("q4" , (V4 , Some(OWORD)));
-        h.insert("q5" , (V5 , Some(OWORD)));
-        h.insert("q6" , (V6 , Some(OWORD)));
-        h.insert("q7" , (V7 , Some(OWORD)));
-        h.insert("q8" , (V8 , Some(OWORD)));
-        h.insert("q9" , (V9 , Some(OWORD)));
-        h.insert("q10", (V10, Some(OWORD)));
-        h.insert("q11", (V11, Some(OWORD)));
-        h.insert("q12", (V12, Some(OWORD)));
-        h.insert("q13", (V13, Some(OWORD)));
-        h.insert("q14", (V14, Some(OWORD)));
-        h.insert("q15", (V15, Some(OWORD)));
-        h.insert("q16", (V16, Some(OWORD)));
-        h.insert("q17", (V17, Some(OWORD)));
-        h.insert("q18", (V18, Some(OWORD)));
-        h.insert("q19", (V19, Some(OWORD)));
-        h.insert("q20", (V20, Some(OWORD)));
-        h.insert("q21", (V21, Some(OWORD)));
-        h.insert("q22", (V22, Some(OWORD)));
-        h.insert("q23", (V23, Some(OWORD)));
-        h.insert("q24", (V24, Some(OWORD)));
-        h.insert("q25", (V25, Some(OWORD)));
-        h.insert("q26", (V26, Some(OWORD)));
-        h.insert("q27", (V27, Some(OWORD)));
-        h.insert("q28", (V28, Some(OWORD)));
-        h.insert("q29", (V29, Some(OWORD)));
-        h.insert("q30", (V30, Some(OWORD)));
-        h.insert("q31", (V31, Some(OWORD)));
+            ("q0" , (V0 , Some(OWORD))),
+            ("q1" , (V1 , Some(OWORD))),
+            ("q2" , (V2 , Some(OWORD))),
+            ("q3" , (V3 , Some(OWORD))),
+            ("q4" , (V4 , Some(OWORD))),
+            ("q5" , (V5 , Some(OWORD))),
+            ("q6" , (V6 , Some(OWORD))),
+            ("q7" , (V7 , Some(OWORD))),
+            ("q8" , (V8 , Some(OWORD))),
+            ("q9" , (V9 , Some(OWORD))),
+            ("q10", (V10, Some(OWORD))),
+            ("q11", (V11, Some(OWORD))),
+            ("q12", (V12, Some(OWORD))),
+            ("q13", (V13, Some(OWORD))),
+            ("q14", (V14, Some(OWORD))),
+            ("q15", (V15, Some(OWORD))),
+            ("q16", (V16, Some(OWORD))),
+            ("q17", (V17, Some(OWORD))),
+            ("q18", (V18, Some(OWORD))),
+            ("q19", (V19, Some(OWORD))),
+            ("q20", (V20, Some(OWORD))),
+            ("q21", (V21, Some(OWORD))),
+            ("q22", (V22, Some(OWORD))),
+            ("q23", (V23, Some(OWORD))),
+            ("q24", (V24, Some(OWORD))),
+            ("q25", (V25, Some(OWORD))),
+            ("q26", (V26, Some(OWORD))),
+            ("q27", (V27, Some(OWORD))),
+            ("q28", (V28, Some(OWORD))),
+            ("q29", (V29, Some(OWORD))),
+            ("q30", (V30, Some(OWORD))),
+            ("q31", (V31, Some(OWORD))),
 
-        h.insert("v0" , (V0 , None));
-        h.insert("v1" , (V1 , None));
-        h.insert("v2" , (V2 , None));
-        h.insert("v3" , (V3 , None));
-        h.insert("v4" , (V4 , None));
-        h.insert("v5" , (V5 , None));
-        h.insert("v6" , (V6 , None));
-        h.insert("v7" , (V7 , None));
-        h.insert("v8" , (V8 , None));
-        h.insert("v9" , (V9 , None));
-        h.insert("v10", (V10, None));
-        h.insert("v11", (V11, None));
-        h.insert("v12", (V12, None));
-        h.insert("v13", (V13, None));
-        h.insert("v14", (V14, None));
-        h.insert("v15", (V15, None));
-        h.insert("v16", (V16, None));
-        h.insert("v17", (V17, None));
-        h.insert("v18", (V18, None));
-        h.insert("v19", (V19, None));
-        h.insert("v20", (V20, None));
-        h.insert("v21", (V21, None));
-        h.insert("v22", (V22, None));
-        h.insert("v23", (V23, None));
-        h.insert("v24", (V24, None));
-        h.insert("v25", (V25, None));
-        h.insert("v26", (V26, None));
-        h.insert("v27", (V27, None));
-        h.insert("v28", (V28, None));
-        h.insert("v29", (V29, None));
-        h.insert("v30", (V30, None));
-        h.insert("v31", (V31, None));
-        h
+            ("v0" , (V0 , None)),
+            ("v1" , (V1 , None)),
+            ("v2" , (V2 , None)),
+            ("v3" , (V3 , None)),
+            ("v4" , (V4 , None)),
+            ("v5" , (V5 , None)),
+            ("v6" , (V6 , None)),
+            ("v7" , (V7 , None)),
+            ("v8" , (V8 , None)),
+            ("v9" , (V9 , None)),
+            ("v10", (V10, None)),
+            ("v11", (V11, None)),
+            ("v12", (V12, None)),
+            ("v13", (V13, None)),
+            ("v14", (V14, None)),
+            ("v15", (V15, None)),
+            ("v16", (V16, None)),
+            ("v17", (V17, None)),
+            ("v18", (V18, None)),
+            ("v19", (V19, None)),
+            ("v20", (V20, None)),
+            ("v21", (V21, None)),
+            ("v22", (V22, None)),
+            ("v23", (V23, None)),
+            ("v24", (V24, None)),
+            ("v25", (V25, None)),
+            ("v26", (V26, None)),
+            ("v27", (V27, None)),
+            ("v28", (V28, None)),
+            ("v29", (V29, None)),
+            ("v30", (V30, None)),
+            ("v31", (V31, None)),
+        ];
+        MAP.iter().cloned().collect()
     };
 
     static ref AARCH64_FAMILIES: HashMap<&'static str, (RegFamily, Option<Size>)> = {
-        let mut h = HashMap::new();
-        h.insert("X",   (RegFamily::INTEGER,   Some(Size::QWORD)));
-        h.insert("W",   (RegFamily::INTEGER,   Some(Size::DWORD)));
-        h.insert("XSP", (RegFamily::INTEGERSP, Some(Size::QWORD)));
-        h.insert("WSP", (RegFamily::INTEGERSP, Some(Size::DWORD)));
+        static MAP: &[(&str, (RegFamily, Option<Size>))] = &[
+            ("X",   (RegFamily::INTEGER,   Some(Size::QWORD))),
+            ("W",   (RegFamily::INTEGER,   Some(Size::DWORD))),
+            ("XSP", (RegFamily::INTEGERSP, Some(Size::QWORD))),
+            ("WSP", (RegFamily::INTEGERSP, Some(Size::DWORD))),
 
-        h.insert("B", (RegFamily::SIMD, Some(Size::BYTE)));
-        h.insert("H", (RegFamily::SIMD, Some(Size::WORD)));
-        h.insert("S", (RegFamily::SIMD, Some(Size::DWORD)));
-        h.insert("D", (RegFamily::SIMD, Some(Size::QWORD)));
-        h.insert("Q", (RegFamily::SIMD, Some(Size::OWORD)));
+            ("B", (RegFamily::SIMD, Some(Size::BYTE))),
+            ("H", (RegFamily::SIMD, Some(Size::WORD))),
+            ("S", (RegFamily::SIMD, Some(Size::DWORD))),
+            ("D", (RegFamily::SIMD, Some(Size::QWORD))),
+            ("Q", (RegFamily::SIMD, Some(Size::OWORD))),
 
-        h.insert("V", (RegFamily::SIMD, None));
-        h
+            ("V", (RegFamily::SIMD, None)),
+        ];
+        MAP.iter().cloned().collect()
     };
 }

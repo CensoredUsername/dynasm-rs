@@ -1,4 +1,4 @@
-Ops!(OPMAP;
+Ops!(
 
 "aaa" = [
     b""           , [0x37              ], X, X86_ONLY;
@@ -5230,34 +5230,58 @@ Ops!(OPMAP;
     b"ob"         , [0x71            ], X, EXACT_SIZE;
     b"od"         , [0x0F, 0x81      ], X;
 ]
-"jb"     |
-"jc"     |
+"jb"     = [
+    b"ob",       [0x72            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x82      ], X;
+]
+"jc"     = [
+    b"ob",       [0x72            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x82      ], X;
+]
 "jnae"   = [
     b"ob",       [0x72            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x82      ], X;
 ]
-"jnb"    |
-"jnc"    |
+"jnb"    = [
+    b"ob",       [0x73            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x83      ], X;
+]
+"jnc"    = [
+    b"ob",       [0x73            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x83      ], X;
+]
 "jae"    = [
     b"ob",       [0x73            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x83      ], X;
 ]
-"jz"     |
+"jz"     = [
+    b"ob",       [0x74            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x84      ], X;
+]
 "je"     = [
     b"ob",       [0x74            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x84      ], X;
 ]
-"jnz"    |
+"jnz"    = [
+    b"ob",       [0x75            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x85      ], X;
+]
 "jne"    = [
     b"ob",       [0x75            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x85      ], X;
 ]
-"jbe"    |
+"jbe"    = [
+    b"ob",       [0x76            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x86      ], X;
+]
 "jna"    = [
     b"ob",       [0x76            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x86      ], X;
 ]
-"jnbe"   |
+"jnbe"   = [
+    b"ob",       [0x77            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x87      ], X;
+]
 "ja"     = [
     b"ob",       [0x77            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x87      ], X;
@@ -5270,32 +5294,50 @@ Ops!(OPMAP;
     b"ob",       [0x79            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x89      ], X;
 ]
-"jp"     |
+"jp"     = [
+    b"ob",       [0x7A            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x8A      ], X;
+]
 "jpe"    = [
     b"ob",       [0x7A            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x8A      ], X;
 ]
-"jnp"    |
+"jnp"    = [
+    b"ob",       [0x7B            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x8B      ], X;
+]
 "jpo"    = [
     b"ob",       [0x7B            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x8B      ], X;
 ]
-"jl"     |
+"jl"     = [
+    b"ob",       [0x7C            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x8C      ], X;
+]
 "jnge"   = [
     b"ob",       [0x7C            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x8C      ], X;
 ]
-"jnl"    |
+"jnl"    = [
+    b"ob",       [0x7D            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x8D      ], X;
+]
 "jge"    = [
     b"ob",       [0x7D            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x8D      ], X;
 ]
-"jle"    |
+"jle"    = [
+    b"ob",       [0x7E            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x8E      ], X;
+]
 "jng"    = [
     b"ob",       [0x7E            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x8E      ], X;
 ]
-"jnle"   |
+"jnle"   = [
+    b"ob",       [0x7F            ], X, EXACT_SIZE;
+    b"od",       [0x0F, 0x8F      ], X;
+]
 "jg"     = [
     b"ob",       [0x7F            ], X, EXACT_SIZE;
     b"od",       [0x0F, 0x8F      ], X;
@@ -5307,29 +5349,45 @@ Ops!(OPMAP;
 "cmovno"   = [
     b"r*v*",     [0x0F, 0x41      ], X, AUTO_SIZE;
 ]
-"cmovb"    |
-"cmovc"    |
+"cmovb"    = [
+    b"r*v*",     [0x0F, 0x42      ], X, AUTO_SIZE;
+]
+"cmovc"    = [
+    b"r*v*",     [0x0F, 0x42      ], X, AUTO_SIZE;
+]
 "cmovnae"  = [
     b"r*v*",     [0x0F, 0x42      ], X, AUTO_SIZE;
 ]
-"cmovnb"   |
-"cmovnc"      |
+"cmovnb"      = [
+    b"r*v*",     [0x0F, 0x43      ], X, AUTO_SIZE;
+]
+"cmovnc"      = [
+    b"r*v*",     [0x0F, 0x43      ], X, AUTO_SIZE;
+]
 "cmovae"      = [
     b"r*v*",     [0x0F, 0x43      ], X, AUTO_SIZE;
 ]
-"cmovz"       |
+"cmovz"       = [
+    b"r*v*",     [0x0F, 0x44      ], X, AUTO_SIZE;
+]
 "cmove"       = [
     b"r*v*",     [0x0F, 0x44      ], X, AUTO_SIZE;
 ]
-"cmovnz"      |
+"cmovnz"      = [
+    b"r*v*",     [0x0F, 0x45      ], X, AUTO_SIZE;
+]
 "cmovne"      = [
     b"r*v*",     [0x0F, 0x45      ], X, AUTO_SIZE;
 ]
-"cmovbe"      |
+"cmovbe"      = [
+    b"r*v*",     [0x0F, 0x46      ], X, AUTO_SIZE;
+]
 "cmovna"      = [
     b"r*v*",     [0x0F, 0x46      ], X, AUTO_SIZE;
 ]
-"cmovnbe"     |
+"cmovnbe"     = [
+    b"r*v*",     [0x0F, 0x47      ], X, AUTO_SIZE;
+]
 "cmova"       = [
     b"r*v*",     [0x0F, 0x47      ], X, AUTO_SIZE;
 ]
@@ -5339,27 +5397,39 @@ Ops!(OPMAP;
 "cmovns"      = [
     b"r*v*",     [0x0F, 0x49      ], X, AUTO_SIZE;
 ]
-"cmovp"       |
+"cmovp"       = [
+    b"r*v*",     [0x0F, 0x4A      ], X, AUTO_SIZE;
+]
 "cmovpe"      = [
     b"r*v*",     [0x0F, 0x4A      ], X, AUTO_SIZE;
 ]
-"cmovnp"      |
+"cmovnp"      = [
+    b"r*v*",     [0x0F, 0x4B      ], X, AUTO_SIZE;
+]
 "cmovpo"      = [
     b"r*v*",     [0x0F, 0x4B      ], X, AUTO_SIZE;
 ]
-"cmovl"       |
+"cmovl"       = [
+    b"r*v*",     [0x0F, 0x4C      ], X, AUTO_SIZE;
+]
 "cmovnge"     = [
     b"r*v*",     [0x0F, 0x4C      ], X, AUTO_SIZE;
 ]
-"cmovnl"      |
+"cmovnl"      = [
+    b"r*v*",     [0x0F, 0x4D      ], X, AUTO_SIZE;
+]
 "cmovge"      = [
     b"r*v*",     [0x0F, 0x4D      ], X, AUTO_SIZE;
 ]
-"cmovle"      |
+"cmovle"      = [
+    b"r*v*",     [0x0F, 0x4E      ], X, AUTO_SIZE;
+]
 "cmovng"      = [
     b"r*v*",     [0x0F, 0x4E      ], X, AUTO_SIZE;
 ]
-"cmovnle"     |
+"cmovnle"     = [
+    b"r*v*",     [0x0F, 0x4F      ], X, AUTO_SIZE;
+]
 "cmovg"       = [
     b"r*v*",     [0x0F, 0x4F      ], X, AUTO_SIZE;
 ]
@@ -5370,28 +5440,45 @@ Ops!(OPMAP;
 "setno"       = [
     b"vb",       [0x0F, 0x91      ], 0;
 ]
-"setb"        |
-"setc"        |
+"setb"        = [
+    b"vb",       [0x0F, 0x92      ], 0;
+]
+"setc"        = [
+    b"vb",       [0x0F, 0x92      ], 0;
+]
 "setnae"      = [
     b"vb",       [0x0F, 0x92      ], 0;
 ]
-"setnb"       |
-"setnc"       |
+"setnb"       = [
+    b"vb",       [0x0F, 0x93      ], 0;
+]
+"setnc"       = [
+    b"vb",       [0x0F, 0x93      ], 0;
+]
 "setae"       = [
     b"vb",       [0x0F, 0x93      ], 0;
 ]
-"setz"        |
+"setz"        = [
+    b"vb",       [0x0F, 0x94      ], 0;
+]
 "sete"        = [
     b"vb",       [0x0F, 0x94      ], 0;
-] "setnz"       |
+]
+"setnz"       = [
+    b"vb",       [0x0F, 0x95      ], 0;
+]
 "setne"       = [
     b"vb",       [0x0F, 0x95      ], 0;
 ]
-"setbe"       |
+"setbe"       = [
+    b"vb",       [0x0F, 0x96      ], 0;
+]
 "setna"       = [
     b"vb",       [0x0F, 0x96      ], 0;
 ]
-"setnbe"      |
+"setnbe"      = [
+    b"vb",       [0x0F, 0x97      ], 0;
+]
 "seta"        = [
     b"vb",       [0x0F, 0x97      ], 0;
 ]
@@ -5401,27 +5488,39 @@ Ops!(OPMAP;
 "setns"       = [
     b"vb",       [0x0F, 0x99      ], 0;
 ]
-"setp"        |
+"setp"        = [
+    b"vb",       [0x0F, 0x9A      ], 0;
+]
 "setpe"       = [
     b"vb",       [0x0F, 0x9A      ], 0;
 ]
-"setnp"       |
+"setnp"       = [
+    b"vb",       [0x0F, 0x9B      ], 0;
+]
 "setpo"       = [
     b"vb",       [0x0F, 0x9B      ], 0;
 ]
-"setl"        |
+"setl"        = [
+    b"vb",       [0x0F, 0x9C      ], 0;
+]
 "setnge"      = [
     b"vb",       [0x0F, 0x9C      ], 0;
 ]
-"setnl"       |
+"setnl"       = [
+    b"vb",       [0x0F, 0x9D      ], 0;
+]
 "setge"       = [
     b"vb",       [0x0F, 0x9D      ], 0;
 ]
-"setle"       |
+"setle"       = [
+    b"vb",       [0x0F, 0x9E      ], 0;
+]
 "setng"       = [
     b"vb",       [0x0F, 0x9E      ], 0;
 ]
-"setnle"      |
+"setnle"      = [
+    b"vb",       [0x0F, 0x9F      ], 0;
+]
 "setg"        = [
     b"vb",       [0x0F, 0x9F      ], 0;
 ]

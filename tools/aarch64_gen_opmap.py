@@ -484,7 +484,7 @@ def main():
     #emit the actual opmap
 
     with open("../plugin/src/arch/aarch64/opmap.rs", "w", encoding="utf-8") as f:
-        f.write("// This file was generated bo tools/aarch64_gen_opmap.py\nOps!(map ;\n\n")
+        f.write("// This file was generated bo tools/aarch64_gen_opmap.py\nOps!(\n\n")
         emit_opmap(ops, f)
         f.write("\n);\n")
 

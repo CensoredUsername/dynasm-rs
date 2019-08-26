@@ -330,349 +330,353 @@ lazy_static!{
         use self::RegId::*;
         use crate::common::Size::*;
 
-        let mut h = HashMap::new();
-        h.insert("rax", (RAX, QWORD));
-        h.insert("r0" , (RAX, QWORD));
-        h.insert("rcx", (RCX, QWORD));
-        h.insert("r1" , (RCX, QWORD));
-        h.insert("rdx", (RDX, QWORD));
-        h.insert("r2" , (RDX, QWORD));
-        h.insert("rbx", (RBX, QWORD));
-        h.insert("r3" , (RBX, QWORD));
-        h.insert("rsp", (RSP, QWORD));
-        h.insert("r4" , (RSP, QWORD));
-        h.insert("rbp", (RBP, QWORD));
-        h.insert("r5" , (RBP, QWORD));
-        h.insert("rsi", (RSI, QWORD));
-        h.insert("r6" , (RSI, QWORD));
-        h.insert("rdi", (RDI, QWORD));
-        h.insert("r7" , (RDI, QWORD));
-        h.insert("r8" , (R8,  QWORD));
-        h.insert("r9" , (R9,  QWORD));
-        h.insert("r10", (R10, QWORD));
-        h.insert("r11", (R11, QWORD));
-        h.insert("r12", (R12, QWORD));
-        h.insert("r13", (R13, QWORD));
-        h.insert("r14", (R14, QWORD));
-        h.insert("r15", (R15, QWORD));
+        static MAP: &[(&str, (RegId, Size))] = &[
+            ("rax", (RAX, QWORD)),
+            ("r0" , (RAX, QWORD)),
+            ("rcx", (RCX, QWORD)),
+            ("r1" , (RCX, QWORD)),
+            ("rdx", (RDX, QWORD)),
+            ("r2" , (RDX, QWORD)),
+            ("rbx", (RBX, QWORD)),
+            ("r3" , (RBX, QWORD)),
+            ("rsp", (RSP, QWORD)),
+            ("r4" , (RSP, QWORD)),
+            ("rbp", (RBP, QWORD)),
+            ("r5" , (RBP, QWORD)),
+            ("rsi", (RSI, QWORD)),
+            ("r6" , (RSI, QWORD)),
+            ("rdi", (RDI, QWORD)),
+            ("r7" , (RDI, QWORD)),
+            ("r8" , (R8,  QWORD)),
+            ("r9" , (R9,  QWORD)),
+            ("r10", (R10, QWORD)),
+            ("r11", (R11, QWORD)),
+            ("r12", (R12, QWORD)),
+            ("r13", (R13, QWORD)),
+            ("r14", (R14, QWORD)),
+            ("r15", (R15, QWORD)),
 
-        h.insert("eax" , (RAX, DWORD));
-        h.insert("r0d" , (RAX, DWORD));
-        h.insert("ecx" , (RCX, DWORD));
-        h.insert("r1d" , (RCX, DWORD));
-        h.insert("edx" , (RDX, DWORD));
-        h.insert("r2d" , (RDX, DWORD));
-        h.insert("ebx" , (RBX, DWORD));
-        h.insert("r3d" , (RBX, DWORD));
-        h.insert("esp" , (RSP, DWORD));
-        h.insert("r4d" , (RSP, DWORD));
-        h.insert("ebp" , (RBP, DWORD));
-        h.insert("r5d" , (RBP, DWORD));
-        h.insert("esi" , (RSI, DWORD));
-        h.insert("r6d" , (RSI, DWORD));
-        h.insert("edi" , (RDI, DWORD));
-        h.insert("r7d" , (RDI, DWORD));
-        h.insert("r8d" , (R8,  DWORD));
-        h.insert("r9d" , (R9,  DWORD));
-        h.insert("r10d", (R10, DWORD));
-        h.insert("r11d", (R11, DWORD));
-        h.insert("r12d", (R12, DWORD));
-        h.insert("r13d", (R13, DWORD));
-        h.insert("r14d", (R14, DWORD));
-        h.insert("r15d", (R15, DWORD));
+            ("eax" , (RAX, DWORD)),
+            ("r0d" , (RAX, DWORD)),
+            ("ecx" , (RCX, DWORD)),
+            ("r1d" , (RCX, DWORD)),
+            ("edx" , (RDX, DWORD)),
+            ("r2d" , (RDX, DWORD)),
+            ("ebx" , (RBX, DWORD)),
+            ("r3d" , (RBX, DWORD)),
+            ("esp" , (RSP, DWORD)),
+            ("r4d" , (RSP, DWORD)),
+            ("ebp" , (RBP, DWORD)),
+            ("r5d" , (RBP, DWORD)),
+            ("esi" , (RSI, DWORD)),
+            ("r6d" , (RSI, DWORD)),
+            ("edi" , (RDI, DWORD)),
+            ("r7d" , (RDI, DWORD)),
+            ("r8d" , (R8,  DWORD)),
+            ("r9d" , (R9,  DWORD)),
+            ("r10d", (R10, DWORD)),
+            ("r11d", (R11, DWORD)),
+            ("r12d", (R12, DWORD)),
+            ("r13d", (R13, DWORD)),
+            ("r14d", (R14, DWORD)),
+            ("r15d", (R15, DWORD)),
 
-        h.insert("ax"  , (RAX, WORD));
-        h.insert("r0w" , (RAX, WORD));
-        h.insert("cx"  , (RCX, WORD));
-        h.insert("r1w" , (RCX, WORD));
-        h.insert("dx"  , (RDX, WORD));
-        h.insert("r2w" , (RDX, WORD));
-        h.insert("bx"  , (RBX, WORD));
-        h.insert("r3w" , (RBX, WORD));
-        h.insert("sp"  , (RSP, WORD));
-        h.insert("r4w" , (RSP, WORD));
-        h.insert("bp"  , (RBP, WORD));
-        h.insert("r5w" , (RBP, WORD));
-        h.insert("si"  , (RSI, WORD));
-        h.insert("r6w" , (RSI, WORD));
-        h.insert("di"  , (RDI, WORD));
-        h.insert("r7w" , (RDI, WORD));
-        h.insert("r8w" , (R8,  WORD));
-        h.insert("r9w" , (R9,  WORD));
-        h.insert("r10w", (R10, WORD));
-        h.insert("r11w", (R11, WORD));
-        h.insert("r12w", (R12, WORD));
-        h.insert("r13w", (R13, WORD));
-        h.insert("r14w", (R14, WORD));
-        h.insert("r15w", (R15, WORD));
+            ("ax"  , (RAX, WORD)),
+            ("r0w" , (RAX, WORD)),
+            ("cx"  , (RCX, WORD)),
+            ("r1w" , (RCX, WORD)),
+            ("dx"  , (RDX, WORD)),
+            ("r2w" , (RDX, WORD)),
+            ("bx"  , (RBX, WORD)),
+            ("r3w" , (RBX, WORD)),
+            ("sp"  , (RSP, WORD)),
+            ("r4w" , (RSP, WORD)),
+            ("bp"  , (RBP, WORD)),
+            ("r5w" , (RBP, WORD)),
+            ("si"  , (RSI, WORD)),
+            ("r6w" , (RSI, WORD)),
+            ("di"  , (RDI, WORD)),
+            ("r7w" , (RDI, WORD)),
+            ("r8w" , (R8,  WORD)),
+            ("r9w" , (R9,  WORD)),
+            ("r10w", (R10, WORD)),
+            ("r11w", (R11, WORD)),
+            ("r12w", (R12, WORD)),
+            ("r13w", (R13, WORD)),
+            ("r14w", (R14, WORD)),
+            ("r15w", (R15, WORD)),
 
-        h.insert("al"  , (RAX, BYTE));
-        h.insert("r0b" , (RAX, BYTE));
-        h.insert("cl"  , (RCX, BYTE));
-        h.insert("r1b" , (RCX, BYTE));
-        h.insert("dl"  , (RDX, BYTE));
-        h.insert("r2b" , (RDX, BYTE));
-        h.insert("bl"  , (RBX, BYTE));
-        h.insert("r3b" , (RBX, BYTE));
-        h.insert("spl" , (RSP, BYTE));
-        h.insert("r4b" , (RSP, BYTE));
-        h.insert("bpl" , (RBP, BYTE));
-        h.insert("r5b" , (RBP, BYTE));
-        h.insert("sil" , (RSI, BYTE));
-        h.insert("r6b" , (RSI, BYTE));
-        h.insert("dil" , (RDI, BYTE));
-        h.insert("r7b" , (RDI, BYTE));
-        h.insert("r8b" , (R8,  BYTE));
-        h.insert("r9b" , (R9,  BYTE));
-        h.insert("r10b", (R10, BYTE));
-        h.insert("r11b", (R11, BYTE));
-        h.insert("r12b", (R12, BYTE));
-        h.insert("r13b", (R13, BYTE));
-        h.insert("r14b", (R14, BYTE));
-        h.insert("r15b", (R15, BYTE));
+            ("al"  , (RAX, BYTE)),
+            ("r0b" , (RAX, BYTE)),
+            ("cl"  , (RCX, BYTE)),
+            ("r1b" , (RCX, BYTE)),
+            ("dl"  , (RDX, BYTE)),
+            ("r2b" , (RDX, BYTE)),
+            ("bl"  , (RBX, BYTE)),
+            ("r3b" , (RBX, BYTE)),
+            ("spl" , (RSP, BYTE)),
+            ("r4b" , (RSP, BYTE)),
+            ("bpl" , (RBP, BYTE)),
+            ("r5b" , (RBP, BYTE)),
+            ("sil" , (RSI, BYTE)),
+            ("r6b" , (RSI, BYTE)),
+            ("dil" , (RDI, BYTE)),
+            ("r7b" , (RDI, BYTE)),
+            ("r8b" , (R8,  BYTE)),
+            ("r9b" , (R9,  BYTE)),
+            ("r10b", (R10, BYTE)),
+            ("r11b", (R11, BYTE)),
+            ("r12b", (R12, BYTE)),
+            ("r13b", (R13, BYTE)),
+            ("r14b", (R14, BYTE)),
+            ("r15b", (R15, BYTE)),
 
-        h.insert("rip", (RIP, QWORD));
-        h.insert("eip", (RIP, DWORD));
+            ("rip", (RIP, QWORD)),
+            ("eip", (RIP, DWORD)),
 
-        h.insert("ah", (AH, BYTE));
-        h.insert("ch", (CH, BYTE));
-        h.insert("dh", (DH, BYTE));
-        h.insert("bh", (BH, BYTE));
+            ("ah", (AH, BYTE)),
+            ("ch", (CH, BYTE)),
+            ("dh", (DH, BYTE)),
+            ("bh", (BH, BYTE)),
 
-        h.insert("st0", (ST0, PWORD));
-        h.insert("st1", (ST1, PWORD));
-        h.insert("st2", (ST2, PWORD));
-        h.insert("st3", (ST3, PWORD));
-        h.insert("st4", (ST4, PWORD));
-        h.insert("st5", (ST5, PWORD));
-        h.insert("st6", (ST6, PWORD));
-        h.insert("st7", (ST7, PWORD));
+            ("st0", (ST0, PWORD)),
+            ("st1", (ST1, PWORD)),
+            ("st2", (ST2, PWORD)),
+            ("st3", (ST3, PWORD)),
+            ("st4", (ST4, PWORD)),
+            ("st5", (ST5, PWORD)),
+            ("st6", (ST6, PWORD)),
+            ("st7", (ST7, PWORD)),
 
-        h.insert("mm0", (MMX0, QWORD));
-        h.insert("mm1", (MMX1, QWORD));
-        h.insert("mm2", (MMX2, QWORD));
-        h.insert("mm3", (MMX3, QWORD));
-        h.insert("mm4", (MMX4, QWORD));
-        h.insert("mm5", (MMX5, QWORD));
-        h.insert("mm6", (MMX6, QWORD));
-        h.insert("mm7", (MMX7, QWORD));
+            ("mm0", (MMX0, QWORD)),
+            ("mm1", (MMX1, QWORD)),
+            ("mm2", (MMX2, QWORD)),
+            ("mm3", (MMX3, QWORD)),
+            ("mm4", (MMX4, QWORD)),
+            ("mm5", (MMX5, QWORD)),
+            ("mm6", (MMX6, QWORD)),
+            ("mm7", (MMX7, QWORD)),
 
-        h.insert("xmm0" , (XMM0 , OWORD));
-        h.insert("xmm1" , (XMM1 , OWORD));
-        h.insert("xmm2" , (XMM2 , OWORD));
-        h.insert("xmm3" , (XMM3 , OWORD));
-        h.insert("xmm4" , (XMM4 , OWORD));
-        h.insert("xmm5" , (XMM5 , OWORD));
-        h.insert("xmm6" , (XMM6 , OWORD));
-        h.insert("xmm7" , (XMM7 , OWORD));
-        h.insert("xmm8" , (XMM8 , OWORD));
-        h.insert("xmm9" , (XMM9 , OWORD));
-        h.insert("xmm10", (XMM10, OWORD));
-        h.insert("xmm11", (XMM11, OWORD));
-        h.insert("xmm12", (XMM12, OWORD));
-        h.insert("xmm13", (XMM13, OWORD));
-        h.insert("xmm14", (XMM14, OWORD));
-        h.insert("xmm15", (XMM15, OWORD));
+            ("xmm0" , (XMM0 , OWORD)),
+            ("xmm1" , (XMM1 , OWORD)),
+            ("xmm2" , (XMM2 , OWORD)),
+            ("xmm3" , (XMM3 , OWORD)),
+            ("xmm4" , (XMM4 , OWORD)),
+            ("xmm5" , (XMM5 , OWORD)),
+            ("xmm6" , (XMM6 , OWORD)),
+            ("xmm7" , (XMM7 , OWORD)),
+            ("xmm8" , (XMM8 , OWORD)),
+            ("xmm9" , (XMM9 , OWORD)),
+            ("xmm10", (XMM10, OWORD)),
+            ("xmm11", (XMM11, OWORD)),
+            ("xmm12", (XMM12, OWORD)),
+            ("xmm13", (XMM13, OWORD)),
+            ("xmm14", (XMM14, OWORD)),
+            ("xmm15", (XMM15, OWORD)),
 
-        h.insert("ymm0" , (XMM0 , HWORD));
-        h.insert("ymm1" , (XMM1 , HWORD));
-        h.insert("ymm2" , (XMM2 , HWORD));
-        h.insert("ymm3" , (XMM3 , HWORD));
-        h.insert("ymm4" , (XMM4 , HWORD));
-        h.insert("ymm5" , (XMM5 , HWORD));
-        h.insert("ymm6" , (XMM6 , HWORD));
-        h.insert("ymm7" , (XMM7 , HWORD));
-        h.insert("ymm8" , (XMM8 , HWORD));
-        h.insert("ymm9" , (XMM9 , HWORD));
-        h.insert("ymm10", (XMM10, HWORD));
-        h.insert("ymm11", (XMM11, HWORD));
-        h.insert("ymm12", (XMM12, HWORD));
-        h.insert("ymm13", (XMM13, HWORD));
-        h.insert("ymm14", (XMM14, HWORD));
-        h.insert("ymm15", (XMM15, HWORD));
+            ("ymm0" , (XMM0 , HWORD)),
+            ("ymm1" , (XMM1 , HWORD)),
+            ("ymm2" , (XMM2 , HWORD)),
+            ("ymm3" , (XMM3 , HWORD)),
+            ("ymm4" , (XMM4 , HWORD)),
+            ("ymm5" , (XMM5 , HWORD)),
+            ("ymm6" , (XMM6 , HWORD)),
+            ("ymm7" , (XMM7 , HWORD)),
+            ("ymm8" , (XMM8 , HWORD)),
+            ("ymm9" , (XMM9 , HWORD)),
+            ("ymm10", (XMM10, HWORD)),
+            ("ymm11", (XMM11, HWORD)),
+            ("ymm12", (XMM12, HWORD)),
+            ("ymm13", (XMM13, HWORD)),
+            ("ymm14", (XMM14, HWORD)),
+            ("ymm15", (XMM15, HWORD)),
 
-        h.insert("es", (ES, WORD));
-        h.insert("cs", (CS, WORD));
-        h.insert("ss", (SS, WORD));
-        h.insert("ds", (DS, WORD));
-        h.insert("fs", (FS, WORD));
-        h.insert("gs", (GS, WORD));
+            ("es", (ES, WORD)),
+            ("cs", (CS, WORD)),
+            ("ss", (SS, WORD)),
+            ("ds", (DS, WORD)),
+            ("fs", (FS, WORD)),
+            ("gs", (GS, WORD)),
 
-        h.insert("cr0" , (CR0 , QWORD));
-        h.insert("cr1" , (CR1 , QWORD));
-        h.insert("cr2" , (CR2 , QWORD));
-        h.insert("cr3" , (CR3 , QWORD));
-        h.insert("cr4" , (CR4 , QWORD));
-        h.insert("cr5" , (CR5 , QWORD));
-        h.insert("cr6" , (CR6 , QWORD));
-        h.insert("cr7" , (CR7 , QWORD));
-        h.insert("cr8" , (CR8 , QWORD));
-        h.insert("cr9" , (CR9 , QWORD));
-        h.insert("cr10", (CR10, QWORD));
-        h.insert("cr11", (CR11, QWORD));
-        h.insert("cr12", (CR12, QWORD));
-        h.insert("cr13", (CR13, QWORD));
-        h.insert("cr14", (CR14, QWORD));
-        h.insert("cr15", (CR15, QWORD));
+            ("cr0" , (CR0 , QWORD)),
+            ("cr1" , (CR1 , QWORD)),
+            ("cr2" , (CR2 , QWORD)),
+            ("cr3" , (CR3 , QWORD)),
+            ("cr4" , (CR4 , QWORD)),
+            ("cr5" , (CR5 , QWORD)),
+            ("cr6" , (CR6 , QWORD)),
+            ("cr7" , (CR7 , QWORD)),
+            ("cr8" , (CR8 , QWORD)),
+            ("cr9" , (CR9 , QWORD)),
+            ("cr10", (CR10, QWORD)),
+            ("cr11", (CR11, QWORD)),
+            ("cr12", (CR12, QWORD)),
+            ("cr13", (CR13, QWORD)),
+            ("cr14", (CR14, QWORD)),
+            ("cr15", (CR15, QWORD)),
 
-        h.insert("dr0" , (DR0 , QWORD));
-        h.insert("dr1" , (DR1 , QWORD));
-        h.insert("dr2" , (DR2 , QWORD));
-        h.insert("dr3" , (DR3 , QWORD));
-        h.insert("dr4" , (DR4 , QWORD));
-        h.insert("dr5" , (DR5 , QWORD));
-        h.insert("dr6" , (DR6 , QWORD));
-        h.insert("dr7" , (DR7 , QWORD));
-        h.insert("dr8" , (DR8 , QWORD));
-        h.insert("dr9" , (DR9 , QWORD));
-        h.insert("dr10", (DR10, QWORD));
-        h.insert("dr11", (DR11, QWORD));
-        h.insert("dr12", (DR12, QWORD));
-        h.insert("dr13", (DR13, QWORD));
-        h.insert("dr14", (DR14, QWORD));
-        h.insert("dr15", (DR15, QWORD));
+            ("dr0" , (DR0 , QWORD)),
+            ("dr1" , (DR1 , QWORD)),
+            ("dr2" , (DR2 , QWORD)),
+            ("dr3" , (DR3 , QWORD)),
+            ("dr4" , (DR4 , QWORD)),
+            ("dr5" , (DR5 , QWORD)),
+            ("dr6" , (DR6 , QWORD)),
+            ("dr7" , (DR7 , QWORD)),
+            ("dr8" , (DR8 , QWORD)),
+            ("dr9" , (DR9 , QWORD)),
+            ("dr10", (DR10, QWORD)),
+            ("dr11", (DR11, QWORD)),
+            ("dr12", (DR12, QWORD)),
+            ("dr13", (DR13, QWORD)),
+            ("dr14", (DR14, QWORD)),
+            ("dr15", (DR15, QWORD)),
 
-        h.insert("bnd0", (BND0, OWORD));
-        h.insert("bnd1", (BND1, OWORD));
-        h.insert("bnd2", (BND2, OWORD));
-        h.insert("bnd3", (BND3, OWORD));
-        h
+            ("bnd0", (BND0, OWORD)),
+            ("bnd1", (BND1, OWORD)),
+            ("bnd2", (BND2, OWORD)),
+            ("bnd3", (BND3, OWORD)),
+        ];
+        MAP.iter().cloned().collect()
     };
     static ref X86_REGISTERS: HashMap<&'static str, (RegId, Size)> = {
         use self::RegId::*;
         use crate::common::Size::*;
 
-        let mut h = HashMap::new();
-        h.insert("eax", (RAX, DWORD));
-        h.insert("ecx", (RCX, DWORD));
-        h.insert("edx", (RDX, DWORD));
-        h.insert("ebx", (RBX, DWORD));
-        h.insert("esp", (RSP, DWORD));
-        h.insert("ebp", (RBP, DWORD));
-        h.insert("esi", (RSI, DWORD));
-        h.insert("edi", (RDI, DWORD));
+        static MAP: &[(&str, (RegId, Size))] = &[
+            ("eax", (RAX, DWORD)),
+            ("ecx", (RCX, DWORD)),
+            ("edx", (RDX, DWORD)),
+            ("ebx", (RBX, DWORD)),
+            ("esp", (RSP, DWORD)),
+            ("ebp", (RBP, DWORD)),
+            ("esi", (RSI, DWORD)),
+            ("edi", (RDI, DWORD)),
 
-        h.insert("ax", (RAX, WORD));
-        h.insert("cx", (RCX, WORD));
-        h.insert("dx", (RDX, WORD));
-        h.insert("bx", (RBX, WORD));
-        h.insert("sp", (RSP, WORD));
-        h.insert("bp", (RBP, WORD));
-        h.insert("si", (RSI, WORD));
-        h.insert("di", (RDI, WORD));
+            ("ax", (RAX, WORD)),
+            ("cx", (RCX, WORD)),
+            ("dx", (RDX, WORD)),
+            ("bx", (RBX, WORD)),
+            ("sp", (RSP, WORD)),
+            ("bp", (RBP, WORD)),
+            ("si", (RSI, WORD)),
+            ("di", (RDI, WORD)),
 
-        h.insert("al", (RAX, BYTE));
-        h.insert("cl", (RCX, BYTE));
-        h.insert("dl", (RDX, BYTE));
-        h.insert("bl", (RBX, BYTE));
+            ("al", (RAX, BYTE)),
+            ("cl", (RCX, BYTE)),
+            ("dl", (RDX, BYTE)),
+            ("bl", (RBX, BYTE)),
 
-        h.insert("eip", (RIP, DWORD));
+            ("eip", (RIP, DWORD)),
 
-        h.insert("ah", (AH, BYTE));
-        h.insert("ch", (CH, BYTE));
-        h.insert("dh", (DH, BYTE));
-        h.insert("bh", (BH, BYTE));
+            ("ah", (AH, BYTE)),
+            ("ch", (CH, BYTE)),
+            ("dh", (DH, BYTE)),
+            ("bh", (BH, BYTE)),
 
-        h.insert("st0", (ST0, PWORD));
-        h.insert("st1", (ST1, PWORD));
-        h.insert("st2", (ST2, PWORD));
-        h.insert("st3", (ST3, PWORD));
-        h.insert("st4", (ST4, PWORD));
-        h.insert("st5", (ST5, PWORD));
-        h.insert("st6", (ST6, PWORD));
-        h.insert("st7", (ST7, PWORD));
+            ("st0", (ST0, PWORD)),
+            ("st1", (ST1, PWORD)),
+            ("st2", (ST2, PWORD)),
+            ("st3", (ST3, PWORD)),
+            ("st4", (ST4, PWORD)),
+            ("st5", (ST5, PWORD)),
+            ("st6", (ST6, PWORD)),
+            ("st7", (ST7, PWORD)),
 
-        h.insert("mm0", (MMX0, QWORD));
-        h.insert("mm1", (MMX1, QWORD));
-        h.insert("mm2", (MMX2, QWORD));
-        h.insert("mm3", (MMX3, QWORD));
-        h.insert("mm4", (MMX4, QWORD));
-        h.insert("mm5", (MMX5, QWORD));
-        h.insert("mm6", (MMX6, QWORD));
-        h.insert("mm7", (MMX7, QWORD));
+            ("mm0", (MMX0, QWORD)),
+            ("mm1", (MMX1, QWORD)),
+            ("mm2", (MMX2, QWORD)),
+            ("mm3", (MMX3, QWORD)),
+            ("mm4", (MMX4, QWORD)),
+            ("mm5", (MMX5, QWORD)),
+            ("mm6", (MMX6, QWORD)),
+            ("mm7", (MMX7, QWORD)),
 
-        h.insert("xmm0", (XMM0, OWORD));
-        h.insert("xmm1", (XMM1, OWORD));
-        h.insert("xmm2", (XMM2, OWORD));
-        h.insert("xmm3", (XMM3, OWORD));
-        h.insert("xmm4", (XMM4, OWORD));
-        h.insert("xmm5", (XMM5, OWORD));
-        h.insert("xmm6", (XMM6, OWORD));
-        h.insert("xmm7", (XMM7, OWORD));
+            ("xmm0", (XMM0, OWORD)),
+            ("xmm1", (XMM1, OWORD)),
+            ("xmm2", (XMM2, OWORD)),
+            ("xmm3", (XMM3, OWORD)),
+            ("xmm4", (XMM4, OWORD)),
+            ("xmm5", (XMM5, OWORD)),
+            ("xmm6", (XMM6, OWORD)),
+            ("xmm7", (XMM7, OWORD)),
 
-        h.insert("ymm0", (XMM0, HWORD));
-        h.insert("ymm1", (XMM1, HWORD));
-        h.insert("ymm2", (XMM2, HWORD));
-        h.insert("ymm3", (XMM3, HWORD));
-        h.insert("ymm4", (XMM4, HWORD));
-        h.insert("ymm5", (XMM5, HWORD));
-        h.insert("ymm6", (XMM6, HWORD));
-        h.insert("ymm7", (XMM7, HWORD));
+            ("ymm0", (XMM0, HWORD)),
+            ("ymm1", (XMM1, HWORD)),
+            ("ymm2", (XMM2, HWORD)),
+            ("ymm3", (XMM3, HWORD)),
+            ("ymm4", (XMM4, HWORD)),
+            ("ymm5", (XMM5, HWORD)),
+            ("ymm6", (XMM6, HWORD)),
+            ("ymm7", (XMM7, HWORD)),
 
-        h.insert("es", (ES, WORD));
-        h.insert("cs", (CS, WORD));
-        h.insert("ss", (SS, WORD));
-        h.insert("ds", (DS, WORD));
-        h.insert("fs", (FS, WORD));
-        h.insert("gs", (GS, WORD));
+            ("es", (ES, WORD)),
+            ("cs", (CS, WORD)),
+            ("ss", (SS, WORD)),
+            ("ds", (DS, WORD)),
+            ("fs", (FS, WORD)),
+            ("gs", (GS, WORD)),
 
-        h.insert("cr0", (CR0, DWORD));
-        h.insert("cr1", (CR1, DWORD));
-        h.insert("cr2", (CR2, DWORD));
-        h.insert("cr3", (CR3, DWORD));
-        h.insert("cr4", (CR4, DWORD));
-        h.insert("cr5", (CR5, DWORD));
-        h.insert("cr6", (CR6, DWORD));
-        h.insert("cr7", (CR7, DWORD));
+            ("cr0", (CR0, DWORD)),
+            ("cr1", (CR1, DWORD)),
+            ("cr2", (CR2, DWORD)),
+            ("cr3", (CR3, DWORD)),
+            ("cr4", (CR4, DWORD)),
+            ("cr5", (CR5, DWORD)),
+            ("cr6", (CR6, DWORD)),
+            ("cr7", (CR7, DWORD)),
 
-        h.insert("dr0", (DR0, DWORD));
-        h.insert("dr1", (DR1, DWORD));
-        h.insert("dr2", (DR2, DWORD));
-        h.insert("dr3", (DR3, DWORD));
-        h.insert("dr4", (DR4, DWORD));
-        h.insert("dr5", (DR5, DWORD));
-        h.insert("dr6", (DR6, DWORD));
-        h.insert("dr7", (DR7, DWORD));
+            ("dr0", (DR0, DWORD)),
+            ("dr1", (DR1, DWORD)),
+            ("dr2", (DR2, DWORD)),
+            ("dr3", (DR3, DWORD)),
+            ("dr4", (DR4, DWORD)),
+            ("dr5", (DR5, DWORD)),
+            ("dr6", (DR6, DWORD)),
+            ("dr7", (DR7, DWORD)),
 
-        h.insert("bnd0", (BND0, OWORD));
-        h.insert("bnd1", (BND1, OWORD));
-        h.insert("bnd2", (BND2, OWORD));
-        h.insert("bnd3", (BND3, OWORD));
-        h
+            ("bnd0", (BND0, OWORD)),
+            ("bnd1", (BND1, OWORD)),
+            ("bnd2", (BND2, OWORD)),
+            ("bnd3", (BND3, OWORD)),
+        ];
+        MAP.iter().cloned().collect()
     };
     static ref X64_FAMILIES:  HashMap<&'static str, (Size, RegFamily)> = {
-        let mut h = HashMap::new();
-        h.insert("Rb", (Size::BYTE,  RegFamily::LEGACY));
-        h.insert("Rh", (Size::BYTE,  RegFamily::HIGHBYTE));
-        h.insert("Rw", (Size::WORD,  RegFamily::LEGACY));
-        h.insert("Rd", (Size::DWORD, RegFamily::LEGACY));
-        h.insert("Ra", (Size::QWORD, RegFamily::LEGACY));
-        h.insert("Rq", (Size::QWORD, RegFamily::LEGACY));
-        h.insert("Rf", (Size::PWORD, RegFamily::FP));
-        h.insert("Rm", (Size::QWORD, RegFamily::MMX));
-        h.insert("Rx", (Size::OWORD, RegFamily::XMM));
-        h.insert("Ry", (Size::HWORD, RegFamily::XMM));
-        h.insert("Rs", (Size::WORD,  RegFamily::SEGMENT));
-        h.insert("RC", (Size::QWORD, RegFamily::CONTROL));
-        h.insert("RD", (Size::QWORD, RegFamily::DEBUG));
-        h.insert("RB", (Size::OWORD, RegFamily::BOUND));
-        h
+        static MAP: &[(&str, (Size, RegFamily))] = &[
+            ("Rb", (Size::BYTE,  RegFamily::LEGACY)),
+            ("Rh", (Size::BYTE,  RegFamily::HIGHBYTE)),
+            ("Rw", (Size::WORD,  RegFamily::LEGACY)),
+            ("Rd", (Size::DWORD, RegFamily::LEGACY)),
+            ("Ra", (Size::QWORD, RegFamily::LEGACY)),
+            ("Rq", (Size::QWORD, RegFamily::LEGACY)),
+            ("Rf", (Size::PWORD, RegFamily::FP)),
+            ("Rm", (Size::QWORD, RegFamily::MMX)),
+            ("Rx", (Size::OWORD, RegFamily::XMM)),
+            ("Ry", (Size::HWORD, RegFamily::XMM)),
+            ("Rs", (Size::WORD,  RegFamily::SEGMENT)),
+            ("RC", (Size::QWORD, RegFamily::CONTROL)),
+            ("RD", (Size::QWORD, RegFamily::DEBUG)),
+            ("RB", (Size::OWORD, RegFamily::BOUND)),
+        ];
+        MAP.iter().cloned().collect()
     };
     static ref X86_FAMILIES:  HashMap<&'static str, (Size, RegFamily)> = {
-        let mut h = HashMap::new();
-        h.insert("Rb",(Size::BYTE,  RegFamily::LEGACY));
-        h.insert("Rh",(Size::BYTE,  RegFamily::HIGHBYTE));
-        h.insert("Rw",(Size::WORD,  RegFamily::LEGACY));
-        h.insert("Ra",(Size::DWORD, RegFamily::LEGACY));
-        h.insert("Rd",(Size::DWORD, RegFamily::LEGACY));
-        h.insert("Rf",(Size::PWORD, RegFamily::FP));
-        h.insert("Rm",(Size::QWORD, RegFamily::MMX));
-        h.insert("Rx",(Size::OWORD, RegFamily::XMM));
-        h.insert("Ry",(Size::HWORD, RegFamily::XMM));
-        h.insert("Rs",(Size::WORD,  RegFamily::SEGMENT));
-        h.insert("RC",(Size::DWORD, RegFamily::CONTROL));
-        h.insert("RD",(Size::DWORD, RegFamily::DEBUG));
-        h.insert("RB",(Size::OWORD, RegFamily::BOUND));
-        h
+        static MAP: &[(&str, (Size, RegFamily))] = &[
+            ("Rb",(Size::BYTE,  RegFamily::LEGACY)),
+            ("Rh",(Size::BYTE,  RegFamily::HIGHBYTE)),
+            ("Rw",(Size::WORD,  RegFamily::LEGACY)),
+            ("Ra",(Size::DWORD, RegFamily::LEGACY)),
+            ("Rd",(Size::DWORD, RegFamily::LEGACY)),
+            ("Rf",(Size::PWORD, RegFamily::FP)),
+            ("Rm",(Size::QWORD, RegFamily::MMX)),
+            ("Rx",(Size::OWORD, RegFamily::XMM)),
+            ("Ry",(Size::HWORD, RegFamily::XMM)),
+            ("Rs",(Size::WORD,  RegFamily::SEGMENT)),
+            ("RC",(Size::DWORD, RegFamily::CONTROL)),
+            ("RD",(Size::DWORD, RegFamily::DEBUG)),
+            ("RB",(Size::OWORD, RegFamily::BOUND)),
+        ];
+        MAP.iter().cloned().collect()
     };
 }

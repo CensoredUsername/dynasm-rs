@@ -1,5 +1,5 @@
 // This file was generated bo tools/aarch64_gen_opmap.py
-Ops!(map ;
+Ops!(
 
 "abs" = [
     0b01011110_11100000_10111000_00000000 = [D, D] => [R(0), R(5)];

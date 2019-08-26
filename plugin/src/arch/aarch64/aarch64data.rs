@@ -215,18 +215,15 @@ macro_rules! SingleOp {
 }
 
 macro_rules! Ops {
-    ( $bind:ident; $( $name:tt $(| $more:tt)* = [ $( $base:tt = [ $( $matcher:expr ),* ] => [ $( $command:expr ),* ] ; )+ ] )* ) => {
-        {
-            $({
-                const DATA: &'static [Opdata] = &[ $(
+    ( $( $name:tt = [ $( $base:tt = [ $( $matcher:expr ),* ] => [ $( $command:expr ),* ] ; )+ ] )* ) => {
+        [ $(
+            (
+                $name,
+                &[ $(
                     SingleOp!( $base, [ $( $matcher ),* ], [ $( $command ),* ] )
-                ),+ ];
-                $bind.insert($name, DATA);
-                $(
-                    $bind.insert($more, DATA);
-                )*
-            })*
-        }
+                ),+ ] as &[_]
+            )
+        ),* ]
     }
 }
 
@@ -241,8 +238,6 @@ pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> 
 
 lazy_static! {
     static ref OPMAP: HashMap<&'static str, &'static [Opdata]> = {
-        let mut map = HashMap::new();
-
         use super::ast::Modifier::*;
         use crate::common::Size::*;
         use self::SpecialComm::*;
@@ -254,204 +249,209 @@ lazy_static! {
         const SHIFTS: &'static [super::ast::Modifier] = &[LSL, LSR, ASR];
         const ROTATES: &'static [super::ast::Modifier] = &[LSL, LSR, ASR, ROR];
 
-        include!("opmap.rs");
-
-        map
+        static MAP: &[(&str, &[Opdata])] = &include!("opmap.rs");
+        MAP.iter().cloned().collect()
     };
 
     /// A map of existing condition codes and their normal encoding
     pub static ref COND_MAP: HashMap<&'static str, u8> = {
-        let mut a = HashMap::new();
-
-        a.insert("eq", 0);
-        a.insert("ne", 1);
-        a.insert("cs", 2);
-        a.insert("hs", 2);
-        a.insert("cc", 3);
-        a.insert("lo", 3);
-        a.insert("mi", 4);
-        a.insert("pl", 5);
-        a.insert("vs", 6);
-        a.insert("vc", 7);
-        a.insert("hi", 8);
-        a.insert("ls", 9);
-        a.insert("ge", 10);
-        a.insert("lt", 11);
-        a.insert("gt", 12);
-        a.insert("le", 13);
-        a.insert("al", 14);
-        a.insert("nv", 15);
-
-        a
+        static MAP: &[(&str, u8)] = &[
+            ("eq", 0),
+            ("ne", 1),
+            ("cs", 2),
+            ("hs", 2),
+            ("cc", 3),
+            ("lo", 3),
+            ("mi", 4),
+            ("pl", 5),
+            ("vs", 6),
+            ("vc", 7),
+            ("hi", 8),
+            ("ls", 9),
+            ("ge", 10),
+            ("lt", 11),
+            ("gt", 12),
+            ("le", 13),
+            ("al", 14),
+            ("nv", 15),
+        ];
+        MAP.iter().cloned().collect()
     };
 
     // special ident maps
     pub static ref SPECIAL_IDENT_MAP: HashMap<&'static str, HashMap<&'static str, u32>> = {
         let mut mapmap = HashMap::new();
         mapmap.insert("AT_OPS", {
-            let mut map = HashMap::new();
-            map.insert("s1e1r",  0b00001111000000);
-            map.insert("s1e1w",  0b00001111000001);
-            map.insert("s1e0r",  0b00001111000010);
-            map.insert("s1e0w",  0b00001111000011);
-            map.insert("s1e2r",  0b10001111000000);
-            map.insert("s1e2w",  0b10001111000001);
-            map.insert("s12e1r", 0b10001111000100);
-            map.insert("s12e1w", 0b10001111000101);
-            map.insert("s12e0r", 0b10001111000110);
-            map.insert("s12e0w", 0b10001111000111);
-            map.insert("s1e3r",  0b11001111000000);
-            map.insert("s1e3w",  0b11001111000001);
-            map.insert("s1e1rp", 0b00001111001000);
-            map.insert("s1e1wp", 0b00001111001001);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("s1e1r",  0b00001111000000),
+                ("s1e1w",  0b00001111000001),
+                ("s1e0r",  0b00001111000010),
+                ("s1e0w",  0b00001111000011),
+                ("s1e2r",  0b10001111000000),
+                ("s1e2w",  0b10001111000001),
+                ("s12e1r", 0b10001111000100),
+                ("s12e1w", 0b10001111000101),
+                ("s12e0r", 0b10001111000110),
+                ("s12e0w", 0b10001111000111),
+                ("s1e3r",  0b11001111000000),
+                ("s1e3w",  0b11001111000001),
+                ("s1e1rp", 0b00001111001000),
+                ("s1e1wp", 0b00001111001001),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap.insert("IC_OPS", {
-            let mut map = HashMap::new();
-            map.insert("ialluis", 0b00001110001000);
-            map.insert("iallu",   0b00001110101000);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("ialluis", 0b00001110001000),
+                ("iallu",   0b00001110101000),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap.insert("DC_OPS", {
-            let mut map = HashMap::new();
-            map.insert("ivac",  0b00001110110001);
-            map.insert("isw",   0b00001110110010);
-            map.insert("csw",   0b00001111010010);
-            map.insert("cisw",  0b00001111110010);
-            map.insert("zva",   0b01101110100001);
-            map.insert("cvac",  0b01101111010001);
-            map.insert("cvau",  0b01101111011001);
-            map.insert("civac", 0b01101111110001);
-            map.insert("cvap",  0b01101111100001);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("ivac",  0b00001110110001),
+                ("isw",   0b00001110110010),
+                ("csw",   0b00001111010010),
+                ("cisw",  0b00001111110010),
+                ("zva",   0b01101110100001),
+                ("cvac",  0b01101111010001),
+                ("cvau",  0b01101111011001),
+                ("civac", 0b01101111110001),
+                ("cvap",  0b01101111100001),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap.insert("BARRIER_OPS", {
-            let mut map = HashMap::new();
-            map.insert("sy",    0b1111);
-            map.insert("st",    0b1110);
-            map.insert("ld",    0b1101);
-            map.insert("ish",   0b1011);
-            map.insert("ishst", 0b1010);
-            map.insert("ishld", 0b1001);
-            map.insert("nsh",   0b0111);
-            map.insert("nshst", 0b0110);
-            map.insert("nshld", 0b0101);
-            map.insert("osh",   0b0011);
-            map.insert("oshst", 0b0010);
-            map.insert("oshld", 0b0001);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("sy",    0b1111),
+                ("st",    0b1110),
+                ("ld",    0b1101),
+                ("ish",   0b1011),
+                ("ishst", 0b1010),
+                ("ishld", 0b1001),
+                ("nsh",   0b0111),
+                ("nshst", 0b0110),
+                ("nshld", 0b0101),
+                ("osh",   0b0011),
+                ("oshst", 0b0010),
+                ("oshld", 0b0001),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap.insert("MSR_IMM_OPS", {
-            let mut map = HashMap::new();
-            map.insert("spsel",   0b00001000000101);
-            map.insert("daifset", 0b01101000000110);
-            map.insert("daifclr", 0b01101000000111);
-            map.insert("uao",     0b00001000000011);
-            map.insert("pan",     0b00001000000100);
-            map.insert("dit",     0b01101000000010);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("spsel",   0b00001000000101),
+                ("daifset", 0b01101000000110),
+                ("daifclr", 0b01101000000111),
+                ("uao",     0b00001000000011),
+                ("pan",     0b00001000000100),
+                ("dit",     0b01101000000010),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap.insert("CONTROL_REGS", {
-            let mut map = HashMap::new();
-            map.insert("c0",  0);
-            map.insert("c1",  1);
-            map.insert("c2",  2);
-            map.insert("c3",  3);
-            map.insert("c4",  4);
-            map.insert("c5",  5);
-            map.insert("c6",  6);
-            map.insert("c7",  7);
-            map.insert("c8",  8);
-            map.insert("c9",  9);
-            map.insert("c10", 10);
-            map.insert("c11", 11);
-            map.insert("c12", 12);
-            map.insert("c13", 13);
-            map.insert("c14", 14);
-            map.insert("c15", 15);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("c0",  0),
+                ("c1",  1),
+                ("c2",  2),
+                ("c3",  3),
+                ("c4",  4),
+                ("c5",  5),
+                ("c6",  6),
+                ("c7",  7),
+                ("c8",  8),
+                ("c9",  9),
+                ("c10", 10),
+                ("c11", 11),
+                ("c12", 12),
+                ("c13", 13),
+                ("c14", 14),
+                ("c15", 15),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap.insert("TLBI_OPS", {
-            let mut map = HashMap::new();
-            map.insert("vmalle1is",    0b00010000011000);
-            map.insert("vae1is",       0b00010000011001);
-            map.insert("aside1is",     0b00010000011010);
-            map.insert("vaae1is",      0b00010000011011);
-            map.insert("vale1is",      0b00010000011101);
-            map.insert("vaale1is",     0b00010000011111);
-            map.insert("vmalle1",      0b00010000111000);
-            map.insert("vae1",         0b00010000111001);
-            map.insert("aside1",       0b00010000111010);
-            map.insert("vaae1",        0b00010000111011);
-            map.insert("vale1",        0b00010000111101);
-            map.insert("vaale1",       0b00010000111111);
-            map.insert("ipas2e1is",    0b10010000000001);
-            map.insert("ipas2le1is",   0b10010000000101);
-            map.insert("alle2is",      0b10010000011000);
-            map.insert("vae2is",       0b10010000011001);
-            map.insert("alle1is",      0b10010000011100);
-            map.insert("vale2is",      0b10010000011101);
-            map.insert("vmalls12e1is", 0b10010000011110);
-            map.insert("ipas2e1",      0b10010000100001);
-            map.insert("ipas2le1",     0b10010000100101);
-            map.insert("alle2",        0b10010000111000);
-            map.insert("vae2",         0b10010000111001);
-            map.insert("alle1",        0b10010000111100);
-            map.insert("vale2",        0b10010000111101);
-            map.insert("vmalls12e1",   0b10010000111110);
-            map.insert("alle3is",      0b11010000011000);
-            map.insert("vae3is",       0b11010000011001);
-            map.insert("vale3is",      0b11010000011101);
-            map.insert("alle3",        0b11010000111000);
-            map.insert("vae3",         0b11010000111001);
-            map.insert("vale3",        0b11010000111101);
-            map.insert("vmalle1os",    0b00010000001000);
-            map.insert("vae1os",       0b00010000001001);
-            map.insert("aside1os",     0b00010000001010);
-            map.insert("vaae1os",      0b00010000001011);
-            map.insert("vale1os",      0b00010000001101);
-            map.insert("vaale1os",     0b00010000001111);
-            map.insert("rvae1is",      0b00010000010001);
-            map.insert("rvaae1is",     0b00010000010011);
-            map.insert("rvale1is",     0b00010000010101);
-            map.insert("rvaale1is",    0b00010000010111);
-            map.insert("rvae1os",      0b00010000101001);
-            map.insert("rvaae1os",     0b00010000101011);
-            map.insert("rvale1os",     0b00010000101101);
-            map.insert("rvaale1os",    0b00010000101111);
-            map.insert("rvae1",        0b00010000110001);
-            map.insert("rvaae1",       0b00010000110011);
-            map.insert("rvale1",       0b00010000110101);
-            map.insert("rvaale1",      0b00010000110111);
-            map.insert("ripas2e1is",   0b10010000000010);
-            map.insert("ripas2le1is",  0b10010000000110);
-            map.insert("alle2os",      0b10010000001000);
-            map.insert("vae2os",       0b10010000001001);
-            map.insert("alle1os",      0b10010000001100);
-            map.insert("vale2os",      0b10010000001101);
-            map.insert("vmalls12e1os", 0b10010000001110);
-            map.insert("rvae2is",      0b10010000010001);
-            map.insert("rvale2is",     0b10010000010101);
-            map.insert("ipas2e1os",    0b10010000100000);
-            map.insert("ripas2e1",     0b10010000100010);
-            map.insert("ripas2e1os",   0b10010000100011);
-            map.insert("ipas2le1os",   0b10010000100100);
-            map.insert("ripas2le1",    0b10010000100110);
-            map.insert("ripas2le1os",  0b10010000100111);
-            map.insert("rvae2os",      0b10010000101001);
-            map.insert("rvale2os",     0b10010000101101);
-            map.insert("rvae2",        0b10010000110001);
-            map.insert("rvale2",       0b10010000110101);
-            map.insert("alle3os",      0b11010000001000);
-            map.insert("vae3os",       0b11010000001001);
-            map.insert("vale3os",      0b11010000001101);
-            map.insert("rvae3is",      0b11010000010001);
-            map.insert("rvale3is",     0b11010000010101);
-            map.insert("rvae3os",      0b11010000101001);
-            map.insert("rvale3os",     0b11010000101101);
-            map.insert("rvae3",        0b11010000110001);
-            map.insert("rvale3",       0b11010000110101);
-            map
+            static MAP: &[(&str, u32)] = &[
+                ("vmalle1is",    0b00010000011000),
+                ("vae1is",       0b00010000011001),
+                ("aside1is",     0b00010000011010),
+                ("vaae1is",      0b00010000011011),
+                ("vale1is",      0b00010000011101),
+                ("vaale1is",     0b00010000011111),
+                ("vmalle1",      0b00010000111000),
+                ("vae1",         0b00010000111001),
+                ("aside1",       0b00010000111010),
+                ("vaae1",        0b00010000111011),
+                ("vale1",        0b00010000111101),
+                ("vaale1",       0b00010000111111),
+                ("ipas2e1is",    0b10010000000001),
+                ("ipas2le1is",   0b10010000000101),
+                ("alle2is",      0b10010000011000),
+                ("vae2is",       0b10010000011001),
+                ("alle1is",      0b10010000011100),
+                ("vale2is",      0b10010000011101),
+                ("vmalls12e1is", 0b10010000011110),
+                ("ipas2e1",      0b10010000100001),
+                ("ipas2le1",     0b10010000100101),
+                ("alle2",        0b10010000111000),
+                ("vae2",         0b10010000111001),
+                ("alle1",        0b10010000111100),
+                ("vale2",        0b10010000111101),
+                ("vmalls12e1",   0b10010000111110),
+                ("alle3is",      0b11010000011000),
+                ("vae3is",       0b11010000011001),
+                ("vale3is",      0b11010000011101),
+                ("alle3",        0b11010000111000),
+                ("vae3",         0b11010000111001),
+                ("vale3",        0b11010000111101),
+                ("vmalle1os",    0b00010000001000),
+                ("vae1os",       0b00010000001001),
+                ("aside1os",     0b00010000001010),
+                ("vaae1os",      0b00010000001011),
+                ("vale1os",      0b00010000001101),
+                ("vaale1os",     0b00010000001111),
+                ("rvae1is",      0b00010000010001),
+                ("rvaae1is",     0b00010000010011),
+                ("rvale1is",     0b00010000010101),
+                ("rvaale1is",    0b00010000010111),
+                ("rvae1os",      0b00010000101001),
+                ("rvaae1os",     0b00010000101011),
+                ("rvale1os",     0b00010000101101),
+                ("rvaale1os",    0b00010000101111),
+                ("rvae1",        0b00010000110001),
+                ("rvaae1",       0b00010000110011),
+                ("rvale1",       0b00010000110101),
+                ("rvaale1",      0b00010000110111),
+                ("ripas2e1is",   0b10010000000010),
+                ("ripas2le1is",  0b10010000000110),
+                ("alle2os",      0b10010000001000),
+                ("vae2os",       0b10010000001001),
+                ("alle1os",      0b10010000001100),
+                ("vale2os",      0b10010000001101),
+                ("vmalls12e1os", 0b10010000001110),
+                ("rvae2is",      0b10010000010001),
+                ("rvale2is",     0b10010000010101),
+                ("ipas2e1os",    0b10010000100000),
+                ("ripas2e1",     0b10010000100010),
+                ("ripas2e1os",   0b10010000100011),
+                ("ipas2le1os",   0b10010000100100),
+                ("ripas2le1",    0b10010000100110),
+                ("ripas2le1os",  0b10010000100111),
+                ("rvae2os",      0b10010000101001),
+                ("rvale2os",     0b10010000101101),
+                ("rvae2",        0b10010000110001),
+                ("rvale2",       0b10010000110101),
+                ("alle3os",      0b11010000001000),
+                ("vae3os",       0b11010000001001),
+                ("vale3os",      0b11010000001101),
+                ("rvae3is",      0b11010000010001),
+                ("rvale3is",     0b11010000010101),
+                ("rvae3os",      0b11010000101001),
+                ("rvale3os",     0b11010000101101),
+                ("rvae3",        0b11010000110001),
+                ("rvale3",       0b11010000110101),
+            ];
+            MAP.iter().cloned().collect()
         });
         mapmap
     };

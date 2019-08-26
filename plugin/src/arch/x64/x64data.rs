@@ -7,7 +7,7 @@ use lazy_static::lazy_static;
 use bitflags::bitflags;
 
 macro_rules! constify {
-    ($t:ty, $e:expr) => { {const C: &'static $t = &$e; C} }
+    ($t:ty, $e:expr) => { {const C: &$t = &$e; C} }
 }
 
 macro_rules! OpInner {
@@ -18,21 +18,16 @@ macro_rules! OpInner {
 }
 
 macro_rules! Ops {
-    ( $bind:ident; $( $name:tt $(| $more:tt)* = [ $( $( $e:expr ),+ ; )+ ] )* ) => {
-        lazy_static! {
-            static ref $bind: HashMap<&'static str, &'static [Opdata]> = {
-                let mut map = HashMap::new();
-                const X: u8 = 0xFF;
-                $({
-                    const DATA: &'static [Opdata] = &[$( OpInner!($( $e ),*) ,)+];
-                    map.insert($name, DATA);
-                    $(
-                        map.insert($more, DATA);
-                    )*
-                })+
-                map
-            };
-        }
+    ( $( $name:tt = [ $( $( $e:expr ),+ ; )+ ] )* ) => {
+        [ $(
+            (
+                $name,
+                {
+                    const OPDATA: &[Opdata] = &[$( OpInner!($( $e ),*) ,)+];
+                    OPDATA
+                }
+            )
+        ),* ]
     };
 }
 
@@ -247,4 +242,11 @@ const PREFETCHWT1  : u32 = Features::PREFETCHWT1.bits;
 const CYRIX        : u32 = Features::CYRIX.bits;
 const AMD          : u32 = Features::AMD.bits;
 
-include!("gen_opmap.rs");
+
+lazy_static! {
+    static ref OPMAP: HashMap<&'static str, &'static [Opdata]> = {
+        const X: u8 = 0xFF;
+        static MAP: &[(&str, &[Opdata])] = &include!("gen_opmap.rs");
+        MAP.iter().cloned().collect()
+    };
+}
