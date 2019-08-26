@@ -205,7 +205,7 @@ This range can be found for any immediate in the instruction reference. Addition
 <tr><td align="left">Wide immediate</td><td align="left">A 32 or 64-bit immediate which is encoded by taking 16 bits and shifting them 0, 16, 32, or 48 bits left, with possible inversion afterwards.</td></tr>
 <tr><td align="left">Logical immediate</td><td align="left">A 32 or 64-bit bitfield, composed out of repeated 2, 4, 8, 16, 32 or 64-bit elements with the first n bits set to 1, and then rotated afterwards. All 0 or all 1 cannot be encoded.</td></tr>
 <tr><td align="left">Stretched immediate</td><td align="left">A 64-bit immediate encoded in 8 bits <code>a:b:c:d:e:f:g:h</code> which encodes the binary value <code>0baaaaaaaabbbbbbbbccccccccddddddddeeeeeeeeffffffffgggggggghhhhhhhh</code>.</td></tr>
-<tr><td align="left">Floating point immediate</td><td align="left">A short, float or double value encoded into 8 bits. It can represent any value in the format <code>(-1.0)^s * 2.0^m * (1.0 + e / 16.0)</code> where <code>-3 &lt;= m &lt;= 4, 0 &lt;= e &lt;= 15, s = [0, 1]</code>.</td></tr>
+<tr><td align="left">Floating point immediate</td><td align="left">A short, float or double value encoded into 8 bits. It can represent any value in the format <code>(-1.0)^s * 2.0^e * (1.0 + m / 16.0)</code> where <code>-3 &lt;= e &lt;= 4, 0 &lt;= m &lt;= 15, s = [0, 1]</code>.</td></tr>
 </tbody></table>
 
     </section>
