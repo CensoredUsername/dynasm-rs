@@ -24,12 +24,10 @@ pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) ->
     while input.peek(Token![.]) {
         let span = input.cursor().span();
         let _: Token![.] = input.parse()?;
-        args.push(RawArg::Dot { span } );
-
         let arg: syn::Ident = input.parse()?;
-        args.push(RawArg::Lit {
-            ident: arg
-        });
+
+        args.push(RawArg::Dot { span } );
+        args.push(RawArg::Lit { ident: arg });
     }
 
     // parse 0 or more comma-separated args
