@@ -4,7 +4,6 @@
 use std::io;
 use std::sync::{Arc, RwLock};
 use std::iter::Extend;
-use std::collections::HashMap;
 
 use take_mut;
 
@@ -61,7 +60,7 @@ impl BaseAssembler {
     pub fn align(&mut self, alignment: usize, with: u8) {
         let offset = self.offset() % alignment;
         if offset != 0 {
-            for _ in 0 .. (alignment - offset) {
+            for _ in offset .. alignment {
                 self.push(with);
             }
         }
@@ -210,6 +209,14 @@ impl<'a> DynasmApi for UncommittedModifier<'a> {
         self.buffer[self.offset - self.base_offset] = value;
         self.offset += 1;
     }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        let offset = self.offset % alignment;
+        if offset != 0 {
+            self.offset += alignment - offset;
+        }
+    }
 }
 
 impl<'a> Extend<u8> for UncommittedModifier<'a> {
@@ -229,86 +236,60 @@ impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
 }
 
 
-/// This struct contains implementations for common parts of label handling between
-/// Assemblers
-#[derive(Debug, Clone)]
-pub(crate) struct LabelRegistry {
-    // mapping of global labels to offsets
-    global_labels: HashMap<&'static str, AssemblyOffset>,
-    // mapping of local labels to offsets
-    local_labels: HashMap<&'static str, AssemblyOffset>,
-    // mapping of dynamic label ids to offsets
-    dynamic_labels: Vec<Option<AssemblyOffset>>,
+#[derive(Clone, Copy, PartialEq, Hash)]
+enum LitPoolEntry {
+    U32(u32),
+    U64(u64),
+    Label(DynamicLabel),
 }
 
-impl LabelRegistry {
-    /// Create a new, empty label registry
-    pub fn new() -> LabelRegistry {
-        LabelRegistry {
-            global_labels: HashMap::new(),
-            local_labels: HashMap::new(),
-            dynamic_labels: Vec::new(),
+pub struct LitPool {
+    offset: usize,
+    entries: Vec<LitPoolEntry>,
+}
+
+impl LitPool {
+    pub fn new() -> LitPool {
+        LitPool {
+            offset: 0,
+            entries: Vec::new()
         }
     }
 
-    /// API for the user to create a new dynamic label
-    pub fn new_dynamic_label(&mut self) -> DynamicLabel {
-        let id = self.dynamic_labels.len();
-        self.dynamic_labels.push(None);
-        DynamicLabel(id)
+    pub fn push_u32(&mut self, value: u32) -> usize {
+        self.entries.push(LitPoolEntry::U32(value));
+        let offset = self.offset;
+        self.offset += 4;
+        offset
     }
 
-    /// API for the user to get the definition offset of a dynamic label so they don't have to
-    /// keep both the dynamic label id and the offset stored when we already do so as well
-    pub fn try_resolve_dynamic_label(&self, id: DynamicLabel) -> Option<AssemblyOffset> {
-        self.dynamic_labels.get(id.0).and_then(|&x| x)
-    }
-
-    /// API for dynasm! to create a new dynamic label target
-    pub fn dynamic_label(&mut self, id: DynamicLabel, offset: AssemblyOffset)  {
-        let entry = &mut self.dynamic_labels[id.0];
-        if entry.is_some() {
-            panic!("Duplicate dynamic label '{}'", id.0);
+    pub fn push_u64(&mut self, value: u64) -> usize {
+        if self.offset & 4 != 0 {
+            self.push_u32(0);
         }
-        *entry = Some(offset);
+        self.entries.push(LitPoolEntry::U64(value));
+        let offset = self.offset;
+        self.offset += 8;
+        offset
     }
 
-    /// API for dynasm! to create a new global label target
-    pub fn global_label(&mut self, name: &'static str, offset: AssemblyOffset) {
-        if let Some(_) = self.global_labels.insert(name, offset) {
-            panic!("Duplicate global label '{}'", name);
+    pub fn push_label(&mut self, label: DynamicLabel) -> usize {
+        if self.offset & 4 != 0 {
+            self.push_u32(0);
         }
+        self.entries.push(LitPoolEntry::Label(label));
+        let offset = self.offset;
+        self.offset += 8;
+        offset
     }
 
-    /// API for dynasm! to create a new local label target
-    pub fn local_label(&mut self, name: &'static str, offset: AssemblyOffset) {
-        self.local_labels.insert(name, offset);
-    }
-
-    /// API for dynasm! to resolve a dynamic label reference
-    pub fn resolve_dynamic_label(&self, id: DynamicLabel) -> AssemblyOffset {
-        if let Some(target) = self.try_resolve_dynamic_label(id) {
-            target
-        } else {
-            panic!("Unknown dynamic label '{}'", id.0);
-        }
-    }
-
-    /// API for dynasm! to resolve a global label reference
-    pub fn resolve_global_label(&self, name: &'static str) -> AssemblyOffset {
-        if let Some(&target) = self.global_labels.get(&name) {
-            target
-        } else {
-            panic!("Unknown global label '{}'", name);
-        }
-    }
-
-    /// API for dynasm! to resolve a dynamic label reference
-    pub fn resolve_local_label(&self, name: &'static str) -> AssemblyOffset {
-        if let Some(&target) = self.local_labels.get(&name) {
-            target
-        } else {
-            panic!("Unknown local label '{}'", name);
+    pub fn emit<A: DynasmApi>(&mut self, assembler: &mut A, mut label_emit_fn: impl FnMut(&mut A, DynamicLabel)) {
+        for entry in &self.entries {
+            match entry {
+                LitPoolEntry::U32(value) => assembler.push_u32(*value),
+                LitPoolEntry::U64(value) => assembler.push_u64(*value),
+                LitPoolEntry::Label(label) => label_emit_fn(assembler, *label)
+            }
         }
     }
 }

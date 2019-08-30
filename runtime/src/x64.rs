@@ -7,8 +7,8 @@ use std::io;
 use byteorder::{ByteOrder, LittleEndian};
 use take_mut;
 
-use ::{DynasmApi, DynasmLabelApi, DynasmError};
-use ::common::{BaseAssembler, LabelRegistry, UncommittedModifier};
+use ::{DynasmApi, DynasmLabelApi, DynasmError, LabelRegistry};
+use ::common::{BaseAssembler, UncommittedModifier};
 use ::{ExecutableBuffer, MutableBuffer, Executor, DynamicLabel, AssemblyOffset};
 
 #[derive(Debug, Clone, Copy)]
@@ -103,11 +103,6 @@ impl Assembler {
         self.labels.new_dynamic_label()
     }
 
-    /// Query the offset of a dynamic label.
-    pub fn get_dynamic_label_offset(&self, label: DynamicLabel) -> Option<AssemblyOffset> {
-        self.labels.try_resolve_dynamic_label(label)
-    }
-
     /// To allow already committed code to be altered, this method allows modification
     /// of the internal ExecutableBuffer directly. When this method is called, all
     /// data will be committed and access to the internal `ExecutableBuffer` will be locked.
@@ -179,14 +174,14 @@ impl Assembler {
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.global_relocs);
         for (loc, name) in relocs {
-            let target = self.labels.resolve_global_label(name);
+            let target = self.labels.resolve_global(name).unwrap();
             self.patch_loc(loc, target.0);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.dynamic_relocs);
         for (loc, id) in relocs {
-            let target = self.labels.resolve_dynamic_label(id);
+            let target = self.labels.resolve_dynamic(id).unwrap();
             self.patch_loc(loc, target.0);
         }
 
@@ -242,6 +237,11 @@ impl DynasmApi for Assembler {
     fn push(&mut self, value: u8) {
         self.base.push(value);
     }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        self.base.align(alignment, 0x90);
+    }
 }
 
 impl DynasmLabelApi for Assembler {
@@ -249,32 +249,13 @@ impl DynasmLabelApi for Assembler {
     type Relocation = (u8, u8);
 
     #[inline]
-    fn align(&mut self, alignment: usize) {
-        self.base.align(alignment, 0x90);
+    fn registry(&self) -> &LabelRegistry {
+        &self.labels
     }
 
     #[inline]
-    fn global_label(&mut self, name: &'static str) {
-        let offset = self.offset();
-        self.labels.global_label(name, offset);
-    }
-
-    #[inline]
-    fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
-        let offset = self.offset().0;
-        self.global_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), name));
-    }
-
-    #[inline]
-    fn dynamic_label(&mut self, id: DynamicLabel) {
-        let offset = self.offset();
-        self.labels.dynamic_label(id, offset)
-    }
-
-    #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
-        let offset = self.offset().0;
-        self.dynamic_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), id));
+    fn registry_mut(&mut self) -> &mut LabelRegistry {
+        &mut self.labels
     }
 
     #[inline]
@@ -285,7 +266,19 @@ impl DynasmLabelApi for Assembler {
                 self.patch_loc(loc, offset.0);
             }
         }
-        self.labels.local_label(name, offset);
+        self.labels.define_local(name, offset);
+    }
+
+    #[inline]
+    fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
+        let offset = self.offset().0;
+        self.global_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), name));
+    }
+
+    #[inline]
+    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
+        let offset = self.offset().0;
+        self.dynamic_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), id));
     }
 
     #[inline]
@@ -303,7 +296,7 @@ impl DynasmLabelApi for Assembler {
 
     #[inline]
     fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
-        let target = self.labels.resolve_local_label(name);
+        let target = self.labels.resolve_local(name).unwrap();
         let offset = self.offset().0;
         self.patch_loc(PatchLoc(
             offset,
@@ -398,14 +391,14 @@ impl<'a, 'b> AssemblyModifier<'a, 'b> {
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.global_relocs);
         for (loc, name) in relocs {
-            let target = self.assembler.labels.resolve_global_label(name);
+            let target = self.assembler.labels.resolve_global(name).unwrap();
             self.patch_loc(loc, target.0);
         }
 
         let mut relocs = Vec::new();
         mem::swap(&mut relocs, &mut self.assembler.dynamic_relocs);
         for (loc, id) in relocs {
-            let target = self.assembler.labels.resolve_dynamic_label(id);
+            let target = self.assembler.labels.resolve_dynamic(id).unwrap();
             self.patch_loc(loc, target.0);
         }
 
@@ -426,36 +419,24 @@ impl<'a, 'b> DynasmApi for AssemblyModifier<'a, 'b> {
         self.buffer[self.asmoffset] = value;
         self.asmoffset += 1;
     }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        self.assembler.align(alignment);
+    }
 }
 
 impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
     type Relocation = (u8, u8);
 
     #[inline]
-    fn align(&mut self, alignment: usize) {
-        self.assembler.align(alignment);
+    fn registry(&self) -> &LabelRegistry {
+        &self.assembler.labels
     }
 
     #[inline]
-    fn global_label(&mut self, name: &'static str) {
-        self.assembler.global_label(name);
-    }
-
-    #[inline]
-    fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
-        let offset = self.asmoffset;
-        self.assembler.global_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), name));
-    }
-
-    #[inline]
-    fn dynamic_label(&mut self, id: DynamicLabel) {
-        self.assembler.dynamic_label(id);
-    }
-
-    #[inline]
-    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
-        let offset = self.asmoffset;
-        self.assembler.dynamic_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), id));
+    fn registry_mut(&mut self) -> &mut LabelRegistry {
+        &mut self.assembler.labels
     }
 
     #[inline]
@@ -466,7 +447,19 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
                 self.patch_loc(loc, offset.0);
             }
         }
-        self.assembler.labels.local_label(name, offset);
+        self.assembler.labels.define_local(name, offset);
+    }
+
+    #[inline]
+    fn global_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
+        let offset = self.asmoffset;
+        self.assembler.global_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), name));
+    }
+
+    #[inline]
+    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: Self::Relocation) {
+        let offset = self.asmoffset;
+        self.assembler.dynamic_relocs.push((PatchLoc(offset, RelocationType::from_tuple(kind)), id));
     }
 
     #[inline]
@@ -484,7 +477,7 @@ impl<'a, 'b> DynasmLabelApi for AssemblyModifier<'a, 'b> {
 
     #[inline]
     fn backward_reloc(&mut self, name: &'static str, kind: Self::Relocation) {
-        let target = self.assembler.labels.resolve_local_label(name);
+        let target = self.assembler.labels.resolve_local(name).unwrap();
         let offset = self.offset();
         self.patch_loc(PatchLoc(
             offset.0,

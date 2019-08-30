@@ -13,8 +13,11 @@ use std::sync::{Arc, RwLock, RwLockReadGuard};
 use std::io;
 use std::error;
 use std::fmt;
+use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 
 use memmap::{Mmap, MmapMut};
+
 
 /// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
@@ -29,6 +32,7 @@ macro_rules! MutPointer {
     ($e:expr) => {$e as *mut _ as _};
 }
 
+
 /// A struct representing an offset into the assembling buffer of a `DynasmLabelApi` struct.
 /// The wrapped `usize` is the offset from the start of the assembling buffer in bytes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -37,6 +41,7 @@ pub struct AssemblyOffset(pub usize);
 /// A dynamic label
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DynamicLabel(usize);
+
 
 /// A structure holding a buffer of executable memory
 #[derive(Debug)]
@@ -121,7 +126,6 @@ impl DerefMut for MutableBuffer {
     }
 }
 
-
 /// A read-only shared reference to the executable buffer inside an Assembler. By
 /// locking it the internal `ExecutableBuffer` can be accessed and executed.
 #[derive(Debug, Clone)]
@@ -142,6 +146,76 @@ impl Executor {
     }
 }
 
+
+/// This struct contains implementations for common parts of label handling between
+/// Assemblers
+#[derive(Debug, Clone)]
+pub struct LabelRegistry {
+    // mapping of global labels to offsets
+    global_labels: HashMap<&'static str, AssemblyOffset>,
+    // mapping of local labels to offsets
+    local_labels: HashMap<&'static str, AssemblyOffset>,
+    // mapping of dynamic label ids to offsets
+    dynamic_labels: Vec<Option<AssemblyOffset>>,
+}
+
+impl LabelRegistry {
+    /// Create a new, empty label registry
+    pub fn new() -> LabelRegistry {
+        LabelRegistry {
+            global_labels: HashMap::new(),
+            local_labels: HashMap::new(),
+            dynamic_labels: Vec::new(),
+        }
+    }
+
+    /// API for the user to create a new dynamic label
+    pub fn new_dynamic_label(&mut self) -> DynamicLabel {
+        let id = self.dynamic_labels.len();
+        self.dynamic_labels.push(None);
+        DynamicLabel(id)
+    }
+
+    /// API for dynasm! to create a new dynamic label target
+    pub fn define_dynamic(&mut self, id: DynamicLabel, offset: AssemblyOffset) -> Result<(), DynasmError> {
+        let entry = &mut self.dynamic_labels[id.0];
+        *entry.as_mut().ok_or(DynasmError::DuplicateLabel)? = offset;
+        Ok(())
+    }
+
+    /// API for dynasm! to create a new global label target
+    pub fn define_global(&mut self, name: &'static str, offset: AssemblyOffset) -> Result<(), DynasmError> {
+        match self.global_labels.entry(name) {
+            Entry::Occupied(_) => Err(DynasmError::DuplicateLabel),
+            Entry::Vacant(v) => {
+                v.insert(offset);
+                Ok(())
+            }
+        }
+    }
+
+    /// API for dynasm! to create a new local label target
+    pub fn define_local(&mut self, name: &'static str, offset: AssemblyOffset) {
+        self.local_labels.insert(name, offset);
+    }
+
+    /// API for dynasm! to resolve a dynamic label reference
+    pub fn resolve_dynamic(&self, id: DynamicLabel) -> Option<AssemblyOffset> {
+        self.dynamic_labels.get(id.0).and_then(|&e| e)
+    }
+
+    /// API for dynasm! to resolve a global label reference
+    pub fn resolve_global(&self, name: &'static str) -> Option<AssemblyOffset> {
+        self.global_labels.get(&name).cloned()
+    }
+
+    /// API for dynasm! to resolve a dynamic label reference
+    pub fn resolve_local(&self, name: &'static str) -> Option<AssemblyOffset> {
+        self.local_labels.get(&name).cloned()
+    }
+}
+
+
 /// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
 pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
@@ -149,8 +223,11 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     fn offset(&self) -> AssemblyOffset;
     /// Push a byte into the assembling target
     fn push(&mut self, byte: u8);
-    /// Push a signed byte into the assembling target
+    /// Push filler until the assembling target end is aligned to the given alignment.
+    fn align(&mut self, alignment: usize);
+
     #[inline]
+    /// Push a signed byte into the assembling target
     fn push_i8(&mut self, value: i8) {
         self.push(value as u8);
     }
@@ -194,16 +271,24 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
 
 /// This trait extends DynasmApi to not only allow assembling, but also labels and various directives
 pub trait DynasmLabelApi : DynasmApi {
+    /// The relocation info type this assembler uses. 
     type Relocation;
 
-    /// Push nops until the assembling target end is aligned to the given alignment
-    fn align(&mut self, alignment: usize);
+    fn registry(&self) -> &LabelRegistry;
+    fn registry_mut(&mut self) -> &mut LabelRegistry;
+
     /// Record the definition of a local label
     fn local_label(  &mut self, name: &'static str);
     /// Record the definition of a global label
-    fn global_label( &mut self, name: &'static str);
+    fn global_label( &mut self, name: &'static str) {
+        let offset = self.offset();
+        self.registry_mut().define_global(name, offset).unwrap();
+    }
     /// Record the definition of a dynamic label
-    fn dynamic_label(&mut self, id: DynamicLabel);
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        let offset = self.offset();
+        self.registry_mut().define_dynamic(id, offset).unwrap();
+    }
 
     /// Record a relocation spot for a forward reference to a local label
     fn forward_reloc( &mut self, name: &'static str, kind: Self::Relocation);
@@ -213,38 +298,72 @@ pub trait DynasmLabelApi : DynasmApi {
     fn global_reloc(  &mut self, name: &'static str, kind: Self::Relocation);
     /// Record a relocation spot for a reference to a dynamic label
     fn dynamic_reloc( &mut self, id: DynamicLabel,   kind: Self::Relocation);
-    /// Record a relocation spot to an arbitrary target
+    /// Record a relocation spot to an arbitrary target.
     fn bare_reloc(    &mut self, target: usize,      kind: Self::Relocation);
 }
 
-/// A basic implementation of DynasmApi onto a simple Vec<u8> to assist debugging
-impl DynasmApi for Vec<u8> {
-    fn offset(&self) -> AssemblyOffset {
-        AssemblyOffset(self.len())
-    }
 
-    fn push(&mut self, byte: u8) {
-        Vec::push(self, byte);
+/// An assembler that is purely a Vec<u8>. It doesn't support labels, but can be used to easily inspect generated code.
+pub struct VecAssembler(Vec<u8>);
+
+impl Extend<u8> for VecAssembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        self.0.extend(iter)
     }
 }
 
-/// An error type that is returned from various check and check_exact methods
+impl<'a> Extend<&'a u8> for VecAssembler {
+    #[inline]
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
+        self.0.extend(iter)
+    }
+}
 
+impl DynasmApi for VecAssembler {
+    #[inline]
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.0.len())
+    }
+
+    #[inline]
+    fn push(&mut self, byte: u8) {
+        self.0.push(byte);
+    }
+
+    #[inline]
+    fn align(&mut self, alignment: usize) {
+        let offset = self.offset().0 % alignment;
+        if offset != 0 {
+            for _ in offset .. alignment {
+                self.push(0);
+            }
+        }
+    }
+}
+
+
+/// An error type that is returned from various check and check_exact methods
 #[derive(Debug, Clone)]
 pub enum DynasmError {
-    CheckFailed
+    CheckFailed,
+    DuplicateLabel
 }
 
 impl fmt::Display for DynasmError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "An assembly modification check failed")
+        match *self {
+            DynasmError::CheckFailed => write!(f, "An assembly modification check failed"),
+            DynasmError::DuplicateLabel => write!(f, "Duplicate label defined"),
+        }
     }
 }
 
 impl error::Error for DynasmError {
     fn description(&self) -> &str {
         match *self {
-            DynasmError::CheckFailed => "An assembly modification offset check failed"
+            DynasmError::CheckFailed => "An assembly modification offset check failed",
+            DynasmError::DuplicateLabel => "Duplicate label defined",
         }
     }
 }
