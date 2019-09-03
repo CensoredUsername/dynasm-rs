@@ -1,10 +1,11 @@
 use byteorder::{ByteOrder, LittleEndian};
+use std::fmt::Debug;
 
 
 /// Used to inform assemblers on how to implement relocations for each architecture.
 /// When implementing a new architecture, one simply has to implement this trait for
 /// the architecture's relocation definition.
-pub trait Relocation {
+pub trait Relocation : Debug {
     /// The encoded representation for this relocation that is emitted by the dynasm! macro.
     type Encoding;
     /// construct this relocation from an encoded representation.
@@ -85,20 +86,15 @@ impl Relocation for RelocationSize {
     type Encoding = u8;
     fn from_encoding(encoding: Self::Encoding) -> Self {
         match encoding {
-            0 => RelocationSize::Byte,
-            1 => RelocationSize::Word,
-            2 => RelocationSize::DWord,
-            3 => RelocationSize::QWord,
-            x => panic!("Unsupported relocation size {}", 1u32 << x)
+            1 => RelocationSize::Byte,
+            2 => RelocationSize::Word,
+            4 => RelocationSize::DWord,
+            8 => RelocationSize::QWord,
+            x => panic!("Unsupported relocation size {}", x)
         }
     }
     fn encode_from_size(size: RelocationSize) -> Self::Encoding {
-        match size {
-            RelocationSize::Byte => 0,
-            RelocationSize::Word => 1,
-            RelocationSize::DWord => 2,
-            RelocationSize::QWord => 3,
-        }
+        size as u8
     }
     fn size(&self) -> usize {
         *self as usize
@@ -129,6 +125,7 @@ impl Relocation for RelocationSize {
 
 
 /// Relocation implementation for the x64 architecture.
+#[derive(Debug, Clone)]
 pub struct X64Relocation {
     size: RelocationSize,
     offset: u8,
@@ -170,6 +167,7 @@ impl Relocation for X64Relocation {
 
 
 /// Relocation implementation for the aarch64 architecture.
+#[derive(Debug, Clone)]
 pub enum Aarch64Relocation {
     // b, bl 26 bits, dword aligned
     B,
@@ -207,7 +205,7 @@ impl Relocation for Aarch64Relocation {
             2 => Self::ADR,
             3 => Self::ADRP,
             4 => Self::TBZ,
-            x  => Self::Plain(RelocationSize::from_encoding(x - 5))
+            x  => Self::Plain(RelocationSize::from_encoding(x - 4))
         }
     }
     fn encode_from_size(size: RelocationSize) -> Self::Encoding {
@@ -278,6 +276,7 @@ impl Relocation for Aarch64Relocation {
 
 
 /// Relocation implementation for the x86 architecture.
+#[derive(Debug, Clone)]
 pub struct X86Relocation {
     size: RelocationSize,
     kind: RelocationKind,

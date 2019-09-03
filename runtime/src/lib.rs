@@ -4,11 +4,11 @@ extern crate byteorder;
 pub mod mmap;
 pub mod components;
 pub mod relocations;
-// pub mod x64;
-// pub mod x86;
-// pub mod aarch64;
+pub mod x64;
+pub mod x86;
+pub mod aarch64;
 
-use crate::mmap::ExecutableBuffer;
+pub use crate::mmap::ExecutableBuffer;
 use crate::components::{MemoryManager, LabelRegistry, RelocRegistry, ManagedRelocs, PatchLoc};
 use crate::relocations::Relocation;
 
@@ -100,7 +100,7 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     /// Push a byte into the assembling target
     fn push(&mut self, byte: u8);
     /// Push filler until the assembling target end is aligned to the given alignment.
-    fn align(&mut self, alignment: usize);
+    fn align(&mut self, alignment: usize, with: u8);
 
     #[inline]
     /// Push a signed byte into the assembling target
@@ -141,7 +141,6 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     #[inline]
     fn runtime_error(&self, msg: &'static str) -> ! {
         panic!(msg);
-
     }
 }
 
@@ -150,21 +149,12 @@ pub trait DynasmLabelApi : DynasmApi {
     /// The relocation info type this assembler uses. 
     type Relocation: Relocation;
 
-    fn registry(&self) -> &LabelRegistry;
-    fn registry_mut(&mut self) -> &mut LabelRegistry;
-
     /// Record the definition of a local label
     fn local_label(  &mut self, name: &'static str);
     /// Record the definition of a global label
-    fn global_label( &mut self, name: &'static str) {
-        let offset = self.offset();
-        self.registry_mut().define_global(name, offset).unwrap();
-    }
+    fn global_label( &mut self, name: &'static str);
     /// Record the definition of a dynamic label
-    fn dynamic_label(&mut self, id: DynamicLabel) {
-        let offset = self.offset();
-        self.registry_mut().define_dynamic(id, offset).unwrap();
-    }
+    fn dynamic_label(&mut self, id: DynamicLabel);
 
     /// Record a relocation spot for a forward reference to a local label
     fn forward_reloc( &mut self, name: &'static str, kind: <Self::Relocation as Relocation>::Encoding);
@@ -183,36 +173,29 @@ pub trait DynasmLabelApi : DynasmApi {
 pub struct VecAssembler(Vec<u8>);
 
 impl Extend<u8> for VecAssembler {
-    #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
         self.0.extend(iter)
     }
 }
 
 impl<'a> Extend<&'a u8> for VecAssembler {
-    #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
         self.0.extend(iter)
     }
 }
 
 impl DynasmApi for VecAssembler {
-    #[inline]
     fn offset(&self) -> AssemblyOffset {
         AssemblyOffset(self.0.len())
     }
-
-    #[inline]
     fn push(&mut self, byte: u8) {
         self.0.push(byte);
     }
-
-    #[inline]
-    fn align(&mut self, alignment: usize) {
+    fn align(&mut self, alignment: usize, with: u8) {
         let offset = self.offset().0 % alignment;
         if offset != 0 {
             for _ in offset .. alignment {
-                self.push(0);
+                self.push(with);
             }
         }
     }
@@ -221,6 +204,7 @@ impl DynasmApi for VecAssembler {
 /// A full assembler implementation. Supports labels, all types of relocations,
 /// incremental compilation and multithreaded execution with simultaneous compiltion.
 /// Its implementation guarantees no memory is executable and writable at the same time.
+#[derive(Debug)]
 pub struct Assembler<R: Relocation> {
     ops: Vec<u8>,
     memory: MemoryManager,
@@ -325,6 +309,16 @@ impl<R: Relocation> Assembler<R> {
         }
     }
 
+    /// Provides access to the assemblers internal labels registry
+    pub fn labels(&self) -> &LabelRegistry {
+        &self.labels
+    }
+
+    /// Provides mutable access to the assemblers internal labels registry
+    pub fn labels_mut(&mut self) -> &mut LabelRegistry {
+        &mut self.labels
+    }
+
     // encode uncommited relocations
     fn encode_relocs(&mut self) {
         let buf_offset = self.memory.committed();
@@ -374,11 +368,11 @@ impl<R: Relocation> DynasmApi for Assembler<R> {
         self.ops.push(value);
     }
 
-    fn align(&mut self, alignment: usize) {
+    fn align(&mut self, alignment: usize, with: u8) {
         let misalign = self.offset().0 % alignment;
         if misalign != 0 {
             for _ in misalign .. alignment {
-                self.push(0x00);
+                self.push(with);
             }
         }
     }
@@ -387,17 +381,6 @@ impl<R: Relocation> DynasmApi for Assembler<R> {
 impl<R: Relocation> DynasmLabelApi for Assembler<R> {
     type Relocation = R;
 
-    #[inline]
-    fn registry(&self) -> &LabelRegistry {
-        &self.labels
-    }
-
-    #[inline]
-    fn registry_mut(&mut self) -> &mut LabelRegistry {
-        &mut self.labels
-    }
-
-    #[inline]
     fn local_label(&mut self, name: &'static str) {
         let offset = self.offset();
         for loc in self.relocs.take_locals_named(name) {
@@ -408,26 +391,26 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
         }
         self.labels.define_local(name, offset);
     }
-
-    #[inline]
+    fn global_label( &mut self, name: &'static str) {
+        let offset = self.offset();
+        self.labels.define_global(name, offset).unwrap();
+    }
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        let offset = self.offset();
+        self.labels.define_dynamic(id, offset).unwrap();
+    }
     fn global_reloc(&mut self, name: &'static str, kind: R::Encoding) {
         let offset = self.offset();
         self.relocs.add_global(name, PatchLoc::new(offset, R::from_encoding(kind)));
     }
-
-    #[inline]
     fn dynamic_reloc(&mut self, id: DynamicLabel, kind: R::Encoding) {
         let offset = self.offset();
         self.relocs.add_dynamic(id, PatchLoc::new(offset, R::from_encoding(kind)));
     }
-
-    #[inline]
     fn forward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
         let offset = self.offset();
         self.relocs.add_local(name, PatchLoc::new(offset, R::from_encoding(kind)));
     }
-
-    #[inline]
     fn backward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
         let target = self.labels.resolve_local(name).unwrap().0;
         let offset = self.offset();
@@ -440,8 +423,6 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
             self.managed.add(loc)
         }
     }
-
-    #[inline]
     fn bare_reloc(&mut self, target: usize, kind: R::Encoding) {
         let offset = self.offset();
         let loc = PatchLoc::new(
@@ -459,6 +440,7 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
 /// Allows modification of already committed assembly code. Contains an internal cursor
 /// into the emitted assembly, initialized to the start, that can be moved around either with the
 /// `goto` function, or just by assembling new code into this `Modifier`.
+#[derive(Debug)]
 pub struct Modifier<'a, R: Relocation> {
     asmoffset: usize,
     previous_asmoffset: usize,
@@ -553,11 +535,11 @@ impl<'a, R: Relocation> DynasmApi for Modifier<'a, R> {
         self.asmoffset += 1
     }
 
-    fn align(&mut self, alignment: usize) {
+    fn align(&mut self, alignment: usize, with: u8) {
         let mismatch = self.asmoffset % alignment;
         if mismatch != 0 {
             for _ in mismatch .. alignment {
-                self.push(0x00)
+                self.push(with)
             }
         }
     }
@@ -566,17 +548,6 @@ impl<'a, R: Relocation> DynasmApi for Modifier<'a, R> {
 impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
     type Relocation = R;
 
-    #[inline]
-    fn registry(&self) -> &LabelRegistry {
-        &*self.labels
-    }
-
-    #[inline]
-    fn registry_mut(&mut self) -> &mut LabelRegistry {
-        self.labels
-    }
-
-    #[inline]
     fn local_label(&mut self, name: &'static str) {
         let offset = self.offset();
         for loc in self.relocs.take_locals_named(name) {
@@ -587,26 +558,26 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
         }
         self.labels.define_local(name, offset);
     }
-
-    #[inline]
+    fn global_label( &mut self, name: &'static str) {
+        let offset = self.offset();
+        self.labels.define_global(name, offset).unwrap();
+    }
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        let offset = self.offset();
+        self.labels.define_dynamic(id, offset).unwrap();
+    }
     fn global_reloc(&mut self, name: &'static str, kind: R::Encoding) {
         let offset = self.offset();
         self.relocs.add_global(name, PatchLoc::new(offset, R::from_encoding(kind)));
     }
-
-    #[inline]
     fn dynamic_reloc(&mut self, id: DynamicLabel, kind: R::Encoding) {
         let offset = self.offset();
         self.relocs.add_dynamic(id, PatchLoc::new(offset, R::from_encoding(kind)));
     }
-
-    #[inline]
     fn forward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
         let offset = self.offset();
         self.relocs.add_local(name, PatchLoc::new(offset, R::from_encoding(kind)));
     }
-
-    #[inline]
     fn backward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
         let target = self.labels.resolve_local(name).unwrap().0;
         let offset = self.offset();
@@ -619,8 +590,6 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
             self.new_managed.add(loc)
         }
     }
-
-    #[inline]
     fn bare_reloc(&mut self, target: usize, kind: R::Encoding) {
         let offset = self.offset();
         let loc = PatchLoc::new(
@@ -640,6 +609,7 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
 /// of the assembling buffer that cannot be determined easily or efficiently
 /// in advance. Due to limitations of the label resolution algorithms, this
 /// assembler does not allow labels to be used.
+#[derive(Debug)]
 pub struct UncommittedModifier<'a> {
     buffer: &'a mut Vec<u8>,
     base_offset: usize,
@@ -657,13 +627,11 @@ impl<'a> UncommittedModifier<'a> {
     }
 
     /// Sets the current modification offset to the given value
-    #[inline]
     pub fn goto(&mut self, offset: AssemblyOffset) {
         self.offset = offset.0;
     }
 
     /// Checks that the current modification offset is not larger than the specified offset.
-    #[inline]
     pub fn check(&mut self, offset: AssemblyOffset) -> Result<(), DynasmError> {
         if self.offset > offset.0 {
             Err(DynasmError::CheckFailed)
@@ -673,7 +641,6 @@ impl<'a> UncommittedModifier<'a> {
     }
 
     /// Checks that the current modification offset is exactly the specified offset.
-    #[inline]
     pub fn check_exact(&mut self, offset: AssemblyOffset) -> Result<(), DynasmError> {
         if self.offset != offset.0 {
             Err(DynasmError::CheckFailed)
@@ -684,30 +651,26 @@ impl<'a> UncommittedModifier<'a> {
 }
 
 impl<'a> DynasmApi for UncommittedModifier<'a> {
-    #[inline]
     fn offset(&self) -> AssemblyOffset {
         AssemblyOffset(self.offset)
     }
 
-    #[inline]
     fn push(&mut self, value: u8) {
         self.buffer[self.offset - self.base_offset] = value;
         self.offset += 1;
     }
 
-    #[inline]
-    fn align(&mut self, alignment: usize) {
+    fn align(&mut self, alignment: usize, with: u8) {
         let mismatch = self.offset % alignment;
         if mismatch != 0 {
             for _ in mismatch .. alignment {
-                self.push(0x00)
+                self.push(with)
             }
         }
     }
 }
 
 impl<'a> Extend<u8> for UncommittedModifier<'a> {
-    #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
         for i in iter {
             self.push(i)
@@ -716,7 +679,6 @@ impl<'a> Extend<u8> for UncommittedModifier<'a> {
 }
 
 impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
-    #[inline]
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
         self.extend(iter.into_iter().cloned())
     }

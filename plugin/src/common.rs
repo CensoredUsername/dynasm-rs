@@ -141,7 +141,7 @@ pub enum Stmt {
     // extend the instruction stream with unsigned bytes
     ExprExtend(TokenTree),
     // align the instruction stream to some alignment
-    Align(TokenTree),
+    Align(TokenTree, TokenTree),
 
     // label declarations
     GlobalLabel(syn::Ident),

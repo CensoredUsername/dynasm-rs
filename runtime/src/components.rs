@@ -159,8 +159,12 @@ impl LabelRegistry {
     /// Define a the dynamic label `id` to be located at `offset`.
     pub fn define_dynamic(&mut self, id: DynamicLabel, offset: AssemblyOffset) -> Result<(), DynasmError> {
         let entry = &mut self.dynamic_labels[id.0];
-        *entry.as_mut().ok_or(DynasmError::DuplicateLabel)? = offset;
-        Ok(())
+        if let Some(_) = entry {
+            Err(DynasmError::DuplicateLabel)
+        } else {
+            *entry = Some(offset);
+            Ok(())
+        }
     }
 
     /// Define a the global label `name` to be located at `offset`.
@@ -261,6 +265,7 @@ impl<R: Relocation> PatchLoc<R> {
 
 
 /// A registry of relocations and the respective labels they point towards.
+#[derive(Debug)]
 pub struct RelocRegistry<R: Relocation> {
     global: Vec<(PatchLoc<R>, &'static str)>,
     dynamic: Vec<(PatchLoc<R>, DynamicLabel)>,
@@ -326,6 +331,7 @@ impl<R: Relocation> RelocRegistry<R> {
 
 /// A registry of relocations that have been encoded previously, but need to be adjusted when the address of the buffer they
 /// reside in changes.
+#[derive(Debug)]
 pub struct ManagedRelocs<R: Relocation> {
     managed: BTreeMap<usize, PatchLoc<R>>
 }
@@ -380,7 +386,7 @@ enum LitPoolEntry {
     Global(RelocationSize, &'static str),
     Forward(RelocationSize, &'static str),
     Backward(RelocationSize, &'static str),
-    Align(usize),
+    Align(u8, usize),
 }
 
 /// Literal pool implementation. One can programmatically push items in this literal pool and retrieve offsets to them in the pool.
@@ -404,20 +410,20 @@ impl LitPool {
     // align the pool to the specified size, record the offset, and bump the offset
     fn bump_offset(&mut self, size: RelocationSize) -> usize {
         // Correct for alignment
-        self.align(size as usize);
+        self.align(size as usize, 0);
         let offset = self.offset;
         self.offset += size as usize;
         offset
     }
 
     /// Add extra alignment for the next value in the literal pool
-    pub fn align(&mut self, size: usize) {
+    pub fn align(&mut self, size: usize, with: u8) {
         let misalign = self.offset % (size as usize);
         if misalign == 0 {
             return;
         }
 
-        self.entries.push(LitPoolEntry::Align(size));
+        self.entries.push(LitPoolEntry::Align(with, size));
         self.offset += misalign;
     }
 
@@ -490,7 +496,7 @@ impl LitPool {
                 LitPoolEntry::Global(size, name) => assembler.global_reloc(name, R::encode_from_size(size)),
                 LitPoolEntry::Forward(size, name) => assembler.forward_reloc(name, R::encode_from_size(size)),
                 LitPoolEntry::Backward(size, name) => assembler.backward_reloc(name, R::encode_from_size(size)),
-                LitPoolEntry::Align(alignment) => assembler.align(alignment),
+                LitPoolEntry::Align(with, alignment) => assembler.align(alignment, with),
             }
         }
     }

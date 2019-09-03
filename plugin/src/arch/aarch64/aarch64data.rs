@@ -165,10 +165,14 @@ pub enum Relocation {
     ADRP = 3,
     // tbnz, tbz: 14 bits, dword aligned
     TBZ = 4,
+    // 8-bit literal
+    LITERAL8 = 5,
+    // 16-bit literal
+    LITERAL16 = 6,
     // 32-bit literal
-    LITERAL32 = 5,
+    LITERAL32 = 8,
     // 64-bit literal
-    LITERAL64 = 6,
+    LITERAL64 = 12,
 }
 
 impl Relocation {

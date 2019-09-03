@@ -77,7 +77,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
             Stmt::ExprSigned(_, _) => unimplemented!(),
             Stmt::Extend(data)     => ("extend", vec![proc_macro2::Literal::byte_string(&data).into()]),
             Stmt::ExprExtend(expr) => ("extend", vec![expr]),
-            Stmt::Align(expr)      => ("align", vec![expr]),
+            Stmt::Align(expr, with)      => ("align", vec![expr, with]),
             Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(&n)]),
             Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(&n)]),
             Stmt::DynamicLabel(expr) => ("dynamic_label", vec![expr]),

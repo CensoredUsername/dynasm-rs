@@ -62,6 +62,10 @@ impl Arch for Archx64 {
         stmts.push(reloc.encode(&data));
     }
 
+    fn default_align(&self) -> u8 {
+        0x90
+    }
+
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
         let mut ctx = Context {
             state,
@@ -113,6 +117,10 @@ impl Arch for Archx86 {
 
         stmts.push(Stmt::Const(0, size));
         stmts.push(reloc.encode(&data));
+    }
+
+    fn default_align(&self) -> u8 {
+        0x90
     }
 
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {

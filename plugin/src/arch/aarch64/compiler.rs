@@ -423,7 +423,9 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }));
                         }
                     },
-                    Relocation::LITERAL32
+                    Relocation::LITERAL8
+                    | Relocation::LITERAL16
+                    | Relocation::LITERAL32
                     | Relocation::LITERAL64 => ()
                 },
 

@@ -13,6 +13,7 @@ pub(crate) trait Arch : Debug + Send {
     fn name(&self) -> &str;
     fn set_features(&mut self, features: &[syn::Ident]);
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size);
+    fn default_align(&self) -> u8;
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()>;
 }
 
@@ -47,6 +48,10 @@ impl Arch for DummyArch {
             JumpType::Bare(expr) => expr.span(),
         };
         emit_error_at(span, "Current assembling architecture is undefined. Define it using a .arch directive".into());
+    }
+
+    fn default_align(&self) -> u8 {
+        0
     }
 
     fn compile_instruction(&self, _state: &mut State, input: parse::ParseStream) -> parse::Result<()> {

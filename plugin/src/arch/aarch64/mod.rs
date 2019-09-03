@@ -48,6 +48,8 @@ impl Arch for ArchAarch64 {
         let span = reloc.span();
 
         let relocation = match size {
+            Size::BYTE => Relocation::LITERAL8,
+            Size::WORD => Relocation::LITERAL16,
             Size::DWORD => Relocation::LITERAL32,
             Size::QWORD => Relocation::LITERAL64,
             _ => {
@@ -59,6 +61,10 @@ impl Arch for ArchAarch64 {
 
         stmts.push(Stmt::Const(0, size));
         stmts.push(reloc.encode(&data));
+    }
+
+    fn default_align(&self) -> u8 {
+        0
     }
 
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {

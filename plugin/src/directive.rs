@@ -2,6 +2,7 @@ use std::collections::hash_map::Entry;
 
 use syn::parse;
 use syn::Token;
+use quote::quote;
 
 use crate::common::{Stmt, Size, delimited, emit_error_at};
 use crate::arch;
@@ -52,10 +53,20 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
             stmts.push(Stmt::ExprExtend(delimited(iterator)));
         },
         "align" => {
-            // ; .align expr
+            // ; .align expr ("," expr)
             // this might need to be architecture dependent
             let value: syn::Expr = input.parse()?;
-            stmts.push(Stmt::Align(delimited(value)));
+
+            let with = if input.peek(Token![,]) {
+                let _: Token![,] = input.parse()?;
+                let with: syn::Expr = input.parse()?;
+                delimited(with)
+            } else {
+                let with = file_data.current_arch.default_align();
+                delimited(quote!(#with))
+            };
+
+            stmts.push(Stmt::Align(delimited(value), with));
         },
         "alias" => {
             // ; .alias ident, ident
