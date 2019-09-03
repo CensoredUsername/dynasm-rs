@@ -8,7 +8,7 @@ mod x64data;
 
 use crate::State;
 use crate::arch::Arch;
-use crate::common::{Size, Stmt, JumpType, emit_error_at};
+use crate::common::{Size, Stmt, Jump, emit_error_at};
 
 #[cfg(feature = "dynasm_opmap")]
 pub use debug::create_opmap;
@@ -55,7 +55,7 @@ impl Arch for Archx64 {
         self.features = new_features;
     }
 
-    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size) {
+    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
         let data = [0, size.in_bytes()]; // no offset, specified size, relative implicit
 
         stmts.push(Stmt::Const(0, size));
@@ -112,7 +112,7 @@ impl Arch for Archx86 {
         self.features = new_features;
     }
 
-    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size) {
+    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
         let data = [0, size.in_bytes(), 0]; // no offset, specified size, relative
 
         stmts.push(Stmt::Const(0, size));

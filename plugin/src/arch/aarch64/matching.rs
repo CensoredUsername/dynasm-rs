@@ -6,7 +6,7 @@ use super::ast::{Instruction, RawArg, CleanArg, FlatArg, RefItem, Register, RegF
 use super::aarch64data::{Opdata, Matcher, COND_MAP, get_mnemonic_data};
 use super::debug::format_opdata_list;
 
-use crate::common::{Size, JumpType, emit_error_at};
+use crate::common::{Size, JumpKind, emit_error_at};
 use crate::parse_helpers::{as_ident, as_number, as_float};
 
 /// Try finding an appropriate definition that matches the given instruction / arguments. 
@@ -55,12 +55,12 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 res.push(CleanArg::Direct { span, reg });
             },
             // offsets: validate that only relative jumps are allowed (no extern relocations)
-            RawArg::JumpTarget { type_ } => {
-                if let JumpType::Bare(_) = type_ {
-                    emit_error_at(type_.span(), "Extern relocations are not allowed in aarch64".into());
+            RawArg::JumpTarget { jump } => {
+                if let JumpKind::Bare(_) = jump.kind {
+                    emit_error_at(jump.span(), "Extern relocations are not allowed in aarch64".into());
                     return Err(None);
                 }
-                res.push(CleanArg::JumpTarget { type_ });
+                res.push(CleanArg::JumpTarget { jump });
             },
             // modifier: LSL LSR ASR ROR and MSL require an immediate.
             RawArg::Modifier { span, modifier } => {
@@ -622,8 +622,8 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
                         }
                     }
                 },
-                CleanArg::JumpTarget { type_ } => {
-                    new_args.push(FlatArg::JumpTarget { type_ } );
+                CleanArg::JumpTarget { jump } => {
+                    new_args.push(FlatArg::JumpTarget { jump } );
                 },
                 CleanArg::Immediate { value, .. } => {
                     new_args.push(FlatArg::Immediate { value } );

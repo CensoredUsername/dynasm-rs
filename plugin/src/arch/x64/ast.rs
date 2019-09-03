@@ -1,7 +1,7 @@
 use syn;
 use proc_macro2::Span;
 
-use crate::common::{Size, JumpType};
+use crate::common::{Size, Jump};
 
 use std::cmp::PartialEq;
 
@@ -279,12 +279,12 @@ pub enum RawArg {
     },
     // a jump offset, i.e. ->foo
     JumpTarget {
-        type_: JumpType,
+        jump: Jump,
         size: Option<Size>
     },
     // a memory reference to a label, i.e. [->foo]
     IndirectJumpTarget {
-        type_: JumpType,
+        jump: Jump,
         size: Option<Size>
     },
     // just an arbitrary expression
@@ -315,12 +315,12 @@ pub enum CleanArg {
     },
     // a jump offset, i.e. ->foo
     JumpTarget {
-        type_: JumpType,
+        jump: Jump,
         size: Option<Size>
     },
     // a memory reference to a label, i.e. [->foo]
     IndirectJumpTarget {
-        type_: JumpType,
+        jump: Jump,
         size: Option<Size>
     },
     // just an arbitrary expression
@@ -348,12 +348,12 @@ pub enum SizedArg {
     },
     // a jump offset, i.e. ->foo
     JumpTarget {
-        type_: JumpType,
+        jump: Jump,
         size: Size
     },
     // a memory reference to a label, i.e. [->foo]
     IndirectJumpTarget {
-        type_: JumpType
+        jump: Jump
     },
     // just an arbitrary expression
     Immediate {

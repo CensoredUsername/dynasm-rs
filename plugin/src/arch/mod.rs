@@ -1,7 +1,6 @@
 use syn::parse;
-use syn::spanned::Spanned;
 
-use crate::common::{Size, Stmt, JumpType, emit_error_at};
+use crate::common::{Size, Stmt, Jump, emit_error_at};
 use crate::State;
 
 use std::fmt::Debug;
@@ -12,7 +11,7 @@ pub mod aarch64;
 pub(crate) trait Arch : Debug + Send {
     fn name(&self) -> &str;
     fn set_features(&mut self, features: &[syn::Ident]);
-    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size);
+    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size);
     fn default_align(&self) -> u8;
     fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()>;
 }
@@ -39,14 +38,8 @@ impl Arch for DummyArch {
         }
     }
 
-    fn handle_static_reloc(&self, _stmts: &mut Vec<Stmt>, reloc: JumpType, _size: Size) {
-        let span = match reloc {
-            JumpType::Global(ident) |
-            JumpType::Backward(ident) |
-            JumpType::Forward(ident) => ident.span(),
-            JumpType::Dynamic(expr) |
-            JumpType::Bare(expr) => expr.span(),
-        };
+    fn handle_static_reloc(&self, _stmts: &mut Vec<Stmt>, reloc: Jump, _size: Size) {
+        let span = reloc.span();
         emit_error_at(span, "Current assembling architecture is undefined. Define it using a .arch directive".into());
     }
 

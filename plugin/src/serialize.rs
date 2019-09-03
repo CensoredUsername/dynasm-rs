@@ -81,10 +81,10 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
             Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(&n)]),
             Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(&n)]),
             Stmt::DynamicLabel(expr) => ("dynamic_label", vec![expr]),
-            Stmt::GlobalJumpTarget(n,     reloc) => ("global_reloc"  , vec![expr_string_from_ident(&n), reloc]),
-            Stmt::ForwardJumpTarget(n,    reloc) => ("forward_reloc" , vec![expr_string_from_ident(&n), reloc]),
-            Stmt::BackwardJumpTarget(n,   reloc) => ("backward_reloc", vec![expr_string_from_ident(&n), reloc]),
-            Stmt::DynamicJumpTarget(expr, reloc) => ("dynamic_reloc" , vec![expr, reloc]),
+            Stmt::GlobalJumpTarget(n,     offset, reloc) => ("global_reloc"  , vec![expr_string_from_ident(&n), offset, reloc]),
+            Stmt::ForwardJumpTarget(n,    offset, reloc) => ("forward_reloc" , vec![expr_string_from_ident(&n), offset, reloc]),
+            Stmt::BackwardJumpTarget(n,   offset, reloc) => ("backward_reloc", vec![expr_string_from_ident(&n), offset, reloc]),
+            Stmt::DynamicJumpTarget(expr, offset, reloc) => ("dynamic_reloc" , vec![expr, offset, reloc]),
             Stmt::BareJumpTarget(expr, reloc)    => ("bare_reloc"    , vec![expr, reloc]),
             Stmt::Stmt(s) => {
                 output.extend(quote! {

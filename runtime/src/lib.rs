@@ -157,15 +157,15 @@ pub trait DynasmLabelApi : DynasmApi {
     fn dynamic_label(&mut self, id: DynamicLabel);
 
     /// Record a relocation spot for a forward reference to a local label
-    fn forward_reloc( &mut self, name: &'static str, kind: <Self::Relocation as Relocation>::Encoding);
+    fn forward_reloc( &mut self, name: &'static str, offset: isize, kind: <Self::Relocation as Relocation>::Encoding);
     /// Record a relocation spot for a backward reference to a local label
-    fn backward_reloc(&mut self, name: &'static str, kind: <Self::Relocation as Relocation>::Encoding);
+    fn backward_reloc(&mut self, name: &'static str, offset: isize, kind: <Self::Relocation as Relocation>::Encoding);
     /// Record a relocation spot for a reference to a global label
-    fn global_reloc(  &mut self, name: &'static str, kind: <Self::Relocation as Relocation>::Encoding);
+    fn global_reloc(  &mut self, name: &'static str, offset: isize, kind: <Self::Relocation as Relocation>::Encoding);
     /// Record a relocation spot for a reference to a dynamic label
-    fn dynamic_reloc( &mut self, id: DynamicLabel,   kind: <Self::Relocation as Relocation>::Encoding);
+    fn dynamic_reloc( &mut self, id: DynamicLabel,   offset: isize, kind: <Self::Relocation as Relocation>::Encoding);
     /// Record a relocation spot to an arbitrary target.
-    fn bare_reloc(    &mut self, target: usize,      kind: <Self::Relocation as Relocation>::Encoding);
+    fn bare_reloc(&mut self, target: usize, kind: <Self::Relocation as Relocation>::Encoding);
 }
 
 
@@ -399,22 +399,23 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
         let offset = self.offset();
         self.labels.define_dynamic(id, offset).unwrap();
     }
-    fn global_reloc(&mut self, name: &'static str, kind: R::Encoding) {
-        let offset = self.offset();
-        self.relocs.add_global(name, PatchLoc::new(offset, R::from_encoding(kind)));
+    fn global_reloc(&mut self, name: &'static str, offset: isize, kind: R::Encoding) {
+        let location = self.offset();
+        self.relocs.add_global(name, PatchLoc::new(location, offset, R::from_encoding(kind)));
     }
-    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: R::Encoding) {
-        let offset = self.offset();
-        self.relocs.add_dynamic(id, PatchLoc::new(offset, R::from_encoding(kind)));
+    fn dynamic_reloc(&mut self, id: DynamicLabel, offset: isize, kind: R::Encoding) {
+        let location = self.offset();
+        self.relocs.add_dynamic(id, PatchLoc::new(location, offset, R::from_encoding(kind)));
     }
-    fn forward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
-        let offset = self.offset();
-        self.relocs.add_local(name, PatchLoc::new(offset, R::from_encoding(kind)));
+    fn forward_reloc(&mut self, name: &'static str, offset: isize, kind: R::Encoding) {
+        let location = self.offset();
+        self.relocs.add_local(name, PatchLoc::new(location, offset, R::from_encoding(kind)));
     }
-    fn backward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
+    fn backward_reloc(&mut self, name: &'static str, offset: isize, kind: R::Encoding) {
         let target = self.labels.resolve_local(name).unwrap().0;
-        let offset = self.offset();
+        let location = self.offset();
         let loc = PatchLoc::new(
+            location,
             offset,
             R::from_encoding(kind)
         );
@@ -424,9 +425,10 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
         }
     }
     fn bare_reloc(&mut self, target: usize, kind: R::Encoding) {
-        let offset = self.offset();
+        let location = self.offset();
         let loc = PatchLoc::new(
-            offset,
+            location,
+            0,
             R::from_encoding(kind)
         );
         loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, target);
@@ -566,22 +568,23 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
         let offset = self.offset();
         self.labels.define_dynamic(id, offset).unwrap();
     }
-    fn global_reloc(&mut self, name: &'static str, kind: R::Encoding) {
-        let offset = self.offset();
-        self.relocs.add_global(name, PatchLoc::new(offset, R::from_encoding(kind)));
+    fn global_reloc(&mut self, name: &'static str, offset: isize, kind: R::Encoding) {
+        let location = self.offset();
+        self.relocs.add_global(name, PatchLoc::new(location, offset, R::from_encoding(kind)));
     }
-    fn dynamic_reloc(&mut self, id: DynamicLabel, kind: R::Encoding) {
-        let offset = self.offset();
-        self.relocs.add_dynamic(id, PatchLoc::new(offset, R::from_encoding(kind)));
+    fn dynamic_reloc(&mut self, id: DynamicLabel, offset: isize, kind: R::Encoding) {
+        let location = self.offset();
+        self.relocs.add_dynamic(id, PatchLoc::new(location, offset, R::from_encoding(kind)));
     }
-    fn forward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
-        let offset = self.offset();
-        self.relocs.add_local(name, PatchLoc::new(offset, R::from_encoding(kind)));
+    fn forward_reloc(&mut self, name: &'static str, offset: isize, kind: R::Encoding) {
+        let location = self.offset();
+        self.relocs.add_local(name, PatchLoc::new(location, offset, R::from_encoding(kind)));
     }
-    fn backward_reloc(&mut self, name: &'static str, kind: R::Encoding) {
+    fn backward_reloc(&mut self, name: &'static str, offset: isize, kind: R::Encoding) {
         let target = self.labels.resolve_local(name).unwrap().0;
-        let offset = self.offset();
+        let location = self.offset();
         let loc = PatchLoc::new(
+            location,
             offset,
             R::from_encoding(kind)
         );
@@ -591,9 +594,10 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
         }
     }
     fn bare_reloc(&mut self, target: usize, kind: R::Encoding) {
-        let offset = self.offset();
+        let location = self.offset();
         let loc = PatchLoc::new(
-            offset,
+            location,
+            0,
             R::from_encoding(kind)
         );
         loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, target);

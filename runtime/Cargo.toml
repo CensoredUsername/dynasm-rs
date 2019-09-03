@@ -16,4 +16,3 @@ license = "MPL-2.0"
 [dependencies]
 memmap = "^0.7"
 byteorder = "1"
-take_mut = "^0.2"

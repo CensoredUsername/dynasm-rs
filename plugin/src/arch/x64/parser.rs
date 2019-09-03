@@ -114,7 +114,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     // bare label
     if let Some(jump) = input.parse_opt()? {
         return Ok(RawArg::JumpTarget {
-            type_: jump,
+            jump,
             size
         })
     }
@@ -129,7 +129,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
         // label
         if let Some(jump) = inner.parse_opt()? {
             return Ok(RawArg::IndirectJumpTarget {
-                type_: jump,
+                jump,
                 size
             })
         }

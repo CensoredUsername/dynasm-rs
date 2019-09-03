@@ -59,7 +59,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     // a label
     if let Some(jump) = input.parse_opt()? {
         return Ok(RawArg::JumpTarget {
-            type_: jump
+            jump
         });
     }
 

@@ -2,7 +2,7 @@ use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenTree};
 use quote::{quote_spanned};
 
-use crate::common::{Stmt, Size, JumpType, delimited, emit_error_at};
+use crate::common::{Stmt, Size, Jump, JumpKind, delimited, emit_error_at};
 use crate::serialize;
 
 use super::{Context, X86Mode};
@@ -360,7 +360,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
                     // but we can work around it with relocations
                     buffer.push(Stmt::u32(0));
                     let disp = disp.unwrap_or_else(|| serialize::reparse(&serialize::expr_zero()).expect("Invalid expression generated"));
-                    relocations.push((JumpType::Bare(disp), 0, Size::DWORD, RelocationKind::Absolute));
+                    relocations.push((Jump::new(JumpKind::Bare(disp), None), 0, Size::DWORD, RelocationKind::Absolute));
                 },
             }
 
@@ -426,7 +426,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
         }
 
     // jump-target relative addressing
-    } else if let Some(SizedArg::IndirectJumpTarget {type_, ..}) = rm {
+    } else if let Some(SizedArg::IndirectJumpTarget {jump, ..}) = rm {
         let reg_k = if let Some(SizedArg::Direct {reg, ..}) = reg {
             reg.kind
         } else {
@@ -436,8 +436,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         buffer.push(Stmt::u32(0));
         match ctx.mode {
-            X86Mode::Long      => relocations.push((type_, 0, Size::DWORD, RelocationKind::Relative)),
-            X86Mode::Protected => relocations.push((type_, 0, Size::DWORD, RelocationKind::Absolute))
+            X86Mode::Long      => relocations.push((jump, 0, Size::DWORD, RelocationKind::Relative)),
+            X86Mode::Protected => relocations.push((jump, 0, Size::DWORD, RelocationKind::Absolute))
         }
     }
 
@@ -482,7 +482,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
                 // bump relocations
                 relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
             },
-            SizedArg::JumpTarget {type_, size} => {
+            SizedArg::JumpTarget {jump, size} => {
                 // placeholder
                 buffer.push(Stmt::Const(0, size));
 
@@ -490,13 +490,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
                 relocations.iter_mut().for_each(|r| r.1 += size.in_bytes());
 
                 // add the new relocation
-                if let JumpType::Bare(_) = type_ {
+                if let JumpKind::Bare(_) = &jump.kind {
                     match ctx.mode {
-                        X86Mode::Protected => relocations.push((type_, 0, size, RelocationKind::Extern)),
+                        X86Mode::Protected => relocations.push((jump, 0, size, RelocationKind::Extern)),
                         X86Mode::Long => return Err(Some("Extern relocations are not supported in x64 mode".to_string()))
                     }
                 } else {
-                    relocations.push((type_, 0, size, RelocationKind::Relative));
+                    relocations.push((jump, 0, size, RelocationKind::Relative));
                 }
             },
             _ => panic!("bad immediate data")
@@ -521,12 +521,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
     Ok(match arg {
         RawArg::Direct {span, reg} => CleanArg::Direct {span, reg},
-        RawArg::JumpTarget {type_, size} => CleanArg::JumpTarget {type_, size},
-        RawArg::IndirectJumpTarget {type_, size} => {
-            if let JumpType::Bare(_) = type_ {
+        RawArg::JumpTarget {jump, size} => CleanArg::JumpTarget {jump, size},
+        RawArg::IndirectJumpTarget {jump, size} => {
+            if let JumpKind::Bare(_) = jump.kind {
                 return Err(Some("Extern indirect jumps are not supported. Use a displacement".to_string()))
             }
-            CleanArg::IndirectJumpTarget {type_, size}
+            CleanArg::IndirectJumpTarget {jump, size}
         },
         RawArg::Immediate {value, size} => CleanArg::Immediate {value, size},
         RawArg::Invalid => return Err(None),
@@ -1256,10 +1256,10 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
         new_args.push(match arg {
             CleanArg::Direct {span, reg} =>
                 SizedArg::Direct {span, reg},
-            CleanArg::JumpTarget {type_, ..} =>
-                SizedArg::JumpTarget {type_, size},
-            CleanArg::IndirectJumpTarget {type_, ..} =>
-                SizedArg::IndirectJumpTarget {type_},
+            CleanArg::JumpTarget {jump, ..} =>
+                SizedArg::JumpTarget {jump, size},
+            CleanArg::IndirectJumpTarget {jump, ..} =>
+                SizedArg::IndirectJumpTarget {jump},
             CleanArg::Immediate {value, ..} =>
                 SizedArg::Immediate {value, size},
             CleanArg::Indirect {span, disp_size, base, index, disp, ..} => 

@@ -9,7 +9,7 @@ mod encoding_helpers;
 mod debug;
 
 use crate::State;
-use crate::common::{Size, Stmt, JumpType, emit_error_at};
+use crate::common::{Size, Stmt, Jump, emit_error_at};
 use crate::arch::Arch;
 use self::aarch64data::Relocation;
 
@@ -44,7 +44,7 @@ impl Arch for ArchAarch64 {
         }
     }
 
-    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: JumpType, size: Size) {
+    fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
         let span = reloc.span();
 
         let relocation = match size {

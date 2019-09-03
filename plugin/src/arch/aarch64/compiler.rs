@@ -466,13 +466,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                 _ => panic!("Invalid argument processor")
             },
-            FlatArg::JumpTarget { type_: ref target } => match *command {
+            FlatArg::JumpTarget { ref jump } => match *command {
                 Command::Offset(relocation) => {
                     // what kind of relocation is it
                     let data = [relocation.to_id()];
 
                     // encode the complete relocation
-                    let stmt = target.clone().encode(&data);
+                    let stmt = jump.clone().encode(&data);
 
                     relocations.push(stmt);
                 },

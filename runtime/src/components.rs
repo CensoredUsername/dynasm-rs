@@ -203,31 +203,33 @@ impl LabelRegistry {
 /// An abstraction of a relocation of type `R` that was defined to exist at offset `offset`
 #[derive(Clone, Debug)]
 pub struct PatchLoc<R: Relocation> {
-    pub offset: AssemblyOffset,
+    pub location: AssemblyOffset,
     pub relocation: R,
+    pub offset: isize,
 }
 
 impl<R: Relocation> PatchLoc<R> {
     /// create a new `PatchLoc`
-    pub fn new(offset: AssemblyOffset, relocation: R) -> PatchLoc<R> {
+    pub fn new(location: AssemblyOffset, offset: isize, relocation: R) -> PatchLoc<R> {
         PatchLoc {
-            offset,
-            relocation
+            location,
+            relocation,
+            offset
         }
     }
 
     // Slice out the relevant part of an assembling buffer
     fn slice<'a>(&self, buf_offset: usize, buffer: &'a mut [u8]) -> &'a mut [u8] {
-        let field_offset = self.offset.0 - buf_offset - self.relocation.field_offset();
+        let field_offset = self.location.0 - buf_offset - self.relocation.field_offset();
         &mut buffer[field_offset .. field_offset + self.relocation.size()]
     }
 
     fn value(&self, target: usize, buf_addr: usize) -> isize {
         (match self.relocation.kind() {
-            RelocationKind::Relative => target.wrapping_sub(self.offset.0 - self.relocation.start_offset()),
-            RelocationKind::RelToAbs => target.wrapping_sub(self.offset.0 - self.relocation.start_offset() + buf_addr),
+            RelocationKind::Relative => target.wrapping_sub(self.location.0 - self.relocation.start_offset()),
+            RelocationKind::RelToAbs => target.wrapping_sub(self.location.0 - self.relocation.start_offset() + buf_addr),
             RelocationKind::AbsToRel => target + buf_addr
-        }) as isize
+        }) as isize + self.offset
     }
 
     /// Patch `buffer` so that this relocation patch will point to `target`.
@@ -346,7 +348,7 @@ impl<R: Relocation> ManagedRelocs<R> {
 
     /// Add a relocation to this registry.
     pub fn add(&mut self, patchloc: PatchLoc<R>) {
-        self.managed.insert(patchloc.offset.0 - patchloc.relocation.field_offset(), patchloc);
+        self.managed.insert(patchloc.location.0 - patchloc.relocation.field_offset(), patchloc);
     }
 
     /// Take all items from another registry and add them to this registry
@@ -492,10 +494,10 @@ impl LitPool {
                 LitPoolEntry::U16(value) => assembler.push_u16(value),
                 LitPoolEntry::U32(value) => assembler.push_u32(value),
                 LitPoolEntry::U64(value) => assembler.push_u64(value),
-                LitPoolEntry::Dynamic(size, id) => assembler.dynamic_reloc(id, R::encode_from_size(size)),
-                LitPoolEntry::Global(size, name) => assembler.global_reloc(name, R::encode_from_size(size)),
-                LitPoolEntry::Forward(size, name) => assembler.forward_reloc(name, R::encode_from_size(size)),
-                LitPoolEntry::Backward(size, name) => assembler.backward_reloc(name, R::encode_from_size(size)),
+                LitPoolEntry::Dynamic(size, id) => assembler.dynamic_reloc(id, 0, R::encode_from_size(size)),
+                LitPoolEntry::Global(size, name) => assembler.global_reloc(name, 0, R::encode_from_size(size)),
+                LitPoolEntry::Forward(size, name) => assembler.forward_reloc(name, 0, R::encode_from_size(size)),
+                LitPoolEntry::Backward(size, name) => assembler.backward_reloc(name, 0, R::encode_from_size(size)),
                 LitPoolEntry::Align(with, alignment) => assembler.align(alignment, with),
             }
         }

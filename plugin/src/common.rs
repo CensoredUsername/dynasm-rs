@@ -1,6 +1,7 @@
 //! This module contains various infrastructure that is common across all assembler backends
 use proc_macro2::{Span, TokenTree};
 use quote::ToTokens;
+use quote::quote;
 use syn::spanned::Spanned;
 use syn::parse;
 use syn::Token;
@@ -45,82 +46,127 @@ impl Size {
 /**
  * Jump types
  */
+#[derive(Debug, Clone)]
+pub struct Jump {
+    pub kind: JumpKind,
+    pub offset: Option<syn::Expr>
+}
 
 #[derive(Debug, Clone)]
-pub enum JumpType {
+pub enum JumpKind {
     // note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
     // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
     // with the symbol <, as this symbol is also the starting symbol for the universal calling syntax <Type as Trait>.method(args)
-    Global(syn::Ident),   // -> label
-    Backward(syn::Ident), //  > label
-    Forward(syn::Ident),  //  < label
-    Dynamic(syn::Expr),   // => expr
+    Global(syn::Ident),   // -> label (["+" "-"] offset)?
+    Backward(syn::Ident), //  > label (["+" "-"] offset)?
+    Forward(syn::Ident),  //  < label (["+" "-"] offset)?
+    Dynamic(syn::Expr),   // =>expr | => (expr) (["+" "-"] offset)?
     Bare(syn::Expr)       // jump to this address
 }
 
-impl ParseOpt for JumpType {
-    fn parse(input: parse::ParseStream) -> parse::Result<Option<JumpType>> {
+impl ParseOpt for Jump {
+    fn parse(input: parse::ParseStream) -> parse::Result<Option<Jump>> {
+        // extern label
+        if eat_pseudo_keyword(input, "extern") {
+            let expr: syn::Expr = input.parse()?;
+
+            return Ok(Some(Jump { kind: JumpKind::Bare(expr), offset: None }));
+
+        }
+
         // -> global_label
-        Ok(if input.peek(Token![->]) {
+        let kind = if input.peek(Token![->]) {
             let _: Token![->] = input.parse()?;
             let name: syn::Ident = input.parse()?;
 
-            Some(JumpType::Global(name))
+            JumpKind::Global(name)
 
         // > forward_label
         } else if input.peek(Token![>]) {
             let _: Token![>] = input.parse()?;
             let name: syn::Ident = input.parse()?;
 
-            Some(JumpType::Forward(name))
+            JumpKind::Forward(name)
 
         // < backwards_label
         } else if input.peek(Token![<]) {
             let _: Token![<] = input.parse()?;
             let name: syn::Ident = input.parse()?;
 
-            Some(JumpType::Backward(name))
+            JumpKind::Backward(name)
             
         // => dynamic_label
         } else if input.peek(Token![=>]) {
             let _: Token![=>] = input.parse()?;
+
+            let expr: syn::Expr = if input.peek(syn::token::Paren) {
+                let inner;
+                let _ = syn::parenthesized!(inner in input);
+                let inner = &inner;
+
+                inner.parse()?
+            } else {
+                input.parse()?
+            };
+
+            JumpKind::Dynamic(expr)
+
+        // nothing
+        } else {
+            return Ok(None);
+        };
+
+        // parse optional offset
+        let offset = if input.peek(Token![-]) || input.peek(Token![+]) {
+            if input.peek(Token![+]) {
+                let _: Token![+] = input.parse()?;
+            }
+
             let expr: syn::Expr = input.parse()?;
-
-            Some(JumpType::Dynamic(expr))
-
-        // extern label
-        } else if eat_pseudo_keyword(input, "extern") {
-            let expr: syn::Expr = input.parse()?;
-
-            Some(JumpType::Bare(expr))
+            Some(expr)
 
         } else {
             None
-        })
+        };
+
+        Ok(Some(Jump::new(kind, offset)))
     }
 }
 
-impl JumpType {
+impl Jump {
+    pub fn new(kind: JumpKind, offset: Option<syn::Expr>) -> Jump {
+        Jump {
+            kind,
+            offset
+        }
+    }
+
     pub fn encode(self, data: &[u8]) -> Stmt {
         let span = self.span();
 
+        let offset = delimited(if let Some(offset) = self.offset {
+            quote!(#offset)
+        } else {
+            quote!(0isize)
+        });
+
         let data = serialize::expr_tuple_of_u8s(span, data);
-        match self {
-            JumpType::Global(ident) => Stmt::GlobalJumpTarget(ident, data),
-            JumpType::Backward(ident) => Stmt::BackwardJumpTarget(ident, data),
-            JumpType::Forward(ident) => Stmt::ForwardJumpTarget(ident, data),
-            JumpType::Dynamic(expr) => Stmt::DynamicJumpTarget(delimited(expr), data),
-            JumpType::Bare(expr) => Stmt::BareJumpTarget(delimited(expr), data),
+        match self.kind {
+            JumpKind::Global(ident) => Stmt::GlobalJumpTarget(ident, offset, data),
+            JumpKind::Backward(ident) => Stmt::BackwardJumpTarget(ident, offset, data),
+            JumpKind::Forward(ident) => Stmt::ForwardJumpTarget(ident, offset, data),
+            JumpKind::Dynamic(expr) => Stmt::DynamicJumpTarget(delimited(expr), offset, data),
+            JumpKind::Bare(expr) => Stmt::BareJumpTarget(delimited(expr), data),
         }
     }
 
     pub fn span(&self) -> Span {
-        match self {
-            JumpType::Global(ident) => ident.span(),
-            JumpType::Backward(ident) => ident.span(),
-            JumpType::Forward(ident) => ident.span(),
-            JumpType::Dynamic(expr) => expr.span(),
-            JumpType::Bare(expr) => expr.span(),
+        match &self.kind {
+            JumpKind::Global(ident) => ident.span(),
+            JumpKind::Backward(ident) => ident.span(),
+            JumpKind::Forward(ident) => ident.span(),
+            JumpKind::Dynamic(expr) => expr.span(),
+            JumpKind::Bare(expr) => expr.span(),
         }
     }
 }
@@ -149,10 +195,10 @@ pub enum Stmt {
     DynamicLabel(TokenTree),
 
     // and their respective relocations (as expressions as they differ per assembler)
-    GlobalJumpTarget(  syn::Ident,    TokenTree),
-    ForwardJumpTarget( syn::Ident,    TokenTree),
-    BackwardJumpTarget(syn::Ident,    TokenTree),
-    DynamicJumpTarget(TokenTree, TokenTree),
+    GlobalJumpTarget(  syn::Ident, TokenTree, TokenTree),
+    ForwardJumpTarget( syn::Ident, TokenTree, TokenTree),
+    BackwardJumpTarget(syn::Ident, TokenTree, TokenTree),
+    DynamicJumpTarget(TokenTree, TokenTree, TokenTree),
     BareJumpTarget(   TokenTree, TokenTree),
 
     // a random statement that has to be inserted between assembly hunks
