@@ -71,7 +71,6 @@ impl ParseOpt for Jump {
             let expr: syn::Expr = input.parse()?;
 
             return Ok(Some(Jump { kind: JumpKind::Bare(expr), offset: None }));
-
         }
 
         // -> global_label
@@ -251,12 +250,12 @@ pub fn emit_error_at(span: Span, msg: String) {
 
 /// Create a bitmask with `scale` bits set
 pub fn bitmask(scale: u8) -> u32 {
-    1u32.checked_shl(scale as u32).unwrap_or(0).wrapping_sub(1)
+    1u32.checked_shl(u32::from(scale)).unwrap_or(0).wrapping_sub(1)
 }
 
 
 /// Create a bitmask with `scale` bits set
 pub fn bitmask64(scale: u8) -> u64 {
-    1u64.checked_shl(scale as u32).unwrap_or(0).wrapping_sub(1)
+    1u64.checked_shl(u32::from(scale)).unwrap_or(0).wrapping_sub(1)
 }
 

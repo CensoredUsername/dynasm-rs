@@ -36,7 +36,7 @@ pub struct FormatStringIterator<'a> {
 
 impl<'a> FormatStringIterator<'a> {
     pub fn new(buf: &'a [u8]) -> FormatStringIterator<'a> {
-        FormatStringIterator {inner: buf.into_iter().cloned()}
+        FormatStringIterator { inner: buf.iter().cloned() }
     }
 }
 

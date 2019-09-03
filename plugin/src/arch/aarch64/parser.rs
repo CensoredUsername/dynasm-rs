@@ -90,9 +90,9 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
         };
 
         return Ok(RawArg::Reference {
-            span: span,
-            items: items,
-            bang: bang
+            span,
+            items,
+            bang
         });
     }
 
@@ -112,7 +112,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
             let last = parse_reg(ctx, inner)?.ok_or_else(|| inner.error("Expected register"))?;
 
             RawArg::DashList {
-                span: span,
+                span,
                 first,
                 last,
                 element: None
@@ -142,8 +142,8 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
             }
 
             RawArg::CommaList {
-                span: span,
-                items: items,
+                span,
+                items,
                 element: None
             }
         };
@@ -170,7 +170,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     if let Some(modifier) = input.parse_opt()? {
         return Ok(RawArg::Modifier {
             span: _start,
-            modifier: modifier
+            modifier
         });
     }
 
@@ -207,7 +207,7 @@ fn parse_refitem(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<
     if let Some(modifier) = input.parse_opt()? {
         return Ok(RefItem::Modifier {
             span: _start,
-            modifier: modifier
+            modifier
         });
     }
 
@@ -282,8 +282,8 @@ fn parse_reg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<Opti
 
     if let Some(size) = size {
         Ok(Some(Register::Scalar(RegScalar {
-            kind: kind,
-            size: size
+            kind,
+            size
         })))
     } else {
         // parse possible vector trailers
@@ -325,7 +325,7 @@ fn parse_reg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<Opti
 
                 return Ok(((element_size, lanes), rest));
             }
-            return Err(cursor.error("Expected a width/lane specifier"));
+            Err(cursor.error("Expected a width/lane specifier"))
         })?;
 
         // parse the element specifier

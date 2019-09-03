@@ -21,11 +21,11 @@ pub enum Aarch64Relocation {
 impl Aarch64Relocation {
     fn op_mask(&self) -> u32 {
         match self {
-            Self::B => 0xFC000000,
-            Self::BCOND => 0xFF00001F,
-            Self::ADR => 0x9F00001F,
-            Self::ADRP => 0x9F00001F,
-            Self::TBZ => 0xFFF8001F,
+            Self::B => 0xFC00_0000,
+            Self::BCOND => 0xFF00_001F,
+            Self::ADR => 0x9F00_001F,
+            Self::ADRP => 0x9F00_001F,
+            Self::TBZ => 0xFFF8_001F,
             Self::Plain(_) => 0
         }
     }
@@ -174,7 +174,7 @@ pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
     let bits = value.to_bits();
 
     let check = (bits >> 25) & 0x3F;
-    if (check == 0b100000 || check == 0b011111) && (bits & 0x7FFFF) == 0 {
+    if (check == 0b10_0000 || check == 0b01_1111) && (bits & 0x7_FFFF) == 0 {
         Some((((bits >> 24) & 0x80) | ((bits >> 19) & 0x7F)) as u8)
     } else {
         None

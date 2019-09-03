@@ -37,7 +37,7 @@ impl MemoryManager {
             execbuffer: Arc::new(RwLock::new(execbuffer)),
             execbuffer_size: initial_mmap_size,
             asmoffset: 0,
-            execbuffer_addr: execbuffer_addr
+            execbuffer_addr
         })
     }
 
@@ -129,7 +129,7 @@ impl MemoryManager {
 /// A registry of labels. Contains all necessessities for keeping track of dynasm labels.
 /// This is useful when implementing your own assembler and can also be used to query
 /// assemblers for the offsets of labels.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct LabelRegistry {
     // mapping of global labels to offsets
     global_labels: HashMap<&'static str, AssemblyOffset>,
@@ -159,12 +159,12 @@ impl LabelRegistry {
     /// Define a the dynamic label `id` to be located at `offset`.
     pub fn define_dynamic(&mut self, id: DynamicLabel, offset: AssemblyOffset) -> Result<(), DynasmError> {
         let entry = &mut self.dynamic_labels[id.0];
-        if let Some(_) = entry {
-            Err(DynasmError::DuplicateLabel)
-        } else {
-            *entry = Some(offset);
-            Ok(())
+        if entry.is_some() {
+            return Err(DynasmError::DuplicateLabel);
         }
+
+        *entry = Some(offset);
+        Ok(())
     }
 
     /// Define a the global label `name` to be located at `offset`.
@@ -267,7 +267,7 @@ impl<R: Relocation> PatchLoc<R> {
 
 
 /// A registry of relocations and the respective labels they point towards.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RelocRegistry<R: Relocation> {
     global: Vec<(PatchLoc<R>, &'static str)>,
     dynamic: Vec<(PatchLoc<R>, DynamicLabel)>,
@@ -333,7 +333,7 @@ impl<R: Relocation> RelocRegistry<R> {
 
 /// A registry of relocations that have been encoded previously, but need to be adjusted when the address of the buffer they
 /// reside in changes.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ManagedRelocs<R: Relocation> {
     managed: BTreeMap<usize, PatchLoc<R>>
 }
@@ -394,7 +394,7 @@ enum LitPoolEntry {
 /// Literal pool implementation. One can programmatically push items in this literal pool and retrieve offsets to them in the pool.
 /// Then later, the pool will be encoded into the instruction stream and items can be retrieved using the address of the literal pool.
 /// and the previously emitted offsets. Values are always at least aligned to their size.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct LitPool {
     offset: usize,
     entries: Vec<LitPoolEntry>,

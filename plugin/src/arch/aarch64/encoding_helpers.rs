@@ -9,7 +9,7 @@ pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
     let bits = value.to_bits();
 
     let check = (bits >> 25) & 0x3F;
-    if (check == 0b100000 || check == 0b011111) && (bits & 0x7FFFF) == 0 {
+    if (check == 0b10_0000 || check == 0b01_1111) && (bits & 0x7_FFFF) == 0 {
         Some((((bits >> 24) & 0x80) | ((bits >> 19) & 0x7F)) as u8)
     } else {
         None
@@ -65,7 +65,7 @@ pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
 
 pub fn encode_stretched_immediate(value: u64) -> Option<u32> {
     // ensure the number is formatted correctly
-    let mut test = value & 0x0101010101010101;
+    let mut test = value & 0x0101_0101_0101_0101;
     test |= test << 1;
     test |= test << 2;
     test |= test << 4;
@@ -74,7 +74,7 @@ pub fn encode_stretched_immediate(value: u64) -> Option<u32> {
     }
 
     // do bitwise magic
-    let mut masked = value & 0x8040201008040201;
+    let mut masked = value & 0x8040_2010_0804_0201;
     masked |= masked >> 32;
     masked |= masked >> 16;
     masked |= masked >> 8;
@@ -83,7 +83,7 @@ pub fn encode_stretched_immediate(value: u64) -> Option<u32> {
 }
 
 pub fn encode_wide_immediate_64bit(value: u64) -> Option<u32> {
-    let offset = value.trailing_zeros() & 0b110000;
+    let offset = value.trailing_zeros() & 0b11_0000;
     let masked = 0xFFFF & (value >> offset);
     if (masked << offset) == value {
         Some((masked as u32) | (offset << 12))
@@ -93,7 +93,7 @@ pub fn encode_wide_immediate_64bit(value: u64) -> Option<u32> {
 }
 
 pub fn encode_wide_immediate_32bit(value: u32) -> Option<u32> {
-    let offset = value.trailing_zeros() & 0b10000;
+    let offset = value.trailing_zeros() & 0b1_0000;
     let masked = 0xFFFF & (value >> offset);
     if (masked << offset) == value {
         Some((masked as u32) | (offset << 12))

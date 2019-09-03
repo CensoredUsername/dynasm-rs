@@ -44,10 +44,9 @@ pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, a
 /// References obey the allowed formats and use only normal registers
 /// Reference modifiers are in the allowed set of modifiers
 fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
-    let mut args = args.into_iter().peekable();
     let mut res = Vec::new();
 
-    while let Some(arg) = args.next() {
+    for arg in args {
         match arg {
             // direct register arguments: Validate vector register element size / lane count combination is possible
             RawArg::Direct { span, reg } => {
@@ -64,11 +63,9 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             },
             // modifier: LSL LSR ASR ROR and MSL require an immediate.
             RawArg::Modifier { span, modifier } => {
-                if modifier.expr.is_none() {
-                    if modifier.op.expr_required() {
-                        emit_error_at(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.".into());
-                        return Err(None);
-                    }
+                if modifier.expr.is_none() && modifier.op.expr_required() {
+                    emit_error_at(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.".into());
+                    return Err(None);
                 }
 
                 res.push(CleanArg::Modifier { span, modifier });
@@ -437,7 +434,7 @@ impl Matcher {
                         Matcher::VElement(size) =>
                             *size == v.element_size && v.element.is_some(),
                         Matcher::VElementStatic(size, element) =>
-                            *size == v.element_size && v.element.as_ref().and_then(as_number) == Some(*element as u64),
+                            *size == v.element_size && v.element.as_ref().and_then(as_number) == Some(u64::from(*element)),
                         Matcher::VStaticElement(size, lanes) =>
                             *size == v.element_size && v.element.is_some() && v.lanes == Some(*lanes),
                         _ => false
@@ -460,8 +457,8 @@ impl Matcher {
             CleanArg::Immediate { prefixed: true, value } => match self {
                 Matcher::Imm
                 | Matcher::Offset => true,
-                Matcher::LitInt(v) => as_number(value) == Some(*v as u64),
-                Matcher::LitFloat(v) => as_float(value) == Some(*v as f64),
+                Matcher::LitInt(v) => as_number(value) == Some(u64::from(*v)),
+                Matcher::LitFloat(v) => as_float(value) == Some(f64::from(*v)),
                 _ => false,
             },
             CleanArg::Immediate { prefixed: false, value} => match self {
@@ -474,12 +471,12 @@ impl Matcher {
                     false
                 },
                 Matcher::Lit(s) => if let Some(i) = as_ident(value) {
-                    i.to_string() == *s
+                    i == s
                 } else {
                     false
                 },
-                Matcher::LitInt(v) => as_number(value) == Some(*v as u64),
-                Matcher::LitFloat(v) => as_float(value) == Some(*v as f64),
+                Matcher::LitInt(v) => as_number(value) == Some(u64::from(*v)),
+                Matcher::LitFloat(v) => as_float(value) == Some(f64::from(*v)),
                 _ => false
             },
             CleanArg::Modifier { modifier, .. } => {
@@ -495,7 +492,7 @@ impl Matcher {
             CleanArg::Lit { ident } => match self {
                 Matcher::Ident => true,
                 Matcher::Cond => COND_MAP.contains_key(&&*ident.to_string()),
-                Matcher::Lit(s) => ident.to_string() == *s,
+                Matcher::Lit(s) => ident == s,
                 _ => false
             }
         }

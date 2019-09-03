@@ -45,28 +45,28 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
         match *arg {
             FlatArg::Direct { span, reg: RegKind::Static(id) } => match *command {
                 Command::R(offset) => {
-                    statics.push((offset, id.code() as u32));
+                    statics.push((offset, u32::from(id.code())));
                 },
                 Command::REven(offset) => {
                     if id.code() & 1 != 0 {
                         emit_error_at(span, "Field only supports even registers".into());
                         return Err(None);
                     }
-                    statics.push((offset, id.code() as u32));
+                    statics.push((offset, u32::from(id.code())));
                 },
                 Command::RNoZr(offset) => {
                     if id.code() == 31 {
                         emit_error_at(span, "Field does not support register the zr/sp register".into());
                         return Err(None);
                     }
-                    statics.push((offset, id.code() as u32));
+                    statics.push((offset, u32::from(id.code())));
                 },
                 Command::R4(offset) => {
                     if id.code() >= 16 {
                         emit_error_at(span, "Field only supports register numbers 0-15".into());
                         return Err(None);
                     }
-                    statics.push((offset, id.code() as u32));
+                    statics.push((offset, u32::from(id.code())));
                 },
                 Command::RNext => {
                     if let Some(FlatArg::Direct { span: _prevspan, reg: ref prevreg } ) = data.args.get(cursor - 1) {
@@ -149,12 +149,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::Cond(offset) => {
                     let name = as_ident(value).expect("bad command data").to_string();
                     let bits = *COND_MAP.get(&&*name).expect("bad command data");
-                    statics.push((offset, bits as u32))
+                    statics.push((offset, u32::from(bits)))
                 },
                 Command::CondInv(offset) => {
                     let name = as_ident(value).expect("bad command data").to_string();
                     let bits = *COND_MAP.get(&&*name).expect("bad command data");
-                    statics.push((offset, bits as u32 ^ 1))
+                    statics.push((offset, u32::from(bits) ^ 1))
                 },
                 Command::LitList(offset, listname) => {
                     let name = as_ident(value).expect("bad command data").to_string();
@@ -200,7 +200,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Ulist(offset, options) => {
                     if let Some(number) = as_number(value) {
-                        if let Some(i) = options.iter().rposition(|&n| n as u64 == number) {
+                        if let Some(i) = options.iter().rposition(|&n| u64::from(n) == number) {
                             statics.push((offset, i as u32));
                         } else {
                             emit_error_at(value.span(), "Impossible value".into());
@@ -213,8 +213,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }
                 },
                 Command::Urange(offset, min, max) => {
-                    let max = max as u32;
-                    let min = min as u32;
+                    let max = u32::from(max);
+                    let min = u32::from(min);
                     if let Some(value) = unsigned_rangecheck(value, min, max, 0) {
                         statics.push((offset, value? - min));
                     } else {
@@ -227,7 +227,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Usub(offset, bitlen, addval) => {
                     let mask = bitmask(bitlen);
-                    let addval = addval as u32;
+                    let addval = u32::from(addval);
                     if let Some(value) = unsigned_rangecheck(value, addval - mask, addval, 0) {
                         statics.push((offset, addval - value?));
                     } else {
@@ -336,8 +336,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }
                 },
                 Command::BUrange(min, max) => {
-                    let min = min as u32;
-                    let max = max as u32;
+                    let min = u32::from(min);
+                    let max = u32::from(max);
                     if let Some(value) = unsigned_rangecheck(value, min, max, 0) {
                         value?;
                     }
@@ -484,12 +484,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::Cond(offset) => {
                     let name = ident.to_string();
                     let bits = *COND_MAP.get(&&*name).expect("bad command data");
-                    statics.push((offset, bits as u32))
+                    statics.push((offset, u32::from(bits)))
                 },
                 Command::CondInv(offset) => {
                     let name = ident.to_string();
                     let bits = *COND_MAP.get(&&*name).expect("bad command data");
-                    statics.push((offset, bits as u32 ^ 1))
+                    statics.push((offset, u32::from(bits) ^ 1))
                 },
                 Command::LitList(offset, listname) => {
                     let name = ident.to_string();
@@ -540,7 +540,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
         }
         ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::DWORD));
     } else {
-        ctx.state.stmts.push(Stmt::Const(bits as u64, Size::DWORD));
+        ctx.state.stmts.push(Stmt::Const(u64::from(bits), Size::DWORD));
     }
 
     // generate code to be emitted for relocations
@@ -567,7 +567,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             return Ok(());
         },
         SpecialComm::INVERTED_WIDE_IMMEDIATE_W => if let Some(number) = as_number(imm) {
-            if number <= std::u32::MAX as u64 {
+            if number <= u64::from(std::u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(!(number as u32)) {
                     statics.push((offset, encoded as u32));
                     return Ok(());
@@ -599,7 +599,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             return Ok(());
         },
         SpecialComm::WIDE_IMMEDIATE_W => if let Some(number) = as_number(imm) {
-            if number <= std::u32::MAX as u64 {
+            if number <= u64::from(std::u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(number as u32) {
                     statics.push((offset, encoded as u32));
                     return Ok(());
@@ -636,9 +636,9 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             return Ok(());
         },
         SpecialComm::LOGICAL_IMMEDIATE_W => if let Some(number) = as_number(imm) {
-            if number <= std::u32::MAX as u64 {
+            if number <= u64::from(std::u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_logical_immediate_32bit(number as u32) {
-                    statics.push((offset, encoded as u32));
+                    statics.push((offset, u32::from(encoded)));
                     return Ok(());
                 }
             }
@@ -650,7 +650,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         },
         SpecialComm::LOGICAL_IMMEDIATE_X => if let Some(number) = as_number(imm) {
             if let Some(encoded) = encoding_helpers::encode_logical_immediate_64bit(number) {
-                statics.push((offset, encoded as u32));
+                statics.push((offset, u32::from(encoded)));
                 return Ok(());
             }
         } else {
@@ -661,7 +661,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         },
         SpecialComm::FLOAT_IMMEDIATE => if let Some(number) = as_float(imm) {
             if let Some(encoded) = encoding_helpers::encode_floating_point_immediate(number as f32) {
-                statics.push((offset, encoded as u32));
+                statics.push((offset, u32::from(encoded)));
                 return Ok(());
             }
         } else {
@@ -676,8 +676,8 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         },
         SpecialComm::SPLIT_FLOAT_IMMEDIATE => if let Some(number) = as_float(imm) {
             if let Some(encoded) = encoding_helpers::encode_floating_point_immediate(number as f32) {
-                statics.push((offset, (encoded & 0x1F) as u32));
-                statics.push((offset + 6, (encoded & 0xE0) as u32));
+                statics.push((offset, u32::from(encoded & 0x1F)));
+                statics.push((offset + 6, u32::from(encoded & 0xE0)));
                 return Ok(());
             }
         } else {
@@ -693,7 +693,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
     }
 
     emit_error_at(imm.span(), "Impossible to encode immediate".into());
-    return Err(None);
+    Err(None)
 }
 
 fn unsigned_rangecheck(expr: &syn::Expr, min: u32, max: u32, scale: u8) -> Option<Result<u32, Option<String>>> {
@@ -703,10 +703,10 @@ fn unsigned_rangecheck(expr: &syn::Expr, min: u32, max: u32, scale: u8) -> Optio
     Some(if (scaled << scale) != value {
         emit_error_at(expr.span(), "Unrepresentable value".into());
         Err(None)
-    } else if scaled > max as u64 {
+    } else if scaled > u64::from(max) {
         emit_error_at(expr.span(), "Value too large".into());
         Err(None)
-    } else if scaled < min as u64 {
+    } else if scaled < u64::from(min) {
         emit_error_at(expr.span(), "Value too small".into());
         Err(None)
     } else {
@@ -721,10 +721,10 @@ fn signed_rangecheck(expr: &syn::Expr, min: i32, max: i32, scale: u8) -> Option<
     Some(if (scaled << scale) != value {
         emit_error_at(expr.span(), "Unrepresentable value".into());
         Err(None)
-    } else if scaled > max as i64 {
+    } else if scaled > i64::from(max) {
         emit_error_at(expr.span(), "Value too large".into());
         Err(None)
-    } else if scaled < min as i64 {
+    } else if scaled < i64::from(min) {
         emit_error_at(expr.span(), "Value too small".into());
         Err(None)
     } else {

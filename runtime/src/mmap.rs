@@ -71,7 +71,7 @@ impl ExecutableBuffer {
 
         Ok(MutableBuffer {
             length: self.length,
-            buffer: buffer
+            buffer
         })
     }
 }

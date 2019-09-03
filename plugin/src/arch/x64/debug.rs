@@ -51,9 +51,9 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
     forms
 }
 
-static REGS: [&'static str; 16] = ["a",  "d",  "c",   "b",   "bp",  "sp",  "si",  "di",
+static REGS: [&str; 16] = ["a",  "d",  "c",   "b",   "bp",  "sp",  "si",  "di",
                                    "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
-static SEGREGS: [&'static str; 6] = ["es", "cs", "ss", "ds", "fs", "gs"];
+static SEGREGS: [&str; 6] = ["es", "cs", "ss", "ds", "fs", "gs"];
 
 fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
     if size == b'*' {

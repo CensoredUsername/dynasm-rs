@@ -44,8 +44,7 @@ pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let dynasm = parse_macro_input!(tokens as Dynasm);
 
     // serialize the resulting output into tokens
-    let res = serialize::serialize(&dynasm.target, dynasm.stmts).into();
-    res
+    serialize::serialize(&dynasm.target, dynasm.stmts).into()
 }
 
 /// output from parsing a full dynasm invocation. target represents the first dynasm argument, being the assembler

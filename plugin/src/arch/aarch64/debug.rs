@@ -127,18 +127,18 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::Q =>   write!(buf, "Q{}", arg_names[0]).unwrap(),
                 Matcher::V(s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "V{}.{}{}", arg_names[0], size_to_string(s), width / s.in_bytes()).unwrap();
+                    write!(buf, "V{}.{}{}", arg_names[0], size_to_string(*s), width / s.in_bytes()).unwrap();
                 },
-                Matcher::VStatic(s, c) => write!(buf, "V{}.{}{}", arg_names[0], size_to_string(s), c).unwrap(),
-                Matcher::VElement(s) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(s), arg_names[1]).unwrap(),
-                Matcher::VElementStatic(s, element) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(s), element).unwrap(),
-                Matcher::VStaticElement(s, c) => write!(buf, "V{}.{}{}[{}]", arg_names[0], size_to_string(s), c, arg_names[1]).unwrap(),
+                Matcher::VStatic(s, c) => write!(buf, "V{}.{}{}", arg_names[0], size_to_string(*s), c).unwrap(),
+                Matcher::VElement(s) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(*s), arg_names[1]).unwrap(),
+                Matcher::VElementStatic(s, element) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(*s), element).unwrap(),
+                Matcher::VStaticElement(s, c) => write!(buf, "V{}.{}{}[{}]", arg_names[0], size_to_string(*s), c, arg_names[1]).unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(s), width / s.in_bytes(), a).unwrap();
+                    write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(*s), width / s.in_bytes(), a).unwrap();
                 },
-                Matcher::RegListStatic(a, s, c) => write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(s), c, a).unwrap(),
-                Matcher::RegListElement(a, s) =>   write!(buf, "{{V{}.{} * {}}}[{}]", arg_names[0], size_to_string(s), a, arg_names[1]).unwrap(),
+                Matcher::RegListStatic(a, s, c) => write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(*s), c, a).unwrap(),
+                Matcher::RegListElement(a, s) =>   write!(buf, "{{V{}.{} * {}}}[{}]", arg_names[0], size_to_string(*s), a, arg_names[1]).unwrap(),
                 Matcher::Offset => buf.push_str(&arg_names[0]),
                 Matcher::RefBase =>   write!(buf, "[X{}|SP]", arg_names[0]).unwrap(),
                 Matcher::RefOffset => write!(buf, "[X{}|SP {{, #{} }} ]", arg_names[0], arg_names[1]).unwrap(),
@@ -213,7 +213,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
     forms
 }
 
-pub fn size_to_string(size: &Size) -> &'static str {
+pub fn size_to_string(size: Size) -> &'static str {
     match size {
         Size::BYTE => "B",
         Size::WORD => "H",
@@ -359,7 +359,7 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
             _ => ()
         }
 
-        command_idx.push((command.clone(), cursor));
+        command_idx.push((*command, cursor));
         match command {
             Command::R(_)
             | Command::REven(_)
@@ -498,7 +498,7 @@ fn name_args(args: &mut [ArgWithCommands]) {
                     | Command::REven(_)
                     | Command::RNoZr(_)
                     | Command::R4(_) => {
-                        arg.name = Some(format!("{}", reg_name_list[reg_name_idx]));
+                        arg.name = Some(reg_name_list[reg_name_idx].to_string());
                         reg_name_idx += 1;
                     },
                     Command::RNext => {
@@ -590,7 +590,7 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             },
             Command::Urange(_, min, max)
             | Command::BUrange(min, max) => write!(buf, "{} <= #{} <= {}", min, name, max),
-            Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", *addval as u32 + 1 - (1u32 << bits), name, addval),
+            Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", u32::from(*addval) + 1 - (1u32 << bits), name, addval),
             Command::Unegmod(_, bits) => write!(buf, "0 <= #{} < {}", name, 1u32 << bits),
             Command::Usumdec(_, bits)
             | Command::BUsum(bits) => write!(buf, "1 <= #{} <= {} - {}", name, 1u32 << bits, prevname),

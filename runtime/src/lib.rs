@@ -624,7 +624,7 @@ impl<'a> UncommittedModifier<'a> {
     /// create a new uncommittedmodifier
     pub fn new(buffer: &mut Vec<u8>, base_offset: AssemblyOffset) -> UncommittedModifier {
         UncommittedModifier {
-            buffer: buffer,
+            buffer,
             base_offset: base_offset.0,
             offset: base_offset.0
         }

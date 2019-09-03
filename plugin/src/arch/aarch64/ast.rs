@@ -157,7 +157,7 @@ impl RegVector {
     /// Returns None if lanes was not set
     pub fn full_size(&self) -> Option<u16> {
         if let Some(lanes) = self.lanes {
-            Some(lanes as u16 * self.element_size.in_bytes() as u16)
+            Some(u16::from(lanes) * u16::from(self.element_size.in_bytes()))
         } else { 
             None
         }
@@ -223,7 +223,7 @@ pub enum Modifier {
 }
 
 impl Modifier {
-    pub fn as_str(&self) -> &'static str {
+    pub fn as_str(self) -> &'static str {
         match self {
             Modifier::LSL => "LSL",
             Modifier::LSR => "LSR",
@@ -241,7 +241,7 @@ impl Modifier {
         }
     }
 
-    pub fn expr_required(&self) -> bool {
+    pub fn expr_required(self) -> bool {
         match self {
             Modifier::LSL
             | Modifier::LSR
