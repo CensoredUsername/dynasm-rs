@@ -486,18 +486,18 @@ impl LitPool {
     }
 
     /// Emit this literal pool into the specified assembler
-    pub fn emit<R, D>(self, assembler: &mut D)
-    where R: Relocation, D: DynasmLabelApi<Relocation=R> {
+    pub fn emit<D>(self, assembler: &mut D)
+    where D: DynasmLabelApi {
         for entry in self.entries {
             match entry {
                 LitPoolEntry::U8(value) => assembler.push(value),
                 LitPoolEntry::U16(value) => assembler.push_u16(value),
                 LitPoolEntry::U32(value) => assembler.push_u32(value),
                 LitPoolEntry::U64(value) => assembler.push_u64(value),
-                LitPoolEntry::Dynamic(size, id) => assembler.dynamic_reloc(id, 0, R::encode_from_size(size)),
-                LitPoolEntry::Global(size, name) => assembler.global_reloc(name, 0, R::encode_from_size(size)),
-                LitPoolEntry::Forward(size, name) => assembler.forward_reloc(name, 0, R::encode_from_size(size)),
-                LitPoolEntry::Backward(size, name) => assembler.backward_reloc(name, 0, R::encode_from_size(size)),
+                LitPoolEntry::Dynamic(size, id) => assembler.dynamic_reloc(id, 0, D::Relocation::encode_from_size(size)),
+                LitPoolEntry::Global(size, name) => assembler.global_reloc(name, 0, D::Relocation::encode_from_size(size)),
+                LitPoolEntry::Forward(size, name) => assembler.forward_reloc(name, 0, D::Relocation::encode_from_size(size)),
+                LitPoolEntry::Backward(size, name) => assembler.backward_reloc(name, 0, D::Relocation::encode_from_size(size)),
                 LitPoolEntry::Align(with, alignment) => assembler.align(alignment, with),
             }
         }
