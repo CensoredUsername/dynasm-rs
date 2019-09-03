@@ -1,4 +1,114 @@
-use crate::relocations::Aarch64Relocation;
+use crate::relocations::{Relocation, RelocationSize, RelocationKind};
+use byteorder::{ByteOrder, LittleEndian};
+
+/// Relocation implementation for the aarch64 architecture.
+#[derive(Debug, Clone)]
+pub enum Aarch64Relocation {
+    // b, bl 26 bits, dword aligned
+    B,
+    // b.cond, cbnz, cbz, ldr, ldrsw, prfm: 19 bits, dword aligned
+    BCOND,
+    // adr split 21 bit, byte aligned
+    ADR,
+    // adrp split 21 bit, 4096-byte aligned
+    ADRP,
+    // tbnz, tbz: 14 bits, dword aligned
+    TBZ,
+    // Anything in directives
+    Plain(RelocationSize),
+}
+
+impl Aarch64Relocation {
+    fn op_mask(&self) -> u32 {
+        match self {
+            Self::B => 0xFC000000,
+            Self::BCOND => 0xFF00001F,
+            Self::ADR => 0x9F00001F,
+            Self::ADRP => 0x9F00001F,
+            Self::TBZ => 0xFFF8001F,
+            Self::Plain(_) => 0
+        }
+    }
+}
+
+impl Relocation for Aarch64Relocation {
+    type Encoding = (u8,);
+    fn from_encoding(encoding: Self::Encoding) -> Self {
+        match encoding.0 {
+            0 => Self::B,
+            1 => Self::BCOND,
+            2 => Self::ADR,
+            3 => Self::ADRP,
+            4 => Self::TBZ,
+            x  => Self::Plain(RelocationSize::from_encoding(x - 4))
+        }
+    }
+    fn encode_from_size(size: RelocationSize) -> Self::Encoding {
+        (RelocationSize::encode_from_size(size) + 5,)
+    }
+    fn size(&self) -> usize {
+        match self {
+            Self::Plain(s) => s.size(),
+            _ => RelocationSize::DWord.size(),
+        }
+    }
+    fn write_value(&self, buf: &mut [u8], value: isize) {
+        if let Self::Plain(s) = self {
+            return s.write_value(buf, value);
+        };
+
+        let mask = self.op_mask();
+        let template = LittleEndian::read_u32(buf) & mask;
+        let value = value as u32;
+        let packed = match self {
+            Self::B => value >> 2,
+            Self::BCOND => (value >> 2) << 5,
+            Self::ADR  => (((value >> 2 ) & 0x7FFFF) << 5) | (( value        & 3) << 29),
+            Self::ADRP => (((value >> 14) & 0x7FFFF) << 5) | (((value >> 12) & 3) << 29),
+            Self::TBZ => (value >> 5) << 2,
+            Self::Plain(_) => unreachable!()
+        };
+
+        LittleEndian::write_u32(buf, template | (packed & !mask));
+    }
+    fn read_value(&self, buf: &[u8]) -> isize {
+        if let Self::Plain(s) = self {
+            return s.read_value(buf);
+        };
+
+        let mask = !self.op_mask();
+        let value = LittleEndian::read_u32(buf) & mask;
+        let unpacked = match self {
+            Self::B => value << 2,
+            Self::BCOND => (value >> 5) << 2,
+            Self::ADR  =>  (((value >> 5) & 0x7FFFF) << 2) | ((value >> 29) & 3),
+            Self::ADRP => ((((value >> 5) & 0x7FFFF) << 2) | ((value >> 29) & 3)) << 12,
+            Self::TBZ => (value >> 5) << 2,
+            Self::Plain(_) => unreachable!()
+        };
+
+        // Sign extend.
+        let bits = match self {
+            Self::B => 26,
+            Self::BCOND => 19,
+            Self::ADR => 21,
+            Self::ADRP => 21,
+            Self::TBZ => 14,
+            Self::Plain(_) => unreachable!()
+        };
+        let offset = 1u32 << (bits - 1);
+        let value: u32 = (unpacked ^ offset) - offset;
+
+        value as i32 as isize
+    }
+    fn kind(&self) -> RelocationKind {
+        RelocationKind::Relative
+    }
+    fn page_size() -> usize {
+        4096
+    }
+}
+
 
 pub type Assembler = crate::Assembler<Aarch64Relocation>;
 pub type AssemblyModifier<'a> = crate::Modifier<'a, Aarch64Relocation>;

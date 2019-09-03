@@ -410,12 +410,12 @@ impl LitPool {
     }
 
     // align the pool to the specified size, record the offset, and bump the offset
-    fn bump_offset(&mut self, size: RelocationSize) -> usize {
+    fn bump_offset(&mut self, size: RelocationSize) -> isize {
         // Correct for alignment
         self.align(size as usize, 0);
         let offset = self.offset;
         self.offset += size as usize;
-        offset
+        offset as isize
     }
 
     /// Add extra alignment for the next value in the literal pool
@@ -426,60 +426,60 @@ impl LitPool {
         }
 
         self.entries.push(LitPoolEntry::Align(with, size));
-        self.offset += misalign;
+        self.offset += size as usize - misalign;
     }
 
     /// Encode `value` into the literal pool.
-    pub fn push_u8(&mut self, value: u8) -> usize {
+    pub fn push_u8(&mut self, value: u8) -> isize {
         let offset = self.bump_offset(RelocationSize::Byte);
         self.entries.push(LitPoolEntry::U8(value));
         offset
     }
 
     /// Encode `value` into the literal pool.
-    pub fn push_u16(&mut self, value: u16) -> usize {
+    pub fn push_u16(&mut self, value: u16) -> isize {
         let offset = self.bump_offset(RelocationSize::Word);
         self.entries.push(LitPoolEntry::U16(value));
         offset
     }
 
     /// Encode `value` into the literal pool.
-    pub fn push_u32(&mut self, value: u32) -> usize {
+    pub fn push_u32(&mut self, value: u32) -> isize {
         let offset = self.bump_offset(RelocationSize::DWord);
         self.entries.push(LitPoolEntry::U32(value));
         offset
     }
 
     /// Encode `value` into the literal pool.
-    pub fn push_u64(&mut self, value: u64) -> usize {
+    pub fn push_u64(&mut self, value: u64) -> isize {
         let offset = self.bump_offset(RelocationSize::QWord);
         self.entries.push(LitPoolEntry::U64(value));
         offset
     }
 
     /// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    pub fn push_dynamic(&mut self, id: DynamicLabel, size: RelocationSize) -> usize {
+    pub fn push_dynamic(&mut self, id: DynamicLabel, size: RelocationSize) -> isize {
         let offset = self.bump_offset(size);
         self.entries.push(LitPoolEntry::Dynamic(size, id));
         offset
     }
 
     /// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    pub fn push_global(&mut self, name: &'static str, size: RelocationSize) -> usize {
+    pub fn push_global(&mut self, name: &'static str, size: RelocationSize) -> isize {
         let offset = self.bump_offset(size);
         self.entries.push(LitPoolEntry::Global(size, name));
         offset
     }
 
     /// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    pub fn push_forward(&mut self, name: &'static str, size: RelocationSize) -> usize {
+    pub fn push_forward(&mut self, name: &'static str, size: RelocationSize) -> isize {
         let offset = self.bump_offset(size);
         self.entries.push(LitPoolEntry::Forward(size, name));
         offset
     }
 
     /// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    pub fn push_backward(&mut self, name: &'static str, size: RelocationSize) -> usize {
+    pub fn push_backward(&mut self, name: &'static str, size: RelocationSize) -> isize {
         let offset = self.bump_offset(size);
         self.entries.push(LitPoolEntry::Backward(size, name));
         offset
