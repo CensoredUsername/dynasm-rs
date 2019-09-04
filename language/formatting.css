@@ -1,5 +1,5 @@
 @import url('../plugin/rustdoc.css');
-@import url('../plugin/main.css');
+@import url('../plugin/light.css');
 
 code.language-diffnew {
     background-color: rgb(203, 255, 203);
@@ -11,4 +11,14 @@ code.language-diffold {
 
 .block h4 {
     text-align: center;
+}
+
+pre.collapse-old {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+pre.collapse-new {
+    margin-top: 0;
+    padding-top: 0;
 }

@@ -280,37 +280,37 @@
 
 
 <span class="doccomment">/// Converts a sequence of abstract Statements to actual tokens</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="comment">// first, try to fold constants into a byte stream</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">folded_stmts</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">const_buffer</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
     <span class="kw">for</span> <span class="ident">stmt</span> <span class="kw">in</span> <span class="ident">stmts</span> {
         <span class="kw">match</span> <span class="ident">stmt</span> {
-            <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> {
+            <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="ident">value</span>, <span class="ident">size</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="ident">size</span> {
-                    <span class="ident">Size</span>::<span class="ident">BYTE</span> <span class="op">=&gt;</span> <span class="ident">const_buffer</span>.<span class="ident">push</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u8</span>),
-                    <span class="ident">Size</span>::<span class="ident">WORD</span> <span class="op">=&gt;</span> {
+                    <span class="ident">Size</span>::<span class="ident">BYTE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">const_buffer</span>.<span class="ident">push</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u8</span>),
+                    <span class="ident">Size</span>::<span class="ident">WORD</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
                         <span class="ident">LittleEndian</span>::<span class="ident">write_u16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u16</span>);
                         <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
                     },
-                    <span class="ident">Size</span>::<span class="ident">DWORD</span> <span class="op">=&gt;</span> {
+                    <span class="ident">Size</span>::<span class="ident">DWORD</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
                         <span class="ident">LittleEndian</span>::<span class="ident">write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>);
                         <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
                     },
-                    <span class="ident">Size</span>::<span class="ident">QWORD</span> <span class="op">=&gt;</span> {
+                    <span class="ident">Size</span>::<span class="ident">QWORD</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
                         <span class="ident">LittleEndian</span>::<span class="ident">write_u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>);
                         <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
                     },
-                    <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>()
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>()
                 }
             },
-            <span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">data</span>) <span class="op">=&gt;</span> {
+            <span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">const_buffer</span>.<span class="ident">extend</span>(<span class="ident">data</span>);
             },
-            <span class="ident">s</span> <span class="op">=&gt;</span> {
+            <span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// empty the const buffer</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">const_buffer</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">folded_stmts</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">const_buffer</span>));
@@ -334,29 +334,29 @@
 
     <span class="kw">for</span> <span class="ident">stmt</span> <span class="kw">in</span> <span class="ident">folded_stmts</span> {
         <span class="kw">let</span> (<span class="ident">method</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">stmt</span> {
-            <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
-            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push&quot;</span>,     <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_u16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_u32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_u64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
-            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_i8&quot;</span>,  <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;push_i16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_i32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=&gt;</span> (<span class="string">&quot;push_i64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
-            <span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">data</span>)     <span class="op">=&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">byte_string</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">into</span>()]),
-            <span class="ident">Stmt</span>::<span class="ident">ExprExtend</span>(<span class="ident">expr</span>) <span class="op">=&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">Align</span>(<span class="ident">expr</span>)      <span class="op">=&gt;</span> (<span class="string">&quot;align&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">GlobalLabel</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> (<span class="string">&quot;global_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)]),
-            <span class="ident">Stmt</span>::<span class="ident">LocalLabel</span>(<span class="ident">n</span>)  <span class="op">=&gt;</span> (<span class="string">&quot;local_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)]),
-            <span class="ident">Stmt</span>::<span class="ident">DynamicLabel</span>(<span class="ident">expr</span>) <span class="op">=&gt;</span> (<span class="string">&quot;dynamic_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">GlobalJumpTarget</span>(<span class="ident">n</span>,     <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;global_reloc&quot;</span>  , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>), <span class="ident">reloc</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">ForwardJumpTarget</span>(<span class="ident">n</span>,    <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;forward_reloc&quot;</span> , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>), <span class="ident">reloc</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">BackwardJumpTarget</span>(<span class="ident">n</span>,   <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;backward_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>), <span class="ident">reloc</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">DynamicJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">reloc</span>) <span class="op">=&gt;</span> (<span class="string">&quot;dynamic_reloc&quot;</span> , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">reloc</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">BareJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">reloc</span>)    <span class="op">=&gt;</span> (<span class="string">&quot;bare_reloc&quot;</span>    , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">reloc</span>]),
-            <span class="ident">Stmt</span>::<span class="ident">Stmt</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> {
+            <span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push&quot;</span>,     <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_u16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_u32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_u64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprUnsigned</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">BYTE</span>)  <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_i8&quot;</span>,  <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">WORD</span>)  <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_i16&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">DWORD</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_i32&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(  <span class="ident">expr</span>, <span class="ident">Size</span>::<span class="ident">QWORD</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;push_i64&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprSigned</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
+            <span class="ident">Stmt</span>::<span class="ident">Extend</span>(<span class="ident">data</span>)     <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">byte_string</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">into</span>()]),
+            <span class="ident">Stmt</span>::<span class="ident">ExprExtend</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;extend&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">Align</span>(<span class="ident">expr</span>, <span class="ident">with</span>)      <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;align&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">with</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">GlobalLabel</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;global_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)]),
+            <span class="ident">Stmt</span>::<span class="ident">LocalLabel</span>(<span class="ident">n</span>)  <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;local_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)]),
+            <span class="ident">Stmt</span>::<span class="ident">DynamicLabel</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;dynamic_label&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">GlobalJumpTarget</span>(<span class="ident">n</span>,     <span class="ident">offset</span>, <span class="ident">reloc</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;global_reloc&quot;</span>  , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>), <span class="ident">offset</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">ForwardJumpTarget</span>(<span class="ident">n</span>,    <span class="ident">offset</span>, <span class="ident">reloc</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;forward_reloc&quot;</span> , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>), <span class="ident">offset</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">BackwardJumpTarget</span>(<span class="ident">n</span>,   <span class="ident">offset</span>, <span class="ident">reloc</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;backward_reloc&quot;</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr_string_from_ident</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>), <span class="ident">offset</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">DynamicJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">offset</span>, <span class="ident">reloc</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;dynamic_reloc&quot;</span> , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">offset</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">BareJumpTarget</span>(<span class="ident">expr</span>, <span class="ident">reloc</span>)    <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;bare_reloc&quot;</span>    , <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">expr</span>, <span class="ident">reloc</span>]),
+            <span class="ident">Stmt</span>::<span class="ident">Stmt</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">output</span>.<span class="ident">extend</span>(<span class="macro">quote</span><span class="macro">!</span> {
                     #<span class="ident">s</span> ;
                 });
@@ -389,45 +389,45 @@
 
 
 <span class="comment">// expression of value 0. sometimes needed.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_zero</span>() <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u8_unsuffixed</span>(<span class="number">0</span>).<span class="ident">into</span>()
 }
 
 <span class="comment">// given an ident, makes it into a &quot;string&quot;</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_string_from_ident</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ident</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_string_from_ident</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">to_string</span>();
     <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">string</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">into</span>()
 }
 
 <span class="comment">// </span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_dynscale</span>(<span class="ident">scale</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">rest</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) <span class="op">-&gt;</span> (<span class="ident">TokenTree</span>, <span class="ident">TokenTree</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_dynscale</span>(<span class="ident">scale</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">rest</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TokenTree</span>, <span class="ident">TokenTree</span>) {
     <span class="kw">let</span> <span class="ident">tempval</span> <span class="op">=</span> <span class="ident">expr_encode_x64_sib_scale</span>(<span class="kw-2">&amp;</span><span class="ident">scale</span>);
     (<span class="ident">delimited</span>(<span class="macro">quote</span><span class="macro">!</span> {
         <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> #<span class="ident">tempval</span>
     }), <span class="ident">delimited</span>(<span class="macro">quote</span><span class="macro">!</span> {
-         #<span class="ident">rest</span> <span class="op">|</span> ((<span class="ident">temp</span> <span class="op">&amp;</span> <span class="number">3</span>) <span class="op">&lt;&lt;</span> <span class="number">6</span>)
+         #<span class="ident">rest</span> <span class="op">|</span> ((<span class="ident">temp</span> <span class="op">&amp;</span> <span class="number">3</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>)
     }))
 }
 
 <span class="comment">// makes (a, b)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
-    <span class="ident">delimited</span>(<span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_tuple_of_u8s</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
+    <span class="ident">delimited</span>(<span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>[<span class="number">0</span>];
-        <span class="macro">quote_spanned</span><span class="macro">!</span> {<span class="ident">span</span><span class="op">=&gt;</span>
+        <span class="macro">quote_spanned</span><span class="macro">!</span> {<span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
             (#<span class="ident">data</span>,)
         }
     } <span class="kw">else</span> {
-        <span class="macro">quote_spanned</span><span class="macro">!</span> {<span class="ident">span</span><span class="op">=&gt;</span>
+        <span class="macro">quote_spanned</span><span class="macro">!</span> {<span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
             (#(#<span class="ident">data</span>),<span class="kw-2">*</span>)
         }
     })
 }
 
 <span class="comment">// makes sum(exprs)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_add_many</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">TokenTree</span><span class="op">&gt;&gt;</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="kw-2">mut</span> <span class="ident">exprs</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenTree</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_add_many</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">TokenTree</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="kw-2">mut</span> <span class="ident">exprs</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenTree</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">first_expr</span> <span class="op">=</span> <span class="ident">exprs</span>.<span class="ident">next</span>()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote_spanned</span><span class="macro">!</span>{ <span class="ident">span</span><span class="op">=&gt;</span>
+    <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote_spanned</span><span class="macro">!</span>{ <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">first_expr</span> #( <span class="op">+</span> #<span class="ident">exprs</span> )<span class="op">*</span>
     };
 
@@ -435,63 +435,63 @@
 }
 
 <span class="comment">// makes (size_of&lt;ty&gt;() * value)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_size_of_scale</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Path</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_size_of_scale</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Path</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">span</span>();
     <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">as_literal</span>();
 
-    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
+    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
         (::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span>() <span class="kw">as</span> #<span class="ident">size</span>) <span class="op">*</span> #<span class="ident">value</span>
     })
 }
 
 <span class="doccomment">/// returns orig | ((expr &amp; mask) &lt;&lt; shift)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_mask_shift_or</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shift</span>: <span class="ident">i8</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_mask_shift_or</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shift</span>: <span class="ident">i8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>();
 
     <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u64_unsuffixed</span>(<span class="ident">mask</span>).<span class="ident">into</span>();
 
-    <span class="ident">delimited</span>(<span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;=</span> <span class="number">0</span> {
+    <span class="ident">delimited</span>(<span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">shift</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">i8_unsuffixed</span>(<span class="ident">shift</span>).<span class="ident">into</span>();
-        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
-            #<span class="ident">orig</span> <span class="op">|</span> ((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&lt;&lt;</span> #<span class="ident">shift</span>)
+        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
+            #<span class="ident">orig</span> <span class="op">|</span> ((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&lt;</span><span class="op">&lt;</span> #<span class="ident">shift</span>)
         }
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">shift</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">i8_unsuffixed</span>(<span class="op">-</span><span class="ident">shift</span>).<span class="ident">into</span>();
-        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
-            #<span class="ident">orig</span> <span class="op">|</span> ((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&gt;&gt;</span> #<span class="ident">shift</span>)
+        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
+            #<span class="ident">orig</span> <span class="op">|</span> ((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&gt;</span><span class="op">&gt;</span> #<span class="ident">shift</span>)
         }
     })
 }
 
 
 <span class="doccomment">/// returns orig &amp; !((expr &amp; mask) &lt;&lt; shift)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_mask_shift_inverted_and</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shift</span>: <span class="ident">i8</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_mask_shift_inverted_and</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shift</span>: <span class="ident">i8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">span</span>();
 
     <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">u64_unsuffixed</span>(<span class="ident">mask</span>).<span class="ident">into</span>();
 
-    <span class="ident">delimited</span>(<span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;=</span> <span class="number">0</span> {
+    <span class="ident">delimited</span>(<span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">shift</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">i8_unsuffixed</span>(<span class="ident">shift</span>).<span class="ident">into</span>();
-        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
-            #<span class="ident">orig</span> <span class="op">&amp;</span> <span class="op">!</span>((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&lt;&lt;</span> #<span class="ident">shift</span>)
+        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
+            #<span class="ident">orig</span> <span class="op">&amp;</span> <span class="op">!</span>((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&lt;</span><span class="op">&lt;</span> #<span class="ident">shift</span>)
         }
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">shift</span>: <span class="ident">TokenTree</span> <span class="op">=</span> <span class="ident">proc_macro2</span>::<span class="ident">Literal</span>::<span class="ident">i8_unsuffixed</span>(<span class="op">-</span><span class="ident">shift</span>).<span class="ident">into</span>();
-        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
-            #<span class="ident">orig</span> <span class="op">&amp;</span> <span class="op">!</span>((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&gt;&gt;</span> #<span class="ident">shift</span>)
+        <span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
+            #<span class="ident">orig</span> <span class="op">&amp;</span> <span class="op">!</span>((#<span class="ident">expr</span> <span class="op">&amp;</span> #<span class="ident">mask</span>) <span class="op">&gt;</span><span class="op">&gt;</span> #<span class="ident">shift</span>)
         }
     })
 }
 
 <span class="doccomment">/// returns (offset_of!(path, attr) as size)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_offset_of</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Path</span>, <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ident</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_offset_of</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Path</span>, <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Ident</span>, <span class="ident">size</span>: <span class="ident">Size</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="comment">// generate a P&lt;Expr&gt; that resolves into the offset of an attribute to a type.</span>
     <span class="comment">// this is somewhat ridiculously complex because we can&#39;t expand macros here</span>
 
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">span</span>();
     <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">as_literal</span>();
 
-    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
+    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> #<span class="ident">path</span> {#<span class="ident">attr</span>: <span class="kw">_</span>, ..};
             <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>#<span class="ident">path</span><span class="op">&gt;</span>::<span class="ident">uninit</span>();
@@ -502,11 +502,11 @@
 }
 
 <span class="comment">// returns std::mem::size_of&lt;path&gt;()</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_size_of</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Path</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_size_of</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn</span>::<span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="comment">// generate a P&lt;Expr&gt; that returns the size of type at path</span>
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">span</span>();
 
-    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
+    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
         ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span>#<span class="ident">path</span><span class="op">&gt;</span>()
     })
 }
@@ -519,22 +519,22 @@
 <span class="comment">//    1 =&gt; 0,</span>
 <span class="comment">//    _ =&gt; panic!r(&quot;Type size not representable as scale&quot;)</span>
 <span class="comment">//}</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_encode_x64_sib_scale</span>(<span class="ident">size</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) <span class="op">-&gt;</span> <span class="ident">TokenTree</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_encode_x64_sib_scale</span>(<span class="ident">size</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenTree</span> {
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">span</span>();
 
-    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=&gt;</span>
+    <span class="ident">delimited</span>(<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span>
         <span class="kw">match</span> #<span class="ident">size</span> {
-            <span class="number">8</span> <span class="op">=&gt;</span> <span class="number">3</span>,
-            <span class="number">4</span> <span class="op">=&gt;</span> <span class="number">2</span>,
-            <span class="number">2</span> <span class="op">=&gt;</span> <span class="number">1</span>,
-            <span class="number">1</span> <span class="op">=&gt;</span> <span class="number">0</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Type size not representable as scale&quot;</span>)
+            <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
+            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Type size not representable as scale&quot;</span>)
         }
     })
 }
 
 <span class="comment">// Reparses a tokentree into an expression</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reparse</span>(<span class="ident">tt</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reparse</span>(<span class="ident">tt</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="ident">syn</span>::<span class="ident">parse2</span>(<span class="ident">tt</span>.<span class="ident">into_token_stream</span>())
 }
 </pre></div>

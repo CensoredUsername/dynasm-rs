@@ -130,6 +130,14 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">parse</span>;
 
@@ -141,7 +149,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">State</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">arch</span>::<span class="ident">Arch</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">Size</span>, <span class="ident">Stmt</span>, <span class="ident">JumpType</span>, <span class="ident">emit_error_at</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">Size</span>, <span class="ident">Stmt</span>, <span class="ident">Jump</span>, <span class="ident">emit_error_at</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_opmap&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">debug</span>::<span class="ident">create_opmap</span>;
@@ -164,22 +172,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Archx64</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Archx64</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Archx64</span> {
         <span class="ident">Archx64</span> { <span class="ident">features</span>: <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">all</span>() }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arch</span> <span class="kw">for</span> <span class="ident">Archx64</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="string">&quot;x64&quot;</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_features</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn</span>::<span class="ident">Ident</span>]) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_features</span> <span class="op">=</span> <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">empty</span>();
         <span class="kw">for</span> <span class="ident">ident</span> <span class="kw">in</span> <span class="ident">features</span> {
-            <span class="ident">new_features</span> <span class="op">|=</span> <span class="kw">match</span> <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">to_string</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">feature</span>) <span class="op">=&gt;</span> <span class="ident">feature</span>,
-                <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+            <span class="ident">new_features</span> <span class="op">|</span><span class="op">=</span> <span class="kw">match</span> <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">to_string</span>()) {
+                <span class="prelude-val">Some</span>(<span class="ident">feature</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">feature</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="ident">emit_error_at</span>(<span class="ident">ident</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Architecture x64 does not support feature &#39;{}&#39;&quot;</span>, <span class="ident">ident</span>.<span class="ident">to_string</span>()));
                     <span class="kw">continue</span>;
                 }
@@ -188,14 +196,18 @@
         <span class="self">self</span>.<span class="ident">features</span> <span class="op">=</span> <span class="ident">new_features</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_static_reloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">reloc</span>: <span class="ident">JumpType</span>, <span class="ident">size</span>: <span class="ident">Size</span>) {
+    <span class="kw">fn</span> <span class="ident">handle_static_reloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">reloc</span>: <span class="ident">Jump</span>, <span class="ident">size</span>: <span class="ident">Size</span>) {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="ident">size</span>.<span class="ident">in_bytes</span>()]; <span class="comment">// no offset, specified size, relative implicit</span>
 
         <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="number">0</span>, <span class="ident">size</span>));
         <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">reloc</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>));
     }
 
-    <span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default_align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="number">0x90</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span> {
             <span class="ident">state</span>,
             <span class="ident">mode</span>: <span class="ident">X86Mode</span>::<span class="ident">Long</span>,
@@ -217,22 +229,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Archx86</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">Archx86</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Archx86</span> {
         <span class="ident">Archx86</span> { <span class="ident">features</span>: <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">all</span>() }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arch</span> <span class="kw">for</span> <span class="ident">Archx86</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="string">&quot;x86&quot;</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_features</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn</span>::<span class="ident">Ident</span>]) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_features</span> <span class="op">=</span> <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">empty</span>();
         <span class="kw">for</span> <span class="ident">ident</span> <span class="kw">in</span> <span class="ident">features</span> {
-            <span class="ident">new_features</span> <span class="op">|=</span> <span class="kw">match</span> <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">to_string</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">feature</span>) <span class="op">=&gt;</span> <span class="ident">feature</span>,
-                <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+            <span class="ident">new_features</span> <span class="op">|</span><span class="op">=</span> <span class="kw">match</span> <span class="ident">x64data</span>::<span class="ident">Features</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">to_string</span>()) {
+                <span class="prelude-val">Some</span>(<span class="ident">feature</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">feature</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="ident">emit_error_at</span>(<span class="ident">ident</span>.<span class="ident">span</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Architecture x86 does not support feature &#39;{}&#39;&quot;</span>, <span class="ident">ident</span>.<span class="ident">to_string</span>()));
                     <span class="kw">continue</span>;
                 }
@@ -241,14 +253,18 @@
         <span class="self">self</span>.<span class="ident">features</span> <span class="op">=</span> <span class="ident">new_features</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_static_reloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">reloc</span>: <span class="ident">JumpType</span>, <span class="ident">size</span>: <span class="ident">Size</span>) {
+    <span class="kw">fn</span> <span class="ident">handle_static_reloc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span>, <span class="ident">reloc</span>: <span class="ident">Jump</span>, <span class="ident">size</span>: <span class="ident">Size</span>) {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="ident">size</span>.<span class="ident">in_bytes</span>(), <span class="number">0</span>]; <span class="comment">// no offset, specified size, relative</span>
 
         <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">Stmt</span>::<span class="ident">Const</span>(<span class="number">0</span>, <span class="ident">size</span>));
         <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">reloc</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>));
     }
 
-    <span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default_align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="number">0x90</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">compile_instruction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span> {
             <span class="ident">state</span>,
             <span class="ident">mode</span>: <span class="ident">X86Mode</span>::<span class="ident">Protected</span>,

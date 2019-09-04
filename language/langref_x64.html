@@ -163,17 +163,23 @@
 <p>Any operand which does not match the previously discussed forms will be interpreted as an immediate argument. This operand will be evaluated as an expression at runtime and the resulting value will be encoded. The size of the encoded value can be determined by a size prefix. If such a a prefix is not given, dynasm-rs will try to infer it from the value of the immediate, but this is only possible if the immediate is a simple constant. As this might change in the future, you should use explicit size overrides if the encoded displacement size matters.</p>
 
     </section>
-<script src="../plugin/jquery.js"></script>
 <script type="text/javascript">
 // make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
-var next = $('pre').has('code.language-diffold').next().has('code.language-diffnew');
-var prev = next.prev();
-console.log(next);
-console.log(prev);
-next.css("margin-top", 0);
-next.css("padding-top", 0);
-prev.css("margin-bottom", 0);
-prev.css("padding-bottom", 0);
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    var old = document.querySelectorAll("code.language-diffold");
+    var old_pre = [];
+    for (var i = 0; i < old.length; i++) {
+        var old_pre = old[i].parentNode;
+        var new_pre = old_pre.nextElementSibling;
+        if (new_pre && new_pre.childNodes.length > 0 && new_pre.childNodes[0].className == "language-diffnew") {
+            old_pre.className = "collapse-old";
+            new_pre.className = "collapse-new";
+        }
+    }
+
+});
 </script>
 
 </body>

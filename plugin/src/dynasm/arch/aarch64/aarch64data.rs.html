@@ -456,6 +456,10 @@
 <span id="456">456</span>
 <span id="457">457</span>
 <span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::<span class="ident">Size</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>;
@@ -624,15 +628,19 @@
     <span class="ident">ADRP</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="comment">// tbnz, tbz: 14 bits, dword aligned</span>
     <span class="ident">TBZ</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="comment">// 8-bit literal</span>
+    <span class="ident">LITERAL8</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="comment">// 16-bit literal</span>
+    <span class="ident">LITERAL16</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="comment">// 32-bit literal</span>
-    <span class="ident">LITERAL32</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">LITERAL32</span> <span class="op">=</span> <span class="number">8</span>,
     <span class="comment">// 64-bit literal</span>
-    <span class="ident">LITERAL64</span> <span class="op">=</span> <span class="number">6</span>,
+    <span class="ident">LITERAL64</span> <span class="op">=</span> <span class="number">12</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Relocation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_id</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
     }
 }
 
@@ -648,7 +656,7 @@
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">SingleOp</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">matcher</span>:<span class="ident">expr</span> ),<span class="op">*</span> ], [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] ) <span class="op">=&gt;</span> {
+    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">matcher</span>:<span class="ident">expr</span> ),<span class="op">*</span> ], [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] ) <span class="op">=</span><span class="op">&gt;</span> {
         {
             <span class="kw">const</span> <span class="ident">MATCHERS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Matcher</span>] <span class="op">=</span> {
                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
@@ -674,7 +682,7 @@
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">Ops</span> {
-    ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span> <span class="op">=</span> [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">tt</span> <span class="op">=</span> [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">matcher</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] <span class="op">=&gt;</span> [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] ; )<span class="op">+</span> ] )<span class="op">*</span> ) <span class="op">=&gt;</span> {
+    ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span> <span class="op">=</span> [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">tt</span> <span class="op">=</span> [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">matcher</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] <span class="op">=</span><span class="op">&gt;</span> [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] ; )<span class="op">+</span> ] )<span class="op">*</span> ) <span class="op">=</span><span class="op">&gt;</span> {
         [ $(
             (
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
@@ -686,12 +694,12 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mnemonic_data</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Opdata</span>]<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mnemonic_data</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Opdata</span>]<span class="op">&gt;</span> {
     <span class="ident">OPMAP</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">cloned</span>()
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mnemnonics</span>() <span class="op">-&gt;</span> <span class="ident">hash_map</span>::<span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Opdata</span>]<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mnemnonics</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hash_map</span>::<span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Opdata</span>]<span class="op">&gt;</span> {
     <span class="ident">OPMAP</span>.<span class="ident">keys</span>()
 }
 
@@ -702,11 +710,11 @@
         <span class="kw">use</span> <span class="self">self</span>::<span class="ident">SpecialComm</span>::<span class="kw-2">*</span>;
         <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Relocation</span>::<span class="kw-2">*</span>;
 
-        <span class="kw">const</span> <span class="ident">EXTENDS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">UXTB</span>, <span class="ident">UXTH</span>, <span class="ident">UXTW</span>, <span class="ident">UXTX</span>, <span class="ident">SXTB</span>, <span class="ident">SXTH</span>, <span class="ident">SXTW</span>, <span class="ident">SXTX</span>, <span class="ident">LSL</span>];
-        <span class="kw">const</span> <span class="ident">EXTENDS_W</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">UXTB</span>, <span class="ident">UXTH</span>, <span class="ident">UXTW</span>, <span class="ident">SXTB</span>, <span class="ident">SXTH</span>, <span class="ident">SXTW</span>];
-        <span class="kw">const</span> <span class="ident">EXTENDS_X</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">UXTX</span>, <span class="ident">SXTX</span>, <span class="ident">LSL</span>];
-        <span class="kw">const</span> <span class="ident">SHIFTS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">LSL</span>, <span class="ident">LSR</span>, <span class="ident">ASR</span>];
-        <span class="kw">const</span> <span class="ident">ROTATES</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">LSL</span>, <span class="ident">LSR</span>, <span class="ident">ASR</span>, <span class="ident">ROR</span>];
+        <span class="kw">const</span> <span class="ident">EXTENDS</span>: <span class="kw-2">&amp;</span>[<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">UXTB</span>, <span class="ident">UXTH</span>, <span class="ident">UXTW</span>, <span class="ident">UXTX</span>, <span class="ident">SXTB</span>, <span class="ident">SXTH</span>, <span class="ident">SXTW</span>, <span class="ident">SXTX</span>, <span class="ident">LSL</span>];
+        <span class="kw">const</span> <span class="ident">EXTENDS_W</span>: <span class="kw-2">&amp;</span>[<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">UXTB</span>, <span class="ident">UXTH</span>, <span class="ident">UXTW</span>, <span class="ident">SXTB</span>, <span class="ident">SXTH</span>, <span class="ident">SXTW</span>];
+        <span class="kw">const</span> <span class="ident">EXTENDS_X</span>: <span class="kw-2">&amp;</span>[<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">UXTX</span>, <span class="ident">SXTX</span>, <span class="ident">LSL</span>];
+        <span class="kw">const</span> <span class="ident">SHIFTS</span>: <span class="kw-2">&amp;</span>[<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">LSL</span>, <span class="ident">LSR</span>, <span class="ident">ASR</span>];
+        <span class="kw">const</span> <span class="ident">ROTATES</span>: <span class="kw-2">&amp;</span>[<span class="kw">super</span>::<span class="ident">ast</span>::<span class="ident">Modifier</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">LSL</span>, <span class="ident">LSR</span>, <span class="ident">ASR</span>, <span class="ident">ROR</span>];
 
         <span class="kw">static</span> <span class="ident">MAP</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span>[<span class="ident">Opdata</span>])] <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">include</span><span class="macro">!</span>(<span class="string">&quot;opmap.rs&quot;</span>);
         <span class="ident">MAP</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
@@ -738,45 +746,45 @@
     };
 
     <span class="comment">// special ident maps</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">SPECIAL_IDENT_MAP</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">u32</span><span class="op">&gt;&gt;</span> <span class="op">=</span> {
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">SPECIAL_IDENT_MAP</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapmap</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
         <span class="ident">mapmap</span>.<span class="ident">insert</span>(<span class="string">&quot;AT_OPS&quot;</span>, {
             <span class="kw">static</span> <span class="ident">MAP</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u32</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                (<span class="string">&quot;s1e1r&quot;</span>,  <span class="number">0b00001111000000</span>),
-                (<span class="string">&quot;s1e1w&quot;</span>,  <span class="number">0b00001111000001</span>),
-                (<span class="string">&quot;s1e0r&quot;</span>,  <span class="number">0b00001111000010</span>),
-                (<span class="string">&quot;s1e0w&quot;</span>,  <span class="number">0b00001111000011</span>),
-                (<span class="string">&quot;s1e2r&quot;</span>,  <span class="number">0b10001111000000</span>),
-                (<span class="string">&quot;s1e2w&quot;</span>,  <span class="number">0b10001111000001</span>),
-                (<span class="string">&quot;s12e1r&quot;</span>, <span class="number">0b10001111000100</span>),
-                (<span class="string">&quot;s12e1w&quot;</span>, <span class="number">0b10001111000101</span>),
-                (<span class="string">&quot;s12e0r&quot;</span>, <span class="number">0b10001111000110</span>),
-                (<span class="string">&quot;s12e0w&quot;</span>, <span class="number">0b10001111000111</span>),
-                (<span class="string">&quot;s1e3r&quot;</span>,  <span class="number">0b11001111000000</span>),
-                (<span class="string">&quot;s1e3w&quot;</span>,  <span class="number">0b11001111000001</span>),
-                (<span class="string">&quot;s1e1rp&quot;</span>, <span class="number">0b00001111001000</span>),
-                (<span class="string">&quot;s1e1wp&quot;</span>, <span class="number">0b00001111001001</span>),
+                (<span class="string">&quot;s1e1r&quot;</span>,  <span class="number">0b00_0011_1100_0000</span>),
+                (<span class="string">&quot;s1e1w&quot;</span>,  <span class="number">0b00_0011_1100_0001</span>),
+                (<span class="string">&quot;s1e0r&quot;</span>,  <span class="number">0b00_0011_1100_0010</span>),
+                (<span class="string">&quot;s1e0w&quot;</span>,  <span class="number">0b00_0011_1100_0011</span>),
+                (<span class="string">&quot;s1e2r&quot;</span>,  <span class="number">0b10_0011_1100_0000</span>),
+                (<span class="string">&quot;s1e2w&quot;</span>,  <span class="number">0b10_0011_1100_0001</span>),
+                (<span class="string">&quot;s12e1r&quot;</span>, <span class="number">0b10_0011_1100_0100</span>),
+                (<span class="string">&quot;s12e1w&quot;</span>, <span class="number">0b10_0011_1100_0101</span>),
+                (<span class="string">&quot;s12e0r&quot;</span>, <span class="number">0b10_0011_1100_0110</span>),
+                (<span class="string">&quot;s12e0w&quot;</span>, <span class="number">0b10_0011_1100_0111</span>),
+                (<span class="string">&quot;s1e3r&quot;</span>,  <span class="number">0b11_0011_1100_0000</span>),
+                (<span class="string">&quot;s1e3w&quot;</span>,  <span class="number">0b11_0011_1100_0001</span>),
+                (<span class="string">&quot;s1e1rp&quot;</span>, <span class="number">0b00_0011_1100_1000</span>),
+                (<span class="string">&quot;s1e1wp&quot;</span>, <span class="number">0b00_0011_1100_1001</span>),
             ];
             <span class="ident">MAP</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
         });
         <span class="ident">mapmap</span>.<span class="ident">insert</span>(<span class="string">&quot;IC_OPS&quot;</span>, {
             <span class="kw">static</span> <span class="ident">MAP</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u32</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                (<span class="string">&quot;ialluis&quot;</span>, <span class="number">0b00001110001000</span>),
-                (<span class="string">&quot;iallu&quot;</span>,   <span class="number">0b00001110101000</span>),
+                (<span class="string">&quot;ialluis&quot;</span>, <span class="number">0b00_0011_1000_1000</span>),
+                (<span class="string">&quot;iallu&quot;</span>,   <span class="number">0b00_0011_1010_1000</span>),
             ];
             <span class="ident">MAP</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
         });
         <span class="ident">mapmap</span>.<span class="ident">insert</span>(<span class="string">&quot;DC_OPS&quot;</span>, {
             <span class="kw">static</span> <span class="ident">MAP</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u32</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                (<span class="string">&quot;ivac&quot;</span>,  <span class="number">0b00001110110001</span>),
-                (<span class="string">&quot;isw&quot;</span>,   <span class="number">0b00001110110010</span>),
-                (<span class="string">&quot;csw&quot;</span>,   <span class="number">0b00001111010010</span>),
-                (<span class="string">&quot;cisw&quot;</span>,  <span class="number">0b00001111110010</span>),
-                (<span class="string">&quot;zva&quot;</span>,   <span class="number">0b01101110100001</span>),
-                (<span class="string">&quot;cvac&quot;</span>,  <span class="number">0b01101111010001</span>),
-                (<span class="string">&quot;cvau&quot;</span>,  <span class="number">0b01101111011001</span>),
-                (<span class="string">&quot;civac&quot;</span>, <span class="number">0b01101111110001</span>),
-                (<span class="string">&quot;cvap&quot;</span>,  <span class="number">0b01101111100001</span>),
+                (<span class="string">&quot;ivac&quot;</span>,  <span class="number">0b00_0011_1011_0001</span>),
+                (<span class="string">&quot;isw&quot;</span>,   <span class="number">0b00_0011_1011_0010</span>),
+                (<span class="string">&quot;csw&quot;</span>,   <span class="number">0b00_0011_1101_0010</span>),
+                (<span class="string">&quot;cisw&quot;</span>,  <span class="number">0b00_0011_1111_0010</span>),
+                (<span class="string">&quot;zva&quot;</span>,   <span class="number">0b01_1011_1010_0001</span>),
+                (<span class="string">&quot;cvac&quot;</span>,  <span class="number">0b01_1011_1101_0001</span>),
+                (<span class="string">&quot;cvau&quot;</span>,  <span class="number">0b01_1011_1101_1001</span>),
+                (<span class="string">&quot;civac&quot;</span>, <span class="number">0b01_1011_1111_0001</span>),
+                (<span class="string">&quot;cvap&quot;</span>,  <span class="number">0b01_1011_1110_0001</span>),
             ];
             <span class="ident">MAP</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
         });
@@ -799,12 +807,12 @@
         });
         <span class="ident">mapmap</span>.<span class="ident">insert</span>(<span class="string">&quot;MSR_IMM_OPS&quot;</span>, {
             <span class="kw">static</span> <span class="ident">MAP</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u32</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                (<span class="string">&quot;spsel&quot;</span>,   <span class="number">0b00001000000101</span>),
-                (<span class="string">&quot;daifset&quot;</span>, <span class="number">0b01101000000110</span>),
-                (<span class="string">&quot;daifclr&quot;</span>, <span class="number">0b01101000000111</span>),
-                (<span class="string">&quot;uao&quot;</span>,     <span class="number">0b00001000000011</span>),
-                (<span class="string">&quot;pan&quot;</span>,     <span class="number">0b00001000000100</span>),
-                (<span class="string">&quot;dit&quot;</span>,     <span class="number">0b01101000000010</span>),
+                (<span class="string">&quot;spsel&quot;</span>,   <span class="number">0b00_0010_0000_0101</span>),
+                (<span class="string">&quot;daifset&quot;</span>, <span class="number">0b01_1010_0000_0110</span>),
+                (<span class="string">&quot;daifclr&quot;</span>, <span class="number">0b01_1010_0000_0111</span>),
+                (<span class="string">&quot;uao&quot;</span>,     <span class="number">0b00_0010_0000_0011</span>),
+                (<span class="string">&quot;pan&quot;</span>,     <span class="number">0b00_0010_0000_0100</span>),
+                (<span class="string">&quot;dit&quot;</span>,     <span class="number">0b01_1010_0000_0010</span>),
             ];
             <span class="ident">MAP</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
         });
@@ -831,84 +839,84 @@
         });
         <span class="ident">mapmap</span>.<span class="ident">insert</span>(<span class="string">&quot;TLBI_OPS&quot;</span>, {
             <span class="kw">static</span> <span class="ident">MAP</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u32</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                (<span class="string">&quot;vmalle1is&quot;</span>,    <span class="number">0b00010000011000</span>),
-                (<span class="string">&quot;vae1is&quot;</span>,       <span class="number">0b00010000011001</span>),
-                (<span class="string">&quot;aside1is&quot;</span>,     <span class="number">0b00010000011010</span>),
-                (<span class="string">&quot;vaae1is&quot;</span>,      <span class="number">0b00010000011011</span>),
-                (<span class="string">&quot;vale1is&quot;</span>,      <span class="number">0b00010000011101</span>),
-                (<span class="string">&quot;vaale1is&quot;</span>,     <span class="number">0b00010000011111</span>),
-                (<span class="string">&quot;vmalle1&quot;</span>,      <span class="number">0b00010000111000</span>),
-                (<span class="string">&quot;vae1&quot;</span>,         <span class="number">0b00010000111001</span>),
-                (<span class="string">&quot;aside1&quot;</span>,       <span class="number">0b00010000111010</span>),
-                (<span class="string">&quot;vaae1&quot;</span>,        <span class="number">0b00010000111011</span>),
-                (<span class="string">&quot;vale1&quot;</span>,        <span class="number">0b00010000111101</span>),
-                (<span class="string">&quot;vaale1&quot;</span>,       <span class="number">0b00010000111111</span>),
-                (<span class="string">&quot;ipas2e1is&quot;</span>,    <span class="number">0b10010000000001</span>),
-                (<span class="string">&quot;ipas2le1is&quot;</span>,   <span class="number">0b10010000000101</span>),
-                (<span class="string">&quot;alle2is&quot;</span>,      <span class="number">0b10010000011000</span>),
-                (<span class="string">&quot;vae2is&quot;</span>,       <span class="number">0b10010000011001</span>),
-                (<span class="string">&quot;alle1is&quot;</span>,      <span class="number">0b10010000011100</span>),
-                (<span class="string">&quot;vale2is&quot;</span>,      <span class="number">0b10010000011101</span>),
-                (<span class="string">&quot;vmalls12e1is&quot;</span>, <span class="number">0b10010000011110</span>),
-                (<span class="string">&quot;ipas2e1&quot;</span>,      <span class="number">0b10010000100001</span>),
-                (<span class="string">&quot;ipas2le1&quot;</span>,     <span class="number">0b10010000100101</span>),
-                (<span class="string">&quot;alle2&quot;</span>,        <span class="number">0b10010000111000</span>),
-                (<span class="string">&quot;vae2&quot;</span>,         <span class="number">0b10010000111001</span>),
-                (<span class="string">&quot;alle1&quot;</span>,        <span class="number">0b10010000111100</span>),
-                (<span class="string">&quot;vale2&quot;</span>,        <span class="number">0b10010000111101</span>),
-                (<span class="string">&quot;vmalls12e1&quot;</span>,   <span class="number">0b10010000111110</span>),
-                (<span class="string">&quot;alle3is&quot;</span>,      <span class="number">0b11010000011000</span>),
-                (<span class="string">&quot;vae3is&quot;</span>,       <span class="number">0b11010000011001</span>),
-                (<span class="string">&quot;vale3is&quot;</span>,      <span class="number">0b11010000011101</span>),
-                (<span class="string">&quot;alle3&quot;</span>,        <span class="number">0b11010000111000</span>),
-                (<span class="string">&quot;vae3&quot;</span>,         <span class="number">0b11010000111001</span>),
-                (<span class="string">&quot;vale3&quot;</span>,        <span class="number">0b11010000111101</span>),
-                (<span class="string">&quot;vmalle1os&quot;</span>,    <span class="number">0b00010000001000</span>),
-                (<span class="string">&quot;vae1os&quot;</span>,       <span class="number">0b00010000001001</span>),
-                (<span class="string">&quot;aside1os&quot;</span>,     <span class="number">0b00010000001010</span>),
-                (<span class="string">&quot;vaae1os&quot;</span>,      <span class="number">0b00010000001011</span>),
-                (<span class="string">&quot;vale1os&quot;</span>,      <span class="number">0b00010000001101</span>),
-                (<span class="string">&quot;vaale1os&quot;</span>,     <span class="number">0b00010000001111</span>),
-                (<span class="string">&quot;rvae1is&quot;</span>,      <span class="number">0b00010000010001</span>),
-                (<span class="string">&quot;rvaae1is&quot;</span>,     <span class="number">0b00010000010011</span>),
-                (<span class="string">&quot;rvale1is&quot;</span>,     <span class="number">0b00010000010101</span>),
-                (<span class="string">&quot;rvaale1is&quot;</span>,    <span class="number">0b00010000010111</span>),
-                (<span class="string">&quot;rvae1os&quot;</span>,      <span class="number">0b00010000101001</span>),
-                (<span class="string">&quot;rvaae1os&quot;</span>,     <span class="number">0b00010000101011</span>),
-                (<span class="string">&quot;rvale1os&quot;</span>,     <span class="number">0b00010000101101</span>),
-                (<span class="string">&quot;rvaale1os&quot;</span>,    <span class="number">0b00010000101111</span>),
-                (<span class="string">&quot;rvae1&quot;</span>,        <span class="number">0b00010000110001</span>),
-                (<span class="string">&quot;rvaae1&quot;</span>,       <span class="number">0b00010000110011</span>),
-                (<span class="string">&quot;rvale1&quot;</span>,       <span class="number">0b00010000110101</span>),
-                (<span class="string">&quot;rvaale1&quot;</span>,      <span class="number">0b00010000110111</span>),
-                (<span class="string">&quot;ripas2e1is&quot;</span>,   <span class="number">0b10010000000010</span>),
-                (<span class="string">&quot;ripas2le1is&quot;</span>,  <span class="number">0b10010000000110</span>),
-                (<span class="string">&quot;alle2os&quot;</span>,      <span class="number">0b10010000001000</span>),
-                (<span class="string">&quot;vae2os&quot;</span>,       <span class="number">0b10010000001001</span>),
-                (<span class="string">&quot;alle1os&quot;</span>,      <span class="number">0b10010000001100</span>),
-                (<span class="string">&quot;vale2os&quot;</span>,      <span class="number">0b10010000001101</span>),
-                (<span class="string">&quot;vmalls12e1os&quot;</span>, <span class="number">0b10010000001110</span>),
-                (<span class="string">&quot;rvae2is&quot;</span>,      <span class="number">0b10010000010001</span>),
-                (<span class="string">&quot;rvale2is&quot;</span>,     <span class="number">0b10010000010101</span>),
-                (<span class="string">&quot;ipas2e1os&quot;</span>,    <span class="number">0b10010000100000</span>),
-                (<span class="string">&quot;ripas2e1&quot;</span>,     <span class="number">0b10010000100010</span>),
-                (<span class="string">&quot;ripas2e1os&quot;</span>,   <span class="number">0b10010000100011</span>),
-                (<span class="string">&quot;ipas2le1os&quot;</span>,   <span class="number">0b10010000100100</span>),
-                (<span class="string">&quot;ripas2le1&quot;</span>,    <span class="number">0b10010000100110</span>),
-                (<span class="string">&quot;ripas2le1os&quot;</span>,  <span class="number">0b10010000100111</span>),
-                (<span class="string">&quot;rvae2os&quot;</span>,      <span class="number">0b10010000101001</span>),
-                (<span class="string">&quot;rvale2os&quot;</span>,     <span class="number">0b10010000101101</span>),
-                (<span class="string">&quot;rvae2&quot;</span>,        <span class="number">0b10010000110001</span>),
-                (<span class="string">&quot;rvale2&quot;</span>,       <span class="number">0b10010000110101</span>),
-                (<span class="string">&quot;alle3os&quot;</span>,      <span class="number">0b11010000001000</span>),
-                (<span class="string">&quot;vae3os&quot;</span>,       <span class="number">0b11010000001001</span>),
-                (<span class="string">&quot;vale3os&quot;</span>,      <span class="number">0b11010000001101</span>),
-                (<span class="string">&quot;rvae3is&quot;</span>,      <span class="number">0b11010000010001</span>),
-                (<span class="string">&quot;rvale3is&quot;</span>,     <span class="number">0b11010000010101</span>),
-                (<span class="string">&quot;rvae3os&quot;</span>,      <span class="number">0b11010000101001</span>),
-                (<span class="string">&quot;rvale3os&quot;</span>,     <span class="number">0b11010000101101</span>),
-                (<span class="string">&quot;rvae3&quot;</span>,        <span class="number">0b11010000110001</span>),
-                (<span class="string">&quot;rvale3&quot;</span>,       <span class="number">0b11010000110101</span>),
+                (<span class="string">&quot;vmalle1is&quot;</span>,    <span class="number">0b00_0100_0001_1000</span>),
+                (<span class="string">&quot;vae1is&quot;</span>,       <span class="number">0b00_0100_0001_1001</span>),
+                (<span class="string">&quot;aside1is&quot;</span>,     <span class="number">0b00_0100_0001_1010</span>),
+                (<span class="string">&quot;vaae1is&quot;</span>,      <span class="number">0b00_0100_0001_1011</span>),
+                (<span class="string">&quot;vale1is&quot;</span>,      <span class="number">0b00_0100_0001_1101</span>),
+                (<span class="string">&quot;vaale1is&quot;</span>,     <span class="number">0b00_0100_0001_1111</span>),
+                (<span class="string">&quot;vmalle1&quot;</span>,      <span class="number">0b00_0100_0011_1000</span>),
+                (<span class="string">&quot;vae1&quot;</span>,         <span class="number">0b00_0100_0011_1001</span>),
+                (<span class="string">&quot;aside1&quot;</span>,       <span class="number">0b00_0100_0011_1010</span>),
+                (<span class="string">&quot;vaae1&quot;</span>,        <span class="number">0b00_0100_0011_1011</span>),
+                (<span class="string">&quot;vale1&quot;</span>,        <span class="number">0b00_0100_0011_1101</span>),
+                (<span class="string">&quot;vaale1&quot;</span>,       <span class="number">0b00_0100_0011_1111</span>),
+                (<span class="string">&quot;ipas2e1is&quot;</span>,    <span class="number">0b10_0100_0000_0001</span>),
+                (<span class="string">&quot;ipas2le1is&quot;</span>,   <span class="number">0b10_0100_0000_0101</span>),
+                (<span class="string">&quot;alle2is&quot;</span>,      <span class="number">0b10_0100_0001_1000</span>),
+                (<span class="string">&quot;vae2is&quot;</span>,       <span class="number">0b10_0100_0001_1001</span>),
+                (<span class="string">&quot;alle1is&quot;</span>,      <span class="number">0b10_0100_0001_1100</span>),
+                (<span class="string">&quot;vale2is&quot;</span>,      <span class="number">0b10_0100_0001_1101</span>),
+                (<span class="string">&quot;vmalls12e1is&quot;</span>, <span class="number">0b10_0100_0001_1110</span>),
+                (<span class="string">&quot;ipas2e1&quot;</span>,      <span class="number">0b10_0100_0010_0001</span>),
+                (<span class="string">&quot;ipas2le1&quot;</span>,     <span class="number">0b10_0100_0010_0101</span>),
+                (<span class="string">&quot;alle2&quot;</span>,        <span class="number">0b10_0100_0011_1000</span>),
+                (<span class="string">&quot;vae2&quot;</span>,         <span class="number">0b10_0100_0011_1001</span>),
+                (<span class="string">&quot;alle1&quot;</span>,        <span class="number">0b10_0100_0011_1100</span>),
+                (<span class="string">&quot;vale2&quot;</span>,        <span class="number">0b10_0100_0011_1101</span>),
+                (<span class="string">&quot;vmalls12e1&quot;</span>,   <span class="number">0b10_0100_0011_1110</span>),
+                (<span class="string">&quot;alle3is&quot;</span>,      <span class="number">0b11_0100_0001_1000</span>),
+                (<span class="string">&quot;vae3is&quot;</span>,       <span class="number">0b11_0100_0001_1001</span>),
+                (<span class="string">&quot;vale3is&quot;</span>,      <span class="number">0b11_0100_0001_1101</span>),
+                (<span class="string">&quot;alle3&quot;</span>,        <span class="number">0b11_0100_0011_1000</span>),
+                (<span class="string">&quot;vae3&quot;</span>,         <span class="number">0b11_0100_0011_1001</span>),
+                (<span class="string">&quot;vale3&quot;</span>,        <span class="number">0b11_0100_0011_1101</span>),
+                (<span class="string">&quot;vmalle1os&quot;</span>,    <span class="number">0b00_0100_0000_1000</span>),
+                (<span class="string">&quot;vae1os&quot;</span>,       <span class="number">0b00_0100_0000_1001</span>),
+                (<span class="string">&quot;aside1os&quot;</span>,     <span class="number">0b00_0100_0000_1010</span>),
+                (<span class="string">&quot;vaae1os&quot;</span>,      <span class="number">0b00_0100_0000_1011</span>),
+                (<span class="string">&quot;vale1os&quot;</span>,      <span class="number">0b00_0100_0000_1101</span>),
+                (<span class="string">&quot;vaale1os&quot;</span>,     <span class="number">0b00_0100_0000_1111</span>),
+                (<span class="string">&quot;rvae1is&quot;</span>,      <span class="number">0b00_0100_0001_0001</span>),
+                (<span class="string">&quot;rvaae1is&quot;</span>,     <span class="number">0b00_0100_0001_0011</span>),
+                (<span class="string">&quot;rvale1is&quot;</span>,     <span class="number">0b00_0100_0001_0101</span>),
+                (<span class="string">&quot;rvaale1is&quot;</span>,    <span class="number">0b00_0100_0001_0111</span>),
+                (<span class="string">&quot;rvae1os&quot;</span>,      <span class="number">0b00_0100_0010_1001</span>),
+                (<span class="string">&quot;rvaae1os&quot;</span>,     <span class="number">0b00_0100_0010_1011</span>),
+                (<span class="string">&quot;rvale1os&quot;</span>,     <span class="number">0b00_0100_0010_1101</span>),
+                (<span class="string">&quot;rvaale1os&quot;</span>,    <span class="number">0b00_0100_0010_1111</span>),
+                (<span class="string">&quot;rvae1&quot;</span>,        <span class="number">0b00_0100_0011_0001</span>),
+                (<span class="string">&quot;rvaae1&quot;</span>,       <span class="number">0b00_0100_0011_0011</span>),
+                (<span class="string">&quot;rvale1&quot;</span>,       <span class="number">0b00_0100_0011_0101</span>),
+                (<span class="string">&quot;rvaale1&quot;</span>,      <span class="number">0b00_0100_0011_0111</span>),
+                (<span class="string">&quot;ripas2e1is&quot;</span>,   <span class="number">0b10_0100_0000_0010</span>),
+                (<span class="string">&quot;ripas2le1is&quot;</span>,  <span class="number">0b10_0100_0000_0110</span>),
+                (<span class="string">&quot;alle2os&quot;</span>,      <span class="number">0b10_0100_0000_1000</span>),
+                (<span class="string">&quot;vae2os&quot;</span>,       <span class="number">0b10_0100_0000_1001</span>),
+                (<span class="string">&quot;alle1os&quot;</span>,      <span class="number">0b10_0100_0000_1100</span>),
+                (<span class="string">&quot;vale2os&quot;</span>,      <span class="number">0b10_0100_0000_1101</span>),
+                (<span class="string">&quot;vmalls12e1os&quot;</span>, <span class="number">0b10_0100_0000_1110</span>),
+                (<span class="string">&quot;rvae2is&quot;</span>,      <span class="number">0b10_0100_0001_0001</span>),
+                (<span class="string">&quot;rvale2is&quot;</span>,     <span class="number">0b10_0100_0001_0101</span>),
+                (<span class="string">&quot;ipas2e1os&quot;</span>,    <span class="number">0b10_0100_0010_0000</span>),
+                (<span class="string">&quot;ripas2e1&quot;</span>,     <span class="number">0b10_0100_0010_0010</span>),
+                (<span class="string">&quot;ripas2e1os&quot;</span>,   <span class="number">0b10_0100_0010_0011</span>),
+                (<span class="string">&quot;ipas2le1os&quot;</span>,   <span class="number">0b10_0100_0010_0100</span>),
+                (<span class="string">&quot;ripas2le1&quot;</span>,    <span class="number">0b10_0100_0010_0110</span>),
+                (<span class="string">&quot;ripas2le1os&quot;</span>,  <span class="number">0b10_0100_0010_0111</span>),
+                (<span class="string">&quot;rvae2os&quot;</span>,      <span class="number">0b10_0100_0010_1001</span>),
+                (<span class="string">&quot;rvale2os&quot;</span>,     <span class="number">0b10_0100_0010_1101</span>),
+                (<span class="string">&quot;rvae2&quot;</span>,        <span class="number">0b10_0100_0011_0001</span>),
+                (<span class="string">&quot;rvale2&quot;</span>,       <span class="number">0b10_0100_0011_0101</span>),
+                (<span class="string">&quot;alle3os&quot;</span>,      <span class="number">0b11_0100_0000_1000</span>),
+                (<span class="string">&quot;vae3os&quot;</span>,       <span class="number">0b11_0100_0000_1001</span>),
+                (<span class="string">&quot;vale3os&quot;</span>,      <span class="number">0b11_0100_0000_1101</span>),
+                (<span class="string">&quot;rvae3is&quot;</span>,      <span class="number">0b11_0100_0001_0001</span>),
+                (<span class="string">&quot;rvale3is&quot;</span>,     <span class="number">0b11_0100_0001_0101</span>),
+                (<span class="string">&quot;rvae3os&quot;</span>,      <span class="number">0b11_0100_0010_1001</span>),
+                (<span class="string">&quot;rvale3os&quot;</span>,     <span class="number">0b11_0100_0010_1101</span>),
+                (<span class="string">&quot;rvae3&quot;</span>,        <span class="number">0b11_0100_0011_0001</span>),
+                (<span class="string">&quot;rvale3&quot;</span>,       <span class="number">0b11_0100_0011_0101</span>),
             ];
             <span class="ident">MAP</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
         });

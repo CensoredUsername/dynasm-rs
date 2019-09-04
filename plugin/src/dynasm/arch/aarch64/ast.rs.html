@@ -429,7 +429,7 @@
 <span class="kw">use</span> <span class="ident">syn</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">Size</span>, <span class="ident">JumpType</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">Size</span>, <span class="ident">Jump</span>};
 
 
 <span class="doccomment">/// A complete abstraction of an aarch64 register access.</span>
@@ -503,89 +503,89 @@
 
 <span class="kw">impl</span> <span class="ident">RegId</span> {
     <span class="doccomment">/// Encode this RegId in a 5-bit value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">&amp;</span> <span class="number">0x1F</span>
     }
 
     <span class="doccomment">/// Returns what family this Regid is from</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RegFamily</span> {
-        <span class="kw">match</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">&gt;&gt;</span> <span class="number">5</span> {
-            <span class="number">0</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGER</span>,
-            <span class="number">1</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGERSP</span>,
-            <span class="number">2</span> <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">SIMD</span>,
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RegFamily</span> {
+        <span class="kw">match</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span> {
+            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGER</span>,
+            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGERSP</span>,
+            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">SIMD</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>()
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RegKind</span> {
     <span class="doccomment">/// Get the 5-bit code of this RegKind. Returns None if it was dynamic</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>.<span class="ident">code</span>()),
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">None</span>
+            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>.<span class="ident">code</span>()),
+            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
         }
     }
 
     <span class="doccomment">/// Encode this RegKind into a 5-bit value, returning 0 if it was dynamic</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">code</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>)
     }
 
     <span class="doccomment">/// Returns the family that this regkind is of</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RegFamily</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RegFamily</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=&gt;</span> <span class="ident">code</span>.<span class="ident">family</span>(),
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="ident">family</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">family</span>
+            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">code</span>.<span class="ident">family</span>(),
+            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="ident">family</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">family</span>
         }
     }
 
     <span class="doccomment">/// Returns true if this RegKind is dynamic</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dynamic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dynamic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">true</span>
+            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>
         }
     }
 
     <span class="doccomment">/// Returns true if this RegKind is static and identifies the zero register</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero_reg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero_reg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">id</span> <span class="op">==</span> <span class="ident">RegId</span>::<span class="ident">XZR</span>,
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RegId</span>::<span class="ident">XZR</span>,
+            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">RegKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RegKind</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RegKind</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RegKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">other</span> {
-                <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">other_id</span>) <span class="op">=&gt;</span> <span class="ident">other_id</span> <span class="op">==</span> <span class="ident">id</span>,
-                <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">other</span> {
+                <span class="ident">RegKind</span>::<span class="ident">Static</span>(<span class="ident">other_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">other_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">id</span>,
+                <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
             },
-            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">RegKind</span>::<span class="ident">Dynamic</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RegScalar</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Size</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Size</span> {
         <span class="self">self</span>.<span class="ident">size</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RegVector</span> {
     <span class="doccomment">/// Returns the size of individual elements in this vector register</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Size</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Size</span> {
         <span class="self">self</span>.<span class="ident">element_size</span>
     }
 
     <span class="doccomment">/// Returns the full size of this vector register (element size * lanecount).</span>
     <span class="doccomment">/// Returns None if lanes was not set</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">full_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">full_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lanes</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">lanes</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">lanes</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">element_size</span>.<span class="ident">in_bytes</span>() <span class="kw">as</span> <span class="ident">u16</span>)
+            <span class="prelude-val">Some</span>(<span class="ident">u16</span>::<span class="ident">from</span>(<span class="ident">lanes</span>) <span class="op">*</span> <span class="ident">u16</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">element_size</span>.<span class="ident">in_bytes</span>()))
         } <span class="kw">else</span> { 
             <span class="prelude-val">None</span>
         }
@@ -593,38 +593,38 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Register</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Size</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Size</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">size</span>(),
-            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">v</span>.<span class="ident">element_size</span>()
+            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">size</span>(),
+            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">element_size</span>()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RegKind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RegKind</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">kind</span>,
-            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">kind</span>
+            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">kind</span>,
+            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">kind</span>
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind_owned</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RegKind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RegKind</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">kind</span>,
-            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">v</span>.<span class="ident">kind</span>
+            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">kind</span>,
+            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">kind</span>
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RegFamily</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RegFamily</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">kind</span>.<span class="ident">family</span>(),
-            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">SIMD</span>,
+            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">kind</span>.<span class="ident">family</span>(),
+            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RegFamily</span>::<span class="ident">SIMD</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assume_vector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RegVector</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assume_vector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RegVector</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;That wasn&#39;t a vector register&quot;</span>),
-            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">v</span>
+            <span class="ident">Register</span>::<span class="ident">Scalar</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;That wasn&#39;t a vector register&quot;</span>),
+            <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>
         }
     }
 }
@@ -651,31 +651,31 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Modifier</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Modifier</span>::<span class="ident">LSL</span> <span class="op">=&gt;</span> <span class="string">&quot;LSL&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">LSR</span> <span class="op">=&gt;</span> <span class="string">&quot;LSR&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">ASR</span> <span class="op">=&gt;</span> <span class="string">&quot;ASR&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">ROR</span> <span class="op">=&gt;</span> <span class="string">&quot;ROR&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">SXTX</span> <span class="op">=&gt;</span> <span class="string">&quot;SXTX&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">SXTW</span> <span class="op">=&gt;</span> <span class="string">&quot;SXTW&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">SXTH</span> <span class="op">=&gt;</span> <span class="string">&quot;SXTH&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">SXTB</span> <span class="op">=&gt;</span> <span class="string">&quot;SXTB&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">UXTX</span> <span class="op">=&gt;</span> <span class="string">&quot;UXTX&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">UXTW</span> <span class="op">=&gt;</span> <span class="string">&quot;UXTW&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">UXTH</span> <span class="op">=&gt;</span> <span class="string">&quot;UXTH&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">UXTB</span> <span class="op">=&gt;</span> <span class="string">&quot;UXTB&quot;</span>,
-            <span class="ident">Modifier</span>::<span class="ident">MSL</span> <span class="op">=&gt;</span> <span class="string">&quot;MSL&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">LSL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LSL&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">LSR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LSR&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">ASR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ASR&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">ROR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ROR&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">SXTX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SXTX&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">SXTW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SXTW&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">SXTH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SXTH&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">SXTB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SXTB&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">UXTX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UXTX&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">UXTW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UXTW&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">UXTH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UXTH&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">UXTB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UXTB&quot;</span>,
+            <span class="ident">Modifier</span>::<span class="ident">MSL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MSL&quot;</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_required</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Modifier</span>::<span class="ident">LSL</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">LSR</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">ASR</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">ROR</span>
-            <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">MSL</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">MSL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
             <span class="ident">Modifier</span>::<span class="ident">SXTX</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">SXTW</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">SXTH</span>
@@ -683,7 +683,7 @@
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">UXTX</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">UXTW</span>
             <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">UXTH</span>
-            <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">UXTB</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+            <span class="op">|</span> <span class="ident">Modifier</span>::<span class="ident">UXTB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
 }
@@ -695,7 +695,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ModifyExpr</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">op</span>: <span class="ident">Modifier</span>, <span class="ident">expr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">ModifyExpr</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">op</span>: <span class="ident">Modifier</span>, <span class="ident">expr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModifyExpr</span> {
         <span class="ident">ModifyExpr</span> {
             <span class="ident">op</span>,
             <span class="ident">expr</span>
@@ -757,7 +757,7 @@
     },
     <span class="comment">// jump target. Also used by PC-rel loads etc</span>
     <span class="ident">JumpTarget</span> {
-        <span class="ident">type_</span>: <span class="ident">JumpType</span>
+        <span class="ident">jump</span>: <span class="ident">Jump</span>
     },
     <span class="comment">// just an arbitrary expression</span>
     <span class="ident">Immediate</span> {
@@ -813,7 +813,7 @@
         <span class="ident">reg</span>: <span class="ident">Register</span>
     },
     <span class="ident">JumpTarget</span> {
-        <span class="ident">type_</span>: <span class="ident">JumpType</span>
+        <span class="ident">jump</span>: <span class="ident">Jump</span>
     },
     <span class="ident">Immediate</span> {
         <span class="ident">prefixed</span>: <span class="ident">bool</span>,
@@ -846,7 +846,7 @@
         <span class="ident">modifier</span>: <span class="ident">Modifier</span>,
     },
     <span class="ident">JumpTarget</span> {
-        <span class="ident">type_</span>: <span class="ident">JumpType</span>
+        <span class="ident">jump</span>: <span class="ident">Jump</span>
     },
     <span class="ident">Lit</span> {
         <span class="ident">ident</span>: <span class="ident">syn</span>::<span class="ident">Ident</span>
