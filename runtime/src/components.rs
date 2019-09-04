@@ -485,21 +485,115 @@ impl LitPool {
         offset
     }
 
+    fn pad_sized<D: DynasmLabelApi>(size: RelocationSize, assembler: &mut D) {
+        match size {
+            RelocationSize::Byte => assembler.push(0),
+            RelocationSize::Word => assembler.push_u16(0),
+            RelocationSize::DWord => assembler.push_u32(0),
+            RelocationSize::QWord => assembler.push_u64(0),
+        }
+    }
+
     /// Emit this literal pool into the specified assembler
-    pub fn emit<D>(self, assembler: &mut D)
-    where D: DynasmLabelApi {
+    pub fn emit<D: DynasmLabelApi>(self, assembler: &mut D) {
         for entry in self.entries {
             match entry {
                 LitPoolEntry::U8(value) => assembler.push(value),
                 LitPoolEntry::U16(value) => assembler.push_u16(value),
                 LitPoolEntry::U32(value) => assembler.push_u32(value),
                 LitPoolEntry::U64(value) => assembler.push_u64(value),
-                LitPoolEntry::Dynamic(size, id) => assembler.dynamic_reloc(id, 0, D::Relocation::encode_from_size(size)),
-                LitPoolEntry::Global(size, name) => assembler.global_reloc(name, 0, D::Relocation::encode_from_size(size)),
-                LitPoolEntry::Forward(size, name) => assembler.forward_reloc(name, 0, D::Relocation::encode_from_size(size)),
-                LitPoolEntry::Backward(size, name) => assembler.backward_reloc(name, 0, D::Relocation::encode_from_size(size)),
+                LitPoolEntry::Dynamic(size, id) => {
+                    Self::pad_sized(size, assembler);
+                    assembler.dynamic_relocation(id, 0, D::Relocation::from_size(size));
+                },
+                LitPoolEntry::Global(size, name) => {
+                    Self::pad_sized(size, assembler);
+                    assembler.global_relocation(name, 0, D::Relocation::from_size(size));
+                },
+                LitPoolEntry::Forward(size, name) => {
+                    Self::pad_sized(size, assembler);
+                    assembler.forward_relocation(name, 0, D::Relocation::from_size(size));
+                },
+                LitPoolEntry::Backward(size, name) => {
+                    Self::pad_sized(size, assembler);
+                    assembler.backward_relocation(name, 0, D::Relocation::from_size(size));
+                },
                 LitPoolEntry::Align(with, alignment) => assembler.align(alignment, with),
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    use relocations::{Relocation, RelocationSize};
+
+    #[test]
+    fn test_litpool_size() {
+        test_litpool::<RelocationSize>();
+    }
+
+    #[test]
+    fn test_litpool_x64() {
+        test_litpool::<x64::X64Relocation>();
+    }
+
+    #[test]
+    fn test_litpool_x86() {
+        test_litpool::<x86::X86Relocation>();
+    }
+
+    #[test]
+    fn test_litpool_aarch64() {
+        test_litpool::<aarch64::Aarch64Relocation>();
+    }
+
+    fn test_litpool<R: Relocation>() {
+        let mut ops = Assembler::<R>::new().unwrap();
+        let dynamic1 = ops.new_dynamic_label();
+
+        let mut pool = components::LitPool::new();
+
+        ops.local_label("backward1");
+
+        assert_eq!(pool.push_u8(0x12), 0);
+        assert_eq!(pool.push_u8(0x34), 1);
+        assert_eq!(pool.push_u8(0x56), 2);
+
+        assert_eq!(pool.push_u16(0x789A), 4);
+
+        assert_eq!(pool.push_u32(0xBCDE_F012), 8);
+
+        assert_eq!(pool.push_u64(0x3456_789A_BCDE_F012), 16);
+
+        assert_eq!(pool.push_forward("forward1", RelocationSize::Byte), 24);
+
+        pool.align(4, 0xCC);
+
+        assert_eq!(pool.push_global("global1", RelocationSize::Word), 28);
+
+        assert_eq!(pool.push_dynamic(dynamic1, RelocationSize::DWord), 32);
+
+        assert_eq!(pool.push_backward("backward1", RelocationSize::QWord), 40);
+
+        pool.emit(&mut ops);
+
+        assert_eq!(ops.offset().0, 48);
+
+        ops.local_label("forward1");
+        ops.global_label("global1");
+        ops.dynamic_label(dynamic1);
+
+        let buf = ops.finalize().unwrap();
+
+        assert_eq!(&*buf, &[
+            0x12, 0x34, 0x56, 0x00, 0x9A, 0x78, 0x00, 0x00,
+            0x12, 0xF0, 0xDE, 0xBC, 0x00, 0x00, 0x00, 0x00,
+            0x12, 0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34,
+            24  , 0xCC, 0xCC, 0xCC, 20  , 0   , 0x00, 0x00,
+            16  , 0   , 0   , 0   , 0x00, 0x00, 0x00, 0x00,
+            0xD8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFFu8, 
+        ] as &[u8]);
     }
 }

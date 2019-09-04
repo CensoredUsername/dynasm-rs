@@ -6,6 +6,7 @@ use crate::relocations::{Relocation, RelocationSize, RelocationKind};
 pub struct X64Relocation {
     size: RelocationSize,
     offset: u8,
+    start_offset: u8
 }
 
 impl Relocation for X64Relocation {
@@ -13,14 +14,19 @@ impl Relocation for X64Relocation {
     fn from_encoding(encoding: Self::Encoding) -> Self {
         Self {
             offset: encoding.0,
-            size: RelocationSize::from_encoding(encoding.1)
+            size: RelocationSize::from_encoding(encoding.1),
+            start_offset: 0,
         }
     }
-    fn encode_from_size(size: RelocationSize) -> Self::Encoding {
-        (0, RelocationSize::encode_from_size(size))
+    fn from_size(size: RelocationSize) -> Self {
+        Self {
+            size,
+            offset: 0,
+            start_offset: size as u8,
+        }
     }
     fn start_offset(&self) -> usize {
-        0
+        self.start_offset as usize
     }
     fn field_offset(&self) -> usize{
         self.size.size() + self.offset as usize

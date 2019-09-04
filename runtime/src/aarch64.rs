@@ -43,8 +43,8 @@ impl Relocation for Aarch64Relocation {
             x  => Self::Plain(RelocationSize::from_encoding(x - 4))
         }
     }
-    fn encode_from_size(size: RelocationSize) -> Self::Encoding {
-        (RelocationSize::encode_from_size(size) + 5,)
+    fn from_size(size: RelocationSize) -> Self {
+        Self::Plain(size)
     }
     fn size(&self) -> usize {
         match self {

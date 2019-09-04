@@ -11,7 +11,7 @@ pub trait Relocation : Debug {
     /// construct this relocation from an encoded representation.
     fn from_encoding(encoding: Self::Encoding) -> Self;
     /// construct this relocation from a simple size. This is used to implement relocations in directives and literal pools.
-    fn encode_from_size(size: RelocationSize) -> Self::Encoding;
+    fn from_size(size: RelocationSize) -> Self;
     /// Returns the offset that this relocation is relative to, backwards with respect to the definition
     /// point of this relocation. (i.e. 0 for x64 as relocations are relative to the end of the instruction, and 4 for aarch64 as they are)
     /// Defaults to the size of this relocation.
@@ -93,8 +93,8 @@ impl Relocation for RelocationSize {
             x => panic!("Unsupported relocation size {}", x)
         }
     }
-    fn encode_from_size(size: RelocationSize) -> Self::Encoding {
-        size as u8
+    fn from_size(size: RelocationSize) -> Self {
+        size
     }
     fn size(&self) -> usize {
         *self as usize
@@ -119,6 +119,6 @@ impl Relocation for RelocationSize {
         RelocationKind::Relative
     }
     fn page_size() -> usize {
-        0
+        4096
     }
 }

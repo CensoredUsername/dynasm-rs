@@ -7,6 +7,7 @@ pub struct X86Relocation {
     size: RelocationSize,
     kind: RelocationKind,
     offset: u8,
+    start_offset: u8,
 }
 
 impl Relocation for X86Relocation {
@@ -16,13 +17,19 @@ impl Relocation for X86Relocation {
             offset: encoding.0,
             size: RelocationSize::from_encoding(encoding.1),
             kind: RelocationKind::from_encoding(encoding.2),
+            start_offset: 0,
         }
     }
-    fn encode_from_size(size: RelocationSize) -> Self::Encoding {
-        (0, RelocationSize::encode_from_size(size), RelocationKind::Relative as _)
+    fn from_size(size: RelocationSize) -> Self {
+        Self {
+            size,
+            kind: RelocationKind::Relative,
+            offset: 0,
+            start_offset: size as u8,
+        }
     }
     fn start_offset(&self) -> usize {
-        0
+        self.start_offset as usize
     }
     fn field_offset(&self) -> usize{
         self.size.size() + self.offset as usize
