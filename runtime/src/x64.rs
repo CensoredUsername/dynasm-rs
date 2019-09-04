@@ -1,4 +1,4 @@
-use crate::relocations::{Relocation, RelocationSize, RelocationKind};
+use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation};
 
 
 /// Relocation implementation for the x64 architecture.
@@ -34,7 +34,7 @@ impl Relocation for X64Relocation {
     fn size(&self) -> usize {
         self.size.size()
     }
-    fn write_value(&self, buf: &mut [u8], value: isize) {
+    fn write_value(&self, buf: &mut [u8], value: isize) -> Result<(), ImpossibleRelocation> {
         self.size.write_value(buf, value)
     }
     fn read_value(&self, buf: &[u8]) -> isize {

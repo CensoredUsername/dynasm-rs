@@ -1,11 +1,16 @@
 use byteorder::{ByteOrder, LittleEndian};
-use std::fmt::Debug;
+
+use std::convert::TryFrom;
+
+/// Error returned when encoding a relocation failed
+#[derive(Debug)]
+pub struct ImpossibleRelocation { }
 
 
 /// Used to inform assemblers on how to implement relocations for each architecture.
 /// When implementing a new architecture, one simply has to implement this trait for
 /// the architecture's relocation definition.
-pub trait Relocation : Debug {
+pub trait Relocation {
     /// The encoded representation for this relocation that is emitted by the dynasm! macro.
     type Encoding;
     /// construct this relocation from an encoded representation.
@@ -28,7 +33,7 @@ pub trait Relocation : Debug {
     fn size(&self) -> usize;
     /// Write a value into a buffer of size `self.size()` in the format of this relocation.
     /// Any bits not part of the relocation should be preserved.
-    fn write_value(&self, buf: &mut [u8], value: isize);
+    fn write_value(&self, buf: &mut [u8], value: isize) -> Result<(), ImpossibleRelocation>;
     /// Read a value from a buffer of size `self.size()` in the format of this relocation.
     fn read_value(&self, buf: &[u8]) -> isize;
     /// Specifies what kind of relocation this relocation instance is.
@@ -99,13 +104,22 @@ impl Relocation for RelocationSize {
     fn size(&self) -> usize {
         *self as usize
     }
-    fn write_value(&self, buf: &mut [u8], value: isize) {
+    fn write_value(&self, buf: &mut [u8], value: isize) -> Result<(), ImpossibleRelocation> {
         match self {
-            RelocationSize::Byte => buf[0] = value as u8,
-            RelocationSize::Word => LittleEndian::write_i16(buf, value as i16),
-            RelocationSize::DWord => LittleEndian::write_i32(buf, value as i32),
-            RelocationSize::QWord => LittleEndian::write_i64(buf, value as i64),
+            RelocationSize::Byte => buf[0] =
+                i8::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            as u8,
+            RelocationSize::Word => LittleEndian::write_i16(buf,
+                i16::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            ),
+            RelocationSize::DWord => LittleEndian::write_i32(buf,
+                i32::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            ),
+            RelocationSize::QWord => LittleEndian::write_i64(buf,
+                i64::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            ),
         }
+        Ok(())
     }
     fn read_value(&self, buf: &[u8]) -> isize {
         match self {
@@ -121,4 +135,13 @@ impl Relocation for RelocationSize {
     fn page_size() -> usize {
         4096
     }
+}
+
+pub(crate) fn fits_signed_bitfield(value: i64, bits: u8) -> bool {
+    if bits >= 64 {
+        return true;
+    }
+
+    let half = 1i64 << (bits - 1);
+    (value < half && value >= -half)
 }

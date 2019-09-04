@@ -1,5 +1,6 @@
-use crate::relocations::{Relocation, RelocationSize, RelocationKind};
+use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation, fits_signed_bitfield};
 use byteorder::{ByteOrder, LittleEndian};
+use std::convert::TryFrom;
 
 /// Relocation implementation for the aarch64 architecture.
 #[derive(Debug, Clone)]
@@ -29,6 +30,50 @@ impl Aarch64Relocation {
             Self::Plain(_) => 0
         }
     }
+
+    fn encode(&self, value: isize) -> Result<u32, ImpossibleRelocation> {
+        let value = i64::try_from(value).map_err(|_| ImpossibleRelocation { } )?;
+        Ok(match self {
+            Self::B => {
+                if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 26) {
+                    return Err(ImpossibleRelocation { } );
+                }
+                let value = (value >> 2) as u32;
+                (value & 0x3FF_FFFF) << 5
+            },
+            Self::BCOND => {
+                if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 19) {
+                    return Err(ImpossibleRelocation { } );
+                }
+                let value = (value >> 2) as u32;
+                (value & 0x7FFFF) << 5
+            },
+            Self::ADR => {
+                if !fits_signed_bitfield(value, 21) {
+                    return Err(ImpossibleRelocation { } );
+                }
+                let low = (value) as u32;
+                let high = (value >> 2) as u32;
+                ((high & 0x7FFFF) << 5) | ((low & 3) << 29)
+            },
+            Self::ADRP => {
+                if value & 0xFFF != 0 || !fits_signed_bitfield(value >> 12, 21) {
+                    return Err(ImpossibleRelocation { } );
+                }
+                let low = (value >> 12) as u32;
+                let high = (value >> 14) as u32;
+                ((high & 0x7FFFF) << 5) | ((low & 3) << 29)
+            },
+            Self::TBZ => {
+                if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 14) {
+                    return Err(ImpossibleRelocation { } );
+                }
+                let value = (value >> 2) as u32;
+                (value & 0x3FFF) << 5
+            },
+            Self::Plain(_) => return Err(ImpossibleRelocation { } )
+        })
+    }
 }
 
 impl Relocation for Aarch64Relocation {
@@ -52,24 +97,18 @@ impl Relocation for Aarch64Relocation {
             _ => RelocationSize::DWord.size(),
         }
     }
-    fn write_value(&self, buf: &mut [u8], value: isize) {
+    fn write_value(&self, buf: &mut [u8], value: isize) -> Result<(), ImpossibleRelocation> {
         if let Self::Plain(s) = self {
             return s.write_value(buf, value);
         };
 
         let mask = self.op_mask();
         let template = LittleEndian::read_u32(buf) & mask;
-        let value = value as u32;
-        let packed = match self {
-            Self::B => value >> 2,
-            Self::BCOND => (value >> 2) << 5,
-            Self::ADR  => (((value >> 2 ) & 0x7FFFF) << 5) | (( value        & 3) << 29),
-            Self::ADRP => (((value >> 14) & 0x7FFFF) << 5) | (((value >> 12) & 3) << 29),
-            Self::TBZ => (value >> 5) << 2,
-            Self::Plain(_) => unreachable!()
-        };
 
-        LittleEndian::write_u32(buf, template | (packed & !mask));
+        let packed = self.encode(value)?;
+
+        LittleEndian::write_u32(buf, template | packed);
+        Ok(())
     }
     fn read_value(&self, buf: &[u8]) -> isize {
         if let Self::Plain(s) = self {
@@ -77,13 +116,25 @@ impl Relocation for Aarch64Relocation {
         };
 
         let mask = !self.op_mask();
-        let value = LittleEndian::read_u32(buf) & mask;
+        let value = LittleEndian::read_u32(buf);
         let unpacked = match self {
-            Self::B => value << 2,
-            Self::BCOND => (value >> 5) << 2,
-            Self::ADR  =>  (((value >> 5) & 0x7FFFF) << 2) | ((value >> 29) & 3),
-            Self::ADRP => ((((value >> 5) & 0x7FFFF) << 2) | ((value >> 29) & 3)) << 12,
-            Self::TBZ => (value >> 5) << 2,
+            Self::B => u64::from(
+                value & mask
+            ) << 2,
+            Self::BCOND => u64::from(
+                (value & mask) >> 5
+            ) << 2,
+            Self::ADR  => u64::from(
+                (((value >> 5 ) & 0x7FFFF) << 2) |
+                ((value >> 29) & 3 )
+            ),
+            Self::ADRP => u64::from(
+                (((value >> 5 ) & 0x7FFFF) << 2) |
+                ((value >> 29) & 3 )
+            ) << 12,
+            Self::TBZ => u64::from(
+                (value & mask) >> 5
+            ) << 2,
             Self::Plain(_) => unreachable!()
         };
 
@@ -92,14 +143,14 @@ impl Relocation for Aarch64Relocation {
             Self::B => 26,
             Self::BCOND => 19,
             Self::ADR => 21,
-            Self::ADRP => 21,
+            Self::ADRP => 33,
             Self::TBZ => 14,
             Self::Plain(_) => unreachable!()
         };
-        let offset = 1u32 << (bits - 1);
-        let value: u32 = (unpacked ^ offset) - offset;
+        let offset = 1u64 << (bits - 1);
+        let value: u64 = (unpacked ^ offset) - offset;
 
-        value as i32 as isize
+        value as i64 as isize
     }
     fn kind(&self) -> RelocationKind {
         RelocationKind::Relative

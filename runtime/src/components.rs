@@ -7,9 +7,9 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, RwLock, RwLockWriteGuard};
 use std::mem;
 
-use crate::{DynamicLabel, AssemblyOffset, DynasmError, DynasmLabelApi};
+use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
 use crate::mmap::{ExecutableBuffer, MutableBuffer};
-use crate::relocations::{Relocation, RelocationKind, RelocationSize};
+use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
 
 
 /// This struct implements a protection-swapping assembling buffer
@@ -160,7 +160,7 @@ impl LabelRegistry {
     pub fn define_dynamic(&mut self, id: DynamicLabel, offset: AssemblyOffset) -> Result<(), DynasmError> {
         let entry = &mut self.dynamic_labels[id.0];
         if entry.is_some() {
-            return Err(DynasmError::DuplicateLabel);
+            return Err(DynasmError::DuplicateLabel(LabelKind::Dynamic(id)));
         }
 
         *entry = Some(offset);
@@ -170,7 +170,7 @@ impl LabelRegistry {
     /// Define a the global label `name` to be located at `offset`.
     pub fn define_global(&mut self, name: &'static str, offset: AssemblyOffset) -> Result<(), DynasmError> {
         match self.global_labels.entry(name) {
-            Entry::Occupied(_) => Err(DynasmError::DuplicateLabel),
+            Entry::Occupied(_) => Err(DynasmError::DuplicateLabel(LabelKind::Global(name))),
             Entry::Vacant(v) => {
                 v.insert(offset);
                 Ok(())
@@ -184,18 +184,18 @@ impl LabelRegistry {
     }
 
     /// Returns the offset at which the dynamic label `id` was defined, if one was defined.
-    pub fn resolve_dynamic(&self, id: DynamicLabel) -> Option<AssemblyOffset> {
-        self.dynamic_labels.get(id.0).and_then(|&e| e)
+    pub fn resolve_dynamic(&self, id: DynamicLabel) -> Result<AssemblyOffset, DynasmError> {
+        self.dynamic_labels.get(id.0).and_then(|&e| e).ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
     }
 
     /// Returns the offset at which the global label `name` was defined, if one was defined.
-    pub fn resolve_global(&self, name: &'static str) -> Option<AssemblyOffset> {
-        self.global_labels.get(&name).cloned()
+    pub fn resolve_global(&self, name: &'static str) -> Result<AssemblyOffset, DynasmError> {
+        self.global_labels.get(&name).cloned().ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Global(name)))
     }
 
     /// Returns the offset at which the last local label named `id` was defined, if one was defined.
-    pub fn resolve_local(&self, name: &'static str) -> Option<AssemblyOffset> {
-        self.local_labels.get(&name).cloned()
+    pub fn resolve_local(&self, name: &'static str) -> Result<AssemblyOffset, DynasmError> {
+        self.local_labels.get(&name).cloned().ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Local(name)))
     }
 }
 
@@ -235,7 +235,7 @@ impl<R: Relocation> PatchLoc<R> {
     /// Patch `buffer` so that this relocation patch will point to `target`.
     /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
     /// `buf_addr` is the address that this larger buffer will come to reside at when it is assembled.
-    pub fn patch(&self, buf_offset: usize, buf_addr: usize, buffer: &mut [u8], target: usize) {
+    pub fn patch(&self, buf_offset: usize, buf_addr: usize, buffer: &mut [u8], target: usize) -> Result<(), ImpossibleRelocation> {
         let buf = self.slice(buf_offset, buffer);
         let value = self.value(target, buf_addr);
         self.relocation.write_value(buf, value)
@@ -244,7 +244,7 @@ impl<R: Relocation> PatchLoc<R> {
     /// Patch `buffer` so that this relocation will still point to the right location due to a change in the address of the containing buffer.
     /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
     /// `adjustment` is `new_buf_addr - old_buf_addr`.
-    pub fn adjust(&self, buf_offset: usize, buffer: &mut [u8], adjustment: isize) {
+    pub fn adjust(&self, buf_offset: usize, buffer: &mut [u8], adjustment: isize) -> Result<(), ImpossibleRelocation> {
         let buf = self.slice(buf_offset, buffer);
         let value = self.relocation.read_value(buf);
         let value = match self.relocation.kind() {
@@ -252,7 +252,7 @@ impl<R: Relocation> PatchLoc<R> {
             RelocationKind::RelToAbs => value.wrapping_sub(adjustment),
             RelocationKind::AbsToRel => value.wrapping_add(adjustment),
         };
-        self.relocation.write_value(buf, value);
+        self.relocation.write_value(buf, value)
     }
 
     /// Returns if this patch requires adjustment when the address of the buffer it resides in is altered.
@@ -527,6 +527,7 @@ impl LitPool {
 #[cfg(test)]
 mod tests {
     use crate::*;
+    use std::fmt::Debug;
     use relocations::{Relocation, RelocationSize};
 
     #[test]
@@ -549,7 +550,7 @@ mod tests {
         test_litpool::<aarch64::Aarch64Relocation>();
     }
 
-    fn test_litpool<R: Relocation>() {
+    fn test_litpool<R: Relocation + Debug>() {
         let mut ops = Assembler::<R>::new().unwrap();
         let dynamic1 = ops.new_dynamic_label();
 
@@ -585,6 +586,7 @@ mod tests {
         ops.global_label("global1");
         ops.dynamic_label(dynamic1);
 
+        assert_eq!(ops.commit(), Ok(()));
         let buf = ops.finalize().unwrap();
 
         assert_eq!(&*buf, &[
