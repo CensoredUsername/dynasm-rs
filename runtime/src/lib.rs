@@ -43,6 +43,14 @@ pub struct AssemblyOffset(pub usize);
 pub struct DynamicLabel(usize);
 
 
+impl DynamicLabel {
+    /// Get the internal ID of this dynamic label. This is only useful for debugging purposes.
+    pub fn get_id(self) -> usize {
+        self.0
+    }
+}
+
+
 /// A read-only shared reference to the executable buffer inside an Assembler. By
 /// locking it the internal `ExecutableBuffer` can be accessed and executed.
 #[derive(Debug, Clone)]
@@ -77,7 +85,7 @@ impl fmt::Display for LabelKind {
         match self {
             Self::Local(s) => write!(f, "label {}", s),
             Self::Global(s) => write!(f, "label ->{}", s),
-            Self::Dynamic(id) => write!(f, "label =>{}", id.0)
+            Self::Dynamic(id) => write!(f, "label =>{}", id.get_id())
         }
     }
 }
@@ -100,7 +108,7 @@ impl fmt::Display for TargetKind {
             Self::Forward(s) => write!(f, "target >{}", s),
             Self::Backward(s) => write!(f, "target <{}", s),
             Self::Global(s) => write!(f, "target ->{}", s),
-            Self::Dynamic(id) => write!(f, "target =>{}", id.0),
+            Self::Dynamic(id) => write!(f, "target =>{}", id.get_id()),
             Self::Extern(value) => write!(f, "target extern {}", value),
             Self::Managed => write!(f, "while adjusting managed relocation"),
         }
