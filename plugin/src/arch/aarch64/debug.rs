@@ -684,18 +684,18 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::Q =>   write!(buf, "<Q,{}>", arg_idx).unwrap(),
                 Matcher::V(s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(s), width / s.in_bytes()).unwrap();
+                    write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(*s), width / s.in_bytes()).unwrap();
                 },
-                Matcher::VStatic(s, c) => write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(s), c).unwrap(),
-                Matcher::VElement(s) => write!(buf, "<V,{}>.{}[<Imm,{}>]", arg_idx, size_to_string(s), arg_idx + 1).unwrap(),
-                Matcher::VElementStatic(s, element) => write!(buf, "<V,{}>.{}[{}]", arg_idx, size_to_string(s), element).unwrap(),
-                Matcher::VStaticElement(s, c) => write!(buf, "<V,{}>.{}{}[<Imm,{}>]", arg_idx, size_to_string(s), c, arg_idx + 1).unwrap(),
+                Matcher::VStatic(s, c) => write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(*s), c).unwrap(),
+                Matcher::VElement(s) => write!(buf, "<V,{}>.{}[<Imm,{}>]", arg_idx, size_to_string(*s), arg_idx + 1).unwrap(),
+                Matcher::VElementStatic(s, element) => write!(buf, "<V,{}>.{}[{}]", arg_idx, size_to_string(*s), element).unwrap(),
+                Matcher::VStaticElement(s, c) => write!(buf, "<V,{}>.{}{}[<Imm,{}>]", arg_idx, size_to_string(*s), c, arg_idx + 1).unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(s), width / s.in_bytes(), a).unwrap();
+                    write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(*s), width / s.in_bytes(), a).unwrap();
                 },
-                Matcher::RegListStatic(a, s, c) => write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(s), c, a).unwrap(),
-                Matcher::RegListElement(a, s) =>   write!(buf, "{{<V,{}>.{} * {}}}[<Imm,{}>]", arg_idx, size_to_string(s), a, arg_idx + 1).unwrap(),
+                Matcher::RegListStatic(a, s, c) => write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(*s), c, a).unwrap(),
+                Matcher::RegListElement(a, s) =>   write!(buf, "{{<V,{}>.{} * {}}}[<Imm,{}>]", arg_idx, size_to_string(*s), a, arg_idx + 1).unwrap(),
                 Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
                 Matcher::RefBase =>   write!(buf, "[<XSP,{}>]", arg_idx).unwrap(),
                 Matcher::RefOffset => write!(buf, "[<XSP,{}> <, <Imm,{}> > ]", arg_idx, arg_idx + 1).unwrap(),
