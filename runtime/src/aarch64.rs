@@ -39,7 +39,7 @@ impl Aarch64Relocation {
                     return Err(ImpossibleRelocation { } );
                 }
                 let value = (value >> 2) as u32;
-                (value & 0x3FF_FFFF) << 5
+                (value & 0x3FF_FFFF)
             },
             Self::BCOND => {
                 if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 19) {
@@ -57,7 +57,8 @@ impl Aarch64Relocation {
                 ((high & 0x7FFFF) << 5) | ((low & 3) << 29)
             },
             Self::ADRP => {
-                if value & 0xFFF != 0 || !fits_signed_bitfield(value >> 12, 21) {
+                let value = value + 0xFFF;
+                if !fits_signed_bitfield(value >> 12, 21) {
                     return Err(ImpossibleRelocation { } );
                 }
                 let low = (value >> 12) as u32;
