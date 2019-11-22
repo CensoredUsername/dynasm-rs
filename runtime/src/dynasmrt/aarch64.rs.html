@@ -231,6 +231,7 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
+<span id="234">234</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">relocations</span>::{<span class="ident">Relocation</span>, <span class="ident">RelocationSize</span>, <span class="ident">RelocationKind</span>, <span class="ident">ImpossibleRelocation</span>, <span class="ident">fits_signed_bitfield</span>};
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">LittleEndian</span>};
@@ -273,7 +274,7 @@
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ImpossibleRelocation</span> { } );
                 }
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-                (<span class="ident">value</span> <span class="op">&amp;</span> <span class="number">0x3FF_FFFF</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>
+                (<span class="ident">value</span> <span class="op">&amp;</span> <span class="number">0x3FF_FFFF</span>)
             },
             <span class="self">Self</span>::<span class="ident">BCOND</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="number">3</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">fits_signed_bitfield</span>(<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>, <span class="number">19</span>) {
@@ -291,7 +292,8 @@
                 ((<span class="ident">high</span> <span class="op">&amp;</span> <span class="number">0x7FFFF</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>) <span class="op">|</span> ((<span class="ident">low</span> <span class="op">&amp;</span> <span class="number">3</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">29</span>)
             },
             <span class="self">Self</span>::<span class="ident">ADRP</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="number">0xFFF</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">fits_signed_bitfield</span>(<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span>, <span class="number">21</span>) {
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span> <span class="op">+</span> <span class="number">0xFFF</span>;
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">fits_signed_bitfield</span>(<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span>, <span class="number">21</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ImpossibleRelocation</span> { } );
                 }
                 <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span>) <span class="kw">as</span> <span class="ident">u32</span>;

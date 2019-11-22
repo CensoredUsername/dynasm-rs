@@ -1,5 +1,6 @@
 var N=null,E="",T="t",U="u",searchIndex={};
 var R=["dynasm"];
+
 searchIndex["dynasm"]={"doc":E,"i":[[14,R[0],R[0],"The whole point",N,N]],"p":[]};
 initSearch(searchIndex);addSearchOptions(searchIndex);// I'm sorry
 var path = document.getElementsByClassName("logo-container")[0].childNodes[0].getAttribute("src");
