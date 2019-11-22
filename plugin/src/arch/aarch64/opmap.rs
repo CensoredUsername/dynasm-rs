@@ -4430,4 +4430,4 @@ Ops!(
     0b00001110_11000000_01111000_00000000 = [VStatic(QWORD, 2), VStatic(QWORD, 2), VStatic(QWORD, 2)] => [R(0), R(5), R(16), Rwidth(30)];
 ]
 
-);
+)
