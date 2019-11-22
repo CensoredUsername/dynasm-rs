@@ -20,10 +20,10 @@ It is currently in beta, meaning that everything is operational, but some APIs m
 
 Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/language/index.html).
 
-## Support
+## Architecture support
 
 - Supports the x64/x86 instruction sets in long and protected mode with every AMD/Intel/VIA extension except for AVX-512.
-- Supports the aarch64 instruction set up to ARMv8.4 except for SVE instructions.
+- Supports the aarch64 instruction set up to ARMv8.4 except for SVE instructions. The development of this assembler backend has been generously sponsored by the awesome folks at [Wasmer](https://github.com/wasmerio/wasmer)!
 
 ## Example
 
@@ -81,6 +81,10 @@ pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
 ## Background
 
 This project is heavily inspired by [Dynasm](http://luajit.org/dynasm.html)
+
+## Sponsorship
+
+The development of the Aarch64 assembler backend has been sponsored by [Wasmer](https://github.com/wasmerio/wasmer).
 
 ## License
 
