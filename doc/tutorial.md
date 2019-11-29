@@ -2,15 +2,14 @@
 
 # Introduction
 
-Dynasm-rs is a library and syntax extension for assembling code at runtime. For the first part of the tutorial we will be examining the following example program that assembles a simple function at runtime:
+Dynasm-rs is a library and syntax extension for assembling code at runtime. For the first part of the tutorial we will be examining the following example program that assembles a simple function at runtime for the x64 instruction set:
 
 ```
-#![feature(plugin)]
-#![plugin(dynasm)]
-
-#[macro_use]
+#![feature(proc_macro_hygiene)]
 extern crate dynasmrt;
+extern crate dynasm;
 
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
@@ -21,6 +20,7 @@ fn main() {
     let string = "Hello World!";
 
     dynasm!(ops
+        ; .arch x64
         ; ->hello:
         ; .bytes string.as_bytes()
     );
@@ -43,33 +43,32 @@ fn main() {
         mem::transmute(buf.ptr(hello))
     };
 
-    assert!(
-        hello_fn()
-    );
+    assert!(hello_fn());
 }
 
 pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
-    io::stdout().write_all(unsafe {
-        slice::from_raw_parts(buffer, length as usize)
-    }).is_ok()
+    io::stdout()
+        .write_all(unsafe { slice::from_raw_parts(buffer, length as usize) })
+        .is_ok()
 }
+
 ```
 
 We will now examine this code snippet piece by piece.
 
 ```
-#![feature(plugin)]
-#![plugin(dynasm)]
+#![feature(proc_macro_hygiene)]
 ```
-To use the `dynasm!` procedural macro, first the dynasm plugin has to be loaded. As plugins are currently unstable, the plugin feature first needs to be enabled. This currently requires a nightly version of rustc.
+To use the `dynasm!` procedural macro the `porc_macro_hygiene` feature has to be used until procedural macros in expression position are stabilized. This currently requires a nightly version of rustc.
 
 ```
-#[macro_use]
 extern crate dynasmrt;
+extern crate dynasm;
 
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 ```
-We then link to the dynasm runtime crate. Although they are not used here, it also contains various utility macros which we load here.
+We then link to the dynasm runtime crate and the dynasm procedural macro crate. We import the `dynasm::dynasm!` macro which will handle all assembling.
 Furthermore, the `DynasmApi` and `DynasmLabelApi` traits are loaded. These traits defines the interfaces used by the `dynasm!` procedural macro to produce assembled code.
 
 ```
@@ -151,56 +150,47 @@ And finally we can call this function, asserting that it returns true to ensure 
 And for the people interested in the behind-the-scenes, here's what the `dynasm!` macros expand to:
 
 ```
-#![feature(plugin)]
-#![plugin(dynasm)]
-
-#[macro_use]
+#![feature(proc_macro_hygiene)]
+extern crate dynasm;
 extern crate dynasmrt;
 
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
-use std::{io, slice, mem};
+use std::{io, mem, slice};
 use std::io::Write;
 
 fn main() {
-    let mut ops = dynasmrt::x64::Assembler::new();
+    let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     let string = "Hello World!";
 
-// dynasm!(
-    ops.global_label("hello");
-    ops.extend(string.as_bytes());
-// )
+    { // dynasm!
+        ops.global_label("hello");
+        ops.extend(string.as_bytes());
+    };
 
     let hello = ops.offset();
-// dynasm!(
-    ops.extend(b"H\x8d\r\x00\x00\x00\x00");
-    ops.global_reloc("hello", 4u8);
-    ops.extend(b"1\xd2\xb2");
-    ops.push_i8(string.len() as _);
-    ops.extend(b"H\xb8");
-    ops.push_i64(print as _);
-    ops.extend(b"H\x83\xec");
-    ops.push_i8(40);
-    ops.extend(b"\xff\xd0H\x83\xc4");
-    ops.push_i8(40);
-    ops.push(b'\xc3');
-// )
+    { // dynasm!
+        ops.extend(b"H\x8d\r\x00\x00\x00\x00");
+        ops.global_reloc("hello", 0isize, (0u8, 4u8));
+        ops.extend(b"1\xd2\xb2");
+        ops.push_i8(string.len() as _);
+        ops.extend(b"H\xb8");
+        ops.push_i64(print as _);
+        ops.extend(b"H\x83\xec");
+        ops.push_i8(0x28);
+        ops.extend(b"\xff\xd0H\x83\xc4");
+        ops.push_i8(0x28);
+        ops.extend(b"\xc3");
+    };
 
     let buf = ops.finalize().unwrap();
 
-    let hello_fn: extern "win64" fn() -> bool = unsafe {
-        mem::transmute(buf.ptr(hello))
-    };
+    let hello_fn: extern "win64" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 
     assert!(
         hello_fn()
     );
-}
-
-pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
-    io::stdout().write_all(unsafe {
-        slice::from_raw_parts(buffer, length as usize)
-    }).is_ok()
 }
 ```
 As you can see, the encoding has been determined fully at compile time, and the assembly has been reduced to a series of push and extend calls.
@@ -360,22 +350,23 @@ fn main() {
 
 ## Basics
 
-To kickstart this process, we'll first add the `dynasm` plugin and `dynasmrt` crate to our project, and `use` the `DynasmApi` and `DynasmLabelApi` traits:
+To kickstart this process, we'll first add the `dynasm` procedural macro and `dynasmrt` crate to our project, and `use` the `DynasmApi` and `DynasmLabelApi` traits:
 
 ```diffnew
-+ #![feature(plugin)]
-+ #![plugin(dynasm)]
-+ 
-+ #[macro_use]
-+ extern crate dynasmrt;
+#![feature(proc_macro_hygiene)]
+extern crate dynasmrt;
+extern crate dynasm;
+
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
+
 ```
 
 Then, we'll define the following aliases to make the code more readable. As this code is specific to `x86_64` we'll add a `cfg` attribute here so the code will fail to compile on other architectures. Note that `ops` is purely a placeholder here for the parser, it isn't actually used.
 
 ```diffnew
-+ #[cfg(target_arch = "x86_64")]
 + dynasm!(ops
++     ; .arch x64
 +     ; .alias a_state, rcx
 +     ; .alias a_current, rdx
 +     ; .alias a_begin, r8
@@ -776,15 +767,16 @@ And finally, we can edit the `main` function to use the JIT:
 With these changes, adding the necessary `use` statements and removing unused functions, you should end up with the following code (you can also find this example [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-jit)):
 
 ```
-#![feature(plugin)]
-#![plugin(dynasm)]
-
-#[macro_use]
+#![feature(proc_macro_hygiene)]
 extern crate dynasmrt;
+extern crate dynasm;
+
+use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 extern crate itertools;
 use itertools::Itertools;
+use itertools::multipeek;
 
 use std::io::{Read, BufRead, Write, stdin, stdout, BufReader, BufWriter};
 use std::env;
@@ -795,8 +787,8 @@ use std::u8;
 
 const TAPE_SIZE: usize = 30000;
 
-#[cfg(target_arch = "x86_64")]
 dynasm!(ops
+    ; .arch x64
     ; .alias a_state, rcx
     ; .alias a_current, rdx
     ; .alias a_begin, r8
@@ -838,9 +830,9 @@ macro_rules! call_extern {
 }
 
 struct State<'a> {
-    pub input: Box<BufRead + 'a>,
-    pub output: Box<Write + 'a>,
-    tape: [u8; TAPE_SIZE]
+    pub input: Box<dyn BufRead + 'a>,
+    pub output: Box<dyn Write + 'a>,
+    tape: [u8; TAPE_SIZE],
 }
 
 struct Program {
@@ -851,9 +843,9 @@ struct Program {
 
 impl Program {
     fn compile(program: &[u8]) -> Result<Program, &'static str> {
-        let mut ops = dynasmrt::x64::Assembler::new();
+        let mut ops = dynasmrt::x64::Assembler::new().unwrap();
         let mut loops = Vec::new();
-        let mut code = program.iter().cloned().multipeek();
+        let mut code = multipeek(program.iter().cloned());
 
         let start = prologue!(ops);
 
@@ -868,7 +860,7 @@ impl Program {
                         ; add a_current, TAPE_SIZE as _
                         ;wrap:
                     );
-                },
+                }
                 b'>' => {
                     let amount = code.take_while_ref(|x| *x == b'>').count() + 1;
                     dynasm!(ops
@@ -923,7 +915,7 @@ impl Program {
                         );
                     } else {
                         let backward_label = ops.new_dynamic_label();
-                        let forward_label  = ops.new_dynamic_label();
+                        let forward_label = ops.new_dynamic_label();
                         loops.push((backward_label, forward_label));
                         dynasm!(ops
                             ; cmp BYTE [a_current], 0
@@ -943,7 +935,7 @@ impl Program {
                         return Err("] without matching [");
                     }
                 },
-                _ => ()
+                _ => (),
             }
         }
         if loops.len() != 0 {
@@ -961,14 +953,13 @@ impl Program {
         let code = ops.finalize().unwrap();
         Ok(Program {
             code: code,
-            start: start
+            start: start,
         })
     }
 
     fn run(self, state: &mut State) -> Result<(), &'static str> {
-        let f: extern "win64" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 = unsafe {
-            mem::transmute(self.code.ptr(self.start))
-        };
+        let f: extern "win64" fn(*mut State, *mut u8, *mut u8, *const u8) -> u8 =
+            unsafe { mem::transmute(self.code.ptr(self.start)) };
         let start = state.tape.as_mut_ptr();
         let end = unsafe { start.offset(TAPE_SIZE as isize) };
         let res = f(state, start, start, end);
@@ -981,7 +972,7 @@ impl Program {
         } else {
             panic!("Unknown error code");
         }
-    }   
+    }
 }
 
 impl<'a> State<'a> {
@@ -996,11 +987,11 @@ impl<'a> State<'a> {
         state.output.write_all(slice::from_raw_parts(cell, 1)).is_err() as u8
     }
 
-    fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> State<'a> {
+    fn new(input: Box<dyn BufRead + 'a>, output: Box<dyn Write + 'a>) -> State<'a> {
         State {
             input: input,
             output: output,
-            tape: [0; TAPE_SIZE]
+            tape: [0; TAPE_SIZE],
         }
     }
 }
@@ -1014,7 +1005,9 @@ fn main() {
     }
     let path = args.pop().unwrap();
 
-    let mut f = if let Ok(f) = File::open(&path) { f } else {
+    let mut f = if let Ok(f) = File::open(&path) {
+        f
+    } else {
         println!("Could not open file {}", path);
         return;
     };
@@ -1025,10 +1018,8 @@ fn main() {
         return;
     }
 
-    let mut state = State::new(
-        Box::new(BufReader::new(stdin())), 
-        Box::new(BufWriter::new(stdout()))
-    );
+    let mut state = State::new(Box::new(BufReader::new(stdin())),
+                               Box::new(BufWriter::new(stdout())));
     let program = match Program::compile(&buf) {
         Ok(p) => p,
         Err(e) => {
