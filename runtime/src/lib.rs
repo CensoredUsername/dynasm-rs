@@ -334,7 +334,7 @@ impl<R: Relocation> VecAssembler<R> {
         // Resolve globals
         for (loc, name) in self.relocs.take_globals() {
             let target = self.labels.resolve_global(name)?;
-            if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target.0) {
+            if loc.patch(0, self.baseaddr, &mut self.ops, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Global(name)));
             }
         }
@@ -342,7 +342,7 @@ impl<R: Relocation> VecAssembler<R> {
         // Resolve dynamics
         for (loc, id) in self.relocs.take_dynamics() {
             let target = self.labels.resolve_dynamic(id)?;
-            if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target.0) {
+            if loc.patch(0, self.baseaddr, &mut self.ops, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Dynamic(id)));
             }
         }
@@ -404,7 +404,7 @@ impl<R: Relocation> DynasmLabelApi for VecAssembler<R> {
     fn local_label(&mut self, name: &'static str) {
         let offset = self.offset();
         for loc in self.relocs.take_locals_named(name) {
-            if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, offset.0) {
+            if loc.patch(0, self.baseaddr, &mut self.ops, offset.0).is_err() {
                 self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Forward(name)))
             }
         }
@@ -444,14 +444,14 @@ impl<R: Relocation> DynasmLabelApi for VecAssembler<R> {
         };
         let location = self.offset();
         let loc = PatchLoc::new(location, offset, kind);
-        if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target) {
+        if loc.patch(0, self.baseaddr, &mut self.ops, target).is_err() {
             self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Backward(name)))
         }
     }
     fn bare_relocation(&mut self, target: usize, kind: R) {
         let location = self.offset();
         let loc = PatchLoc::new(location, 0, kind);
-        if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target) {
+        if loc.patch(0, self.baseaddr, &mut self.ops, target).is_err() {
             self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)))
         }
     }
@@ -548,7 +548,7 @@ impl<R: Relocation> Assembler<R> {
             let change = new_addr.wrapping_sub(old_addr) as isize;
 
             for reloc in managed.iter() {
-                if let Err(_) = reloc.adjust(0, buffer, change) {
+                if reloc.adjust(0, buffer, change).is_err() {
                     *error = Some(DynasmError::ImpossibleRelocation(TargetKind::Managed))
                 }
             }
@@ -604,7 +604,7 @@ impl<R: Relocation> Assembler<R> {
         // Resolve globals
         for (loc, name) in self.relocs.take_globals() {
             let target = self.labels.resolve_global(name)?;
-            if let Err(_) = loc.patch(buf_offset, buf_addr, buf, target.0) {
+            if loc.patch(buf_offset, buf_addr, buf, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Global(name)));
             }
             if loc.needs_adjustment() {
@@ -615,7 +615,7 @@ impl<R: Relocation> Assembler<R> {
         // Resolve dynamics
         for (loc, id) in self.relocs.take_dynamics() {
             let target = self.labels.resolve_dynamic(id)?;
-            if let Err(_) = loc.patch(buf_offset, buf_addr, buf, target.0) {
+            if loc.patch(buf_offset, buf_addr, buf, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Dynamic(id)));
             }
             if loc.needs_adjustment() {
@@ -669,7 +669,7 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
     fn local_label(&mut self, name: &'static str) {
         let offset = self.offset();
         for loc in self.relocs.take_locals_named(name) {
-            if let Err(_) = loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, offset.0) {
+            if loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, offset.0).is_err() {
                 self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Forward(name)))
             } else if loc.needs_adjustment() {
                 self.managed.add(loc)
@@ -711,7 +711,7 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
         };
         let location = self.offset();
         let loc = PatchLoc::new(location, offset, kind);
-        if let Err(_) = loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, target) {
+        if loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, target).is_err() {
             self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Backward(name)))
         } else if loc.needs_adjustment() {
             self.managed.add(loc)
@@ -720,7 +720,7 @@ impl<R: Relocation> DynasmLabelApi for Assembler<R> {
     fn bare_relocation(&mut self, target: usize, kind: R) {
         let location = self.offset();
         let loc = PatchLoc::new(location, 0, kind);
-        if let Err(_) = loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, target) {
+        if loc.patch(self.memory.committed(), self.memory.execbuffer_addr(), &mut self.ops, target).is_err() {
             self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)))
         } else if loc.needs_adjustment() {
             self.managed.add(loc)
@@ -784,7 +784,7 @@ impl<'a, R: Relocation> Modifier<'a, R> {
         // Resolve globals
         for (loc, name) in self.relocs.take_globals() {
             let target = self.labels.resolve_global(name)?;
-            if let Err(_) = loc.patch(0, buf_addr, self.buffer, target.0) {
+            if loc.patch(0, buf_addr, self.buffer, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Global(name)));
             }
             if loc.needs_adjustment() {
@@ -795,7 +795,7 @@ impl<'a, R: Relocation> Modifier<'a, R> {
         // Resolve dynamics
         for (loc, id) in self.relocs.take_dynamics() {
             let target = self.labels.resolve_dynamic(id)?;
-            if let Err(_) = loc.patch(0, buf_addr, self.buffer, target.0) {
+            if loc.patch(0, buf_addr, self.buffer, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Dynamic(id)));
             }
             if loc.needs_adjustment() {
@@ -859,7 +859,7 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
     fn local_label(&mut self, name: &'static str) {
         let offset = self.offset();
         for loc in self.relocs.take_locals_named(name) {
-            if let Err(_) = loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, offset.0)  {
+            if loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, offset.0).is_err()  {
                 self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Forward(name)));
             } else if loc.needs_adjustment() {
                 self.new_managed.add(loc);
@@ -901,7 +901,7 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
         };
         let location = self.offset();
         let loc = PatchLoc::new(location, offset, kind);
-        if let Err(_) = loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, target) {
+        if loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, target).is_err() {
             self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Backward(name)));
         } else if loc.needs_adjustment() {
             self.new_managed.add(loc)
@@ -910,7 +910,7 @@ impl<'a, R: Relocation> DynasmLabelApi for Modifier<'a, R> {
     fn bare_relocation(&mut self, target: usize, kind: R) {
         let location = self.offset();
         let loc = PatchLoc::new(location, 0, kind);
-        if let Err(_) = loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, target) {
+        if loc.patch(0, self.buffer.as_ptr() as usize, self.buffer, target).is_err() {
             self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)));
         } else if loc.needs_adjustment() {
             self.new_managed.add(loc)
