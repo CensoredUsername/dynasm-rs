@@ -246,27 +246,49 @@ pub trait DynasmLabelApi : DynasmApi {
 }
 
 
-/// An assembler that is purely a `Vec<u8>`. It doesn't support labels, but can be used to easily inspect generated code.
-pub struct VecAssembler(Vec<u8>);
+/// An assembler that is purely a `Vec<u8>`. It doesn't support labels or architecture-specific directives,
+/// but can be used to easily inspect generated code. It is intended to be used in testcases.
+pub struct SimpleAssembler {
+    pub ops: Vec<u8>
+}
 
-impl Extend<u8> for VecAssembler {
+impl SimpleAssembler {
+    /// Creates a new `SimpleAssembler`, containing an empty `Vec`.
+    pub fn new() -> SimpleAssembler {
+        SimpleAssembler {
+            ops: Vec::new()
+        }
+    }
+
+    /// Use an `UncommittedModifier` to alter uncommitted code.
+    pub fn alter(&mut self) -> UncommittedModifier {
+        UncommittedModifier::new(&mut self.ops, AssemblyOffset(0))
+    }
+
+    /// Destroys this assembler, returning the `Vec<u8>` contained within
+    pub fn finalize(self) -> Vec<u8> {
+        self.ops
+    }
+}
+
+impl Extend<u8> for SimpleAssembler {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
-        self.0.extend(iter)
+        self.ops.extend(iter)
     }
 }
 
-impl<'a> Extend<&'a u8> for VecAssembler {
+impl<'a> Extend<&'a u8> for SimpleAssembler {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
-        self.0.extend(iter)
+        self.ops.extend(iter)
     }
 }
 
-impl DynasmApi for VecAssembler {
+impl DynasmApi for SimpleAssembler {
     fn offset(&self) -> AssemblyOffset {
-        AssemblyOffset(self.0.len())
+        AssemblyOffset(self.ops.len())
     }
     fn push(&mut self, byte: u8) {
-        self.0.push(byte);
+        self.ops.push(byte);
     }
     fn align(&mut self, alignment: usize, with: u8) {
         let offset = self.offset().0 % alignment;
@@ -277,6 +299,164 @@ impl DynasmApi for VecAssembler {
         }
     }
 }
+
+
+/// An assembler that assembles into a `Vec<u8>`, while supporting labels. To support the different types of relocations
+/// it requires a base address of the to be assembled code to be specified.
+pub struct VecAssembler<R: Relocation> {
+    ops: Vec<u8>,
+    baseaddr: usize,
+    labels: LabelRegistry,
+    relocs: RelocRegistry<R>,
+    error: Option<DynasmError>,
+}
+
+impl<R: Relocation> VecAssembler<R> {
+    /// Creates a new VecAssembler, with the specified base address.
+    pub fn new(baseaddr: usize) -> VecAssembler<R> {
+        VecAssembler {
+            ops: Vec::new(),
+            baseaddr,
+            labels: LabelRegistry::new(),
+            relocs: RelocRegistry::new(),
+            error: None
+        }
+    }
+
+    /// Resolves any relocations emitted to the assembler before this point.
+    /// If an impossible relocation was specified before this point, returns them here.
+    pub fn commit(&mut self) -> Result<(), DynasmError> {
+        // If we accrued any errors while assembling before, emit them now.
+        if let Some(e) = self.error.take() {
+            return Err(e);
+        }
+
+        // Resolve globals
+        for (loc, name) in self.relocs.take_globals() {
+            let target = self.labels.resolve_global(name)?;
+            if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target.0) {
+                return Err(DynasmError::ImpossibleRelocation(TargetKind::Global(name)));
+            }
+        }
+
+        // Resolve dynamics
+        for (loc, id) in self.relocs.take_dynamics() {
+            let target = self.labels.resolve_dynamic(id)?;
+            if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target.0) {
+                return Err(DynasmError::ImpossibleRelocation(TargetKind::Dynamic(id)));
+            }
+        }
+
+        // Check that there are no unknown local labels
+        for (_, name) in self.relocs.take_locals() {
+            return Err(DynasmError::UnknownLabel(LabelKind::Local(name)));
+        }
+
+        Ok(())
+    }
+
+    /// Use an `UncommittedModifier` to alter uncommitted code.
+    /// This does not allow the user to change labels/relocations.
+    pub fn alter(&mut self) -> UncommittedModifier {
+        UncommittedModifier::new(&mut self.ops, AssemblyOffset(0))
+    }
+
+    /// Finalizes the `VecAssembler`, returning the resulting `Vec<u8>` containing all assembled data.
+    /// this implicitly commits any relocations beforehand and returns an error if required.
+    pub fn finalize(mut self) -> Result<Vec<u8>, DynasmError> {
+        self.commit()?;
+        Ok(self.ops)
+    }
+}
+
+impl<R: Relocation> Extend<u8> for VecAssembler<R> {
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
+        self.ops.extend(iter)
+    }
+}
+
+impl<'a, R: Relocation> Extend<&'a u8> for VecAssembler<R> {
+    fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
+        self.ops.extend(iter)
+    }
+}
+
+impl<R: Relocation> DynasmApi for VecAssembler<R> {
+    fn offset(&self) -> AssemblyOffset {
+        AssemblyOffset(self.ops.len())
+    }
+    fn push(&mut self, byte: u8) {
+        self.ops.push(byte);
+    }
+    fn align(&mut self, alignment: usize, with: u8) {
+        let offset = self.offset().0 % alignment;
+        if offset != 0 {
+            for _ in offset .. alignment {
+                self.push(with);
+            }
+        }
+    }
+}
+
+impl<R: Relocation> DynasmLabelApi for VecAssembler<R> {
+    type Relocation = R;
+
+    fn local_label(&mut self, name: &'static str) {
+        let offset = self.offset();
+        for loc in self.relocs.take_locals_named(name) {
+            if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, offset.0) {
+                self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Forward(name)))
+            }
+        }
+        self.labels.define_local(name, offset);
+    }
+    fn global_label( &mut self, name: &'static str) {
+        let offset = self.offset();
+        if let Err(e) = self.labels.define_global(name, offset) {
+            self.error = Some(e)
+        }
+    }
+    fn dynamic_label(&mut self, id: DynamicLabel) {
+        let offset = self.offset();
+        if let Err(e) = self.labels.define_dynamic(id, offset) {
+            self.error = Some(e)
+        }
+    }
+    fn global_relocation(&mut self, name: &'static str, offset: isize, kind: R) {
+        let location = self.offset();
+        self.relocs.add_global(name, PatchLoc::new(location, offset, kind));
+    }
+    fn dynamic_relocation(&mut self, id: DynamicLabel, offset: isize, kind: R) {
+        let location = self.offset();
+        self.relocs.add_dynamic(id, PatchLoc::new(location, offset, kind));
+    }
+    fn forward_relocation(&mut self, name: &'static str, offset: isize, kind: R) {
+        let location = self.offset();
+        self.relocs.add_local(name, PatchLoc::new(location, offset, kind));
+    }
+    fn backward_relocation(&mut self, name: &'static str, offset: isize, kind: R) {
+        let target = match self.labels.resolve_local(name) {
+            Ok(target) => target.0,
+            Err(e) => {
+                self.error = Some(e);
+                return;
+            }
+        };
+        let location = self.offset();
+        let loc = PatchLoc::new(location, offset, kind);
+        if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target) {
+            self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Backward(name)))
+        }
+    }
+    fn bare_relocation(&mut self, target: usize, kind: R) {
+        let location = self.offset();
+        let loc = PatchLoc::new(location, 0, kind);
+        if let Err(_) = loc.patch(0, self.baseaddr, &mut self.ops, target) {
+            self.error = Some(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)))
+        }
+    }
+}
+
 
 /// A full assembler implementation. Supports labels, all types of relocations,
 /// incremental compilation and multithreaded execution with simultaneous compiltion.
