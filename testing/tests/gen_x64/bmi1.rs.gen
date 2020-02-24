@@ -1,12 +1,12 @@
 
 #[test]
 fn enc_bmi1_andn5912() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; andn rbx, rdx, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF2, 0x18", "andn rbx, rdx, QWORD [rax]");
@@ -16,12 +16,12 @@ fn enc_bmi1_andn5912() {
 
 #[test]
 fn enc_bmi1_andn5913() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; andn rdx, rax, rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF2, 0xD1", "andn rdx, rax, rcx");
@@ -31,12 +31,12 @@ fn enc_bmi1_andn5913() {
 
 #[test]
 fn enc_bmi1_andn5914() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; andn rax, rdx, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF2, 0x00", "andn rax, rdx, QWORD [rax]");
@@ -46,12 +46,12 @@ fn enc_bmi1_andn5914() {
 
 #[test]
 fn enc_bmi1_andn5915() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; andn rdx, rbx, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE0, 0xF2, 0x10", "andn rdx, rbx, QWORD [rax]");
@@ -61,12 +61,12 @@ fn enc_bmi1_andn5915() {
 
 #[test]
 fn enc_bmi1_bextr5916() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; bextr rcx, QWORD [rax * 2 + rdx], rax
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF7, 0x0C, 0x42", "bextr rcx, QWORD [rax * 2 + rdx], rax");
@@ -76,12 +76,12 @@ fn enc_bmi1_bextr5916() {
 
 #[test]
 fn enc_bmi1_bextr5917() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; bextr rcx, QWORD [rax * 2 + rdx], rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF0, 0xF7, 0x0C, 0x42", "bextr rcx, QWORD [rax * 2 + rdx], rcx");
@@ -91,12 +91,12 @@ fn enc_bmi1_bextr5917() {
 
 #[test]
 fn enc_bmi1_bextr5918() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; bextr rax, rcx, rdx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF7, 0xC1", "bextr rax, rcx, rdx");
@@ -106,12 +106,12 @@ fn enc_bmi1_bextr5918() {
 
 #[test]
 fn enc_bmi1_bextr5919() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; bextr rcx, QWORD [rax], rdx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF7, 0x08", "bextr rcx, QWORD [rax], rdx");
@@ -121,12 +121,12 @@ fn enc_bmi1_bextr5919() {
 
 #[test]
 fn enc_bmi1_bextr5920() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; bextr rcx, rcx, rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF0, 0xF7, 0xC9", "bextr rcx, rcx, rcx");
@@ -136,12 +136,12 @@ fn enc_bmi1_bextr5920() {
 
 #[test]
 fn enc_bmi1_blsi5921() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsi rcx, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF0, 0xF3, 0x1C, 0x42", "blsi rcx, QWORD [rax * 2 + rdx]");
@@ -151,12 +151,12 @@ fn enc_bmi1_blsi5921() {
 
 #[test]
 fn enc_bmi1_blsi5922() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsi rax, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF3, 0x18", "blsi rax, QWORD [rax]");
@@ -166,12 +166,12 @@ fn enc_bmi1_blsi5922() {
 
 #[test]
 fn enc_bmi1_blsi5923() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsi rdx, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF3, 0x1C, 0x42", "blsi rdx, QWORD [rax * 2 + rdx]");
@@ -181,12 +181,12 @@ fn enc_bmi1_blsi5923() {
 
 #[test]
 fn enc_bmi1_blsi5924() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsi rax, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF3, 0x1C, 0x42", "blsi rax, QWORD [rax * 2 + rdx]");
@@ -196,12 +196,12 @@ fn enc_bmi1_blsi5924() {
 
 #[test]
 fn enc_bmi1_blsmsk5925() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsmsk rbx, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE0, 0xF3, 0x14, 0x42", "blsmsk rbx, QWORD [rax * 2 + rdx]");
@@ -211,12 +211,12 @@ fn enc_bmi1_blsmsk5925() {
 
 #[test]
 fn enc_bmi1_blsmsk5926() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsmsk rax, rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF3, 0xD1", "blsmsk rax, rcx");
@@ -226,12 +226,12 @@ fn enc_bmi1_blsmsk5926() {
 
 #[test]
 fn enc_bmi1_blsmsk5927() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsmsk rax, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF3, 0x10", "blsmsk rax, QWORD [rax]");
@@ -241,12 +241,12 @@ fn enc_bmi1_blsmsk5927() {
 
 #[test]
 fn enc_bmi1_blsmsk5928() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsmsk rbx, rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE0, 0xF3, 0xD1", "blsmsk rbx, rcx");
@@ -256,12 +256,12 @@ fn enc_bmi1_blsmsk5928() {
 
 #[test]
 fn enc_bmi1_blsr5929() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsr rdx, rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF3, 0xC9", "blsr rdx, rcx");
@@ -271,12 +271,12 @@ fn enc_bmi1_blsr5929() {
 
 #[test]
 fn enc_bmi1_blsr5930() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsr rdx, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF3, 0x08", "blsr rdx, QWORD [rax]");
@@ -286,12 +286,12 @@ fn enc_bmi1_blsr5930() {
 
 #[test]
 fn enc_bmi1_blsr5931() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsr rdx, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE8, 0xF3, 0x0C, 0x42", "blsr rdx, QWORD [rax * 2 + rdx]");
@@ -301,12 +301,12 @@ fn enc_bmi1_blsr5931() {
 
 #[test]
 fn enc_bmi1_blsr5932() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsr rbx, rcx
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xE0, 0xF3, 0xC9", "blsr rbx, rcx");
@@ -316,12 +316,12 @@ fn enc_bmi1_blsr5932() {
 
 #[test]
 fn enc_bmi1_blsr5933() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; blsr rax, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xC4, 0xE2, 0xF8, 0xF3, 0x0C, 0x42", "blsr rax, QWORD [rax * 2 + rdx]");
@@ -331,12 +331,12 @@ fn enc_bmi1_blsr5933() {
 
 #[test]
 fn enc_bmi1_tzcnt5934() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; tzcnt rax, QWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0x04, 0x42", "tzcnt rax, QWORD [rax * 2 + rdx]");
@@ -346,12 +346,12 @@ fn enc_bmi1_tzcnt5934() {
 
 #[test]
 fn enc_bmi1_tzcnt5935() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; tzcnt rbx, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0x18", "tzcnt rbx, QWORD [rax]");
@@ -361,12 +361,12 @@ fn enc_bmi1_tzcnt5935() {
 
 #[test]
 fn enc_bmi1_tzcnt5936() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; tzcnt rdx, QWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x48, 0x0F, 0xBC, 0x10", "tzcnt rdx, QWORD [rax]");

@@ -1,12 +1,12 @@
 
 #[test]
 fn xtn2_6400() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; xtn2 V(29).S4, v4.D2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "9D, 28, A1, 4E", "xtn2 V(29).S4, v4.D2");
@@ -14,12 +14,12 @@ fn xtn2_6400() {
 
 #[test]
 fn yield_6401() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; yield
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "3F, 20, 03, D5", "yield");
@@ -27,12 +27,12 @@ fn yield_6401() {
 
 #[test]
 fn yield_6402() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; yield
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "3F, 20, 03, D5", "yield");
@@ -40,12 +40,12 @@ fn yield_6402() {
 
 #[test]
 fn zip1_6403() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(16).B16, v7.B16, v23.B16
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "F0, 38, 17, 4E", "zip1 V(16).B16, v7.B16, v23.B16");
@@ -53,12 +53,12 @@ fn zip1_6403() {
 
 #[test]
 fn zip1_6404() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(17).B16, V(28).B16, V(21).B16
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "91, 3B, 15, 4E", "zip1 V(17).B16, V(28).B16, V(21).B16");
@@ -66,12 +66,12 @@ fn zip1_6404() {
 
 #[test]
 fn zip1_6405() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v1.B8, v16.B8, v0.B8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "01, 3A, 00, 0E", "zip1 v1.B8, v16.B8, v0.B8");
@@ -79,12 +79,12 @@ fn zip1_6405() {
 
 #[test]
 fn zip1_6406() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(19).B8, V(4).B8, v28.B8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "93, 38, 1C, 0E", "zip1 V(19).B8, V(4).B8, v28.B8");
@@ -92,12 +92,12 @@ fn zip1_6406() {
 
 #[test]
 fn zip1_6407() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(3).H8, v18.H8, V(23).H8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "43, 3A, 57, 4E", "zip1 V(3).H8, v18.H8, V(23).H8");
@@ -105,12 +105,12 @@ fn zip1_6407() {
 
 #[test]
 fn zip1_6408() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v18.H8, v9.H8, v29.H8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "32, 39, 5D, 4E", "zip1 v18.H8, v9.H8, v29.H8");
@@ -118,12 +118,12 @@ fn zip1_6408() {
 
 #[test]
 fn zip1_6409() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(30).H4, V(20).H4, v15.H4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "9E, 3A, 4F, 0E", "zip1 V(30).H4, V(20).H4, v15.H4");
@@ -131,12 +131,12 @@ fn zip1_6409() {
 
 #[test]
 fn zip1_6410() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(13).H4, v6.H4, v15.H4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "CD, 38, 4F, 0E", "zip1 V(13).H4, v6.H4, v15.H4");
@@ -144,12 +144,12 @@ fn zip1_6410() {
 
 #[test]
 fn zip1_6411() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v7.S4, v0.S4, V(29).S4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "07, 38, 9D, 4E", "zip1 v7.S4, v0.S4, V(29).S4");
@@ -157,12 +157,12 @@ fn zip1_6411() {
 
 #[test]
 fn zip1_6412() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v12.S4, V(29).S4, v10.S4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "AC, 3B, 8A, 4E", "zip1 v12.S4, V(29).S4, v10.S4");
@@ -170,12 +170,12 @@ fn zip1_6412() {
 
 #[test]
 fn zip1_6413() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v12.S2, v3.S2, V(1).S2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "6C, 38, 81, 0E", "zip1 v12.S2, v3.S2, V(1).S2");
@@ -183,12 +183,12 @@ fn zip1_6413() {
 
 #[test]
 fn zip1_6414() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v0.S2, v10.S2, V(10).S2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "40, 39, 8A, 0E", "zip1 v0.S2, v10.S2, V(10).S2");
@@ -196,12 +196,12 @@ fn zip1_6414() {
 
 #[test]
 fn zip1_6415() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 V(9).D2, v17.D2, v23.D2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "29, 3A, D7, 4E", "zip1 V(9).D2, v17.D2, v23.D2");
@@ -209,12 +209,12 @@ fn zip1_6415() {
 
 #[test]
 fn zip1_6416() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip1 v23.D2, V(17).D2, v5.D2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "37, 3A, C5, 4E", "zip1 v23.D2, V(17).D2, v5.D2");
@@ -222,12 +222,12 @@ fn zip1_6416() {
 
 #[test]
 fn zip2_6417() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(1).B16, V(9).B16, V(30).B16
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "21, 79, 1E, 4E", "zip2 V(1).B16, V(9).B16, V(30).B16");
@@ -235,12 +235,12 @@ fn zip2_6417() {
 
 #[test]
 fn zip2_6418() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 v11.B16, v30.B16, v9.B16
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "CB, 7B, 09, 4E", "zip2 v11.B16, v30.B16, v9.B16");
@@ -248,12 +248,12 @@ fn zip2_6418() {
 
 #[test]
 fn zip2_6419() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(12).B8, v29.B8, v9.B8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "AC, 7B, 09, 0E", "zip2 V(12).B8, v29.B8, v9.B8");
@@ -261,12 +261,12 @@ fn zip2_6419() {
 
 #[test]
 fn zip2_6420() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(20).B8, V(26).B8, v5.B8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "54, 7B, 05, 0E", "zip2 V(20).B8, V(26).B8, v5.B8");
@@ -274,12 +274,12 @@ fn zip2_6420() {
 
 #[test]
 fn zip2_6421() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 v2.H8, v2.H8, v9.H8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "42, 78, 49, 4E", "zip2 v2.H8, v2.H8, v9.H8");
@@ -287,12 +287,12 @@ fn zip2_6421() {
 
 #[test]
 fn zip2_6422() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 v1.H8, v11.H8, V(19).H8
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "61, 79, 53, 4E", "zip2 v1.H8, v11.H8, V(19).H8");
@@ -300,12 +300,12 @@ fn zip2_6422() {
 
 #[test]
 fn zip2_6423() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(19).H4, V(12).H4, V(7).H4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "93, 79, 47, 0E", "zip2 V(19).H4, V(12).H4, V(7).H4");
@@ -313,12 +313,12 @@ fn zip2_6423() {
 
 #[test]
 fn zip2_6424() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(24).H4, V(18).H4, V(18).H4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "58, 7A, 52, 0E", "zip2 V(24).H4, V(18).H4, V(18).H4");
@@ -326,12 +326,12 @@ fn zip2_6424() {
 
 #[test]
 fn zip2_6425() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 v17.S4, v3.S4, V(7).S4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "71, 78, 87, 4E", "zip2 v17.S4, v3.S4, V(7).S4");
@@ -339,12 +339,12 @@ fn zip2_6425() {
 
 #[test]
 fn zip2_6426() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(18).S4, v31.S4, v0.S4
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "F2, 7B, 80, 4E", "zip2 V(18).S4, v31.S4, v0.S4");
@@ -352,12 +352,12 @@ fn zip2_6426() {
 
 #[test]
 fn zip2_6427() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(17).S2, v7.S2, V(27).S2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "F1, 78, 9B, 0E", "zip2 V(17).S2, v7.S2, V(27).S2");
@@ -365,12 +365,12 @@ fn zip2_6427() {
 
 #[test]
 fn zip2_6428() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(20).S2, v28.S2, V(1).S2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "94, 7B, 81, 0E", "zip2 V(20).S2, v28.S2, V(1).S2");
@@ -378,12 +378,12 @@ fn zip2_6428() {
 
 #[test]
 fn zip2_6429() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 V(8).D2, v25.D2, v2.D2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "28, 7B, C2, 4E", "zip2 V(8).D2, v25.D2, v2.D2");
@@ -391,12 +391,12 @@ fn zip2_6429() {
 
 #[test]
 fn zip2_6430() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch aarch64
         ; zip2 v25.D2, v19.D2, V(3).D2
     );
-    let buf = ops.finalize().unwrap();
+    let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
     assert_eq!(hex, "79, 7A, C3, 4E", "zip2 v25.D2, v19.D2, V(3).D2");

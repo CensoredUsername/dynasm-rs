@@ -1,12 +1,12 @@
 
 #[test]
 fn enc_cyrix_cpu_read1788() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; cpu_read
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x3D", "cpu_read");
@@ -16,12 +16,12 @@ fn enc_cyrix_cpu_read1788() {
 
 #[test]
 fn enc_cyrix_cpu_write1789() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; cpu_write
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x3C", "cpu_write");
@@ -31,12 +31,12 @@ fn enc_cyrix_cpu_write1789() {
 
 #[test]
 fn enc_cyrix_dmint1790() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; dmint
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x39", "dmint");
@@ -46,12 +46,12 @@ fn enc_cyrix_dmint1790() {
 
 #[test]
 fn enc_cyrix_montmul1791() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; montmul
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA6, 0xC0", "montmul");
@@ -61,12 +61,12 @@ fn enc_cyrix_montmul1791() {
 
 #[test]
 fn enc_cyrix_rdm1792() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rdm
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x3A", "rdm");
@@ -76,12 +76,12 @@ fn enc_cyrix_rdm1792() {
 
 #[test]
 fn enc_cyrix_rdshr1793() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rdshr eax
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x36, 0xC0", "rdshr eax");
@@ -91,12 +91,12 @@ fn enc_cyrix_rdshr1793() {
 
 #[test]
 fn enc_cyrix_rdshr1794() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rdshr DWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x36, 0x00", "rdshr DWORD [rax]");
@@ -106,12 +106,12 @@ fn enc_cyrix_rdshr1794() {
 
 #[test]
 fn enc_cyrix_rsldt1795() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rsldt TWORD [rax + 16]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7B, 0x40, 0x10", "rsldt TWORD [rax + 16]");
@@ -121,12 +121,12 @@ fn enc_cyrix_rsldt1795() {
 
 #[test]
 fn enc_cyrix_rsldt1796() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rsldt TWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7B, 0x00", "rsldt TWORD [rax]");
@@ -136,12 +136,12 @@ fn enc_cyrix_rsldt1796() {
 
 #[test]
 fn enc_cyrix_rsts1797() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rsts TWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7D, 0x00", "rsts TWORD [rax]");
@@ -151,12 +151,12 @@ fn enc_cyrix_rsts1797() {
 
 #[test]
 fn enc_cyrix_rsts1798() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rsts TWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7D, 0x04, 0x42", "rsts TWORD [rax * 2 + rdx]");
@@ -166,12 +166,12 @@ fn enc_cyrix_rsts1798() {
 
 #[test]
 fn enc_cyrix_rsts1799() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; rsts TWORD [rax + 16]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7D, 0x40, 0x10", "rsts TWORD [rax + 16]");
@@ -181,12 +181,12 @@ fn enc_cyrix_rsts1799() {
 
 #[test]
 fn enc_cyrix_smint1800() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; smint
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x38", "smint");
@@ -196,12 +196,12 @@ fn enc_cyrix_smint1800() {
 
 #[test]
 fn enc_cyrix_svldt1801() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; svldt TWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7A, 0x04, 0x42", "svldt TWORD [rax * 2 + rdx]");
@@ -211,12 +211,12 @@ fn enc_cyrix_svldt1801() {
 
 #[test]
 fn enc_cyrix_svldt1802() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; svldt TWORD [rax + 16]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7A, 0x40, 0x10", "svldt TWORD [rax + 16]");
@@ -226,12 +226,12 @@ fn enc_cyrix_svldt1802() {
 
 #[test]
 fn enc_cyrix_svts1803() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; svts TWORD [rax + 16]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7C, 0x40, 0x10", "svts TWORD [rax + 16]");
@@ -241,12 +241,12 @@ fn enc_cyrix_svts1803() {
 
 #[test]
 fn enc_cyrix_svts1804() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; svts TWORD [rax * 2 + rdx]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x7C, 0x04, 0x42", "svts TWORD [rax * 2 + rdx]");
@@ -256,12 +256,12 @@ fn enc_cyrix_svts1804() {
 
 #[test]
 fn enc_cyrix_wrshr1805() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; wrshr eax
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x37, 0xC0", "wrshr eax");
@@ -271,12 +271,12 @@ fn enc_cyrix_wrshr1805() {
 
 #[test]
 fn enc_cyrix_wrshr1806() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; wrshr DWORD [rax]
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0x37, 0x00", "wrshr DWORD [rax]");
@@ -286,12 +286,12 @@ fn enc_cyrix_wrshr1806() {
 
 #[test]
 fn enc_cyrix_xcryptcbc1807() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xcryptcbc
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA7, 0xD0", "xcryptcbc");
@@ -301,12 +301,12 @@ fn enc_cyrix_xcryptcbc1807() {
 
 #[test]
 fn enc_cyrix_xcryptcfb1808() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xcryptcfb
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA7, 0xE0", "xcryptcfb");
@@ -316,12 +316,12 @@ fn enc_cyrix_xcryptcfb1808() {
 
 #[test]
 fn enc_cyrix_xcryptctr1809() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xcryptctr
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA7, 0xD8", "xcryptctr");
@@ -331,12 +331,12 @@ fn enc_cyrix_xcryptctr1809() {
 
 #[test]
 fn enc_cyrix_xcryptecb1810() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xcryptecb
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA7, 0xC8", "xcryptecb");
@@ -346,12 +346,12 @@ fn enc_cyrix_xcryptecb1810() {
 
 #[test]
 fn enc_cyrix_xcryptofb1811() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xcryptofb
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA7, 0xE8", "xcryptofb");
@@ -361,12 +361,12 @@ fn enc_cyrix_xcryptofb1811() {
 
 #[test]
 fn enc_cyrix_xsha11812() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xsha1
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA6, 0xC8", "xsha1");
@@ -376,12 +376,12 @@ fn enc_cyrix_xsha11812() {
 
 #[test]
 fn enc_cyrix_xsha2561813() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xsha256
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0xF3, 0x0F, 0xA6, 0xD0", "xsha256");
@@ -391,12 +391,12 @@ fn enc_cyrix_xsha2561813() {
 
 #[test]
 fn enc_cyrix_xstore1814() {
-     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+     let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
              ; .arch x64
              ; xstore
      );
-     let buf = ops.finalize().unwrap();
+     let buf = ops.finalize();
      let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
      let hex: String = hex.join(", ");
      assert_eq!(hex, "0x0F, 0xA7, 0xC0", "xstore");
