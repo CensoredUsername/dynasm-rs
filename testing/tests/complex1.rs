@@ -188,7 +188,7 @@ fn complex1() {
             ; inc r12
         );
         ops.check(end).unwrap();
-    });
+    }).unwrap();
 
     let index = ops.offset();
     dynasm!(ops
