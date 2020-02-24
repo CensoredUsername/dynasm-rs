@@ -1,3 +1,9 @@
+#![warn(missing_docs)]
+
+//! This crate provides runtime support for dynasm-rs. It contains traits that document the interface used by the dynasm proc_macro to generate code,
+//! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools
+//! to write your own Assemblers using these components.
+
 extern crate memmap;
 extern crate byteorder;
 
@@ -75,8 +81,11 @@ impl Executor {
 /// A description of a label. Used for error reporting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LabelKind {
+    /// A local label, like `label:`
     Local(&'static str),
+    /// A global label, like `->label:`
     Global(&'static str),
+    /// A dynamic label, like `=>value:`
     Dynamic(DynamicLabel)
 }
 
@@ -94,11 +103,17 @@ impl fmt::Display for LabelKind {
 /// A description of a relocation target. Used for error reporting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TargetKind {
+    /// This targets a local label with the specified name that still has to be defined.
     Forward(&'static str),
+    /// This targets a local label with the specified name that was already previously defined.
     Backward(&'static str),
+    /// This targets a global label with the specified name.
     Global(&'static str),
+    /// This targets the specified dynamic label.
     Dynamic(DynamicLabel),
+    /// This targets the specified address.
     Extern(usize),
+    /// An already resolved relocation that needs to be adjusted when the buffer moves in memory.
     Managed,
 }
 
@@ -237,18 +252,24 @@ pub trait DynasmLabelApi : DynasmApi {
         self.bare_relocation(target, Self::Relocation::from_encoding(kind))
     }
 
-    /// Equivalents of the previous functions but taking non-encoded relocations
+    /// Equivalent of forward_reloc, but takes a non-encoded relocation
     fn forward_relocation( &mut self, name: &'static str, offset: isize, kind: Self::Relocation);
+    /// Equivalent of backward_reloc, but takes a non-encoded relocation
     fn backward_relocation(&mut self, name: &'static str, offset: isize, kind: Self::Relocation);
+    /// Equivalent of global_reloc, but takes a non-encoded relocation
     fn global_relocation(  &mut self, name: &'static str, offset: isize, kind: Self::Relocation);
+    /// Equivalent of dynamic_reloc, but takes a non-encoded relocation
     fn dynamic_relocation( &mut self, id: DynamicLabel,   offset: isize, kind: Self::Relocation);
+    /// Equivalent of bare_reloc, but takes a non-encoded relocation
     fn bare_relocation(&mut self, target: usize, kind: Self::Relocation);
 }
 
 
 /// An assembler that is purely a `Vec<u8>`. It doesn't support labels or architecture-specific directives,
 /// but can be used to easily inspect generated code. It is intended to be used in testcases.
+#[derive(Debug, Clone)]
 pub struct SimpleAssembler {
+    /// The assembling buffer.
     pub ops: Vec<u8>
 }
 
@@ -303,6 +324,7 @@ impl DynasmApi for SimpleAssembler {
 
 /// An assembler that assembles into a `Vec<u8>`, while supporting labels. To support the different types of relocations
 /// it requires a base address of the to be assembled code to be specified.
+#[derive(Debug)]
 pub struct VecAssembler<R: Relocation> {
     ops: Vec<u8>,
     baseaddr: usize,

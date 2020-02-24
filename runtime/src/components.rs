@@ -1,5 +1,4 @@
-// some basic types that are used across multiple assemblers.
-// like primitives for assembling buffers, etc
+//! This module provides several reusable compoments for implementing assemblers
 
 use std::io;
 use std::collections::hash_map::{HashMap, Entry};
@@ -200,11 +199,14 @@ impl LabelRegistry {
 }
 
 
-/// An abstraction of a relocation of type `R` that was defined to exist at offset `offset`
+/// An abstraction of a relocation of type `R`, located at `location`.
 #[derive(Clone, Debug)]
 pub struct PatchLoc<R: Relocation> {
+    /// The AssemblyOffset at which this relocation was emitted
     pub location: AssemblyOffset,
+    /// The type of relocation to be emitted, and any information necessary for it to be done.
     pub relocation: R,
+    /// A constant offset to be applied to this relocation when emitting it.
     pub offset: isize,
 }
 

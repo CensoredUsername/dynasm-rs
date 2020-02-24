@@ -1,12 +1,12 @@
+//! This module implements some wrappers around Mmap/MmapMut to also support a cheap "empty" variant.
+// Unfortunately Memmap itself doesn't support a cheap zero-length variant
+
 use std::ops::{Deref, DerefMut};
 use std::io;
 
 use memmap::{Mmap, MmapMut};
 
 use crate::AssemblyOffset;
-
-/// This module implements some wrappers around Mmap/MmapMut to also support a cheap "empty" variant.
-/// Unfortunately Memmap itself doesn't support a cheap zero-length variant
 
 /// A structure holding a buffer of executable memory. It also derefs to a `&[u8]`.
 /// This structure does not allocate when its size is 0.

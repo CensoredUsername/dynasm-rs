@@ -1,3 +1,5 @@
+//! This module implements the relocation model for the x64 architecture, as well as aliases for x64 Assemblers.
+
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation};
 
 
@@ -48,7 +50,9 @@ impl Relocation for X64Relocation {
     }
 }
 
-
+/// An x64 Assembler. This is aliased here for backwards compatability.
 pub type Assembler = crate::Assembler<X64Relocation>;
+/// An x64 AssemblyModifier. This is aliased here for backwards compatability.
 pub type AssemblyModifier<'a> = crate::Modifier<'a, X64Relocation>;
+/// An x64 UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;

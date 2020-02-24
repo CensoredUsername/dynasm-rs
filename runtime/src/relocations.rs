@@ -1,3 +1,5 @@
+//! This module defines the `Relocation` trait and several utilities for implementing relocations.
+
 use byteorder::{ByteOrder, LittleEndian};
 
 use std::convert::TryFrom;

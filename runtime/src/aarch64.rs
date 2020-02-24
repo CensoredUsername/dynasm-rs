@@ -1,9 +1,12 @@
+//! This module implements the relocation model for the aarch64 architecture, as well as aliases for aarch64 Assemblers.
+
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation, fits_signed_bitfield};
 use byteorder::{ByteOrder, LittleEndian};
 use std::convert::TryFrom;
 
 /// Relocation implementation for the aarch64 architecture.
 #[derive(Debug, Clone)]
+#[allow(missing_docs)]
 pub enum Aarch64Relocation {
     // b, bl 26 bits, dword aligned
     B,
@@ -161,9 +164,11 @@ impl Relocation for Aarch64Relocation {
     }
 }
 
-
+/// An aarch64 Assembler. This is aliased here for backwards compatability.
 pub type Assembler = crate::Assembler<Aarch64Relocation>;
+/// An aarch64 AssemblyModifier. This is aliased here for backwards compatability.
 pub type AssemblyModifier<'a> = crate::Modifier<'a, Aarch64Relocation>;
+/// An aarch64 UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
 
