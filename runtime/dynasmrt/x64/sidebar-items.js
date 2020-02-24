@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["X64Relocation","Relocation implementation for the x64 architecture."]],"type":[["Assembler",""],["AssemblyModifier",""],["UncommittedModifier",""]]});
+initSidebarItems({"struct":[["X64Relocation","Relocation implementation for the x64 architecture."]],"type":[["Assembler","An x64 Assembler. This is aliased here for backwards compatability."],["AssemblyModifier","An x64 AssemblyModifier. This is aliased here for backwards compatability."],["UncommittedModifier","An x64 UncommittedModifier. This is aliased here for backwards compatability."]]});

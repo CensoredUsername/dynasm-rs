@@ -168,15 +168,15 @@
 <span id="168">168</span>
 <span id="169">169</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! This module implements some wrappers around Mmap/MmapMut to also support a cheap &quot;empty&quot; variant.</span>
+<span class="comment">// Unfortunately Memmap itself doesn&#39;t support a cheap zero-length variant</span>
+
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
 <span class="kw">use</span> <span class="ident">memmap</span>::{<span class="ident">Mmap</span>, <span class="ident">MmapMut</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">AssemblyOffset</span>;
-
-<span class="doccomment">/// This module implements some wrappers around Mmap/MmapMut to also support a cheap &quot;empty&quot; variant.</span>
-<span class="doccomment">/// Unfortunately Memmap itself doesn&#39;t support a cheap zero-length variant</span>
 
 <span class="doccomment">/// A structure holding a buffer of executable memory. It also derefs to a `&amp;[u8]`.</span>
 <span class="doccomment">/// This structure does not allocate when its size is 0.</span>

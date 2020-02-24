@@ -599,9 +599,10 @@
 <span id="599">599</span>
 <span id="600">600</span>
 <span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// some basic types that are used across multiple assemblers.</span>
-<span class="comment">// like primitives for assembling buffers, etc</span>
+<span class="doccomment">//! This module provides several reusable compoments for implementing assemblers</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::{<span class="ident">HashMap</span>, <span class="ident">Entry</span>};
@@ -802,11 +803,14 @@
 }
 
 
-<span class="doccomment">/// An abstraction of a relocation of type `R` that was defined to exist at offset `offset`</span>
+<span class="doccomment">/// An abstraction of a relocation of type `R`, located at `location`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PatchLoc</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Relocation</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The AssemblyOffset at which this relocation was emitted</span>
     <span class="kw">pub</span> <span class="ident">location</span>: <span class="ident">AssemblyOffset</span>,
+    <span class="doccomment">/// The type of relocation to be emitted, and any information necessary for it to be done.</span>
     <span class="kw">pub</span> <span class="ident">relocation</span>: <span class="ident">R</span>,
+    <span class="doccomment">/// A constant offset to be applied to this relocation when emitting it.</span>
     <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">isize</span>,
 }
 
