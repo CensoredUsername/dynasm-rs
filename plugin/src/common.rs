@@ -93,7 +93,7 @@ impl ParseOpt for Jump {
             let name: syn::Ident = input.parse()?;
 
             JumpKind::Backward(name)
-            
+
         // => dynamic_label
         } else if input.peek(Token![=>]) {
             let _: Token![=>] = input.parse()?;
@@ -236,15 +236,6 @@ pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
     );
     group.set_span(span);
     proc_macro2::TokenTree::Group(group)
-}
-
-
-
-// FIXME: temporary till Diagnostic gets stabilized
-/// Emit a diagnostic at a certain span.
-pub fn emit_error_at(span: Span, msg: String) {
-    let span: proc_macro::Span = span.unstable();
-    span.error(msg).emit();
 }
 
 

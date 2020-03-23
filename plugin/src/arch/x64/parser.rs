@@ -1,10 +1,11 @@
 use syn::{parse, Token};
 use syn::spanned::Spanned;
 use proc_macro2::Span;
+use proc_macro_error::emit_error;
 
 use lazy_static::lazy_static;
 
-use crate::common::{Size, emit_error_at};
+use crate::common::Size;
 use crate::parse_helpers::{eat_pseudo_keyword, parse_ident_or_rust_keyword, as_ident, ParseOptExt};
 
 use super::{Context, X86Mode};
@@ -134,7 +135,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
             })
         }
 
-        // memory reference 
+        // memory reference
         let nosplit = eat_pseudo_keyword(inner, "NOSPLIT");
         let disp_size = eat_size_hint(ctx, inner);
         let expr: syn::Expr = inner.parse()?;
@@ -162,7 +163,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
         let base = if let Some((_, base)) = parse_reg(ctx, &arg) {
             base
         } else {
-            emit_error_at(arg.span(), "Expected register".into());
+            emit_error!(arg, "Expected register");
             return Ok(RawArg::Invalid);
         };
 
@@ -208,7 +209,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
     // direct register
     if let Some((span, reg)) = parse_reg(ctx, &arg) {
         if size.is_some() {
-            emit_error_at(span, "size hint with direct register".into());
+            emit_error!(span, "size hint with direct register");
         }
         return Ok(RawArg::Direct {
             reg,

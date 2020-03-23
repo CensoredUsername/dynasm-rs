@@ -4,12 +4,13 @@ use super::Context;
 use super::ast::{FlatArg, RegKind, RegId, Modifier};
 use super::encoding_helpers;
 
-use crate::common::{Stmt, Size, delimited, emit_error_at, bitmask};
+use crate::common::{Stmt, Size, delimited, bitmask};
 use crate::parse_helpers::{as_ident, as_number, as_float, as_signed_number};
 
 use syn::spanned::Spanned;
 use quote::{quote, quote_spanned};
 use proc_macro2::TokenStream;
+use proc_macro_error::emit_error;
 
 pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<(), Option<String>> {
     let mut cursor = 0usize;
@@ -49,21 +50,21 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::REven(offset) => {
                     if id.code() & 1 != 0 {
-                        emit_error_at(span, "Field only supports even registers".into());
+                        emit_error!(span, "Field only supports even registers");
                         return Err(None);
                     }
                     statics.push((offset, u32::from(id.code())));
                 },
                 Command::RNoZr(offset) => {
                     if id.code() == 31 {
-                        emit_error_at(span, "Field does not support register the zr/sp register".into());
+                        emit_error!(span, "Field does not support register the zr/sp register");
                         return Err(None);
                     }
                     statics.push((offset, u32::from(id.code())));
                 },
                 Command::R4(offset) => {
                     if id.code() >= 16 {
-                        emit_error_at(span, "Field only supports register numbers 0-15".into());
+                        emit_error!(span, "Field only supports register numbers 0-15");
                         return Err(None);
                     }
                     statics.push((offset, u32::from(id.code())));
@@ -72,11 +73,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     if let Some(FlatArg::Direct { span: _prevspan, reg: ref prevreg } ) = data.args.get(cursor - 1) {
                         match prevreg {
                             RegKind::Static(previd) => if id.code() != ((previd.code() + 1) % 32) {
-                                emit_error_at(span, "Invalid register. This register has to be the register after the previous argument.".into());
+                                emit_error!(span, "Invalid register. This register has to be the register after the previous argument.");
                                 return Err(None);
                             },
                             RegKind::Dynamic(_, _) => if id != RegId::XZR {
-                                emit_error_at(span, "Please use XZR here to indicate that it should be the register after the previous argument.".into());
+                                emit_error!(span, "Please use XZR here to indicate that it should be the register after the previous argument.");
                                 return Err(None);
                             }
                         }
@@ -104,7 +105,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::RNext => {
-                    emit_error_at(span, "This register is constrained to be the register after the previous argument's register. As such, it does not support dynamic registers. Please substitute it with XZR to indicate this".into());
+                    emit_error!(span, "This register is constrained to be the register after the previous argument's register. As such, it does not support dynamic registers. Please substitute it with XZR to indicate this");
                     return Err(None);
                 },
                 _ => panic!("Invalid argument processor")
@@ -162,7 +163,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     if let Some(&bits) = list.get(&&*name) {
                         statics.push((offset, bits));
                     } else {
-                        emit_error_at(value.span(), "Unknown literal".into());
+                        emit_error!(value, "Unknown literal");
                         return Err(None);
                     }
                 },
@@ -203,7 +204,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         if let Some(i) = options.iter().rposition(|&n| u64::from(n) == number) {
                             statics.push((offset, i as u32));
                         } else {
-                            emit_error_at(value.span(), "Impossible value".into());
+                            emit_error!(value, "Impossible value");
                             return Err(None);
                         }
                     } else {
@@ -231,7 +232,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     if let Some(value) = unsigned_rangecheck(value, addval - mask, addval, 0) {
                         statics.push((offset, addval - value?));
                     } else {
-                        dynamics.push((offset, quote_spanned!{ value.span()=> 
+                        dynamics.push((offset, quote_spanned!{ value.span()=>
                             (#addval - #value) & #mask
                         }));
                     }
@@ -242,7 +243,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     if let Some(value) = unsigned_rangecheck(value, 0, mask, 0) {
                         statics.push((offset, (addval - value?) & mask));
                     } else {
-                        dynamics.push((offset, quote_spanned!{ value.span()=> 
+                        dynamics.push((offset, quote_spanned!{ value.span()=>
                             (#addval - #value) & #mask
                         }));
                     }
@@ -250,7 +251,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::Usumdec(offset, bitlen) => {
                     let mask = bitmask(bitlen);
                     if let Some(FlatArg::Immediate {value: leftvalue } ) = data.args.get(cursor - 1) {
-                        dynamics.push((offset, quote_spanned!{ value.span()=> 
+                        dynamics.push((offset, quote_spanned!{ value.span()=>
                             (#leftvalue + #value - 1) & #mask
                         }));
                     } else {
@@ -266,7 +267,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         }
                     } else {
                         for (i, &field) in bitfields.iter().rev().enumerate() {
-                            dynamics.push((field as u8, quote_spanned!{ value.span()=> 
+                            dynamics.push((field as u8, quote_spanned!{ value.span()=>
                                 (#value >> #i) & 1
                             }));
                         }
@@ -497,7 +498,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     if let Some(&bits) = list.get(&&*name) {
                         statics.push((offset, bits));
                     } else {
-                        emit_error_at(ident.span(), "Unknown literal".into());
+                        emit_error!(ident, "Unknown literal");
                         return Err(None);
                     }
                 },
@@ -630,7 +631,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
                     masked |= masked >> 16;
                     masked |= masked >> 8;
                     let masked = masked as u32;
-                    ((masked & 0xE0) << 6) | (masked & 0x1F) 
+                    ((masked & 0xE0) << 6) | (masked & 0x1F)
                 }
             }));
             return Ok(());
@@ -692,7 +693,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         },
     }
 
-    emit_error_at(imm.span(), "Impossible to encode immediate".into());
+    emit_error!(imm, "Impossible to encode immediate");
     Err(None)
 }
 
@@ -701,13 +702,13 @@ fn unsigned_rangecheck(expr: &syn::Expr, min: u32, max: u32, scale: u8) -> Optio
     let scaled = value >> scale;
 
     Some(if (scaled << scale) != value {
-        emit_error_at(expr.span(), "Unrepresentable value".into());
+        emit_error!(expr, "Unrepresentable value");
         Err(None)
     } else if scaled > u64::from(max) {
-        emit_error_at(expr.span(), "Value too large".into());
+        emit_error!(expr, "Value too large");
         Err(None)
     } else if scaled < u64::from(min) {
-        emit_error_at(expr.span(), "Value too small".into());
+        emit_error!(expr, "Value too small");
         Err(None)
     } else {
         Ok(scaled as u32)
@@ -719,13 +720,13 @@ fn signed_rangecheck(expr: &syn::Expr, min: i32, max: i32, scale: u8) -> Option<
     let scaled = value >> scale;
 
     Some(if (scaled << scale) != value {
-        emit_error_at(expr.span(), "Unrepresentable value".into());
+        emit_error!(expr, "Unrepresentable value");
         Err(None)
     } else if scaled > i64::from(max) {
-        emit_error_at(expr.span(), "Value too large".into());
+        emit_error!(expr, "Value too large");
         Err(None)
     } else if scaled < i64::from(min) {
-        emit_error_at(expr.span(), "Value too small".into());
+        emit_error!(expr, "Value too small");
         Err(None)
     } else {
         Ok(scaled as i32)

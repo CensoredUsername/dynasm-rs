@@ -1,4 +1,3 @@
-#![feature(proc_macro_diagnostic)]
 #![feature(proc_macro_span)]
 
 // token/ast manipulation
@@ -17,6 +16,7 @@ use syn::parse;
 use syn::{Token, parse_macro_input};
 use proc_macro2::{Span, TokenTree, TokenStream};
 use quote::quote;
+use proc_macro_error::proc_macro_error;
 
 use lazy_static::lazy_static;
 use owning_ref::{OwningRef, RwLockReadGuardRef};
@@ -38,6 +38,7 @@ mod parse_helpers;
 
 /// The whole point
 #[proc_macro]
+#[proc_macro_error]
 pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     // try parsing the tokenstream into a dynasm struct containing
     // an abstract representation of the statements to create

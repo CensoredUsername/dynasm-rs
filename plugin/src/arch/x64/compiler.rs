@@ -1,8 +1,9 @@
 use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenTree};
 use quote::{quote_spanned};
+use proc_macro_error::emit_error;
 
-use crate::common::{Stmt, Size, Jump, JumpKind, delimited, emit_error_at};
+use crate::common::{Stmt, Size, Jump, JumpKind, delimited};
 use crate::serialize;
 
 use super::{Context, X86Mode};
@@ -587,7 +588,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
 
 
             if !joined_regs.is_empty() {
-                emit_error_at(span, "Impossible memory argument".into());
+                emit_error!(span, "Impossible memory argument");
                 return Err(None);
             }
 
@@ -635,7 +636,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             let index = joined_regs.pop();
 
             if !joined_regs.is_empty() {
-                emit_error_at(span, "Impossible memory argument".into());
+                emit_error!(span, "Impossible memory argument");
                 return Err(None);
             }
 
@@ -703,7 +704,7 @@ fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<
             CleanArg::Indirect {span, nosplit, ref mut disp_size, ref mut base, ref mut index, ref disp, ..} => {
 
                 if encountered_indirect {
-                    emit_error_at(span, "Multiple memory references in a single instruction".into())
+                    emit_error!(span, "Multiple memory references in a single instruction")
                 }
                 encountered_indirect = true;
 
@@ -712,23 +713,23 @@ fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<
 
                 if let Some((_, scale, _)) = *index {
                     if encode_scale(scale).is_none() {
-                        emit_error_at(span, "Impossible scale".into());
+                        emit_error!(span, "Impossible scale");
                     }
                 }
 
                 // if specified, sanitize the displacement size. Else, derive one
                 if let Some(size) = *disp_size {
                     if disp.is_none() {
-                        emit_error_at(span, "Displacement size without displacement".into());
+                        emit_error!(span, "Displacement size without displacement");
                     }
 
                     // 16-bit addressing has smaller displacements
                     if addr_size == Some(Size::WORD) {
                         if size != Size::BYTE && size != Size::WORD {
-                            emit_error_at(span, "Invalid displacement size, only BYTE or WORD are possible".into());
+                            emit_error!(span, "Invalid displacement size, only BYTE or WORD are possible");
                         }
                     } else if size != Size::BYTE && size != Size::DWORD {
-                        emit_error_at(span, "Invalid displacement size, only BYTE or DWORD are possible".into());
+                        emit_error!(span, "Invalid displacement size, only BYTE or DWORD are possible");
                     }
                 } else if let Some(ref disp) = *disp {
                     match derive_size(disp) {
@@ -788,7 +789,7 @@ fn derive_size(expr: &syn::Expr) -> Option<Size> {
 /// Validates that the base/index combination can actually be encoded and returns the effective address size.
 /// If the address size can't be determined (purely displacement, or VSIB without base), the result is None.
 fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option<Register>,
-                     index: &mut Option<(Register, isize, Option<syn::Expr>)>) -> Result<Option<Size>, Option<String>> 
+                     index: &mut Option<(Register, isize, Option<syn::Expr>)>) -> Result<Option<Size>, Option<String>>
 {
 
     // figure out the addressing size/mode used.
@@ -812,7 +813,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
         },
         (&Some((f1, s1)), &Some((f2, s2))) => if f1 == f2 {
             if s1 != s2 {
-                emit_error_at(span, "Registers of differing sizes".into());
+                emit_error!(span, "Registers of differing sizes");
                 return Err(None);
             }
             size = s1;
@@ -828,34 +829,34 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             size = s1;
             family = f1;
         } else {
-            emit_error_at(span, "Register type combination not supported".into());
+            emit_error!(span, "Register type combination not supported");
             return Err(None);
         }
     }
-    
+
     // filter out combinations that are impossible to encode
     match family {
         RegFamily::RIP => if b.is_some() && i.is_some() {
-            emit_error_at(span, "Register type combination not supported".into());
+            emit_error!(span, "Register type combination not supported");
             return Err(None);
         },
         RegFamily::LEGACY => match size {
             Size::DWORD => (),
             Size::QWORD => (), // only valid in long mode, but should only be possible in long mode
             Size::WORD  => if ctx.mode == X86Mode::Protected || vsib_mode {
-                emit_error_at(span, "16-bit addressing is not supported in this mode".into());
+                emit_error!(span, "16-bit addressing is not supported in this mode");
                 return Err(None);
             },
             _ => {
-                emit_error_at(span, "Register type not supported".into());
+                emit_error!(span, "Register type not supported");
                 return Err(None);
             }
         },
         RegFamily::XMM => if b.is_some() && i.is_some() {
-            emit_error_at(span, "Register type combination not supported".into());
+            emit_error!(span, "Register type combination not supported");
         },
         _ => {
-            emit_error_at(span, "Register type not supported".into());
+            emit_error!(span, "Register type not supported");
             return Err(None);
         }
     }
@@ -866,7 +867,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
         match index.take() {
             Some((index, 1, None)) => *base = Some(index),
             Some(_) => {
-                emit_error_at(span, "RIP cannot be scaled".into());
+                emit_error!(span, "RIP cannot be scaled");
                 return Err(None);
             },
             None => ()
@@ -893,7 +894,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             if let (ref mut i, 1, None) = index.as_mut().unwrap() {
                 swap(i, base.as_mut().unwrap())
             } else {
-                emit_error_at(span, "vsib addressing requires a general purpose register as base".into());
+                emit_error!(span, "vsib addressing requires a general purpose register as base");
                 return Err(None);
             }
         }
@@ -909,7 +910,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             Some((i, 1, None)) => Some(i),
             None => None,
             Some(_) => {
-                emit_error_at(span, "16-bit addressing with scaled index".into());
+                emit_error!(span, "16-bit addressing with scaled index");
                 return Err(None);
             },
         };
@@ -919,7 +920,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
         }
 
         let encoded_base = match (&first_reg, &second_reg) {
-            (r1, r2) if (r1 == &RegId::RBX && r2 == &RegId::RSI) || 
+            (r1, r2) if (r1 == &RegId::RBX && r2 == &RegId::RSI) ||
                         (r1 == &RegId::RSI && r2 == &RegId::RBX) => RegId::from_number(0),
             (r1, r2) if (r1 == &RegId::RBX && r2 == &RegId::RDI) ||
                         (r1 == &RegId::RDI && r2 == &RegId::RBX) => RegId::from_number(1),
@@ -932,7 +933,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             (r, None) if r == &RegId::RBP => RegId::from_number(6),
             (r, None) if r == &RegId::RBX => RegId::from_number(7),
             _ => {
-                emit_error_at(span, "Impossible register combination".into());
+                emit_error!(span, "Impossible register combination");
                 return Err(None);
             }
         };
@@ -963,7 +964,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
                 *index = base.take().map(|reg| (reg, 1, None));
                 *base = Some(i);
             } else {
-                emit_error_at(span, "'rsp' cannot be used as index field".into());
+                emit_error!(span, "'rsp' cannot be used as index field");
                 return Err(None);
             }
         } else {
@@ -987,7 +988,7 @@ fn match_op_format(ctx: &Context, ident: &syn::Ident, args: &[CleanArg]) -> Resu
     let data = if let Some(data) = get_mnemnonic_data(name) {
         data
     } else {
-        emit_error_at(ident.span(), format!("'{}' is not a valid instruction", name));
+        emit_error!(ident, "'{}' is not a valid instruction", name);
         return Err(None);
     };
 
@@ -1234,7 +1235,7 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
     // fill-in loop. default should never be used.
     let mut new_args = Vec::new();
     for (arg, (code, fsize)) in args.into_iter().zip(FormatStringIterator::new(&fmt.args)) {
-        
+
         //get the specified operand size from the format string
         let size = match (fsize, code) {
             (b'b', _) => Size::BYTE,
@@ -1262,7 +1263,7 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
                 SizedArg::IndirectJumpTarget {jump},
             CleanArg::Immediate {value, ..} =>
                 SizedArg::Immediate {value, size},
-            CleanArg::Indirect {span, disp_size, base, index, disp, ..} => 
+            CleanArg::Indirect {span, disp_size, base, index, disp, ..} =>
                 SizedArg::Indirect {span, disp_size, base, index, disp},
         });
     }
@@ -1280,27 +1281,27 @@ fn get_legacy_prefixes(fmt: &'static Opdata, idents: Vec<syn::Ident>) -> Result<
             "rep"   => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF3)
             } else {
-                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error!(prefix, "Cannot use prefix {} on this instruction", name);
                 return Err(None);
             },
             "repe"  |
             "repz"  => if fmt.flags.contains(Flags::REPE) {
                 (&mut group1, 0xF3)
             } else {
-                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error!(prefix, "Cannot use prefix {} on this instruction", name);
                 return Err(None);
             },
             "repnz" |
             "repne" => if fmt.flags.contains(Flags::REP) {
                 (&mut group1, 0xF2)
             } else {
-                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error!(prefix, "Cannot use prefix {} on this instruction", name);
                 return Err(None);
             },
             "lock"  => if fmt.flags.contains(Flags::LOCK) {
                 (&mut group1, 0xF0)
             } else {
-                emit_error_at(prefix.span(), format!("Cannot use prefix {} on this instruction", name));
+                emit_error!(prefix, "Cannot use prefix {} on this instruction", name);
                 return Err(None);
             },
             "ss"    => (&mut group2, 0x36),
@@ -1312,7 +1313,7 @@ fn get_legacy_prefixes(fmt: &'static Opdata, idents: Vec<syn::Ident>) -> Result<
             _       => panic!("unimplemented prefix")
         };
         if group.is_some() {
-            emit_error_at(prefix.span(), "Duplicate prefix group".into());
+            emit_error!(prefix, "Duplicate prefix group");
             return Err(None);
         }
         *group = Some(value);

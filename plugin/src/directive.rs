@@ -3,8 +3,9 @@ use std::collections::hash_map::Entry;
 use syn::parse;
 use syn::Token;
 use quote::quote;
+use proc_macro_error::emit_error;
 
-use crate::common::{Stmt, Size, delimited, emit_error_at};
+use crate::common::{Stmt, Size, delimited};
 use crate::arch;
 use crate::DynasmData;
 use crate::parse_helpers::ParseOptExt;
@@ -21,7 +22,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
             if let Some(a) = arch::from_str(arch.to_string().as_str()) {
                 file_data.current_arch = a;
             } else {
-                emit_error_at(arch.span(), format!("Unknown architecture '{}'", arch.to_string()));
+                emit_error!(arch, "Unknown architecture '{}'", arch);
             }
         },
         "feature" => {
@@ -79,7 +80,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
 
             match file_data.aliases.entry(alias_name) {
                 Entry::Occupied(_) => {
-                    emit_error_at(alias.span(), format!("Duplicate alias definition, alias '{}' was already defined", alias.to_string()));
+                    emit_error!(alias, "Duplicate alias definition, alias '{}' was already defined", alias);
                 },
                 Entry::Vacant(v) => {
                     v.insert(reg.to_string());
@@ -88,7 +89,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
         },
         d => {
             // unknown directive. skip ahead until we hit a ; so the parser can recover
-            emit_error_at(directive.span(), format!("unknown directive '{}'", d));
+            emit_error!(directive, "unknown directive '{}'", d);
             skip_until_semicolon(input);
         }
     }
@@ -126,7 +127,7 @@ fn directive_const(file_data: &mut DynasmData, stmts: &mut Vec<Stmt>, input: par
     Ok(())
 }
 
-/// In case a directive is unknown, try to skip up to the next ; and resume parsing. 
+/// In case a directive is unknown, try to skip up to the next ; and resume parsing.
 fn skip_until_semicolon(input: parse::ParseStream) {
     let _ = input.step(|cursor| {
         let mut rest = *cursor;

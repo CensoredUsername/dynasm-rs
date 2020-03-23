@@ -1,4 +1,5 @@
 use syn::parse;
+use proc_macro_error::emit_error;
 
 mod ast;
 mod parser;
@@ -9,7 +10,7 @@ mod encoding_helpers;
 mod debug;
 
 use crate::State;
-use crate::common::{Size, Stmt, Jump, emit_error_at};
+use crate::common::{Size, Stmt, Jump};
 use crate::arch::Arch;
 use self::aarch64data::Relocation;
 
@@ -40,7 +41,7 @@ impl Arch for ArchAarch64 {
 
     fn set_features(&mut self, features: &[syn::Ident]) {
         if let Some(feature) = features.first() {
-            emit_error_at(feature.span(), "Arch aarch64 has no known features".into());
+            emit_error!(feature, "Arch aarch64 has no known features");
         }
     }
 
@@ -53,7 +54,7 @@ impl Arch for ArchAarch64 {
             Size::DWORD => Relocation::LITERAL32,
             Size::QWORD => Relocation::LITERAL64,
             _ => {
-                emit_error_at(span, "Relocation of unsupported size for the current target architecture".into());
+                emit_error!(span, "Relocation of unsupported size for the current target architecture");
                 return;
             }
         };
@@ -78,7 +79,7 @@ impl Arch for ArchAarch64 {
         let match_data = match matching::match_instruction(&mut ctx, &instruction, args) {
             Err(None) => return Ok(()),
             Err(Some(e)) => {
-                emit_error_at(span, e);
+                emit_error!(span, e);
                 return Ok(())
             }
             Ok(m) => m
@@ -87,7 +88,7 @@ impl Arch for ArchAarch64 {
         match compiler::compile_instruction(&mut ctx, match_data) {
             Err(None) => return Ok(()),
             Err(Some(e)) => {
-                emit_error_at(span, e);
+                emit_error!(span, e);
                 return Ok(())
             }
             Ok(()) => ()

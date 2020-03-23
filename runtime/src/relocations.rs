@@ -145,5 +145,5 @@ pub(crate) fn fits_signed_bitfield(value: i64, bits: u8) -> bool {
     }
 
     let half = 1i64 << (bits - 1);
-    (value < half && value >= -half)
+    value < half && value >= -half
 }

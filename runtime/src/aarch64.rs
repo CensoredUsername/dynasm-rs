@@ -42,7 +42,7 @@ impl Aarch64Relocation {
                     return Err(ImpossibleRelocation { } );
                 }
                 let value = (value >> 2) as u32;
-                (value & 0x3FF_FFFF)
+                value & 0x3FF_FFFF
             },
             Self::BCOND => {
                 if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 19) {

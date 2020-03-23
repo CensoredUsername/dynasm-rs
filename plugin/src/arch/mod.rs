@@ -1,6 +1,7 @@
 use syn::parse;
+use proc_macro_error::emit_error;
 
-use crate::common::{Size, Stmt, Jump, emit_error_at};
+use crate::common::{Size, Stmt, Jump};
 use crate::State;
 
 use std::fmt::Debug;
@@ -34,13 +35,13 @@ impl Arch for DummyArch {
 
     fn set_features(&mut self, features: &[syn::Ident]) {
         if let Some(feature) = features.first() {
-            emit_error_at(feature.span(), "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive".into());
+            emit_error!(feature, "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive");
         }
     }
 
     fn handle_static_reloc(&self, _stmts: &mut Vec<Stmt>, reloc: Jump, _size: Size) {
         let span = reloc.span();
-        emit_error_at(span, "Current assembling architecture is undefined. Define it using a .arch directive".into());
+        emit_error!(span, "Current assembling architecture is undefined. Define it using a .arch directive");
     }
 
     fn default_align(&self) -> u8 {
@@ -48,7 +49,7 @@ impl Arch for DummyArch {
     }
 
     fn compile_instruction(&self, _state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
-        emit_error_at(input.cursor().span(), "Current assembling architecture is undefined. Define it using a .arch directive".into());
+        emit_error!(input.cursor().span(), "Current assembling architecture is undefined. Define it using a .arch directive");
         Ok(())
     }
 }

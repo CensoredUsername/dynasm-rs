@@ -1,4 +1,5 @@
 use syn::parse;
+use proc_macro_error::emit_error;
 
 mod ast;
 mod compiler;
@@ -8,7 +9,7 @@ mod x64data;
 
 use crate::State;
 use crate::arch::Arch;
-use crate::common::{Size, Stmt, Jump, emit_error_at};
+use crate::common::{Size, Stmt, Jump};
 
 #[cfg(feature = "dynasm_opmap")]
 pub use debug::create_opmap;
@@ -47,7 +48,7 @@ impl Arch for Archx64 {
             new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    emit_error_at(ident.span(), format!("Architecture x64 does not support feature '{}'", ident.to_string()));
+                    emit_error!(ident, "Architecture x64 does not support feature '{}'", ident);
                     continue;
                 }
             }
@@ -76,7 +77,7 @@ impl Arch for Archx64 {
         let span = instruction.span;
 
         if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, instruction, args) {
-            emit_error_at(span, e);
+            emit_error!(span, e);
         }
         Ok(())
     }
@@ -104,7 +105,7 @@ impl Arch for Archx86 {
             new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    emit_error_at(ident.span(), format!("Architecture x86 does not support feature '{}'", ident.to_string()));
+                    emit_error!(ident, "Architecture x86 does not support feature '{}'", ident);
                     continue;
                 }
             }
@@ -133,7 +134,7 @@ impl Arch for Archx86 {
         let span = instruction.span;
 
         if let Err(Some(e)) = compiler::compile_instruction(&mut ctx, instruction, args) {
-            emit_error_at(span, e);
+            emit_error!(span, e);
         }
         Ok(())
     }

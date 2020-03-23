@@ -1,4 +1,4 @@
-
+use proc_macro_error::emit_error;
 use proc_macro2::Span;
 
 use super::Context;
@@ -6,10 +6,10 @@ use super::ast::{Instruction, RawArg, CleanArg, FlatArg, RefItem, Register, RegF
 use super::aarch64data::{Opdata, Matcher, COND_MAP, get_mnemonic_data};
 use super::debug::format_opdata_list;
 
-use crate::common::{Size, JumpKind, emit_error_at};
+use crate::common::{Size, JumpKind};
 use crate::parse_helpers::{as_ident, as_number, as_float};
 
-/// Try finding an appropriate definition that matches the given instruction / arguments. 
+/// Try finding an appropriate definition that matches the given instruction / arguments.
 pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, args: Vec<RawArg>) -> Result<MatchData, Option<String>> {
     // sanitize our arg list to remove any structures that cannot be matched on
     let args = sanitize_args(args)?;
@@ -56,7 +56,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             // offsets: validate that only relative jumps are allowed (no extern relocations)
             RawArg::JumpTarget { jump } => {
                 if let JumpKind::Bare(_) = jump.kind {
-                    emit_error_at(jump.span(), "Extern relocations are not allowed in aarch64".into());
+                    emit_error!(jump.span(), "Extern relocations are not allowed in aarch64");
                     return Err(None);
                 }
                 res.push(CleanArg::JumpTarget { jump });
@@ -64,7 +64,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             // modifier: LSL LSR ASR ROR and MSL require an immediate.
             RawArg::Modifier { span, modifier } => {
                 if modifier.expr.is_none() && modifier.op.expr_required() {
-                    emit_error_at(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.".into());
+                    emit_error!(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.");
                     return Err(None);
                 }
 
@@ -95,7 +95,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 let base = match items.next() {
                     Some(RefItem::Direct { reg, .. }) => reg,
                     Some(_) => {
-                        emit_error_at(span, "First item in a reference list has to be a register".into());
+                        emit_error!(span, "First item in a reference list has to be a register");
                         return Err(None);
                     },
                     None => unreachable!("Cannot create empty references in the parser")
@@ -110,7 +110,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                         kind = RefKind::Offset(value);
                     },
                     Some(RefItem::Modifier { .. }) => {
-                        emit_error_at(span, "Cannot have a modifier without index register or offset".into());
+                        emit_error!(span, "Cannot have a modifier without index register or offset");
                         return Err(None);
                     },
                     None => hit_end = true
@@ -123,7 +123,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                             *modifier = Some(m)
                         },
                         Some(_) => {
-                            emit_error_at(span, "Too many items in reference list".into());
+                            emit_error!(span, "Too many items in reference list");
                             return Err(None);
                         },
                         None => hit_end = true
@@ -132,7 +132,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
 
                 // there should not be any more items in the reference
                 if !hit_end && items.next().is_some() {
-                    emit_error_at(span, "Too many items in reference list".into());
+                    emit_error!(span, "Too many items in reference list");
                     return Err(None);
                 }
 
@@ -141,7 +141,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     if let RefKind::Offset(offset) = kind {
                         kind = RefKind::PreIndexed(offset);
                     } else {
-                        emit_error_at(span, "Cannot use pre-indexed addressing without an immediate offset.".into());
+                        emit_error!(span, "Cannot use pre-indexed addressing without an immediate offset.");
                         return Err(None);
                     }
                 }
@@ -149,27 +149,27 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 // sanitizaiton
                 // base can only be a Xn|SP reg
                 if !(base.size() == Size::QWORD && (base.family() == RegFamily::INTEGERSP || (base.family() == RegFamily::INTEGER && !base.kind().is_zero_reg()))) {
-                    emit_error_at(span, "Base register can only be a Xn|SP register".into());
+                    emit_error!(span, "Base register can only be a Xn|SP register");
                     return Err(None);
                 }
 
                 // index can only be a Xn or Wn reg
                 if let RefKind::Indexed(ref index, ref modifier) = kind {
                     if index.family() != RegFamily::INTEGER {
-                        emit_error_at(span, "Index register can only be a Xn or Wn register".into());
+                        emit_error!(span, "Index register can only be a Xn or Wn register");
                         return Err(None);
                     }
 
                     // limited set of allowed modifiers.
                     if let Some(ref m) = modifier {
                         if if index.size() == Size::QWORD {m.op != Modifier::LSL && m.op != Modifier::SXTX} else {m.op != Modifier::SXTW && m.op != Modifier::UXTW} {
-                            emit_error_at(span, "Invalid modifier for the selected base register type".into());
+                            emit_error!(span, "Invalid modifier for the selected base register type");
                             return Err(None);
                         }
 
                         // LSL requires a stated immediate
                         if m.op.expr_required() && m.expr.is_none() {
-                            emit_error_at(span, "LSL reference modifier requires an immediate".into());
+                            emit_error!(span, "LSL reference modifier requires an immediate");
                             return Err(None);
                         }
                     }
@@ -208,7 +208,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             // then, canonicalize it to first register / count and confirm it is a valid bare vector register
             RawArg::CommaList { span, items, element } => {
                 if items.len() > 32 {
-                    emit_error_at(span, "Too many registers in register list.".into());
+                    emit_error!(span, "Too many registers in register list.");
                     return Err(None);
                 }
                 let amount = items.len() as u8;
@@ -226,7 +226,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     s.sanitize(span, &item)?;
                     next_code = (next_code + 1) % 32;
                     if item.kind().encode() != next_code {
-                        emit_error_at(span, "Registers in register list are not monotonically incrementing".into());
+                        emit_error!(span, "Registers in register list are not monotonically incrementing");
                         return Err(None);
                     }
                 }
@@ -243,23 +243,23 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 sanitize_register(span, &first)?;
                 if let Register::Vector(v) = &first {
                     if v.element.is_some() {
-                        emit_error_at(span, "Cannot use element specifiers inside of register lists.".into());
+                        emit_error!(span, "Cannot use element specifiers inside of register lists.");
                         return Err(None);
                     }
                 } else {
-                    emit_error_at(span, "Can only use vector registers in register lists.".into());
+                    emit_error!(span, "Can only use vector registers in register lists.");
                     return Err(None);
                 }
 
                 // ensure amount is a constant usize
                 let amount = if let Some(amount) = as_number(&amount) {
                     if amount > 32 {
-                        emit_error_at(span, "Too many registers in register list.".into());
+                        emit_error!(span, "Too many registers in register list.");
                         return Err(None);
                     }
                     amount as u8
                 } else {
-                    emit_error_at(span, "Register list requires a contant amount of registers specified".into());
+                    emit_error!(span, "Register list requires a contant amount of registers specified");
                     return Err(None);
                 };
 
@@ -294,18 +294,18 @@ impl ListSanitizer {
         sanitize_register(span, register)?;
         if let Register::Vector(v) = register {
             if v.element.is_some() {
-                emit_error_at(span, "Cannot use element specifiers inside of register lists.".into());
+                emit_error!(span, "Cannot use element specifiers inside of register lists.");
                 return Err(None);
             }
 
             if v.kind.is_dynamic() {
-                emit_error_at(span, "Cannot use dynamic registers inside of a comma/dash register list.".into());
+                emit_error!(span, "Cannot use dynamic registers inside of a comma/dash register list.");
                 return Err(None);
             }
 
             if let Some(size) = self.element_size {
                 if size != v.element_size {
-                    emit_error_at(span, "Inconsistent element sizes.".into());
+                    emit_error!(span, "Inconsistent element sizes.");
                     return Err(None);
                 }
             } else {
@@ -314,14 +314,14 @@ impl ListSanitizer {
 
             if let Some(lanes) = self.lanes {
                 if lanes != v.lanes {
-                    emit_error_at(span, "Inconsistent lane count.".into());
+                    emit_error!(span, "Inconsistent lane count.");
                     return Err(None);
                 }
             } else {
                 self.lanes = Some(v.lanes);
             }
         } else {
-            emit_error_at(span, "Can only use vector registers in register lists.".into());
+            emit_error!(span, "Can only use vector registers in register lists.");
             return Err(None);
         }
         Ok(())
@@ -333,7 +333,7 @@ fn sanitize_register(span: Span, register: &Register) -> Result<(), Option<Strin
     if let Register::Vector(v) = register {
         if let Some(total) = v.full_size() {
             if total > 16 {
-                emit_error_at(span, "Overly wide vector register.".into());
+                emit_error!(span, "Overly wide vector register.");
                 return Err(None)
             }
         }
