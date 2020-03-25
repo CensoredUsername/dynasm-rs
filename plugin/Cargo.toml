@@ -23,7 +23,7 @@ bitflags = "1"
 owning_ref = "^0.4"
 byteorder = "1"
 quote = "1"
-proc-macro-error = "0.4"
+proc-macro-error = "1"
 
 [dependencies.syn]
 version = "1"
