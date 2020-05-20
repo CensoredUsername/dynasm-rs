@@ -95,7 +95,7 @@ impl MemoryManager {
 
             // repack the buffer
             let buffer = buffer.make_exec().expect("Could not swap buffer protection modes");
-            mem::replace(&mut *lock, buffer);
+            *lock = buffer;
         }
 
         new.clear();

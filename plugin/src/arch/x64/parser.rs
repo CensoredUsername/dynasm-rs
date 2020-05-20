@@ -231,7 +231,7 @@ fn parse_reg(ctx: &Context, expr: &syn::Expr) -> Option<(Span, Register)> {
 
         let name = path.to_string();
         let mut name = name.as_str();
-        if let Some(x) = ctx.state.file_data.aliases.get(name) {
+        if let Some(x) = ctx.state.invocation_context.aliases.get(name) {
             name = x;
         }
 

@@ -244,7 +244,7 @@ fn parse_reg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<Opti
                 return Ok((ident, rest));
             }
 
-            if let Some(repl) = ctx.state.file_data.aliases.get(&ident) {
+            if let Some(repl) = ctx.state.invocation_context.aliases.get(&ident) {
                 ident = repl.clone();
             }
 

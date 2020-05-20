@@ -36,3 +36,6 @@ features = ["nightly"]
 [features]
 dynasm_opmap = []
 dynasm_extract = []
+filelocal = []
+
+default = []

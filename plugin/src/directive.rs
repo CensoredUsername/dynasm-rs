@@ -7,10 +7,10 @@ use proc_macro_error::emit_error;
 
 use crate::common::{Stmt, Size, delimited};
 use crate::arch;
-use crate::DynasmData;
+use crate::DynasmContext;
 use crate::parse_helpers::ParseOptExt;
 
-pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stmt>, input: parse::ParseStream) -> parse::Result<()> {
+pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream) -> parse::Result<()> {
     let directive: syn::Ident = input.parse()?;
 
     match directive.to_string().as_str() {
@@ -20,7 +20,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
             // ; .arch ident
             let arch: syn::Ident = input.parse()?;
             if let Some(a) = arch::from_str(arch.to_string().as_str()) {
-                file_data.current_arch = a;
+                invocation_context.current_arch = a;
             } else {
                 emit_error!(arch, "Unknown architecture '{}'", arch);
             }
@@ -41,13 +41,13 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
             if features.len() == 1 && features[0] == "none" {
                 features.pop();
             }
-            file_data.current_arch.set_features(&features);
+            invocation_context.current_arch.set_features(&features);
         },
         // ; .byte (expr ("," expr)*)?
-        "byte"  => directive_const(file_data, stmts, input, Size::BYTE)?,
-        "word"  => directive_const(file_data, stmts, input, Size::WORD)?,
-        "dword" => directive_const(file_data, stmts, input, Size::DWORD)?,
-        "qword" => directive_const(file_data, stmts, input, Size::QWORD)?,
+        "byte"  => directive_const(invocation_context, stmts, input, Size::BYTE)?,
+        "word"  => directive_const(invocation_context, stmts, input, Size::WORD)?,
+        "dword" => directive_const(invocation_context, stmts, input, Size::DWORD)?,
+        "qword" => directive_const(invocation_context, stmts, input, Size::QWORD)?,
         "bytes" => {
             // ; .bytes expr
             let iterator: syn::Expr = input.parse()?;
@@ -63,7 +63,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
                 let with: syn::Expr = input.parse()?;
                 delimited(with)
             } else {
-                let with = file_data.current_arch.default_align();
+                let with = invocation_context.current_arch.default_align();
                 delimited(quote!(#with))
             };
 
@@ -78,7 +78,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
 
             let alias_name = alias.to_string();
 
-            match file_data.aliases.entry(alias_name) {
+            match invocation_context.aliases.entry(alias_name) {
                 Entry::Occupied(_) => {
                     emit_error!(alias, "Duplicate alias definition, alias '{}' was already defined", alias);
                 },
@@ -97,7 +97,7 @@ pub(crate) fn evaluate_directive(file_data: &mut DynasmData, stmts: &mut Vec<Stm
     Ok(())
 }
 
-fn directive_const(file_data: &mut DynasmData, stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
+fn directive_const(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
     // FIXME: this could be replaced by a Punctuated parser?
     // parse (expr (, expr)*)?
 
@@ -106,7 +106,7 @@ fn directive_const(file_data: &mut DynasmData, stmts: &mut Vec<Stmt>, input: par
     }
 
     if let Some(jump) = input.parse_opt()? {
-        file_data.current_arch.handle_static_reloc(stmts, jump, size);
+        invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
     } else {
         let expr: syn::Expr = input.parse()?;
         stmts.push(Stmt::ExprSigned(delimited(expr), size));
@@ -117,7 +117,7 @@ fn directive_const(file_data: &mut DynasmData, stmts: &mut Vec<Stmt>, input: par
         let _: Token![,] = input.parse()?;
 
         if let Some(jump) = input.parse_opt()? {
-            file_data.current_arch.handle_static_reloc(stmts, jump, size);
+            invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
         } else {
             let expr: syn::Expr = input.parse()?;
             stmts.push(Stmt::ExprSigned(delimited(expr), size));

@@ -1,3 +1,4 @@
+#![cfg(feature = "filelocal")]
 #![feature(proc_macro_span)]
 
 // token/ast manipulation
@@ -14,16 +15,18 @@ extern crate byteorder;
 
 use syn::parse;
 use syn::{Token, parse_macro_input};
-use proc_macro2::{Span, TokenTree, TokenStream};
+use proc_macro2::{TokenTree, TokenStream};
 use quote::quote;
 use proc_macro_error::proc_macro_error;
 
-use lazy_static::lazy_static;
-use owning_ref::{OwningRef, RwLockReadGuardRef};
-
-use std::sync::{RwLock, RwLockReadGuard, Mutex};
 use std::collections::HashMap;
+
+#[cfg(feature = "filelocal")]
+use std::sync::{MutexGuard, Mutex};
+#[cfg(feature = "filelocal")]
 use std::path::PathBuf;
+#[cfg(any(feature = "filelocal", feature = "dynasm_opmap", feature = "dynasm_extract"))]
+use proc_macro2::Span;
 
 /// Module with common infrastructure across assemblers
 mod common;
@@ -68,8 +71,8 @@ impl parse::Parse for Dynasm {
         let target = common::delimited(target);
 
         // get file-local data (alias definitions, current architecture)
-        let file_data = file_local_data();
-        let mut file_data = file_data.lock().unwrap();
+        let mut provider = ContextProvider::new();
+        let invocation_context = provider.get_context_mut();
 
         // prepare the statement buffer
         let mut stmts = Vec::new();
@@ -134,16 +137,16 @@ impl parse::Parse for Dynasm {
             if input.peek(Token![.]) {
                 let _: Token![.] = input.parse()?;
 
-                directive::evaluate_directive(&mut file_data, &mut stmts, input)?;
+                directive::evaluate_directive(invocation_context, &mut stmts, input)?;
             } else {
                 // anything else is an assembly instruction which should be in current_arch
 
                 let mut state = State {
                     stmts: &mut stmts,
                     target: &target,
-                    file_data: &*file_data,
+                    invocation_context: &*invocation_context,
                 };
-                file_data.current_arch.compile_instruction(&mut state, input)?;
+                invocation_context.current_arch.compile_instruction(&mut state, input)?;
             }
 
         }
@@ -173,7 +176,7 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
         x => panic!("Unknown architecture {}", x)
     });
 
-    let token = quote::quote! {
+    let token = quote::quote_spanned! { Span::mixed_site()=>
         #s
     };
     token.into()
@@ -194,7 +197,7 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
         x => panic!("Unknown architecture {}", x)
     };
 
-    let token = quote::quote! {
+    let token = quote::quote_spanned! { Span::mixed_site()=>
         #s
     };
     token.into()
@@ -221,53 +224,121 @@ impl parse::Parse for DynasmOpmap {
 struct State<'a> {
     pub stmts: &'a mut Vec<common::Stmt>,
     pub target: &'a TokenTree,
-    pub file_data: &'a DynasmData,
+    pub invocation_context: &'a DynasmContext,
 }
 
 // File local data implementation.
 
-type DynasmStorage = HashMap<PathBuf, Mutex<DynasmData>>;
-
-struct DynasmData {
+// context inside of a dynasm invocation, manipulated by directives and such
+struct DynasmContext {
     pub current_arch: Box<dyn arch::Arch>,
     pub aliases: HashMap<String, String>,
 }
 
-impl DynasmData {
-    fn new() -> DynasmData {
-        DynasmData {
-            current_arch:
-                arch::from_str(arch::CURRENT_ARCH).expect("Default architecture is invalid"),
-            aliases: HashMap::new(),
+impl DynasmContext {
+    fn new() -> DynasmContext {
+        DynasmContext {
+            current_arch: arch::from_str(arch::CURRENT_ARCH).expect("Invalid default architecture"),
+            aliases: HashMap::new()
         }
     }
 }
 
-type FileLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
+// Oneshot context provider
+#[cfg(not(feature = "filelocal"))]
+struct ContextProvider {
+    context: DynasmContext
+}
 
-fn file_local_data() -> FileLocalData {
-    // get the file that generated this macro expansion
-    let span = Span::call_site().unstable();
-
-    // and use the file that that was at as scope for resolving dynasm data
-    let id = span.source_file().path();
-
-    {
-        let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
-
-        if data.get(&id).is_some() {
-            return data.map(|x| x.get(&id).unwrap());
+#[cfg(not(feature = "filelocal"))]
+impl ContextProvider {
+    pub fn new() -> ContextProvider {
+        ContextProvider {
+            context: DynasmContext::new()
         }
     }
 
-    {
-        let mut lock = DYNASM_STORAGE.write().unwrap();
-        lock.insert(id.clone(), Mutex::new(DynasmData::new()));
+    pub fn get_context_mut(&mut self) -> &mut DynasmContext {
+        &mut self.context
     }
-    RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&id).unwrap())
 }
 
-// this is where the actual storage resides.
-lazy_static! {
-    static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
+/// Filelocal context provider
+#[cfg(feature = "filelocal")]
+struct ContextProvider {
+    guard: MutexGuard<'static, HashMap<PathBuf, DynasmContext>>
 }
+
+#[cfg(feature = "filelocal")]
+impl ContextProvider {
+    pub fn new() -> ContextProvider {
+        ContextProvider {
+            guard: CONTEXT_STORAGE.lock().unwrap()
+        }
+    }
+
+    pub fn get_context_mut(&mut self) -> &mut DynasmContext {
+        // get the file that generated this macro expansion
+        let span = Span::call_site().unstable();
+
+        // and use the file that that was at as scope for resolving dynasm data
+        let id = span.source_file().path();
+
+        self.guard.entry(id).or_insert_with(DynasmContext::new)
+    }
+}
+
+#[cfg(feature = "filelocal")]
+lazy_static::lazy_static! {
+    static ref CONTEXT_STORAGE: Mutex<HashMap<PathBuf, DynasmContext>> = Mutex::new(HashMap::new());
+}
+
+
+
+
+
+// type DynasmStorage = HashMap<PathBuf, Mutex<DynasmData>>;
+
+// struct DynasmData {
+//     pub current_arch: Box<dyn arch::Arch>,
+//     pub aliases: HashMap<String, String>,
+// }
+
+// impl DynasmData {
+//     fn new() -> DynasmData {
+//         DynasmData {
+//             current_arch:
+//                 arch::from_str(arch::CURRENT_ARCH).expect("Default architecture is invalid"),
+//             aliases: HashMap::new(),
+//         }
+//     }
+// }
+
+// type FileLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
+
+// fn file_local_data() -> FileLocalData {
+//     // get the file that generated this macro expansion
+//     let span = Span::call_site().unstable();
+
+//     // and use the file that that was at as scope for resolving dynasm data
+//     let id = span.source_file().path();
+
+//     {
+//         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
+
+//         if data.get(&id).is_some() {
+//             return data.map(|x| x.get(&id).unwrap());
+//         }
+//     }
+
+//     {
+//         let mut lock = DYNASM_STORAGE.write().unwrap();
+//         lock.insert(id.clone(), Mutex::new(DynasmData::new()));
+//     }
+//     RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&id).unwrap())
+// }
+
+// // this is where the actual storage resides.
+// lazy_static! {
+//     static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
+// }

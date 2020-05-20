@@ -552,7 +552,7 @@ impl<R: Relocation> Assembler<R> {
 
         // repack the buffer
         let buffer = buffer.make_exec().expect("Could not swap buffer protection modes");
-        mem::replace(&mut *lock, buffer);
+        *lock = buffer;
 
         // call it a day
         Ok(output)
