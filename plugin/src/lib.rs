@@ -1,17 +1,6 @@
-#![cfg(feature = "filelocal")]
-#![feature(proc_macro_span)]
+#![cfg_attr(feature = "filelocal", feature(proc_macro_span))]
 
-// token/ast manipulation
 extern crate proc_macro;
-extern crate proc_macro2;
-extern crate syn;
-extern crate quote;
-
-// utility
-extern crate lazy_static;
-extern crate bitflags;
-extern crate owning_ref;
-extern crate byteorder;
 
 use syn::parse;
 use syn::{Token, parse_macro_input};

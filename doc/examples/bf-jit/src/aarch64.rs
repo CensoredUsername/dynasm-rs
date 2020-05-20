@@ -1,11 +1,8 @@
 #![feature(proc_macro_hygiene)]
-extern crate dynasmrt;
-extern crate dynasm;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
-extern crate itertools;
 use itertools::Itertools;
 use itertools::multipeek;
 
@@ -17,20 +14,24 @@ use std::mem;
 use std::u8;
 
 const TAPE_SIZE: usize = 30000;
-
-dynasm!(ops
-    ; .arch aarch64
-    ; .alias a_state, x0
-    ; .alias a_current, x1
-    ; .alias a_begin, x2
-    ; .alias a_end, x3
-    ; .alias retval, x0
-);
+macro_rules! my_dynasm {
+    ($ops:ident $($t:tt)*) => {
+        dynasm!($ops
+            ; .arch aarch64
+            ; .alias a_state, x0
+            ; .alias a_current, x1
+            ; .alias a_begin, x2
+            ; .alias a_end, x3
+            ; .alias retval, x0
+            $($t)*
+        );
+    }
+}
 
 macro_rules! prologue {
     ($ops:ident) => {{
         let start = $ops.offset();
-        dynasm!($ops
+        my_dynasm!($ops
             ; str x30, [sp, #-16]!
             ; stp x0, x1, [sp, #-16]!
             ; stp x2, x3, [sp, #-16]!
@@ -40,7 +41,7 @@ macro_rules! prologue {
 }
 
 macro_rules! epilogue {
-    ($ops:ident, $e:expr) => {dynasm!($ops
+    ($ops:ident, $e:expr) => {my_dynasm!($ops
         ; mov x0, $e
         ; add sp, sp, #32
         ; ldr x30, [sp], #16
@@ -49,7 +50,7 @@ macro_rules! epilogue {
 }
 
 macro_rules! call_extern {
-    ($ops:ident, $addr:ident) => {dynasm!($ops
+    ($ops:ident, $addr:ident) => {my_dynasm!($ops
         ; str x1, [sp, #24]
         ; ldr x9, ->$addr
         ; blr x9
@@ -91,7 +92,7 @@ impl Program {
             match c {
                 b'<' => {
                     let amount = code.take_while_ref(|x| *x == b'<').count() + 1;
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; sub a_current, a_current, (amount % TAPE_SIZE) as u32 & 0xFFF
                         ; sub a_current, a_current, (amount % TAPE_SIZE) as u32 >> 12, LSL #12
                         ; cmp a_current, a_begin
@@ -103,7 +104,7 @@ impl Program {
                 },
                 b'>' => {
                     let amount = code.take_while_ref(|x| *x == b'>').count() + 1;
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; add a_current, a_current, (amount % TAPE_SIZE) as u32 & 0xFFF
                         ; add a_current, a_current, (amount % TAPE_SIZE) as u32 >> 12, LSL #12
                         ; cmp a_current, a_end
@@ -118,7 +119,7 @@ impl Program {
                     if amount > u8::MAX as usize {
                         return Err("An overflow occurred");
                     }
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; ldrb w9, [a_current]
                         ; add w9, w9, amount as u32
                         ; tbz w9, 8, >fine
@@ -132,7 +133,7 @@ impl Program {
                     if amount > u8::MAX as usize {
                         return Err("An overflow occurred");
                     }
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; ldrb w9, [a_current]
                         ; sub w9, w9, amount as u32
                         ; tbz w9, 8, >fine
@@ -142,13 +143,13 @@ impl Program {
                     );
                 },
                 b',' => {
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ;; call_extern!(ops, getchar)
                         ; cbnz x9, ->io_failure
                     );
                 },
                 b'.' => {
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ;; call_extern!(ops, putchar)
                         ; cbnz x9, ->io_failure
                     );
@@ -158,14 +159,14 @@ impl Program {
                     if first && code.peek() == Some(&b']') {
                         code.next();
                         code.next();
-                        dynasm!(ops
+                        my_dynasm!(ops
                             ; strb wzr, [a_current]
                         );
                     } else {
                         let backward_label = ops.new_dynamic_label();
                         let forward_label = ops.new_dynamic_label();
                         loops.push((backward_label, forward_label));
-                        dynasm!(ops
+                        my_dynasm!(ops
                             ; ldrb w9, [a_current]
                             ; cbz w9, =>forward_label
                             ;=>backward_label
@@ -174,7 +175,7 @@ impl Program {
                 },
                 b']' => {
                     if let Some((backward_label, forward_label)) = loops.pop() {
-                        dynasm!(ops
+                        my_dynasm!(ops
                             ; ldrb w9, [a_current]
                             ; cbnz w9, =>backward_label
                             ;=>forward_label
@@ -190,7 +191,7 @@ impl Program {
             return Err("[ without matching ]");
         }
 
-        dynasm!(ops
+        my_dynasm!(ops
             ;; epilogue!(ops, 0)
             ;->overflow:
             ;; epilogue!(ops, 1)

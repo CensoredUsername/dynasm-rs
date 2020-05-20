@@ -1,6 +1,4 @@
 #![feature(proc_macro_hygiene)]
-extern crate dynasmrt;
-extern crate dynasm;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
@@ -20,6 +18,7 @@ fn main() {
 
     let hello = ops.offset();
     dynasm!(ops
+        ; .arch x64
         ; lea rcx, [->hello]
         ; xor edx, edx
         ; mov dl, BYTE string.len() as _

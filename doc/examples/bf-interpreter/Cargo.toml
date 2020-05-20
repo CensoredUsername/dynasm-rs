@@ -2,5 +2,6 @@
 name = "bf-int"
 version = "0.1.0"
 authors = ["CensoredUsername <cens.username@gmail.com>"]
+edition = "2018"
 
 [dependencies]

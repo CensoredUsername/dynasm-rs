@@ -3,15 +3,19 @@
 
 #[macro_use]
 extern crate dynasmrt;
-extern crate dynasm;
 
 use dynasm::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 // aliases, and dynasm! in item position
-dynasm!(ops
-    ; .alias test, rax
-);
+macro_rules! my_dynasm {
+    ($ops:ident $($t:tt)*) => {
+        dynasm!($ops
+            ; .alias test, rax
+            $($t)*
+        )
+    }
+}
 
 fn complex1() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
@@ -21,7 +25,7 @@ fn complex1() {
     let label = ops.new_dynamic_label();
 
     // interesting testcases
-    dynasm!(ops
+    my_dynasm!(ops
         // no args
         ; ret
         // reserved keyword
@@ -153,7 +157,7 @@ fn complex1() {
     let test_array = &mut test_array;
     let mut test_single = Test {foo: 7, bar: 8};
     let test_single = &mut test_single;
-    dynasm!(ops
+    my_dynasm!(ops
         ; mov rax, AWORD MutPointer!(test_array)
         ; mov ebx, 2
         ; vgatherqpd ymm13, QWORD rax => f64[ymm15], ymm14
@@ -178,20 +182,20 @@ fn complex1() {
 
     // fixups
     let start = ops.offset();
-    dynasm!( (ops)
+    my_dynasm!( ops
         ; inc rbx
     );
     let end = ops.offset();
     ops.alter(|ops| {
         ops.goto(start);
-        dynasm!(ops
+        my_dynasm!(ops
             ; inc r12
         );
         ops.check(end).unwrap();
     }).unwrap();
 
     let index = ops.offset();
-    dynasm!(ops
+    my_dynasm!(ops
         ; mov eax, 10203040
         ; ret
     );

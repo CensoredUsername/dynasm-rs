@@ -4,9 +4,6 @@
 //! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools
 //! to write your own Assemblers using these components.
 
-extern crate memmap;
-extern crate byteorder;
-
 pub mod mmap;
 pub mod components;
 pub mod relocations;
