@@ -4,10 +4,12 @@ The purpose of this tool is to ease the creation of programs that require run-ti
 
 It is currently in beta, meaning that everything is operational, but some APIs might change in the future.
 
+The tool currently requires a nightly toolchain to build with, but will transition to stable at rust 1.45.
+
 [![Build Status](https://travis-ci.org/CensoredUsername/dynasm-rs.svg?branch=master)](https://travis-ci.org/CensoredUsername/dynasm-rs)
 [![](https://img.shields.io/crates/v/dynasm.svg)](https://crates.io/crates/dynasm)
 
-`#dynasm-rs` on irc.mozilla.org
+`##dynasm-rs` on irc.freenode.net
 
 ## Features
 
