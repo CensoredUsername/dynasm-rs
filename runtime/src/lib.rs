@@ -7,6 +7,24 @@
 pub mod mmap;
 pub mod components;
 pub mod relocations;
+
+/// Helper to implement common traits on register enums.
+macro_rules! reg_impls {
+    ($r:ty) => {
+        impl $crate::Register for $r {
+            fn code(&self) -> u8 {
+                *self as u8
+            }
+        }
+
+        impl From<$r> for u8 {
+            fn from(rq: $r) -> u8 {
+                rq.code()
+            }
+        }
+    }
+}
+
 pub mod x64;
 pub mod x86;
 pub mod aarch64;
@@ -15,11 +33,12 @@ pub use crate::mmap::ExecutableBuffer;
 use crate::components::{MemoryManager, LabelRegistry, RelocRegistry, ManagedRelocs, PatchLoc};
 use crate::relocations::Relocation;
 
+use std::hash::Hash;
 use std::iter::Extend;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
 use std::io;
 use std::error;
-use std::fmt;
+use std::fmt::{self, Debug};
 use std::mem;
 
 /// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
@@ -1016,4 +1035,10 @@ impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
         self.extend(iter.into_iter().cloned())
     }
+}
+
+/// All register enumerations implement this.
+pub trait Register: Debug + Clone + Copy + PartialEq + Eq + Hash {
+    /// Returns the integer ID of the register.
+    fn code(&self) -> u8;
 }

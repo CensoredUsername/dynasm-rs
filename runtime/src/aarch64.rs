@@ -1,5 +1,6 @@
 //! This module implements the relocation model for the aarch64 architecture, as well as aliases for aarch64 Assemblers.
 
+use crate::Register;
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation, fits_signed_bitfield};
 use byteorder::{ByteOrder, LittleEndian};
 use std::convert::TryFrom;
@@ -235,5 +236,67 @@ pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
         Some((((bits >> 24) & 0x80) | ((bits >> 19) & 0x7F)) as u8)
     } else {
         None
+    }
+}
+
+/// General purpose registers. 4 or 8 bytes.
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RX {
+    X0 = 0x00, X1 = 0x01, X2 = 0x02, X3 = 0x03,
+    X4 = 0x04, X5 = 0x05, X6 = 0x06, X7 = 0x07,
+    X8 = 0x08, X9 = 0x09, X10= 0x0A, X11= 0x0B,
+    X12= 0x0C, X13= 0x0D, X14= 0x0E, X15= 0x0F,
+    X16= 0x10, X17= 0x11, X18= 0x12, X19= 0x13,
+    X20= 0x14, X21= 0x15, X22= 0x16, X23= 0x17,
+    X24= 0x18, X25= 0x19, X26= 0x1A, X27= 0x1B,
+    X28= 0x1C, X29= 0x1D, X30= 0x1E, XZR= 0x1F,
+}
+reg_impls!(RX);
+
+/// 0x1F addresses both XZR and SP (disambiguated by context). This enum is a mirror of RX just
+/// with the SP in place of XZR.
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RXSP {
+    X0 = 0x00, X1 = 0x01, X2 = 0x02, X3 = 0x03,
+    X4 = 0x04, X5 = 0x05, X6 = 0x06, X7 = 0x07,
+    X8 = 0x08, X9 = 0x09, X10= 0x0A, X11= 0x0B,
+    X12= 0x0C, X13= 0x0D, X14= 0x0E, X15= 0x0F,
+    X16= 0x10, X17= 0x11, X18= 0x12, X19= 0x13,
+    X20= 0x14, X21= 0x15, X22= 0x16, X23= 0x17,
+    X24= 0x18, X25= 0x19, X26= 0x1A, X27= 0x1B,
+    X28= 0x1C, X29= 0x1D, X30= 0x1E, SP = 0x1F,
+}
+reg_impls!(RXSP);
+
+/// Scalar FP / vector SIMD registers. 1, 2, 4, 8 or 16-bytes.
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RV {
+    V0 = 0x00, V1 = 0x01, V2 = 0x02, V3 = 0x03,
+    V4 = 0x04, V5 = 0x05, V6 = 0x06, V7 = 0x07,
+    V8 = 0x08, V9 = 0x09, V10= 0x0A, V11= 0x0B,
+    V12= 0x0C, V13= 0x0D, V14= 0x0E, V15= 0x0F,
+    V16= 0x10, V17= 0x11, V18= 0x12, V19= 0x13,
+    V20= 0x14, V21= 0x15, V22= 0x16, V23= 0x17,
+    V24= 0x18, V25= 0x19, V26= 0x1A, V27= 0x1B,
+    V28= 0x1C, V29= 0x1D, V30= 0x1E, V31= 0x1F,
+}
+reg_impls!(RV);
+
+#[cfg(test)]
+mod tests {
+    use super::RX::*;
+    use crate::Register;
+
+    #[test]
+    fn reg_code() {
+        assert_eq!(X2.code(), 2);
+    }
+
+    #[test]
+    fn reg_code_from() {
+        assert_eq!(u8::from(X24), 0x18);
     }
 }
