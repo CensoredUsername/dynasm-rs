@@ -1,4 +1,4 @@
-//! This module implements the relocation model for the x86 architecture, as well as aliases for x68 Assemblers.
+//! This module implements the relocation model for the x86 architecture, as well as aliases for x86 Assemblers.
 
 use crate::Register;
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation};
