@@ -58,10 +58,9 @@ impl Arch for ArchAarch64 {
                 return;
             }
         };
-        let data = [relocation.to_id()];
 
         stmts.push(Stmt::Const(0, size));
-        stmts.push(reloc.encode(&data));
+        stmts.push(reloc.encode(size.in_bytes(), size.in_bytes(), &[relocation.to_id()]));
     }
 
     fn default_align(&self) -> u8 {

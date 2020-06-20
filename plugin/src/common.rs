@@ -140,22 +140,30 @@ impl Jump {
         }
     }
 
-    pub fn encode(self, data: &[u8]) -> Stmt {
+    /// Takes a jump and encodes it as a relocation starting `start_offset` bytes ago, relative to `ref_offset`.
+    /// Any data detailing the type of relocation emitted should be contained in `data`, which is emitted as a tuple of u8's.
+    pub fn encode(self, field_offset: u8, ref_offset: u8, data: &[u8]) -> Stmt {
         let span = self.span();
 
-        let offset = delimited(if let Some(offset) = self.offset {
+        let target_offset = delimited(if let Some(offset) = self.offset {
             quote!(#offset)
         } else {
             quote!(0isize)
         });
 
-        let data = serialize::expr_tuple_of_u8s(span, data);
+        // Create a relocation descriptor, containing all information about the actual jump except for the target itself.
+        let relocation = Relocation {
+            target_offset,
+            field_offset,
+            ref_offset,
+            kind: serialize::expr_tuple_of_u8s(span, data)
+        };
         match self.kind {
-            JumpKind::Global(ident) => Stmt::GlobalJumpTarget(ident, offset, data),
-            JumpKind::Backward(ident) => Stmt::BackwardJumpTarget(ident, offset, data),
-            JumpKind::Forward(ident) => Stmt::ForwardJumpTarget(ident, offset, data),
-            JumpKind::Dynamic(expr) => Stmt::DynamicJumpTarget(delimited(expr), offset, data),
-            JumpKind::Bare(expr) => Stmt::BareJumpTarget(delimited(expr), data),
+            JumpKind::Global(ident) => Stmt::GlobalJumpTarget(ident, relocation),
+            JumpKind::Backward(ident) => Stmt::BackwardJumpTarget(ident, relocation),
+            JumpKind::Forward(ident) => Stmt::ForwardJumpTarget(ident, relocation),
+            JumpKind::Dynamic(expr) => Stmt::DynamicJumpTarget(delimited(expr), relocation),
+            JumpKind::Bare(expr) => Stmt::BareJumpTarget(delimited(expr), relocation),
         }
     }
 
@@ -168,6 +176,16 @@ impl Jump {
             JumpKind::Bare(expr) => expr.span(),
         }
     }
+}
+
+
+/// A relocation entry description
+#[derive(Debug, Clone)]
+pub struct Relocation {
+    pub target_offset: TokenTree,
+    pub field_offset: u8,
+    pub ref_offset: u8,
+    pub kind: TokenTree,
 }
 
 
@@ -193,12 +211,12 @@ pub enum Stmt {
     LocalLabel(syn::Ident),
     DynamicLabel(TokenTree),
 
-    // and their respective relocations (as expressions as they differ per assembler)
-    GlobalJumpTarget(  syn::Ident, TokenTree, TokenTree),
-    ForwardJumpTarget( syn::Ident, TokenTree, TokenTree),
-    BackwardJumpTarget(syn::Ident, TokenTree, TokenTree),
-    DynamicJumpTarget(TokenTree, TokenTree, TokenTree),
-    BareJumpTarget(   TokenTree, TokenTree),
+    // and their respective relocations (as expressions as they differ per assembler).
+    GlobalJumpTarget(syn::Ident, Relocation),
+    ForwardJumpTarget(syn::Ident, Relocation),
+    BackwardJumpTarget(syn::Ident, Relocation),
+    DynamicJumpTarget(TokenTree, Relocation),
+    BareJumpTarget(TokenTree, Relocation),
 
     // a random statement that has to be inserted between assembly hunks
     Stmt(TokenTree)

@@ -57,10 +57,9 @@ impl Arch for Archx64 {
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
-        let data = [0, size.in_bytes()]; // no offset, specified size, relative implicit
-
         stmts.push(Stmt::Const(0, size));
-        stmts.push(reloc.encode(&data));
+        // field_offset of size. Relative to the start of the field so matching ref_offset. Type is size and relative
+        stmts.push(reloc.encode(size.in_bytes(), size.in_bytes(), &[size.in_bytes(), 0]));
     }
 
     fn default_align(&self) -> u8 {
@@ -114,10 +113,9 @@ impl Arch for Archx86 {
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
-        let data = [0, size.in_bytes(), 0]; // no offset, specified size, relative
-
         stmts.push(Stmt::Const(0, size));
-        stmts.push(reloc.encode(&data));
+        // field_offset of size. Relative to the start of the field so matching ref_offset. Type is simply the size.
+        stmts.push(reloc.encode(size.in_bytes(), size.in_bytes(), &[size.in_bytes()]));
     }
 
     fn default_align(&self) -> u8 {

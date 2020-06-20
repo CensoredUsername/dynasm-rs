@@ -506,13 +506,14 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
     // push relocations
     for (target, offset, size, kind) in relocations {
-        let data = [offset, size.in_bytes(), kind.to_id()];
+        let data = [size.in_bytes(), kind.to_id()];
         let data = match ctx.mode {
             X86Mode::Protected => &data,
-            X86Mode::Long      => &data[..2],
+            X86Mode::Long      => &data[..1],
         };
 
-        buffer.push(target.encode(data));
+        // field offset has been tracked, and ref_offset is 0 as x86 offsets are relative to the end of the instruction
+        buffer.push(target.encode(offset + size.in_bytes(), 0, data));
     }
 
     Ok(())

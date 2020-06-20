@@ -469,11 +469,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             },
             FlatArg::JumpTarget { ref jump } => match *command {
                 Command::Offset(relocation) => {
-                    // what kind of relocation is it
-                    let data = [relocation.to_id()];
-
-                    // encode the complete relocation
-                    let stmt = jump.clone().encode(&data);
+                    // encode the complete relocation. Always starts at the begin of the instruction, and also relative to that
+                    let stmt = jump.clone().encode(4, 4, &[relocation.to_id()]);
 
                     relocations.push(stmt);
                 },
