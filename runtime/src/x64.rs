@@ -10,31 +10,19 @@ use std::hash::Hash;
 #[derive(Debug, Clone)]
 pub struct X64Relocation {
     size: RelocationSize,
-    offset: u8,
-    start_offset: u8
 }
 
 impl Relocation for X64Relocation {
-    type Encoding = (u8, u8);
+    type Encoding = (u8,);
     fn from_encoding(encoding: Self::Encoding) -> Self {
         Self {
-            offset: encoding.0,
-            size: RelocationSize::from_encoding(encoding.1),
-            start_offset: 0,
+            size: RelocationSize::from_encoding(encoding.0),
         }
     }
     fn from_size(size: RelocationSize) -> Self {
         Self {
             size,
-            offset: 0,
-            start_offset: size as u8,
         }
-    }
-    fn start_offset(&self) -> usize {
-        self.start_offset as usize
-    }
-    fn field_offset(&self) -> usize{
-        self.size.size() + self.offset as usize
     }
     fn size(&self) -> usize {
         self.size.size()

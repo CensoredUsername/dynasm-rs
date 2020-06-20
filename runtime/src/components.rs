@@ -204,34 +204,40 @@ impl LabelRegistry {
 pub struct PatchLoc<R: Relocation> {
     /// The AssemblyOffset at which this relocation was emitted
     pub location: AssemblyOffset,
-    /// The type of relocation to be emitted, and any information necessary for it to be done.
+    /// The offset, backwards, from location that the actual field to be modified starts at
+    pub field_offset: u8,
+    /// The offset, backwards, to be subtracted from location to get the address that the relocation should be calculated relative to.
+    pub ref_offset: u8,
+    /// The type of relocation to be emitted.
     pub relocation: R,
-    /// A constant offset to be applied to this relocation when emitting it.
-    pub offset: isize,
+    /// A constant offset added to the destination address of this relocation when it is calculated.
+    pub target_offset: isize,
 }
 
 impl<R: Relocation> PatchLoc<R> {
     /// create a new `PatchLoc`
-    pub fn new(location: AssemblyOffset, offset: isize, relocation: R) -> PatchLoc<R> {
+    pub fn new(location: AssemblyOffset, target_offset: isize, field_offset: u8, ref_offset: u8, relocation: R) -> PatchLoc<R> {
         PatchLoc {
             location,
+            field_offset,
+            ref_offset,
             relocation,
-            offset
+            target_offset
         }
     }
 
     // Slice out the relevant part of an assembling buffer
     fn slice<'a>(&self, buf_offset: usize, buffer: &'a mut [u8]) -> &'a mut [u8] {
-        let field_offset = self.location.0 - buf_offset - self.relocation.field_offset();
+        let field_offset = self.location.0 - buf_offset - self.field_offset as usize;
         &mut buffer[field_offset .. field_offset + self.relocation.size()]
     }
 
     fn value(&self, target: usize, buf_addr: usize) -> isize {
         (match self.relocation.kind() {
-            RelocationKind::Relative => target.wrapping_sub(self.location.0 - self.relocation.start_offset()),
-            RelocationKind::RelToAbs => target.wrapping_sub(self.location.0 - self.relocation.start_offset() + buf_addr),
+            RelocationKind::Relative => target.wrapping_sub(self.location.0 - self.ref_offset as usize),
+            RelocationKind::RelToAbs => target.wrapping_sub(self.location.0 - self.ref_offset as usize + buf_addr),
             RelocationKind::AbsToRel => target + buf_addr
-        }) as isize + self.offset
+        }) as isize + self.target_offset
     }
 
     /// Patch `buffer` so that this relocation patch will point to `target`.
@@ -350,7 +356,7 @@ impl<R: Relocation> ManagedRelocs<R> {
 
     /// Add a relocation to this registry.
     pub fn add(&mut self, patchloc: PatchLoc<R>) {
-        self.managed.insert(patchloc.location.0 - patchloc.relocation.field_offset(), patchloc);
+        self.managed.insert(patchloc.location.0 - patchloc.field_offset as usize, patchloc);
     }
 
     /// Take all items from another registry and add them to this registry
@@ -506,19 +512,19 @@ impl LitPool {
                 LitPoolEntry::U64(value) => assembler.push_u64(value),
                 LitPoolEntry::Dynamic(size, id) => {
                     Self::pad_sized(size, assembler);
-                    assembler.dynamic_relocation(id, 0, D::Relocation::from_size(size));
+                    assembler.dynamic_relocation(id, 0, size as u8, size as u8, D::Relocation::from_size(size));
                 },
                 LitPoolEntry::Global(size, name) => {
                     Self::pad_sized(size, assembler);
-                    assembler.global_relocation(name, 0, D::Relocation::from_size(size));
+                    assembler.global_relocation(name, 0, size as u8, size as u8, D::Relocation::from_size(size));
                 },
                 LitPoolEntry::Forward(size, name) => {
                     Self::pad_sized(size, assembler);
-                    assembler.forward_relocation(name, 0, D::Relocation::from_size(size));
+                    assembler.forward_relocation(name, 0, size as u8, size as u8, D::Relocation::from_size(size));
                 },
                 LitPoolEntry::Backward(size, name) => {
                     Self::pad_sized(size, assembler);
-                    assembler.backward_relocation(name, 0, D::Relocation::from_size(size));
+                    assembler.backward_relocation(name, 0, size as u8, size as u8, D::Relocation::from_size(size));
                 },
                 LitPoolEntry::Align(with, alignment) => assembler.align(alignment, with),
             }

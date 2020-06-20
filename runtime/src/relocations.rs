@@ -19,18 +19,6 @@ pub trait Relocation {
     fn from_encoding(encoding: Self::Encoding) -> Self;
     /// construct this relocation from a simple size. This is used to implement relocations in directives and literal pools.
     fn from_size(size: RelocationSize) -> Self;
-    /// Returns the offset that this relocation is relative to, backwards with respect to the definition
-    /// point of this relocation. (i.e. 0 for x64 as relocations are relative to the end of the instruction, and 4 for aarch64 as they are)
-    /// Defaults to the size of this relocation.
-    fn start_offset(&self) -> usize {
-        self.size()
-    }
-    /// Returns the offset of the start of the bytes containing this relocation, backwards with respect to the definition point
-    /// of this relocation.
-    /// Defaults to the size of this relocation.
-    fn field_offset(&self) -> usize {
-        self.size()
-    }
     /// The size of the slice of bytes affected by this relocation
     fn size(&self) -> usize;
     /// Write a value into a buffer of size `self.size()` in the format of this relocation.

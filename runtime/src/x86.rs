@@ -9,33 +9,21 @@ use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleR
 pub struct X86Relocation {
     size: RelocationSize,
     kind: RelocationKind,
-    offset: u8,
-    start_offset: u8,
 }
 
 impl Relocation for X86Relocation {
-    type Encoding = (u8, u8, u8);
+    type Encoding = (u8, u8);
     fn from_encoding(encoding: Self::Encoding) -> Self {
         Self {
-            offset: encoding.0,
-            size: RelocationSize::from_encoding(encoding.1),
-            kind: RelocationKind::from_encoding(encoding.2),
-            start_offset: 0,
+            size: RelocationSize::from_encoding(encoding.0),
+            kind: RelocationKind::from_encoding(encoding.1),
         }
     }
     fn from_size(size: RelocationSize) -> Self {
         Self {
             size,
             kind: RelocationKind::Relative,
-            offset: 0,
-            start_offset: size as u8,
         }
-    }
-    fn start_offset(&self) -> usize {
-        self.start_offset as usize
-    }
-    fn field_offset(&self) -> usize{
-        self.size.size() + self.offset as usize
     }
     fn size(&self) -> usize {
         self.size.size()
