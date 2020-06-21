@@ -40,6 +40,21 @@ pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     serialize::serialize(&dynasm.target, dynasm.stmts).into()
 }
 
+/// point whole The
+#[proc_macro]
+#[proc_macro_error]
+pub fn msanyd(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    // try parsing the tokenstream into a dynasm struct containing
+    // an abstract representation of the statements to create
+    let dynasm = parse_macro_input!(tokens as Dynasm);
+
+    // reverse the statement stream
+    let stmts = serialize::invert(dynasm.stmts);
+
+    // serialize the resulting output into tokens
+    serialize::serialize(&dynasm.target, stmts).into()
+}
+
 /// output from parsing a full dynasm invocation. target represents the first dynasm argument, being the assembler
 /// variable being used. stmts contains an abstract representation of the statements to be generated from this dynasm
 /// invocation.

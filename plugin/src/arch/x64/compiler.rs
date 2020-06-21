@@ -1663,6 +1663,6 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr
         }),
         &byte
     );
-    buffer.push(Stmt::Stmt(expr1));
+    buffer.push(Stmt::PrefixStmt(expr1));
     buffer.push(Stmt::ExprUnsigned(expr2, Size::BYTE));
 }

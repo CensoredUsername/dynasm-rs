@@ -218,6 +218,10 @@ pub enum Stmt {
     DynamicJumpTarget(TokenTree, Relocation),
     BareJumpTarget(TokenTree, Relocation),
 
+    // a statement that provides some information for the next statement,
+    // and should therefore not be reordered with it
+    PrefixStmt(TokenTree),
+
     // a random statement that has to be inserted between assembly hunks
     Stmt(TokenTree)
 }
