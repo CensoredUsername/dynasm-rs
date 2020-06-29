@@ -226,13 +226,16 @@ impl<R: Relocation> PatchLoc<R> {
         }
     }
 
-    // Slice out the relevant part of an assembling buffer
-    fn slice<'a>(&self, buf_offset: usize, buffer: &'a mut [u8]) -> &'a mut [u8] {
-        let field_offset = self.location.0 - buf_offset - self.field_offset as usize;
-        &mut buffer[field_offset .. field_offset + self.relocation.size()]
+    /// Returns a range that covers the entire relocation in its assembling buffer
+    /// `buf_offset` is a value that is subtracted from this range when the buffer you want to slice
+    /// with this range is only a part of a bigger buffer.
+    pub fn range(&self, buf_offset: usize) -> std::ops::Range<usize> {
+        let field_offset = self.location.0 - buf_offset -  self.field_offset as usize;
+        field_offset .. field_offset + self.relocation.size()
     }
 
-    fn value(&self, target: usize, buf_addr: usize) -> isize {
+    /// Returns the actual value that should be inserted at the relocation site.
+    pub fn value(&self, target: usize, buf_addr: usize) -> isize {
         (match self.relocation.kind() {
             RelocationKind::Relative => target.wrapping_sub(self.location.0 - self.ref_offset as usize),
             RelocationKind::RelToAbs => target.wrapping_sub(self.location.0 - self.ref_offset as usize + buf_addr),
@@ -241,26 +244,24 @@ impl<R: Relocation> PatchLoc<R> {
     }
 
     /// Patch `buffer` so that this relocation patch will point to `target`.
-    /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
-    /// `buf_addr` is the address that this larger buffer will come to reside at when it is assembled.
-    pub fn patch(&self, buf_offset: usize, buf_addr: usize, buffer: &mut [u8], target: usize) -> Result<(), ImpossibleRelocation> {
-        let buf = self.slice(buf_offset, buffer);
+    /// `buf_addr` is the address that the assembling buffer will come to reside at when it is assembled.
+    /// `target` is the offset that this relocation will be targetting.
+    pub fn patch(&self, buffer: &mut [u8], buf_addr: usize, target: usize) -> Result<(), ImpossibleRelocation> {
         let value = self.value(target, buf_addr);
-        self.relocation.write_value(buf, value)
+        self.relocation.write_value(buffer, value)
     }
 
     /// Patch `buffer` so that this relocation will still point to the right location due to a change in the address of the containing buffer.
     /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
     /// `adjustment` is `new_buf_addr - old_buf_addr`.
-    pub fn adjust(&self, buf_offset: usize, buffer: &mut [u8], adjustment: isize) -> Result<(), ImpossibleRelocation> {
-        let buf = self.slice(buf_offset, buffer);
-        let value = self.relocation.read_value(buf);
+    pub fn adjust(&self, buffer: &mut [u8], adjustment: isize) -> Result<(), ImpossibleRelocation> {
+        let value = self.relocation.read_value(buffer);
         let value = match self.relocation.kind() {
             RelocationKind::Relative => value,
             RelocationKind::RelToAbs => value.wrapping_sub(adjustment),
             RelocationKind::AbsToRel => value.wrapping_add(adjustment),
         };
-        self.relocation.write_value(buf, value)
+        self.relocation.write_value(buffer, value)
     }
 
     /// Returns if this patch requires adjustment when the address of the buffer it resides in is altered.
