@@ -28,7 +28,8 @@ mod serialize;
 /// Module containing utility functions for parsing
 mod parse_helpers;
 
-/// The whole point
+/// The whole point. This macro compiles given assembly/rust templates down to `DynasmApi` and `DynasmLabelApi`
+/// compliant calls to an assembler.
 #[proc_macro]
 #[proc_macro_error]
 pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -40,10 +41,13 @@ pub fn dynasm(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     serialize::serialize(&dynasm.target, dynasm.stmts).into()
 }
 
-/// point whole The
+/// Similar to `dynasm!`, but the calls to the assembler are executed in piecewise reversed order.
+/// This is to allow the system to be used with assemblers that assemble backwards.
+/// Currently this is not supported by the `dynasmrt` crate, but this allows experimentation with it
+/// out of tree.
 #[proc_macro]
 #[proc_macro_error]
-pub fn msanyd(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn dynasm_backwards(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     // try parsing the tokenstream into a dynasm struct containing
     // an abstract representation of the statements to create
     let dynasm = parse_macro_input!(tokens as Dynasm);
