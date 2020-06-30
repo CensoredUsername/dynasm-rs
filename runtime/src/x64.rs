@@ -48,9 +48,15 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, X64Relocation>;
 /// An x64 UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
-/// 8-byte general purpose "quad-word" registers.
+/// The following enums contain the logical ID's for registers when dynamic registers are used.
+/// Groups that are identical to x86's registers are exported from there.
 ///
-/// RIP does not appear here as it is addressed differently in dynasm.
+/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant
+/// architecture documentation to find what is architecturally valid.
+///
+/// 1, 2, 4 or 8-byte general purpose "quad-word" registers.
+///
+/// RIP does not appear here as it cannot be addressed dynamically.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Rq {
@@ -62,10 +68,7 @@ pub enum Rq {
 reg_impls!(Rq);
 
 
-/// 16-byte SSE registers.
-///
-/// Note that XMM8-SMM15 are X86_64 specific, so we don't inherit this from the enum of the same
-/// name in the X86 backend.
+/// 16 or 32-byte SSE registers.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Rx {
@@ -77,8 +80,6 @@ pub enum Rx {
 reg_impls!(Rx);
 
 /// 8-byte control registers.
-///
-/// Note that 32-bit x86 can only address CR0-7, hence this enum is duplicated here.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RC {
@@ -89,7 +90,7 @@ pub enum RC {
 }
 reg_impls!(RC);
 
-// The other register families are the same as 32-bit X86.
+// The other register families are the same as 32-bit X86. (Although access size for Debug regs is 8-byte)
 pub use crate::x86::{Rh, Rf, Rm, Rs, RD, RB};
 
 #[cfg(test)]

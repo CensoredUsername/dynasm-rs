@@ -51,9 +51,14 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, X86Relocation>;
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
 
-/// 4-byte general purpose "double-word" registers.
+/// The following enums contain the logical ID's for registers when dynamic registers are used.
 ///
-/// EIP does not appear here as it is addressed differently in dynasm.
+/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant
+/// architecture documentation to find what is architecturally valid.
+///
+/// 1, 2 or 4-byte general purpose "double-word" registers.
+///
+/// EIP does not appear here as it cannot be addressed dynamically.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Rd {
@@ -79,7 +84,7 @@ pub enum Rf {
 }
 reg_impls!(Rf);
 
-/// 8-byte MMX registers. Alternative encoding exists.
+/// 8-byte MMX registers.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Rm {
@@ -88,7 +93,7 @@ pub enum Rm {
 }
 reg_impls!(Rm);
 
-/// 16-byte SSE registers.
+/// 16 or 32-byte SSE registers.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Rx {

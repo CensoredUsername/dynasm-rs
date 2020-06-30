@@ -239,7 +239,12 @@ pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
     }
 }
 
-/// General purpose registers. 4 or 8 bytes.
+/// The following enums contain the logical ID's for registers when dynamic registers are used.
+///
+/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant
+/// architecture documentation to find what is architecturally valid.
+///
+/// 4 or 8-byte general purpopse registers, where X31 is the zero register.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RX {
@@ -270,7 +275,7 @@ pub enum RXSP {
 }
 reg_impls!(RXSP);
 
-/// Scalar FP / vector SIMD registers. 1, 2, 4, 8 or 16-bytes.
+/// 1, 2, 4, 8 or 16-bytes scalar FP / vector SIMD registers. 
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RV {

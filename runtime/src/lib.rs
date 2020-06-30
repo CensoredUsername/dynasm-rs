@@ -1056,8 +1056,11 @@ impl<'a, 'b> Extend<&'b u8> for UncommittedModifier<'a> {
     }
 }
 
-/// All register enumerations implement this.
+/// A trait abstracting over architectural register families. This is usually implemented
+/// over an enum of all available registers in each family. This allows for code that is generic
+/// over register families.
 pub trait Register: Debug + Clone + Copy + PartialEq + Eq + Hash {
-    /// Returns the integer ID of the register.
+    /// Returns the integer ID of the register. Usually equivalent to casting
+    /// the enum to an u8, but allows you to be generic over the register family.
     fn code(&self) -> u8;
 }
