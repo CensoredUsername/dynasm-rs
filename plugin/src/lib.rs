@@ -1,4 +1,13 @@
 #![cfg_attr(feature = "filelocal", feature(proc_macro_span))]
+//! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates
+//! a full dynamic assembler for several assembly dialects with rust code.
+//! 
+//! As this is a proc-macro crate, it only exports the `dynasm!` and `dynasm_backwards!` macros.
+//! Any directives used in these macro invocations are normally local to the invocation itself, unless
+//! the `filelocal` crate feature is used. This feature requires a nightly compiler.
+//!
+//! Additionally, the `dynasm_opmap` and `dynasm_extract` development features can be used to export two additional macros
+//! with matching names. These macros expand into instruction listing overviews and are normally only used for documentation purposes.
 
 extern crate proc_macro;
 

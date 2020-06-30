@@ -60,9 +60,11 @@ Name      | Argument format | Description
 `.qword`  | One or more expressions of the type `i64` | Pushes the values into the assembling buffer.
 `.bytes`  | An expression of that implements `IntoIterator<Item=u8>` or `IntoIterator<Item=&u8>` | Extends the assembling buffer with the iterator.
 
+Directives are normally local to the current `dynasm!` invocation. However, if the `filelocal` feature is used they will be processed in lexical order over the whole file. This feature only works on a nightly compiler and might be removed in the future.
+
 ## Aliases
 
-Dynasm-rs allows the user to define aliases for registers using the `.alias name, register` directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order and that their scoping is file-local.
+Dynasm-rs allows the user to define aliases for registers using the `.alias name, register` directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order.
 
 ## Macros
 
@@ -79,7 +81,7 @@ macro_rules! fma {
 }
 ```
 
-## statements
+## Statements
 
 To make code that uses a lot of macros less verbose, dynasm-rs allows bare rust statements to be inserted inside `dynasm!` invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:
 
