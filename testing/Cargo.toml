@@ -7,8 +7,5 @@ edition = "2018"
 [dependencies]
 itertools = "0.5.*"
 
-[dependencies.dynasm]
-path = "../plugin"
-
 [dependencies.dynasmrt]
 path = "../runtime"
