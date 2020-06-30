@@ -1,5 +1,3 @@
-#![feature(proc_macro_hygiene)]
-
 use std::io::{self, Write};
 
 fn main() {
