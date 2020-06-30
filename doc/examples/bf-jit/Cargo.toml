@@ -15,8 +15,5 @@ path = "src/aarch64.rs"
 [dependencies]
 itertools = "0.5.*"
 
-[dependencies.dynasm]
-path = "../../../plugin"
-
 [dependencies.dynasmrt]
 path = "../../../runtime"

@@ -1,7 +1,4 @@
-#![feature(proc_macro_hygiene)]
-
-use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
+use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 
 use itertools::Itertools;
 use itertools::multipeek;

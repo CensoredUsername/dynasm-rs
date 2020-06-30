@@ -4,13 +4,8 @@
 
 Dynasm-rs is a library and syntax extension for assembling code at runtime. For the first part of the tutorial we will be examining the following example program that assembles a simple function at runtime for the x64 instruction set:
 
-```
-#![feature(proc_macro_hygiene)]
-extern crate dynasmrt;
-extern crate dynasm;
-
-use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
+```rust
+use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
 use std::io::Write;
@@ -27,6 +22,7 @@ fn main() {
 
     let hello = ops.offset();
     dynasm!(ops
+        ; .arch x64
         ; lea rcx, [->hello]
         ; xor edx, edx
         ; mov dl, BYTE string.len() as _
@@ -39,9 +35,7 @@ fn main() {
 
     let buf = ops.finalize().unwrap();
 
-    let hello_fn: extern "win64" fn() -> bool = unsafe {
-        mem::transmute(buf.ptr(hello))
-    };
+    let hello_fn: extern "win64" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 
     assert!(hello_fn());
 }
@@ -56,42 +50,36 @@ pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
 
 We will now examine this code snippet piece by piece.
 
-```
-#![feature(proc_macro_hygiene)]
-```
-To use the `dynasm!` procedural macro the `porc_macro_hygiene` feature has to be used until procedural macros in expression position are stabilized. This currently requires a nightly version of rustc.
 
+```rust
+use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 ```
-extern crate dynasmrt;
-extern crate dynasm;
+We then link to the dynasm runtime crate. We import the `dynasmrt::dynasm!` macro which will handle all assembling.
+Furthermore, the `DynasmApi` and `DynasmLabelApi` traits are loaded. These traits define the interfaces used by the `dynasm!` procedural macro to produce assembled code.
 
-use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
-```
-We then link to the dynasm runtime crate and the dynasm procedural macro crate. We import the `dynasm::dynasm!` macro which will handle all assembling.
-Furthermore, the `DynasmApi` and `DynasmLabelApi` traits are loaded. These traits defines the interfaces used by the `dynasm!` procedural macro to produce assembled code.
-
-```
+```rust
 let mut ops = dynasmrt::x64::Assembler::new();
 ```
 Of course, the machine code that will be generated will need to live somewhere. `dynasmrt::x64::Assembler` is a struct that implements the `DynasmApi` and `DynasmLabelApi` traits, provides storage for the generated machine code, handles memory permissions and provides various utilities for dynamically assembling code. It even allows assembling code in one thread while several other threads execute said code. For this example though, we will use it in the most simple use case, just assembling everything in advance and then executing it.
 
-```
+```rust
 dynasm!(ops
+    ; .arch x64
     ; ->hello:
     ; .bytes string.as_bytes()
 );
 ```
-The first invocation of the `dynasm!` macro shows of two features of dynasm. The first line defines a global label `hello` which later can be referenced, while the second line contains an assembler directive. Assembler directives allow the assembler to perform tasks that do not involve instruction assembling like, in this case, inserting a string into the executable buffer.
+The first invocation of the `dynasm!` macro shows of three features of dynasm. `.arch x64` is a directive that specifies the current assembling architecture. By default this is set to the compiler target architecture, but we repeat it here to show it clearly. The second line defines a global label `hello` which later can be referenced, and the third line contains another assembler directive. Assembler directives allow the assembler to perform tasks that do not involve instruction assembling like, in this case, inserting a string into the executable buffer.
 
-```
+```rust
 let hello = ops.offset();
 ```
 This utility function returns a value indicating the position of the current end of the machine code buffer. It can later be used to obtain a pointer to this position in the generated machine code.
 
 
-```
+```rust
 dynasm!(ops
+    ; .arch x64
     ; lea rcx, [->hello]
     ; xor edx, edx
     ; mov dl, BYTE string.len() as _
@@ -104,18 +92,18 @@ dynasm!(ops
 ```
 The second invocation of the `dynasm!` macro contains the definition of a small function. It performs the following tasks:
 
-```
+```rust
 ; lea rcx, [->hello]
 ```
 First, the address of the global label `->hello` is loaded using the load effective address instruction and a label memory reference.
 
-```
+```rust
 ; xor edx, edx
 ; mov dl, BYTE string.len() as _
 ```
 Then the length of the string is loaded. Here the `BYTE` prefix determines the size of the immediate in the second instruction. the `as _` cast is necessary to coerce the size of the length down to the `i8` type expected of an immediate. Dynasm-rs tries to avoid performing implicit casts as this tends to hide errors.
 
-```
+```rust
 ; mov rax, QWORD print as _
 ; sub rsp, BYTE 0x28
 ; call rax
@@ -123,56 +111,42 @@ Then the length of the string is loaded. Here the `BYTE` prefix determines the s
 ```
 Here, a call is made from the dynamically assembled code to the rust `print` function. Note the `QWORD` size prefix which is necessary to determine the appropriate form of the `mov` instruction to encode as `dynasm!` does not analyze the immediate expression at runtime. As this example uses the `"win64"` calling convention, the stack pointer needs to be manipulated too. (Note: the `"win64"` calling convention is used as this it is currently impossible to use the `"sysv64"` calling convention on all platforms)
 
-```
+```rust
 ; ret
 ```
 And finally the assembled function returns, returning the return value from the `print` function in `rax` back to the caller rust code.
 
-```
+```rust
 let buf = ops.finalize().unwrap();
 ```
 With the assembly completed, we now finalize the `dynasmrt::x64::Assembler`, which will resolve all labels previously used and move the data into a `dynasmrt::ExecutableBuffer`. This struct, which dereferences to a `&[u8]`, wraps a buffer of readable and executable memory.
 
-```
-let hello_fn: extern "win64" fn() -> bool = unsafe {
-    mem::transmute(buf.ptr(hello))
-};
+```rust
+let hello_fn: extern "win64" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 ```
 We can now get a pointer to the executable memory using the `dynasmrt::ExecutableBuffer::ptr` method, using the value obtained earlier from `ops.offset()`. We can then transmute this pointer into a function.
 
+```rust
+assert!(hello_fn());
 ```
-assert!(
-    hello_fn()
-);
-```
-And finally we can call this function, asserting that it returns true to ensure that it managed to print the encoded message!
+And finally we can call this function, asserting that it returns true to confirm that it managed to print the encoded message!
 
-And for the people interested in the behind-the-scenes, here's what the `dynasm!` macros expand to:
+For the people interested in the behind-the-scenes, here's what the `dynasm!` macros expand to:
 
-```
-#![feature(proc_macro_hygiene)]
-extern crate dynasm;
-extern crate dynasmrt;
-
-use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
-
-use std::{io, mem, slice};
-use std::io::Write;
-
+```rust
 fn main() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     let string = "Hello World!";
 
-    { // dynasm!
+    {
         ops.global_label("hello");
         ops.extend(string.as_bytes());
     };
 
     let hello = ops.offset();
-    { // dynasm!
+    {
         ops.extend(b"H\x8d\r\x00\x00\x00\x00");
-        ops.global_reloc("hello", 0isize, (0u8, 4u8));
+        ops.global_reloc("hello", 0isize, 4u8, 0u8, (4u8,));
         ops.extend(b"1\xd2\xb2");
         ops.push_i8(string.len() as _);
         ops.extend(b"H\xb8");
@@ -188,9 +162,7 @@ fn main() {
 
     let hello_fn: extern "win64" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 
-    assert!(
-        hello_fn()
-    );
+    assert!(hello_fn());
 }
 ```
 As you can see, the encoding has been determined fully at compile time, and the assembly has been reduced to a series of push and extend calls.
@@ -199,7 +171,7 @@ As you can see, the encoding has been determined fully at compile time, and the 
 
 To demonstrate some of the more advanced usage, we'll show how to rewrite a rust brainfsck interpreter to a jit compiler. The starting point is the following interpreter that can also be found [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-interpreter):
 
-```
+```rust
 use std::io::{Read, BufRead, Write, stdin, stdout, BufReader, BufWriter};
 use std::env;
 use std::fs::File;
@@ -207,8 +179,8 @@ use std::fs::File;
 const TAPE_SIZE: usize = 30000;
 
 struct Interpreter<'a> {
-    pub input: Box<BufRead + 'a>,
-    pub output: Box<Write + 'a>,
+    pub input: Box<dyn BufRead + 'a>,
+    pub output: Box<dyn Write + 'a>,
     pub loops: Vec<usize>,
     pub tape: [u8; TAPE_SIZE],
     pub tape_index: usize,
@@ -216,7 +188,7 @@ struct Interpreter<'a> {
 }
 
 impl<'a> Interpreter<'a> {
-    fn new(input: Box<BufRead + 'a>, output: Box<Write + 'a>) -> Interpreter<'a> {
+    fn new(input: Box<dyn BufRead + 'a>, output: Box<dyn Write + 'a>) -> Interpreter<'a> {
         Interpreter {
             input: input,
             output: output,
@@ -350,29 +322,28 @@ fn main() {
 
 ## Basics
 
-To kickstart this process, we'll first add the `dynasm` procedural macro and `dynasmrt` crate to our project, and `use` the `DynasmApi` and `DynasmLabelApi` traits:
+To kickstart this process, we'll `use` the `dynasm!` macro as well as the `DynasmApi` and `DynasmLabelApi` traits:
 
 ```diffnew
-#![feature(proc_macro_hygiene)]
-extern crate dynasmrt;
-extern crate dynasm;
-
-use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
-
++ use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 ```
 
-Then, we'll define the following aliases to make the code more readable. As this code is specific to `x86_64` we'll add a `cfg` attribute here so the code will fail to compile on other architectures. Note that `ops` is purely a placeholder here for the parser, it isn't actually used.
+Next, we'll define our own custom dynasm macro which first defines the current architecture as well as several aliases we'd like to use when writing the rest of the code.
 
 ```diffnew
-+ dynasm!(ops
-+     ; .arch x64
-+     ; .alias a_state, rcx
-+     ; .alias a_current, rdx
-+     ; .alias a_begin, r8
-+     ; .alias a_end, r9
-+     ; .alias retval, rax
-+ );
++ macro_rules! my_dynasm {
++     ($ops:ident $($t:tt)*) => {
++         dynasm!($ops
++             ; .arch x64
++             ; .alias a_state, rcx
++             ; .alias a_current, rdx
++             ; .alias a_begin, r8
++             ; .alias a_end, r9
++             ; .alias retval, rax
++             $($t)*
++         )
++     }
++ }
 ```
 
 We can now define several utility macros to handle common operations in the code.
@@ -381,7 +352,7 @@ We can now define several utility macros to handle common operations in the code
 + macro_rules! prologue {
 +     ($ops:ident) => {{
 +         let start = $ops.offset();
-+         dynasm!($ops
++         my_dynasm!($ops
 +             ; sub rsp, 0x28
 +             ; mov [rsp + 0x30], rcx
 +             ; mov [rsp + 0x40], r8
@@ -392,7 +363,7 @@ We can now define several utility macros to handle common operations in the code
 + }
 + 
 + macro_rules! epilogue {
-+     ($ops:ident, $e:expr) => {dynasm!($ops
++     ($ops:ident, $e:expr) => {my_dynasm!($ops
 +         ; mov retval, $e
 +         ; add rsp, 0x28
 +         ; ret
@@ -400,7 +371,7 @@ We can now define several utility macros to handle common operations in the code
 + }
 + 
 + macro_rules! call_extern {
-+     ($ops:ident, $addr:expr) => {dynasm!($ops
++     ($ops:ident, $addr:expr) => {my_dynasm!($ops
 +         ; mov [rsp + 0x38], rdx
 +         ; mov rax, QWORD $addr as _
 +         ; call rax
@@ -463,11 +434,12 @@ With the state defined, we can now start adapting the `Interpreter::run` method 
 ```diffnew
 + impl Program {
 +     fn compile(program: &[u8]) -> Result<Program, &'static str> {
-+         let mut ops = dynasmrt::x64::Assembler::new();
++         let mut ops = dynasmrt::x64::Assembler::new().unwrap();
 +         let mut loops = Vec::new();
-+         let mut code = program.iter().cloned().multipeek();
++         let mut code = multipeek(program.iter().cloned());
 + 
 +         let start = prologue!(ops);
++ 
 +         while let Some(c) = code.next() {
 ```
 
@@ -486,7 +458,7 @@ We can now replace the the tape movement by an optimized assembly version. Note 
 ```
 ```diffnew
 + let amount = code.take_while_ref(|x| *x == b'<').count() + 1;
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ; sub a_current, (amount % TAPE_SIZE) as _
 +     ; cmp a_current, a_begin
 +     ; jae >wrap
@@ -505,7 +477,7 @@ We can now replace the the tape movement by an optimized assembly version. Note 
 ```
 ```diffnew
 + let amount = code.take_while_ref(|x| *x == b'>').count() + 1;
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ; add a_current, (amount % TAPE_SIZE) as _
 +     ; cmp a_current, a_end
 +     ; jb >wrap
@@ -531,7 +503,7 @@ The `+` and `-` instructions have by far the most simple implementations. Note t
 + if amount > u8::MAX as usize {
 +     return Err("An overflow occurred");
 + }
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ; add BYTE [a_current], amount as _
 +     ; jo ->overflow
 + );
@@ -551,7 +523,7 @@ The `+` and `-` instructions have by far the most simple implementations. Note t
 + if amount > u8::MAX as usize {
 +     return Err("An overflow occurred");
 + }
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ; sub BYTE [a_current], amount as _
 +     ; jo ->overflow
 + );
@@ -584,7 +556,7 @@ We can then simply call these methods directly from the compiled code. If the I/
 - }
 ```
 ```diffnew
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ;; call_extern!(ops, State::getchar)
 +     ; cmp al, 0
 +     ; jnz ->io_failure
@@ -597,7 +569,7 @@ We can then simply call these methods directly from the compiled code. If the I/
 - }
 ```
 ```diffnew
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ;; call_extern!(ops, State::putchar)
 +     ; cmp al, 0
 +     ; jnz ->io_failure
@@ -629,14 +601,14 @@ The `[` and `]` commands have the most complex implementation. When a `[` is enc
 + if first && code.peek() == Some(&b']') {
 +     code.next();
 +     code.next();
-+     dynasm!(ops
++     my_dynasm!(ops
 +         ; mov BYTE [a_current], 0
 +     );
 + } else {
 +     let backward_label = ops.new_dynamic_label();
 +     let forward_label  = ops.new_dynamic_label();
 +     loops.push((backward_label, forward_label));
-+     dynasm!(ops
++     my_dynasm!(ops
 +         ; cmp BYTE [a_current], 0
 +         ; jz =>forward_label
 +         ;=>backward_label
@@ -655,7 +627,7 @@ The `[` and `]` commands have the most complex implementation. When a `[` is enc
 ```
 ```diffnew
 + if let Some((backward_label, forward_label)) = loops.pop() {
-+     dynasm!(ops
++     my_dynasm!(ops
 +         ; cmp BYTE [a_current], 0
 +         ; jnz =>backward_label
 +         ;=>forward_label
@@ -667,10 +639,10 @@ The `[` and `]` commands have the most complex implementation. When a `[` is enc
 
 ### Epilogue
 
-With the end of the parsing reached, we must now handle the return and possible error conditions. This is done by returning 0 if the executionw as successful, or an error code when an error happened at runtime.
+With the end of the parsing reached, we must now handle the return and possible error conditions. This is done by returning 0 if the execution was successful, or an error code when an error happened at runtime.
 
 ```diffnew
-+ dynasm!(ops
++ my_dynasm!(ops
 +     ;; epilogue!(ops, 0)
 +     ;->overflow:
 +     ;; epilogue!(ops, 1)
@@ -766,15 +738,9 @@ And finally, we can edit the `main` function to use the JIT:
 
 With these changes, adding the necessary `use` statements and removing unused functions, you should end up with the following code (you can also find this example [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-jit)):
 
-```
-#![feature(proc_macro_hygiene)]
-extern crate dynasmrt;
-extern crate dynasm;
+```rust
+use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 
-use dynasm::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi};
-
-extern crate itertools;
 use itertools::Itertools;
 use itertools::multipeek;
 
@@ -787,19 +753,24 @@ use std::u8;
 
 const TAPE_SIZE: usize = 30000;
 
-dynasm!(ops
-    ; .arch x64
-    ; .alias a_state, rcx
-    ; .alias a_current, rdx
-    ; .alias a_begin, r8
-    ; .alias a_end, r9
-    ; .alias retval, rax
-);
+macro_rules! my_dynasm {
+    ($ops:ident $($t:tt)*) => {
+        dynasm!($ops
+            ; .arch x64
+            ; .alias a_state, rcx
+            ; .alias a_current, rdx
+            ; .alias a_begin, r8
+            ; .alias a_end, r9
+            ; .alias retval, rax
+            $($t)*
+        )
+    }
+}
 
 macro_rules! prologue {
     ($ops:ident) => {{
         let start = $ops.offset();
-        dynasm!($ops
+        my_dynasm!($ops
             ; sub rsp, 0x28
             ; mov [rsp + 0x30], rcx
             ; mov [rsp + 0x40], r8
@@ -810,7 +781,7 @@ macro_rules! prologue {
 }
 
 macro_rules! epilogue {
-    ($ops:ident, $e:expr) => {dynasm!($ops
+    ($ops:ident, $e:expr) => {my_dynasm!($ops
         ; mov retval, $e
         ; add rsp, 0x28
         ; ret
@@ -818,7 +789,7 @@ macro_rules! epilogue {
 }
 
 macro_rules! call_extern {
-    ($ops:ident, $addr:expr) => {dynasm!($ops
+    ($ops:ident, $addr:expr) => {my_dynasm!($ops
         ; mov [rsp + 0x38], rdx
         ; mov rax, QWORD $addr as _
         ; call rax
@@ -853,7 +824,7 @@ impl Program {
             match c {
                 b'<' => {
                     let amount = code.take_while_ref(|x| *x == b'<').count() + 1;
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; sub a_current, (amount % TAPE_SIZE) as _
                         ; cmp a_current, a_begin
                         ; jae >wrap
@@ -863,7 +834,7 @@ impl Program {
                 }
                 b'>' => {
                     let amount = code.take_while_ref(|x| *x == b'>').count() + 1;
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; add a_current, (amount % TAPE_SIZE) as _
                         ; cmp a_current, a_end
                         ; jb >wrap
@@ -876,7 +847,7 @@ impl Program {
                     if amount > u8::MAX as usize {
                         return Err("An overflow occurred");
                     }
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; add BYTE [a_current], amount as _
                         ; jo ->overflow
                     );
@@ -886,20 +857,20 @@ impl Program {
                     if amount > u8::MAX as usize {
                         return Err("An overflow occurred");
                     }
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ; sub BYTE [a_current], amount as _
                         ; jo ->overflow
                     );
                 },
                 b',' => {
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ;; call_extern!(ops, State::getchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
                     );
                 },
                 b'.' => {
-                    dynasm!(ops
+                    my_dynasm!(ops
                         ;; call_extern!(ops, State::putchar)
                         ; cmp al, 0
                         ; jnz ->io_failure
@@ -910,14 +881,14 @@ impl Program {
                     if first && code.peek() == Some(&b']') {
                         code.next();
                         code.next();
-                        dynasm!(ops
+                        my_dynasm!(ops
                             ; mov BYTE [a_current], 0
                         );
                     } else {
                         let backward_label = ops.new_dynamic_label();
                         let forward_label = ops.new_dynamic_label();
                         loops.push((backward_label, forward_label));
-                        dynasm!(ops
+                        my_dynasm!(ops
                             ; cmp BYTE [a_current], 0
                             ; jz =>forward_label
                             ;=>backward_label
@@ -926,7 +897,7 @@ impl Program {
                 },
                 b']' => {
                     if let Some((backward_label, forward_label)) = loops.pop() {
-                        dynasm!(ops
+                        my_dynasm!(ops
                             ; cmp BYTE [a_current], 0
                             ; jnz =>backward_label
                             ;=>forward_label
@@ -942,7 +913,7 @@ impl Program {
             return Err("[ without matching ]");
         }
 
-        dynasm!(ops
+        my_dynasm!(ops
             ;; epilogue!(ops, 0)
             ;->overflow:
             ;; epilogue!(ops, 1)

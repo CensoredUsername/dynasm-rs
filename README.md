@@ -20,7 +20,8 @@ The tool currently requires a nightly toolchain to build with, but will transiti
 
 ## Documentation
 
-Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/language/index.html).
+[Documentation](https://CensoredUsername.github.com/dynasm-rs/language/index.html).
+[Release notes](https://github.com/CensoredUsername/dynasm-rs/blob/master/doc/releasenotes.md).
 
 ## Architecture support
 
@@ -30,13 +31,7 @@ Documentation can be found [here](https://CensoredUsername.github.com/dynasm-rs/
 ## Example
 
 ```rust
-#![feature(plugin)]
-#![plugin(dynasm)]
-
-#[macro_use]
-extern crate dynasmrt;
-
-use dynasmrt::{DynasmApi, DynasmLabelApi};
+use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 
 use std::{io, slice, mem};
 use std::io::Write;
@@ -46,12 +41,14 @@ fn main() {
     let string = "Hello World!";
 
     dynasm!(ops
+        ; .arch x64
         ; ->hello:
         ; .bytes string.as_bytes()
     );
 
     let hello = ops.offset();
     dynasm!(ops
+        ; .arch x64
         ; lea rcx, [->hello]
         ; xor edx, edx
         ; mov dl, BYTE string.len() as _
@@ -64,19 +61,15 @@ fn main() {
 
     let buf = ops.finalize().unwrap();
 
-    let hello_fn: extern "win64" fn() -> bool = unsafe {
-        mem::transmute(buf.ptr(hello))
-    };
+    let hello_fn: extern "win64" fn() -> bool = unsafe { mem::transmute(buf.ptr(hello)) };
 
-    assert!(
-        hello_fn()
-    );
+    assert!(hello_fn());
 }
 
 pub extern "win64" fn print(buffer: *const u8, length: u64) -> bool {
-    io::stdout().write_all(unsafe {
-        slice::from_raw_parts(buffer, length as usize)
-    }).is_ok()
+    io::stdout()
+        .write_all(unsafe { slice::from_raw_parts(buffer, length as usize) })
+        .is_ok()
 }
 ```
 
