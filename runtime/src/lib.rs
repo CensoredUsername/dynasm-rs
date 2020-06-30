@@ -30,6 +30,8 @@ pub mod x86;
 pub mod aarch64;
 
 pub use crate::mmap::ExecutableBuffer;
+pub use dynasm::{dynasm, dynasm_backwards};
+
 use crate::components::{MemoryManager, LabelRegistry, RelocRegistry, ManagedRelocs, PatchLoc};
 use crate::relocations::Relocation;
 
