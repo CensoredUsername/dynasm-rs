@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\aarch64\matching.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>matching.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../dynasm/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\arch\aarch64\matching.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>matching.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../dynasm/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -646,7 +646,7 @@
 <span id="646">646</span>
 <span id="647">647</span>
 </pre><div class="example-wrap"><pre class="rust ">
-
+<span class="kw">use</span> <span class="ident">proc_macro_error</span>::<span class="ident">emit_error</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Context</span>;
@@ -654,10 +654,10 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">aarch64data</span>::{<span class="ident">Opdata</span>, <span class="ident">Matcher</span>, <span class="ident">COND_MAP</span>, <span class="ident">get_mnemonic_data</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">debug</span>::<span class="ident">format_opdata_list</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">Size</span>, <span class="ident">JumpKind</span>, <span class="ident">emit_error_at</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">Size</span>, <span class="ident">JumpKind</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">parse_helpers</span>::{<span class="ident">as_ident</span>, <span class="ident">as_number</span>, <span class="ident">as_float</span>};
 
-<span class="doccomment">/// Try finding an appropriate definition that matches the given instruction / arguments. </span>
+<span class="doccomment">/// Try finding an appropriate definition that matches the given instruction / arguments.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">match_instruction</span>(<span class="ident">_ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">instruction</span>: <span class="kw-2">&amp;</span><span class="ident">Instruction</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RawArg</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MatchData</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="comment">// sanitize our arg list to remove any structures that cannot be matched on</span>
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">sanitize_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>;
@@ -704,7 +704,7 @@
             <span class="comment">// offsets: validate that only relative jumps are allowed (no extern relocations)</span>
             <span class="ident">RawArg</span>::<span class="ident">JumpTarget</span> { <span class="ident">jump</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JumpKind</span>::<span class="ident">Bare</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">jump</span>.<span class="ident">kind</span> {
-                    <span class="ident">emit_error_at</span>(<span class="ident">jump</span>.<span class="ident">span</span>(), <span class="string">&quot;Extern relocations are not allowed in aarch64&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">jump</span>.<span class="ident">span</span>(), <span class="string">&quot;Extern relocations are not allowed in aarch64&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
                 <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">CleanArg</span>::<span class="ident">JumpTarget</span> { <span class="ident">jump</span> });
@@ -712,7 +712,7 @@
             <span class="comment">// modifier: LSL LSR ASR ROR and MSL require an immediate.</span>
             <span class="ident">RawArg</span>::<span class="ident">Modifier</span> { <span class="ident">span</span>, <span class="ident">modifier</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">modifier</span>.<span class="ident">expr</span>.<span class="ident">is_none</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">modifier</span>.<span class="ident">op</span>.<span class="ident">expr_required</span>() {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
@@ -743,7 +743,7 @@
                 <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">items</span>.<span class="ident">next</span>() {
                     <span class="prelude-val">Some</span>(<span class="ident">RefItem</span>::<span class="ident">Direct</span> { <span class="ident">reg</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reg</span>,
                     <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;First item in a reference list has to be a register&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;First item in a reference list has to be a register&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     },
                     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;Cannot create empty references in the parser&quot;</span>)
@@ -758,7 +758,7 @@
                         <span class="ident">kind</span> <span class="op">=</span> <span class="ident">RefKind</span>::<span class="ident">Offset</span>(<span class="ident">value</span>);
                     },
                     <span class="prelude-val">Some</span>(<span class="ident">RefItem</span>::<span class="ident">Modifier</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot have a modifier without index register or offset&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot have a modifier without index register or offset&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     },
                     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hit_end</span> <span class="op">=</span> <span class="bool-val">true</span>
@@ -771,7 +771,7 @@
                             <span class="kw-2">*</span><span class="ident">modifier</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>)
                         },
                         <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Too many items in reference list&quot;</span>.<span class="ident">into</span>());
+                            <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Too many items in reference list&quot;</span>);
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                         },
                         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hit_end</span> <span class="op">=</span> <span class="bool-val">true</span>
@@ -780,7 +780,7 @@
 
                 <span class="comment">// there should not be any more items in the reference</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">hit_end</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">items</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Too many items in reference list&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Too many items in reference list&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
@@ -789,7 +789,7 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RefKind</span>::<span class="ident">Offset</span>(<span class="ident">offset</span>) <span class="op">=</span> <span class="ident">kind</span> {
                         <span class="ident">kind</span> <span class="op">=</span> <span class="ident">RefKind</span>::<span class="ident">PreIndexed</span>(<span class="ident">offset</span>);
                     } <span class="kw">else</span> {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use pre-indexed addressing without an immediate offset.&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use pre-indexed addressing without an immediate offset.&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                 }
@@ -797,27 +797,27 @@
                 <span class="comment">// sanitizaiton</span>
                 <span class="comment">// base can only be a Xn|SP reg</span>
                 <span class="kw">if</span> <span class="op">!</span>(<span class="ident">base</span>.<span class="ident">size</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">Size</span>::<span class="ident">QWORD</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> (<span class="ident">base</span>.<span class="ident">family</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGERSP</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">base</span>.<span class="ident">family</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGER</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="op">!</span><span class="ident">base</span>.<span class="ident">kind</span>().<span class="ident">is_zero_reg</span>()))) {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Base register can only be a Xn|SP register&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Base register can only be a Xn|SP register&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
                 <span class="comment">// index can only be a Xn or Wn reg</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RefKind</span>::<span class="ident">Indexed</span>(<span class="kw-2">ref</span> <span class="ident">index</span>, <span class="kw-2">ref</span> <span class="ident">modifier</span>) <span class="op">=</span> <span class="ident">kind</span> {
                     <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">family</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">RegFamily</span>::<span class="ident">INTEGER</span> {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Index register can only be a Xn or Wn register&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Index register can only be a Xn or Wn register&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
 
                     <span class="comment">// limited set of allowed modifiers.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) <span class="op">=</span> <span class="ident">modifier</span> {
                         <span class="kw">if</span> <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">size</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">Size</span>::<span class="ident">QWORD</span> {<span class="ident">m</span>.<span class="ident">op</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Modifier</span>::<span class="ident">LSL</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">m</span>.<span class="ident">op</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Modifier</span>::<span class="ident">SXTX</span>} <span class="kw">else</span> {<span class="ident">m</span>.<span class="ident">op</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Modifier</span>::<span class="ident">SXTW</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">m</span>.<span class="ident">op</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Modifier</span>::<span class="ident">UXTW</span>} {
-                            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Invalid modifier for the selected base register type&quot;</span>.<span class="ident">into</span>());
+                            <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Invalid modifier for the selected base register type&quot;</span>);
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                         }
 
                         <span class="comment">// LSL requires a stated immediate</span>
                         <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">op</span>.<span class="ident">expr_required</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">m</span>.<span class="ident">expr</span>.<span class="ident">is_none</span>() {
-                            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;LSL reference modifier requires an immediate&quot;</span>.<span class="ident">into</span>());
+                            <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;LSL reference modifier requires an immediate&quot;</span>);
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                         }
                     }
@@ -856,7 +856,7 @@
             <span class="comment">// then, canonicalize it to first register / count and confirm it is a valid bare vector register</span>
             <span class="ident">RawArg</span>::<span class="ident">CommaList</span> { <span class="ident">span</span>, <span class="ident">items</span>, <span class="ident">element</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">32</span> {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Too many registers in register list.&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Too many registers in register list.&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
                 <span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
@@ -874,7 +874,7 @@
                     <span class="ident">s</span>.<span class="ident">sanitize</span>(<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>)<span class="question-mark">?</span>;
                     <span class="ident">next_code</span> <span class="op">=</span> (<span class="ident">next_code</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="number">32</span>;
                     <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">kind</span>().<span class="ident">encode</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">next_code</span> {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Registers in register list are not monotonically incrementing&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Registers in register list are not monotonically incrementing&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                 }
@@ -891,23 +891,23 @@
                 <span class="ident">sanitize_register</span>(<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="ident">first</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">first</span> {
                     <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">element</span>.<span class="ident">is_some</span>() {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use element specifiers inside of register lists.&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use element specifiers inside of register lists.&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                 } <span class="kw">else</span> {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Can only use vector registers in register lists.&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Can only use vector registers in register lists.&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
                 <span class="comment">// ensure amount is a constant usize</span>
                 <span class="kw">let</span> <span class="ident">amount</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">amount</span>) <span class="op">=</span> <span class="ident">as_number</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>) {
                     <span class="kw">if</span> <span class="ident">amount</span> <span class="op">&gt;</span> <span class="number">32</span> {
-                        <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Too many registers in register list.&quot;</span>.<span class="ident">into</span>());
+                        <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Too many registers in register list.&quot;</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                     <span class="ident">amount</span> <span class="kw">as</span> <span class="ident">u8</span>
                 } <span class="kw">else</span> {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Register list requires a contant amount of registers specified&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Register list requires a contant amount of registers specified&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 };
 
@@ -942,18 +942,18 @@
         <span class="ident">sanitize_register</span>(<span class="ident">span</span>, <span class="ident">register</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">register</span> {
             <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">element</span>.<span class="ident">is_some</span>() {
-                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use element specifiers inside of register lists.&quot;</span>.<span class="ident">into</span>());
+                <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use element specifiers inside of register lists.&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">kind</span>.<span class="ident">is_dynamic</span>() {
-                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use dynamic registers inside of a comma/dash register list.&quot;</span>.<span class="ident">into</span>());
+                <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Cannot use dynamic registers inside of a comma/dash register list.&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">size</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">element_size</span> {
                 <span class="kw">if</span> <span class="ident">size</span> <span class="op">!</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">element_size</span> {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Inconsistent element sizes.&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Inconsistent element sizes.&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
             } <span class="kw">else</span> {
@@ -962,14 +962,14 @@
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lanes</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">lanes</span> {
                 <span class="kw">if</span> <span class="ident">lanes</span> <span class="op">!</span><span class="op">=</span> <span class="ident">v</span>.<span class="ident">lanes</span> {
-                    <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Inconsistent lane count.&quot;</span>.<span class="ident">into</span>());
+                    <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Inconsistent lane count.&quot;</span>);
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">lanes</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">lanes</span>);
             }
         } <span class="kw">else</span> {
-            <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Can only use vector registers in register lists.&quot;</span>.<span class="ident">into</span>());
+            <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Can only use vector registers in register lists.&quot;</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
         <span class="prelude-val">Ok</span>(())
@@ -981,7 +981,7 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Register</span>::<span class="ident">Vector</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">register</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">total</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">full_size</span>() {
             <span class="kw">if</span> <span class="ident">total</span> <span class="op">&gt;</span> <span class="number">16</span> {
-                <span class="ident">emit_error_at</span>(<span class="ident">span</span>, <span class="string">&quot;Overly wide vector register.&quot;</span>.<span class="ident">into</span>());
+                <span class="macro">emit_error</span><span class="macro">!</span>(<span class="ident">span</span>, <span class="string">&quot;Overly wide vector register.&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>)
             }
         }
@@ -1294,4 +1294,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "dynasm";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

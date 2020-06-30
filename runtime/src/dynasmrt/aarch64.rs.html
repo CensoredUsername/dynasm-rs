@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\aarch64.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aarch64.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../dynasmrt/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\aarch64.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aarch64.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../dynasmrt/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -237,9 +237,78 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! This module implements the relocation model for the aarch64 architecture, as well as aliases for aarch64 Assemblers.</span>
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Register</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">relocations</span>::{<span class="ident">Relocation</span>, <span class="ident">RelocationSize</span>, <span class="ident">RelocationKind</span>, <span class="ident">ImpossibleRelocation</span>, <span class="ident">fits_signed_bitfield</span>};
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">LittleEndian</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
@@ -282,7 +351,7 @@
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ImpossibleRelocation</span> { } );
                 }
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-                (<span class="ident">value</span> <span class="op">&amp;</span> <span class="number">0x3FF_FFFF</span>)
+                <span class="ident">value</span> <span class="op">&amp;</span> <span class="number">0x3FF_FFFF</span>
             },
             <span class="self">Self</span>::<span class="ident">BCOND</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">value</span> <span class="op">&amp;</span> <span class="number">3</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">fits_signed_bitfield</span>(<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>, <span class="number">19</span>) {
@@ -476,5 +545,73 @@
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
     }
-}</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "dynasmrt";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+}
+
+<span class="doccomment">/// The following enums contain the logical ID&#39;s for registers when dynamic registers are used.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant</span>
+<span class="doccomment">/// architecture documentation to find what is architecturally valid.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// 4 or 8-byte general purpopse registers, where X31 is the zero register.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RX</span> {
+    <span class="ident">X0</span> <span class="op">=</span> <span class="number">0x00</span>, <span class="ident">X1</span> <span class="op">=</span> <span class="number">0x01</span>, <span class="ident">X2</span> <span class="op">=</span> <span class="number">0x02</span>, <span class="ident">X3</span> <span class="op">=</span> <span class="number">0x03</span>,
+    <span class="ident">X4</span> <span class="op">=</span> <span class="number">0x04</span>, <span class="ident">X5</span> <span class="op">=</span> <span class="number">0x05</span>, <span class="ident">X6</span> <span class="op">=</span> <span class="number">0x06</span>, <span class="ident">X7</span> <span class="op">=</span> <span class="number">0x07</span>,
+    <span class="ident">X8</span> <span class="op">=</span> <span class="number">0x08</span>, <span class="ident">X9</span> <span class="op">=</span> <span class="number">0x09</span>, <span class="ident">X10</span><span class="op">=</span> <span class="number">0x0A</span>, <span class="ident">X11</span><span class="op">=</span> <span class="number">0x0B</span>,
+    <span class="ident">X12</span><span class="op">=</span> <span class="number">0x0C</span>, <span class="ident">X13</span><span class="op">=</span> <span class="number">0x0D</span>, <span class="ident">X14</span><span class="op">=</span> <span class="number">0x0E</span>, <span class="ident">X15</span><span class="op">=</span> <span class="number">0x0F</span>,
+    <span class="ident">X16</span><span class="op">=</span> <span class="number">0x10</span>, <span class="ident">X17</span><span class="op">=</span> <span class="number">0x11</span>, <span class="ident">X18</span><span class="op">=</span> <span class="number">0x12</span>, <span class="ident">X19</span><span class="op">=</span> <span class="number">0x13</span>,
+    <span class="ident">X20</span><span class="op">=</span> <span class="number">0x14</span>, <span class="ident">X21</span><span class="op">=</span> <span class="number">0x15</span>, <span class="ident">X22</span><span class="op">=</span> <span class="number">0x16</span>, <span class="ident">X23</span><span class="op">=</span> <span class="number">0x17</span>,
+    <span class="ident">X24</span><span class="op">=</span> <span class="number">0x18</span>, <span class="ident">X25</span><span class="op">=</span> <span class="number">0x19</span>, <span class="ident">X26</span><span class="op">=</span> <span class="number">0x1A</span>, <span class="ident">X27</span><span class="op">=</span> <span class="number">0x1B</span>,
+    <span class="ident">X28</span><span class="op">=</span> <span class="number">0x1C</span>, <span class="ident">X29</span><span class="op">=</span> <span class="number">0x1D</span>, <span class="ident">X30</span><span class="op">=</span> <span class="number">0x1E</span>, <span class="ident">XZR</span><span class="op">=</span> <span class="number">0x1F</span>,
+}
+<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">RX</span>);
+
+<span class="doccomment">/// 0x1F addresses both XZR and SP (disambiguated by context). This enum is a mirror of RX just</span>
+<span class="doccomment">/// with the SP in place of XZR.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RXSP</span> {
+    <span class="ident">X0</span> <span class="op">=</span> <span class="number">0x00</span>, <span class="ident">X1</span> <span class="op">=</span> <span class="number">0x01</span>, <span class="ident">X2</span> <span class="op">=</span> <span class="number">0x02</span>, <span class="ident">X3</span> <span class="op">=</span> <span class="number">0x03</span>,
+    <span class="ident">X4</span> <span class="op">=</span> <span class="number">0x04</span>, <span class="ident">X5</span> <span class="op">=</span> <span class="number">0x05</span>, <span class="ident">X6</span> <span class="op">=</span> <span class="number">0x06</span>, <span class="ident">X7</span> <span class="op">=</span> <span class="number">0x07</span>,
+    <span class="ident">X8</span> <span class="op">=</span> <span class="number">0x08</span>, <span class="ident">X9</span> <span class="op">=</span> <span class="number">0x09</span>, <span class="ident">X10</span><span class="op">=</span> <span class="number">0x0A</span>, <span class="ident">X11</span><span class="op">=</span> <span class="number">0x0B</span>,
+    <span class="ident">X12</span><span class="op">=</span> <span class="number">0x0C</span>, <span class="ident">X13</span><span class="op">=</span> <span class="number">0x0D</span>, <span class="ident">X14</span><span class="op">=</span> <span class="number">0x0E</span>, <span class="ident">X15</span><span class="op">=</span> <span class="number">0x0F</span>,
+    <span class="ident">X16</span><span class="op">=</span> <span class="number">0x10</span>, <span class="ident">X17</span><span class="op">=</span> <span class="number">0x11</span>, <span class="ident">X18</span><span class="op">=</span> <span class="number">0x12</span>, <span class="ident">X19</span><span class="op">=</span> <span class="number">0x13</span>,
+    <span class="ident">X20</span><span class="op">=</span> <span class="number">0x14</span>, <span class="ident">X21</span><span class="op">=</span> <span class="number">0x15</span>, <span class="ident">X22</span><span class="op">=</span> <span class="number">0x16</span>, <span class="ident">X23</span><span class="op">=</span> <span class="number">0x17</span>,
+    <span class="ident">X24</span><span class="op">=</span> <span class="number">0x18</span>, <span class="ident">X25</span><span class="op">=</span> <span class="number">0x19</span>, <span class="ident">X26</span><span class="op">=</span> <span class="number">0x1A</span>, <span class="ident">X27</span><span class="op">=</span> <span class="number">0x1B</span>,
+    <span class="ident">X28</span><span class="op">=</span> <span class="number">0x1C</span>, <span class="ident">X29</span><span class="op">=</span> <span class="number">0x1D</span>, <span class="ident">X30</span><span class="op">=</span> <span class="number">0x1E</span>, <span class="ident">SP</span> <span class="op">=</span> <span class="number">0x1F</span>,
+}
+<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">RXSP</span>);
+
+<span class="doccomment">/// 1, 2, 4, 8 or 16-bytes scalar FP / vector SIMD registers. </span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RV</span> {
+    <span class="ident">V0</span> <span class="op">=</span> <span class="number">0x00</span>, <span class="ident">V1</span> <span class="op">=</span> <span class="number">0x01</span>, <span class="ident">V2</span> <span class="op">=</span> <span class="number">0x02</span>, <span class="ident">V3</span> <span class="op">=</span> <span class="number">0x03</span>,
+    <span class="ident">V4</span> <span class="op">=</span> <span class="number">0x04</span>, <span class="ident">V5</span> <span class="op">=</span> <span class="number">0x05</span>, <span class="ident">V6</span> <span class="op">=</span> <span class="number">0x06</span>, <span class="ident">V7</span> <span class="op">=</span> <span class="number">0x07</span>,
+    <span class="ident">V8</span> <span class="op">=</span> <span class="number">0x08</span>, <span class="ident">V9</span> <span class="op">=</span> <span class="number">0x09</span>, <span class="ident">V10</span><span class="op">=</span> <span class="number">0x0A</span>, <span class="ident">V11</span><span class="op">=</span> <span class="number">0x0B</span>,
+    <span class="ident">V12</span><span class="op">=</span> <span class="number">0x0C</span>, <span class="ident">V13</span><span class="op">=</span> <span class="number">0x0D</span>, <span class="ident">V14</span><span class="op">=</span> <span class="number">0x0E</span>, <span class="ident">V15</span><span class="op">=</span> <span class="number">0x0F</span>,
+    <span class="ident">V16</span><span class="op">=</span> <span class="number">0x10</span>, <span class="ident">V17</span><span class="op">=</span> <span class="number">0x11</span>, <span class="ident">V18</span><span class="op">=</span> <span class="number">0x12</span>, <span class="ident">V19</span><span class="op">=</span> <span class="number">0x13</span>,
+    <span class="ident">V20</span><span class="op">=</span> <span class="number">0x14</span>, <span class="ident">V21</span><span class="op">=</span> <span class="number">0x15</span>, <span class="ident">V22</span><span class="op">=</span> <span class="number">0x16</span>, <span class="ident">V23</span><span class="op">=</span> <span class="number">0x17</span>,
+    <span class="ident">V24</span><span class="op">=</span> <span class="number">0x18</span>, <span class="ident">V25</span><span class="op">=</span> <span class="number">0x19</span>, <span class="ident">V26</span><span class="op">=</span> <span class="number">0x1A</span>, <span class="ident">V27</span><span class="op">=</span> <span class="number">0x1B</span>,
+    <span class="ident">V28</span><span class="op">=</span> <span class="number">0x1C</span>, <span class="ident">V29</span><span class="op">=</span> <span class="number">0x1D</span>, <span class="ident">V30</span><span class="op">=</span> <span class="number">0x1E</span>, <span class="ident">V31</span><span class="op">=</span> <span class="number">0x1F</span>,
+}
+<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">RV</span>);
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">RX</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Register</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">reg_code</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">X2</span>.<span class="ident">code</span>(), <span class="number">2</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">reg_code_from</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">u8</span>::<span class="ident">from</span>(<span class="ident">X24</span>), <span class="number">0x18</span>);
+    }
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "dynasmrt";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

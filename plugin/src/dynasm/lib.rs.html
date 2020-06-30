@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../dynasm/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../dynasm/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -270,33 +270,123 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">proc_macro_diagnostic</span>)]</span>
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">proc_macro_span</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>, <span class="ident">feature</span>(<span class="ident">proc_macro_span</span>))]</span>
+<span class="doccomment">//! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates</span>
+<span class="doccomment">//! a full dynamic assembler for several assembly dialects with rust code.</span>
+<span class="doccomment">//! </span>
+<span class="doccomment">//! As this is a proc-macro crate, it only exports the `dynasm!` and `dynasm_backwards!` macros.</span>
+<span class="doccomment">//! Any directives used in these macro invocations are normally local to the invocation itself, unless</span>
+<span class="doccomment">//! the `filelocal` crate feature is used. This feature requires a nightly compiler.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Additionally, the `dynasm_opmap` and `dynasm_extract` development features can be used to export two additional macros</span>
+<span class="doccomment">//! with matching names. These macros expand into instruction listing overviews and are normally only used for documentation purposes.</span>
 
-<span class="comment">// token/ast manipulation</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro2</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">syn</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quote</span>;
-
-<span class="comment">// utility</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">bitflags</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">owning_ref</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">byteorder</span>;
 
 <span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">parse</span>;
 <span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">Token</span>, <span class="ident">parse_macro_input</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenTree</span>, <span class="ident">TokenStream</span>};
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">TokenTree</span>, <span class="ident">TokenStream</span>};
 <span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_error</span>::<span class="ident">proc_macro_error</span>;
 
-<span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="ident">lazy_static</span>;
-<span class="kw">use</span> <span class="ident">owning_ref</span>::{<span class="ident">OwningRef</span>, <span class="ident">RwLockReadGuardRef</span>};
-
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>, <span class="ident">Mutex</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">MutexGuard</span>, <span class="ident">Mutex</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_opmap&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_extract&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
 
 <span class="doccomment">/// Module with common infrastructure across assemblers</span>
 <span class="kw">mod</span> <span class="ident">common</span>;
@@ -309,8 +399,10 @@
 <span class="doccomment">/// Module containing utility functions for parsing</span>
 <span class="kw">mod</span> <span class="ident">parse_helpers</span>;
 
-<span class="doccomment">/// The whole point</span>
+<span class="doccomment">/// The whole point. This macro compiles given assembly/rust templates down to `DynasmApi` and `DynasmLabelApi`</span>
+<span class="doccomment">/// compliant calls to an assembler.</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
+<span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span> {
     <span class="comment">// try parsing the tokenstream into a dynasm struct containing</span>
     <span class="comment">// an abstract representation of the statements to create</span>
@@ -318,6 +410,24 @@
 
     <span class="comment">// serialize the resulting output into tokens</span>
     <span class="ident">serialize</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">dynasm</span>.<span class="ident">target</span>, <span class="ident">dynasm</span>.<span class="ident">stmts</span>).<span class="ident">into</span>()
+}
+
+<span class="doccomment">/// Similar to `dynasm!`, but the calls to the assembler are executed in piecewise reversed order.</span>
+<span class="doccomment">/// This is to allow the system to be used with assemblers that assemble backwards.</span>
+<span class="doccomment">/// Currently this is not supported by the `dynasmrt` crate, but this allows experimentation with it</span>
+<span class="doccomment">/// out of tree.</span>
+<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
+<span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_backwards</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span> {
+    <span class="comment">// try parsing the tokenstream into a dynasm struct containing</span>
+    <span class="comment">// an abstract representation of the statements to create</span>
+    <span class="kw">let</span> <span class="ident">dynasm</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">Dynasm</span>);
+
+    <span class="comment">// reverse the statement stream</span>
+    <span class="kw">let</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">invert</span>(<span class="ident">dynasm</span>.<span class="ident">stmts</span>);
+
+    <span class="comment">// serialize the resulting output into tokens</span>
+    <span class="ident">serialize</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">dynasm</span>.<span class="ident">target</span>, <span class="ident">stmts</span>).<span class="ident">into</span>()
 }
 
 <span class="doccomment">/// output from parsing a full dynasm invocation. target represents the first dynasm argument, being the assembler</span>
@@ -340,8 +450,8 @@
         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">common</span>::<span class="ident">delimited</span>(<span class="ident">target</span>);
 
         <span class="comment">// get file-local data (alias definitions, current architecture)</span>
-        <span class="kw">let</span> <span class="ident">file_data</span> <span class="op">=</span> <span class="ident">file_local_data</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file_data</span> <span class="op">=</span> <span class="ident">file_data</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">ContextProvider</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">invocation_context</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">get_context_mut</span>();
 
         <span class="comment">// prepare the statement buffer</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
@@ -406,16 +516,16 @@
             <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[.]) {
                 <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[.] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="ident">directive</span>::<span class="ident">evaluate_directive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">file_data</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmts</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
+                <span class="ident">directive</span>::<span class="ident">evaluate_directive</span>(<span class="ident">invocation_context</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmts</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
             } <span class="kw">else</span> {
                 <span class="comment">// anything else is an assembly instruction which should be in current_arch</span>
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span> {
                     <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmts</span>,
                     <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">target</span>,
-                    <span class="ident">file_data</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">file_data</span>,
+                    <span class="ident">invocation_context</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">invocation_context</span>,
                 };
-                <span class="ident">file_data</span>.<span class="ident">current_arch</span>.<span class="ident">compile_instruction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
+                <span class="ident">invocation_context</span>.<span class="ident">current_arch</span>.<span class="ident">compile_instruction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
             }
 
         }
@@ -445,7 +555,7 @@
         <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
     });
 
-    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote</span><span class="macro">!</span> {
+    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">call_site</span>()<span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">s</span>
     };
     <span class="ident">token</span>.<span class="ident">into</span>()
@@ -466,7 +576,7 @@
         <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
     };
 
-    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote</span><span class="macro">!</span> {
+    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">call_site</span>()<span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">s</span>
     };
     <span class="ident">token</span>.<span class="ident">into</span>()
@@ -493,55 +603,123 @@
 <span class="kw">struct</span> <span class="ident">State</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">common</span>::<span class="ident">Stmt</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TokenTree</span>,
-    <span class="kw">pub</span> <span class="ident">file_data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DynasmData</span>,
+    <span class="kw">pub</span> <span class="ident">invocation_context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DynasmContext</span>,
 }
 
 <span class="comment">// File local data implementation.</span>
 
-<span class="kw">type</span> <span class="ident">DynasmStorage</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PathBuf</span>, <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">DynasmData</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-<span class="kw">struct</span> <span class="ident">DynasmData</span> {
+<span class="comment">// context inside of a dynasm invocation, manipulated by directives and such</span>
+<span class="kw">struct</span> <span class="ident">DynasmContext</span> {
     <span class="kw">pub</span> <span class="ident">current_arch</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">arch</span>::<span class="ident">Arch</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">aliases</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">DynasmData</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DynasmData</span> {
-        <span class="ident">DynasmData</span> {
-            <span class="ident">current_arch</span>:
-                <span class="ident">arch</span>::<span class="ident">from_str</span>(<span class="ident">arch</span>::<span class="ident">CURRENT_ARCH</span>).<span class="ident">expect</span>(<span class="string">&quot;Default architecture is invalid&quot;</span>),
-            <span class="ident">aliases</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+<span class="kw">impl</span> <span class="ident">DynasmContext</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DynasmContext</span> {
+        <span class="ident">DynasmContext</span> {
+            <span class="ident">current_arch</span>: <span class="ident">arch</span>::<span class="ident">from_str</span>(<span class="ident">arch</span>::<span class="ident">CURRENT_ARCH</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid default architecture&quot;</span>),
+            <span class="ident">aliases</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>()
         }
     }
 }
 
-<span class="kw">type</span> <span class="ident">FileLocalData</span> <span class="op">=</span> <span class="ident">OwningRef</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">DynasmStorage</span><span class="op">&gt;</span>, <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">DynasmData</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="comment">// Oneshot context provider</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>))]</span>
+<span class="kw">struct</span> <span class="ident">ContextProvider</span> {
+    <span class="ident">context</span>: <span class="ident">DynasmContext</span>
+}
 
-<span class="kw">fn</span> <span class="ident">file_local_data</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FileLocalData</span> {
-    <span class="comment">// get the file that generated this macro expansion</span>
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span</span>::<span class="ident">call_site</span>().<span class="ident">unstable</span>();
-
-    <span class="comment">// and use the file that that was at as scope for resolving dynasm data</span>
-    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">source_file</span>().<span class="ident">path</span>();
-
-    {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">RwLockReadGuardRef</span>::<span class="ident">new</span>(<span class="ident">DYNASM_STORAGE</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>());
-
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="ident">data</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">unwrap</span>());
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>))]</span>
+<span class="kw">impl</span> <span class="ident">ContextProvider</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContextProvider</span> {
+        <span class="ident">ContextProvider</span> {
+            <span class="ident">context</span>: <span class="ident">DynasmContext</span>::<span class="ident">new</span>()
         }
     }
 
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">DYNASM_STORAGE</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
-        <span class="ident">lock</span>.<span class="ident">insert</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">DynasmData</span>::<span class="ident">new</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_context_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DynasmContext</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">context</span>
     }
-    <span class="ident">RwLockReadGuardRef</span>::<span class="ident">new</span>(<span class="ident">DYNASM_STORAGE</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">unwrap</span>())
 }
 
-<span class="comment">// this is where the actual storage resides.</span>
-<span class="macro">lazy_static</span><span class="macro">!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DYNASM_STORAGE</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">DynasmStorage</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>());
+<span class="doccomment">/// Filelocal context provider</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
+<span class="kw">struct</span> <span class="ident">ContextProvider</span> {
+    <span class="ident">guard</span>: <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PathBuf</span>, <span class="ident">DynasmContext</span><span class="op">&gt;</span><span class="op">&gt;</span>
 }
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">ContextProvider</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContextProvider</span> {
+        <span class="ident">ContextProvider</span> {
+            <span class="ident">guard</span>: <span class="ident">CONTEXT_STORAGE</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>()
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_context_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DynasmContext</span> {
+        <span class="comment">// get the file that generated this macro expansion</span>
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span</span>::<span class="ident">call_site</span>().<span class="ident">unstable</span>();
+
+        <span class="comment">// and use the file that that was at as scope for resolving dynasm data</span>
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">source_file</span>().<span class="ident">path</span>();
+
+        <span class="self">self</span>.<span class="ident">guard</span>.<span class="ident">entry</span>(<span class="ident">id</span>).<span class="ident">or_insert_with</span>(<span class="ident">DynasmContext</span>::<span class="ident">new</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
+<span class="ident">lazy_static</span>::<span class="macro">lazy_static</span><span class="macro">!</span> {
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">CONTEXT_STORAGE</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PathBuf</span>, <span class="ident">DynasmContext</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>());
+}
+
+
+
+
+
+<span class="comment">// type DynasmStorage = HashMap&lt;PathBuf, Mutex&lt;DynasmData&gt;&gt;;</span>
+
+<span class="comment">// struct DynasmData {</span>
+<span class="comment">//     pub current_arch: Box&lt;dyn arch::Arch&gt;,</span>
+<span class="comment">//     pub aliases: HashMap&lt;String, String&gt;,</span>
+<span class="comment">// }</span>
+
+<span class="comment">// impl DynasmData {</span>
+<span class="comment">//     fn new() -&gt; DynasmData {</span>
+<span class="comment">//         DynasmData {</span>
+<span class="comment">//             current_arch:</span>
+<span class="comment">//                 arch::from_str(arch::CURRENT_ARCH).expect(&quot;Default architecture is invalid&quot;),</span>
+<span class="comment">//             aliases: HashMap::new(),</span>
+<span class="comment">//         }</span>
+<span class="comment">//     }</span>
+<span class="comment">// }</span>
+
+<span class="comment">// type FileLocalData = OwningRef&lt;RwLockReadGuard&lt;&#39;static, DynasmStorage&gt;, Mutex&lt;DynasmData&gt;&gt;;</span>
+
+<span class="comment">// fn file_local_data() -&gt; FileLocalData {</span>
+<span class="comment">//     // get the file that generated this macro expansion</span>
+<span class="comment">//     let span = Span::call_site().unstable();</span>
+
+<span class="comment">//     // and use the file that that was at as scope for resolving dynasm data</span>
+<span class="comment">//     let id = span.source_file().path();</span>
+
+<span class="comment">//     {</span>
+<span class="comment">//         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());</span>
+
+<span class="comment">//         if data.get(&amp;id).is_some() {</span>
+<span class="comment">//             return data.map(|x| x.get(&amp;id).unwrap());</span>
+<span class="comment">//         }</span>
+<span class="comment">//     }</span>
+
+<span class="comment">//     {</span>
+<span class="comment">//         let mut lock = DYNASM_STORAGE.write().unwrap();</span>
+<span class="comment">//         lock.insert(id.clone(), Mutex::new(DynasmData::new()));</span>
+<span class="comment">//     }</span>
+<span class="comment">//     RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&amp;id).unwrap())</span>
+<span class="comment">// }</span>
+
+<span class="comment">// // this is where the actual storage resides.</span>
+<span class="comment">// lazy_static! {</span>
+<span class="comment">//     static ref DYNASM_STORAGE: RwLock&lt;DynasmStorage&gt; = RwLock::new(HashMap::new());</span>
+<span class="comment">// }</span>
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "dynasm";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "dynasm";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

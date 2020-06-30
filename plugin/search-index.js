@@ -1,7 +1,7 @@
-var N=null,E="",T="t",U="u",searchIndex={};
-var R=["dynasm"];
-searchIndex["dynasm"]={"doc":E,"i":[[14,R[0],R[0],"The whole point",N,N]],"p":[]};
-initSearch(searchIndex);addSearchOptions(searchIndex);// I'm sorry
+var searchIndex = JSON.parse('{\
+"dynasm":{"doc":"The dynasm crate contains the procedural macros that power…","i":[[14,"dynasm","dynasm","The whole point. This macro compiles given assembly/rust…",null,null],[14,"dynasm_backwards","","Similar to `dynasm!`, but the calls to the assembler are…",null,null]],"p":[]}\
+}');
+addSearchOptions(searchIndex);initSearch(searchIndex);// I'm sorry
 var path = document.getElementsByClassName("logo-container")[0].childNodes[0].getAttribute("src");
 var nest_count = (path.match(/\.\./g)||[]).length + 1; 
 

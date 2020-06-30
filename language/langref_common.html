@@ -48,6 +48,9 @@
       <li>
         <a href="./langref_common.html">Language</a>
       </li>
+      <li>
+        <a href="./releasenotes.html">Release Notes</a>
+      </li>
     </ul>
   </div>
   <div class = "block crate">
@@ -113,8 +116,9 @@ Check the documentation for the specific architecture.</p>
 <tr><td><code>.qword</code></td><td>One or more expressions of the type <code>i64</code></td><td>Pushes the values into the assembling buffer.</td></tr>
 <tr><td><code>.bytes</code></td><td>An expression of that implements <code>IntoIterator&lt;Item=u8&gt;</code> or <code>IntoIterator&lt;Item=&amp;u8&gt;</code></td><td>Extends the assembling buffer with the iterator.</td></tr>
 </tbody></table>
+<p>Directives are normally local to the current <code>dynasm!</code> invocation. However, if the <code>filelocal</code> feature is used they will be processed in lexical order over the whole file. This feature only works on a nightly compiler and might be removed in the future.</p>
 <h2 id="aliases" class="section-header"><a href="#aliases">Aliases</a></h2>
-<p>Dynasm-rs allows the user to define aliases for registers using the <code>.alias name, register</code> directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order and that their scoping is file-local.</p>
+<p>Dynasm-rs allows the user to define aliases for registers using the <code>.alias name, register</code> directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order.</p>
 <h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
 <p>While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal rust macros with dynasm-rs.</p>
 <p>First of all, it is not possible to have <code>dynasm!</code> parse the result of a rust macro. This is a limitation of rust itself. The proper way to use rust macros with dynasm-rs is to have macros expand to a <code>dynasm!</code> call as can be seen in the following example:</p>
@@ -126,7 +130,7 @@ Check the documentation for the specific architecture.</p>
         ; <span class="ident">add</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accumulator</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>
     )};
 }</pre></div>
-<h2 id="statements" class="section-header"><a href="#statements">statements</a></h2>
+<h2 id="statements" class="section-header"><a href="#statements">Statements</a></h2>
 <p>To make code that uses a lot of macros less verbose, dynasm-rs allows bare rust statements to be inserted inside <code>dynasm!</code> invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">

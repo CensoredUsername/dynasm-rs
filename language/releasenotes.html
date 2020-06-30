@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>Release notes</title>
+
+    <link rel="stylesheet" type="text/css" href="./formatting.css">
+
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <nav class="sidebar">
+  <p class="location">
+    <a href="./index.html">dynasm-rs</a>
+  </p>
+  <div class = "block modules">
+    <h3>Components</h3>
+    <ul>
+      <li>
+        <a href="../language/index.html">Syntax</a>
+      </li>
+      <li>
+        <a href="../plugin/dynasm/index.html">Plugin (dynasm)</a>
+      </li>
+      <li>
+        <a href="../runtime/dynasmrt/index.html">Runtime (dynasmrt)</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+    <h3>Syntax</h3>
+    <ul>
+      <li>
+        <a href="./index.html">Home</a>
+      </li>
+      <li>
+        <a href="./tutorial.html">Tutorial</a>
+      </li>
+      <li>
+        <a href="./langref_common.html">Language</a>
+      </li>
+      <li>
+        <a href="./releasenotes.html">Release Notes</a>
+      </li>
+    </ul>
+  </div>
+  <div class = "block crate">
+    <h3>Architectures</h3>
+    <h4>x64/x86</h4>
+    <ul>
+      <li>
+        <a href="./langref_x64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_x64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>aarch64</h4>
+    <ul>
+      <li>
+        <a href="./langref_aarch64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_aarch64.html">Instruction reference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section id="main" class="content mod docblock">
+
+    <h1 class="title">Release notes</h1>
+    <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
+<h1 id="version-070" class="section-header"><a href="#version-070">Version 0.7.0</a></h1><h2 id="global" class="section-header"><a href="#global">Global</a></h2>
+<ul>
+<li>Updated everything to the 2018 edition of rust.</li>
+<li>The crate will be able to be used on a rust 1.45 stable compiler!</li>
+</ul>
+<h2 id="plugin" class="section-header"><a href="#plugin">Plugin</a></h2>
+<ul>
+<li>File-local directives now requires the <code>filelocal</code> feature and a nightly compiler.</li>
+<li>Now compiles and is usable on a stable 1.45 rust compiler.</li>
+<li>Added <code>dynasm_backwards!</code>, which emits templates in reverse order. This allows writing assemblers that compile code backwards.</li>
+</ul>
+<h2 id="runtime" class="section-header"><a href="#runtime">Runtime</a></h2>
+<ul>
+<li><code>dynasmrt</code> now re-exports the <code>dynasm!</code> macro from <code>dynasm</code>, so projects only need the <code>dynasmrt</code> dependency.</li>
+<li>Refactoring PatchLoc and Relocation to generalize relocation handling between architectures.</li>
+<li>Added register family listings, to facilitate dynamic register usage. This feature was contributed by vext01.</li>
+</ul>
+<h1 id="version-060" class="section-header"><a href="#version-060">Version 0.6.0</a></h1><h2 id="runtime-1" class="section-header"><a href="#runtime-1">Runtime</a></h2>
+<ul>
+<li>Significant internal refactoring: Architectural support is now abstracted through the Relocation trait, that all assemblers are generic over. Aliases for the previous architecture-specific assemblers are kept for backwards compatibility.</li>
+<li>Made assembler components public to facilitate writing custom assemblers.</li>
+</ul>
+<h2 id="tests" class="section-header"><a href="#tests">Tests</a></h2>
+<ul>
+<li>Reduced compile time significantly by migrating simple instruction format tests to <code>SimpleAssembler</code>.</li>
+</ul>
+<h1 id="version-052" class="section-header"><a href="#version-052">Version 0.5.2</a></h1><h2 id="plugin-1" class="section-header"><a href="#plugin-1">Plugin</a></h2>
+<ul>
+<li>Remove a problematic semicolon that might cause errors in the future.</li>
+<li>README update.</li>
+</ul>
+<h1 id="version-051" class="section-header"><a href="#version-051">Version 0.5.1</a></h1><h2 id="runtime-2" class="section-header"><a href="#runtime-2">Runtime</a></h2>
+<ul>
+<li>Fix a bug that caused emitted code corruption corruption in Aarch64's B and ADRP relocation calculations.</li>
+</ul>
+<h1 id="version-050" class="section-header"><a href="#version-050">Version 0.5.0</a></h1><h2 id="plugin-2" class="section-header"><a href="#plugin-2">Plugin</a></h2>
+<ul>
+<li>We now support an arbitrary offset added to any jump. This feature allows direct addressing of literal pools or arrays of values without generating labels for every single item in them.</li>
+</ul>
+<h2 id="runtime-3" class="section-header"><a href="#runtime-3">Runtime</a></h2>
+<ul>
+<li>Added LitPool, a tool to automatically build literal pools.</li>
+<li>Impossible relocations no longer panic. Instead they cause an error to be emitted from <code>Assembler::commit()</code>.</li>
+<li>Significant refactoring.</li>
+</ul>
+<h1 id="version-040" class="section-header"><a href="#version-040">Version 0.4.0</a></h1><h2 id="architecture-support" class="section-header"><a href="#architecture-support">Architecture support</a></h2>
+<ul>
+<li>Added Aarch64 support, thanks to sponsoring from <a href="https://wasmer.io">Wasmer</a>.</li>
+</ul>
+<h2 id="plugin-3" class="section-header"><a href="#plugin-3">Plugin</a></h2>
+<ul>
+<li>Remove use of mem::unitialized when calculating the offsets of members in structs in generated code.
+-Optimization of opmap and register tables to reduce compile time and file size.</li>
+</ul>
+<h2 id="documentation" class="section-header"><a href="#documentation">Documentation</a></h2>
+<ul>
+<li>Split architecture-specific DSL documentation and generic DSL documentation.</li>
+<li>Ported examples to Aarch64.</li>
+</ul>
+<h1 id="version-032" class="section-header"><a href="#version-032">Version 0.3.2</a></h1><h2 id="plugin-4" class="section-header"><a href="#plugin-4">Plugin</a></h2>
+<ul>
+<li>x64/x86: Always escape into SIB encoding with a displacement when a register is used as a memory reference base, to allow RBP to be encoded.</li>
+<li>x64/x86: Properly handle dynamic registers in VEX prefixes</li>
+</ul>
+<h1 id="version-031" class="section-header"><a href="#version-031">Version 0.3.1</a></h1><h2 id="plugin-5" class="section-header"><a href="#plugin-5">Plugin</a></h2>
+<ul>
+<li>Fixed an issue where dynamic registers caused wrong code generation.</li>
+</ul>
+<h2 id="runtime-4" class="section-header"><a href="#runtime-4">Runtime</a></h2>
+<ul>
+<li>Added an API for returning the offset of a dynamic label directly.</li>
+</ul>
+<h1 id="version-030" class="section-header"><a href="#version-030">Version 0.3.0</a></h1><h2 id="architecture-support-1" class="section-header"><a href="#architecture-support-1">Architecture support</a></h2>
+<ul>
+<li>Fixed SETB and SETNB not being present in x64/x86</li>
+</ul>
+<h2 id="plugin-6" class="section-header"><a href="#plugin-6">Plugin</a></h2>
+<ul>
+<li>The plugin has been updated to the new procedural macro system. This means it should no longer break when new compiler versions are released.</li>
+<li>Directives are now scoped file-local instead of crate-local.</li>
+</ul>
+<h2 id="runtime-5" class="section-header"><a href="#runtime-5">Runtime</a></h2>
+<ul>
+<li>The alter API can now return values produced by the user-defined closure.</li>
+</ul>
+<h1 id="versions-021-022-and-023" class="section-header"><a href="#versions-021-022-and-023">Versions 0.2.1, 0.2.2 and 0.2.3</a></h1><h2 id="plugin-7" class="section-header"><a href="#plugin-7">Plugin</a></h2>
+<ul>
+<li>Updates so it stays compatible with rustc as the plugin API changes.</li>
+</ul>
+<h1 id="version-020" class="section-header"><a href="#version-020">Version 0.2.0</a></h1><h2 id="architecture-support-2" class="section-header"><a href="#architecture-support-2">Architecture support</a></h2>
+<ul>
+<li>Added support for x86</li>
+<li>Enabled relocation support in x64 when additional immediate fields are present.</li>
+</ul>
+<h2 id="plugin-8" class="section-header"><a href="#plugin-8">Plugin</a></h2>
+<ul>
+<li>Significant refactoring of the x64 backend to also handle x86</li>
+<li>Added x64 feature selection support.</li>
+</ul>
+<h2 id="runtime-6" class="section-header"><a href="#runtime-6">Runtime</a></h2>
+<ul>
+<li>Added managed relocation support to handle non-relative relocations.</li>
+</ul>
+<h1 id="versions-014-013-012-011" class="section-header"><a href="#versions-014-013-012-011">Versions 0.1.4, 0.1.3, 0.1.2, 0.1.1</a></h1><h2 id="plugin-9" class="section-header"><a href="#plugin-9">Plugin</a></h2>
+<ul>
+<li>Updates so it stays compatible with rustc as the plugin API changes.</li>
+</ul>
+<h1 id="versions--010" class="section-header"><a href="#versions--010">Versions &lt;= 0.1.0</a></h1><h2 id="global-1" class="section-header"><a href="#global-1">Global</a></h2>
+<ul>
+<li>Initial library experiments, starting with basic x64 support, refactoring to support multiple architectures, and cleanup.</li>
+</ul>
+
+    </section>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    var old = document.querySelectorAll("code.language-diffold");
+    var old_pre = [];
+    for (var i = 0; i < old.length; i++) {
+        var old_pre = old[i].parentNode;
+        var new_pre = old_pre.nextElementSibling;
+        if (new_pre && new_pre.childNodes.length > 0 && new_pre.childNodes[0].className == "language-diffnew") {
+            old_pre.className = "collapse-old";
+            new_pre.className = "collapse-new";
+        }
+    }
+
+});
+</script>
+
+</body>
+</html>
