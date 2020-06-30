@@ -9,7 +9,7 @@ Version 0.7.0
 Global
 ------
 - Updated everything to the 2018 edition of rust.
-- The crate can now be used on a stable rust compiler!
+- The crate will be able to be used on a rust 1.45 stable compiler!
 
 Plugin
 ------
