@@ -193,7 +193,7 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
         x => panic!("Unknown architecture {}", x)
     });
 
-    let token = quote::quote_spanned! { Span::mixed_site()=>
+    let token = quote::quote_spanned! { Span::call_site()=>
         #s
     };
     token.into()
@@ -214,7 +214,7 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
         x => panic!("Unknown architecture {}", x)
     };
 
-    let token = quote::quote_spanned! { Span::mixed_site()=>
+    let token = quote::quote_spanned! { Span::call_site()=>
         #s
     };
     token.into()
