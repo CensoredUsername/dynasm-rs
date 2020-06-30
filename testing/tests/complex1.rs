@@ -1,10 +1,9 @@
-#![feature(proc_macro_hygiene)]
 #![allow(unused_imports)]
 
 #[macro_use]
 extern crate dynasmrt;
 
-use dynasm::dynasm;
+use dynasmrt::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 // aliases, and dynasm! in item position
