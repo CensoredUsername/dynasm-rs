@@ -1,6 +1,6 @@
 [package]
 name = "dynasmrt"
-version = "0.7.0" # remember to update dynasm dependency
+version = "0.7.1" # remember to update dynasm dependency
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
 edition = "2018"
 
@@ -17,4 +17,4 @@ license = "MPL-2.0"
 [dependencies]
 memmap = "^0.7"
 byteorder = "1"
-dynasm = { version = "0.7.0", path = "../plugin" }
+dynasm = { version = "=0.7.1", path = "../plugin" }
