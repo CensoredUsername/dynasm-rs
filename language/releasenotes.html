@@ -79,6 +79,10 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
+<h1 id="version-071" class="section-header"><a href="#version-071">Version 0.7.1</a></h1><h2 id="runtime" class="section-header"><a href="#runtime">Runtime</a></h2>
+<ul>
+<li>Fixed an issue where calls to Modifier.extend would cause invalid code to be emitted.</li>
+</ul>
 <h1 id="version-070" class="section-header"><a href="#version-070">Version 0.7.0</a></h1><h2 id="global" class="section-header"><a href="#global">Global</a></h2>
 <ul>
 <li>Updated everything to the 2018 edition of rust.</li>
@@ -90,13 +94,13 @@
 <li>Now compiles and is usable on a stable 1.45 rust compiler.</li>
 <li>Added <code>dynasm_backwards!</code>, which emits templates in reverse order. This allows writing assemblers that compile code backwards.</li>
 </ul>
-<h2 id="runtime" class="section-header"><a href="#runtime">Runtime</a></h2>
+<h2 id="runtime-1" class="section-header"><a href="#runtime-1">Runtime</a></h2>
 <ul>
 <li><code>dynasmrt</code> now re-exports the <code>dynasm!</code> macro from <code>dynasm</code>, so projects only need the <code>dynasmrt</code> dependency.</li>
 <li>Refactoring PatchLoc and Relocation to generalize relocation handling between architectures.</li>
 <li>Added register family listings, to facilitate dynamic register usage. This feature was contributed by vext01.</li>
 </ul>
-<h1 id="version-060" class="section-header"><a href="#version-060">Version 0.6.0</a></h1><h2 id="runtime-1" class="section-header"><a href="#runtime-1">Runtime</a></h2>
+<h1 id="version-060" class="section-header"><a href="#version-060">Version 0.6.0</a></h1><h2 id="runtime-2" class="section-header"><a href="#runtime-2">Runtime</a></h2>
 <ul>
 <li>Significant internal refactoring: Architectural support is now abstracted through the Relocation trait, that all assemblers are generic over. Aliases for the previous architecture-specific assemblers are kept for backwards compatibility.</li>
 <li>Made assembler components public to facilitate writing custom assemblers.</li>
@@ -110,7 +114,7 @@
 <li>Remove a problematic semicolon that might cause errors in the future.</li>
 <li>README update.</li>
 </ul>
-<h1 id="version-051" class="section-header"><a href="#version-051">Version 0.5.1</a></h1><h2 id="runtime-2" class="section-header"><a href="#runtime-2">Runtime</a></h2>
+<h1 id="version-051" class="section-header"><a href="#version-051">Version 0.5.1</a></h1><h2 id="runtime-3" class="section-header"><a href="#runtime-3">Runtime</a></h2>
 <ul>
 <li>Fix a bug that caused emitted code corruption corruption in Aarch64's B and ADRP relocation calculations.</li>
 </ul>
@@ -118,7 +122,7 @@
 <ul>
 <li>We now support an arbitrary offset added to any jump. This feature allows direct addressing of literal pools or arrays of values without generating labels for every single item in them.</li>
 </ul>
-<h2 id="runtime-3" class="section-header"><a href="#runtime-3">Runtime</a></h2>
+<h2 id="runtime-4" class="section-header"><a href="#runtime-4">Runtime</a></h2>
 <ul>
 <li>Added LitPool, a tool to automatically build literal pools.</li>
 <li>Impossible relocations no longer panic. Instead they cause an error to be emitted from <code>Assembler::commit()</code>.</li>
@@ -147,7 +151,7 @@
 <ul>
 <li>Fixed an issue where dynamic registers caused wrong code generation.</li>
 </ul>
-<h2 id="runtime-4" class="section-header"><a href="#runtime-4">Runtime</a></h2>
+<h2 id="runtime-5" class="section-header"><a href="#runtime-5">Runtime</a></h2>
 <ul>
 <li>Added an API for returning the offset of a dynamic label directly.</li>
 </ul>
@@ -160,7 +164,7 @@
 <li>The plugin has been updated to the new procedural macro system. This means it should no longer break when new compiler versions are released.</li>
 <li>Directives are now scoped file-local instead of crate-local.</li>
 </ul>
-<h2 id="runtime-5" class="section-header"><a href="#runtime-5">Runtime</a></h2>
+<h2 id="runtime-6" class="section-header"><a href="#runtime-6">Runtime</a></h2>
 <ul>
 <li>The alter API can now return values produced by the user-defined closure.</li>
 </ul>
@@ -178,7 +182,7 @@
 <li>Significant refactoring of the x64 backend to also handle x86</li>
 <li>Added x64 feature selection support.</li>
 </ul>
-<h2 id="runtime-6" class="section-header"><a href="#runtime-6">Runtime</a></h2>
+<h2 id="runtime-7" class="section-header"><a href="#runtime-7">Runtime</a></h2>
 <ul>
 <li>Added managed relocation support to handle non-relative relocations.</li>
 </ul>
