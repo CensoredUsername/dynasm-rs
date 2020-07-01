@@ -874,6 +874,7 @@ impl<'a, R: Relocation> Extend<u8> for Modifier<'a,R> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
         for (src, dst) in iter.into_iter().zip(self.buffer[self.asmoffset ..].iter_mut()) {
             *dst = src;
+            self.asmoffset += 1;
         }
     }
 }
@@ -882,6 +883,7 @@ impl<'a, 'b, R: Relocation> Extend<&'b u8> for Modifier<'a, R> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'b u8> {
         for (src, dst) in iter.into_iter().zip(self.buffer[self.asmoffset ..].iter_mut()) {
             *dst = *src;
+            self.asmoffset += 1;
         }
     }
 }
