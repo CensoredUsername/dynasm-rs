@@ -1,4 +1,23 @@
-//! This module implements the relocation model for the x86 architecture, as well as aliases for x86 Assemblers.
+//! Runtime support for the x86 architecture assembling target.
+//!
+//! The x86 instruction set features variable-length instructions and
+//! relative relocations up to 16 bits in size, or absolute relocations of 32 bits in size.
+//!
+//! The core relocation behaviour for this architecture is provided by the [`X86Relocation`] type.
+//!
+//! Next to that, this module contains the following:
+//!
+//! ## Type aliases
+//!
+//! Several specialized type aliases of the generic [`Assembler`] are provided as these are by far the most common usecase.
+//!
+//! ## Enums
+//!
+//! There are enumerator of every logically distinct register family usable in x86. 
+//! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.
+//!
+//! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*
+
 
 use crate::Register;
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation};
@@ -51,11 +70,6 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, X86Relocation>;
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
 
-/// The following enums contain the logical ID's for registers when dynamic registers are used.
-///
-/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant
-/// architecture documentation to find what is architecturally valid.
-///
 /// 1, 2 or 4-byte general purpose "double-word" registers.
 ///
 /// EIP does not appear here as it cannot be addressed dynamically.

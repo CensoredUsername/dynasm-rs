@@ -1,4 +1,26 @@
-//! This module implements the relocation model for the aarch64 architecture, as well as aliases for aarch64 Assemblers.
+//! Runtime support for the aarch64 architecture assembling target.
+//!
+//! The aarch64 instruction set features fixed-width 32-bit instructions and relative relocations up to 28 bits in size.
+//!
+//! The core relocation behaviour for this architecture is provided by the [`Aarch64Relocation`] type.
+//!
+//! Next to that, this module contains the following:
+//!
+//! ## Type aliases
+//!
+//! Several specialized type aliases of the generic [`Assembler`] are provided as these are by far the most common usecase.
+//!
+//! ## Enums
+//!
+//! There are enumerator of every logically distinct register family usable in aarch64. 
+//! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.
+//!
+//! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*
+//!
+//! ## Functions
+//!
+//! The aarch64 architecture allows encoding several special types of immediates. The encoding implementations for these immediate types have been exposed to assist the user
+//! in correctly using these instructions. They will return `Some(encoding)` only if the given value can be encoded losslessly in that immediate type.
 
 use crate::Register;
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation, fits_signed_bitfield};
@@ -239,11 +261,7 @@ pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
     }
 }
 
-/// The following enums contain the logical ID's for registers when dynamic registers are used.
-///
-/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant
-/// architecture documentation to find what is architecturally valid.
-///
+
 /// 4 or 8-byte general purpopse registers, where X31 is the zero register.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

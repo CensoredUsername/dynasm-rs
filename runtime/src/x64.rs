@@ -1,4 +1,23 @@
-//! This module implements the relocation model for the x64 architecture, as well as aliases for x64 Assemblers.
+//! Runtime support for the x64 architecture assembling target.
+//!
+//! The x64 instruction set features variable-length instructions and
+//! relative relocations up to 32 bits in size.
+//!
+//! The core relocation behaviour for this architecture is provided by the [`X64Relocation`] type.
+//!
+//! Next to that, this module contains the following:
+//!
+//! ## Type aliases
+//!
+//! Several specialized type aliases of the generic [`Assembler`] are provided as these are by far the most common usecase.
+//!
+//! ## Enums
+//!
+//! There are enumerator of every logically distinct register family usable in x64. 
+//! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.
+//! Some of these are re-exported from the x86 architecture.
+//!
+//! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*
 
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation};
 use crate::Register;
@@ -48,12 +67,7 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, X64Relocation>;
 /// An x64 UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
-/// The following enums contain the logical ID's for registers when dynamic registers are used.
-/// Groups that are identical to x86's registers are exported from there.
-///
-/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant
-/// architecture documentation to find what is architecturally valid.
-///
+
 /// 1, 2, 4 or 8-byte general purpose "quad-word" registers.
 ///
 /// RIP does not appear here as it cannot be addressed dynamically.
@@ -66,7 +80,6 @@ pub enum Rq {
     R12 = 0xC, R13 = 0xD, R14 = 0xE, R15 = 0xF,
 }
 reg_impls!(Rq);
-
 
 /// 16 or 32-byte SSE registers.
 #[allow(missing_docs)]
