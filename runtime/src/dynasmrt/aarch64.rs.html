@@ -305,8 +305,48 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! This module implements the relocation model for the aarch64 architecture, as well as aliases for aarch64 Assemblers.</span>
+<span class="doccomment">//! Runtime support for the aarch64 architecture assembling target.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The aarch64 instruction set features fixed-width 32-bit instructions and relative relocations up to 28 bits in size.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The core relocation behaviour for this architecture is provided by the [`Aarch64Relocation`] type.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Next to that, this module contains the following:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Type aliases</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Several specialized type aliases of the generic [`Assembler`] are provided as these are by far the most common usecase.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Enums</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are enumerator of every logically distinct register family usable in aarch64. </span>
+<span class="doccomment">//! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Functions</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The aarch64 architecture allows encoding several special types of immediates. The encoding implementations for these immediate types have been exposed to assist the user</span>
+<span class="doccomment">//! in correctly using these instructions. They will return `Some(encoding)` only if the given value can be encoded losslessly in that immediate type.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Register</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">relocations</span>::{<span class="ident">Relocation</span>, <span class="ident">RelocationSize</span>, <span class="ident">RelocationKind</span>, <span class="ident">ImpossibleRelocation</span>, <span class="ident">fits_signed_bitfield</span>};
@@ -547,11 +587,7 @@
     }
 }
 
-<span class="doccomment">/// The following enums contain the logical ID&#39;s for registers when dynamic registers are used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant</span>
-<span class="doccomment">/// architecture documentation to find what is architecturally valid.</span>
-<span class="doccomment">///</span>
+
 <span class="doccomment">/// 4 or 8-byte general purpopse registers, where X31 is the zero register.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>

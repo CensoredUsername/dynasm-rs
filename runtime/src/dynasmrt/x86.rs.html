@@ -154,8 +154,41 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! This module implements the relocation model for the x86 architecture, as well as aliases for x86 Assemblers.</span>
+<span class="doccomment">//! Runtime support for the x86 architecture assembling target.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The x86 instruction set features variable-length instructions and</span>
+<span class="doccomment">//! relative relocations up to 16 bits in size, or absolute relocations of 32 bits in size.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The core relocation behaviour for this architecture is provided by the [`X86Relocation`] type.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Next to that, this module contains the following:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Type aliases</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Several specialized type aliases of the generic [`Assembler`] are provided as these are by far the most common usecase.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Enums</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are enumerator of every logically distinct register family usable in x86. </span>
+<span class="doccomment">//! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*</span>
+
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Register</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">relocations</span>::{<span class="ident">Relocation</span>, <span class="ident">RelocationSize</span>, <span class="ident">RelocationKind</span>, <span class="ident">ImpossibleRelocation</span>};
@@ -208,11 +241,6 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
 
-<span class="doccomment">/// The following enums contain the logical ID&#39;s for registers when dynamic registers are used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: The presence of some registers listed here is purely what is encodable. Check the relevant</span>
-<span class="doccomment">/// architecture documentation to find what is architecturally valid.</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// 1, 2 or 4-byte general purpose &quot;double-word&quot; registers.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// EIP does not appear here as it cannot be addressed dynamically.</span>
