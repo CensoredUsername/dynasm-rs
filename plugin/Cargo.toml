@@ -1,6 +1,6 @@
 [package]
 name = "dynasm"
-version = "0.7.1"
+version = "1.0.0"
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
 edition = "2018"
 
