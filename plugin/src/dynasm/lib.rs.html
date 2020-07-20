@@ -309,56 +309,6 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>, <span class="ident">feature</span>(<span class="ident">proc_macro_span</span>))]</span>
 <span class="doccomment">//! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates</span>
@@ -555,7 +505,7 @@
         <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
     });
 
-    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">call_site</span>()<span class="op">=</span><span class="op">&gt;</span>
+    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">mixed_site</span>()<span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">s</span>
     };
     <span class="ident">token</span>.<span class="ident">into</span>()
@@ -576,7 +526,7 @@
         <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
     };
 
-    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">call_site</span>()<span class="op">=</span><span class="op">&gt;</span>
+    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">mixed_site</span>()<span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">s</span>
     };
     <span class="ident">token</span>.<span class="ident">into</span>()
@@ -671,55 +621,5 @@
 <span class="ident">lazy_static</span>::<span class="macro">lazy_static</span><span class="macro">!</span> {
     <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">CONTEXT_STORAGE</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PathBuf</span>, <span class="ident">DynasmContext</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>());
 }
-
-
-
-
-
-<span class="comment">// type DynasmStorage = HashMap&lt;PathBuf, Mutex&lt;DynasmData&gt;&gt;;</span>
-
-<span class="comment">// struct DynasmData {</span>
-<span class="comment">//     pub current_arch: Box&lt;dyn arch::Arch&gt;,</span>
-<span class="comment">//     pub aliases: HashMap&lt;String, String&gt;,</span>
-<span class="comment">// }</span>
-
-<span class="comment">// impl DynasmData {</span>
-<span class="comment">//     fn new() -&gt; DynasmData {</span>
-<span class="comment">//         DynasmData {</span>
-<span class="comment">//             current_arch:</span>
-<span class="comment">//                 arch::from_str(arch::CURRENT_ARCH).expect(&quot;Default architecture is invalid&quot;),</span>
-<span class="comment">//             aliases: HashMap::new(),</span>
-<span class="comment">//         }</span>
-<span class="comment">//     }</span>
-<span class="comment">// }</span>
-
-<span class="comment">// type FileLocalData = OwningRef&lt;RwLockReadGuard&lt;&#39;static, DynasmStorage&gt;, Mutex&lt;DynasmData&gt;&gt;;</span>
-
-<span class="comment">// fn file_local_data() -&gt; FileLocalData {</span>
-<span class="comment">//     // get the file that generated this macro expansion</span>
-<span class="comment">//     let span = Span::call_site().unstable();</span>
-
-<span class="comment">//     // and use the file that that was at as scope for resolving dynasm data</span>
-<span class="comment">//     let id = span.source_file().path();</span>
-
-<span class="comment">//     {</span>
-<span class="comment">//         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());</span>
-
-<span class="comment">//         if data.get(&amp;id).is_some() {</span>
-<span class="comment">//             return data.map(|x| x.get(&amp;id).unwrap());</span>
-<span class="comment">//         }</span>
-<span class="comment">//     }</span>
-
-<span class="comment">//     {</span>
-<span class="comment">//         let mut lock = DYNASM_STORAGE.write().unwrap();</span>
-<span class="comment">//         lock.insert(id.clone(), Mutex::new(DynasmData::new()));</span>
-<span class="comment">//     }</span>
-<span class="comment">//     RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&amp;id).unwrap())</span>
-<span class="comment">// }</span>
-
-<span class="comment">// // this is where the actual storage resides.</span>
-<span class="comment">// lazy_static! {</span>
-<span class="comment">//     static ref DYNASM_STORAGE: RwLock&lt;DynasmStorage&gt; = RwLock::new(HashMap::new());</span>
-<span class="comment">// }</span>
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "dynasm";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
