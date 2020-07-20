@@ -29,7 +29,7 @@ version = "1"
 features = ["full", "extra-traits"]
 
 [dependencies.proc-macro2]
-version = "1"
+version = "1.0.19"
 
 [features]
 dynasm_opmap = []
