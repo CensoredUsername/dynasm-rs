@@ -38,7 +38,7 @@ impl Size {
             Size::PWORD => "i80",
             Size::OWORD => "i128",
             Size::HWORD => "i256"
-        }, Span::call_site()) // should be mixed_site
+        }, Span::mixed_site())
     }
 }
 

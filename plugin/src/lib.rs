@@ -193,7 +193,7 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
         x => panic!("Unknown architecture {}", x)
     });
 
-    let token = quote::quote_spanned! { Span::call_site()=>
+    let token = quote::quote_spanned! { Span::mixed_site()=>
         #s
     };
     token.into()
@@ -214,7 +214,7 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
         x => panic!("Unknown architecture {}", x)
     };
 
-    let token = quote::quote_spanned! { Span::call_site()=>
+    let token = quote::quote_spanned! { Span::mixed_site()=>
         #s
     };
     token.into()
@@ -309,53 +309,3 @@ impl ContextProvider {
 lazy_static::lazy_static! {
     static ref CONTEXT_STORAGE: Mutex<HashMap<PathBuf, DynasmContext>> = Mutex::new(HashMap::new());
 }
-
-
-
-
-
-// type DynasmStorage = HashMap<PathBuf, Mutex<DynasmData>>;
-
-// struct DynasmData {
-//     pub current_arch: Box<dyn arch::Arch>,
-//     pub aliases: HashMap<String, String>,
-// }
-
-// impl DynasmData {
-//     fn new() -> DynasmData {
-//         DynasmData {
-//             current_arch:
-//                 arch::from_str(arch::CURRENT_ARCH).expect("Default architecture is invalid"),
-//             aliases: HashMap::new(),
-//         }
-//     }
-// }
-
-// type FileLocalData = OwningRef<RwLockReadGuard<'static, DynasmStorage>, Mutex<DynasmData>>;
-
-// fn file_local_data() -> FileLocalData {
-//     // get the file that generated this macro expansion
-//     let span = Span::call_site().unstable();
-
-//     // and use the file that that was at as scope for resolving dynasm data
-//     let id = span.source_file().path();
-
-//     {
-//         let data = RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap());
-
-//         if data.get(&id).is_some() {
-//             return data.map(|x| x.get(&id).unwrap());
-//         }
-//     }
-
-//     {
-//         let mut lock = DYNASM_STORAGE.write().unwrap();
-//         lock.insert(id.clone(), Mutex::new(DynasmData::new()));
-//     }
-//     RwLockReadGuardRef::new(DYNASM_STORAGE.read().unwrap()).map(|x| x.get(&id).unwrap())
-// }
-
-// // this is where the actual storage resides.
-// lazy_static! {
-//     static ref DYNASM_STORAGE: RwLock<DynasmStorage> = RwLock::new(HashMap::new());
-// }

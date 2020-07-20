@@ -30,7 +30,6 @@ features = ["full", "extra-traits"]
 
 [dependencies.proc-macro2]
 version = "1"
-features = ["nightly"]
 
 [features]
 dynasm_opmap = []

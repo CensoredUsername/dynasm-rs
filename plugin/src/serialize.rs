@@ -103,7 +103,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
         };
 
         // and construct the appropriate method call
-        let method = syn::Ident::new(method, Span::call_site()); // should be mixed_site
+        let method = syn::Ident::new(method, Span::mixed_site());
         output.extend(quote! {
             #name . #method ( #( #args ),* ) ;
         })
@@ -228,9 +228,9 @@ pub fn expr_string_from_ident(i: &syn::Ident) -> TokenTree {
 // Makes a dynamic scale expression. Useful for x64 generic addressing mode
 pub fn expr_dynscale(scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
     let tempval = expr_encode_x64_sib_scale(&scale);
-    (delimited(quote_spanned! { Span::call_site()=> // should be mixed_site
+    (delimited(quote_spanned! { Span::mixed_site()=>
         let temp = #tempval
-    }), delimited(quote_spanned! { Span::call_site()=> // should be mixed_site
+    }), delimited(quote_spanned! { Span::mixed_site()=>
          #rest | ((temp & 3) << 6)
     }))
 }
