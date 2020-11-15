@@ -442,8 +442,8 @@ impl Matcher {
                     Register::Scalar(ref s) => match self {
                         Matcher::W => s.size() == Size::DWORD && s.kind.family() == RegFamily::INTEGER,
                         Matcher::X => s.size() == Size::QWORD && s.kind.family() == RegFamily::INTEGER,
-                        Matcher::WSP => s.size() == Size::DWORD && (s.kind.family() == RegFamily::INTEGERSP || (s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
-                        Matcher::XSP => s.size() == Size::QWORD && (s.kind.family() == RegFamily::INTEGERSP || (s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
+                        Matcher::WSP => s.size() == Size::DWORD && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
+                        Matcher::XSP => s.size() == Size::QWORD && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
                         Matcher::B => s.size() == Size::BYTE && s.kind.family() == RegFamily::SIMD,
                         Matcher::H => s.size() == Size::WORD && s.kind.family() == RegFamily::SIMD,
                         Matcher::S => s.size() == Size::DWORD && s.kind.family() == RegFamily::SIMD,
