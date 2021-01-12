@@ -4,7 +4,7 @@
 use std::ops::{Deref, DerefMut};
 use std::io;
 
-use memmap::{Mmap, MmapMut};
+use memmap2::{Mmap, MmapMut};
 
 use crate::AssemblyOffset;
 
