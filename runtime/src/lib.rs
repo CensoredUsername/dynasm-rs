@@ -363,6 +363,11 @@ impl<R: Relocation> VecAssembler<R> {
         }
     }
 
+    /// Create a new dynamic label ID
+    pub fn new_dynamic_label(&mut self) -> DynamicLabel {
+        self.labels.new_dynamic_label()
+    }
+
     /// Resolves any relocations emitted to the assembler before this point.
     /// If an impossible relocation was specified before this point, returns them here.
     pub fn commit(&mut self) -> Result<(), DynasmError> {
@@ -401,6 +406,16 @@ impl<R: Relocation> VecAssembler<R> {
     /// This does not allow the user to change labels/relocations.
     pub fn alter(&mut self) -> UncommittedModifier {
         UncommittedModifier::new(&mut self.ops, AssemblyOffset(0))
+    }
+
+    /// Provides access to the assemblers internal labels registry
+    pub fn labels(&self) -> &LabelRegistry {
+        &self.labels
+    }
+
+    /// Provides mutable access to the assemblers internal labels registry
+    pub fn labels_mut(&mut self) -> &mut LabelRegistry {
+        &mut self.labels
     }
 
     /// Finalizes the `VecAssembler`, returning the resulting `Vec<u8>` containing all assembled data.
