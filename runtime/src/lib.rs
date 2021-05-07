@@ -233,7 +233,7 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     /// This function is called in when a runtime error has to be generated. It panics.
     #[inline]
     fn runtime_error(&self, msg: &'static str) -> ! {
-        panic!(msg);
+        panic!("{}", msg);
     }
 }
 
