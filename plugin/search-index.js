@@ -1,7 +1,7 @@
 var searchIndex = JSON.parse('{\
-"dynasm":{"doc":"The dynasm crate contains the procedural macros that power…","i":[[14,"dynasm","dynasm","The whole point. This macro compiles given assembly/rust…",null,null],[14,"dynasm_backwards","","Similar to `dynasm!`, but the calls to the assembler are…",null,null]],"p":[]}\
+"dynasm":{"doc":"The dynasm crate contains the procedural macros that …","t":[14,14],"n":["dynasm","dynasm_backwards"],"q":["dynasm",""],"d":["The whole point. This macro compiles given assembly/rust …","Similar to <code>dynasm!</code>, but the calls to the assembler are …"],"i":[0,0],"f":[null,null],"p":[]}\
 }');
-addSearchOptions(searchIndex);initSearch(searchIndex);// I'm sorry
+initSearch(searchIndex);// I'm sorry
 var path = document.getElementsByClassName("logo-container")[0].childNodes[0].getAttribute("src");
 var nest_count = (path.match(/\.\./g)||[]).length + 1; 
 
