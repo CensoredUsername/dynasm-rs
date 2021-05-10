@@ -18,7 +18,7 @@ It is compatible with stable rustc 1.45 and higher.
 
 ## Documentation
 
-[Documentation](https://CensoredUsername.github.com/dynasm-rs/language/index.html).
+[Documentation](https://CensoredUsername.github.io/dynasm-rs/language/index.html).
 [Release notes](https://github.com/CensoredUsername/dynasm-rs/blob/master/doc/releasenotes.md).
 
 ## Architecture support
