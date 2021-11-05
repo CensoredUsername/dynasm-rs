@@ -15,6 +15,6 @@ license = "MPL-2.0"
 
 
 [dependencies]
-memmap2 = "^0.2"
+memmap2 = "^0.5"
 byteorder = "1"
 dynasm = { version = "=1.1.0", path = "../plugin" }
