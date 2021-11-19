@@ -4,7 +4,7 @@ The purpose of this tool is to ease the creation of programs that require run-ti
 
 It is compatible with stable rustc 1.45 and higher.
 
-[![Build Status](https://travis-ci.org/CensoredUsername/dynasm-rs.svg?branch=master)](https://travis-ci.org/CensoredUsername/dynasm-rs)
+[![Build Status](https://travis-ci.com/CensoredUsername/dynasm-rs.svg?branch=master)](https://travis-ci.com/CensoredUsername/dynasm-rs)
 [![](https://img.shields.io/crates/v/dynasm.svg)](https://crates.io/crates/dynasm)
 
 `##dynasm-rs` on irc.libera.chat
