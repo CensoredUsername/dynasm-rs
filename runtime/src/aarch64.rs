@@ -205,7 +205,7 @@ pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
         return None;
     }
 
-    let element = value & (1u32 << element_size).wrapping_sub(1);
+    let element = value & 1u32.checked_shl(element_size).unwrap_or(0).wrapping_sub(1);
     let ones = element.count_ones();
     let imms = (!((element_size << 1) - 1) & 0x3F) | (ones - 1);
 
@@ -228,7 +228,7 @@ pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
         return None;
     }
 
-    let element = value & (1u64 << element_size).wrapping_sub(1);
+    let element = value & 1u64.checked_shl(element_size).unwrap_or(0).wrapping_sub(1);
     let ones = element.count_ones();
     let imms = (!((element_size << 1) - 1) & 0x7F) | (ones - 1);
 

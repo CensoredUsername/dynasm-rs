@@ -68,3 +68,13 @@ fn bugreport_3() {
     let hex: String = hex.join(", ");
     assert_eq!(hex, "0xC4, 0xE1, 0x6B, 0x58, 0xCB, 0xC4, 0x41, 0x33, 0x58, 0xD3", "bugreport_3");
 }
+
+// overflow in logical immediate encoding
+#[test]
+fn bugreport_4() {
+    let mut ops = dynasmrt::VecAssembler::<dynasmrt::aarch64::Aarch64Relocation>::new(0);
+    dynasm!(ops
+        ; .arch aarch64
+        ; and w0, w0, 255
+    );
+}
