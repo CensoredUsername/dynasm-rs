@@ -1,0 +1,21 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build and run tests
+      run: |
+        cd testing && cargo update && cargo test -j 1 --verbose
