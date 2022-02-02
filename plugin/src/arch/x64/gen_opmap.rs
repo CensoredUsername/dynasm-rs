@@ -2623,6 +2623,9 @@ Ops!(
     b"yomd"       , [0x0F, 0x2E        ], X, DEFAULT, SSE;
     b"yoyo"       , [0x0F, 0x2E        ], X, DEFAULT, SSE;
 ]
+"ud1" = [
+    b"rdvd"       , [0x0F, 0xB9        ], X, EXACT_SIZE;
+]
 "ud2" = [
     b""           , [0x0F, 0x0B        ], X;
 ]
