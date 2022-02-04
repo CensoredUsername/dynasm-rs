@@ -1293,7 +1293,7 @@ fn get_legacy_prefixes(fmt: &'static Opdata, idents: Vec<syn::Ident>) -> Result<
                 return Err(None);
             },
             "repnz" |
-            "repne" => if fmt.flags.contains(Flags::REP) {
+            "repne" => if fmt.flags.contains(Flags::REPE) {
                 (&mut group1, 0xF2)
             } else {
                 emit_error!(prefix, "Cannot use prefix {} on this instruction", name);
