@@ -2961,7 +2961,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="string">&quot;repnz&quot;</span> <span class="op">|</span>
-            <span class="string">&quot;repne&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags::REP</span>) {
+            <span class="string">&quot;repne&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">Flags::REPE</span>) {
                 (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group1</span>, <span class="number">0xF2</span>)
             } <span class="kw">else</span> {
                 <span class="macro">emit_error!</span>(<span class="ident">prefix</span>, <span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, <span class="ident">name</span>);
