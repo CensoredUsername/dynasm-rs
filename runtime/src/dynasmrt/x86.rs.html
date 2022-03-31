@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\x86.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x86.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../dynasmrt/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\x86.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x86.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../dynasmrt/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -171,8 +168,7 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Runtime support for the x86 architecture assembling target.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Runtime support for the x86 architecture assembling target.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The x86 instruction set features variable-length instructions and</span>
 <span class="doccomment">//! relative relocations up to 16 bits in size, or absolute relocations of 32 bits in size.</span>
@@ -193,8 +189,8 @@
 <span class="doccomment">//! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*</span>
 
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Register</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">relocations</span>::{<span class="ident">Relocation</span>, <span class="ident">RelocationSize</span>, <span class="ident">RelocationKind</span>, <span class="ident">ImpossibleRelocation</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Register</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::relocations</span>::{<span class="ident">Relocation</span>, <span class="ident">RelocationSize</span>, <span class="ident">RelocationKind</span>, <span class="ident">ImpossibleRelocation</span>};
 
 
 <span class="doccomment">/// Relocation implementation for the x86 architecture.</span>
@@ -206,16 +202,16 @@
 
 <span class="kw">impl</span> <span class="ident">Relocation</span> <span class="kw">for</span> <span class="ident">X86Relocation</span> {
     <span class="kw">type</span> <span class="ident">Encoding</span> <span class="op">=</span> (<span class="ident">u8</span>, <span class="ident">u8</span>);
-    <span class="kw">fn</span> <span class="ident">from_encoding</span>(<span class="ident">encoding</span>: <span class="self">Self</span>::<span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_encoding</span>(<span class="ident">encoding</span>: <span class="ident"><span class="self">Self</span>::Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">size</span>: <span class="ident">RelocationSize</span>::<span class="ident">from_encoding</span>(<span class="ident">encoding</span>.<span class="number">0</span>),
-            <span class="ident">kind</span>: <span class="ident">RelocationKind</span>::<span class="ident">from_encoding</span>(<span class="ident">encoding</span>.<span class="number">1</span>),
+            <span class="ident">size</span>: <span class="ident">RelocationSize::from_encoding</span>(<span class="ident">encoding</span>.<span class="number">0</span>),
+            <span class="ident">kind</span>: <span class="ident">RelocationKind::from_encoding</span>(<span class="ident">encoding</span>.<span class="number">1</span>),
         }
     }
     <span class="kw">fn</span> <span class="ident">from_size</span>(<span class="ident">size</span>: <span class="ident">RelocationSize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">size</span>,
-            <span class="ident">kind</span>: <span class="ident">RelocationKind</span>::<span class="ident">Relative</span>,
+            <span class="ident">kind</span>: <span class="ident">RelocationKind::Relative</span>,
         }
     }
     <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
@@ -237,11 +233,11 @@
 
 
 <span class="doccomment">/// An x86 Assembler. This is aliased here for backwards compatability.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Assembler</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">Assembler</span><span class="op">&lt;</span><span class="ident">X86Relocation</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Assembler</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Assembler</span><span class="op">&lt;</span><span class="ident">X86Relocation</span><span class="op">&gt;</span>;
 <span class="doccomment">/// An x86 AssemblyModifier. This is aliased here for backwards compatability.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">Modifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">X86Relocation</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AssemblyModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Modifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">X86Relocation</span><span class="op">&gt;</span>;
 <span class="doccomment">/// An x86 UncommittedModifier. This is aliased here for backwards compatability.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::UncommittedModifier</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
 
 <span class="doccomment">/// 1, 2 or 4-byte general purpose &quot;double-word&quot; registers.</span>
@@ -253,7 +249,7 @@
     <span class="ident">EAX</span> <span class="op">=</span> <span class="number">0x00</span>, <span class="ident">ECX</span> <span class="op">=</span> <span class="number">0x01</span>, <span class="ident">EDX</span> <span class="op">=</span> <span class="number">0x02</span>, <span class="ident">EBX</span> <span class="op">=</span> <span class="number">0x03</span>,
     <span class="ident">ESP</span> <span class="op">=</span> <span class="number">0x04</span>, <span class="ident">EBP</span> <span class="op">=</span> <span class="number">0x05</span>, <span class="ident">ESI</span> <span class="op">=</span> <span class="number">0x06</span>, <span class="ident">EDI</span> <span class="op">=</span> <span class="number">0x07</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">Rd</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">Rd</span>);
 
 <span class="doccomment">/// High-byte general purpose registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -261,7 +257,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Rh</span> {
     <span class="ident">AH</span> <span class="op">=</span> <span class="number">0x4</span>, <span class="ident">CH</span> <span class="op">=</span> <span class="number">0x5</span>, <span class="ident">DH</span> <span class="op">=</span> <span class="number">0x6</span>, <span class="ident">BH</span> <span class="op">=</span> <span class="number">0x7</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">Rh</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">Rh</span>);
 
 <span class="doccomment">/// 10-byte floating point registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -270,7 +266,7 @@
     <span class="ident">ST0</span> <span class="op">=</span> <span class="number">0x0</span>, <span class="ident">ST1</span> <span class="op">=</span> <span class="number">0x1</span>, <span class="ident">ST2</span> <span class="op">=</span> <span class="number">0x2</span>, <span class="ident">ST3</span> <span class="op">=</span> <span class="number">0x3</span>,
     <span class="ident">ST4</span> <span class="op">=</span> <span class="number">0x4</span>, <span class="ident">ST5</span> <span class="op">=</span> <span class="number">0x5</span>, <span class="ident">ST6</span> <span class="op">=</span> <span class="number">0x6</span>, <span class="ident">ST7</span> <span class="op">=</span> <span class="number">0x7</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">Rf</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">Rf</span>);
 
 <span class="doccomment">/// 8-byte MMX registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -279,7 +275,7 @@
     <span class="ident">MMX0</span> <span class="op">=</span> <span class="number">0x0</span>, <span class="ident">MMX1</span> <span class="op">=</span> <span class="number">0x1</span>, <span class="ident">MMX2</span> <span class="op">=</span> <span class="number">0x2</span>, <span class="ident">MMX3</span> <span class="op">=</span> <span class="number">0x3</span>,
     <span class="ident">MMX4</span> <span class="op">=</span> <span class="number">0x4</span>, <span class="ident">MMX5</span> <span class="op">=</span> <span class="number">0x5</span>, <span class="ident">MMX6</span> <span class="op">=</span> <span class="number">0x6</span>, <span class="ident">MMX7</span> <span class="op">=</span> <span class="number">0x7</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">Rm</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">Rm</span>);
 
 <span class="doccomment">/// 16 or 32-byte SSE registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -288,7 +284,7 @@
     <span class="ident">XMM0</span>  <span class="op">=</span> <span class="number">0x0</span>, <span class="ident">XMM1</span>  <span class="op">=</span> <span class="number">0x1</span>, <span class="ident">XMM2</span>  <span class="op">=</span> <span class="number">0x2</span>, <span class="ident">XMM3</span>  <span class="op">=</span> <span class="number">0x3</span>,
     <span class="ident">XMM4</span>  <span class="op">=</span> <span class="number">0x4</span>, <span class="ident">XMM5</span>  <span class="op">=</span> <span class="number">0x5</span>, <span class="ident">XMM6</span>  <span class="op">=</span> <span class="number">0x6</span>, <span class="ident">XMM7</span>  <span class="op">=</span> <span class="number">0x7</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">Rx</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">Rx</span>);
 
 <span class="doccomment">/// 2-byte segment registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -297,7 +293,7 @@
     <span class="ident">ES</span> <span class="op">=</span> <span class="number">0x0</span>, <span class="ident">CS</span> <span class="op">=</span> <span class="number">0x1</span>, <span class="ident">SS</span> <span class="op">=</span> <span class="number">0x2</span>, <span class="ident">DS</span> <span class="op">=</span> <span class="number">0x3</span>,
     <span class="ident">FS</span> <span class="op">=</span> <span class="number">0x4</span>, <span class="ident">GS</span> <span class="op">=</span> <span class="number">0x5</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">Rs</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">Rs</span>);
 
 <span class="doccomment">/// 4-byte control registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -306,7 +302,7 @@
     <span class="ident">CR0</span>  <span class="op">=</span> <span class="number">0x0</span>, <span class="ident">CR1</span>  <span class="op">=</span> <span class="number">0x1</span>, <span class="ident">CR2</span>  <span class="op">=</span> <span class="number">0x2</span>, <span class="ident">CR3</span>  <span class="op">=</span> <span class="number">0x3</span>,
     <span class="ident">CR4</span>  <span class="op">=</span> <span class="number">0x4</span>, <span class="ident">CR5</span>  <span class="op">=</span> <span class="number">0x5</span>, <span class="ident">CR6</span>  <span class="op">=</span> <span class="number">0x6</span>, <span class="ident">CR7</span>  <span class="op">=</span> <span class="number">0x7</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">RC</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">RC</span>);
 
 <span class="doccomment">/// 4-byte debug registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -317,7 +313,7 @@
     <span class="ident">DR8</span>  <span class="op">=</span> <span class="number">0x8</span>, <span class="ident">DR9</span>  <span class="op">=</span> <span class="number">0x9</span>, <span class="ident">DR10</span> <span class="op">=</span> <span class="number">0xA</span>, <span class="ident">DR11</span> <span class="op">=</span> <span class="number">0xB</span>,
     <span class="ident">DR12</span> <span class="op">=</span> <span class="number">0xC</span>, <span class="ident">DR13</span> <span class="op">=</span> <span class="number">0xD</span>, <span class="ident">DR14</span> <span class="op">=</span> <span class="number">0xE</span>, <span class="ident">DR15</span> <span class="op">=</span> <span class="number">0xF</span>,
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">RD</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">RD</span>);
 
 <span class="doccomment">/// 16-byte bound registers.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
@@ -325,23 +321,24 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RB</span> {
     <span class="ident">BND0</span> <span class="op">=</span> <span class="number">0x0</span>, <span class="ident">BND1</span> <span class="op">=</span> <span class="number">0x1</span>, <span class="ident">BND2</span> <span class="op">=</span> <span class="number">0x2</span>, <span class="ident">BND3</span> <span class="op">=</span> <span class="number">0x3</span>
 }
-<span class="macro">reg_impls</span><span class="macro">!</span>(<span class="ident">RB</span>);
+<span class="macro">reg_impls!</span>(<span class="ident">RB</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Rd</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Register</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Rd</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Register</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">reg_code</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">EAX</span>.<span class="ident">code</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">EAX</span>.<span class="ident">code</span>(), <span class="number">0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">reg_code_from</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">u8</span>::<span class="ident">from</span>(<span class="ident">ECX</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">ECX</span>), <span class="number">1</span>);
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dynasmrt" data-search-js="../../search-index.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dynasmrt" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>

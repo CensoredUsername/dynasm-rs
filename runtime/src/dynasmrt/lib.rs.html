@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../dynasmrt/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../dynasmrt/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1086,8 +1083,7 @@
 <span id="1083">1083</span>
 <span id="1084">1084</span>
 <span id="1085">1085</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! This crate provides runtime support for dynasm-rs. It contains traits that document the interface used by the dynasm proc_macro to generate code,</span>
 <span class="doccomment">//! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools</span>
@@ -1098,9 +1094,9 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">relocations</span>;
 
 <span class="doccomment">/// Helper to implement common traits on register enums.</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">reg_impls</span> {
+<span class="macro">macro_rules!</span> <span class="ident">reg_impls</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Register</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> {
+        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Register</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> {
             <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
                 <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
             }
@@ -1118,30 +1114,30 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">x86</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">aarch64</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">mmap</span>::<span class="ident">ExecutableBuffer</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mmap::ExecutableBuffer</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dynasm</span>::{<span class="ident">dynasm</span>, <span class="ident">dynasm_backwards</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">components</span>::{<span class="ident">MemoryManager</span>, <span class="ident">LabelRegistry</span>, <span class="ident">RelocRegistry</span>, <span class="ident">ManagedRelocs</span>, <span class="ident">PatchLoc</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">relocations</span>::<span class="ident">Relocation</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::components</span>::{<span class="ident">MemoryManager</span>, <span class="ident">LabelRegistry</span>, <span class="ident">RelocRegistry</span>, <span class="ident">ManagedRelocs</span>, <span class="ident">PatchLoc</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::relocations::Relocation</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::<span class="ident">Hash</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">Extend</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
+<span class="kw">use</span> <span class="ident">std::iter::Extend</span>;
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>};
+<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use</span> <span class="ident">std::error</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>};
+<span class="kw">use</span> <span class="ident">std::mem</span>;
 
 <span class="doccomment">/// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.</span>
 <span class="doccomment">/// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">Pointer</span> {
+<span class="macro">macro_rules!</span> <span class="ident">Pointer</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>};
 }
 
 <span class="doccomment">/// Preforms the same action as the `Pointer!` macro, but casts to a *mut pointer.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">MutPointer</span> {
+<span class="macro">macro_rules!</span> <span class="ident">MutPointer</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>};
 }
 
@@ -1196,12 +1192,12 @@
     <span class="ident">Dynamic</span>(<span class="ident">DynamicLabel</span>)
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">LabelKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">LabelKind</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Local</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;label {}&quot;</span>, <span class="ident">s</span>),
-            <span class="self">Self</span>::<span class="ident">Global</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;label -&gt;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="self">Self</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;label =&gt;{}&quot;</span>, <span class="ident">id</span>.<span class="ident">get_id</span>())
+            <span class="ident"><span class="self">Self</span>::Local</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;label {}&quot;</span>, <span class="ident">s</span>),
+            <span class="ident"><span class="self">Self</span>::Global</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;label -&gt;{}&quot;</span>, <span class="ident">s</span>),
+            <span class="ident"><span class="self">Self</span>::Dynamic</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;label =&gt;{}&quot;</span>, <span class="ident">id</span>.<span class="ident">get_id</span>())
         }
     }
 }
@@ -1224,15 +1220,15 @@
     <span class="ident">Managed</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TargetKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TargetKind</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Forward</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;target &gt;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="self">Self</span>::<span class="ident">Backward</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;target &lt;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="self">Self</span>::<span class="ident">Global</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;target -&gt;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="self">Self</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;target =&gt;{}&quot;</span>, <span class="ident">id</span>.<span class="ident">get_id</span>()),
-            <span class="self">Self</span>::<span class="ident">Extern</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;target extern {}&quot;</span>, <span class="ident">value</span>),
-            <span class="self">Self</span>::<span class="ident">Managed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;while adjusting managed relocation&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Forward</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;target &gt;{}&quot;</span>, <span class="ident">s</span>),
+            <span class="ident"><span class="self">Self</span>::Backward</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;target &lt;{}&quot;</span>, <span class="ident">s</span>),
+            <span class="ident"><span class="self">Self</span>::Global</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;target -&gt;{}&quot;</span>, <span class="ident">s</span>),
+            <span class="ident"><span class="self">Self</span>::Dynamic</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;target =&gt;{}&quot;</span>, <span class="ident">id</span>.<span class="ident">get_id</span>()),
+            <span class="ident"><span class="self">Self</span>::Extern</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;target extern {}&quot;</span>, <span class="ident">value</span>),
+            <span class="ident"><span class="self">Self</span>::Managed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;while adjusting managed relocation&quot;</span>),
         }
     }
 }
@@ -1251,24 +1247,24 @@
     <span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DynasmError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DynasmError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;An assembly modification check failed&quot;</span>),
-            <span class="ident">DynasmError</span>::<span class="ident">DuplicateLabel</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Duplicate label defined: &#39;{}&#39;&quot;</span>, <span class="ident">l</span>),
-            <span class="ident">DynasmError</span>::<span class="ident">UnknownLabel</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown label: &#39;{}&#39;&quot;</span>, <span class="ident">l</span>),
-            <span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Impossible relocation: &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
+            <span class="ident">DynasmError::CheckFailed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;An assembly modification check failed&quot;</span>),
+            <span class="ident">DynasmError::DuplicateLabel</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Duplicate label defined: &#39;{}&#39;&quot;</span>, <span class="ident">l</span>),
+            <span class="ident">DynasmError::UnknownLabel</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown label: &#39;{}&#39;&quot;</span>, <span class="ident">l</span>),
+            <span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Impossible relocation: &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">DynasmError</span> {
+<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">DynasmError</span> {
     <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;An assembly modification offset check failed&quot;</span>,
-            <span class="ident">DynasmError</span>::<span class="ident">DuplicateLabel</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Duplicate label defined&quot;</span>,
-            <span class="ident">DynasmError</span>::<span class="ident">UnknownLabel</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unknown label&quot;</span>,
-            <span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Impossible relocation&quot;</span>,
+            <span class="ident">DynasmError::CheckFailed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;An assembly modification offset check failed&quot;</span>,
+            <span class="ident">DynasmError::DuplicateLabel</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Duplicate label defined&quot;</span>,
+            <span class="ident">DynasmError::UnknownLabel</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unknown label&quot;</span>,
+            <span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Impossible relocation&quot;</span>,
         }
     }
 }
@@ -1322,7 +1318,7 @@
     <span class="doccomment">/// This function is called in when a runtime error has to be generated. It panics.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">runtime_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
-        <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
+        <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
     }
 }
 
@@ -1339,36 +1335,36 @@
     <span class="kw">fn</span> <span class="ident">dynamic_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>);
 
     <span class="doccomment">/// Record a relocation spot for a forward reference to a local label</span>
-    <span class="kw">fn</span> <span class="ident">forward_reloc</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span>::<span class="ident">Encoding</span>) {
-        <span class="self">self</span>.<span class="ident">forward_relocation</span>(<span class="ident">name</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="self">Self</span>::<span class="ident">Relocation</span>::<span class="ident">from_encoding</span>(<span class="ident">kind</span>))
+    <span class="kw">fn</span> <span class="ident">forward_reloc</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span><span class="ident">::Encoding</span>) {
+        <span class="self">self</span>.<span class="ident">forward_relocation</span>(<span class="ident">name</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident"><span class="self">Self</span>::Relocation::from_encoding</span>(<span class="ident">kind</span>))
     }
     <span class="doccomment">/// Record a relocation spot for a backward reference to a local label</span>
-    <span class="kw">fn</span> <span class="ident">backward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span>::<span class="ident">Encoding</span>) {
-        <span class="self">self</span>.<span class="ident">backward_relocation</span>(<span class="ident">name</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="self">Self</span>::<span class="ident">Relocation</span>::<span class="ident">from_encoding</span>(<span class="ident">kind</span>))
+    <span class="kw">fn</span> <span class="ident">backward_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span><span class="ident">::Encoding</span>) {
+        <span class="self">self</span>.<span class="ident">backward_relocation</span>(<span class="ident">name</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident"><span class="self">Self</span>::Relocation::from_encoding</span>(<span class="ident">kind</span>))
     }
     <span class="doccomment">/// Record a relocation spot for a reference to a global label</span>
-    <span class="kw">fn</span> <span class="ident">global_reloc</span>(  <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span>::<span class="ident">Encoding</span>) {
-        <span class="self">self</span>.<span class="ident">global_relocation</span>(<span class="ident">name</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="self">Self</span>::<span class="ident">Relocation</span>::<span class="ident">from_encoding</span>(<span class="ident">kind</span>))
+    <span class="kw">fn</span> <span class="ident">global_reloc</span>(  <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span><span class="ident">::Encoding</span>) {
+        <span class="self">self</span>.<span class="ident">global_relocation</span>(<span class="ident">name</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident"><span class="self">Self</span>::Relocation::from_encoding</span>(<span class="ident">kind</span>))
     }
     <span class="doccomment">/// Record a relocation spot for a reference to a dynamic label</span>
-    <span class="kw">fn</span> <span class="ident">dynamic_reloc</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>,   <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span>::<span class="ident">Encoding</span>) {
-        <span class="self">self</span>.<span class="ident">dynamic_relocation</span>(<span class="ident">id</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="self">Self</span>::<span class="ident">Relocation</span>::<span class="ident">from_encoding</span>(<span class="ident">kind</span>))
+    <span class="kw">fn</span> <span class="ident">dynamic_reloc</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>,   <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span><span class="ident">::Encoding</span>) {
+        <span class="self">self</span>.<span class="ident">dynamic_relocation</span>(<span class="ident">id</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident"><span class="self">Self</span>::Relocation::from_encoding</span>(<span class="ident">kind</span>))
     }
     <span class="doccomment">/// Record a relocation spot to an arbitrary target.</span>
-    <span class="kw">fn</span> <span class="ident">bare_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span>::<span class="ident">Encoding</span>) {
-        <span class="self">self</span>.<span class="ident">bare_relocation</span>(<span class="ident">target</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="self">Self</span>::<span class="ident">Relocation</span>::<span class="ident">from_encoding</span>(<span class="ident">kind</span>))
+    <span class="kw">fn</span> <span class="ident">bare_reloc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Relocation</span> <span class="kw">as</span> <span class="ident">Relocation</span><span class="op">&gt;</span><span class="ident">::Encoding</span>) {
+        <span class="self">self</span>.<span class="ident">bare_relocation</span>(<span class="ident">target</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident"><span class="self">Self</span>::Relocation::from_encoding</span>(<span class="ident">kind</span>))
     }
 
     <span class="doccomment">/// Equivalent of forward_reloc, but takes a non-encoded relocation</span>
-    <span class="kw">fn</span> <span class="ident">forward_relocation</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>);
+    <span class="kw">fn</span> <span class="ident">forward_relocation</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident"><span class="self">Self</span>::Relocation</span>);
     <span class="doccomment">/// Equivalent of backward_reloc, but takes a non-encoded relocation</span>
-    <span class="kw">fn</span> <span class="ident">backward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>);
+    <span class="kw">fn</span> <span class="ident">backward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident"><span class="self">Self</span>::Relocation</span>);
     <span class="doccomment">/// Equivalent of global_reloc, but takes a non-encoded relocation</span>
-    <span class="kw">fn</span> <span class="ident">global_relocation</span>(  <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>);
+    <span class="kw">fn</span> <span class="ident">global_relocation</span>(  <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident"><span class="self">Self</span>::Relocation</span>);
     <span class="doccomment">/// Equivalent of dynamic_reloc, but takes a non-encoded relocation</span>
-    <span class="kw">fn</span> <span class="ident">dynamic_relocation</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>,   <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>);
+    <span class="kw">fn</span> <span class="ident">dynamic_relocation</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>,   <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident"><span class="self">Self</span>::Relocation</span>);
     <span class="doccomment">/// Equivalent of bare_reloc, but takes a non-encoded relocation</span>
-    <span class="kw">fn</span> <span class="ident">bare_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="self">Self</span>::<span class="ident">Relocation</span>);
+    <span class="kw">fn</span> <span class="ident">bare_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident"><span class="self">Self</span>::Relocation</span>);
 }
 
 
@@ -1384,13 +1380,13 @@
     <span class="doccomment">/// Creates a new `SimpleAssembler`, containing an empty `Vec`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SimpleAssembler</span> {
         <span class="ident">SimpleAssembler</span> {
-            <span class="ident">ops</span>: <span class="ident">Vec</span>::<span class="ident">new</span>()
+            <span class="ident">ops</span>: <span class="ident">Vec::new</span>()
         }
     }
 
     <span class="doccomment">/// Use an `UncommittedModifier` to alter uncommitted code.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UncommittedModifier</span> {
-        <span class="ident">UncommittedModifier</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>, <span class="ident">AssemblyOffset</span>(<span class="number">0</span>))
+        <span class="ident">UncommittedModifier::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>, <span class="ident">AssemblyOffset</span>(<span class="number">0</span>))
     }
 
     <span class="doccomment">/// Destroys this assembler, returning the `Vec&lt;u8&gt;` contained within</span>
@@ -1444,10 +1440,10 @@
     <span class="doccomment">/// Creates a new VecAssembler, with the specified base address.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">baseaddr</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">VecAssembler</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="ident">VecAssembler</span> {
-            <span class="ident">ops</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">ops</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">baseaddr</span>,
-            <span class="ident">labels</span>: <span class="ident">LabelRegistry</span>::<span class="ident">new</span>(),
-            <span class="ident">relocs</span>: <span class="ident">RelocRegistry</span>::<span class="ident">new</span>(),
+            <span class="ident">labels</span>: <span class="ident">LabelRegistry::new</span>(),
+            <span class="ident">relocs</span>: <span class="ident">RelocRegistry::new</span>(),
             <span class="ident">error</span>: <span class="prelude-val">None</span>
         }
     }
@@ -1470,7 +1466,7 @@
             <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_global</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">baseaddr</span>, <span class="ident">target</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Global</span>(<span class="ident">name</span>)));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Global</span>(<span class="ident">name</span>)));
             }
         }
 
@@ -1479,13 +1475,13 @@
             <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_dynamic</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">baseaddr</span>, <span class="ident">target</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>)));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Dynamic</span>(<span class="ident">id</span>)));
             }
         }
 
         <span class="comment">// Check that there are no unknown local labels</span>
         <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">take_locals</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">UnknownLabel</span>(<span class="ident">LabelKind</span>::<span class="ident">Local</span>(<span class="ident">name</span>)));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::UnknownLabel</span>(<span class="ident">LabelKind::Local</span>(<span class="ident">name</span>)));
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1494,7 +1490,7 @@
     <span class="doccomment">/// Use an `UncommittedModifier` to alter uncommitted code.</span>
     <span class="doccomment">/// This does not allow the user to change labels/relocations.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UncommittedModifier</span> {
-        <span class="ident">UncommittedModifier</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>, <span class="ident">AssemblyOffset</span>(<span class="number">0</span>))
+        <span class="ident">UncommittedModifier::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>, <span class="ident">AssemblyOffset</span>(<span class="number">0</span>))
     }
 
     <span class="doccomment">/// Provides access to the assemblers internal labels registry</span>
@@ -1552,7 +1548,7 @@
         <span class="kw">for</span> <span class="ident">loc</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">take_locals_named</span>(<span class="ident">name</span>) {
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">baseaddr</span>, <span class="ident">offset</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Forward</span>(<span class="ident">name</span>)))
+                <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Forward</span>(<span class="ident">name</span>)))
             }
         }
         <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">define_local</span>(<span class="ident">name</span>, <span class="ident">offset</span>);
@@ -1571,15 +1567,15 @@
     }
     <span class="kw">fn</span> <span class="ident">global_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_global</span>(<span class="ident">name</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_global</span>(<span class="ident">name</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">dynamic_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_dynamic</span>(<span class="ident">id</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_dynamic</span>(<span class="ident">id</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">forward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_local</span>(<span class="ident">name</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_local</span>(<span class="ident">name</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">backward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_local</span>(<span class="ident">name</span>) {
@@ -1590,18 +1586,18 @@
             }
         };
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
+        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
         <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">baseaddr</span>, <span class="ident">target</span>).<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Backward</span>(<span class="ident">name</span>)))
+            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Backward</span>(<span class="ident">name</span>)))
         }
     }
     <span class="kw">fn</span> <span class="ident">bare_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="number">0</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
+        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="number">0</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
         <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">baseaddr</span>, <span class="ident">target</span>).<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Extern</span>(<span class="ident">target</span>)))
+            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Extern</span>(<span class="ident">target</span>)))
         }
     }
 }
@@ -1622,13 +1618,13 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Relocation</span><span class="op">&gt;</span> <span class="ident">Assembler</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new, empty assembler, with initial allocation size `page_size`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">ops</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">memory</span>: <span class="ident">MemoryManager</span>::<span class="ident">new</span>(<span class="ident">R</span>::<span class="ident">page_size</span>())<span class="question-mark">?</span>,
-            <span class="ident">labels</span>: <span class="ident">LabelRegistry</span>::<span class="ident">new</span>(),
-            <span class="ident">relocs</span>: <span class="ident">RelocRegistry</span>::<span class="ident">new</span>(),
-            <span class="ident">managed</span>: <span class="ident">ManagedRelocs</span>::<span class="ident">new</span>(),
+            <span class="ident">ops</span>: <span class="ident">Vec::new</span>(),
+            <span class="ident">memory</span>: <span class="ident">MemoryManager::new</span>(<span class="ident">R::page_size</span>())<span class="question-mark">?</span>,
+            <span class="ident">labels</span>: <span class="ident">LabelRegistry::new</span>(),
+            <span class="ident">relocs</span>: <span class="ident">RelocRegistry::new</span>(),
+            <span class="ident">managed</span>: <span class="ident">ManagedRelocs::new</span>(),
             <span class="ident">error</span>: <span class="prelude-val">None</span>
         })
     }
@@ -1642,7 +1638,7 @@
     <span class="doccomment">/// This does not allow the user to change labels/relocations.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alter_uncommitted</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UncommittedModifier</span> {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">committed</span>();
-        <span class="ident">UncommittedModifier</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>, <span class="ident">AssemblyOffset</span>(<span class="ident">offset</span>))
+        <span class="ident">UncommittedModifier::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>, <span class="ident">AssemblyOffset</span>(<span class="ident">offset</span>))
     }
 
     <span class="doccomment">/// Use a `Modifier` to alter committed code directly. While this is happening</span>
@@ -1654,7 +1650,7 @@
 
         <span class="comment">// swap out a buffer from base</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">write</span>();
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">lock</span>, <span class="ident">ExecutableBuffer</span>::<span class="ident">default</span>());
+        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">lock</span>, <span class="ident">ExecutableBuffer::default</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">make_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Could not swap buffer protection modes&quot;</span>);
 
         <span class="comment">// construct the modifier</span>
@@ -1666,7 +1662,7 @@
             <span class="ident">labels</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">labels</span>,
             <span class="ident">relocs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">relocs</span>,
             <span class="ident">old_managed</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">managed</span>,
-            <span class="ident">new_managed</span>: <span class="ident">ManagedRelocs</span>::<span class="ident">new</span>(),
+            <span class="ident">new_managed</span>: <span class="ident">ManagedRelocs::new</span>(),
 
             <span class="ident">error</span>: <span class="prelude-val">None</span>
         };
@@ -1699,7 +1695,7 @@
             <span class="kw">for</span> <span class="ident">reloc</span> <span class="kw">in</span> <span class="ident">managed</span>.<span class="ident">iter</span>() {
                 <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>[<span class="ident">reloc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
                 <span class="kw">if</span> <span class="ident">reloc</span>.<span class="ident">adjust</span>(<span class="ident">buf</span>, <span class="ident">change</span>).<span class="ident">is_err</span>() {
-                    <span class="kw-2">*</span><span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Managed</span>))
+                    <span class="kw-2">*</span><span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Managed</span>))
                 }
             }
         });
@@ -1756,7 +1752,7 @@
             <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_global</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="ident">buf_offset</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">target</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Global</span>(<span class="ident">name</span>)));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Global</span>(<span class="ident">name</span>)));
             }
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
                 <span class="self">self</span>.<span class="ident">managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
@@ -1768,7 +1764,7 @@
             <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_dynamic</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="ident">buf_offset</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">target</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>)));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Dynamic</span>(<span class="ident">id</span>)));
             }
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
                 <span class="self">self</span>.<span class="ident">managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
@@ -1777,7 +1773,7 @@
 
         <span class="comment">// Check that there are no unknown local labels</span>
         <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">take_locals</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">UnknownLabel</span>(<span class="ident">LabelKind</span>::<span class="ident">Local</span>(<span class="ident">name</span>)));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::UnknownLabel</span>(<span class="ident">LabelKind::Local</span>(<span class="ident">name</span>)));
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1823,7 +1819,7 @@
         <span class="kw">for</span> <span class="ident">loc</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">take_locals_named</span>(<span class="ident">name</span>) {
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">committed</span>())];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">execbuffer_addr</span>(), <span class="ident">offset</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Forward</span>(<span class="ident">name</span>)))
+                <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Forward</span>(<span class="ident">name</span>)))
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
                 <span class="self">self</span>.<span class="ident">managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
             }
@@ -1844,15 +1840,15 @@
     }
     <span class="kw">fn</span> <span class="ident">global_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_global</span>(<span class="ident">name</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_global</span>(<span class="ident">name</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">dynamic_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_dynamic</span>(<span class="ident">id</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_dynamic</span>(<span class="ident">id</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">forward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_local</span>(<span class="ident">name</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_local</span>(<span class="ident">name</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">backward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_local</span>(<span class="ident">name</span>) {
@@ -1863,20 +1859,20 @@
             }
         };
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
+        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">committed</span>())];
         <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">execbuffer_addr</span>(), <span class="ident">target</span>).<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Backward</span>(<span class="ident">name</span>)))
+            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Backward</span>(<span class="ident">name</span>)))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
             <span class="self">self</span>.<span class="ident">managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
         }
     }
     <span class="kw">fn</span> <span class="ident">bare_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="number">0</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
+        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="number">0</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ops</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">committed</span>())];
         <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="self">self</span>.<span class="ident">memory</span>.<span class="ident">execbuffer_addr</span>(), <span class="ident">target</span>).<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Extern</span>(<span class="ident">target</span>)))
+            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Extern</span>(<span class="ident">target</span>)))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
             <span class="self">self</span>.<span class="ident">managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
         }
@@ -1912,7 +1908,7 @@
     <span class="doccomment">/// Check that the modifier cursor has not moved past the specified location.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynasmError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">&gt;</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span>)
+            <span class="prelude-val">Err</span>(<span class="ident">DynasmError::CheckFailed</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(())
         }
@@ -1921,7 +1917,7 @@
     <span class="doccomment">/// Check that the modifier cursor is exactly at the specified location.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_exact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynasmError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">asmoffset</span> <span class="op">!</span><span class="op">=</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span>)
+            <span class="prelude-val">Err</span>(<span class="ident">DynasmError::CheckFailed</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(())
         }
@@ -1941,7 +1937,7 @@
             <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_global</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">target</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Global</span>(<span class="ident">name</span>)));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Global</span>(<span class="ident">name</span>)));
             }
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
                 <span class="self">self</span>.<span class="ident">new_managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>);
@@ -1953,7 +1949,7 @@
             <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_dynamic</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">target</span>.<span class="number">0</span>).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Dynamic</span>(<span class="ident">id</span>)));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Dynamic</span>(<span class="ident">id</span>)));
             }
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
                 <span class="self">self</span>.<span class="ident">new_managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>);
@@ -1962,7 +1958,7 @@
 
         <span class="comment">// Check for unknown locals</span>
         <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">take_locals</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">UnknownLabel</span>(<span class="ident">LabelKind</span>::<span class="ident">Local</span>(<span class="ident">name</span>)));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DynasmError::UnknownLabel</span>(<span class="ident">LabelKind::Local</span>(<span class="ident">name</span>)));
         }
 
         <span class="self">self</span>.<span class="ident">old_managed</span>.<span class="ident">remove_between</span>(<span class="self">self</span>.<span class="ident">previous_asmoffset</span>, <span class="self">self</span>.<span class="ident">asmoffset</span>);
@@ -2021,7 +2017,7 @@
             <span class="kw">let</span> <span class="ident">buf_addr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
             <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">offset</span>.<span class="number">0</span>).<span class="ident">is_err</span>()  {
-                <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Forward</span>(<span class="ident">name</span>)));
+                <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Forward</span>(<span class="ident">name</span>)));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
                 <span class="self">self</span>.<span class="ident">new_managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>);
             }
@@ -2042,15 +2038,15 @@
     }
     <span class="kw">fn</span> <span class="ident">global_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_global</span>(<span class="ident">name</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_global</span>(<span class="ident">name</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">dynamic_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">DynamicLabel</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_dynamic</span>(<span class="ident">id</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_dynamic</span>(<span class="ident">id</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">forward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_local</span>(<span class="ident">name</span>, <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
+        <span class="self">self</span>.<span class="ident">relocs</span>.<span class="ident">add_local</span>(<span class="ident">name</span>, <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>));
     }
     <span class="kw">fn</span> <span class="ident">backward_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">target_offset</span>: <span class="ident">isize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">resolve_local</span>(<span class="ident">name</span>) {
@@ -2061,22 +2057,22 @@
             }
         };
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
+        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="ident">target_offset</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
             <span class="kw">let</span> <span class="ident">buf_addr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
         <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">target</span>).<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Backward</span>(<span class="ident">name</span>)));
+            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Backward</span>(<span class="ident">name</span>)));
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
             <span class="self">self</span>.<span class="ident">new_managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
         }
     }
     <span class="kw">fn</span> <span class="ident">bare_relocation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">field_offset</span>: <span class="ident">u8</span>, <span class="ident">ref_offset</span>: <span class="ident">u8</span>, <span class="ident">kind</span>: <span class="ident">R</span>) {
         <span class="kw">let</span> <span class="ident">location</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
-        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc</span>::<span class="ident">new</span>(<span class="ident">location</span>, <span class="number">0</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
+        <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">PatchLoc::new</span>(<span class="ident">location</span>, <span class="number">0</span>, <span class="ident">field_offset</span>, <span class="ident">ref_offset</span>, <span class="ident">kind</span>);
             <span class="kw">let</span> <span class="ident">buf_addr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">loc</span>.<span class="ident">range</span>(<span class="number">0</span>)];
         <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">patch</span>(<span class="ident">buf</span>, <span class="ident">buf_addr</span>, <span class="ident">target</span>).<span class="ident">is_err</span>() {
-            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError</span>::<span class="ident">ImpossibleRelocation</span>(<span class="ident">TargetKind</span>::<span class="ident">Extern</span>(<span class="ident">target</span>)));
+            <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DynasmError::ImpossibleRelocation</span>(<span class="ident">TargetKind::Extern</span>(<span class="ident">target</span>)));
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">loc</span>.<span class="ident">needs_adjustment</span>() {
             <span class="self">self</span>.<span class="ident">new_managed</span>.<span class="ident">add</span>(<span class="ident">loc</span>)
         }
@@ -2114,7 +2110,7 @@
     <span class="doccomment">/// Checks that the current modification offset is not larger than the specified offset.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynasmError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span>)
+            <span class="prelude-val">Err</span>(<span class="ident">DynasmError::CheckFailed</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(())
         }
@@ -2123,7 +2119,7 @@
     <span class="doccomment">/// Checks that the current modification offset is exactly the specified offset.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">AssemblyOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynasmError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="ident">offset</span>.<span class="number">0</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">DynasmError</span>::<span class="ident">CheckFailed</span>)
+            <span class="prelude-val">Err</span>(<span class="ident">DynasmError::CheckFailed</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(())
         }
@@ -2172,6 +2168,7 @@
     <span class="doccomment">/// the enum to an u8, but allows you to be generic over the register family.</span>
     <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dynasmrt" data-search-js="../../search-index.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dynasmrt" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>

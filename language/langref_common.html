@@ -123,30 +123,28 @@ Check the documentation for the specific architecture.</p>
 <p>While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal rust macros with dynasm-rs.</p>
 <p>First of all, it is not possible to have <code>dynasm!</code> parse the result of a rust macro. This is a limitation of rust itself. The proper way to use rust macros with dynasm-rs is to have macros expand to a <code>dynasm!</code> call as can be seen in the following example:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">fma</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ops</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accumulator</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg2</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="macro">dynasm</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ops</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">macro_rules!</span> <span class="ident">fma</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ops</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accumulator</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg2</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="macro">dynasm!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ops</span>
         ; <span class="ident">imul</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg2</span>
         ; <span class="ident">add</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accumulator</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>
     )};
-}</pre></div>
+}</code></pre></div>
 <h2 id="statements" class="section-header"><a href="#statements">Statements</a></h2>
 <p>To make code that uses a lot of macros less verbose, dynasm-rs allows bare rust statements to be inserted inside <code>dynasm!</code> invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">ops</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">dynasm!</span>(<span class="ident">ops</span>
     ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
 );
-<span class="macro">call_extern</span><span class="macro">!</span>(<span class="ident">ops</span>, <span class="ident">extern_func</span>);
-<span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">ops</span>
+<span class="macro">call_extern!</span>(<span class="ident">ops</span>, <span class="ident">extern_func</span>);
+<span class="macro">dynasm!</span>(<span class="ident">ops</span>
     ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
 );
 
-<span class="macro">dynasm</span><span class="macro">!</span>(<span class="ident">ops</span>
+<span class="macro">dynasm!</span>(<span class="ident">ops</span>
     ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
-    ;; <span class="macro">call_extern</span><span class="macro">!</span>(<span class="ident">ops</span>, <span class="ident">extern_func</span>)
+    ;; <span class="macro">call_extern!</span>(<span class="ident">ops</span>, <span class="ident">extern_func</span>)
     ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
-);</pre></div>
+);</code></pre></div>
 <h2 id="labels-1" class="section-header"><a href="#labels-1">Labels</a></h2>
 <p>In order to describe flow control effectively, dynasm-rs supports labels. However, since the assembly templates can be combined in a variety of ways at the mercy of the program using dynasm-rs, the semantics of these labels are somewhat different from how labels work in a static assembler.</p>
 <p>Dynasm-rs distinguishes between three different types of labels: global, local and dynamic labels. Their syntax is as follows:</p>

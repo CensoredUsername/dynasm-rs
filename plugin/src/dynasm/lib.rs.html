@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../dynasm/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../dynasm/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -312,8 +309,7 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>, <span class="ident">feature</span>(<span class="ident">proc_macro_span</span>))]</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>, <span class="ident">feature</span>(<span class="ident">proc_macro_span</span>))]</span>
 <span class="doccomment">//! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates</span>
 <span class="doccomment">//! a full dynamic assembler for several assembly dialects with rust code.</span>
 <span class="doccomment">//! </span>
@@ -326,20 +322,20 @@
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
-<span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">parse</span>;
+<span class="kw">use</span> <span class="ident">syn::parse</span>;
 <span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">Token</span>, <span class="ident">parse_macro_input</span>};
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">TokenTree</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
-<span class="kw">use</span> <span class="ident">proc_macro_error</span>::<span class="ident">proc_macro_error</span>;
+<span class="kw">use</span> <span class="ident">quote::quote</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_error::proc_macro_error</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">MutexGuard</span>, <span class="ident">Mutex</span>};
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">MutexGuard</span>, <span class="ident">Mutex</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
+<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_opmap&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_extract&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
 
 <span class="doccomment">/// Module with common infrastructure across assemblers</span>
 <span class="kw">mod</span> <span class="ident">common</span>;
@@ -356,13 +352,13 @@
 <span class="doccomment">/// compliant calls to an assembler.</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
     <span class="comment">// try parsing the tokenstream into a dynasm struct containing</span>
     <span class="comment">// an abstract representation of the statements to create</span>
-    <span class="kw">let</span> <span class="ident">dynasm</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">Dynasm</span>);
+    <span class="kw">let</span> <span class="ident">dynasm</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">Dynasm</span>);
 
     <span class="comment">// serialize the resulting output into tokens</span>
-    <span class="ident">serialize</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">dynasm</span>.<span class="ident">target</span>, <span class="ident">dynasm</span>.<span class="ident">stmts</span>).<span class="ident">into</span>()
+    <span class="ident">serialize::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">dynasm</span>.<span class="ident">target</span>, <span class="ident">dynasm</span>.<span class="ident">stmts</span>).<span class="ident">into</span>()
 }
 
 <span class="doccomment">/// Similar to `dynasm!`, but the calls to the assembler are executed in piecewise reversed order.</span>
@@ -371,16 +367,16 @@
 <span class="doccomment">/// out of tree.</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_backwards</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_backwards</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
     <span class="comment">// try parsing the tokenstream into a dynasm struct containing</span>
     <span class="comment">// an abstract representation of the statements to create</span>
-    <span class="kw">let</span> <span class="ident">dynasm</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">Dynasm</span>);
+    <span class="kw">let</span> <span class="ident">dynasm</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">Dynasm</span>);
 
     <span class="comment">// reverse the statement stream</span>
-    <span class="kw">let</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">serialize</span>::<span class="ident">invert</span>(<span class="ident">dynasm</span>.<span class="ident">stmts</span>);
+    <span class="kw">let</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">serialize::invert</span>(<span class="ident">dynasm</span>.<span class="ident">stmts</span>);
 
     <span class="comment">// serialize the resulting output into tokens</span>
-    <span class="ident">serialize</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">dynasm</span>.<span class="ident">target</span>, <span class="ident">stmts</span>).<span class="ident">into</span>()
+    <span class="ident">serialize::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">dynasm</span>.<span class="ident">target</span>, <span class="ident">stmts</span>).<span class="ident">into</span>()
 }
 
 <span class="doccomment">/// output from parsing a full dynasm invocation. target represents the first dynasm argument, being the assembler</span>
@@ -388,88 +384,88 @@
 <span class="doccomment">/// invocation.</span>
 <span class="kw">struct</span> <span class="ident">Dynasm</span> {
     <span class="ident">target</span>: <span class="ident">TokenTree</span>,
-    <span class="ident">stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">common</span>::<span class="ident">Stmt</span><span class="op">&gt;</span>
+    <span class="ident">stmts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">common::Stmt</span><span class="op">&gt;</span>
 }
 
 <span class="doccomment">/// top-level parsing. Handles common prefix symbols and diverts to the selected architecture</span>
 <span class="doccomment">/// when an assembly instruction is encountered. When parsing fails an Err() is returned, when</span>
 <span class="doccomment">/// non-parsing errors happen err() will be called, but this function returns Ok().</span>
-<span class="kw">impl</span> <span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Dynasm</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">parse::Parse</span> <span class="kw">for</span> <span class="ident">Dynasm</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
 
         <span class="comment">// parse the assembler target declaration</span>
-        <span class="kw">let</span> <span class="ident">target</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">target</span>: <span class="ident">syn::Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="comment">// and just convert it back to a tokentree since that&#39;s how we&#39;ll always be using it.</span>
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">common</span>::<span class="ident">delimited</span>(<span class="ident">target</span>);
+        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">common::delimited</span>(<span class="ident">target</span>);
 
         <span class="comment">// get file-local data (alias definitions, current architecture)</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">ContextProvider</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">ContextProvider::new</span>();
         <span class="kw">let</span> <span class="ident">invocation_context</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">get_context_mut</span>();
 
         <span class="comment">// prepare the statement buffer</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmts</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="comment">// if we&#39;re not at the end of the macro, we should be expecting a semicolon and a new directive/statement/label/op</span>
         <span class="kw">while</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[;] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[;] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
             <span class="comment">// ;; stmt</span>
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[;]) {
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[;] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token!</span>[;]) {
+                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[;] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
                 <span class="comment">// collect all tokentrees till the next ;</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">TokenStream</span>::<span class="ident">new</span>();
-                <span class="kw">while</span> <span class="op">!</span>(<span class="ident">input</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[;])) {
-                    <span class="ident">buffer</span>.<span class="ident">extend</span>(<span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">once</span>(<span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">TokenTree</span><span class="op">&gt;</span>()<span class="question-mark">?</span>));
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
+                <span class="kw">while</span> <span class="op">!</span>(<span class="ident">input</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token!</span>[;])) {
+                    <span class="ident">buffer</span>.<span class="ident">extend</span>(<span class="ident">std::iter::once</span>(<span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">TokenTree</span><span class="op">&gt;</span>()<span class="question-mark">?</span>));
                 }
                 <span class="comment">// glue an extra ; on there</span>
-                <span class="ident">buffer</span>.<span class="ident">extend</span>(<span class="macro">quote</span><span class="macro">!</span> { ; } );
+                <span class="ident">buffer</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> { ; } );
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
                     <span class="comment">// ensure that the statement is actually a proper statement and then emit it for serialization</span>
-                    <span class="kw">let</span> <span class="ident">stmt</span>: <span class="ident">syn</span>::<span class="ident">Stmt</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="ident">parse2</span>(<span class="ident">buffer</span>)<span class="question-mark">?</span>;
-                    <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common</span>::<span class="ident">Stmt</span>::<span class="ident">Stmt</span>(<span class="ident">common</span>::<span class="ident">delimited</span>(<span class="ident">stmt</span>)));
+                    <span class="kw">let</span> <span class="ident">stmt</span>: <span class="ident">syn::Stmt</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="ident">buffer</span>)<span class="question-mark">?</span>;
+                    <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common::Stmt::Stmt</span>(<span class="ident">common::delimited</span>(<span class="ident">stmt</span>)));
                 }
                 <span class="kw">continue</span>;
             }
 
             <span class="comment">// ; -&gt; label :</span>
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">-</span><span class="op">&gt;</span>]) {
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">-</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token!</span>[<span class="op">-</span><span class="op">&gt;</span>]) {
+                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[<span class="op">-</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn</span>::<span class="ident">Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[:] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn::Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[:] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common</span>::<span class="ident">Stmt</span>::<span class="ident">GlobalLabel</span>(<span class="ident">name</span>));
+                <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common::Stmt::GlobalLabel</span>(<span class="ident">name</span>));
                 <span class="kw">continue</span>;
             }
 
             <span class="comment">// ; =&gt; expr</span>
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span><span class="op">&gt;</span>]) {
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token!</span>[<span class="op">=</span><span class="op">&gt;</span>]) {
+                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[<span class="op">=</span><span class="op">&gt;</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">expr</span>: <span class="ident">syn::Expr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common</span>::<span class="ident">Stmt</span>::<span class="ident">DynamicLabel</span>(<span class="ident">common</span>::<span class="ident">delimited</span>(<span class="ident">expr</span>)));
+                <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common::Stmt::DynamicLabel</span>(<span class="ident">common::delimited</span>(<span class="ident">expr</span>)));
                 <span class="kw">continue</span>;
             }
 
             <span class="comment">// ; label :</span>
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">syn</span>::<span class="ident">Ident</span>) <span class="op">&amp;&amp;</span> <span class="ident">input</span>.<span class="ident">peek2</span>(<span class="macro">Token</span><span class="macro">!</span>[:]) {
+            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">syn::Ident</span>) <span class="op">&amp;&amp;</span> <span class="ident">input</span>.<span class="ident">peek2</span>(<span class="macro">Token!</span>[:]) {
 
-                <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn</span>::<span class="ident">Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[:] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">syn::Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[:] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common</span>::<span class="ident">Stmt</span>::<span class="ident">LocalLabel</span>(<span class="ident">name</span>));
+                <span class="ident">stmts</span>.<span class="ident">push</span>(<span class="ident">common::Stmt::LocalLabel</span>(<span class="ident">name</span>));
                 <span class="kw">continue</span>;
             }
 
 
             <span class="comment">// ; . directive</span>
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[.]) {
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token</span><span class="macro">!</span>[.] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token!</span>[.]) {
+                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Token!</span>[.] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-                <span class="ident">directive</span>::<span class="ident">evaluate_directive</span>(<span class="ident">invocation_context</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmts</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
+                <span class="ident">directive::evaluate_directive</span>(<span class="ident">invocation_context</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmts</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
             } <span class="kw">else</span> {
                 <span class="comment">// anything else is an assembly instruction which should be in current_arch</span>
 
@@ -494,21 +490,21 @@
 <span class="doccomment">/// into a string that can then be included into the documentation for dynasm.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_opmap&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_opmap</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_opmap</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
 
     <span class="comment">// parse to ensure that no macro arguments were provided</span>
-    <span class="kw">let</span> <span class="ident">opmap</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">DynasmOpmap</span>);
+    <span class="kw">let</span> <span class="ident">opmap</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">DynasmOpmap</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">&quot;% Instruction Reference\n\n&quot;</span>);
 
     <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw">match</span> <span class="ident">opmap</span>.<span class="ident">arch</span>.<span class="ident">as_str</span>() {
-        <span class="string">&quot;x64&quot;</span> <span class="op">|</span> <span class="string">&quot;x86&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arch</span>::<span class="ident">x64</span>::<span class="ident">create_opmap</span>(),
-        <span class="string">&quot;aarch64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arch</span>::<span class="ident">aarch64</span>::<span class="ident">create_opmap</span>(),
-        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
+        <span class="string">&quot;x64&quot;</span> <span class="op">|</span> <span class="string">&quot;x86&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arch::x64::create_opmap</span>(),
+        <span class="string">&quot;aarch64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arch::aarch64::create_opmap</span>(),
+        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
     });
 
-    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">mixed_site</span>()<span class="op">=</span><span class="op">&gt;</span>
+    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="macro">quote::quote_spanned!</span> { <span class="ident">Span::mixed_site</span>()<span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">s</span>
     };
     <span class="ident">token</span>.<span class="ident">into</span>()
@@ -518,18 +514,18 @@
 <span class="doccomment">/// into a string that can then be included into the documentation for dynasm.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dynasm_extract&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_extract</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynasm_extract</span>(<span class="ident">tokens</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
 
     <span class="comment">// parse to ensure that no macro arguments were provided</span>
-    <span class="kw">let</span> <span class="ident">opmap</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">DynasmOpmap</span>);
+    <span class="kw">let</span> <span class="ident">opmap</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">tokens</span> <span class="kw">as</span> <span class="ident">DynasmOpmap</span>);
 
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">opmap</span>.<span class="ident">arch</span>.<span class="ident">as_str</span>() {
         <span class="string">&quot;x64&quot;</span> <span class="op">|</span> <span class="string">&quot;x86&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UNIMPLEMENTED&quot;</span>.<span class="ident">into</span>(),
-        <span class="string">&quot;aarch64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arch</span>::<span class="ident">aarch64</span>::<span class="ident">extract_opmap</span>(),
-        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
+        <span class="string">&quot;aarch64&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arch::aarch64::extract_opmap</span>(),
+        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, <span class="ident">x</span>)
     };
 
-    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span> { <span class="ident">Span</span>::<span class="ident">mixed_site</span>()<span class="op">=</span><span class="op">&gt;</span>
+    <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="macro">quote::quote_spanned!</span> { <span class="ident">Span::mixed_site</span>()<span class="op">=</span><span class="op">&gt;</span>
         #<span class="ident">s</span>
     };
     <span class="ident">token</span>.<span class="ident">into</span>()
@@ -542,9 +538,9 @@
 
 <span class="doccomment">/// As dynasm_opmap takes no args it doesn&#39;t parse to anything.</span>
 <span class="doccomment">/// This just exists so syn will give an error when no args are present.</span>
-<span class="kw">impl</span> <span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">DynasmOpmap</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">arch</span>: <span class="ident">syn</span>::<span class="ident">Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+<span class="kw">impl</span> <span class="ident">parse::Parse</span> <span class="kw">for</span> <span class="ident">DynasmOpmap</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">arch</span>: <span class="ident">syn::Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">DynasmOpmap</span> {
             <span class="ident">arch</span>: <span class="ident">arch</span>.<span class="ident">to_string</span>()
@@ -554,7 +550,7 @@
 
 <span class="doccomment">/// This struct contains all non-parsing state that dynasm! requires while parsing and compiling</span>
 <span class="kw">struct</span> <span class="ident">State</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">common</span>::<span class="ident">Stmt</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">stmts</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">common::Stmt</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TokenTree</span>,
     <span class="kw">pub</span> <span class="ident">invocation_context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DynasmContext</span>,
 }
@@ -563,15 +559,15 @@
 
 <span class="comment">// context inside of a dynasm invocation, manipulated by directives and such</span>
 <span class="kw">struct</span> <span class="ident">DynasmContext</span> {
-    <span class="kw">pub</span> <span class="ident">current_arch</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">arch</span>::<span class="ident">Arch</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">current_arch</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">arch::Arch</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">aliases</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">DynasmContext</span> {
     <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DynasmContext</span> {
         <span class="ident">DynasmContext</span> {
-            <span class="ident">current_arch</span>: <span class="ident">arch</span>::<span class="ident">from_str</span>(<span class="ident">arch</span>::<span class="ident">CURRENT_ARCH</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid default architecture&quot;</span>),
-            <span class="ident">aliases</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>()
+            <span class="ident">current_arch</span>: <span class="ident">arch::from_str</span>(<span class="ident">arch::CURRENT_ARCH</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid default architecture&quot;</span>),
+            <span class="ident">aliases</span>: <span class="ident">HashMap::new</span>()
         }
     }
 }
@@ -586,7 +582,7 @@
 <span class="kw">impl</span> <span class="ident">ContextProvider</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContextProvider</span> {
         <span class="ident">ContextProvider</span> {
-            <span class="ident">context</span>: <span class="ident">DynasmContext</span>::<span class="ident">new</span>()
+            <span class="ident">context</span>: <span class="ident">DynasmContext::new</span>()
         }
     }
 
@@ -611,19 +607,20 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_context_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DynasmContext</span> {
         <span class="comment">// get the file that generated this macro expansion</span>
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span</span>::<span class="ident">call_site</span>().<span class="ident">unstable</span>();
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::call_site</span>().<span class="ident">unstable</span>();
 
         <span class="comment">// and use the file that that was at as scope for resolving dynasm data</span>
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">source_file</span>().<span class="ident">path</span>();
 
-        <span class="self">self</span>.<span class="ident">guard</span>.<span class="ident">entry</span>(<span class="ident">id</span>).<span class="ident">or_insert_with</span>(<span class="ident">DynasmContext</span>::<span class="ident">new</span>)
+        <span class="self">self</span>.<span class="ident">guard</span>.<span class="ident">entry</span>(<span class="ident">id</span>).<span class="ident">or_insert_with</span>(<span class="ident">DynasmContext::new</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filelocal&quot;</span>)]</span>
-<span class="ident">lazy_static</span>::<span class="macro">lazy_static</span><span class="macro">!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">CONTEXT_STORAGE</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PathBuf</span>, <span class="ident">DynasmContext</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>());
+<span class="macro">lazy_static::lazy_static!</span> {
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">CONTEXT_STORAGE</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PathBuf</span>, <span class="ident">DynasmContext</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">HashMap::new</span>());
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dynasm" data-search-js="../../search-index.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dynasm" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>
