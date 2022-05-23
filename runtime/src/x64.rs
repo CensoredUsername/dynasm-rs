@@ -22,8 +22,7 @@
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation};
 use crate::Register;
 
-use std::hash::Hash;
-
+use core::hash::Hash;
 
 /// Relocation implementation for the x64 architecture.
 #[derive(Debug, Clone)]
@@ -61,6 +60,7 @@ impl Relocation for X64Relocation {
 }
 
 /// An x64 Assembler. This is aliased here for backwards compatability.
+#[cfg(feature = "mmap")]
 pub type Assembler = crate::Assembler<X64Relocation>;
 /// An x64 AssemblyModifier. This is aliased here for backwards compatability.
 pub type AssemblyModifier<'a> = crate::Modifier<'a, X64Relocation>;

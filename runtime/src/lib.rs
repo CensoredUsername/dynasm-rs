@@ -1,11 +1,15 @@
+#![cfg_attr(not(feature = "std"), no_std)]
 #![warn(missing_docs)]
 
 //! This crate provides runtime support for dynasm-rs. It contains traits that document the interface used by the dynasm proc_macro to generate code,
 //! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools
 //! to write your own Assemblers using these components.
 
-pub mod mmap;
+#[cfg_attr(not(feature = "std"), macro_use)]
+extern crate alloc;
+
 pub mod components;
+#[cfg(feature = "mmap")] pub mod mmap;
 pub mod relocations;
 
 /// Helper to implement common traits on register enums.
@@ -29,19 +33,29 @@ pub mod x64;
 pub mod x86;
 pub mod aarch64;
 
-pub use crate::mmap::ExecutableBuffer;
+#[cfg(feature = "mmap")] pub use crate::mmap::ExecutableBuffer;
 pub use dynasm::{dynasm, dynasm_backwards};
+#[cfg(feature = "mmap")] use crate::components::MemoryManager;
 
-use crate::components::{MemoryManager, LabelRegistry, RelocRegistry, ManagedRelocs, PatchLoc};
+use crate::components::{LabelRegistry, ManagedRelocs, PatchLoc, RelocRegistry};
 use crate::relocations::Relocation;
+use core::hash::Hash;
+use core::iter::Extend;
+use core::fmt::{self, Debug};
+#[cfg(feature = "mmap")] use core::mem;
 
-use std::hash::Hash;
-use std::iter::Extend;
-use std::sync::{Arc, RwLock, RwLockReadGuard};
-use std::io;
+cfg_if::cfg_if! {
+    if #[cfg(feature = "std")] {
+        #[cfg(feature = "mmap")] use std::sync::Arc;
 use std::error;
-use std::fmt::{self, Debug};
-use std::mem;
+    } else {
+        use alloc::vec::Vec;
+        #[cfg(feature = "mmap")] use alloc::sync::Arc;
+    }
+}
+
+#[cfg(feature = "mmap")]
+use parking_lot::RwLock;
 
 /// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
@@ -77,6 +91,7 @@ impl DynamicLabel {
 
 /// A read-only shared reference to the executable buffer inside an Assembler. By
 /// locking it the internal `ExecutableBuffer` can be accessed and executed.
+#[cfg(feature = "mmap")]
 #[derive(Debug, Clone)]
 pub struct Executor {
     execbuffer: Arc<RwLock<ExecutableBuffer>>
@@ -84,6 +99,7 @@ pub struct Executor {
 
 /// A read-only lockable reference to the internal `ExecutableBuffer` of an Assembler.
 /// To gain access to this buffer, it must be locked.
+#[cfg(feature = "mmap")]
 impl Executor {
     /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
     /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
@@ -521,6 +537,7 @@ impl<R: Relocation> DynasmLabelApi for VecAssembler<R> {
 /// A full assembler implementation. Supports labels, all types of relocations,
 /// incremental compilation and multithreaded execution with simultaneous compiltion.
 /// Its implementation guarantees no memory is executable and writable at the same time.
+#[cfg(feature = "mmap")]
 #[derive(Debug)]
 pub struct Assembler<R: Relocation> {
     ops: Vec<u8>,
@@ -530,6 +547,7 @@ pub struct Assembler<R: Relocation> {
     managed: ManagedRelocs<R>,
     error: Option<DynasmError>,
 }
+#[cfg(feature = "mmap")]
 
 impl<R: Relocation> Assembler<R> {
     /// Create a new, empty assembler, with initial allocation size `page_size`.
@@ -695,18 +713,21 @@ impl<R: Relocation> Assembler<R> {
     }
 }
 
+#[cfg(feature = "mmap")]
 impl<R: Relocation> Extend<u8> for Assembler<R> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
         self.ops.extend(iter)
     }
 }
 
+#[cfg(feature = "mmap")]
 impl<'a, R: Relocation> Extend<&'a u8> for Assembler<R> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
         self.ops.extend(iter)
     }
 }
 
+#[cfg(feature = "mmap")]
 impl<R: Relocation> DynasmApi for Assembler<R> {
     fn offset(&self) -> AssemblyOffset {
         AssemblyOffset(self.memory.committed() + self.ops.len())
@@ -726,6 +747,7 @@ impl<R: Relocation> DynasmApi for Assembler<R> {
     }
 }
 
+#[cfg(feature = "mmap")]
 impl<R: Relocation> DynasmLabelApi for Assembler<R> {
     type Relocation = R;
 

@@ -1,17 +1,43 @@
 //! This module provides several reusable compoments for implementing assemblers
 
-use std::io;
-use std::collections::hash_map::{HashMap, Entry};
+use cfg_if::cfg_if;
+
+cfg_if! {
+    if #[cfg(feature = "std")] {
 use std::collections::BTreeMap;
-use std::sync::{Arc, RwLock, RwLockWriteGuard};
-use std::mem;
+        use std::sync::Arc;
+    } else {
+        use alloc::collections::BTreeMap;
+        use alloc::vec::Vec;
+    }
+}
 
-use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
-use crate::mmap::{ExecutableBuffer, MutableBuffer};
-use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
+cfg_if! {
+    if #[cfg(feature = "std")] {
+        use std::collections::hash_map::{HashMap, Entry};
+    } else if #[cfg(feature = "hashbrown")] {
+        use hashbrown::hash_map::{HashMap, Entry};
+    } else {
+        // workaround
+        use BTreeMap as HashMap;
+        use alloc::collections::btree_map::Entry;
+    }
+}
 
+use crate::relocations::{ImpossibleRelocation, Relocation, RelocationKind, RelocationSize};
+use crate::{AssemblyOffset, DynamicLabel, DynasmError, DynasmLabelApi, LabelKind};
+
+cfg_if! {
+    if #[cfg(feature = "mmap")] {
+        use crate::mmap::{ExecutableBuffer, MutableBuffer};
+        use parking_lot::{RwLock, RwLockWriteGuard};
+        use core::mem;        
+    } else {
+    }
+}
 
 /// This struct implements a protection-swapping assembling buffer
+#[cfg(feature = "mmap")]
 #[derive(Debug)]
 pub struct MemoryManager {
     // buffer where the end result is copied into
@@ -26,9 +52,10 @@ pub struct MemoryManager {
     execbuffer_addr: usize
 }
 
+#[cfg(feature = "mmap")]
 impl MemoryManager {
     /// Create a new memory manager, with `initial_mmap_size` data allocated
-    pub fn new(initial_mmap_size: usize) -> io::Result<Self> {
+    pub fn new(initial_mmap_size: usize) -> anyhow::Result<Self> {
         let execbuffer = ExecutableBuffer::new(initial_mmap_size)?;
         let execbuffer_addr = execbuffer.as_ptr() as usize;
 
@@ -229,7 +256,7 @@ impl<R: Relocation> PatchLoc<R> {
     /// Returns a range that covers the entire relocation in its assembling buffer
     /// `buf_offset` is a value that is subtracted from this range when the buffer you want to slice
     /// with this range is only a part of a bigger buffer.
-    pub fn range(&self, buf_offset: usize) -> std::ops::Range<usize> {
+    pub fn range(&self, buf_offset: usize) -> core::ops::Range<usize> {
         let field_offset = self.location.0 - buf_offset -  self.field_offset as usize;
         field_offset .. field_offset + self.relocation.size()
     }
@@ -536,29 +563,34 @@ impl LitPool {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use std::fmt::Debug;
+    use core::fmt::Debug;
     use relocations::{Relocation, RelocationSize};
 
     #[test]
+    #[cfg(feature = "mmap")]
     fn test_litpool_size() {
         test_litpool::<RelocationSize>();
     }
 
     #[test]
+    #[cfg(feature = "mmap")]
     fn test_litpool_x64() {
         test_litpool::<x64::X64Relocation>();
     }
 
     #[test]
+    #[cfg(feature = "mmap")]
     fn test_litpool_x86() {
         test_litpool::<x86::X86Relocation>();
     }
 
+    #[cfg(feature = "mmap")]
     #[test]
     fn test_litpool_aarch64() {
         test_litpool::<aarch64::Aarch64Relocation>();
     }
 
+    #[cfg(feature = "mmap")]
     fn test_litpool<R: Relocation + Debug>() {
         let mut ops = Assembler::<R>::new().unwrap();
         let dynamic1 = ops.new_dynamic_label();

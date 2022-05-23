@@ -63,6 +63,7 @@ impl Relocation for X86Relocation {
 
 
 /// An x86 Assembler. This is aliased here for backwards compatability.
+#[cfg(feature = "mmap")]
 pub type Assembler = crate::Assembler<X86Relocation>;
 /// An x86 AssemblyModifier. This is aliased here for backwards compatability.
 pub type AssemblyModifier<'a> = crate::Modifier<'a, X86Relocation>;

@@ -2,7 +2,7 @@
 
 use byteorder::{ByteOrder, LittleEndian};
 
-use std::convert::TryFrom;
+use core::convert::TryFrom;
 
 /// Error returned when encoding a relocation failed
 #[derive(Debug)]
