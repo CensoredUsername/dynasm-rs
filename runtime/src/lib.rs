@@ -189,6 +189,7 @@ impl fmt::Display for DynasmError {
     }
 }
 
+#[cfg(feature = "std")]
 impl error::Error for DynasmError {
     fn description(&self) -> &str {
         match self {
