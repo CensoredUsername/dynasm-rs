@@ -290,7 +290,7 @@ fn parse_reg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<Opti
 
         // parse the elementsize/lanes specifier ("." [BHSDQ][124816])
         // note: actual ARM register width specifiers put the lane count before
-        // the size, but this cannot be parsed by the rust tokenizer
+        // the size, but this cannot be parsed by the Rust tokenizer
         let _: Token![.] = input.parse()?;
         let (element_size, lanes) = input.step(|cursor| {
             if let Some((ident, rest)) = cursor.ident() {

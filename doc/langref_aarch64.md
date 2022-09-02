@@ -2,7 +2,7 @@
 
 # Lexical structure definition
 
-Instructions for the `x86` and `x64` assembling backend use the following lexical structure
+Instructions for the `aarch64` assembling backend use the following lexical structure
 
 ## Base units
 
@@ -50,7 +50,7 @@ The following base syntax units are recognized by the parser.
 
 ## Instructions
 
-The language used by dynasm-rs in aarch64 mode is close to the assembly dialect described in official ARM documentation. Several additions have been made to support dynamic registers and to ensure the rust parser can handle parsing the language.
+The language used by dynasm-rs in aarch64 mode is close to the assembly dialect described in official ARM documentation. Several additions have been made to support dynamic registers and to ensure the Rust parser can handle parsing the language.
 
 The largest difference is in the notation of vector registers. In ARM assembly, the lane count comes before the element size as in `v1.16b`. But in dynasm-rs, this is reversed as bare identifiers cannot start with numbers. So the used notation ends up being `v1.b16`. Next to this, the register section will describe the syntax used for addressing registers.
 

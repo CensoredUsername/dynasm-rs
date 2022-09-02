@@ -107,7 +107,7 @@ impl MemoryManager {
         self.execbuffer.write().unwrap()
     }
 
-    /// finalizes the currently committed part of the buffer.
+    /// Finalizes the currently committed part of the buffer.
     pub fn finalize(self) -> Result<ExecutableBuffer, Self> {
         match Arc::try_unwrap(self.execbuffer) {
             Ok(execbuffer) => Ok(execbuffer.into_inner().unwrap()),

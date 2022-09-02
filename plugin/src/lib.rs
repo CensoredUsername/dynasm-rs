@@ -1,6 +1,6 @@
 #![cfg_attr(feature = "filelocal", feature(proc_macro_span))]
 //! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates
-//! a full dynamic assembler for several assembly dialects with rust code.
+//! a full dynamic assembler for several assembly dialects with Rust code.
 //! 
 //! As this is a proc-macro crate, it only exports the `dynasm!` and `dynasm_backwards!` macros.
 //! Any directives used in these macro invocations are normally local to the invocation itself, unless
@@ -37,7 +37,7 @@ mod serialize;
 /// Module containing utility functions for parsing
 mod parse_helpers;
 
-/// The whole point. This macro compiles given assembly/rust templates down to `DynasmApi` and `DynasmLabelApi`
+/// The whole point. This macro compiles given assembly/Rust templates down to `DynasmApi` and `DynasmLabelApi`
 /// compliant calls to an assembler.
 #[proc_macro]
 #[proc_macro_error]

@@ -44,7 +44,7 @@ pub enum RelocationKind {
     /// This means adjustment is necessary when the executable buffer is moved
     AbsToRel = 1,
     /// A relative relocation to an absolute address,
-    /// i.e. trying to call a rust function with a dynasm x86 call.
+    /// i.e. trying to call a Rust function with a dynasm x86 call.
     /// This means adjustment is necessary when the executable buffer is moved
     RelToAbs = 2,
 }

@@ -4,7 +4,7 @@
 
 ## Base units
 
-The following syntax units used in dynasm syntax are defined by the [rust grammar](https://doc.rust-lang.org/grammar.html) itself:
+The following syntax units used in dynasm syntax are defined by the [Rust grammar](https://doc.rust-lang.org/grammar.html) itself:
 
 - `num_lit`
 - `ident`
@@ -68,9 +68,9 @@ Dynasm-rs allows the user to define aliases for registers using the `.alias name
 
 ## Macros
 
-While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal rust macros with dynasm-rs.
+While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal Rust macros with dynasm-rs.
 
-First of all, it is not possible to have `dynasm!` parse the result of a rust macro. This is a limitation of rust itself. The proper way to use rust macros with dynasm-rs is to have macros expand to a `dynasm!` call as can be seen in the following example:
+First of all, it is not possible to have `dynasm!` parse the result of a Rust macro. This is a limitation of Rust itself. The proper way to use Rust macros with dynasm-rs is to have macros expand to a `dynasm!` call as can be seen in the following example:
 
 ```
 macro_rules! fma {
@@ -83,7 +83,7 @@ macro_rules! fma {
 
 ## Statements
 
-To make code that uses a lot of macros less verbose, dynasm-rs allows bare rust statements to be inserted inside `dynasm!` invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:
+To make code that uses a lot of macros less verbose, dynasm-rs allows bare Rust statements to be inserted inside `dynasm!` invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:
 
 ```
 dynasm!(ops
@@ -118,11 +118,11 @@ Extern  | `-`          | `extern expr`
 
 ### Local labels
 
-On first sight, local label definitions are similar to how labels are normally used in static assemblers. The trick with local labels is however in how they can be referenced. Local labels referenced with the `>label` syntax will be resolved to the first definition of this label after this piece of code, while local labels referenced with the `<label` will be resolved to the last definition of this label before the reference site. Any valid rust identifier can be used as a local label name, and local labels can be defined multiple times.
+On first sight, local label definitions are similar to how labels are normally used in static assemblers. The trick with local labels is however in how they can be referenced. Local labels referenced with the `>label` syntax will be resolved to the first definition of this label after this piece of code, while local labels referenced with the `<label` will be resolved to the last definition of this label before the reference site. Any valid Rust identifier can be used as a local label name, and local labels can be defined multiple times.
 
 ### Global labels
 
-Global labels can only be defined once, and all references to a global label will be resolved to this label. Any valid rust identifier can be used as a local label name.
+Global labels can only be defined once, and all references to a global label will be resolved to this label. Any valid Rust identifier can be used as a local label name.
 
 ### Dynamic labels
 

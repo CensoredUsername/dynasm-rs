@@ -35,7 +35,7 @@ impl ExecutableBuffer {
     /// which can then be jumped or called to divert control flow into the executable
     /// buffer. Note that if this buffer is accessed through an Executor, these pointers
     /// will only be valid as long as its lock is held. When no locks are held,
-    /// The assembler is free to relocate the executable buffer when it requires
+    /// the assembler is free to relocate the executable buffer when it requires
     /// more memory than available.
     pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
         &self[offset.0] as *const u8

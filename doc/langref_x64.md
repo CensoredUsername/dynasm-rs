@@ -110,7 +110,7 @@ Syntax   | Explanation
 
 #### Type mapped references
 
-To ease interoperation with rust structures, dynasm-rs supports the following syntax for accessing members of pointers to structs and struct arrays. In this syntax, the scale and displacement in a normal memory reference are derived from the size of the type and the offset of the member in the type. Due to the limitations of procedural macros, invalid scales will unfortunately only panic at runtime. Note that dynasm-rs is unable to infer the size of the attribute and it should therefore be determined by a size prefix.
+To ease interoperation with Rust structures, dynasm-rs supports the following syntax for accessing members of pointers to structs and struct arrays. In this syntax, the scale and displacement in a normal memory reference are derived from the size of the type and the offset of the member in the type. Due to the limitations of procedural macros, invalid scales will unfortunately only panic at runtime. Note that dynasm-rs is unable to infer the size of the attribute and it should therefore be determined by a size prefix.
 
 Just like memory references, type mapped references support displacement size overrides after the opening square bracket. However, as the first register is always encoded as index, they do not support `NOSPLIT`.
 

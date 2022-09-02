@@ -109,12 +109,12 @@ Then the length of the string is loaded. Here the `BYTE` prefix determines the s
 ; call rax
 ; add rsp, BYTE 0x28
 ```
-Here, a call is made from the dynamically assembled code to the rust `print` function. Note the `QWORD` size prefix which is necessary to determine the appropriate form of the `mov` instruction to encode as `dynasm!` does not analyze the immediate expression at runtime. As this example uses the `"win64"` calling convention, the stack pointer needs to be manipulated too. (Note: the `"win64"` calling convention is used as this it is currently impossible to use the `"sysv64"` calling convention on all platforms)
+Here, a call is made from the dynamically assembled code to the Rust `print` function. Note the `QWORD` size prefix which is necessary to determine the appropriate form of the `mov` instruction to encode as `dynasm!` does not analyze the immediate expression at runtime. As this example uses the `"win64"` calling convention, the stack pointer needs to be manipulated too. (Note: the `"win64"` calling convention is used as this it is currently impossible to use the `"sysv64"` calling convention on all platforms)
 
 ```rust
 ; ret
 ```
-And finally the assembled function returns, returning the return value from the `print` function in `rax` back to the caller rust code.
+And finally the assembled function returns, returning the return value from the `print` function in `rax` back to the caller Rust code.
 
 ```rust
 let buf = ops.finalize().unwrap();
@@ -169,7 +169,7 @@ As you can see, the encoding has been determined fully at compile time, and the 
 
 # Advanced usage
 
-To demonstrate some of the more advanced usage, we'll show how to rewrite a rust brainfsck interpreter to a jit compiler. The starting point is the following interpreter that can also be found [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-interpreter):
+To demonstrate some of the more advanced usage, we'll show how to rewrite a Rust brainfsck interpreter to a jit compiler. The starting point is the following interpreter that can also be found [here](https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-interpreter):
 
 ```rust
 use std::io::{Read, BufRead, Write, stdin, stdout, BufReader, BufWriter};
@@ -487,7 +487,7 @@ We can now replace the the tape movement by an optimized assembly version. Note 
 ```
 ### Arithmetric
 
-The `+` and `-` instructions have by far the most simple implementations. Note that when an overflow occurs at runtime, we jump to the `->overflow:` global label (Note: overflow is somewhat ill-defined in brainfsck, but in the spirit of rust I decided that everything that can be checked should be checked):
+The `+` and `-` instructions have by far the most simple implementations. Note that when an overflow occurs at runtime, we jump to the `->overflow:` global label (Note: overflow is somewhat ill-defined in brainfsck, but in the spirit of Rust I decided that everything that can be checked should be checked):
 
 ```diffold
 - let amount = count_leading_chars(&program[self.pos..], b'+');
@@ -531,7 +531,7 @@ The `+` and `-` instructions have by far the most simple implementations. Note t
 
 ### I/O
 
-As the input and output fields of state are implemented as trait objects, we need to handle the virtual call to them in rust code. Therefore, we first define the following wrapper methods on `State`:
+As the input and output fields of state are implemented as trait objects, we need to handle the virtual call to them in Rust code. Therefore, we first define the following wrapper methods on `State`:
 
 ```diffnew
 impl<'a> State<'a> {

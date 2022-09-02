@@ -100,7 +100,7 @@ fn complex1() {
         // labels
         ; a: // local
         ; -> b: // global
-        ; => label // dynamic. note the lack of a trailing :. this is due to : being a valid symbol within expressions that does not occur in any other normal rust expr contexts.
+        ; => label // dynamic. note the lack of a trailing :. this is due to : being a valid symbol within expressions that does not occur in any other normal Rust expr contexts.
         // jumps
         ; jmp <a
         ; jmp -> b

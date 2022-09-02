@@ -75,19 +75,19 @@ impl DynamicLabel {
 }
 
 
-/// A read-only shared reference to the executable buffer inside an Assembler. By
+/// A read-only shared reference to the executable buffer inside an `Assembler`. By
 /// locking it the internal `ExecutableBuffer` can be accessed and executed.
 #[derive(Debug, Clone)]
 pub struct Executor {
     execbuffer: Arc<RwLock<ExecutableBuffer>>
 }
 
-/// A read-only lockable reference to the internal `ExecutableBuffer` of an Assembler.
+/// A read-only lockable reference to the internal `ExecutableBuffer` of an `Assembler`.
 /// To gain access to this buffer, it must be locked.
 impl Executor {
     /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
     /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
-    /// Any pointers created to the `Executablebuffer` should no longer be used when
+    /// Any pointers created to the `ExecutableBuffer` should no longer be used when
     /// the guard is dropped.
     #[inline]
     pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
@@ -519,7 +519,7 @@ impl<R: Relocation> DynasmLabelApi for VecAssembler<R> {
 
 
 /// A full assembler implementation. Supports labels, all types of relocations,
-/// incremental compilation and multithreaded execution with simultaneous compiltion.
+/// incremental compilation and multithreaded execution with simultaneous compilation.
 /// Its implementation guarantees no memory is executable and writable at the same time.
 #[derive(Debug)]
 pub struct Assembler<R: Relocation> {
@@ -621,7 +621,7 @@ impl<R: Relocation> Assembler<R> {
         Ok(())
     }
 
-    /// Finalize this assembler, returning the internal executablebuffer if no Executor instances exist.
+    /// Finalize this assembler, returning the internal `ExecutableBuffer` if no `Executor` instances exist.
     /// This panics if any uncommitted changes caused errors near the end. To handle these, call `commit()` explicitly beforehand.
     pub fn finalize(mut self) -> Result<ExecutableBuffer, Self> {
         self.commit().expect("Errors were encountered when committing before finalization");
