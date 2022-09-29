@@ -148,6 +148,21 @@ impl LabelRegistry {
         }
     }
 
+    /// Reserve capacity for at least `additional` more global labels to be inserted
+    pub fn reserve_global(&mut self, additional: usize) {
+        self.global_labels.reserve(additional);
+    }
+
+    /// Reserve capacity for at least `additional` more dynamic labels to be inserted
+    pub fn reserve_dynamic(&mut self, additional: usize) {
+        self.dynamic_labels.reserve(additional);
+    }
+
+    /// Reserve capacity for at least `additional` more local labels to be inserted
+    pub fn reserve_local(&mut self, additional: usize) {
+        self.local_labels.reserve(additional);
+    }
+
     /// Create a new dynamic label id
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         let id = self.dynamic_labels.len();
@@ -291,6 +306,21 @@ impl<R: Relocation> RelocRegistry<R> {
             dynamic: Vec::new(),
             local: HashMap::new()
         }
+    }
+
+    /// Reserve capacity for at least `additional` more global relocs to be inserted
+    pub fn reserve_global(&mut self, additional: usize) {
+        self.global.reserve(additional);
+    }
+
+    /// Reserve capacity for at least `additional` more dynamic relocs to be inserted
+    pub fn reserve_dynamic(&mut self, additional: usize) {
+        self.dynamic.reserve(additional);
+    }
+
+    /// Reserve capacity for at least `additional` more local relocs to be inserted
+    pub fn reserve_local(&mut self, additional: usize) {
+        self.local.reserve(additional);
     }
 
     /// Add a new patch targetting the global label `name`.

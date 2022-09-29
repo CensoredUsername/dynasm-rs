@@ -363,6 +363,11 @@ impl<R: Relocation> VecAssembler<R> {
         }
     }
 
+    /// Reserve capacity for at least `additional` more instruction bytes to be inserted
+    pub fn reserve_ops(&mut self, additional: usize) {
+        self.ops.reserve(additional);
+    }
+
     /// Create a new dynamic label ID
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         self.labels.new_dynamic_label()
@@ -416,6 +421,16 @@ impl<R: Relocation> VecAssembler<R> {
     /// Provides mutable access to the assemblers internal labels registry
     pub fn labels_mut(&mut self) -> &mut LabelRegistry {
         &mut self.labels
+    }
+
+    /// Provides access to the assemblers internal relocs registry
+    pub fn relocs(&self) -> &RelocRegistry<R> {
+        &self.relocs
+    }
+
+    /// Provides mutable access to the assemblers internal labels registry
+    pub fn relocs_mut(&mut self) -> &mut RelocRegistry<R> {
+        &mut self.relocs
     }
 
     /// Finalizes the `VecAssembler`, returning the resulting `Vec<u8>` containing all assembled data.
