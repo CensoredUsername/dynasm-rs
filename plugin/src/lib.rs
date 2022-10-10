@@ -160,7 +160,6 @@ impl parse::Parse for Dynasm {
 
                 let mut state = State {
                     stmts: &mut stmts,
-                    target: &target,
                     invocation_context: &*invocation_context,
                 };
                 invocation_context.current_arch.compile_instruction(&mut state, input)?;
@@ -221,12 +220,15 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
 }
 
 /// As dynasm_opmap takes no args it doesn't parse to anything
+
+#[cfg(any(feature="dynasm_extract", feature="dynasm_opmap"))]
 struct DynasmOpmap {
     pub arch: String
 }
 
 /// As dynasm_opmap takes no args it doesn't parse to anything.
 /// This just exists so syn will give an error when no args are present.
+#[cfg(any(feature="dynasm_extract", feature="dynasm_opmap"))]
 impl parse::Parse for DynasmOpmap {
     fn parse(input: parse::ParseStream) -> parse::Result<Self> {
         let arch: syn::Ident = input.parse()?;
@@ -240,7 +242,6 @@ impl parse::Parse for DynasmOpmap {
 /// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
 struct State<'a> {
     pub stmts: &'a mut Vec<common::Stmt>,
-    pub target: &'a TokenTree,
     pub invocation_context: &'a DynasmContext,
 }
 
