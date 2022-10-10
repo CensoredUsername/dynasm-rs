@@ -32,7 +32,8 @@ They are executed at parse time, and each directive can have different parsing r
 ## Labels
 
 `label : ident ":" | "->" ident ":" | "=>" expr ;`
-`labelref : (">" ident | "<" ident | "->" ident | "=>" expr | "extern" expr) ;`
+`offset : ("+" | "-") expr`
+`labelref : (">" ident offset? | "<" ident offset? | "->" ident offset? | "=>" expr offset? | "extern" expr) ;`
 
 ## Instructions
 

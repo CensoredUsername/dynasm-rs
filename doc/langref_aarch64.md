@@ -8,9 +8,8 @@ Instructions for the `aarch64` assembling backend use the following lexical stru
 
 The following base syntax units are recognized by the parser.
 
-- `prefix : "cs" | "ds" | "es" | "fs" | "gs" | "ss" | "lock" | "rep" | "repne" | "repe" | "repnz" | "repz" ;`
-- `static_reg_name` matches any valid register name as seen in table 4, or any previously defined alias
-- `dynamic_reg_family` matches any valid register family from table 4
+- `static_reg_name` matches any valid register name as seen in table 1, or any previously defined alias
+- `dynamic_reg_family` matches any valid register family from table 1
 - `vector_reg_name` matches `v0` up to `v31`
 - `modifier : "LSL" | "LSR" | "ASR" | "ROR" | "UXTB" | "UXTH" | "UXTW" | "UXTX" | "SXTB" | "SXTH" | "SXTW" | "SXTX" | "MSL" ;`
 
