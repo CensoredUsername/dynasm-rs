@@ -1,10 +1,12 @@
 //! This module provides several reusable compoments for implementing assemblers
 
 use std::io;
-use std::collections::hash_map::{HashMap, Entry};
+use std::collections::hash_map::Entry;
 use std::collections::BTreeMap;
 use std::sync::{Arc, RwLock, RwLockWriteGuard};
 use std::mem;
+
+use fnv::FnvHashMap;
 
 use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
 use crate::mmap::{ExecutableBuffer, MutableBuffer};
@@ -131,9 +133,9 @@ impl MemoryManager {
 #[derive(Debug, Clone, Default)]
 pub struct LabelRegistry {
     // mapping of global labels to offsets
-    global_labels: HashMap<&'static str, AssemblyOffset>,
+    global_labels: FnvHashMap<&'static str, AssemblyOffset>,
     // mapping of local labels to offsets
-    local_labels: HashMap<&'static str, AssemblyOffset>,
+    local_labels: FnvHashMap<&'static str, AssemblyOffset>,
     // mapping of dynamic label ids to offsets
     dynamic_labels: Vec<Option<AssemblyOffset>>,
 }
@@ -142,10 +144,26 @@ impl LabelRegistry {
     /// Create a new, empty label registry
     pub fn new() -> LabelRegistry {
         LabelRegistry {
-            global_labels: HashMap::new(),
-            local_labels: HashMap::new(),
+            global_labels: FnvHashMap::default(),
+            local_labels: FnvHashMap::default(),
             dynamic_labels: Vec::new(),
         }
+    }
+
+    /// Create a new, empty label registry with `capacity` space for each different label type.
+    pub fn with_capacity(capacity: usize) -> LabelRegistry {
+        LabelRegistry {
+            global_labels: FnvHashMap::with_capacity_and_hasher(capacity, Default::default()),
+            local_labels: FnvHashMap::with_capacity_and_hasher(capacity, Default::default()),
+            dynamic_labels: Vec::with_capacity(capacity),
+        }
+    }
+
+    /// Clears the internal contents of this label registry, while maintaining the backing allocations.
+    pub fn clear(&mut self) {
+        self.global_labels.clear();
+        self.local_labels.clear();
+        self.dynamic_labels.clear();
     }
 
     /// Create a new dynamic label id
@@ -280,7 +298,7 @@ impl<R: Relocation> PatchLoc<R> {
 pub struct RelocRegistry<R: Relocation> {
     global: Vec<(PatchLoc<R>, &'static str)>,
     dynamic: Vec<(PatchLoc<R>, DynamicLabel)>,
-    local: HashMap<&'static str, Vec<PatchLoc<R>>>
+    local: FnvHashMap<&'static str, Vec<PatchLoc<R>>>
 }
 
 impl<R: Relocation> RelocRegistry<R> {
@@ -289,7 +307,7 @@ impl<R: Relocation> RelocRegistry<R> {
         RelocRegistry {
             global: Vec::new(),
             dynamic: Vec::new(),
-            local: HashMap::new()
+            local: FnvHashMap::default()
         }
     }
 

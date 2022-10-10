@@ -363,6 +363,18 @@ impl<R: Relocation> VecAssembler<R> {
         }
     }
 
+    /// Creates a new VecAssembler, with the specified base address.
+    /// Preallocates `vec_capacity` bytes to the internal vector, and `label_capacity` label locations of each type.
+    pub fn new_with_capacity(baseaddr: usize, vec_capacity: usize, label_capacity: usize) -> VecAssembler<R> {
+        VecAssembler {
+            ops: Vec::with_capacity(vec_capacity),
+            baseaddr,
+            labels: LabelRegistry::with_capacity(label_capacity),
+            relocs: RelocRegistry::new(),
+            error: None
+        }
+    }
+
     /// Create a new dynamic label ID
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         self.labels.new_dynamic_label()
@@ -423,6 +435,20 @@ impl<R: Relocation> VecAssembler<R> {
     pub fn finalize(mut self) -> Result<Vec<u8>, DynasmError> {
         self.commit()?;
         Ok(self.ops)
+    }
+
+    /// Equivalent of finalize, but allows the VecAssembler's internal allocations to be reused for the next assembler.
+    pub fn take(&mut self) -> Result<Vec<u8>, DynasmError> {
+        self.commit()?;
+        self.labels.clear();
+        Ok(std::mem::take(&mut self.ops))
+    }
+
+    /// Equivalent of take, but instead of allocating a new vector it simply provides a draining iterator over the internal contents.
+    pub fn drain<'a>(&'a mut self) -> Result<impl Iterator<Item=u8> + 'a, DynasmError> {
+        self.commit()?;
+        self.labels.clear();
+        Ok(self.ops.drain(..))
     }
 }
 
