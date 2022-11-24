@@ -12,6 +12,65 @@ use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi
 use crate::mmap::{ExecutableBuffer, MutableBuffer};
 use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
 
+/// A static label represents either a local label or a global label reference.
+/// Global labels are unique names, which can be referenced multiple times, but only defined once.
+/// Local labels are non-unique names. They can be referenced multiple times, and any reference
+/// indicates if they refer to a label after the reference, or a label before the reference.
+/// A static label records how many local labels with the same name have been emitted beforehand
+/// so we can treat them as local labels as well.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct StaticLabel {
+    name: &'static str,
+    version: usize,
+}
+
+impl StaticLabel {
+    /// Create a new static label for a global label
+    pub fn global(name: &'static str) -> StaticLabel {
+        StaticLabel {
+            name,
+            version: 0
+        }
+    }
+
+    /// Create a new static label for a local label, with the given version id to distinguish it.
+    pub fn local(name: &'static str, version: usize) -> StaticLabel {
+        StaticLabel {
+            name,
+            version
+        }
+    }
+
+    /// Returns if this static label represents a global label
+    pub fn is_global(&self) -> bool {
+        self.version == 0
+    }
+
+    /// Returns if this static label represents a local label
+    pub fn is_local(&self) -> bool {
+        self.version != 0
+    }
+
+    /// Returns the static label targetting the label with the same name, after this one.
+    /// if it is a global label, returns a copy of itself.
+    pub fn next(mut self) -> StaticLabel {
+        self.version += (self.version != 0) as usize;
+        self
+    }
+
+    /// Returns the representation of the first local label used with the given name.
+    pub fn first(name: &'static str) -> StaticLabel {
+        StaticLabel {
+            name,
+            version: 1
+        }
+    }
+
+    /// Returns the name of this static label
+    pub fn get_name(&self) -> &'static str {
+        self.name
+    }
+}
 
 /// This struct implements a protection-swapping assembling buffer
 #[derive(Debug)]
@@ -132,38 +191,38 @@ impl MemoryManager {
 /// assemblers for the offsets of labels.
 #[derive(Debug, Clone, Default)]
 pub struct LabelRegistry {
-    // mapping of global labels to offsets
-    global_labels: FnvHashMap<&'static str, AssemblyOffset>,
-    // mapping of local labels to offsets
-    local_labels: FnvHashMap<&'static str, AssemblyOffset>,
+    // mapping of local + global labels to offsets
+    static_labels: FnvHashMap<StaticLabel, AssemblyOffset>,
     // mapping of dynamic label ids to offsets
     dynamic_labels: Vec<Option<AssemblyOffset>>,
+    // mapping of local label -> current generation. Generation starts at 1.
+    local_versions: FnvHashMap<&'static str, usize>,
 }
 
 impl LabelRegistry {
     /// Create a new, empty label registry
     pub fn new() -> LabelRegistry {
         LabelRegistry {
-            global_labels: FnvHashMap::default(),
-            local_labels: FnvHashMap::default(),
+            static_labels: FnvHashMap::default(),
             dynamic_labels: Vec::new(),
+            local_versions: FnvHashMap::default(),
         }
     }
 
     /// Create a new, empty label registry with `capacity` space for each different label type.
-    pub fn with_capacity(capacity: usize) -> LabelRegistry {
+    pub fn with_capacity(locals: usize, globals: usize, dynamics: usize) -> LabelRegistry {
         LabelRegistry {
-            global_labels: FnvHashMap::with_capacity_and_hasher(capacity, Default::default()),
-            local_labels: FnvHashMap::with_capacity_and_hasher(capacity, Default::default()),
-            dynamic_labels: Vec::with_capacity(capacity),
+            static_labels: FnvHashMap::with_capacity_and_hasher(locals + globals, Default::default()),
+            dynamic_labels: Vec::with_capacity(dynamics),
+            local_versions: FnvHashMap::with_capacity_and_hasher(locals, Default::default()),
         }
     }
 
     /// Clears the internal contents of this label registry, while maintaining the backing allocations.
     pub fn clear(&mut self) {
-        self.global_labels.clear();
-        self.local_labels.clear();
+        self.static_labels.clear();
         self.dynamic_labels.clear();
+        self.local_versions.clear();
     }
 
     /// Create a new dynamic label id
@@ -175,18 +234,17 @@ impl LabelRegistry {
 
     /// Define a the dynamic label `id` to be located at `offset`.
     pub fn define_dynamic(&mut self, id: DynamicLabel, offset: AssemblyOffset) -> Result<(), DynasmError> {
-        let entry = &mut self.dynamic_labels[id.0];
-        if entry.is_some() {
-            return Err(DynasmError::DuplicateLabel(LabelKind::Dynamic(id)));
+        match self.dynamic_labels.get_mut(id.0) {
+            Some(Some(_)) => return Err(DynasmError::DuplicateLabel(LabelKind::Dynamic(id))),
+            Some(e)       => *e = Some(offset),
+            None          => return Err(DynasmError::UnknownLabel(LabelKind::Dynamic(id))),
         }
-
-        *entry = Some(offset);
         Ok(())
     }
 
     /// Define a the global label `name` to be located at `offset`.
     pub fn define_global(&mut self, name: &'static str, offset: AssemblyOffset) -> Result<(), DynasmError> {
-        match self.global_labels.entry(name) {
+        match self.static_labels.entry(StaticLabel::global(name)) {
             Entry::Occupied(_) => Err(DynasmError::DuplicateLabel(LabelKind::Global(name))),
             Entry::Vacant(v) => {
                 v.insert(offset);
@@ -197,7 +255,23 @@ impl LabelRegistry {
 
     /// Define a the local label `name` to be located at `offset`.
     pub fn define_local(&mut self, name: &'static str, offset: AssemblyOffset) {
-        self.local_labels.insert(name, offset);
+        let generation = match self.local_versions.entry(name) {
+            Entry::Occupied(mut o) => {
+                *o.get_mut() += 1;
+                *o.get()
+            },
+            Entry::Vacant(v) => {
+                v.insert(1);
+                1
+            }
+        };
+        self.static_labels.insert(StaticLabel::local(name, generation), offset);
+    }
+
+    /// Turns a local label into a static label, by adding some extra information to it
+    /// so we know what local label it is even after another has been defined
+    pub fn place_local_reference(&self, name: &'static str) -> Option<StaticLabel> {
+        self.local_versions.get(name).map(|&version| StaticLabel::local(name, version))
     }
 
     /// Returns the offset at which the dynamic label `id` was defined, if one was defined.
@@ -206,13 +280,14 @@ impl LabelRegistry {
     }
 
     /// Returns the offset at which the global label `name` was defined, if one was defined.
-    pub fn resolve_global(&self, name: &'static str) -> Result<AssemblyOffset, DynasmError> {
-        self.global_labels.get(&name).cloned().ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Global(name)))
-    }
-
-    /// Returns the offset at which the last local label named `id` was defined, if one was defined.
-    pub fn resolve_local(&self, name: &'static str) -> Result<AssemblyOffset, DynasmError> {
-        self.local_labels.get(&name).cloned().ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Local(name)))
+    pub fn resolve_static(&self, label: &StaticLabel) -> Result<AssemblyOffset, DynasmError> {
+        self.static_labels.get(label).cloned().ok_or_else(|| DynasmError::UnknownLabel(
+            if label.is_global() {
+                LabelKind::Global(label.name)
+            } else {
+                LabelKind::Local(label.name)
+            }
+        ))
     }
 }
 
@@ -296,64 +371,46 @@ impl<R: Relocation> PatchLoc<R> {
 /// A registry of relocations and the respective labels they point towards.
 #[derive(Debug, Default)]
 pub struct RelocRegistry<R: Relocation> {
-    global: Vec<(PatchLoc<R>, &'static str)>,
-    dynamic: Vec<(PatchLoc<R>, DynamicLabel)>,
-    local: FnvHashMap<&'static str, Vec<PatchLoc<R>>>
+    static_targets: Vec<(PatchLoc<R>, StaticLabel)>,
+    dynamic_targets: Vec<(PatchLoc<R>, DynamicLabel)>,
 }
 
 impl<R: Relocation> RelocRegistry<R> {
     /// Create a new, empty relocation registry.
     pub fn new() -> RelocRegistry<R> {
         RelocRegistry {
-            global: Vec::new(),
-            dynamic: Vec::new(),
-            local: FnvHashMap::default()
+            static_targets: Vec::new(),
+            dynamic_targets: Vec::new(),
         }
     }
 
-    /// Add a new patch targetting the global label `name`.
-    pub fn add_global(&mut self, name: &'static str, patchloc: PatchLoc<R>) {
-        self.global.push((patchloc, name));
+    pub fn with_capacity(static_references: usize, dynamic_references: usize) -> RelocRegistry<R> {
+        RelocRegistry {
+            static_targets: Vec::with_capacity(static_references),
+            dynamic_targets: Vec::with_capacity(dynamic_references),
+        }
+    }
+
+    /// Add a new patch targetting a static label (either global or local).
+    pub fn add_static(&mut self, label: StaticLabel, patchloc: PatchLoc<R>) {
+        self.static_targets.push((patchloc, label));
     }
 
     /// Add a new patch targetting the dynamic label `id`.
     pub fn add_dynamic(&mut self, id: DynamicLabel, patchloc: PatchLoc<R>) {
-        self.dynamic.push((patchloc, id))
-    }
-
-    /// Add a new patch targetting the next local label `name`.
-    /// As any relocation targetting a previous local label can be immediately resolved these should not be recorded.
-    pub fn add_local(&mut self, name: &'static str, patchloc: PatchLoc<R>) {
-        match self.local.entry(name) {
-            Entry::Occupied(mut o) => o.get_mut().push(patchloc),
-            Entry::Vacant(v) => {
-                v.insert(vec![patchloc]);
-            }
-        }
-    }
-
-    /// Return an iterator through all defined relocations targetting local label `name`.
-    /// These relocations are removed from the registry.
-    pub fn take_locals_named<'a>(&'a mut self, name: &'static str) -> impl Iterator<Item=PatchLoc<R>> + 'a {
-        self.local.get_mut(&name).into_iter().flat_map(|v| v.drain(..))
+        self.dynamic_targets.push((patchloc, id))
     }
 
     /// Return an iterator through all defined relocations targeting global labels and the labels they target.
     /// These relocations are removed from the registry.
-    pub fn take_globals<'a>(&'a mut self) -> impl Iterator<Item=(PatchLoc<R>, &'static str)> + 'a {
-        self.global.drain(..)
+    pub fn take_statics<'a>(&'a mut self) -> impl Iterator<Item=(PatchLoc<R>, StaticLabel)> + 'a {
+        self.static_targets.drain(..)
     }
 
     /// Return an iterator through all defined relocations targeting dynamic labels and the labels they target.
     /// These relocations are removed from the registry.
     pub fn take_dynamics<'a>(&'a mut self) -> impl Iterator<Item=(PatchLoc<R>, DynamicLabel)> + 'a {
-        self.dynamic.drain(..)
-    }
-
-    /// Return an iterator through all defined relocations targeting local labels and the labels they target.
-    /// These relocations are removed from the registry.
-    pub fn take_locals<'a>(&'a mut self) -> impl Iterator<Item=(PatchLoc<R>, &'static str)> + 'a {
-        self.local.iter_mut().flat_map(|(&k, v)| v.drain(..).map(move |p| (p, k)))
+        self.dynamic_targets.drain(..)
     }
 }
 
