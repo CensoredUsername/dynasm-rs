@@ -381,6 +381,11 @@ impl<R: Relocation> VecAssembler<R> {
         }
     }
 
+    /// Reserve capacity for at least `additional` instruction bytes to be inserted
+    pub fn reserve_ops(&mut self, additional: usize) {
+        self.ops.reserve(additional);
+    }
+
     /// Create a new dynamic label ID
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         self.labels.new_dynamic_label()
