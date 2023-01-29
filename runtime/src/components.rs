@@ -384,6 +384,7 @@ impl<R: Relocation> RelocRegistry<R> {
         }
     }
 
+    /// Create a new, empty relocation registry with reserved space for the specified amount of static and dynamic references
     pub fn with_capacity(static_references: usize, dynamic_references: usize) -> RelocRegistry<R> {
         RelocRegistry {
             static_targets: Vec::with_capacity(static_references),
