@@ -1,5 +1,5 @@
-@import url('../plugin/rustdoc.css');
-@import url('../plugin/light.css');
+@import url('${RUSTDOC}');
+@import url('${LIGHT}');
 
 code.language-diffnew {
     background-color: rgb(203, 255, 203);

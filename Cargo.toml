@@ -4,6 +4,7 @@ members = [
     "plugin",
     "runtime",
     "testing",
+    "doc/insref",
 ]
 
 [workspace.package]
@@ -11,7 +12,7 @@ authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gm
 version = "1.2.3"
 edition = "2018"
 
-documentation = "https://censoredusername.github.io/dynasm-rs/plugin/dynasm/index.html"
+documentation = "https://censoredusername.github.io/dynasm-rs/language/index.html"
 repository = "https://github.com/CensoredUsername/dynasm-rs"
 
 readme = "README.md"
