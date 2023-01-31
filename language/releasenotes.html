@@ -7,7 +7,6 @@
     <title>Release notes</title>
 
     <link rel="stylesheet" type="text/css" href="./formatting.css">
-
     
 </head>
 <body class="rustdoc">
@@ -19,26 +18,24 @@
     <![endif]-->
 
     <nav class="sidebar">
-  <p class="location">
-    <a href="./index.html">dynasm-rs</a>
-  </p>
-  <div class = "block modules">
+  <h2 class="location">
+    <a href="#">Language dynasm-rs</a>
+  </h2>
+  <div class="sidebar-elems">
     <h3>Components</h3>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="../language/index.html">Syntax</a>
       </li>
       <li>
-        <a href="../plugin/dynasm/index.html">Plugin (dynasm)</a>
+        <a href="../dynasm/index.html">Plugin (dynasm)</a>
       </li>
       <li>
-        <a href="../runtime/dynasmrt/index.html">Runtime (dynasmrt)</a>
+        <a href="../dynasmrt/index.html">Runtime (dynasmrt)</a>
       </li>
     </ul>
-  </div>
-  <div class = "block crate">
     <h3>Syntax</h3>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="./index.html">Home</a>
       </li>
@@ -52,11 +49,9 @@
         <a href="./releasenotes.html">Release Notes</a>
       </li>
     </ul>
-  </div>
-  <div class = "block crate">
     <h3>Architectures</h3>
     <h4>x64/x86</h4>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="./langref_x64.html">Language dialect</a>
       </li>
@@ -65,7 +60,7 @@
       </li>
     </ul>
     <h4>aarch64</h4>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="./langref_aarch64.html">Language dialect</a>
       </li>
@@ -79,135 +74,163 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
-<p>Version 1.1.0</p>
-<h2 id="runtime" class="section-header"><a href="#runtime">Runtime</a></h2>
+<h1 id="version-200"><a href="#version-200">Version 2.0.0</a></h1><h2 id="plugin"><a href="#plugin">Plugin</a></h2>
+<ul>
+<li>Be stricter on X/W or XSP/WSP differentiation in x64.</li>
+</ul>
+<h2 id="runtime"><a href="#runtime">Runtime</a></h2>
+<ul>
+<li>Significant performance optimization of label processing.</li>
+<li>Rework of various components.</li>
+<li>Additional APIs to reuse Assemblers, or to allocate them with pre-reserved buffers.</li>
+</ul>
+<h2 id="documentation"><a href="#documentation">Documentation</a></h2>
+<ul>
+<li>Various fixes</li>
+</ul>
+<h1 id="version-123"><a href="#version-123">Version 1.2.3</a></h1><h2 id="plugin-1"><a href="#plugin-1">Plugin</a></h2>
+<ul>
+<li>add x64 ud1 opcode.</li>
+<li>Bugfix the REPNE prefix so it can actually be used.</li>
+</ul>
+<h1 id="version-122"><a href="#version-122">Version 1.2.2</a></h1><h2 id="global"><a href="#global">Global</a></h2>
+<p>Fixes travis integration displayed in crates.io</p>
+<h1 id="version-121"><a href="#version-121">Version 1.2.1</a></h1><h2 id="runtime-1"><a href="#runtime-1">Runtime</a></h2>
+<ul>
+<li>Fix overflow in aarch64 logical immediate encoding at runtime.</li>
+</ul>
+<h1 id="version-120"><a href="#version-120">Version 1.2.0</a></h1><h2 id="runtime-2"><a href="#runtime-2">Runtime</a></h2>
+<ul>
+<li>update memmap2 version.</li>
+</ul>
+<h1 id="version-110"><a href="#version-110">Version 1.1.0</a></h1><h2 id="runtime-3"><a href="#runtime-3">Runtime</a></h2>
 <ul>
 <li>Added missing label management methods to <code>VecAssembler</code>.</li>
 </ul>
-<h1 id="version-101" class="section-header"><a href="#version-101">Version 1.0.1</a></h1><h2 id="runtime-1" class="section-header"><a href="#runtime-1">Runtime</a></h2>
+<h1 id="version-101"><a href="#version-101">Version 1.0.1</a></h1><h2 id="runtime-4"><a href="#runtime-4">Runtime</a></h2>
 <ul>
 <li>Switched from the unmaintained <code>memmap</code> crate to <code>memmap2</code>.</li>
 </ul>
-<h1 id="version-100" class="section-header"><a href="#version-100">Version 1.0.0</a></h1><h2 id="global" class="section-header"><a href="#global">Global</a></h2>
+<h1 id="version-100"><a href="#version-100">Version 1.0.0</a></h1><h2 id="global-1"><a href="#global-1">Global</a></h2>
 <ul>
 <li>First release on rust stable (1.45+)!</li>
 </ul>
-<h2 id="plugin" class="section-header"><a href="#plugin">Plugin</a></h2>
+<h2 id="plugin-2"><a href="#plugin-2">Plugin</a></h2>
 <ul>
 <li>Use new Span::mixed_site hygiene to replace call_site hygiene wherever relevant.</li>
 </ul>
-<h1 id="version-071" class="section-header"><a href="#version-071">Version 0.7.1</a></h1><h2 id="runtime-2" class="section-header"><a href="#runtime-2">Runtime</a></h2>
+<h1 id="version-071"><a href="#version-071">Version 0.7.1</a></h1><h2 id="runtime-5"><a href="#runtime-5">Runtime</a></h2>
 <ul>
 <li>Fixed an issue where calls to Modifier.extend would cause invalid code to be emitted.</li>
 </ul>
-<h1 id="version-070" class="section-header"><a href="#version-070">Version 0.7.0</a></h1><h2 id="global-1" class="section-header"><a href="#global-1">Global</a></h2>
+<h1 id="version-070"><a href="#version-070">Version 0.7.0</a></h1><h2 id="global-2"><a href="#global-2">Global</a></h2>
 <ul>
 <li>Updated everything to the 2018 edition of rust.</li>
 <li>The crate will be able to be used on a rust 1.45 stable compiler!</li>
 </ul>
-<h2 id="plugin-1" class="section-header"><a href="#plugin-1">Plugin</a></h2>
+<h2 id="plugin-3"><a href="#plugin-3">Plugin</a></h2>
 <ul>
 <li>File-local directives now requires the <code>filelocal</code> feature and a nightly compiler.</li>
 <li>Now compiles and is usable on a stable 1.45 rust compiler.</li>
 <li>Added <code>dynasm_backwards!</code>, which emits templates in reverse order. This allows writing assemblers that compile code backwards.</li>
 </ul>
-<h2 id="runtime-3" class="section-header"><a href="#runtime-3">Runtime</a></h2>
+<h2 id="runtime-6"><a href="#runtime-6">Runtime</a></h2>
 <ul>
 <li><code>dynasmrt</code> now re-exports the <code>dynasm!</code> macro from <code>dynasm</code>, so projects only need the <code>dynasmrt</code> dependency.</li>
 <li>Refactoring PatchLoc and Relocation to generalize relocation handling between architectures.</li>
 <li>Added register family listings, to facilitate dynamic register usage. This feature was contributed by vext01.</li>
 </ul>
-<h1 id="version-060" class="section-header"><a href="#version-060">Version 0.6.0</a></h1><h2 id="runtime-4" class="section-header"><a href="#runtime-4">Runtime</a></h2>
+<h1 id="version-060"><a href="#version-060">Version 0.6.0</a></h1><h2 id="runtime-7"><a href="#runtime-7">Runtime</a></h2>
 <ul>
 <li>Significant internal refactoring: Architectural support is now abstracted through the Relocation trait, that all assemblers are generic over. Aliases for the previous architecture-specific assemblers are kept for backwards compatibility.</li>
 <li>Made assembler components public to facilitate writing custom assemblers.</li>
 </ul>
-<h2 id="tests" class="section-header"><a href="#tests">Tests</a></h2>
+<h2 id="tests"><a href="#tests">Tests</a></h2>
 <ul>
 <li>Reduced compile time significantly by migrating simple instruction format tests to <code>SimpleAssembler</code>.</li>
 </ul>
-<h1 id="version-052" class="section-header"><a href="#version-052">Version 0.5.2</a></h1><h2 id="plugin-2" class="section-header"><a href="#plugin-2">Plugin</a></h2>
+<h1 id="version-052"><a href="#version-052">Version 0.5.2</a></h1><h2 id="plugin-4"><a href="#plugin-4">Plugin</a></h2>
 <ul>
 <li>Remove a problematic semicolon that might cause errors in the future.</li>
 <li>README update.</li>
 </ul>
-<h1 id="version-051" class="section-header"><a href="#version-051">Version 0.5.1</a></h1><h2 id="runtime-5" class="section-header"><a href="#runtime-5">Runtime</a></h2>
+<h1 id="version-051"><a href="#version-051">Version 0.5.1</a></h1><h2 id="runtime-8"><a href="#runtime-8">Runtime</a></h2>
 <ul>
 <li>Fix a bug that caused emitted code corruption corruption in Aarch64’s B and ADRP relocation calculations.</li>
 </ul>
-<h1 id="version-050" class="section-header"><a href="#version-050">Version 0.5.0</a></h1><h2 id="plugin-3" class="section-header"><a href="#plugin-3">Plugin</a></h2>
+<h1 id="version-050"><a href="#version-050">Version 0.5.0</a></h1><h2 id="plugin-5"><a href="#plugin-5">Plugin</a></h2>
 <ul>
 <li>We now support an arbitrary offset added to any jump. This feature allows direct addressing of literal pools or arrays of values without generating labels for every single item in them.</li>
 </ul>
-<h2 id="runtime-6" class="section-header"><a href="#runtime-6">Runtime</a></h2>
+<h2 id="runtime-9"><a href="#runtime-9">Runtime</a></h2>
 <ul>
 <li>Added LitPool, a tool to automatically build literal pools.</li>
 <li>Impossible relocations no longer panic. Instead they cause an error to be emitted from <code>Assembler::commit()</code>.</li>
 <li>Significant refactoring.</li>
 </ul>
-<h1 id="version-040" class="section-header"><a href="#version-040">Version 0.4.0</a></h1><h2 id="architecture-support" class="section-header"><a href="#architecture-support">Architecture support</a></h2>
+<h1 id="version-040"><a href="#version-040">Version 0.4.0</a></h1><h2 id="architecture-support"><a href="#architecture-support">Architecture support</a></h2>
 <ul>
 <li>Added Aarch64 support, thanks to sponsoring from <a href="https://wasmer.io">Wasmer</a>.</li>
 </ul>
-<h2 id="plugin-4" class="section-header"><a href="#plugin-4">Plugin</a></h2>
+<h2 id="plugin-6"><a href="#plugin-6">Plugin</a></h2>
 <ul>
 <li>Remove use of mem::unitialized when calculating the offsets of members in structs in generated code.
 -Optimization of opmap and register tables to reduce compile time and file size.</li>
 </ul>
-<h2 id="documentation" class="section-header"><a href="#documentation">Documentation</a></h2>
+<h2 id="documentation-1"><a href="#documentation-1">Documentation</a></h2>
 <ul>
 <li>Split architecture-specific DSL documentation and generic DSL documentation.</li>
 <li>Ported examples to Aarch64.</li>
 </ul>
-<h1 id="version-032" class="section-header"><a href="#version-032">Version 0.3.2</a></h1><h2 id="plugin-5" class="section-header"><a href="#plugin-5">Plugin</a></h2>
+<h1 id="version-032"><a href="#version-032">Version 0.3.2</a></h1><h2 id="plugin-7"><a href="#plugin-7">Plugin</a></h2>
 <ul>
 <li>x64/x86: Always escape into SIB encoding with a displacement when a register is used as a memory reference base, to allow RBP to be encoded.</li>
 <li>x64/x86: Properly handle dynamic registers in VEX prefixes</li>
 </ul>
-<h1 id="version-031" class="section-header"><a href="#version-031">Version 0.3.1</a></h1><h2 id="plugin-6" class="section-header"><a href="#plugin-6">Plugin</a></h2>
+<h1 id="version-031"><a href="#version-031">Version 0.3.1</a></h1><h2 id="plugin-8"><a href="#plugin-8">Plugin</a></h2>
 <ul>
 <li>Fixed an issue where dynamic registers caused wrong code generation.</li>
 </ul>
-<h2 id="runtime-7" class="section-header"><a href="#runtime-7">Runtime</a></h2>
+<h2 id="runtime-10"><a href="#runtime-10">Runtime</a></h2>
 <ul>
 <li>Added an API for returning the offset of a dynamic label directly.</li>
 </ul>
-<h1 id="version-030" class="section-header"><a href="#version-030">Version 0.3.0</a></h1><h2 id="architecture-support-1" class="section-header"><a href="#architecture-support-1">Architecture support</a></h2>
+<h1 id="version-030"><a href="#version-030">Version 0.3.0</a></h1><h2 id="architecture-support-1"><a href="#architecture-support-1">Architecture support</a></h2>
 <ul>
 <li>Fixed SETB and SETNB not being present in x64/x86</li>
 </ul>
-<h2 id="plugin-7" class="section-header"><a href="#plugin-7">Plugin</a></h2>
+<h2 id="plugin-9"><a href="#plugin-9">Plugin</a></h2>
 <ul>
 <li>The plugin has been updated to the new procedural macro system. This means it should no longer break when new compiler versions are released.</li>
 <li>Directives are now scoped file-local instead of crate-local.</li>
 </ul>
-<h2 id="runtime-8" class="section-header"><a href="#runtime-8">Runtime</a></h2>
+<h2 id="runtime-11"><a href="#runtime-11">Runtime</a></h2>
 <ul>
 <li>The alter API can now return values produced by the user-defined closure.</li>
 </ul>
-<h1 id="versions-021-022-and-023" class="section-header"><a href="#versions-021-022-and-023">Versions 0.2.1, 0.2.2 and 0.2.3</a></h1><h2 id="plugin-8" class="section-header"><a href="#plugin-8">Plugin</a></h2>
+<h1 id="versions-021-022-and-023"><a href="#versions-021-022-and-023">Versions 0.2.1, 0.2.2 and 0.2.3</a></h1><h2 id="plugin-10"><a href="#plugin-10">Plugin</a></h2>
 <ul>
 <li>Updates so it stays compatible with rustc as the plugin API changes.</li>
 </ul>
-<h1 id="version-020" class="section-header"><a href="#version-020">Version 0.2.0</a></h1><h2 id="architecture-support-2" class="section-header"><a href="#architecture-support-2">Architecture support</a></h2>
+<h1 id="version-020"><a href="#version-020">Version 0.2.0</a></h1><h2 id="architecture-support-2"><a href="#architecture-support-2">Architecture support</a></h2>
 <ul>
 <li>Added support for x86</li>
 <li>Enabled relocation support in x64 when additional immediate fields are present.</li>
 </ul>
-<h2 id="plugin-9" class="section-header"><a href="#plugin-9">Plugin</a></h2>
+<h2 id="plugin-11"><a href="#plugin-11">Plugin</a></h2>
 <ul>
 <li>Significant refactoring of the x64 backend to also handle x86</li>
 <li>Added x64 feature selection support.</li>
 </ul>
-<h2 id="runtime-9" class="section-header"><a href="#runtime-9">Runtime</a></h2>
+<h2 id="runtime-12"><a href="#runtime-12">Runtime</a></h2>
 <ul>
 <li>Added managed relocation support to handle non-relative relocations.</li>
 </ul>
-<h1 id="versions-014-013-012-011" class="section-header"><a href="#versions-014-013-012-011">Versions 0.1.4, 0.1.3, 0.1.2, 0.1.1</a></h1><h2 id="plugin-10" class="section-header"><a href="#plugin-10">Plugin</a></h2>
+<h1 id="versions-014-013-012-011"><a href="#versions-014-013-012-011">Versions 0.1.4, 0.1.3, 0.1.2, 0.1.1</a></h1><h2 id="plugin-12"><a href="#plugin-12">Plugin</a></h2>
 <ul>
 <li>Updates so it stays compatible with rustc as the plugin API changes.</li>
 </ul>
-<h1 id="versions--010" class="section-header"><a href="#versions--010">Versions &lt;= 0.1.0</a></h1><h2 id="global-2" class="section-header"><a href="#global-2">Global</a></h2>
+<h1 id="versions--010"><a href="#versions--010">Versions &lt;= 0.1.0</a></h1><h2 id="global-3"><a href="#global-3">Global</a></h2>
 <ul>
 <li>Initial library experiments, starting with basic x64 support, refactoring to support multiple architectures, and cleanup.</li>
 </ul>

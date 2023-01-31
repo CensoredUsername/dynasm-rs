@@ -7,7 +7,6 @@
     <title>Language Reference</title>
 
     <link rel="stylesheet" type="text/css" href="./formatting.css">
-
     
 </head>
 <body class="rustdoc">
@@ -19,26 +18,24 @@
     <![endif]-->
 
     <nav class="sidebar">
-  <p class="location">
-    <a href="./index.html">dynasm-rs</a>
-  </p>
-  <div class = "block modules">
+  <h2 class="location">
+    <a href="#">Language dynasm-rs</a>
+  </h2>
+  <div class="sidebar-elems">
     <h3>Components</h3>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="../language/index.html">Syntax</a>
       </li>
       <li>
-        <a href="../plugin/dynasm/index.html">Plugin (dynasm)</a>
+        <a href="../dynasm/index.html">Plugin (dynasm)</a>
       </li>
       <li>
-        <a href="../runtime/dynasmrt/index.html">Runtime (dynasmrt)</a>
+        <a href="../dynasmrt/index.html">Runtime (dynasmrt)</a>
       </li>
     </ul>
-  </div>
-  <div class = "block crate">
     <h3>Syntax</h3>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="./index.html">Home</a>
       </li>
@@ -52,11 +49,9 @@
         <a href="./releasenotes.html">Release Notes</a>
       </li>
     </ul>
-  </div>
-  <div class = "block crate">
     <h3>Architectures</h3>
     <h4>x64/x86</h4>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="./langref_x64.html">Language dialect</a>
       </li>
@@ -65,7 +60,7 @@
       </li>
     </ul>
     <h4>aarch64</h4>
-    <ul>
+    <ul class="block crate">
       <li>
         <a href="./langref_aarch64.html">Language dialect</a>
       </li>
@@ -78,8 +73,8 @@
 <section id="main" class="content mod docblock">
 
     <h1 class="title">Language Reference</h1>
-    <h1 id="lexical-structure-definition" class="section-header"><a href="#lexical-structure-definition">Lexical structure definition</a></h1><h2 id="base-units" class="section-header"><a href="#base-units">Base units</a></h2>
-<p>The following syntax units used in dynasm syntax are defined by the <a href="https://doc.rust-lang.org/grammar.html">rust grammar</a> itself:</p>
+    <h1 id="lexical-structure-definition"><a href="#lexical-structure-definition">Lexical structure definition</a></h1><h2 id="base-units"><a href="#base-units">Base units</a></h2>
+<p>The following syntax units used in dynasm syntax are defined by the <a href="https://doc.rust-lang.org/grammar.html">Rust grammar</a> itself:</p>
 <ul>
 <li><code>num_lit</code></li>
 <li><code>ident</code></li>
@@ -87,25 +82,26 @@
 <li><code>expr</code></li>
 <li><code>stmt</code></li>
 </ul>
-<h2 id="entry-point" class="section-header"><a href="#entry-point">Entry point</a></h2>
+<h2 id="entry-point"><a href="#entry-point">Entry point</a></h2>
 <p>The entry point of dynasm-rs is the dynasm! macro. It is structured as following</p>
 <p><code>dynasm : &quot;dynasm&quot; &quot;!&quot; &quot;(&quot; ident (&quot;;&quot; line)* &quot;)&quot; ;</code></p>
 <p>Where line can be one of the following:</p>
 <p><code>line : (&quot;;&quot; stmt) | directive | label | instruction ;</code></p>
-<h2 id="directives" class="section-header"><a href="#directives">Directives</a></h2>
+<h2 id="directives"><a href="#directives">Directives</a></h2>
 <p>Directives are special commands given to the assembler that do not correspond to instructions directly.
 They are executed at parse time, and each directive can have different parsing rules.</p>
 <p><code>directive : &quot;.&quot; ident directive_parsing_rule;</code></p>
-<h2 id="labels" class="section-header"><a href="#labels">Labels</a></h2>
+<h2 id="labels"><a href="#labels">Labels</a></h2>
 <p><code>label : ident &quot;:&quot; | &quot;-&gt;&quot; ident &quot;:&quot; | &quot;=&gt;&quot; expr ;</code>
-<code>labelref : (&quot;&gt;&quot; ident | &quot;&lt;&quot; ident | &quot;-&gt;&quot; ident | &quot;=&gt;&quot; expr | &quot;extern&quot; expr) ;</code></p>
-<h2 id="instructions" class="section-header"><a href="#instructions">Instructions</a></h2>
+<code>offset : (&quot;+&quot; | &quot;-&quot;) expr</code>
+<code>labelref : (&quot;&gt;&quot; ident offset? | &quot;&lt;&quot; ident offset? | &quot;-&gt;&quot; ident offset? | &quot;=&gt;&quot; expr offset? | &quot;extern&quot; expr) ;</code></p>
+<h2 id="instructions"><a href="#instructions">Instructions</a></h2>
 <p>The assembly dialect used by dynasm-rs and parsing rules for it differ based on the target architecture (configured using the <code>.arch</code> directive).
 Check the documentation for the specific architecture.</p>
-<h1 id="reference" class="section-header"><a href="#reference">Reference</a></h1><h2 id="directives-1" class="section-header"><a href="#directives-1">Directives</a></h2>
+<h1 id="reference"><a href="#reference">Reference</a></h1><h2 id="directives-1"><a href="#directives-1">Directives</a></h2>
 <p>Dynasm-rs currently supports the following directives:</p>
 <p>Table 1: dynasm-rs directives</p>
-<table><thead><tr><th>Name</th><th>Argument format</th><th>Description</th></tr></thead><tbody>
+<div><table><thead><tr><th>Name</th><th>Argument format</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>.arch</code></td><td>A single identifier</td><td>Specifies the current architecture to assemble. Defaults to the current target architecture. Only <code>x64</code>, <code>x86</code> and <code>aarch64</code> are supported as of now.</td></tr>
 <tr><td><code>.feature</code></td><td>A comma-separated list of identifiers.</td><td>Set architectural features that are allowed to be used.</td></tr>
 <tr><td><code>.alias</code></td><td>An name followed by a register</td><td>Defines the name as an alias for the wanted register.</td></tr>
@@ -116,52 +112,53 @@ Check the documentation for the specific architecture.</p>
 <tr><td><code>.qword</code></td><td>One or more expressions of the type <code>i64</code></td><td>Pushes the values into the assembling buffer.</td></tr>
 <tr><td><code>.bytes</code></td><td>An expression of that implements <code>IntoIterator&lt;Item=u8&gt;</code> or <code>IntoIterator&lt;Item=&amp;u8&gt;</code></td><td>Extends the assembling buffer with the iterator.</td></tr>
 </tbody></table>
+</div>
 <p>Directives are normally local to the current <code>dynasm!</code> invocation. However, if the <code>filelocal</code> feature is used they will be processed in lexical order over the whole file. This feature only works on a nightly compiler and might be removed in the future.</p>
-<h2 id="aliases" class="section-header"><a href="#aliases">Aliases</a></h2>
+<h2 id="aliases"><a href="#aliases">Aliases</a></h2>
 <p>Dynasm-rs allows the user to define aliases for registers using the <code>.alias name, register</code> directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order.</p>
-<h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<p>While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal rust macros with dynasm-rs.</p>
-<p>First of all, it is not possible to have <code>dynasm!</code> parse the result of a rust macro. This is a limitation of rust itself. The proper way to use rust macros with dynasm-rs is to have macros expand to a <code>dynasm!</code> call as can be seen in the following example:</p>
+<h2 id="macros"><a href="#macros">Macros</a></h2>
+<p>While this is technically not a feature of dynasm-rs, there are a few rules that must be taken into account when using normal Rust macros with dynasm-rs.</p>
+<p>First of all, it is not possible to have <code>dynasm!</code> parse the result of a Rust macro. This is a limitation of Rust itself. The proper way to use Rust macros with dynasm-rs is to have macros expand to a <code>dynasm!</code> call as can be seen in the following example:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">macro_rules!</span> <span class="ident">fma</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ops</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accumulator</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg2</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="macro">dynasm!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ops</span>
-        ; <span class="ident">imul</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg2</span>
-        ; <span class="ident">add</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accumulator</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg1</span>
-    )};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">macro_rules! </span>fma {
+    (<span class="macro-nonterminal">$ops</span>:ident, <span class="macro-nonterminal">$accumulator</span>:expr, <span class="macro-nonterminal">$arg1</span>:expr, <span class="macro-nonterminal">$arg2</span>:expr) =&gt; {<span class="macro">dynasm!</span>(<span class="macro-nonterminal">$ops
+        </span>; imul <span class="macro-nonterminal">$arg1</span>, <span class="macro-nonterminal">$arg2
+        </span>; add <span class="macro-nonterminal">$accumulator</span>, <span class="macro-nonterminal">$arg1
+    </span>)};
 }</code></pre></div>
-<h2 id="statements" class="section-header"><a href="#statements">Statements</a></h2>
-<p>To make code that uses a lot of macros less verbose, dynasm-rs allows bare rust statements to be inserted inside <code>dynasm!</code> invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:</p>
+<h2 id="statements"><a href="#statements">Statements</a></h2>
+<p>To make code that uses a lot of macros less verbose, dynasm-rs allows bare Rust statements to be inserted inside <code>dynasm!</code> invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">dynasm!</span>(<span class="ident">ops</span>
-    ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">dynasm!</span>(ops
+    ; mov rcx, rax
 );
-<span class="macro">call_extern!</span>(<span class="ident">ops</span>, <span class="ident">extern_func</span>);
-<span class="macro">dynasm!</span>(<span class="ident">ops</span>
-    ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
+<span class="macro">call_extern!</span>(ops, extern_func);
+<span class="macro">dynasm!</span>(ops
+    ; mov rcx, rax
 );
 
-<span class="macro">dynasm!</span>(<span class="ident">ops</span>
-    ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
-    ;; <span class="macro">call_extern!</span>(<span class="ident">ops</span>, <span class="ident">extern_func</span>)
-    ; <span class="ident">mov</span> <span class="ident">rcx</span>, <span class="ident">rax</span>
+<span class="macro">dynasm!</span>(ops
+    ; mov rcx, rax
+    ;; <span class="macro">call_extern!</span>(ops, extern_func)
+    ; mov rcx, rax
 );</code></pre></div>
-<h2 id="labels-1" class="section-header"><a href="#labels-1">Labels</a></h2>
+<h2 id="labels-1"><a href="#labels-1">Labels</a></h2>
 <p>In order to describe flow control effectively, dynasm-rs supports labels. However, since the assembly templates can be combined in a variety of ways at the mercy of the program using dynasm-rs, the semantics of these labels are somewhat different from how labels work in a static assembler.</p>
 <p>Dynasm-rs distinguishes between three different types of labels: global, local and dynamic labels. Their syntax is as follows:</p>
 <p>Table 2: dynasm-rs label types</p>
-<table><thead><tr><th>Type</th><th>Definition</th><th>Reference</th></tr></thead><tbody>
+<div><table><thead><tr><th>Type</th><th>Definition</th><th>Reference</th></tr></thead><tbody>
 <tr><td>Local</td><td><code>label:</code></td><td><code>&gt;label</code> or <code>&lt;label</code></td></tr>
 <tr><td>GLobal</td><td><code>-&gt;label:</code></td><td><code>-&gt;label</code></td></tr>
 <tr><td>Dynamic</td><td><code>=&gt;expr</code></td><td><code>=&gt;expr</code></td></tr>
 <tr><td>Extern</td><td><code>-</code></td><td><code>extern expr</code></td></tr>
 </tbody></table>
-<h3 id="local-labels" class="section-header"><a href="#local-labels">Local labels</a></h3>
-<p>On first sight, local label definitions are similar to how labels are normally used in static assemblers. The trick with local labels is however in how they can be referenced. Local labels referenced with the <code>&gt;label</code> syntax will be resolved to the first definition of this label after this piece of code, while local labels referenced with the <code>&lt;label</code> will be resolved to the last definition of this label before the reference site. Any valid rust identifier can be used as a local label name, and local labels can be defined multiple times.</p>
-<h3 id="global-labels" class="section-header"><a href="#global-labels">Global labels</a></h3>
-<p>Global labels can only be defined once, and all references to a global label will be resolved to this label. Any valid rust identifier can be used as a local label name.</p>
-<h3 id="dynamic-labels" class="section-header"><a href="#dynamic-labels">Dynamic labels</a></h3>
+</div><h3 id="local-labels"><a href="#local-labels">Local labels</a></h3>
+<p>On first sight, local label definitions are similar to how labels are normally used in static assemblers. The trick with local labels is however in how they can be referenced. Local labels referenced with the <code>&gt;label</code> syntax will be resolved to the first definition of this label after this piece of code, while local labels referenced with the <code>&lt;label</code> will be resolved to the last definition of this label before the reference site. Any valid Rust identifier can be used as a local label name, and local labels can be defined multiple times.</p>
+<h3 id="global-labels"><a href="#global-labels">Global labels</a></h3>
+<p>Global labels can only be defined once, and all references to a global label will be resolved to this label. Any valid Rust identifier can be used as a local label name.</p>
+<h3 id="dynamic-labels"><a href="#dynamic-labels">Dynamic labels</a></h3>
 <p>Dynamic labels are similar to global labels in that they can be defined only once, but instead of a name, they are identified by an expression. New dynamic labels can be created at runtime by the assembler. This expression is evaluated at the point where the label is defined or referenced, and the labels will be resolved at only at commit time.</p>
-<h3 id="extern-labels" class="section-header"><a href="#extern-labels">Extern labels</a></h3>
+<h3 id="extern-labels"><a href="#extern-labels">Extern labels</a></h3>
 <p>Extern labels allow emitted machine code to directly reference fixed addresses as branch targets. This is only supported on architectures featuring absolute branch targets, like <code>x86</code>.</p>
 
     </section>
