@@ -646,7 +646,7 @@ impl<R: Relocation> Assembler<R> {
                     *error = Some(DynasmError::ImpossibleRelocation(TargetKind::Managed))
                 }
 
-                mmap::cache_management::invalidate_icache_lines(buf);
+                mmap::cache_management::invalidate_cache(buf);
             }
         });
 
@@ -842,7 +842,7 @@ pub struct Modifier<'a, R: Relocation> {
 impl<'a, R: Relocation> Modifier<'a, R> {
     /// Move the modifier cursor to the selected location.
     pub fn goto(&mut self, offset: AssemblyOffset) {
-        mmap::cache_management::invalidate_icache_lines(&self.buffer[self.previous_asmoffset .. self.asmoffset]);
+        mmap::cache_management::invalidate_cache(&self.buffer[self.previous_asmoffset .. self.asmoffset]);
         self.old_managed.remove_between(self.previous_asmoffset, self.asmoffset);
 
         self.asmoffset = offset.0;
@@ -893,7 +893,7 @@ impl<'a, R: Relocation> Modifier<'a, R> {
                 self.new_managed.add(loc);
             }
 
-            mmap::cache_management::invalidate_icache_lines(buf);
+            mmap::cache_management::invalidate_cache(buf);
         }
 
         // Resolve dynamics
@@ -907,10 +907,10 @@ impl<'a, R: Relocation> Modifier<'a, R> {
                 self.new_managed.add(loc);
             }
 
-            mmap::cache_management::invalidate_icache_lines(buf);
+            mmap::cache_management::invalidate_cache(buf);
         }
 
-        mmap::cache_management::invalidate_icache_lines(&self.buffer[self.previous_asmoffset .. self.asmoffset]);
+        mmap::cache_management::invalidate_cache(&self.buffer[self.previous_asmoffset .. self.asmoffset]);
 
         self.old_managed.remove_between(self.previous_asmoffset, self.asmoffset);
 

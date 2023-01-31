@@ -38,6 +38,7 @@ impl ExecutableBuffer {
     /// the assembler is free to relocate the executable buffer when it requires
     /// more memory than available.
     pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
+        cache_management::invalidate_pipeline();
         &self[offset.0] as *const u8
     }
 
@@ -174,82 +175,93 @@ pub mod cache_management {
     //! This module exports the necessary interfaces to handle instruction cache invalidation that has to happen on the target platform.
     //! The current target platform is aarch64 and therefore this is quite necessary.
 
-    // some hacks to execute instructions not wrapped by the core::arch::arm
-    #[repr(align(4))]
-    struct Align4<T> {
-        inner: T
-    }
-
-    #[link_section = ".text"]
-    static GET_CTR_CL0: Align4<[u8; 8]> = Align4 {
-        inner: [
-            0x20, 0x00, 0x3b, 0xd5, // mrs x0, ctr_cl0
-            0xc0, 0x03, 0x5f, 0xd6, // ret
-        ]
-    };
-
-    #[link_section = ".text"]
-    static INVALIDATE_CACHELINE: Align4<[u8; 8]> = Align4 {
-        inner: [
-            0x20, 0x75, 0x0b, 0xd5, // ic ivau
-            0xc0, 0x03, 0x5f, 0xd6, // ret
-        ]
-    };
-
-    #[link_section = ".text"]
-    static INVALIDATE_PIPELINE: Align4<[u8; 12]> = Align4 { 
-        inner: [
-            0x9f, 0x3b, 0x03, 0xd5, // dsb ish
-            0xdf, 0x3f, 0x03, 0xd5, // isb sy
-            0xc0, 0x03, 0x5f, 0xd6, // ret
-        ]
-    };
-
-    fn get_cacheline_size() -> usize {
-        let get_cacheline_size_internal: extern "aarch64" fn() -> usize = unsafe { std::mem::transmute(GET_CTR_CL0.inner.as_ptr()) };
-        4 << (get_cacheline_size_internal() & 0xF)
-    }
-
-    /// Ensures that the cache lines covered by `slice` are invalidated in the instruction cache, by successive calls to `ic ivau
-    pub fn invalidate_icache_lines(slice: &[u8]) {
-        let invalidate_cacheline: extern "aarch64" fn(usize) -> () = unsafe {std::mem::transmute(INVALIDATE_CACHELINE.inner.as_ptr()) };
-
-        // icache lines are guaranteed at least an instruction in size so for small values we can just emit a single instruction.
-        // relocations generate a lot of these so we handle them specially here.
-        if slice.len() <= 4 {
-            invalidate_cacheline((slice.as_ptr() as usize) & !3);
-            return;
+    // returns the dcache and icache line sizes in bytes. Both are guaranteed to at least be 4
+    fn get_cacheline_sizes() -> (usize, usize) {
+        let ctr_el0: usize;
+        // safety: just querying a system register for the cache line sizes.
+        unsafe {
+            asm!(
+                "mrs {outreg}, ctr_cl0",
+                outreg = lateout(reg) ctr_el0,
+                options(nomem, nostack, preserves_flags)
+            );
         }
+        (
+            4 << ((ctr_el0 >> 16) & 0xF),
+            4 << (ctr_el0 & 0xF)
+        )
+    }
 
+    // globals containing the smallest recorded dcache and icache size
+    // to work around big.LITTLE shenanigans.
+    // they're initialized to the max possible cache line size
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    static min_dcache_size: AtomicUsize = AtomicUsize::new(0x20000);
+    static min_icache_size: AtomicUsize = AtomicUsize::new(0x20000);
 
-        // have to flush between these addresses
+    /// Ensures that the cache lines covered by `slice` are invalidated in the instruction cache.
+    pub fn invalidate_cache(slice: &[u8]) {
         let start_addr = slice.as_ptr() as usize;
         let end_addr = start_addr + slice.len();
 
-        // there is no nice API for figuring out the minimum cache line size on aarch64 BIG.little processors.
-        // therefore, this ugly kludge
-        let mut line_size = get_cacheline_size();
-        let mut current_line_size = 0xFFFFFFFF; // max cacheline size is 4 << 15
+        // figure out the minimum cache line size, accounting for big.LITTLE insanity
+        let (dcache_size, icache_size) = get_cacheline_sizes();
+        let dcache_size = min_dcache_size.fetch_min(dcache_size, Ordering::Relaxed).min(dcache_size);
+        let icache_size = min_icache_size.fetch_min(icache_size, Ordering::Relaxed).min(icache_size);
 
-        while current_line_size > line_size {
-            current_line_size = line_size;
-
-            let mut addr = start_addr & !(line_size - 1);
-
-            while addr < end_addr {
-                invalidate_cacheline(addr);
-                addr += line_size;
+        // dcache cleaning loop (to update data to point of unification)
+        let mut addr = start_addr & !(dcache_size - 1);
+        while addr < end_addr {
+            // safety: cleaning caches is always safe
+            unsafe {
+                asm!(
+                    "dc cvau, {address}",
+                    address = in(reg)addr,
+                    options(nostack, preserves_flags)
+                );
             }
-
-            // recheck the line size. The loop will run again if it became smaller.
-            line_size = get_cacheline_size();
+            addr += dcache_size;
+        }
+        // await completion of the previous instructions
+        // safety: barrier
+        unsafe {
+            asm!(
+                "dsb ish",
+                options(nostack, preserves_flags)
+            );
+        }
+        // icache invalidation loop (to make the icache coherent to the point to unification)
+        let mut addr = start_addr & !(icache_size - 1);
+        while addr < end_addr {
+            // safety: invalidating caches is always safe
+            unsafe {
+                asm!(
+                    "ic ivau, {address}",
+                    address = in(reg)addr,
+                    options(nostack, preserves_flags)
+                );
+            }
+            addr += icache_size;
+        }
+        // await completion of the previous instructions
+        // safety: barrier
+        unsafe {
+            asm!(
+                "dsb ish",
+                options(nostack, preserves_flags)
+            );
         }
     }
 
-    /// Ensures the instruction pipeline is brought fully up to date with any previous writes and cache invalidations. Equivalent to `dsb ish, isb sy`.
+    /// Invalidate any instructions already fetched from the instruction cache before executing possibly altered code.
     pub fn invalidate_pipeline() {
-        let invalidate_pipeline_internal: extern "aarch64" fn() -> () = unsafe { std::mem::transmute(INVALIDATE_PIPELINE.inner.as_ptr()) };
-        invalidate_pipeline_internal();
+        // safety: this is just a barrier. It can at worst slow performance down.
+        unsafe {
+            asm!(
+                "isb", // flush the pipeline of the current processor
+                options(nostack, preserves_flags)
+            );
+        }
     }
 }
 
@@ -257,9 +269,17 @@ pub mod cache_management {
 pub mod cache_management {
     //! This module exports the necessary interfaces to handle instruction cache invalidation that has to happen on the target platform.
     //! The current target architecture has a coherent instruction cache, data cache and pipeline so these are no-ops.
+    //! Cache management is necessary at two points:
+    //! first, after data that was already in the instruction cache has been altered in the data cache. The instruction cache needs
+    //! to be made coherent again with the data cache. This should happen in the thread that altered the data.
+    //! second, before data that has possibly been altered in the instruction cache is executed. It is required to flush the pipeline
+    //! of the executing thread to prevent the execution of possibly stale data that was already loaded from the instruction cache.
 
-    /// Ensures that the cache lines covered by `slice` are invalidated in the instruction cache. This is a no-op on the current platform.
-    pub fn invalidate_icache_lines(_slice: &[u8]) {}
-    /// Ensures the instruction pipeline is brought fully up to date with any previous writes and cache invalidations. This is a no-op on the current platform.
+    /// Ensures that the cache lines covered by `slice` are invalidated in the instruction cache.
+    /// This is a no-op on the current platform.
+    pub fn invalidate_cache(_slice: &[u8]) {}
+
+    /// Invalidate any instructions already fetched from the instruction cache before executing possibly altered code.
+    /// This is a no-op on the current platform.
     pub fn invalidate_pipeline() {}
 }
