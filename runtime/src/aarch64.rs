@@ -12,7 +12,7 @@
 //!
 //! ## Enums
 //!
-//! There are enumerator of every logically distinct register family usable in aarch64. 
+//! There are enumerator of every logically distinct register family usable in aarch64.
 //! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.
 //!
 //! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*
@@ -22,8 +22,10 @@
 //! The aarch64 architecture allows encoding several special types of immediates. The encoding implementations for these immediate types have been exposed to assist the user
 //! in correctly using these instructions. They will return `Some(encoding)` only if the given value can be encoded losslessly in that immediate type.
 
+use crate::relocations::{
+    fits_signed_bitfield, ImpossibleRelocation, Relocation, RelocationKind, RelocationSize,
+};
 use crate::Register;
-use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation, fits_signed_bitfield};
 use byteorder::{ByteOrder, LittleEndian};
 use std::convert::TryFrom;
 
@@ -53,52 +55,52 @@ impl Aarch64Relocation {
             Self::ADR => 0x9F00_001F,
             Self::ADRP => 0x9F00_001F,
             Self::TBZ => 0xFFF8_001F,
-            Self::Plain(_) => 0
+            Self::Plain(_) => 0,
         }
     }
 
     fn encode(&self, value: isize) -> Result<u32, ImpossibleRelocation> {
-        let value = i64::try_from(value).map_err(|_| ImpossibleRelocation { } )?;
+        let value = i64::try_from(value).map_err(|_| ImpossibleRelocation {})?;
         Ok(match self {
             Self::B => {
                 if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 26) {
-                    return Err(ImpossibleRelocation { } );
+                    return Err(ImpossibleRelocation {});
                 }
                 let value = (value >> 2) as u32;
                 value & 0x3FF_FFFF
-            },
+            }
             Self::BCOND => {
                 if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 19) {
-                    return Err(ImpossibleRelocation { } );
+                    return Err(ImpossibleRelocation {});
                 }
                 let value = (value >> 2) as u32;
                 (value & 0x7FFFF) << 5
-            },
+            }
             Self::ADR => {
                 if !fits_signed_bitfield(value, 21) {
-                    return Err(ImpossibleRelocation { } );
+                    return Err(ImpossibleRelocation {});
                 }
                 let low = (value) as u32;
                 let high = (value >> 2) as u32;
                 ((high & 0x7FFFF) << 5) | ((low & 3) << 29)
-            },
+            }
             Self::ADRP => {
                 let value = value + 0xFFF;
                 if !fits_signed_bitfield(value >> 12, 21) {
-                    return Err(ImpossibleRelocation { } );
+                    return Err(ImpossibleRelocation {});
                 }
                 let low = (value >> 12) as u32;
                 let high = (value >> 14) as u32;
                 ((high & 0x7FFFF) << 5) | ((low & 3) << 29)
-            },
+            }
             Self::TBZ => {
                 if value & 3 != 0 || !fits_signed_bitfield(value >> 2, 14) {
-                    return Err(ImpossibleRelocation { } );
+                    return Err(ImpossibleRelocation {});
                 }
                 let value = (value >> 2) as u32;
                 (value & 0x3FFF) << 5
-            },
-            Self::Plain(_) => return Err(ImpossibleRelocation { } )
+            }
+            Self::Plain(_) => return Err(ImpossibleRelocation {}),
         })
     }
 }
@@ -112,7 +114,7 @@ impl Relocation for Aarch64Relocation {
             2 => Self::ADR,
             3 => Self::ADRP,
             4 => Self::TBZ,
-            x  => Self::Plain(RelocationSize::from_encoding(x - 4))
+            x => Self::Plain(RelocationSize::from_encoding(x - 4)),
         }
     }
     fn from_size(size: RelocationSize) -> Self {
@@ -145,24 +147,12 @@ impl Relocation for Aarch64Relocation {
         let mask = !self.op_mask();
         let value = LittleEndian::read_u32(buf);
         let unpacked = match self {
-            Self::B => u64::from(
-                value & mask
-            ) << 2,
-            Self::BCOND => u64::from(
-                (value & mask) >> 5
-            ) << 2,
-            Self::ADR  => u64::from(
-                (((value >> 5 ) & 0x7FFFF) << 2) |
-                ((value >> 29) & 3 )
-            ),
-            Self::ADRP => u64::from(
-                (((value >> 5 ) & 0x7FFFF) << 2) |
-                ((value >> 29) & 3 )
-            ) << 12,
-            Self::TBZ => u64::from(
-                (value & mask) >> 5
-            ) << 2,
-            Self::Plain(_) => unreachable!()
+            Self::B => u64::from(value & mask) << 2,
+            Self::BCOND => u64::from((value & mask) >> 5) << 2,
+            Self::ADR => u64::from((((value >> 5) & 0x7FFFF) << 2) | ((value >> 29) & 3)),
+            Self::ADRP => u64::from((((value >> 5) & 0x7FFFF) << 2) | ((value >> 29) & 3)) << 12,
+            Self::TBZ => u64::from((value & mask) >> 5) << 2,
+            Self::Plain(_) => unreachable!(),
         };
 
         // Sign extend.
@@ -172,7 +162,7 @@ impl Relocation for Aarch64Relocation {
             Self::ADR => 21,
             Self::ADRP => 33,
             Self::TBZ => 14,
-            Self::Plain(_) => unreachable!()
+            Self::Plain(_) => unreachable!(),
         };
         let offset = 1u64 << (bits - 1);
         let value: u64 = (unpacked ^ offset) - offset;
@@ -193,7 +183,6 @@ pub type Assembler = crate::Assembler<Aarch64Relocation>;
 pub type AssemblyModifier<'a> = crate::Modifier<'a, Aarch64Relocation>;
 /// An aarch64 UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
-
 
 /// Helper function for validating that a given value can be encoded as a 32-bit logical immediate
 pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
@@ -261,19 +250,42 @@ pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
     }
 }
 
-
 /// 4 or 8-byte general purpopse registers, where X31 is the zero register.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RX {
-    X0 = 0x00, X1 = 0x01, X2 = 0x02, X3 = 0x03,
-    X4 = 0x04, X5 = 0x05, X6 = 0x06, X7 = 0x07,
-    X8 = 0x08, X9 = 0x09, X10= 0x0A, X11= 0x0B,
-    X12= 0x0C, X13= 0x0D, X14= 0x0E, X15= 0x0F,
-    X16= 0x10, X17= 0x11, X18= 0x12, X19= 0x13,
-    X20= 0x14, X21= 0x15, X22= 0x16, X23= 0x17,
-    X24= 0x18, X25= 0x19, X26= 0x1A, X27= 0x1B,
-    X28= 0x1C, X29= 0x1D, X30= 0x1E, XZR= 0x1F,
+    X0 = 0x00,
+    X1 = 0x01,
+    X2 = 0x02,
+    X3 = 0x03,
+    X4 = 0x04,
+    X5 = 0x05,
+    X6 = 0x06,
+    X7 = 0x07,
+    X8 = 0x08,
+    X9 = 0x09,
+    X10 = 0x0A,
+    X11 = 0x0B,
+    X12 = 0x0C,
+    X13 = 0x0D,
+    X14 = 0x0E,
+    X15 = 0x0F,
+    X16 = 0x10,
+    X17 = 0x11,
+    X18 = 0x12,
+    X19 = 0x13,
+    X20 = 0x14,
+    X21 = 0x15,
+    X22 = 0x16,
+    X23 = 0x17,
+    X24 = 0x18,
+    X25 = 0x19,
+    X26 = 0x1A,
+    X27 = 0x1B,
+    X28 = 0x1C,
+    X29 = 0x1D,
+    X30 = 0x1E,
+    XZR = 0x1F,
 }
 reg_impls!(RX);
 
@@ -282,29 +294,77 @@ reg_impls!(RX);
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RXSP {
-    X0 = 0x00, X1 = 0x01, X2 = 0x02, X3 = 0x03,
-    X4 = 0x04, X5 = 0x05, X6 = 0x06, X7 = 0x07,
-    X8 = 0x08, X9 = 0x09, X10= 0x0A, X11= 0x0B,
-    X12= 0x0C, X13= 0x0D, X14= 0x0E, X15= 0x0F,
-    X16= 0x10, X17= 0x11, X18= 0x12, X19= 0x13,
-    X20= 0x14, X21= 0x15, X22= 0x16, X23= 0x17,
-    X24= 0x18, X25= 0x19, X26= 0x1A, X27= 0x1B,
-    X28= 0x1C, X29= 0x1D, X30= 0x1E, SP = 0x1F,
+    X0 = 0x00,
+    X1 = 0x01,
+    X2 = 0x02,
+    X3 = 0x03,
+    X4 = 0x04,
+    X5 = 0x05,
+    X6 = 0x06,
+    X7 = 0x07,
+    X8 = 0x08,
+    X9 = 0x09,
+    X10 = 0x0A,
+    X11 = 0x0B,
+    X12 = 0x0C,
+    X13 = 0x0D,
+    X14 = 0x0E,
+    X15 = 0x0F,
+    X16 = 0x10,
+    X17 = 0x11,
+    X18 = 0x12,
+    X19 = 0x13,
+    X20 = 0x14,
+    X21 = 0x15,
+    X22 = 0x16,
+    X23 = 0x17,
+    X24 = 0x18,
+    X25 = 0x19,
+    X26 = 0x1A,
+    X27 = 0x1B,
+    X28 = 0x1C,
+    X29 = 0x1D,
+    X30 = 0x1E,
+    SP = 0x1F,
 }
 reg_impls!(RXSP);
 
-/// 1, 2, 4, 8 or 16-bytes scalar FP / vector SIMD registers. 
+/// 1, 2, 4, 8 or 16-bytes scalar FP / vector SIMD registers.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RV {
-    V0 = 0x00, V1 = 0x01, V2 = 0x02, V3 = 0x03,
-    V4 = 0x04, V5 = 0x05, V6 = 0x06, V7 = 0x07,
-    V8 = 0x08, V9 = 0x09, V10= 0x0A, V11= 0x0B,
-    V12= 0x0C, V13= 0x0D, V14= 0x0E, V15= 0x0F,
-    V16= 0x10, V17= 0x11, V18= 0x12, V19= 0x13,
-    V20= 0x14, V21= 0x15, V22= 0x16, V23= 0x17,
-    V24= 0x18, V25= 0x19, V26= 0x1A, V27= 0x1B,
-    V28= 0x1C, V29= 0x1D, V30= 0x1E, V31= 0x1F,
+    V0 = 0x00,
+    V1 = 0x01,
+    V2 = 0x02,
+    V3 = 0x03,
+    V4 = 0x04,
+    V5 = 0x05,
+    V6 = 0x06,
+    V7 = 0x07,
+    V8 = 0x08,
+    V9 = 0x09,
+    V10 = 0x0A,
+    V11 = 0x0B,
+    V12 = 0x0C,
+    V13 = 0x0D,
+    V14 = 0x0E,
+    V15 = 0x0F,
+    V16 = 0x10,
+    V17 = 0x11,
+    V18 = 0x12,
+    V19 = 0x13,
+    V20 = 0x14,
+    V21 = 0x15,
+    V22 = 0x16,
+    V23 = 0x17,
+    V24 = 0x18,
+    V25 = 0x19,
+    V26 = 0x1A,
+    V27 = 0x1B,
+    V28 = 0x1C,
+    V29 = 0x1D,
+    V30 = 0x1E,
+    V31 = 0x1F,
 }
 reg_impls!(RV);
 

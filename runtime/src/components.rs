@@ -1,16 +1,16 @@
 //! This module provides several reusable compoments for implementing assemblers
 
-use std::io;
 use std::collections::hash_map::Entry;
 use std::collections::BTreeMap;
-use std::sync::{Arc, RwLock, RwLockWriteGuard};
+use std::io;
 use std::mem;
+use std::sync::{Arc, RwLock, RwLockWriteGuard};
 
 use fnv::FnvHashMap;
 
-use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
 use crate::mmap::{ExecutableBuffer, MutableBuffer};
-use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
+use crate::relocations::{ImpossibleRelocation, Relocation, RelocationKind, RelocationSize};
+use crate::{AssemblyOffset, DynamicLabel, DynasmError, DynasmLabelApi, LabelKind};
 
 /// A static label represents either a local label or a global label reference.
 /// Global labels are unique names, which can be referenced multiple times, but only defined once.
@@ -27,18 +27,12 @@ pub struct StaticLabel {
 impl StaticLabel {
     /// Create a new static label for a global label
     pub fn global(name: &'static str) -> StaticLabel {
-        StaticLabel {
-            name,
-            version: 0
-        }
+        StaticLabel { name, version: 0 }
     }
 
     /// Create a new static label for a local label, with the given version id to distinguish it.
     pub fn local(name: &'static str, version: usize) -> StaticLabel {
-        StaticLabel {
-            name,
-            version
-        }
+        StaticLabel { name, version }
     }
 
     /// Returns if this static label represents a global label
@@ -60,10 +54,7 @@ impl StaticLabel {
 
     /// Returns the representation of the first local label used with the given name.
     pub fn first(name: &'static str) -> StaticLabel {
-        StaticLabel {
-            name,
-            version: 1
-        }
+        StaticLabel { name, version: 1 }
     }
 
     /// Returns the name of this static label
@@ -84,7 +75,7 @@ pub struct MemoryManager {
     asmoffset: usize,
 
     // the address that the current execbuffer starts at
-    execbuffer_addr: usize
+    execbuffer_addr: usize,
 }
 
 impl MemoryManager {
@@ -97,7 +88,7 @@ impl MemoryManager {
             execbuffer: Arc::new(RwLock::new(execbuffer)),
             execbuffer_size: initial_mmap_size,
             asmoffset: 0,
-            execbuffer_addr
+            execbuffer_addr,
         })
     }
 
@@ -113,7 +104,10 @@ impl MemoryManager {
 
     /// Commits the data from `new` into the managed memory, calling `f` when the buffer is moved to fix anything
     /// that relies on the address of the buffer
-    pub fn commit<F>(&mut self, new: &mut Vec<u8>, f: F) where F: FnOnce(&mut [u8], usize, usize) {
+    pub fn commit<F>(&mut self, new: &mut Vec<u8>, f: F)
+    where
+        F: FnOnce(&mut [u8], usize, usize),
+    {
         let old_asmoffset = self.asmoffset;
         let new_asmoffset = self.asmoffset + new.len();
 
@@ -128,11 +122,12 @@ impl MemoryManager {
             }
 
             // create a larger writable buffer
-            let mut new_buffer = MutableBuffer::new(self.execbuffer_size).expect("Could not allocate a larger buffer");
+            let mut new_buffer = MutableBuffer::new(self.execbuffer_size)
+                .expect("Could not allocate a larger buffer");
             new_buffer.set_len(new_asmoffset);
 
             // copy over the data
-            new_buffer[.. old_asmoffset].copy_from_slice(&self.execbuffer.read().unwrap());
+            new_buffer[..old_asmoffset].copy_from_slice(&self.execbuffer.read().unwrap());
             new_buffer[old_asmoffset..].copy_from_slice(&new);
             let new_buffer_addr = new_buffer.as_ptr() as usize;
 
@@ -141,21 +136,25 @@ impl MemoryManager {
 
             // swap the buffers
             self.execbuffer_addr = new_buffer_addr;
-            *self.execbuffer.write().unwrap() = new_buffer.make_exec().expect("Could not swap buffer protection modes")
-
+            *self.execbuffer.write().unwrap() = new_buffer
+                .make_exec()
+                .expect("Could not swap buffer protection modes")
         } else {
-
             // temporarily change the buffer protection modes and copy in new data
             let mut lock = self.write();
             let buffer = mem::replace(&mut *lock, ExecutableBuffer::default());
-            let mut buffer = buffer.make_mut().expect("Could not swap buffer protection modes");
+            let mut buffer = buffer
+                .make_mut()
+                .expect("Could not swap buffer protection modes");
 
             // update buffer and length
             buffer.set_len(new_asmoffset);
             buffer[old_asmoffset..].copy_from_slice(&new);
 
             // repack the buffer
-            let buffer = buffer.make_exec().expect("Could not swap buffer protection modes");
+            let buffer = buffer
+                .make_exec()
+                .expect("Could not swap buffer protection modes");
             *lock = buffer;
         }
 
@@ -175,7 +174,7 @@ impl MemoryManager {
             Err(arc) => Err(Self {
                 execbuffer: arc,
                 ..self
-            })
+            }),
         }
     }
 
@@ -184,7 +183,6 @@ impl MemoryManager {
         self.execbuffer.clone()
     }
 }
-
 
 /// A registry of labels. Contains all necessessities for keeping track of dynasm labels.
 /// This is useful when implementing your own assembler and can also be used to query
@@ -212,7 +210,10 @@ impl LabelRegistry {
     /// Create a new, empty label registry with `capacity` space for each different label type.
     pub fn with_capacity(locals: usize, globals: usize, dynamics: usize) -> LabelRegistry {
         LabelRegistry {
-            static_labels: FnvHashMap::with_capacity_and_hasher(locals + globals, Default::default()),
+            static_labels: FnvHashMap::with_capacity_and_hasher(
+                locals + globals,
+                Default::default(),
+            ),
             dynamic_labels: Vec::with_capacity(dynamics),
             local_versions: FnvHashMap::with_capacity_and_hasher(locals, Default::default()),
         }
@@ -233,17 +234,25 @@ impl LabelRegistry {
     }
 
     /// Define a the dynamic label `id` to be located at `offset`.
-    pub fn define_dynamic(&mut self, id: DynamicLabel, offset: AssemblyOffset) -> Result<(), DynasmError> {
+    pub fn define_dynamic(
+        &mut self,
+        id: DynamicLabel,
+        offset: AssemblyOffset,
+    ) -> Result<(), DynasmError> {
         match self.dynamic_labels.get_mut(id.0) {
             Some(Some(_)) => return Err(DynasmError::DuplicateLabel(LabelKind::Dynamic(id))),
-            Some(e)       => *e = Some(offset),
-            None          => return Err(DynasmError::UnknownLabel(LabelKind::Dynamic(id))),
+            Some(e) => *e = Some(offset),
+            None => return Err(DynasmError::UnknownLabel(LabelKind::Dynamic(id))),
         }
         Ok(())
     }
 
     /// Define a the global label `name` to be located at `offset`.
-    pub fn define_global(&mut self, name: &'static str, offset: AssemblyOffset) -> Result<(), DynasmError> {
+    pub fn define_global(
+        &mut self,
+        name: &'static str,
+        offset: AssemblyOffset,
+    ) -> Result<(), DynasmError> {
         match self.static_labels.entry(StaticLabel::global(name)) {
             Entry::Occupied(_) => Err(DynasmError::DuplicateLabel(LabelKind::Global(name))),
             Entry::Vacant(v) => {
@@ -259,38 +268,43 @@ impl LabelRegistry {
             Entry::Occupied(mut o) => {
                 *o.get_mut() += 1;
                 *o.get()
-            },
+            }
             Entry::Vacant(v) => {
                 v.insert(1);
                 1
             }
         };
-        self.static_labels.insert(StaticLabel::local(name, generation), offset);
+        self.static_labels
+            .insert(StaticLabel::local(name, generation), offset);
     }
 
     /// Turns a local label into a static label, by adding some extra information to it
     /// so we know what local label it is even after another has been defined
     pub fn place_local_reference(&self, name: &'static str) -> Option<StaticLabel> {
-        self.local_versions.get(name).map(|&version| StaticLabel::local(name, version))
+        self.local_versions
+            .get(name)
+            .map(|&version| StaticLabel::local(name, version))
     }
 
     /// Returns the offset at which the dynamic label `id` was defined, if one was defined.
     pub fn resolve_dynamic(&self, id: DynamicLabel) -> Result<AssemblyOffset, DynasmError> {
-        self.dynamic_labels.get(id.0).and_then(|&e| e).ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
+        self.dynamic_labels
+            .get(id.0)
+            .and_then(|&e| e)
+            .ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
     }
 
     /// Returns the offset at which the global label `name` was defined, if one was defined.
     pub fn resolve_static(&self, label: &StaticLabel) -> Result<AssemblyOffset, DynasmError> {
-        self.static_labels.get(label).cloned().ok_or_else(|| DynasmError::UnknownLabel(
-            if label.is_global() {
+        self.static_labels.get(label).cloned().ok_or_else(|| {
+            DynasmError::UnknownLabel(if label.is_global() {
                 LabelKind::Global(label.name)
             } else {
                 LabelKind::Local(label.name)
-            }
-        ))
+            })
+        })
     }
 }
-
 
 /// An abstraction of a relocation of type `R`, located at `location`.
 #[derive(Clone, Debug)]
@@ -309,13 +323,19 @@ pub struct PatchLoc<R: Relocation> {
 
 impl<R: Relocation> PatchLoc<R> {
     /// create a new `PatchLoc`
-    pub fn new(location: AssemblyOffset, target_offset: isize, field_offset: u8, ref_offset: u8, relocation: R) -> PatchLoc<R> {
+    pub fn new(
+        location: AssemblyOffset,
+        target_offset: isize,
+        field_offset: u8,
+        ref_offset: u8,
+        relocation: R,
+    ) -> PatchLoc<R> {
         PatchLoc {
             location,
             field_offset,
             ref_offset,
             relocation,
-            target_offset
+            target_offset,
         }
     }
 
@@ -323,23 +343,33 @@ impl<R: Relocation> PatchLoc<R> {
     /// `buf_offset` is a value that is subtracted from this range when the buffer you want to slice
     /// with this range is only a part of a bigger buffer.
     pub fn range(&self, buf_offset: usize) -> std::ops::Range<usize> {
-        let field_offset = self.location.0 - buf_offset -  self.field_offset as usize;
-        field_offset .. field_offset + self.relocation.size()
+        let field_offset = self.location.0 - buf_offset - self.field_offset as usize;
+        field_offset..field_offset + self.relocation.size()
     }
 
     /// Returns the actual value that should be inserted at the relocation site.
     pub fn value(&self, target: usize, buf_addr: usize) -> isize {
         (match self.relocation.kind() {
-            RelocationKind::Relative => target.wrapping_sub(self.location.0 - self.ref_offset as usize),
-            RelocationKind::RelToAbs => target.wrapping_sub(self.location.0 - self.ref_offset as usize + buf_addr),
-            RelocationKind::AbsToRel => target + buf_addr
-        }) as isize + self.target_offset
+            RelocationKind::Relative => {
+                target.wrapping_sub(self.location.0 - self.ref_offset as usize)
+            }
+            RelocationKind::RelToAbs => {
+                target.wrapping_sub(self.location.0 - self.ref_offset as usize + buf_addr)
+            }
+            RelocationKind::AbsToRel => target + buf_addr,
+        }) as isize
+            + self.target_offset
     }
 
     /// Patch `buffer` so that this relocation patch will point to `target`.
     /// `buf_addr` is the address that the assembling buffer will come to reside at when it is assembled.
     /// `target` is the offset that this relocation will be targetting.
-    pub fn patch(&self, buffer: &mut [u8], buf_addr: usize, target: usize) -> Result<(), ImpossibleRelocation> {
+    pub fn patch(
+        &self,
+        buffer: &mut [u8],
+        buf_addr: usize,
+        target: usize,
+    ) -> Result<(), ImpossibleRelocation> {
         let value = self.value(target, buf_addr);
         self.relocation.write_value(buffer, value)
     }
@@ -361,12 +391,10 @@ impl<R: Relocation> PatchLoc<R> {
     pub fn needs_adjustment(&self) -> bool {
         match self.relocation.kind() {
             RelocationKind::Relative => false,
-            RelocationKind::RelToAbs
-            | RelocationKind::AbsToRel => true,
+            RelocationKind::RelToAbs | RelocationKind::AbsToRel => true,
         }
     }
 }
-
 
 /// A registry of relocations and the respective labels they point towards.
 #[derive(Debug, Default)]
@@ -404,36 +432,40 @@ impl<R: Relocation> RelocRegistry<R> {
 
     /// Return an iterator through all defined relocations targeting global labels and the labels they target.
     /// These relocations are removed from the registry.
-    pub fn take_statics<'a>(&'a mut self) -> impl Iterator<Item=(PatchLoc<R>, StaticLabel)> + 'a {
+    pub fn take_statics<'a>(&'a mut self) -> impl Iterator<Item = (PatchLoc<R>, StaticLabel)> + 'a {
         self.static_targets.drain(..)
     }
 
     /// Return an iterator through all defined relocations targeting dynamic labels and the labels they target.
     /// These relocations are removed from the registry.
-    pub fn take_dynamics<'a>(&'a mut self) -> impl Iterator<Item=(PatchLoc<R>, DynamicLabel)> + 'a {
+    pub fn take_dynamics<'a>(
+        &'a mut self,
+    ) -> impl Iterator<Item = (PatchLoc<R>, DynamicLabel)> + 'a {
         self.dynamic_targets.drain(..)
     }
 }
-
 
 /// A registry of relocations that have been encoded previously, but need to be adjusted when the address of the buffer they
 /// reside in changes.
 #[derive(Debug, Default)]
 pub struct ManagedRelocs<R: Relocation> {
-    managed: BTreeMap<usize, PatchLoc<R>>
+    managed: BTreeMap<usize, PatchLoc<R>>,
 }
 
 impl<R: Relocation> ManagedRelocs<R> {
     /// Create a new, empty managed relocation registry.
     pub fn new() -> Self {
         Self {
-            managed: BTreeMap::new()
+            managed: BTreeMap::new(),
         }
     }
 
     /// Add a relocation to this registry.
     pub fn add(&mut self, patchloc: PatchLoc<R>) {
-        self.managed.insert(patchloc.location.0 - patchloc.field_offset as usize, patchloc);
+        self.managed.insert(
+            patchloc.location.0 - patchloc.field_offset as usize,
+            patchloc,
+        );
     }
 
     /// Take all items from another registry and add them to this registry
@@ -450,18 +482,17 @@ impl<R: Relocation> ManagedRelocs<R> {
             return;
         }
 
-        let keys: Vec<_> = self.managed.range(start .. end).map(|(&k, _)| k).collect();
+        let keys: Vec<_> = self.managed.range(start..end).map(|(&k, _)| k).collect();
         for k in keys {
             self.managed.remove(&k);
         }
     }
 
     /// Iterate through all defined managed relocations.
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item=&'a PatchLoc<R>> + 'a {
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = &'a PatchLoc<R>> + 'a {
         self.managed.values()
-    } 
+    }
 }
-
 
 #[derive(Clone, Debug)]
 enum LitPoolEntry {
@@ -589,20 +620,44 @@ impl LitPool {
                 LitPoolEntry::U64(value) => assembler.push_u64(value),
                 LitPoolEntry::Dynamic(size, id) => {
                     Self::pad_sized(size, assembler);
-                    assembler.dynamic_relocation(id, 0, size as u8, size as u8, D::Relocation::from_size(size));
-                },
+                    assembler.dynamic_relocation(
+                        id,
+                        0,
+                        size as u8,
+                        size as u8,
+                        D::Relocation::from_size(size),
+                    );
+                }
                 LitPoolEntry::Global(size, name) => {
                     Self::pad_sized(size, assembler);
-                    assembler.global_relocation(name, 0, size as u8, size as u8, D::Relocation::from_size(size));
-                },
+                    assembler.global_relocation(
+                        name,
+                        0,
+                        size as u8,
+                        size as u8,
+                        D::Relocation::from_size(size),
+                    );
+                }
                 LitPoolEntry::Forward(size, name) => {
                     Self::pad_sized(size, assembler);
-                    assembler.forward_relocation(name, 0, size as u8, size as u8, D::Relocation::from_size(size));
-                },
+                    assembler.forward_relocation(
+                        name,
+                        0,
+                        size as u8,
+                        size as u8,
+                        D::Relocation::from_size(size),
+                    );
+                }
                 LitPoolEntry::Backward(size, name) => {
                     Self::pad_sized(size, assembler);
-                    assembler.backward_relocation(name, 0, size as u8, size as u8, D::Relocation::from_size(size));
-                },
+                    assembler.backward_relocation(
+                        name,
+                        0,
+                        size as u8,
+                        size as u8,
+                        D::Relocation::from_size(size),
+                    );
+                }
                 LitPoolEntry::Align(with, alignment) => assembler.align(alignment, with),
             }
         }
@@ -612,8 +667,8 @@ impl LitPool {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use std::fmt::Debug;
     use relocations::{Relocation, RelocationSize};
+    use std::fmt::Debug;
 
     #[test]
     fn test_litpool_size() {
@@ -674,13 +729,14 @@ mod tests {
         assert_eq!(ops.commit(), Ok(()));
         let buf = ops.finalize().unwrap();
 
-        assert_eq!(&*buf, &[
-            0x12, 0x34, 0x56, 0x00, 0x9A, 0x78, 0x00, 0x00,
-            0x12, 0xF0, 0xDE, 0xBC, 0x00, 0x00, 0x00, 0x00,
-            0x12, 0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34,
-            24  , 0xCC, 0xCC, 0xCC, 20  , 0   , 0x00, 0x00,
-            16  , 0   , 0   , 0   , 0x00, 0x00, 0x00, 0x00,
-            0xD8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFFu8, 
-        ] as &[u8]);
+        assert_eq!(
+            &*buf,
+            &[
+                0x12, 0x34, 0x56, 0x00, 0x9A, 0x78, 0x00, 0x00, 0x12, 0xF0, 0xDE, 0xBC, 0x00, 0x00,
+                0x00, 0x00, 0x12, 0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 24, 0xCC, 0xCC, 0xCC,
+                20, 0, 0x00, 0x00, 16, 0, 0, 0, 0x00, 0x00, 0x00, 0x00, 0xD8, 0xFF, 0xFF, 0xFF,
+                0xFF, 0xFF, 0xFF, 0xFFu8,
+            ] as &[u8]
+        );
     }
 }

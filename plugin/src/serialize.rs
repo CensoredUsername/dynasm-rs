@@ -1,15 +1,14 @@
+use proc_macro2::{Literal, Span, TokenStream, TokenTree};
+use quote::{quote, quote_spanned, ToTokens};
 use syn;
 use syn::parse;
 use syn::spanned::Spanned;
-use proc_macro2::{Span, TokenStream, TokenTree, Literal};
-use quote::{quote, quote_spanned, ToTokens};
 
 use byteorder::{ByteOrder, LittleEndian};
 
-use crate::common::{Size, Stmt, delimited, Relocation};
+use crate::common::{delimited, Relocation, Size, Stmt};
 
 use std::convert::TryInto;
-
 
 /// Converts a sequence of abstract Statements to actual tokens
 pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
@@ -18,30 +17,28 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
     let mut const_buffer = Vec::new();
     for stmt in stmts {
         match stmt {
-            Stmt::Const(value, size) => {
-                match size {
-                    Size::BYTE => const_buffer.push(value as u8),
-                    Size::WORD => {
-                        let mut buffer = [0u8; 2];
-                        LittleEndian::write_u16(&mut buffer, value as u16);
-                        const_buffer.extend(&buffer);
-                    },
-                    Size::DWORD => {
-                        let mut buffer = [0u8; 4];
-                        LittleEndian::write_u32(&mut buffer, value as u32);
-                        const_buffer.extend(&buffer);
-                    },
-                    Size::QWORD => {
-                        let mut buffer = [0u8; 8];
-                        LittleEndian::write_u64(&mut buffer, value as u64);
-                        const_buffer.extend(&buffer);
-                    },
-                    _ => unimplemented!()
+            Stmt::Const(value, size) => match size {
+                Size::BYTE => const_buffer.push(value as u8),
+                Size::WORD => {
+                    let mut buffer = [0u8; 2];
+                    LittleEndian::write_u16(&mut buffer, value as u16);
+                    const_buffer.extend(&buffer);
                 }
+                Size::DWORD => {
+                    let mut buffer = [0u8; 4];
+                    LittleEndian::write_u32(&mut buffer, value as u32);
+                    const_buffer.extend(&buffer);
+                }
+                Size::QWORD => {
+                    let mut buffer = [0u8; 8];
+                    LittleEndian::write_u64(&mut buffer, value as u64);
+                    const_buffer.extend(&buffer);
+                }
+                _ => unimplemented!(),
             },
             Stmt::Extend(data) => {
                 const_buffer.extend(data);
-            },
+            }
             s => {
                 // empty the const buffer
                 if !const_buffer.is_empty() {
@@ -67,34 +64,112 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
     for stmt in folded_stmts {
         let (method, args) = match stmt {
             Stmt::Const(_, _) => unreachable!(),
-            Stmt::ExprUnsigned(expr, Size::BYTE)  => ("push",     vec![expr]),
-            Stmt::ExprUnsigned(expr, Size::WORD)  => ("push_u16", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::BYTE) => ("push", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::WORD) => ("push_u16", vec![expr]),
             Stmt::ExprUnsigned(expr, Size::DWORD) => ("push_u32", vec![expr]),
             Stmt::ExprUnsigned(expr, Size::QWORD) => ("push_u64", vec![expr]),
             Stmt::ExprUnsigned(_, _) => unimplemented!(),
-            Stmt::ExprSigned(  expr, Size::BYTE)  => ("push_i8",  vec![expr]),
-            Stmt::ExprSigned(  expr, Size::WORD)  => ("push_i16", vec![expr]),
-            Stmt::ExprSigned(  expr, Size::DWORD) => ("push_i32", vec![expr]),
-            Stmt::ExprSigned(  expr, Size::QWORD) => ("push_i64", vec![expr]),
+            Stmt::ExprSigned(expr, Size::BYTE) => ("push_i8", vec![expr]),
+            Stmt::ExprSigned(expr, Size::WORD) => ("push_i16", vec![expr]),
+            Stmt::ExprSigned(expr, Size::DWORD) => ("push_i32", vec![expr]),
+            Stmt::ExprSigned(expr, Size::QWORD) => ("push_i64", vec![expr]),
             Stmt::ExprSigned(_, _) => unimplemented!(),
-            Stmt::Extend(data)     => ("extend", vec![Literal::byte_string(&data).into()]),
+            Stmt::Extend(data) => ("extend", vec![Literal::byte_string(&data).into()]),
             Stmt::ExprExtend(expr) => ("extend", vec![expr]),
-            Stmt::Align(expr, with)      => ("align", vec![expr, with]),
+            Stmt::Align(expr, with) => ("align", vec![expr, with]),
             Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(&n)]),
-            Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(&n)]),
+            Stmt::LocalLabel(n) => ("local_label", vec![expr_string_from_ident(&n)]),
             Stmt::DynamicLabel(expr) => ("dynamic_label", vec![expr]),
-            Stmt::GlobalJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind }) => 
-                ("global_reloc"  , vec![expr_string_from_ident(&n), target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-            Stmt::ForwardJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind }) =>
-                ("forward_reloc" , vec![expr_string_from_ident(&n), target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-            Stmt::BackwardJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind }) =>
-                ("backward_reloc", vec![expr_string_from_ident(&n), target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-            Stmt::DynamicJumpTarget(expr, Relocation { target_offset, field_offset, ref_offset, kind }) =>
-                ("dynamic_reloc" , vec![expr, target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-            Stmt::BareJumpTarget(expr, Relocation { field_offset, ref_offset, kind, .. })    =>
-                ("bare_reloc"    , vec![expr, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-            Stmt::PrefixStmt(s)
-            | Stmt::Stmt(s) => {
+            Stmt::GlobalJumpTarget(
+                n,
+                Relocation {
+                    target_offset,
+                    field_offset,
+                    ref_offset,
+                    kind,
+                },
+            ) => (
+                "global_reloc",
+                vec![
+                    expr_string_from_ident(&n),
+                    target_offset,
+                    Literal::u8_suffixed(field_offset).into(),
+                    Literal::u8_suffixed(ref_offset).into(),
+                    kind,
+                ],
+            ),
+            Stmt::ForwardJumpTarget(
+                n,
+                Relocation {
+                    target_offset,
+                    field_offset,
+                    ref_offset,
+                    kind,
+                },
+            ) => (
+                "forward_reloc",
+                vec![
+                    expr_string_from_ident(&n),
+                    target_offset,
+                    Literal::u8_suffixed(field_offset).into(),
+                    Literal::u8_suffixed(ref_offset).into(),
+                    kind,
+                ],
+            ),
+            Stmt::BackwardJumpTarget(
+                n,
+                Relocation {
+                    target_offset,
+                    field_offset,
+                    ref_offset,
+                    kind,
+                },
+            ) => (
+                "backward_reloc",
+                vec![
+                    expr_string_from_ident(&n),
+                    target_offset,
+                    Literal::u8_suffixed(field_offset).into(),
+                    Literal::u8_suffixed(ref_offset).into(),
+                    kind,
+                ],
+            ),
+            Stmt::DynamicJumpTarget(
+                expr,
+                Relocation {
+                    target_offset,
+                    field_offset,
+                    ref_offset,
+                    kind,
+                },
+            ) => (
+                "dynamic_reloc",
+                vec![
+                    expr,
+                    target_offset,
+                    Literal::u8_suffixed(field_offset).into(),
+                    Literal::u8_suffixed(ref_offset).into(),
+                    kind,
+                ],
+            ),
+            Stmt::BareJumpTarget(
+                expr,
+                Relocation {
+                    field_offset,
+                    ref_offset,
+                    kind,
+                    ..
+                },
+            ) => (
+                "bare_reloc",
+                vec![
+                    expr,
+                    Literal::u8_suffixed(field_offset).into(),
+                    Literal::u8_suffixed(ref_offset).into(),
+                    kind,
+                ],
+            ),
+            Stmt::PrefixStmt(s) | Stmt::Stmt(s) => {
                 output.extend(quote! {
                     #s ;
                 });
@@ -113,7 +188,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
     if output.is_empty() {
         output
     } else {
-        quote!{
+        quote! {
             {
                 #output
             }
@@ -135,16 +210,51 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
     while let Some(stmt) = iter.next() {
         // if we find a relocation, note it down together with the current counter value and the value at which it can be safely emitted
         match stmt {
-            Stmt::GlobalJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-            | Stmt::ForwardJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-            | Stmt::BackwardJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-            | Stmt::DynamicJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-            | Stmt::BareJumpTarget(_, Relocation { field_offset, ref_offset, .. } ) => {
+            Stmt::GlobalJumpTarget(
+                _,
+                Relocation {
+                    field_offset,
+                    ref_offset,
+                    ..
+                },
+            )
+            | Stmt::ForwardJumpTarget(
+                _,
+                Relocation {
+                    field_offset,
+                    ref_offset,
+                    ..
+                },
+            )
+            | Stmt::BackwardJumpTarget(
+                _,
+                Relocation {
+                    field_offset,
+                    ref_offset,
+                    ..
+                },
+            )
+            | Stmt::DynamicJumpTarget(
+                _,
+                Relocation {
+                    field_offset,
+                    ref_offset,
+                    ..
+                },
+            )
+            | Stmt::BareJumpTarget(
+                _,
+                Relocation {
+                    field_offset,
+                    ref_offset,
+                    ..
+                },
+            ) => {
                 let trigger = counter + std::cmp::max(field_offset, ref_offset) as usize;
                 relocation_buf.push((trigger, counter, stmt));
                 continue;
-            },
-            _ => ()
+            }
+            _ => (),
         };
 
         while let Some(Stmt::PrefixStmt(_)) = iter.peek() {
@@ -156,15 +266,17 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
 
         // otherwise, calculate the size of the current statement and add that to the counter
         let size = match &stmt {
-            Stmt::Const(_, size)
-            | Stmt::ExprUnsigned(_, size)
-            | Stmt::ExprSigned(_, size) => size.in_bytes() as usize,
+            Stmt::Const(_, size) | Stmt::ExprUnsigned(_, size) | Stmt::ExprSigned(_, size) => {
+                size.in_bytes() as usize
+            }
             Stmt::Extend(buf) => buf.len(),
-            Stmt::ExprExtend(_)
-            | Stmt::Align(_, _) => {
-                assert!(relocation_buf.is_empty(), "Tried to hoist relocation over unknown size");
+            Stmt::ExprExtend(_) | Stmt::Align(_, _) => {
+                assert!(
+                    relocation_buf.is_empty(),
+                    "Tried to hoist relocation over unknown size"
+                );
                 0
-            },
+            }
             Stmt::GlobalLabel(_)
             | Stmt::LocalLabel(_)
             | Stmt::DynamicLabel(_)
@@ -189,17 +301,54 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
             }
 
             // apply the fixups and emit
-            let change: u8 = (counter - orig_counter).try_into().expect("Tried to hoist a relocation by over 255 bytes");
+            let change: u8 = (counter - orig_counter)
+                .try_into()
+                .expect("Tried to hoist a relocation by over 255 bytes");
             match &mut stmt {
-                Stmt::GlobalJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-                | Stmt::ForwardJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-                | Stmt::BackwardJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-                | Stmt::DynamicJumpTarget(_, Relocation { field_offset, ref_offset, .. } )
-                | Stmt::BareJumpTarget(_, Relocation { field_offset, ref_offset, .. } ) => {
+                Stmt::GlobalJumpTarget(
+                    _,
+                    Relocation {
+                        field_offset,
+                        ref_offset,
+                        ..
+                    },
+                )
+                | Stmt::ForwardJumpTarget(
+                    _,
+                    Relocation {
+                        field_offset,
+                        ref_offset,
+                        ..
+                    },
+                )
+                | Stmt::BackwardJumpTarget(
+                    _,
+                    Relocation {
+                        field_offset,
+                        ref_offset,
+                        ..
+                    },
+                )
+                | Stmt::DynamicJumpTarget(
+                    _,
+                    Relocation {
+                        field_offset,
+                        ref_offset,
+                        ..
+                    },
+                )
+                | Stmt::BareJumpTarget(
+                    _,
+                    Relocation {
+                        field_offset,
+                        ref_offset,
+                        ..
+                    },
+                ) => {
                     *field_offset = change - *field_offset;
                     *ref_offset = change - *ref_offset;
-                },
-                _ => unreachable!()
+                }
+                _ => unreachable!(),
             }
             reversed.push(stmt);
         }
@@ -212,7 +361,6 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
 // below here are all kinds of utility functions to quickly generate TokenTree constructs
 // this collection is arbitrary and purely based on what special things are needed for assembler
 // codegen implementations
-
 
 // expression of value 0. sometimes needed.
 pub fn expr_zero() -> TokenTree {
@@ -228,11 +376,14 @@ pub fn expr_string_from_ident(i: &syn::Ident) -> TokenTree {
 // Makes a dynamic scale expression. Useful for x64 generic addressing mode
 pub fn expr_dynscale(scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
     let tempval = expr_encode_x64_sib_scale(&scale);
-    (delimited(quote_spanned! { Span::mixed_site()=>
-        let temp = #tempval
-    }), delimited(quote_spanned! { Span::mixed_site()=>
-         #rest | ((temp & 3) << 6)
-    }))
+    (
+        delimited(quote_spanned! { Span::mixed_site()=>
+            let temp = #tempval
+        }),
+        delimited(quote_spanned! { Span::mixed_site()=>
+             #rest | ((temp & 3) << 6)
+        }),
+    )
 }
 
 // makes (a, b)
@@ -250,10 +401,10 @@ pub fn expr_tuple_of_u8s(span: Span, data: &[u8]) -> TokenTree {
 }
 
 // makes sum(exprs)
-pub fn expr_add_many<T: Iterator<Item=TokenTree>>(span: Span, mut exprs: T) -> Option<TokenTree> {
+pub fn expr_add_many<T: Iterator<Item = TokenTree>>(span: Span, mut exprs: T) -> Option<TokenTree> {
     let first_expr = exprs.next()?;
 
-    let tokens = quote_spanned!{ span=>
+    let tokens = quote_spanned! { span=>
         #first_expr #( + #exprs )*
     };
 
@@ -289,9 +440,13 @@ pub fn expr_mask_shift_or(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: 
     })
 }
 
-
 /// returns orig & !((expr & mask) << shift)
-pub fn expr_mask_shift_inverted_and(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: i8) -> TokenTree {
+pub fn expr_mask_shift_inverted_and(
+    orig: &TokenTree,
+    expr: &TokenTree,
+    mask: u64,
+    shift: i8,
+) -> TokenTree {
     let span = expr.span();
 
     let mask: TokenTree = proc_macro2::Literal::u64_unsuffixed(mask).into();
