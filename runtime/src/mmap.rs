@@ -1,7 +1,6 @@
 //! This module implements some wrappers around Mmap/MmapMut to also support a cheap "empty" variant.
 // Unfortunately Memmap itself doesn't support a cheap zero-length variant
 
-#[cfg(feature = "std")]
 use std::io;
 use std::ops::{Deref, DerefMut};
 
@@ -44,7 +43,6 @@ impl ExecutableBuffer {
 
     /// Create a new executable buffer, backed by a buffer of size `size`.
     /// It will start with an initialized length of 0.
-    #[cfg(feature = "std")]
     pub fn new(size: usize) -> io::Result<ExecutableBuffer> {
         let buffer = if size == 0 {
             None
@@ -61,7 +59,6 @@ impl ExecutableBuffer {
     }
 
     /// Change this executable buffer into a mutable buffer.
-    #[cfg(feature = "std")]
     pub fn make_mut(self) -> io::Result<MutableBuffer> {
         let buffer = if let Some(map) = self.buffer {
             Some(map.make_mut()?)
@@ -79,7 +76,6 @@ impl ExecutableBuffer {
 impl MutableBuffer {
     /// Create a new mutable buffer, backed by a buffer of size `size`.
     /// It will start with an initialized length of 0.
-    #[cfg(feature = "std")]
     pub fn new(size: usize) -> io::Result<MutableBuffer> {
         let buffer = if size == 0 {
             None
@@ -102,7 +98,6 @@ impl MutableBuffer {
     }
 
     /// Change this mutable buffer into an executable buffer.
-    #[cfg(feature = "std")]
     pub fn make_exec(self) -> io::Result<ExecutableBuffer> {
         let buffer = if let Some(map) = self.buffer {
             Some(map.make_exec()?)
