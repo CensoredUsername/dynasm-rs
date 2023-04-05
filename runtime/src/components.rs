@@ -680,8 +680,8 @@ impl LitPool {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use std::fmt::Debug;
     use relocations::{Relocation, RelocationSize};
+    use std::fmt::Debug;
 
     #[test]
     #[cfg(feature = "mmap")]
