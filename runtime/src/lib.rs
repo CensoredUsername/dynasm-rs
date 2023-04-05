@@ -731,8 +731,8 @@ pub struct Assembler<R: Relocation> {
     managed: ManagedRelocs<R>,
     error: Option<DynasmError>,
 }
-#[cfg(feature = "mmap")]
 
+#[cfg(feature = "mmap")]
 impl<R: Relocation> Assembler<R> {
     /// Create a new, empty assembler, with initial allocation size `page_size`.
     pub fn new() -> std::io::Result<Self> {

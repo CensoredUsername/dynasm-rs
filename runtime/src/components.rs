@@ -19,6 +19,7 @@ use {
 
 use fnv::FnvHashMap;
 
+#[cfg(feature = "mmap")]
 use crate::mmap::{ExecutableBuffer, MutableBuffer};
 use crate::relocations::{ImpossibleRelocation, Relocation, RelocationKind, RelocationSize};
 use crate::{AssemblyOffset, DynamicLabel, DynasmError, DynasmLabelApi, LabelKind};
