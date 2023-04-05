@@ -1,21 +1,24 @@
 use std::collections::hash_map::Entry;
 
+use proc_macro_error::emit_error;
+use quote::quote;
 use syn::parse;
 use syn::Token;
-use quote::quote;
-use proc_macro_error::emit_error;
 
-use crate::common::{Stmt, Size, delimited};
 use crate::arch;
-use crate::DynasmContext;
+use crate::common::{delimited, Size, Stmt};
 use crate::parse_helpers::ParseOptExt;
+use crate::DynasmContext;
 
-pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream) -> parse::Result<()> {
+pub(crate) fn evaluate_directive(
+    invocation_context: &mut DynasmContext,
+    stmts: &mut Vec<Stmt>,
+    input: parse::ParseStream,
+) -> parse::Result<()> {
     let directive: syn::Ident = input.parse()?;
 
     match directive.to_string().as_str() {
         // TODO: oword, qword, float, double, long double
-
         "arch" => {
             // ; .arch ident
             let arch: syn::Ident = input.parse()?;
@@ -24,7 +27,7 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
             } else {
                 emit_error!(arch, "Unknown architecture '{}'", arch);
             }
-        },
+        }
         "feature" => {
             // ; .feature ident ("," ident) *
             let mut features = Vec::new();
@@ -42,17 +45,17 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
                 features.pop();
             }
             invocation_context.current_arch.set_features(&features);
-        },
+        }
         // ; .byte (expr ("," expr)*)?
-        "byte"  => directive_const(invocation_context, stmts, input, Size::BYTE)?,
-        "word"  => directive_const(invocation_context, stmts, input, Size::WORD)?,
+        "byte" => directive_const(invocation_context, stmts, input, Size::BYTE)?,
+        "word" => directive_const(invocation_context, stmts, input, Size::WORD)?,
         "dword" => directive_const(invocation_context, stmts, input, Size::DWORD)?,
         "qword" => directive_const(invocation_context, stmts, input, Size::QWORD)?,
         "bytes" => {
             // ; .bytes expr
             let iterator: syn::Expr = input.parse()?;
             stmts.push(Stmt::ExprExtend(delimited(iterator)));
-        },
+        }
         "align" => {
             // ; .align expr ("," expr)
             // this might need to be architecture dependent
@@ -68,7 +71,7 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
             };
 
             stmts.push(Stmt::Align(delimited(value), with));
-        },
+        }
         "alias" => {
             // ; .alias ident, ident
             // consider changing this to ; .alias ident = ident next breaking change
@@ -80,13 +83,17 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
 
             match invocation_context.aliases.entry(alias_name) {
                 Entry::Occupied(_) => {
-                    emit_error!(alias, "Duplicate alias definition, alias '{}' was already defined", alias);
-                },
+                    emit_error!(
+                        alias,
+                        "Duplicate alias definition, alias '{}' was already defined",
+                        alias
+                    );
+                }
                 Entry::Vacant(v) => {
                     v.insert(reg.to_string());
                 }
             }
-        },
+        }
         d => {
             // unknown directive. skip ahead until we hit a ; so the parser can recover
             emit_error!(directive, "unknown directive '{}'", d);
@@ -97,27 +104,35 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
     Ok(())
 }
 
-fn directive_const(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
+fn directive_const(
+    invocation_context: &mut DynasmContext,
+    stmts: &mut Vec<Stmt>,
+    input: parse::ParseStream,
+    size: Size,
+) -> parse::Result<()> {
     // FIXME: this could be replaced by a Punctuated parser?
     // parse (expr (, expr)*)?
 
     if input.is_empty() || input.peek(Token![;]) {
-        return Ok(())
+        return Ok(());
     }
 
     if let Some(jump) = input.parse_opt()? {
-        invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
+        invocation_context
+            .current_arch
+            .handle_static_reloc(stmts, jump, size);
     } else {
         let expr: syn::Expr = input.parse()?;
         stmts.push(Stmt::ExprSigned(delimited(expr), size));
     }
 
-
     while input.peek(Token![,]) {
         let _: Token![,] = input.parse()?;
 
         if let Some(jump) = input.parse_opt()? {
-            invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
+            invocation_context
+                .current_arch
+                .handle_static_reloc(stmts, jump, size);
         } else {
             let expr: syn::Expr = input.parse()?;
             stmts.push(Stmt::ExprSigned(delimited(expr), size));

@@ -5,8 +5,8 @@ set -o errexit
 shopt -s globstar
 
 echo "build individual documentation"
-(cd plugin && cargo doc --no-deps)
-(cd runtime && cargo doc --no-deps)
+cargo doc -p dynasm --no-deps
+cargo doc -p dynasmrt --no-deps
 
 echo "remove old docs build"
 rm -rf build_docs
@@ -14,8 +14,6 @@ rm -rf build_docs
 echo "build directory structure"
 mkdir ./build_docs
 mkdir ./build_docs/language
-mkdir ./build_docs/plugin
-mkdir ./build_docs/runtime
 
 echo "create instruction reference markdown file"
 (cd doc/insref && cargo update && cargo run -- x64 > ../instructionref_x64.md && cargo run -- aarch64 > ../instructionref_aarch64.md)
@@ -24,15 +22,20 @@ echo "build plugin docs"
 for f in ./doc/*.md; do
     rustdoc $f -o ./build_docs/language --markdown-no-toc --html-before-content=./doc/pre.html --html-after-content=./doc/post.html --markdown-css=./formatting.css
 done
-cp ./doc/formatting.css ./build_docs/language/formatting.css
 
 echo "copy over the docs folders"
-cp -r ./plugin/target/doc/* ./build_docs/plugin
-cp -r ./runtime/target/doc/* ./build_docs/runtime
+cp -r ./target/doc/* ./build_docs/
+
+echo "Do some css linking"
+cd build_docs/language
+RUSTDOC=$(echo ../static.files/rustdoc*.css)
+LIGHT=$(echo ../static.files/light*.css)
+cd ../..
+RUSTDOC=$RUSTDOC LIGHT=$LIGHT envsubst < ./doc/formatting.css > ./build_docs/language/formatting.css
+
 
 echo "insert javascript"
-cat ./doc/hack.js >> ./build_docs/plugin/search-index.js
-cat ./doc/hack.js >> ./build_docs/runtime/search-index.js
+cat ./doc/hack.js >> ./build_docs/static.files/main-*.js
 
 echo "copy docs examples to tests"
 declare -a examples=("bf-jit" "hello-world" "bf-interpreter")

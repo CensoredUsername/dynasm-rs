@@ -29,7 +29,7 @@ and formats supported by dynasm-rs. Finally, documentation on the
 
 The following list summarizes some of the larger differences between LuaJIT dynasm and dynasm-rs.
 
-## general
+### general
 
 - LuaJIT dynasm uses full program analysis, allowing it to compile local and global labels down to
 enums. Dynasm-rs however uses HashMaps keyed by static strings, meaning label resolution in dynasm-rs
@@ -41,7 +41,7 @@ instructions, dynasm-rs uses the `dynasm!` procedural macro with lines starting 
 - LuaJIT has macros in its invocations, dynasm-rs uses rust macros that expand to `dynasm!` invocations.
 - Dynasm-rs doesn't have typed aliases
 
-## x64/x86
+### x64/x86
 
 - LuaJIT uses the `mov64` mnemnonic to encode 64-bit displacement mov. Dynasm-rs uses the `movabs`
 mnemnonic with a 64-bit immediate parameter to encode this.
@@ -49,6 +49,6 @@ mnemnonic with a 64-bit immediate parameter to encode this.
 - The syntax used for type maps is significantly different. In LuaJit dynasm it is `Type:reg->attr`
 in dynasm-rs it is `reg => Type.attr`.
 
-## aarch64
+### aarch64
 
 - Unknown.

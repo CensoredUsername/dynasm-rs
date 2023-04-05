@@ -1,0 +1,20 @@
+[workspace]
+
+members = [
+    "plugin",
+    "runtime",
+    "testing",
+    "doc/insref",
+]
+
+[workspace.package]
+authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
+version = "2.0.0"
+edition = "2018"
+
+documentation = "https://censoredusername.github.io/dynasm-rs/language/index.html"
+repository = "https://github.com/CensoredUsername/dynasm-rs"
+
+readme = "README.md"
+keywords = ["jit", "dynasm", "dynasmrt", "dynasm-rs", "assembler"]
+license = "MPL-2.0"

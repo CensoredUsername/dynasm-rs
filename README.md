@@ -2,7 +2,7 @@
 
 The purpose of this tool is to ease the creation of programs that require run-time assembling.
 
-It is compatible with stable rustc 1.45 and higher.
+It is compatible with stable `rustc` 1.45 and higher.
 
 [![Build status](https://github.com/CensoredUsername/dynasm-rs/actions/workflows/Build_and_test.yml/badge.svg?branch=master)](https://github.com/CensoredUsername/dynasm-rs/actions/workflows/Build_and_test.yml)
 [![](https://img.shields.io/crates/v/dynasm.svg)](https://crates.io/crates/dynasm)
@@ -11,7 +11,7 @@ It is compatible with stable rustc 1.45 and higher.
 
 ## Features
 
-- Fully integrated in the rust toolchain, no other tools necessary.
+- Fully integrated in the Rust toolchain, no other tools necessary.
 - The assembly is optimized into a series of `Vec.push` and `Vec.extend` statements.
 - Errors are almost all diagnosed at compile time in a clear fashion.
 - Write the to be generated assembly inline in nasm-like syntax using a simple macro.

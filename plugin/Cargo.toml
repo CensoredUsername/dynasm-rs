@@ -1,17 +1,17 @@
 [package]
 name = "dynasm"
-version = "1.2.3"
-authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
-edition = "2018"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
 
 description = "A plugin for assembling code at runtime. Combined with the runtime crate dynasmrt it can be used to write JIT compilers easily."
 
-documentation = "https://censoredusername.github.io/dynasm-rs/plugin/dynasm/index.html"
-repository = "https://github.com/CensoredUsername/dynasm-rs"
+documentation.workspace = true
+repository.workspace = true
 
-readme = "../README.md"
-keywords = ["jit", "dynasm", "dynasmrt", "dynasm-rs", "assembler"]
-license = "MPL-2.0"
+readme.workspace = true
+keywords.workspace = true
+license.workspace = true
 
 [lib]
 name = "dynasm"
@@ -19,7 +19,7 @@ proc-macro = true
 
 [dependencies]
 lazy_static = "1"
-bitflags = "1"
+bitflags = "1.1.0"
 byteorder = "1"
 quote = "1"
 proc-macro-error = "1"

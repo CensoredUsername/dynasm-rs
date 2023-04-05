@@ -2,7 +2,54 @@
 
 The `dynasm-rs` project consists out of two crates: The procedural macro crate `dynasm` and the runtime support crate `dynasmrt`. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards `dynasmrt` depends on `dynasm` itself to simplify this relationship. Any version listings below therefore refers to both the `dynasm` and `dynasmrt` crate version.
 
+Version 2.0.0
+=============
+
+Plugin
+------
+- Be stricter on X/W or XSP/WSP differentiation in x64.
+
+Runtime
+-------
+- Significant performance optimization of label processing.
+- Rework of various components.
+- Additional APIs to reuse Assemblers, or to allocate them with pre-reserved buffers.
+
+Documentation
+-------------
+- Various fixes
+
+Version 1.2.3
+=============
+
+Plugin
+------
+- add x64 ud1 opcode.
+- Bugfix the REPNE prefix so it can actually be used.
+
+Version 1.2.2
+=============
+
+Global
+------
+Fixes travis integration displayed in crates.io
+
+Version 1.2.1
+=============
+
+Runtime
+-------
+- Fix overflow in aarch64 logical immediate encoding at runtime.
+
+Version 1.2.0
+=============
+
+Runtime
+-------
+- update memmap2 version.
+
 Version 1.1.0
+=============
 
 Runtime
 -------

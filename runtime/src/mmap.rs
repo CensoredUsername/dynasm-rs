@@ -1,8 +1,9 @@
 //! This module implements some wrappers around Mmap/MmapMut to also support a cheap "empty" variant.
 // Unfortunately Memmap itself doesn't support a cheap zero-length variant
 
-use std::ops::{Deref, DerefMut};
+#[cfg(feature = "std")]
 use std::io;
+use std::ops::{Deref, DerefMut};
 
 use memmap2::{Mmap, MmapMut};
 
@@ -15,7 +16,7 @@ pub struct ExecutableBuffer {
     // length of the buffer that has actually been written to
     length: usize,
     // backing buffer
-    buffer: Option<Mmap>
+    buffer: Option<Mmap>,
 }
 
 /// ExecutableBuffer equivalent that holds a buffer of mutable memory instead of executable memory. It also derefs to a `&mut [u8]`.
@@ -25,7 +26,7 @@ pub struct MutableBuffer {
     // length of the buffer that has actually been written to
     length: usize,
     // backing buffer
-    buffer: Option<MmapMut>
+    buffer: Option<MmapMut>,
 }
 
 impl ExecutableBuffer {
@@ -35,7 +36,7 @@ impl ExecutableBuffer {
     /// which can then be jumped or called to divert control flow into the executable
     /// buffer. Note that if this buffer is accessed through an Executor, these pointers
     /// will only be valid as long as its lock is held. When no locks are held,
-    /// The assembler is free to relocate the executable buffer when it requires
+    /// the assembler is free to relocate the executable buffer when it requires
     /// more memory than available.
     pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
         &self[offset.0] as *const u8
@@ -43,6 +44,7 @@ impl ExecutableBuffer {
 
     /// Create a new executable buffer, backed by a buffer of size `size`.
     /// It will start with an initialized length of 0.
+    #[cfg(feature = "std")]
     pub fn new(size: usize) -> io::Result<ExecutableBuffer> {
         let buffer = if size == 0 {
             None
@@ -50,10 +52,7 @@ impl ExecutableBuffer {
             Some(MmapMut::map_anon(size)?.make_exec()?)
         };
 
-        Ok(ExecutableBuffer {
-            length: 0,
-            buffer
-        })
+        Ok(ExecutableBuffer { length: 0, buffer })
     }
 
     /// Query the backing size of this executable buffer
@@ -62,6 +61,7 @@ impl ExecutableBuffer {
     }
 
     /// Change this executable buffer into a mutable buffer.
+    #[cfg(feature = "std")]
     pub fn make_mut(self) -> io::Result<MutableBuffer> {
         let buffer = if let Some(map) = self.buffer {
             Some(map.make_mut()?)
@@ -71,7 +71,7 @@ impl ExecutableBuffer {
 
         Ok(MutableBuffer {
             length: self.length,
-            buffer
+            buffer,
         })
     }
 }
@@ -79,6 +79,7 @@ impl ExecutableBuffer {
 impl MutableBuffer {
     /// Create a new mutable buffer, backed by a buffer of size `size`.
     /// It will start with an initialized length of 0.
+    #[cfg(feature = "std")]
     pub fn new(size: usize) -> io::Result<MutableBuffer> {
         let buffer = if size == 0 {
             None
@@ -86,10 +87,7 @@ impl MutableBuffer {
             Some(MmapMut::map_anon(size)?)
         };
 
-        Ok(MutableBuffer {
-            length: 0,
-            buffer
-        })
+        Ok(MutableBuffer { length: 0, buffer })
     }
 
     /// Query the backing size of this mutable buffer
@@ -104,6 +102,7 @@ impl MutableBuffer {
     }
 
     /// Change this mutable buffer into an executable buffer.
+    #[cfg(feature = "std")]
     pub fn make_exec(self) -> io::Result<ExecutableBuffer> {
         let buffer = if let Some(map) = self.buffer {
             Some(map.make_exec()?)
@@ -113,7 +112,7 @@ impl MutableBuffer {
 
         Ok(ExecutableBuffer {
             length: self.length,
-            buffer
+            buffer,
         })
     }
 }
@@ -122,7 +121,7 @@ impl Default for ExecutableBuffer {
     fn default() -> ExecutableBuffer {
         ExecutableBuffer {
             length: 0,
-            buffer: None
+            buffer: None,
         }
     }
 }
@@ -131,7 +130,7 @@ impl Default for MutableBuffer {
     fn default() -> MutableBuffer {
         MutableBuffer {
             length: 0,
-            buffer: None
+            buffer: None,
         }
     }
 }

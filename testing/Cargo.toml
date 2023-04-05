@@ -1,8 +1,8 @@
 [package]
 name = "testing"
 version = "0.1.0"
-authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
-edition = "2018"
+authors.workspace = true
+edition.workspace = true
 
 [dependencies]
 itertools = "0.5.*"
