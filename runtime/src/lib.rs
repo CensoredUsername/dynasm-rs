@@ -47,6 +47,7 @@ use std::fmt::{self, Debug};
 use std::hash::Hash;
 use std::iter::Extend;
 use std::mem;
+use std::sync::{Arc, RwLock, RwLockReadGuard};
 
 #[cfg(feature = "mmap")]
 use crate::components::MemoryManager;

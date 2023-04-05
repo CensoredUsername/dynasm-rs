@@ -1,6 +1,7 @@
 //! This module provides several reusable compoments for implementing assemblers
 
 use std::mem;
+use std::sync::{Arc, RwLock, RwLockWriteGuard};
 
 #[cfg(feature = "std")]
 use {
