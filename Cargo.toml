@@ -5,6 +5,9 @@ members = [
     "runtime",
     "testing",
     "doc/insref",
+    "doc/examples/bf-interpreter",
+    "doc/examples/bf-jit",
+    "doc/examples/hello-world",
 ]
 
 [workspace.package]
