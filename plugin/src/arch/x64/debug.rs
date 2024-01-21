@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::compiler::{Opdata, FormatStringIterator};
+use super::compiler::{FormatStringIterator, Opdata};
 use super::x64data::Flags;
 
 pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
@@ -12,12 +12,19 @@ pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
 }
 
 pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
-    let opsizes = if data.flags.contains(Flags::AUTO_SIZE) {&b"qwd"[..]}
-             else if data.flags.contains(Flags::AUTO_NO32) {&b"qw"[..]}
-             else if data.flags.contains(Flags::AUTO_REXW) {&b"qd"[..]}
-             else if data.flags.contains(Flags::AUTO_VEXL) {&b"ho"[..]}
-             else if name == "monitorx"                    {&b"qwd"[..]}
-             else                                          {&b"!"[..]};
+    let opsizes = if data.flags.contains(Flags::AUTO_SIZE) {
+        &b"qwd"[..]
+    } else if data.flags.contains(Flags::AUTO_NO32) {
+        &b"qw"[..]
+    } else if data.flags.contains(Flags::AUTO_REXW) {
+        &b"qd"[..]
+    } else if data.flags.contains(Flags::AUTO_VEXL) {
+        &b"ho"[..]
+    } else if name == "monitorx" {
+        &b"qwd"[..]
+    } else {
+        &b"!"[..]
+    };
 
     let mut forms = Vec::new();
     for opsize in opsizes.iter().cloned() {
@@ -35,13 +42,13 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
             buf.push_str(&format_arg(ty, size, opsize))
         }
         if data.flags.contains(Flags::X86_ONLY) {
-            for _ in buf.len() .. 45 {
+            for _ in buf.len()..45 {
                 buf.push(' ');
             }
             buf.push_str(" (x86 only)");
         }
         if !data.features.is_empty() {
-            for _ in buf.len() .. 45 {
+            for _ in buf.len()..45 {
                 buf.push(' ');
             }
             buf.push_str(&format!(" ({})", data.features));
@@ -51,8 +58,10 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
     forms
 }
 
-static REGS: [&str; 16] = ["a",  "d",  "c",   "b",   "bp",  "sp",  "si",  "di",
-                                   "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
+static REGS: [&str; 16] = [
+    "a", "d", "c", "b", "bp", "sp", "si", "di", "r8", "r9", "r10", "r11", "r12", "r13", "r14",
+    "r15",
+];
 static SEGREGS: [&str; 6] = ["es", "cs", "ss", "ds", "fs", "gs"];
 
 fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
@@ -74,48 +83,76 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
             b'p' => "80",
             b'o' => "128",
             b'h' => "256",
-            _ => ""
+            _ => "",
         }
     }
 
     match ty {
-        b'i' => format!("imm{}",      format_size(size)).into(),
-        b'o' => format!("rel{}off",   format_size(size)).into(),
-        b'm' => format!("mem{}",      format_size(size)).into(),
+        b'i' => format!("imm{}", format_size(size)).into(),
+        b'o' => format!("rel{}off", format_size(size)).into(),
+        b'm' => format!("mem{}", format_size(size)).into(),
         b'k' => format!("vm32addr{}", format_size(size)).into(),
         b'l' => format!("vm64addr{}", format_size(size)).into(),
-        b'r' => format!("reg{}",      format_size(size)).into(),
+        b'r' => format!("reg{}", format_size(size)).into(),
         b'f' => "st".into(),
         b'x' => "mm".into(),
-        b'y' => (if size == b'h' {"ymm"} else {"xmm"}).into(),
+        b'y' => (if size == b'h' { "ymm" } else { "xmm" }).into(),
         b's' => "segreg".into(),
         b'c' => "creg".into(),
         b'd' => "dreg".into(),
         b'b' => "bndreg".into(),
         b'v' => format!("reg/mem{}", format_size(size)).into(),
         b'u' => format!("mm/mem{}", format_size(size)).into(),
-        b'w' => format!("{}mm/mem{}", if size == b'h' {"y"} else {"x"}, format_size(size)).into(),
+        b'w' => format!(
+            "{}mm/mem{}",
+            if size == b'h' { "y" } else { "x" },
+            format_size(size)
+        )
+        .into(),
         b'A'..=b'P' => {
             let i = ty as usize - 'A' as usize;
             match size {
-                b'b' => if i < 4 { format!("{}l", REGS[i]).into() }
-                   else if i < 8 { REGS[i].into() }
-                   else          { format!("{}b", REGS[i]).into() },
-                b'w' => if i < 4 { format!("{}x", REGS[i]).into() }
-                   else if i < 8 { REGS[i].into() }
-                   else          { format!("{}w", REGS[i]).into() },
-                b'd' => if i < 4 { format!("e{}x",REGS[i]).into() }
-                   else if i < 8 { format!("e{}", REGS[i]).into() }
-                   else          { format!("{}d", REGS[i]).into() },
-                b'q' => if i < 4 { format!("r{}x",REGS[i]).into() }
-                   else          { format!("r{}", REGS[i]).into() },
-                _ => panic!("invalid formatting data")
+                b'b' => {
+                    if i < 4 {
+                        format!("{}l", REGS[i]).into()
+                    } else if i < 8 {
+                        REGS[i].into()
+                    } else {
+                        format!("{}b", REGS[i]).into()
+                    }
+                }
+                b'w' => {
+                    if i < 4 {
+                        format!("{}x", REGS[i]).into()
+                    } else if i < 8 {
+                        REGS[i].into()
+                    } else {
+                        format!("{}w", REGS[i]).into()
+                    }
+                }
+                b'd' => {
+                    if i < 4 {
+                        format!("e{}x", REGS[i]).into()
+                    } else if i < 8 {
+                        format!("e{}", REGS[i]).into()
+                    } else {
+                        format!("{}d", REGS[i]).into()
+                    }
+                }
+                b'q' => {
+                    if i < 4 {
+                        format!("r{}x", REGS[i]).into()
+                    } else {
+                        format!("r{}", REGS[i]).into()
+                    }
+                }
+                _ => panic!("invalid formatting data"),
             }
-        },
+        }
         b'Q'..=b'V' => SEGREGS[ty as usize - 'Q' as usize].into(),
         b'W' => "cr8".into(),
         b'X' => "st0".into(),
-        _ => panic!("invalid formatting data")
+        _ => panic!("invalid formatting data"),
     }
 }
 
@@ -130,7 +167,8 @@ pub fn create_opmap() -> String {
         // get the data for this mnemnonic
         let data = super::x64data::get_mnemnonic_data(mnemnonic).unwrap();
         // format the data for the opmap docs
-        let mut formats = data.into_iter()
+        let mut formats = data
+            .into_iter()
             .map(|x| format_opdata(mnemnonic, x))
             .flat_map(|x| x)
             .map(|x| x.replace(">>> ", ""))
