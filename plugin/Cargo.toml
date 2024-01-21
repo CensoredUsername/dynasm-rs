@@ -32,6 +32,7 @@ features = ["full", "extra-traits"]
 version = "1.0.26"
 
 [features]
+std = []
 dynasm_opmap = []
 dynasm_extract = []
 filelocal = []

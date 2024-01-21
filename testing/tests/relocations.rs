@@ -1,8 +1,7 @@
 #![allow(unused_imports)]
 
 use dynasmrt::dynasm;
-use dynasmrt::{DynasmApi, DynasmLabelApi, DynasmError, LabelKind, DynamicLabel};
-
+use dynasmrt::{DynamicLabel, DynasmApi, DynasmError, DynasmLabelApi, LabelKind};
 
 #[test]
 fn test_local_jumps() {
@@ -59,31 +58,30 @@ fn test_local_jumps() {
     assert!(&output == expected);
 }
 
-
 #[test]
 fn test_global_jumps() {
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
 
     dynasm!(ops
-        ; jmp BYTE ->minusone
-        ; jmp BYTE ->plustwo
-        ; jmp BYTE ->minusone
-        ;->start:
-        ; inc rax
-        ;->plusone:
-        ; inc rbx
-        ;->plustwo:
-        ; jmp BYTE ->end
-        ; jmp BYTE ->start
-        ;->minustwo:
-        ; inc rcx
-        ;->minusone:
-        ; inc rdx
-        ;->end:
-        ; jmp BYTE ->plusone
-        ; jmp BYTE ->minustwo
-        ; jmp BYTE ->plusone
-        );
+    ; jmp BYTE ->minusone
+    ; jmp BYTE ->plustwo
+    ; jmp BYTE ->minusone
+    ;->start:
+    ; inc rax
+    ;->plusone:
+    ; inc rbx
+    ;->plustwo:
+    ; jmp BYTE ->end
+    ; jmp BYTE ->start
+    ;->minustwo:
+    ; inc rcx
+    ;->minusone:
+    ; inc rdx
+    ;->end:
+    ; jmp BYTE ->plusone
+    ; jmp BYTE ->minustwo
+    ; jmp BYTE ->plusone
+    );
 
     let output = ops.finalize().unwrap();
 
@@ -97,7 +95,6 @@ fn test_global_jumps() {
 \x48\xFF\xC1\x48\xFF\xC2\xEB\xF1\xEB\xF6\xEB\xED";
     assert!(&output == expected);
 }
-
 
 #[test]
 fn test_dynamic_jumps() {
@@ -143,7 +140,6 @@ fn test_dynamic_jumps() {
     assert!(&output == expected);
 }
 
-
 #[test]
 fn test_all_jumps() {
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
@@ -185,7 +181,6 @@ fn test_all_jumps() {
 \xc7\xe9\xe8\xff\xff\xff";
     assert!(&output == expected);
 }
-
 
 #[test]
 fn test_bad_jumps() {
@@ -251,6 +246,6 @@ fn test_bad_jumps() {
     );
     match ops.finalize() {
         Err(DynasmError::UnknownLabel(LabelKind::Dynamic(_))) => (),
-        _ => assert!(false)
+        _ => assert!(false),
     }
 }

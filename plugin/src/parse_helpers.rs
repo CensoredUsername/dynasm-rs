@@ -1,6 +1,6 @@
 //! This file contains parsing helpers used by multiple parsing backends
-use syn::parse;
 use std::convert::TryInto;
+use syn::parse;
 
 /**
  * Jump types
@@ -24,14 +24,16 @@ impl<'a> ParseOptExt for parse::ParseBuffer<'a> {
 
 /// Tries to parse an ident that has a specific name as a keyword. Returns true if it worked.
 pub fn eat_pseudo_keyword(input: parse::ParseStream, kw: &str) -> bool {
-    input.step(|cursor| {
-        if let Some((ident, rest)) = cursor.ident() {
-            if ident == kw {
-                return Ok(((), rest));
+    input
+        .step(|cursor| {
+            if let Some((ident, rest)) = cursor.ident() {
+                if ident == kw {
+                    return Ok(((), rest));
+                }
             }
-        }
-        Err(cursor.error("expected identifier"))
-    }).is_ok()
+            Err(cursor.error("expected identifier"))
+        })
+        .is_ok()
 }
 
 /// parses an ident, but instead of syn's Parse impl it does also parse keywords as idents
@@ -47,8 +49,12 @@ pub fn parse_ident_or_rust_keyword(input: parse::ParseStream) -> parse::Result<s
 /// checks if an expression is simply an ident, and if so, returns a clone of it.
 pub fn as_ident(expr: &syn::Expr) -> Option<&syn::Ident> {
     let path = match *expr {
-        syn::Expr::Path(syn::ExprPath {ref path, qself: None, ..}) => path,
-        _ => return None
+        syn::Expr::Path(syn::ExprPath {
+            ref path,
+            qself: None,
+            ..
+        }) => path,
+        _ => return None,
     };
 
     if path.leading_colon.is_some() || path.segments.len() != 1 {
@@ -72,8 +78,8 @@ pub fn as_lit(expr: &syn::Expr) -> Option<&syn::Lit> {
     }
 
     match inner {
-        syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => Some(lit),
-        _ => None
+        syn::Expr::Lit(syn::ExprLit { ref lit, .. }) => Some(lit),
+        _ => None,
     }
 }
 
@@ -86,22 +92,24 @@ pub fn as_lit_with_negation(expr: &syn::Expr) -> Option<(&syn::Lit, bool)> {
     }
 
     match inner {
-        syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => Some((lit, false)),
-        syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(_), ref expr, .. } ) => {
-            match &**expr {
-                syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => Some((lit, true)),
-                _ => None
-            }
-        }
-        _ => None
+        syn::Expr::Lit(syn::ExprLit { ref lit, .. }) => Some((lit, false)),
+        syn::Expr::Unary(syn::ExprUnary {
+            op: syn::UnOp::Neg(_),
+            ref expr,
+            ..
+        }) => match &**expr {
+            syn::Expr::Lit(syn::ExprLit { ref lit, .. }) => Some((lit, true)),
+            _ => None,
+        },
+        _ => None,
     }
 }
 
 /// checks if an expression is a constant number literal
 pub fn as_number(expr: &syn::Expr) -> Option<u64> {
-    match as_lit(expr)?  {
+    match as_lit(expr)? {
         syn::Lit::Int(i) => i.base10_parse().ok(),
-        _ => None
+        _ => None,
     }
 }
 
@@ -109,13 +117,15 @@ pub fn as_number(expr: &syn::Expr) -> Option<u64> {
 pub fn as_signed_number(expr: &syn::Expr) -> Option<i64> {
     let (expr, negated) = as_lit_with_negation(expr)?;
     match expr {
-        syn::Lit::Int(i) => if let Ok(value) = i.base10_parse::<u64>() {
-            let value: i64 = value.try_into().ok()?;
-            Some (if negated {-value} else {value})
-        } else {
-            None
-        },
-        _ => None
+        syn::Lit::Int(i) => {
+            if let Ok(value) = i.base10_parse::<u64>() {
+                let value: i64 = value.try_into().ok()?;
+                Some(if negated { -value } else { value })
+            } else {
+                None
+            }
+        }
+        _ => None,
     }
 }
 
@@ -123,7 +133,10 @@ pub fn as_signed_number(expr: &syn::Expr) -> Option<i64> {
 pub fn as_float(expr: &syn::Expr) -> Option<f64> {
     let (expr, negated) = as_lit_with_negation(expr)?;
     match expr {
-        syn::Lit::Float(i) => i.base10_parse::<f64>().ok().map(|i| if negated { -i } else { i } ),
-        _ => None
+        syn::Lit::Float(i) => i
+            .base10_parse::<f64>()
+            .ok()
+            .map(|i| if negated { -i } else { i }),
+        _ => None,
     }
 }

@@ -1,9 +1,8 @@
+use super::aarch64data::{Command, Matcher, Opdata, Relocation, SpecialComm};
 use super::ast::Modifier;
-use super::aarch64data::{Opdata, Matcher, Command, Relocation, SpecialComm};
 use crate::common::Size;
 
 use std::fmt::Write;
-
 
 #[cfg(feature = "dynasm_opmap")]
 pub fn create_opmap() -> String {
@@ -16,18 +15,24 @@ pub fn create_opmap() -> String {
         // get the data for this mnemnonic
         let data = super::aarch64data::get_mnemonic_data(mnemnonic).unwrap();
         // format the data for the opmap docs
-        let formats = data.into_iter()
+        let formats = data
+            .into_iter()
             .map(|x| format_opdata(mnemnonic, x))
             .flat_map(|x| x)
             .map(|x| x.replace(">>> ", ""))
             .collect::<Vec<_>>();
 
         // push mnemnonic name as title
-        write!(s, "### {}\n```insref\n{}\n```\n", mnemnonic, formats.join("\n")).unwrap();
+        write!(
+            s,
+            "### {}\n```insref\n{}\n```\n",
+            mnemnonic,
+            formats.join("\n")
+        )
+        .unwrap();
     }
     s
 }
-
 
 #[cfg(feature = "dynasm_extract")]
 pub fn extract_opmap() -> String {
@@ -42,14 +47,13 @@ pub fn extract_opmap() -> String {
 
         buf.extend(
             data.into_iter()
-            .map(|x| extract_opdata(mnemnonic, x))
-            .flat_map(|x| x)
+                .map(|x| extract_opdata(mnemnonic, x))
+                .flat_map(|x| x),
         );
     }
 
     buf.join("\n")
 }
-
 
 pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
     let mut forms = Vec::new();
@@ -62,21 +66,20 @@ pub fn format_opdata_list(name: &str, data: &[Opdata]) -> String {
 }
 
 pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
-
     let has_simd_full_width = data.matchers.iter().any(|m| match m {
         Matcher::V(_) | Matcher::RegList(_, _) => true,
-        _ => false
+        _ => false,
     });
 
     let form_count = 1 + has_simd_full_width as u8;
     let mut forms = Vec::new();
 
-    for i in 0 .. form_count {
+    for i in 0..form_count {
         let mut buf = format!(">>> {}", name);
 
         let (constraints, names) = match constraints_and_names(data) {
             Ok(o) => o,
-            Err(e) => panic!("Encountered a faulty op listing for {}: {}", name, e)
+            Err(e) => panic!("Encountered a faulty op listing for {}: {}", name, e),
         };
 
         let mut first = true;
@@ -116,34 +119,93 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::Ident => write!(buf, "{}", arg_names[0]).unwrap(),
                 Matcher::Cond => write!(buf, "<cond>").unwrap(),
                 Matcher::Imm => write!(buf, "#{}", arg_names[0]).unwrap(),
-                Matcher::W =>   write!(buf, "W{}", arg_names[0]).unwrap(),
-                Matcher::X =>   write!(buf, "X{}", arg_names[0]).unwrap(),
+                Matcher::W => write!(buf, "W{}", arg_names[0]).unwrap(),
+                Matcher::X => write!(buf, "X{}", arg_names[0]).unwrap(),
                 Matcher::WSP => write!(buf, "W{}|WSP", arg_names[0]).unwrap(),
                 Matcher::XSP => write!(buf, "X{}|SP", arg_names[0]).unwrap(),
-                Matcher::B =>   write!(buf, "B{}", arg_names[0]).unwrap(),
-                Matcher::H =>   write!(buf, "H{}", arg_names[0]).unwrap(),
-                Matcher::S =>   write!(buf, "S{}", arg_names[0]).unwrap(),
-                Matcher::D =>   write!(buf, "D{}", arg_names[0]).unwrap(),
-                Matcher::Q =>   write!(buf, "Q{}", arg_names[0]).unwrap(),
+                Matcher::B => write!(buf, "B{}", arg_names[0]).unwrap(),
+                Matcher::H => write!(buf, "H{}", arg_names[0]).unwrap(),
+                Matcher::S => write!(buf, "S{}", arg_names[0]).unwrap(),
+                Matcher::D => write!(buf, "D{}", arg_names[0]).unwrap(),
+                Matcher::Q => write!(buf, "Q{}", arg_names[0]).unwrap(),
                 Matcher::V(s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "V{}.{}{}", arg_names[0], size_to_string(*s), width / s.in_bytes()).unwrap();
-                },
-                Matcher::VStatic(s, c) => write!(buf, "V{}.{}{}", arg_names[0], size_to_string(*s), c).unwrap(),
-                Matcher::VElement(s) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(*s), arg_names[1]).unwrap(),
-                Matcher::VElementStatic(s, element) => write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(*s), element).unwrap(),
-                Matcher::VStaticElement(s, c) => write!(buf, "V{}.{}{}[{}]", arg_names[0], size_to_string(*s), c, arg_names[1]).unwrap(),
+                    write!(
+                        buf,
+                        "V{}.{}{}",
+                        arg_names[0],
+                        size_to_string(*s),
+                        width / s.in_bytes()
+                    )
+                    .unwrap();
+                }
+                Matcher::VStatic(s, c) => {
+                    write!(buf, "V{}.{}{}", arg_names[0], size_to_string(*s), c).unwrap()
+                }
+                Matcher::VElement(s) => write!(
+                    buf,
+                    "V{}.{}[{}]",
+                    arg_names[0],
+                    size_to_string(*s),
+                    arg_names[1]
+                )
+                .unwrap(),
+                Matcher::VElementStatic(s, element) => {
+                    write!(buf, "V{}.{}[{}]", arg_names[0], size_to_string(*s), element).unwrap()
+                }
+                Matcher::VStaticElement(s, c) => write!(
+                    buf,
+                    "V{}.{}{}[{}]",
+                    arg_names[0],
+                    size_to_string(*s),
+                    c,
+                    arg_names[1]
+                )
+                .unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(*s), width / s.in_bytes(), a).unwrap();
-                },
-                Matcher::RegListStatic(a, s, c) => write!(buf, "{{V{}.{}{} * {}}}", arg_names[0], size_to_string(*s), c, a).unwrap(),
-                Matcher::RegListElement(a, s) =>   write!(buf, "{{V{}.{} * {}}}[{}]", arg_names[0], size_to_string(*s), a, arg_names[1]).unwrap(),
+                    write!(
+                        buf,
+                        "{{V{}.{}{} * {}}}",
+                        arg_names[0],
+                        size_to_string(*s),
+                        width / s.in_bytes(),
+                        a
+                    )
+                    .unwrap();
+                }
+                Matcher::RegListStatic(a, s, c) => write!(
+                    buf,
+                    "{{V{}.{}{} * {}}}",
+                    arg_names[0],
+                    size_to_string(*s),
+                    c,
+                    a
+                )
+                .unwrap(),
+                Matcher::RegListElement(a, s) => write!(
+                    buf,
+                    "{{V{}.{} * {}}}[{}]",
+                    arg_names[0],
+                    size_to_string(*s),
+                    a,
+                    arg_names[1]
+                )
+                .unwrap(),
                 Matcher::Offset => buf.push_str(&arg_names[0]),
-                Matcher::RefBase =>   write!(buf, "[X{}|SP]", arg_names[0]).unwrap(),
-                Matcher::RefOffset => write!(buf, "[X{}|SP {{, #{} }} ]", arg_names[0], arg_names[1]).unwrap(),
-                Matcher::RefPre =>    write!(buf, "[X{}|SP, #{}]!", arg_names[0], arg_names[1]).unwrap(),
-                Matcher::RefIndex =>  write!(buf, "[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]", arg_names[0], arg_names[1], arg_names[1], arg_names[3]).unwrap(),
+                Matcher::RefBase => write!(buf, "[X{}|SP]", arg_names[0]).unwrap(),
+                Matcher::RefOffset => {
+                    write!(buf, "[X{}|SP {{, #{} }} ]", arg_names[0], arg_names[1]).unwrap()
+                }
+                Matcher::RefPre => {
+                    write!(buf, "[X{}|SP, #{}]!", arg_names[0], arg_names[1]).unwrap()
+                }
+                Matcher::RefIndex => write!(
+                    buf,
+                    "[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]",
+                    arg_names[0], arg_names[1], arg_names[1], arg_names[3]
+                )
+                .unwrap(),
                 Matcher::LitMod(m) => {
                     buf.push_str(m.as_str());
                     if !m.expr_required() {
@@ -151,18 +213,26 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     } else {
                         write!(buf, " #{}", arg_names[0]).unwrap();
                     }
-                },
+                }
                 Matcher::Mod(mods) => {
                     let mut required = false;
                     let mut unsigned_extends = String::new();
-                    let mut signed_extends   = String::new();
+                    let mut signed_extends = String::new();
                     let mut rest = Vec::new();
                     for m in *mods {
                         required = required || m.expr_required();
                         match m {
-                            Modifier::LSL | Modifier::LSR | Modifier::ASR | Modifier::ROR | Modifier::MSL => rest.push(m.as_str()),
-                            Modifier::SXTX | Modifier::SXTW | Modifier::SXTH | Modifier::SXTB => signed_extends.push(m.as_str().chars().nth(3).unwrap()),
-                            Modifier::UXTX | Modifier::UXTW | Modifier::UXTH | Modifier::UXTB => unsigned_extends.push(m.as_str().chars().nth(3).unwrap()),
+                            Modifier::LSL
+                            | Modifier::LSR
+                            | Modifier::ASR
+                            | Modifier::ROR
+                            | Modifier::MSL => rest.push(m.as_str()),
+                            Modifier::SXTX | Modifier::SXTW | Modifier::SXTH | Modifier::SXTB => {
+                                signed_extends.push(m.as_str().chars().nth(3).unwrap())
+                            }
+                            Modifier::UXTX | Modifier::UXTW | Modifier::UXTH | Modifier::UXTB => {
+                                unsigned_extends.push(m.as_str().chars().nth(3).unwrap())
+                            }
                         }
                     }
                     if !unsigned_extends.is_empty() {
@@ -188,13 +258,12 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     } else {
                         write!(buf, " #{}", arg_names[1]).unwrap();
                     }
-                },
-                Matcher::End => ()
+                }
+                Matcher::End => (),
             }
-
         }
 
-        for _ in 0 .. end_count {
+        for _ in 0..end_count {
             buf.push_str(" }");
         }
 
@@ -220,14 +289,17 @@ pub fn size_to_string(size: Size) -> &'static str {
         Size::DWORD => "S",
         Size::QWORD => "D",
         Size::OWORD => "Q",
-        _ => unimplemented!()
+        _ => unimplemented!(),
     }
 }
 
 fn constraints_and_names(opdata: &Opdata) -> Result<(Option<String>, Vec<String>), &'static str> {
     let data = group_opdata(opdata)?;
     let constraints = format_constraints(&data);
-    let names = data.into_iter().map(|a| a.name.unwrap_or_else(|| "?".into())).collect();
+    let names = data
+        .into_iter()
+        .map(|a| a.name.unwrap_or_else(|| "?".into()))
+        .collect();
     Ok((constraints, names))
 }
 
@@ -239,12 +311,15 @@ fn group_opdata(opdata: &Opdata) -> Result<Vec<ArgWithCommands>, &'static str> {
         return Err("arg / command count mismatch");
     }
 
-    let mut args: Vec<_> = args.into_iter().map(|(arg, can_be_default)| ArgWithCommands {
-        arg,
-        can_be_default,
-        commands: Vec::new(),
-        name: None
-    }).collect();
+    let mut args: Vec<_> = args
+        .into_iter()
+        .map(|(arg, can_be_default)| ArgWithCommands {
+            arg,
+            can_be_default,
+            commands: Vec::new(),
+            name: None,
+        })
+        .collect();
 
     for (command, idx) in commands {
         args[idx].commands.push(command);
@@ -258,14 +333,13 @@ fn group_opdata(opdata: &Opdata) -> Result<Vec<ArgWithCommands>, &'static str> {
     Ok(args)
 }
 
-
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum FlatArgTy {
     Direct,
     Immediate,
     Modifier,
     JumpTarget,
-    Lit
+    Lit,
 }
 
 struct ArgWithCommands {
@@ -282,13 +356,10 @@ fn flatten_matchers(matchers: &[Matcher]) -> Vec<(FlatArgTy, bool)> {
 
     for matcher in matchers {
         match matcher {
-            Matcher::Dot
-            | Matcher::Lit(_)
-            | Matcher::LitInt(_)
-            | Matcher::LitFloat(_) => (),
-            Matcher::Ident
-            | Matcher::Cond
-            | Matcher::Imm => args.push((FlatArgTy::Immediate, default)),
+            Matcher::Dot | Matcher::Lit(_) | Matcher::LitInt(_) | Matcher::LitFloat(_) => (),
+            Matcher::Ident | Matcher::Cond | Matcher::Imm => {
+                args.push((FlatArgTy::Immediate, default))
+            }
             Matcher::W
             | Matcher::X
             | Matcher::WSP
@@ -308,30 +379,30 @@ fn flatten_matchers(matchers: &[Matcher]) -> Vec<(FlatArgTy, bool)> {
             | Matcher::RegListElement(_, _) => {
                 args.push((FlatArgTy::Direct, default));
                 args.push((FlatArgTy::Immediate, default));
-            },
+            }
             Matcher::Offset => args.push((FlatArgTy::JumpTarget, default)),
             Matcher::RefBase => args.push((FlatArgTy::Direct, default)),
             Matcher::RefOffset => {
                 args.push((FlatArgTy::Direct, default));
                 args.push((FlatArgTy::Immediate, true));
-            },
+            }
             Matcher::RefPre => {
                 args.push((FlatArgTy::Direct, default));
                 args.push((FlatArgTy::Immediate, default));
-            },
+            }
             Matcher::RefIndex => {
                 args.push((FlatArgTy::Direct, default));
                 args.push((FlatArgTy::Direct, default));
                 args.push((FlatArgTy::Modifier, true));
                 args.push((FlatArgTy::Immediate, true));
-            },
+            }
             Matcher::LitMod(_) => {
                 args.push((FlatArgTy::Immediate, true));
-            },
+            }
             Matcher::Mod(_) => {
                 args.push((FlatArgTy::Modifier, default));
                 args.push((FlatArgTy::Immediate, true));
-            },
+            }
             Matcher::End => default = true,
         }
     }
@@ -348,15 +419,15 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
             Command::A => {
                 cursor += 1;
                 continue;
-            },
+            }
             Command::C => {
                 cursor -= 1;
                 continue;
-            },
+            }
             Command::Rwidth(_) => {
                 continue;
-            },
-            _ => ()
+            }
+            _ => (),
         }
 
         command_idx.push((*command, cursor));
@@ -375,7 +446,7 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
             | Command::Usumdec(_, _)
             | Command::Ufields(_)
             | Command::Sbits(_, _)
-            | Command::Sscaled(_, _,_)
+            | Command::Sscaled(_, _, _)
             | Command::Special(_, _)
             | Command::Rotates(_)
             | Command::ExtendsW(_)
@@ -384,7 +455,7 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
             | Command::CondInv(_)
             | Command::LitList(_, _)
             | Command::Offset(_) => cursor += 1,
-            _ => ()
+            _ => (),
         }
     }
 
@@ -395,7 +466,7 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
 fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
     for arg in args {
         if arg.commands.is_empty() {
-            return Err("Arg with no commands")
+            return Err("Arg with no commands");
         }
 
         for command in &arg.commands {
@@ -414,7 +485,7 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Usumdec(_, _)
                 | Command::Ufields(_)
                 | Command::Sbits(_, _)
-                | Command::Sscaled(_, _,_)
+                | Command::Sscaled(_, _, _)
                 | Command::BUbits(_)
                 | Command::BUsum(_)
                 | Command::BSscaled(_, _)
@@ -422,16 +493,14 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Uslice(_, _, _)
                 | Command::Sslice(_, _, _)
                 | Command::Special(_, _) => arg.arg == FlatArgTy::Immediate,
-                Command::Cond(_)
-                | Command::CondInv(_)
-                | Command::LitList(_, _) => arg.arg == FlatArgTy::Lit || arg.arg == FlatArgTy::Immediate,
+                Command::Cond(_) | Command::CondInv(_) | Command::LitList(_, _) => {
+                    arg.arg == FlatArgTy::Lit || arg.arg == FlatArgTy::Immediate
+                }
                 Command::Offset(_) => arg.arg == FlatArgTy::JumpTarget,
-                Command::Rotates(_)
-                | Command::ExtendsW(_)
-                | Command::ExtendsX(_) => arg.arg == FlatArgTy::Modifier,
-                Command::A
-                | Command::C
-                | Command::Rwidth(_) => unreachable!()
+                Command::Rotates(_) | Command::ExtendsW(_) | Command::ExtendsX(_) => {
+                    arg.arg == FlatArgTy::Modifier
+                }
+                Command::A | Command::C | Command::Rwidth(_) => unreachable!(),
             };
 
             if !check {
@@ -468,9 +537,7 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::CondInv(_)
                 | Command::LitList(_, _)
                 | Command::Offset(_) => !arg.can_be_default,
-                Command::A
-                | Command::C
-                | Command::Rwidth(_) => unreachable!()
+                Command::A | Command::C | Command::Rwidth(_) => unreachable!(),
             };
 
             if !check {
@@ -492,66 +559,61 @@ fn name_args(args: &mut [ArgWithCommands]) {
 
     for arg in args {
         match arg.arg {
-            FlatArgTy::Direct => {
-                match &arg.commands[0] {
-                    Command::R(_)
-                    | Command::REven(_)
-                    | Command::RNoZr(_)
-                    | Command::R4(_) => {
-                        arg.name = Some(reg_name_list[reg_name_idx].to_string());
-                        reg_name_idx += 1;
-                    },
-                    Command::RNext => {
-                        arg.name = Some(format!("{}+1", reg_name_list[reg_name_idx - 1]));
-                    },
-                    _ => unreachable!()
+            FlatArgTy::Direct => match &arg.commands[0] {
+                Command::R(_) | Command::REven(_) | Command::RNoZr(_) | Command::R4(_) => {
+                    arg.name = Some(reg_name_list[reg_name_idx].to_string());
+                    reg_name_idx += 1;
                 }
+                Command::RNext => {
+                    arg.name = Some(format!("{}+1", reg_name_list[reg_name_idx - 1]));
+                }
+                _ => unreachable!(),
             },
-            FlatArgTy::Immediate => {
-                match &arg.commands[0] {
-                    Command::Cond(_)
-                    | Command::CondInv(_) => arg.name = None,
-                    Command::LitList(_, name) => arg.name = Some(name.trim_end_matches('S').to_lowercase()),
-                    Command::Ubits(_, _)
-                    | Command::Uscaled(_, _, _)
-                    | Command::Ulist(_, _)
-                    | Command::Urange(_, _, _)
-                    | Command::Usub(_, _, _)
-                    | Command::Unegmod(_, _)
-                    | Command::Usumdec(_, _)
-                    | Command::Ufields(_)
-                    | Command::BUbits(_)
-                    | Command::BUsum(_)
-                    | Command::BUrange(_, _)
-                    | Command::Uslice(_, _, _) => {
-                        arg.name = Some(format!("uimm{}", imm_name_list[imm_name_idx]));
-                        imm_name_idx += 1;
-                    },
-                    Command::Sbits(_, _)
-                    | Command::Sscaled(_, _,_)
-                    | Command::BSscaled(_, _)
-                    | Command::Sslice(_, _, _) => {
-                        arg.name = Some(format!("simm{}", imm_name_list[imm_name_idx]));
-                        imm_name_idx += 1;
-                    },
-                    Command::Special(_, _) => {
-                        arg.name = Some(format!("imm{}", imm_name_list[imm_name_idx]));
-                        imm_name_idx += 1;
-                    },
-                    _ => unreachable!()
+            FlatArgTy::Immediate => match &arg.commands[0] {
+                Command::Cond(_) | Command::CondInv(_) => arg.name = None,
+                Command::LitList(_, name) => {
+                    arg.name = Some(name.trim_end_matches('S').to_lowercase())
                 }
+                Command::Ubits(_, _)
+                | Command::Uscaled(_, _, _)
+                | Command::Ulist(_, _)
+                | Command::Urange(_, _, _)
+                | Command::Usub(_, _, _)
+                | Command::Unegmod(_, _)
+                | Command::Usumdec(_, _)
+                | Command::Ufields(_)
+                | Command::BUbits(_)
+                | Command::BUsum(_)
+                | Command::BUrange(_, _)
+                | Command::Uslice(_, _, _) => {
+                    arg.name = Some(format!("uimm{}", imm_name_list[imm_name_idx]));
+                    imm_name_idx += 1;
+                }
+                Command::Sbits(_, _)
+                | Command::Sscaled(_, _, _)
+                | Command::BSscaled(_, _)
+                | Command::Sslice(_, _, _) => {
+                    arg.name = Some(format!("simm{}", imm_name_list[imm_name_idx]));
+                    imm_name_idx += 1;
+                }
+                Command::Special(_, _) => {
+                    arg.name = Some(format!("imm{}", imm_name_list[imm_name_idx]));
+                    imm_name_idx += 1;
+                }
+                _ => unreachable!(),
             },
             FlatArgTy::Modifier => arg.name = None,
             FlatArgTy::JumpTarget => match &arg.commands[0] {
                 Command::Offset(_) => arg.name = Some("<offset>".to_string()),
-                _ => unreachable!()
+                _ => unreachable!(),
             },
             FlatArgTy::Lit => match &arg.commands[0] {
-                Command::Cond(_)
-                | Command::CondInv(_) => arg.name = None,
-                Command::LitList(_, name) => arg.name = Some(name.trim_end_matches('S').to_lowercase()),
-                _ => unreachable!()
-            }
+                Command::Cond(_) | Command::CondInv(_) => arg.name = None,
+                Command::LitList(_, name) => {
+                    arg.name = Some(name.trim_end_matches('S').to_lowercase())
+                }
+                _ => unreachable!(),
+            },
         }
     }
 }
@@ -571,7 +633,7 @@ fn format_constraints(args: &[ArgWithCommands]) -> Option<String> {
         None
     } else {
         let len = constraints.len();
-        Some(format!(" ({})", &constraints[0 .. len - 2]))
+        Some(format!(" ({})", &constraints[0..len - 2]))
     }
 }
 
@@ -581,32 +643,73 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::R4(_) => write!(buf, "{} is 0-15", name),
             Command::RNoZr(_) => write!(buf, "{} is 0-30", name),
             Command::REven(_) => write!(buf, "{} is even", name),
-            Command::Ubits(_, bits)
-            | Command::BUbits(bits) => write!(buf, "#{} < {}", name, 1u32 << bits),
-            Command::Uscaled(_, bits, scale) => write!(buf, "#{} < {}, #{} = {} * N", name, 1u32 << (bits + scale), name, 1u32 << scale),
+            Command::Ubits(_, bits) | Command::BUbits(bits) => {
+                write!(buf, "#{} < {}", name, 1u32 << bits)
+            }
+            Command::Uscaled(_, bits, scale) => write!(
+                buf,
+                "#{} < {}, #{} = {} * N",
+                name,
+                1u32 << (bits + scale),
+                name,
+                1u32 << scale
+            ),
             Command::Ulist(_, list) => {
-                let numbers = list.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(", ");
+                let numbers = list
+                    .iter()
+                    .map(|n| n.to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ");
                 write!(buf, "#{} = [{}]", name, numbers)
-            },
-            Command::Urange(_, min, max)
-            | Command::BUrange(min, max) => write!(buf, "{} <= #{} <= {}", min, name, max),
-            Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", u32::from(*addval) + 1 - (1u32 << bits), name, addval),
+            }
+            Command::Urange(_, min, max) | Command::BUrange(min, max) => {
+                write!(buf, "{} <= #{} <= {}", min, name, max)
+            }
+            Command::Usub(_, bits, addval) => write!(
+                buf,
+                "{} <= #{} <= {}",
+                u32::from(*addval) + 1 - (1u32 << bits),
+                name,
+                addval
+            ),
             Command::Unegmod(_, bits) => write!(buf, "0 <= #{} < {}", name, 1u32 << bits),
-            Command::Usumdec(_, bits)
-            | Command::BUsum(bits) => write!(buf, "1 <= #{} <= {} - {}", name, 1u32 << bits, prevname),
+            Command::Usumdec(_, bits) | Command::BUsum(bits) => {
+                write!(buf, "1 <= #{} <= {} - {}", name, 1u32 << bits, prevname)
+            }
             Command::Ufields(fields) => write!(buf, "#{} < {}", name, 1u32 << fields.len()),
-            Command::Sbits(_, bits) => write!(buf, "-{} <= #{} < {}", 1u32 << (bits - 1), name, 1u32 << (bits - 1)),
-            Command::Sscaled(_, bits, scale)
-            | Command::BSscaled(bits, scale) => write!(buf, "-{} <= #{} < {}, #{} = {} * N", 1u32 << (bits + scale - 1), name, 1u32 << (bits + scale - 1), name, 1u32 << scale),
+            Command::Sbits(_, bits) => write!(
+                buf,
+                "-{} <= #{} < {}",
+                1u32 << (bits - 1),
+                name,
+                1u32 << (bits - 1)
+            ),
+            Command::Sscaled(_, bits, scale) | Command::BSscaled(bits, scale) => write!(
+                buf,
+                "-{} <= #{} < {}, #{} = {} * N",
+                1u32 << (bits + scale - 1),
+                name,
+                1u32 << (bits + scale - 1),
+                name,
+                1u32 << scale
+            ),
             Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W)
             | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X)
             | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W)
-            | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) => write!(buf, "#{} is a wide immediate", name),
+            | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) => {
+                write!(buf, "#{} is a wide immediate", name)
+            }
             Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_W)
-            | Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_X) => write!(buf, "#{} is a logical immediate", name),
+            | Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_X) => {
+                write!(buf, "#{} is a logical immediate", name)
+            }
             Command::Special(_, SpecialComm::FLOAT_IMMEDIATE)
-            | Command::Special(_, SpecialComm::SPLIT_FLOAT_IMMEDIATE) => write!(buf, "#{} is a floating point immediate", name),
-            Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => write!(buf, "#{} is a stretched immediate", name),
+            | Command::Special(_, SpecialComm::SPLIT_FLOAT_IMMEDIATE) => {
+                write!(buf, "#{} is a floating point immediate", name)
+            }
+            Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => {
+                write!(buf, "#{} is a stretched immediate", name)
+            }
             Command::Offset(Relocation::B) => write!(buf, "offset is 26 bit, 4-byte aligned"),
             Command::Offset(Relocation::BCOND) => write!(buf, "offset is 19 bit, 4-byte aligned"),
             Command::Offset(Relocation::ADR) => write!(buf, "offset is 21 bit"),
@@ -614,8 +717,9 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::Offset(Relocation::TBZ) => write!(buf, "offset is 14 bit, 4-byte aligned"),
             Command::Offset(Relocation::LITERAL32) => write!(buf, "offset is 32 bit>"),
             Command::Offset(Relocation::LITERAL64) => write!(buf, "offset is 64 bit>"),
-            _ => continue
-        }.unwrap();
+            _ => continue,
+        }
+        .unwrap();
 
         write!(buf, ", ").unwrap();
         break;
@@ -624,16 +728,15 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
 
 #[cfg(feature = "dynasm_extract")]
 pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
-
     let has_simd_full_width = data.matchers.iter().any(|m| match m {
         Matcher::V(_) | Matcher::RegList(_, _) => true,
-        _ => false
+        _ => false,
     });
 
     let form_count = 1 + has_simd_full_width as u8;
     let mut forms = Vec::new();
 
-    for i in 0 .. form_count {
+    for i in 0..form_count {
         let mut buf = format!("\"{}", name);
 
         let mut first = true;
@@ -670,40 +773,101 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 Matcher::Lit(s) => write!(buf, "{}", s).unwrap(),
                 Matcher::LitInt(v) => write!(buf, "{}", v).unwrap(),
                 Matcher::LitFloat(v) => write!(buf, "{:.5}", v).unwrap(),
-                Matcher::Ident
-                | Matcher::Cond => write!(buf, "<Ident,{}>", arg_idx).unwrap(),
+                Matcher::Ident | Matcher::Cond => write!(buf, "<Ident,{}>", arg_idx).unwrap(),
                 Matcher::Imm => write!(buf, "<Imm,{}>", arg_idx).unwrap(),
-                Matcher::W =>   write!(buf, "<W,{}>", arg_idx).unwrap(),
-                Matcher::X =>   write!(buf, "<X,{}>", arg_idx).unwrap(),
+                Matcher::W => write!(buf, "<W,{}>", arg_idx).unwrap(),
+                Matcher::X => write!(buf, "<X,{}>", arg_idx).unwrap(),
                 Matcher::WSP => write!(buf, "<WSP,{}>", arg_idx).unwrap(),
                 Matcher::XSP => write!(buf, "<XSP,{}>", arg_idx).unwrap(),
-                Matcher::B =>   write!(buf, "<B,{}>", arg_idx).unwrap(),
-                Matcher::H =>   write!(buf, "<H,{}>", arg_idx).unwrap(),
-                Matcher::S =>   write!(buf, "<S,{}>", arg_idx).unwrap(),
-                Matcher::D =>   write!(buf, "<D,{}>", arg_idx).unwrap(),
-                Matcher::Q =>   write!(buf, "<Q,{}>", arg_idx).unwrap(),
+                Matcher::B => write!(buf, "<B,{}>", arg_idx).unwrap(),
+                Matcher::H => write!(buf, "<H,{}>", arg_idx).unwrap(),
+                Matcher::S => write!(buf, "<S,{}>", arg_idx).unwrap(),
+                Matcher::D => write!(buf, "<D,{}>", arg_idx).unwrap(),
+                Matcher::Q => write!(buf, "<Q,{}>", arg_idx).unwrap(),
                 Matcher::V(s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(*s), width / s.in_bytes()).unwrap();
-                },
-                Matcher::VStatic(s, c) => write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(*s), c).unwrap(),
-                Matcher::VElement(s) => write!(buf, "<V,{}>.{}[<Imm,{}>]", arg_idx, size_to_string(*s), arg_idx + 1).unwrap(),
-                Matcher::VElementStatic(s, element) => write!(buf, "<V,{}>.{}[{}]", arg_idx, size_to_string(*s), element).unwrap(),
-                Matcher::VStaticElement(s, c) => write!(buf, "<V,{}>.{}{}[<Imm,{}>]", arg_idx, size_to_string(*s), c, arg_idx + 1).unwrap(),
+                    write!(
+                        buf,
+                        "<V,{}>.{}{}",
+                        arg_idx,
+                        size_to_string(*s),
+                        width / s.in_bytes()
+                    )
+                    .unwrap();
+                }
+                Matcher::VStatic(s, c) => {
+                    write!(buf, "<V,{}>.{}{}", arg_idx, size_to_string(*s), c).unwrap()
+                }
+                Matcher::VElement(s) => write!(
+                    buf,
+                    "<V,{}>.{}[<Imm,{}>]",
+                    arg_idx,
+                    size_to_string(*s),
+                    arg_idx + 1
+                )
+                .unwrap(),
+                Matcher::VElementStatic(s, element) => {
+                    write!(buf, "<V,{}>.{}[{}]", arg_idx, size_to_string(*s), element).unwrap()
+                }
+                Matcher::VStaticElement(s, c) => write!(
+                    buf,
+                    "<V,{}>.{}{}[<Imm,{}>]",
+                    arg_idx,
+                    size_to_string(*s),
+                    c,
+                    arg_idx + 1
+                )
+                .unwrap(),
                 Matcher::RegList(a, s) => {
                     let width = if i == 0 { 16 } else { 8 };
-                    write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(*s), width / s.in_bytes(), a).unwrap();
-                },
-                Matcher::RegListStatic(a, s, c) => write!(buf, "{{<V,{}>.{}{} * {}}}", arg_idx, size_to_string(*s), c, a).unwrap(),
-                Matcher::RegListElement(a, s) =>   write!(buf, "{{<V,{}>.{} * {}}}[<Imm,{}>]", arg_idx, size_to_string(*s), a, arg_idx + 1).unwrap(),
+                    write!(
+                        buf,
+                        "{{<V,{}>.{}{} * {}}}",
+                        arg_idx,
+                        size_to_string(*s),
+                        width / s.in_bytes(),
+                        a
+                    )
+                    .unwrap();
+                }
+                Matcher::RegListStatic(a, s, c) => write!(
+                    buf,
+                    "{{<V,{}>.{}{} * {}}}",
+                    arg_idx,
+                    size_to_string(*s),
+                    c,
+                    a
+                )
+                .unwrap(),
+                Matcher::RegListElement(a, s) => write!(
+                    buf,
+                    "{{<V,{}>.{} * {}}}[<Imm,{}>]",
+                    arg_idx,
+                    size_to_string(*s),
+                    a,
+                    arg_idx + 1
+                )
+                .unwrap(),
                 Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
-                Matcher::RefBase =>   write!(buf, "[<XSP,{}>]", arg_idx).unwrap(),
-                Matcher::RefOffset => write!(buf, "[<XSP,{}> <, <Imm,{}> > ]", arg_idx, arg_idx + 1).unwrap(),
-                Matcher::RefPre =>    write!(buf, "[<XSP,{}>, <Imm,{}>]!", arg_idx, arg_idx + 1).unwrap(),
+                Matcher::RefBase => write!(buf, "[<XSP,{}>]", arg_idx).unwrap(),
+                Matcher::RefOffset => {
+                    write!(buf, "[<XSP,{}> <, <Imm,{}> > ]", arg_idx, arg_idx + 1).unwrap()
+                }
+                Matcher::RefPre => {
+                    write!(buf, "[<XSP,{}>, <Imm,{}>]!", arg_idx, arg_idx + 1).unwrap()
+                }
                 Matcher::RefIndex => {
                     constraints.push(format!("{}: ModWX()", arg_idx + 2));
-                    write!(buf, "[<XSP,{}>, <WX,{}> < , <Mod,{}> < <Imm,{}> > > ]", arg_idx, arg_idx + 1, arg_idx + 2, arg_idx + 3).unwrap();
-                },
+                    write!(
+                        buf,
+                        "[<XSP,{}>, <WX,{}> < , <Mod,{}> < <Imm,{}> > > ]",
+                        arg_idx,
+                        arg_idx + 1,
+                        arg_idx + 2,
+                        arg_idx + 3
+                    )
+                    .unwrap();
+                }
                 Matcher::LitMod(m) => {
                     buf.push_str(m.as_str());
                     if !m.expr_required() {
@@ -711,7 +875,7 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     } else {
                         write!(buf, " <Imm,{}>", arg_idx).unwrap();
                     }
-                },
+                }
                 Matcher::Mod(mods) => {
                     let mut required = false;
                     let mut options = Vec::new();
@@ -727,14 +891,14 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                     } else {
                         write!(buf, "<Mod,{}> <Imm,{}>", arg_idx, arg_idx + 1).unwrap();
                     }
-                },
-                Matcher::End => ()
+                }
+                Matcher::End => (),
             }
 
             arg_idx += matcher.flatarg_count();
         }
 
-        for _ in 0 .. end_count {
+        for _ in 0..end_count {
             buf.push_str(" >");
         }
 
@@ -759,52 +923,109 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::RNoZr(_) => format!("R(31)"),
                 Command::R4(_) => format!("R(16)"),
                 Command::RNext => format!("RNext()"),
-                Command::Ubits(_, bits)
-                | Command::BUbits(bits) => format!("Range(0, {}, 1)", 1u32 << bits),
-                Command::Uscaled(_, bits, scale) => format!("Range(0, {}, {})", 1u32 << (bits + scale), 1u32 << scale),
+                Command::Ubits(_, bits) | Command::BUbits(bits) => {
+                    format!("Range(0, {}, 1)", 1u32 << bits)
+                }
+                Command::Uscaled(_, bits, scale) => {
+                    format!("Range(0, {}, {})", 1u32 << (bits + scale), 1u32 << scale)
+                }
                 Command::Ulist(_, list) => {
-                    let numbers = list.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(", ");
+                    let numbers = list
+                        .iter()
+                        .map(|n| n.to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ");
                     format!("List({})", numbers)
-                },
-                Command::Urange(_, min, max)
-                | Command::BUrange(min, max) => format!("Range({}, {}+1, 1)", min, max),
-                Command::Usub(_, bits, addval) => format!("Range({}, {}+1, 1)", *addval as u32 + 1 - (1u32 << bits), addval),
+                }
+                Command::Urange(_, min, max) | Command::BUrange(min, max) => {
+                    format!("Range({}, {}+1, 1)", min, max)
+                }
+                Command::Usub(_, bits, addval) => format!(
+                    "Range({}, {}+1, 1)",
+                    *addval as u32 + 1 - (1u32 << bits),
+                    addval
+                ),
                 Command::Unegmod(_, bits) => format!("Range(0, {}, 1)", 1u32 << bits),
-                Command::Usumdec(_, bits)
-                | Command::BUsum(bits) => format!("Range2(1, {}+1, 1)", 1u32 << bits),
+                Command::Usumdec(_, bits) | Command::BUsum(bits) => {
+                    format!("Range2(1, {}+1, 1)", 1u32 << bits)
+                }
                 Command::Ufields(fields) => format!("Range(0, {}, 1)", 1u32 << fields.len()),
-                Command::Sbits(_, bits) => format!("Range(-{}, {}, 1)", 1u32 << (bits - 1), 1u32 << (bits - 1)),
-                Command::Sscaled(_, bits, scale)
-                | Command::BSscaled(bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits + scale - 1), 1u32 << (bits + scale - 1), 1u32 << scale),
+                Command::Sbits(_, bits) => {
+                    format!("Range(-{}, {}, 1)", 1u32 << (bits - 1), 1u32 << (bits - 1))
+                }
+                Command::Sscaled(_, bits, scale) | Command::BSscaled(bits, scale) => format!(
+                    "Range(-{}, {}, {})",
+                    1u32 << (bits + scale - 1),
+                    1u32 << (bits + scale - 1),
+                    1u32 << scale
+                ),
                 Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W) => format!("Special('wide_w')"),
-                | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X) => format!("Special('wide_x')"),
-                | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) => format!("Special('inverted_w')"),
-                | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) => format!("Special('inverted_x')"),
-                Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_W) => format!("Special('logical_w')"),
-                | Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_X) => format!("Special('logical_x')"),
+                Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X) => format!("Special('wide_x')"),
+                Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) => {
+                    format!("Special('inverted_w')")
+                }
+                Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) => {
+                    format!("Special('inverted_x')")
+                }
+                Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_W) => {
+                    format!("Special('logical_w')")
+                }
+                Command::Special(_, SpecialComm::LOGICAL_IMMEDIATE_X) => {
+                    format!("Special('logical_x')")
+                }
                 Command::Special(_, SpecialComm::FLOAT_IMMEDIATE)
-                | Command::Special(_, SpecialComm::SPLIT_FLOAT_IMMEDIATE) => format!("Special('float')"),
-                Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => format!("Special('stretched')"),
-                Command::Offset(Relocation::B) => format!("Range(-{}, {}, {})", 1<<27, 1<<27, 4),
-                Command::Offset(Relocation::BCOND) => format!("Range(-{}, {}, {})", 1<<18, 1<<18, 4),
-                Command::Offset(Relocation::ADR) => format!("Range(-{}, {}, {})", 1<<20, 1<<20, 1),
-                Command::Offset(Relocation::ADRP) => format!("Range(-{}, {}, {})", 1u64<<32, 1u64<<32, 4096),
-                Command::Offset(Relocation::TBZ) => format!("Range(-{}, {}, {})", 1<<15, 1<<15, 4),
-                Command::Offset(Relocation::LITERAL32) => format!("Range(-{}, {}, {})", 1<<31, 1<<31, 1),
-                Command::Offset(Relocation::LITERAL64) => format!("Range(-{}, {}, {})", 1u64<<63, 1u64<<63, 1),
+                | Command::Special(_, SpecialComm::SPLIT_FLOAT_IMMEDIATE) => {
+                    format!("Special('float')")
+                }
+                Command::Special(_, SpecialComm::STRETCHED_IMMEDIATE) => {
+                    format!("Special('stretched')")
+                }
+                Command::Offset(Relocation::B) => {
+                    format!("Range(-{}, {}, {})", 1 << 27, 1 << 27, 4)
+                }
+                Command::Offset(Relocation::BCOND) => {
+                    format!("Range(-{}, {}, {})", 1 << 18, 1 << 18, 4)
+                }
+                Command::Offset(Relocation::ADR) => {
+                    format!("Range(-{}, {}, {})", 1 << 20, 1 << 20, 1)
+                }
+                Command::Offset(Relocation::ADRP) => {
+                    format!("Range(-{}, {}, {})", 1u64 << 32, 1u64 << 32, 4096)
+                }
+                Command::Offset(Relocation::TBZ) => {
+                    format!("Range(-{}, {}, {})", 1 << 15, 1 << 15, 4)
+                }
+                Command::Offset(Relocation::LITERAL32) => {
+                    format!("Range(-{}, {}, {})", 1 << 31, 1 << 31, 1)
+                }
+                Command::Offset(Relocation::LITERAL64) => {
+                    format!("Range(-{}, {}, {})", 1u64 << 63, 1u64 << 63, 1)
+                }
                 Command::Cond(_) => {
                     let keys: Vec<_> = COND_MAP.keys().map(|k| format!("\"{}\"", k)).collect();
                     format!("List({})", keys.join(", "))
-                },
+                }
                 Command::CondInv(_) => {
-                    let keys: Vec<_> = COND_MAP.iter().filter_map(|(k, v)| if *v < 14 { Some(format!("\"{}\"", k)) } else { None }).collect();
-                    format!("List({})", keys.join(", "))
-                },
-                Command::LitList(_, name) => {
-                    let keys: Vec<_> = SPECIAL_IDENT_MAP[name].keys().map(|k| format!("\"{}\"", k)).collect();
+                    let keys: Vec<_> = COND_MAP
+                        .iter()
+                        .filter_map(|(k, v)| {
+                            if *v < 14 {
+                                Some(format!("\"{}\"", k))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
                     format!("List({})", keys.join(", "))
                 }
-                _ => continue
+                Command::LitList(_, name) => {
+                    let keys: Vec<_> = SPECIAL_IDENT_MAP[name]
+                        .keys()
+                        .map(|k| format!("\"{}\"", k))
+                        .collect();
+                    format!("List({})", keys.join(", "))
+                }
+                _ => continue,
             };
             constraints.push(format!("{}: {}", i, constraint));
 

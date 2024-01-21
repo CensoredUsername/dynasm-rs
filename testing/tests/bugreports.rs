@@ -18,7 +18,10 @@ fn bugreport_1() {
     let buf = ops.finalize().unwrap();
     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
     let hex: String = hex.join(", ");
-    assert_eq!(hex, "0xCD, 0x03, 0x49, 0x89, 0xF8, 0x49, 0x83, 0xC0, 0x01, 0x4C, 0x89, 0xC0, 0xC3", "bugreport_1");
+    assert_eq!(
+        hex, "0xCD, 0x03, 0x49, 0x89, 0xF8, 0x49, 0x83, 0xC0, 0x01, 0x4C, 0x89, 0xC0, 0xC3",
+        "bugreport_1"
+    );
 }
 
 // ensure RBP/RSP can be used as dynamic base register by always emitting the full SIB byte and a displacement
@@ -66,7 +69,10 @@ fn bugreport_3() {
     let buf = ops.finalize().unwrap();
     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
     let hex: String = hex.join(", ");
-    assert_eq!(hex, "0xC4, 0xE1, 0x6B, 0x58, 0xCB, 0xC4, 0x41, 0x33, 0x58, 0xD3", "bugreport_3");
+    assert_eq!(
+        hex, "0xC4, 0xE1, 0x6B, 0x58, 0xCB, 0xC4, 0x41, 0x33, 0x58, 0xD3",
+        "bugreport_3"
+    );
 }
 
 // overflow in logical immediate encoding

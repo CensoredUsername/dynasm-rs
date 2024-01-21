@@ -1,8 +1,8 @@
 //! This module implements some wrappers around Mmap/MmapMut to also support a cheap "empty" variant.
 // Unfortunately Memmap itself doesn't support a cheap zero-length variant
 
-use std::ops::{Deref, DerefMut};
 use std::io;
+use std::ops::{Deref, DerefMut};
 
 use memmap2::{Mmap, MmapMut};
 
@@ -15,7 +15,7 @@ pub struct ExecutableBuffer {
     // length of the buffer that has actually been written to
     length: usize,
     // backing buffer
-    buffer: Option<Mmap>
+    buffer: Option<Mmap>,
 }
 
 /// ExecutableBuffer equivalent that holds a buffer of mutable memory instead of executable memory. It also derefs to a `&mut [u8]`.
@@ -25,7 +25,7 @@ pub struct MutableBuffer {
     // length of the buffer that has actually been written to
     length: usize,
     // backing buffer
-    buffer: Option<MmapMut>
+    buffer: Option<MmapMut>,
 }
 
 impl ExecutableBuffer {
@@ -50,10 +50,7 @@ impl ExecutableBuffer {
             Some(MmapMut::map_anon(size)?.make_exec()?)
         };
 
-        Ok(ExecutableBuffer {
-            length: 0,
-            buffer
-        })
+        Ok(ExecutableBuffer { length: 0, buffer })
     }
 
     /// Query the backing size of this executable buffer
@@ -71,7 +68,7 @@ impl ExecutableBuffer {
 
         Ok(MutableBuffer {
             length: self.length,
-            buffer
+            buffer,
         })
     }
 }
@@ -86,10 +83,7 @@ impl MutableBuffer {
             Some(MmapMut::map_anon(size)?)
         };
 
-        Ok(MutableBuffer {
-            length: 0,
-            buffer
-        })
+        Ok(MutableBuffer { length: 0, buffer })
     }
 
     /// Query the backing size of this mutable buffer
@@ -113,7 +107,7 @@ impl MutableBuffer {
 
         Ok(ExecutableBuffer {
             length: self.length,
-            buffer
+            buffer,
         })
     }
 }
@@ -122,7 +116,7 @@ impl Default for ExecutableBuffer {
     fn default() -> ExecutableBuffer {
         ExecutableBuffer {
             length: 0,
-            buffer: None
+            buffer: None,
         }
     }
 }
@@ -131,7 +125,7 @@ impl Default for MutableBuffer {
     fn default() -> MutableBuffer {
         MutableBuffer {
             length: 0,
-            buffer: None
+            buffer: None,
         }
     }
 }

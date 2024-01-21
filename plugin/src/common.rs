@@ -1,20 +1,20 @@
 //! This module contains various infrastructure that is common across all assembler backends
 use proc_macro2::{Span, TokenTree};
-use quote::ToTokens;
 use quote::quote;
-use syn::spanned::Spanned;
+use quote::ToTokens;
 use syn::parse;
+use syn::spanned::Spanned;
 use syn::Token;
 
-use crate::parse_helpers::{ParseOpt, eat_pseudo_keyword};
+use crate::parse_helpers::{eat_pseudo_keyword, ParseOpt};
 use crate::serialize;
 
 /// Enum representing the result size of a value/expression/register/etc in bytes.
 /// Uses the NASM syntax for sizes (a word is 16 bits)
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 pub enum Size {
-    BYTE  = 1,
-    WORD  = 2,
+    BYTE = 1,
+    WORD = 2,
     DWORD = 4,
     FWORD = 6,
     QWORD = 8,
@@ -29,19 +29,21 @@ impl Size {
     }
 
     pub fn as_literal(self) -> syn::Ident {
-        syn::Ident::new(match self {
-            Size::BYTE  => "i8",
-            Size::WORD  => "i16",
-            Size::DWORD => "i32",
-            Size::FWORD => "i48",
-            Size::QWORD => "i64",
-            Size::PWORD => "i80",
-            Size::OWORD => "i128",
-            Size::HWORD => "i256"
-        }, Span::mixed_site())
+        syn::Ident::new(
+            match self {
+                Size::BYTE => "i8",
+                Size::WORD => "i16",
+                Size::DWORD => "i32",
+                Size::FWORD => "i48",
+                Size::QWORD => "i64",
+                Size::PWORD => "i80",
+                Size::OWORD => "i128",
+                Size::HWORD => "i256",
+            },
+            Span::mixed_site(),
+        )
     }
 }
-
 
 /**
  * Jump types
@@ -49,7 +51,7 @@ impl Size {
 #[derive(Debug, Clone)]
 pub struct Jump {
     pub kind: JumpKind,
-    pub offset: Option<syn::Expr>
+    pub offset: Option<syn::Expr>,
 }
 
 #[derive(Debug, Clone)]
@@ -61,7 +63,7 @@ pub enum JumpKind {
     Backward(syn::Ident), //  > label (["+" "-"] offset)?
     Forward(syn::Ident),  //  < label (["+" "-"] offset)?
     Dynamic(syn::Expr),   // =>expr | => (expr) (["+" "-"] offset)?
-    Bare(syn::Expr)       // jump to this address
+    Bare(syn::Expr),      // jump to this address
 }
 
 impl ParseOpt for Jump {
@@ -70,7 +72,10 @@ impl ParseOpt for Jump {
         if eat_pseudo_keyword(input, "extern") {
             let expr: syn::Expr = input.parse()?;
 
-            return Ok(Some(Jump { kind: JumpKind::Bare(expr), offset: None }));
+            return Ok(Some(Jump {
+                kind: JumpKind::Bare(expr),
+                offset: None,
+            }));
         }
 
         // -> global_label
@@ -123,7 +128,6 @@ impl ParseOpt for Jump {
 
             let expr: syn::Expr = input.parse()?;
             Some(expr)
-
         } else {
             None
         };
@@ -134,10 +138,7 @@ impl ParseOpt for Jump {
 
 impl Jump {
     pub fn new(kind: JumpKind, offset: Option<syn::Expr>) -> Jump {
-        Jump {
-            kind,
-            offset
-        }
+        Jump { kind, offset }
     }
 
     /// Takes a jump and encodes it as a relocation starting `start_offset` bytes ago, relative to `ref_offset`.
@@ -156,7 +157,7 @@ impl Jump {
             target_offset,
             field_offset,
             ref_offset,
-            kind: serialize::expr_tuple_of_u8s(span, data)
+            kind: serialize::expr_tuple_of_u8s(span, data),
         };
         match self.kind {
             JumpKind::Global(ident) => Stmt::GlobalJumpTarget(ident, relocation),
@@ -178,7 +179,6 @@ impl Jump {
     }
 }
 
-
 /// A relocation entry description
 #[derive(Debug, Clone)]
 pub struct Relocation {
@@ -187,7 +187,6 @@ pub struct Relocation {
     pub ref_offset: u8,
     pub kind: TokenTree,
 }
-
 
 /// An abstract representation of a dynasm runtime statement to be emitted
 #[derive(Debug, Clone)]
@@ -223,7 +222,7 @@ pub enum Stmt {
     PrefixStmt(TokenTree),
 
     // a random statement that has to be inserted between assembly hunks
-    Stmt(TokenTree)
+    Stmt(TokenTree),
 }
 
 // convenience methods
@@ -247,28 +246,26 @@ impl Stmt {
     }
 }
 
-
 // Makes a None-delimited TokenTree item out of anything that can be converted to tokens.
 // This is a useful shortcut to escape issues around not-properly delimited tokenstreams
 // because it is guaranteed to be parsed back properly to its source ast at type-level.
 pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
     let span = expr.span();
-    let mut group = proc_macro2::Group::new(
-        proc_macro2::Delimiter::None, expr.into_token_stream()
-    );
+    let mut group = proc_macro2::Group::new(proc_macro2::Delimiter::None, expr.into_token_stream());
     group.set_span(span);
     proc_macro2::TokenTree::Group(group)
 }
 
-
 /// Create a bitmask with `scale` bits set
 pub fn bitmask(scale: u8) -> u32 {
-    1u32.checked_shl(u32::from(scale)).unwrap_or(0).wrapping_sub(1)
+    1u32.checked_shl(u32::from(scale))
+        .unwrap_or(0)
+        .wrapping_sub(1)
 }
-
 
 /// Create a bitmask with `scale` bits set
 pub fn bitmask64(scale: u8) -> u64 {
-    1u64.checked_shl(u32::from(scale)).unwrap_or(0).wrapping_sub(1)
+    1u64.checked_shl(u32::from(scale))
+        .unwrap_or(0)
+        .wrapping_sub(1)
 }
-

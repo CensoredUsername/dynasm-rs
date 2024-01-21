@@ -1,7 +1,7 @@
 #![cfg_attr(feature = "filelocal", feature(proc_macro_span))]
 //! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates
 //! a full dynamic assembler for several assembly dialects with Rust code.
-//! 
+//!
 //! As this is a proc-macro crate, it only exports the `dynasm!` and `dynasm_backwards!` macros.
 //! Any directives used in these macro invocations are normally local to the invocation itself, unless
 //! the `filelocal` crate feature is used. This feature requires a nightly compiler.
@@ -11,31 +11,35 @@
 
 extern crate proc_macro;
 
-use syn::parse;
-use syn::{Token, parse_macro_input};
-use proc_macro2::{TokenTree, TokenStream};
-use quote::quote;
+use proc_macro2::{TokenStream, TokenTree};
 use proc_macro_error::proc_macro_error;
+use quote::quote;
+use syn::parse;
+use syn::{parse_macro_input, Token};
 
 use std::collections::HashMap;
 
-#[cfg(feature = "filelocal")]
-use std::sync::{MutexGuard, Mutex};
+#[cfg(any(
+    feature = "filelocal",
+    feature = "dynasm_opmap",
+    feature = "dynasm_extract"
+))]
+use proc_macro2::Span;
 #[cfg(feature = "filelocal")]
 use std::path::PathBuf;
-#[cfg(any(feature = "filelocal", feature = "dynasm_opmap", feature = "dynasm_extract"))]
-use proc_macro2::Span;
+#[cfg(feature = "filelocal")]
+use std::sync::{Mutex, MutexGuard};
 
-/// Module with common infrastructure across assemblers
-mod common;
 /// Module with architecture-specific assembler implementations
 mod arch;
+/// Module with common infrastructure across assemblers
+mod common;
 /// Module contaning the implementation of directives
 mod directive;
-/// Module containing utility functions for creating TokenTrees from assembler / directive output
-mod serialize;
 /// Module containing utility functions for parsing
 mod parse_helpers;
+/// Module containing utility functions for creating TokenTrees from assembler / directive output
+mod serialize;
 
 /// The whole point. This macro compiles given assembly/Rust templates down to `DynasmApi` and `DynasmLabelApi`
 /// compliant calls to an assembler.
@@ -73,7 +77,7 @@ pub fn dynasm_backwards(tokens: proc_macro::TokenStream) -> proc_macro::TokenStr
 /// invocation.
 struct Dynasm {
     target: TokenTree,
-    stmts: Vec<common::Stmt>
+    stmts: Vec<common::Stmt>,
 }
 
 /// top-level parsing. Handles common prefix symbols and diverts to the selected architecture
@@ -81,7 +85,6 @@ struct Dynasm {
 /// non-parsing errors happen err() will be called, but this function returns Ok().
 impl parse::Parse for Dynasm {
     fn parse(input: parse::ParseStream) -> parse::Result<Self> {
-
         // parse the assembler target declaration
         let target: syn::Expr = input.parse()?;
         // and just convert it back to a tokentree since that's how we'll always be using it.
@@ -108,7 +111,7 @@ impl parse::Parse for Dynasm {
                     buffer.extend(std::iter::once(input.parse::<TokenTree>()?));
                 }
                 // glue an extra ; on there
-                buffer.extend(quote! { ; } );
+                buffer.extend(quote! { ; });
 
                 if !buffer.is_empty() {
                     // ensure that the statement is actually a proper statement and then emit it for serialization
@@ -141,14 +144,12 @@ impl parse::Parse for Dynasm {
 
             // ; label :
             if input.peek(syn::Ident) && input.peek2(Token![:]) {
-
                 let name: syn::Ident = input.parse()?;
                 let _: Token![:] = input.parse()?;
 
                 stmts.push(common::Stmt::LocalLabel(name));
                 continue;
             }
-
 
             // ; . directive
             if input.peek(Token![.]) {
@@ -162,15 +163,13 @@ impl parse::Parse for Dynasm {
                     stmts: &mut stmts,
                     invocation_context: &*invocation_context,
                 };
-                invocation_context.current_arch.compile_instruction(&mut state, input)?;
+                invocation_context
+                    .current_arch
+                    .compile_instruction(&mut state, input)?;
             }
-
         }
 
-        Ok(Dynasm {
-            target,
-            stmts
-        })
+        Ok(Dynasm { target, stmts })
     }
 }
 
@@ -179,7 +178,6 @@ impl parse::Parse for Dynasm {
 #[cfg(feature = "dynasm_opmap")]
 #[proc_macro]
 pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-
     // parse to ensure that no macro arguments were provided
     let opmap = parse_macro_input!(tokens as DynasmOpmap);
 
@@ -189,7 +187,7 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
     s.push_str(&match opmap.arch.as_str() {
         "x64" | "x86" => arch::x64::create_opmap(),
         "aarch64" => arch::aarch64::create_opmap(),
-        x => panic!("Unknown architecture {}", x)
+        x => panic!("Unknown architecture {}", x),
     });
 
     let token = quote::quote_spanned! { Span::mixed_site()=>
@@ -203,14 +201,13 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
 #[cfg(feature = "dynasm_extract")]
 #[proc_macro]
 pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-
     // parse to ensure that no macro arguments were provided
     let opmap = parse_macro_input!(tokens as DynasmOpmap);
 
     let s = match opmap.arch.as_str() {
         "x64" | "x86" => "UNIMPLEMENTED".into(),
         "aarch64" => arch::aarch64::extract_opmap(),
-        x => panic!("Unknown architecture {}", x)
+        x => panic!("Unknown architecture {}", x),
     };
 
     let token = quote::quote_spanned! { Span::mixed_site()=>
@@ -221,20 +218,20 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
 
 /// As dynasm_opmap takes no args it doesn't parse to anything
 
-#[cfg(any(feature="dynasm_extract", feature="dynasm_opmap"))]
+#[cfg(any(feature = "dynasm_extract", feature = "dynasm_opmap"))]
 struct DynasmOpmap {
-    pub arch: String
+    pub arch: String,
 }
 
 /// As dynasm_opmap takes no args it doesn't parse to anything.
 /// This just exists so syn will give an error when no args are present.
-#[cfg(any(feature="dynasm_extract", feature="dynasm_opmap"))]
+#[cfg(any(feature = "dynasm_extract", feature = "dynasm_opmap"))]
 impl parse::Parse for DynasmOpmap {
     fn parse(input: parse::ParseStream) -> parse::Result<Self> {
         let arch: syn::Ident = input.parse()?;
 
         Ok(DynasmOpmap {
-            arch: arch.to_string()
+            arch: arch.to_string(),
         })
     }
 }
@@ -257,7 +254,7 @@ impl DynasmContext {
     fn new() -> DynasmContext {
         DynasmContext {
             current_arch: arch::from_str(arch::CURRENT_ARCH).expect("Invalid default architecture"),
-            aliases: HashMap::new()
+            aliases: HashMap::new(),
         }
     }
 }
@@ -265,14 +262,14 @@ impl DynasmContext {
 // Oneshot context provider
 #[cfg(not(feature = "filelocal"))]
 struct ContextProvider {
-    context: DynasmContext
+    context: DynasmContext,
 }
 
 #[cfg(not(feature = "filelocal"))]
 impl ContextProvider {
     pub fn new() -> ContextProvider {
         ContextProvider {
-            context: DynasmContext::new()
+            context: DynasmContext::new(),
         }
     }
 
@@ -284,14 +281,14 @@ impl ContextProvider {
 /// Filelocal context provider
 #[cfg(feature = "filelocal")]
 struct ContextProvider {
-    guard: MutexGuard<'static, HashMap<PathBuf, DynasmContext>>
+    guard: MutexGuard<'static, HashMap<PathBuf, DynasmContext>>,
 }
 
 #[cfg(feature = "filelocal")]
 impl ContextProvider {
     pub fn new() -> ContextProvider {
         ContextProvider {
-            guard: CONTEXT_STORAGE.lock().unwrap()
+            guard: CONTEXT_STORAGE.lock().unwrap(),
         }
     }
 

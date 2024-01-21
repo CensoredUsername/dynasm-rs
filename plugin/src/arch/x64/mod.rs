@@ -1,15 +1,15 @@
-use syn::parse;
 use proc_macro_error::emit_error;
+use syn::parse;
 
 mod ast;
 mod compiler;
-mod parser;
 mod debug;
+mod parser;
 mod x64data;
 
-use crate::State;
 use crate::arch::Arch;
-use crate::common::{Size, Stmt, Jump};
+use crate::common::{Jump, Size, Stmt};
+use crate::State;
 
 #[cfg(feature = "dynasm_opmap")]
 pub use debug::create_opmap;
@@ -17,23 +17,25 @@ pub use debug::create_opmap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum X86Mode {
     Long,
-    Protected
+    Protected,
 }
 
 struct Context<'a, 'b: 'a> {
     pub state: &'a mut State<'b>,
     pub mode: X86Mode,
-    pub features: x64data::Features
+    pub features: x64data::Features,
 }
 
 #[derive(Clone, Debug)]
 pub struct Archx64 {
-    features: x64data::Features
+    features: x64data::Features,
 }
 
 impl Default for Archx64 {
     fn default() -> Archx64 {
-        Archx64 { features: x64data::Features::all() }
+        Archx64 {
+            features: x64data::Features::all(),
+        }
     }
 }
 
@@ -48,7 +50,11 @@ impl Arch for Archx64 {
             new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    emit_error!(ident, "Architecture x64 does not support feature '{}'", ident);
+                    emit_error!(
+                        ident,
+                        "Architecture x64 does not support feature '{}'",
+                        ident
+                    );
                     continue;
                 }
             }
@@ -66,11 +72,15 @@ impl Arch for Archx64 {
         0x90
     }
 
-    fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
+    fn compile_instruction(
+        &self,
+        state: &mut State,
+        input: parse::ParseStream,
+    ) -> parse::Result<()> {
         let mut ctx = Context {
             state,
             mode: X86Mode::Long,
-            features: self.features
+            features: self.features,
         };
         let (instruction, args) = parser::parse_instruction(&mut ctx, input)?;
         let span = instruction.span;
@@ -84,12 +94,14 @@ impl Arch for Archx64 {
 
 #[derive(Clone, Debug)]
 pub struct Archx86 {
-    features: x64data::Features
+    features: x64data::Features,
 }
 
 impl Default for Archx86 {
     fn default() -> Archx86 {
-        Archx86 { features: x64data::Features::all() }
+        Archx86 {
+            features: x64data::Features::all(),
+        }
     }
 }
 
@@ -104,7 +116,11 @@ impl Arch for Archx86 {
             new_features |= match x64data::Features::from_str(&ident.to_string()) {
                 Some(feature) => feature,
                 None => {
-                    emit_error!(ident, "Architecture x86 does not support feature '{}'", ident);
+                    emit_error!(
+                        ident,
+                        "Architecture x86 does not support feature '{}'",
+                        ident
+                    );
                     continue;
                 }
             }
@@ -122,11 +138,15 @@ impl Arch for Archx86 {
         0x90
     }
 
-    fn compile_instruction(&self, state: &mut State, input: parse::ParseStream) -> parse::Result<()> {
+    fn compile_instruction(
+        &self,
+        state: &mut State,
+        input: parse::ParseStream,
+    ) -> parse::Result<()> {
         let mut ctx = Context {
             state,
             mode: X86Mode::Protected,
-            features: self.features
+            features: self.features,
         };
         let (instruction, args) = parser::parse_instruction(&mut ctx, input)?;
         let span = instruction.span;

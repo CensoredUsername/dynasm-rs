@@ -1,16 +1,22 @@
-use proc_macro_error::emit_error;
 use proc_macro2::Span;
+use proc_macro_error::emit_error;
 
-use super::Context;
-use super::ast::{Instruction, RawArg, CleanArg, FlatArg, RefItem, Register, RegFamily, RefKind, Modifier};
-use super::aarch64data::{Opdata, Matcher, COND_MAP, get_mnemonic_data};
+use super::aarch64data::{get_mnemonic_data, Matcher, Opdata, COND_MAP};
+use super::ast::{
+    CleanArg, FlatArg, Instruction, Modifier, RawArg, RefItem, RefKind, RegFamily, Register,
+};
 use super::debug::format_opdata_list;
+use super::Context;
 
-use crate::common::{Size, JumpKind};
-use crate::parse_helpers::{as_ident, as_number, as_float};
+use crate::common::{JumpKind, Size};
+use crate::parse_helpers::{as_float, as_ident, as_number};
 
 /// Try finding an appropriate definition that matches the given instruction / arguments.
-pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, args: Vec<RawArg>) -> Result<MatchData, Option<String>> {
+pub(super) fn match_instruction(
+    _ctx: &mut Context,
+    instruction: &Instruction,
+    args: Vec<RawArg>,
+) -> Result<MatchData, Option<String>> {
     // sanitize our arg list to remove any structures that cannot be matched on
     let args = sanitize_args(args)?;
 
@@ -25,7 +31,6 @@ pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, a
     // matching loop
     for data in opdata {
         if let Some(mut ctx) = match_args(&args, data) {
-
             // flatten the arg list for the encoding vm
             flatten_args(args, data, &mut ctx);
 
@@ -33,9 +38,11 @@ pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, a
         }
     }
 
-    Err(Some(
-        format!("'{}': instruction format mismatch, expected one of the following forms:\n{}", &name, format_opdata_list(&name, opdata))
-    ))
+    Err(Some(format!(
+        "'{}': instruction format mismatch, expected one of the following forms:\n{}",
+        &name,
+        format_opdata_list(&name, opdata)
+    )))
 }
 
 /// Sanitizes arguments, ensuring that:
@@ -52,7 +59,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
             RawArg::Direct { span, reg } => {
                 sanitize_register(span, &reg)?;
                 res.push(CleanArg::Direct { span, reg });
-            },
+            }
             // offsets: validate that only relative jumps are allowed (no extern relocations)
             RawArg::JumpTarget { jump } => {
                 if let JumpKind::Bare(_) = jump.kind {
@@ -60,28 +67,31 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     return Err(None);
                 }
                 res.push(CleanArg::JumpTarget { jump });
-            },
+            }
             // modifier: LSL LSR ASR ROR and MSL require an immediate.
             RawArg::Modifier { span, modifier } => {
                 if modifier.expr.is_none() && modifier.op.expr_required() {
-                    emit_error!(span, "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.");
+                    emit_error!(
+                        span,
+                        "LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate."
+                    );
                     return Err(None);
                 }
 
                 res.push(CleanArg::Modifier { span, modifier });
-            },
+            }
             // dot: passthrough
             RawArg::Dot { span } => {
-                res.push(CleanArg::Dot { span } );
-            },
+                res.push(CleanArg::Dot { span });
+            }
             // lit: passthrough
             RawArg::Lit { ident } => {
-                res.push(CleanArg::Lit { ident } );
-            },
+                res.push(CleanArg::Lit { ident });
+            }
             // immediate: pass through
             RawArg::Immediate { value, prefixed } => {
                 res.push(CleanArg::Immediate { value, prefixed })
-            },
+            }
             // reference: first, assert the used indexing mode (base, offset, pre-indexed, or register-indexed)
             // then, verify that the base register is always an XSP register
             // for the register-indexed mode, additionally verify that the index register is either an W or an X register
@@ -97,36 +107,37 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     Some(_) => {
                         emit_error!(span, "First item in a reference list has to be a register");
                         return Err(None);
-                    },
-                    None => unreachable!("Cannot create empty references in the parser")
+                    }
+                    None => unreachable!("Cannot create empty references in the parser"),
                 };
 
                 // second item is either a register or an offset
                 match items.next() {
-                    Some(RefItem::Direct { reg, ..}) => {
+                    Some(RefItem::Direct { reg, .. }) => {
                         kind = RefKind::Indexed(reg, None);
-                    },
+                    }
                     Some(RefItem::Immediate { value }) => {
                         kind = RefKind::Offset(value);
-                    },
+                    }
                     Some(RefItem::Modifier { .. }) => {
-                        emit_error!(span, "Cannot have a modifier without index register or offset");
+                        emit_error!(
+                            span,
+                            "Cannot have a modifier without index register or offset"
+                        );
                         return Err(None);
-                    },
-                    None => hit_end = true
+                    }
+                    None => hit_end = true,
                 }
 
                 // if the second item was a register, there could be a modifier
                 if let RefKind::Indexed(_, ref mut modifier) = kind {
                     match items.next() {
-                        Some(RefItem::Modifier { modifier: m, ..}) => {
-                            *modifier = Some(m)
-                        },
+                        Some(RefItem::Modifier { modifier: m, .. }) => *modifier = Some(m),
                         Some(_) => {
                             emit_error!(span, "Too many items in reference list");
                             return Err(None);
-                        },
-                        None => hit_end = true
+                        }
+                        None => hit_end = true,
                     }
                 }
 
@@ -141,14 +152,20 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     if let RefKind::Offset(offset) = kind {
                         kind = RefKind::PreIndexed(offset);
                     } else {
-                        emit_error!(span, "Cannot use pre-indexed addressing without an immediate offset.");
+                        emit_error!(
+                            span,
+                            "Cannot use pre-indexed addressing without an immediate offset."
+                        );
                         return Err(None);
                     }
                 }
 
                 // sanitizaiton
                 // base can only be a Xn|SP reg
-                if !(base.size() == Size::QWORD && (base.family() == RegFamily::INTEGERSP || (base.family() == RegFamily::INTEGER && !base.kind().is_zero_reg()))) {
+                if !(base.size() == Size::QWORD
+                    && (base.family() == RegFamily::INTEGERSP
+                        || (base.family() == RegFamily::INTEGER && !base.kind().is_zero_reg())))
+                {
                     emit_error!(span, "Base register can only be a Xn|SP register");
                     return Err(None);
                 }
@@ -162,8 +179,15 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
 
                     // limited set of allowed modifiers.
                     if let Some(ref m) = modifier {
-                        if if index.size() == Size::QWORD {m.op != Modifier::LSL && m.op != Modifier::SXTX} else {m.op != Modifier::SXTW && m.op != Modifier::UXTW} {
-                            emit_error!(span, "Invalid modifier for the selected base register type");
+                        if if index.size() == Size::QWORD {
+                            m.op != Modifier::LSL && m.op != Modifier::SXTX
+                        } else {
+                            m.op != Modifier::SXTW && m.op != Modifier::UXTW
+                        } {
+                            emit_error!(
+                                span,
+                                "Invalid modifier for the selected base register type"
+                            );
                             return Err(None);
                         }
 
@@ -175,15 +199,16 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     }
                 }
 
-                res.push(CleanArg::Reference {
-                    span,
-                    base,
-                    kind
-                });
-            },
+                res.push(CleanArg::Reference { span, base, kind });
+            }
             // registerlist in dash notation: verify that all used registers have the same element size / lane count.
             // then, canonicalize it to first register / count and confirm it is a valid bare vector register
-            RawArg::DashList { span, first, last, element } => {
+            RawArg::DashList {
+                span,
+                first,
+                last,
+                element,
+            } => {
                 let mut s = ListSanitizer::new();
                 s.sanitize(span, &first)?;
                 s.sanitize(span, &last)?;
@@ -200,13 +225,16 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     span,
                     first,
                     amount,
-                    element
+                    element,
                 })
-
-            },
+            }
             // registerlist in comma notation: verify that all used registers have the same element size / lane count.
             // then, canonicalize it to first register / count and confirm it is a valid bare vector register
-            RawArg::CommaList { span, items, element } => {
+            RawArg::CommaList {
+                span,
+                items,
+                element,
+            } => {
                 if items.len() > 32 {
                     emit_error!(span, "Too many registers in register list.");
                     return Err(None);
@@ -221,12 +249,14 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 let code = first.kind().encode();
                 let mut next_code = code;
 
-
                 for item in items {
                     s.sanitize(span, &item)?;
                     next_code = (next_code + 1) % 32;
                     if item.kind().encode() != next_code {
-                        emit_error!(span, "Registers in register list are not monotonically incrementing");
+                        emit_error!(
+                            span,
+                            "Registers in register list are not monotonically incrementing"
+                        );
                         return Err(None);
                     }
                 }
@@ -237,13 +267,21 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     amount,
                     element,
                 })
-            },
+            }
             // registerlist in amount notation: verify the register and confirm it is a valid bare vector register
-            RawArg::AmountList { span, first, amount, element } => {
+            RawArg::AmountList {
+                span,
+                first,
+                amount,
+                element,
+            } => {
                 sanitize_register(span, &first)?;
                 if let Register::Vector(v) = &first {
                     if v.element.is_some() {
-                        emit_error!(span, "Cannot use element specifiers inside of register lists.");
+                        emit_error!(
+                            span,
+                            "Cannot use element specifiers inside of register lists."
+                        );
                         return Err(None);
                     }
                 } else {
@@ -259,7 +297,10 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     }
                     amount as u8
                 } else {
-                    emit_error!(span, "Register list requires a contant amount of registers specified");
+                    emit_error!(
+                        span,
+                        "Register list requires a contant amount of registers specified"
+                    );
                     return Err(None);
                 };
 
@@ -278,14 +319,14 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
 
 struct ListSanitizer {
     pub element_size: Option<Size>,
-    pub lanes: Option<Option<u8>>
+    pub lanes: Option<Option<u8>>,
 }
 
 impl ListSanitizer {
     fn new() -> ListSanitizer {
         ListSanitizer {
             element_size: None,
-            lanes: None
+            lanes: None,
         }
     }
 
@@ -294,12 +335,18 @@ impl ListSanitizer {
         sanitize_register(span, register)?;
         if let Register::Vector(v) = register {
             if v.element.is_some() {
-                emit_error!(span, "Cannot use element specifiers inside of register lists.");
+                emit_error!(
+                    span,
+                    "Cannot use element specifiers inside of register lists."
+                );
                 return Err(None);
             }
 
             if v.kind.is_dynamic() {
-                emit_error!(span, "Cannot use dynamic registers inside of a comma/dash register list.");
+                emit_error!(
+                    span,
+                    "Cannot use dynamic registers inside of a comma/dash register list."
+                );
                 return Err(None);
             }
 
@@ -334,13 +381,12 @@ fn sanitize_register(span: Span, register: &Register) -> Result<(), Option<Strin
         if let Some(total) = v.full_size() {
             if total > 16 {
                 emit_error!(span, "Overly wide vector register.");
-                return Err(None)
+                return Err(None);
             }
         }
     }
     Ok(())
 }
-
 
 /// struct containing information found during a match
 #[derive(Debug)]
@@ -355,29 +401,34 @@ impl MatchData {
         MatchData {
             simd_full_width: None,
             data,
-            args: Vec::new()
+            args: Vec::new(),
         }
     }
 }
-
 
 impl Matcher {
     /// Returns if this matcher matches the given argument
     pub fn matches(&self, arg: &CleanArg, ctx: &mut MatchData) -> bool {
         match arg {
-            CleanArg::Reference { kind, .. } => {
-                match kind {
-                    RefKind::Base => *self == Matcher::RefBase || *self == Matcher::RefOffset,
-                    RefKind::Offset(_) => *self == Matcher::RefOffset,
-                    RefKind::PreIndexed(_) => *self == Matcher::RefPre,
-                    RefKind::Indexed(_, _) => *self == Matcher::RefIndex,
-                }
+            CleanArg::Reference { kind, .. } => match kind {
+                RefKind::Base => *self == Matcher::RefBase || *self == Matcher::RefOffset,
+                RefKind::Offset(_) => *self == Matcher::RefOffset,
+                RefKind::PreIndexed(_) => *self == Matcher::RefPre,
+                RefKind::Indexed(_, _) => *self == Matcher::RefIndex,
             },
-            CleanArg::RegList { amount, element, first, .. } => {
+            CleanArg::RegList {
+                amount,
+                element,
+                first,
+                ..
+            } => {
                 let first = first.assume_vector();
                 match self {
                     Matcher::RegList(m_amount, element_size) => {
-                        if m_amount != amount || *element_size != first.element_size() || element.is_some() {
+                        if m_amount != amount
+                            || *element_size != first.element_size()
+                            || element.is_some()
+                        {
                             return false;
                         }
 
@@ -385,99 +436,128 @@ impl Matcher {
                             let full_width = match bytes {
                                 8 => false,
                                 16 => true,
-                                _ => return false
+                                _ => return false,
                             };
                             match ctx.simd_full_width {
                                 None => {
                                     ctx.simd_full_width = Some(full_width);
                                     true
                                 }
-                                Some(f) => f == full_width
+                                Some(f) => f == full_width,
                             }
                         } else {
                             false
                         }
-                    },
-                    Matcher::RegListStatic(m_amount, element_size, lanecount) =>
-                        m_amount == amount && *element_size == first.element_size() && element.is_none() && first.lanes == Some(*lanecount),
-                    Matcher::RegListElement(m_amount, element_size) =>
-                        m_amount == amount && *element_size == first.element_size() && element.is_some(),
-                    _ => false
-                }
-            },
-            CleanArg::Direct { reg, .. } => {
-                match reg {
-                    Register::Vector(ref v) => match self {
-                        Matcher::V(size) => {
-                            if *size != v.element_size || v.element.is_some() {
-                                return false;
-                            }
-                            if let Some(bytes) = v.full_size() {
-                                let full_width = match bytes {
-                                    8 => false,
-                                    16 => true,
-                                    _ => return false
-                                };
-                                match ctx.simd_full_width {
-                                    None => {
-                                        ctx.simd_full_width = Some(full_width);
-                                        true
-                                    }
-                                    Some(f) => f == full_width
-                                }
-                            } else {
-                                false
-                            }
-                        },
-                        Matcher::VStatic(size, lanes) =>
-                            *size == v.element_size && v.element.is_none() && v.lanes == Some(*lanes),
-                        Matcher::VElement(size) =>
-                            *size == v.element_size && v.element.is_some(),
-                        Matcher::VElementStatic(size, element) =>
-                            *size == v.element_size && v.element.as_ref().and_then(as_number) == Some(u64::from(*element)),
-                        Matcher::VStaticElement(size, lanes) =>
-                            *size == v.element_size && v.element.is_some() && v.lanes == Some(*lanes),
-                        _ => false
-                    },
-                    Register::Scalar(ref s) => match self {
-                        Matcher::W => s.size() == Size::DWORD && s.kind.family() == RegFamily::INTEGER,
-                        Matcher::X => s.size() == Size::QWORD && s.kind.family() == RegFamily::INTEGER,
-                        Matcher::WSP => s.size() == Size::DWORD && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
-                        Matcher::XSP => s.size() == Size::QWORD && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
-                        Matcher::B => s.size() == Size::BYTE && s.kind.family() == RegFamily::SIMD,
-                        Matcher::H => s.size() == Size::WORD && s.kind.family() == RegFamily::SIMD,
-                        Matcher::S => s.size() == Size::DWORD && s.kind.family() == RegFamily::SIMD,
-                        Matcher::D => s.size() == Size::QWORD && s.kind.family() == RegFamily::SIMD,
-                        Matcher::Q => s.size() == Size::OWORD && s.kind.family() == RegFamily::SIMD,
-                        _ => false
                     }
+                    Matcher::RegListStatic(m_amount, element_size, lanecount) => {
+                        m_amount == amount
+                            && *element_size == first.element_size()
+                            && element.is_none()
+                            && first.lanes == Some(*lanecount)
+                    }
+                    Matcher::RegListElement(m_amount, element_size) => {
+                        m_amount == amount
+                            && *element_size == first.element_size()
+                            && element.is_some()
+                    }
+                    _ => false,
                 }
+            }
+            CleanArg::Direct { reg, .. } => match reg {
+                Register::Vector(ref v) => match self {
+                    Matcher::V(size) => {
+                        if *size != v.element_size || v.element.is_some() {
+                            return false;
+                        }
+                        if let Some(bytes) = v.full_size() {
+                            let full_width = match bytes {
+                                8 => false,
+                                16 => true,
+                                _ => return false,
+                            };
+                            match ctx.simd_full_width {
+                                None => {
+                                    ctx.simd_full_width = Some(full_width);
+                                    true
+                                }
+                                Some(f) => f == full_width,
+                            }
+                        } else {
+                            false
+                        }
+                    }
+                    Matcher::VStatic(size, lanes) => {
+                        *size == v.element_size && v.element.is_none() && v.lanes == Some(*lanes)
+                    }
+                    Matcher::VElement(size) => *size == v.element_size && v.element.is_some(),
+                    Matcher::VElementStatic(size, element) => {
+                        *size == v.element_size
+                            && v.element.as_ref().and_then(as_number) == Some(u64::from(*element))
+                    }
+                    Matcher::VStaticElement(size, lanes) => {
+                        *size == v.element_size && v.element.is_some() && v.lanes == Some(*lanes)
+                    }
+                    _ => false,
+                },
+                Register::Scalar(ref s) => match self {
+                    Matcher::W => s.size() == Size::DWORD && s.kind.family() == RegFamily::INTEGER,
+                    Matcher::X => s.size() == Size::QWORD && s.kind.family() == RegFamily::INTEGER,
+                    Matcher::WSP => {
+                        s.size() == Size::DWORD
+                            && (s.kind.family() == RegFamily::INTEGERSP
+                                || (!s.kind.is_dynamic()
+                                    && s.kind.family() == RegFamily::INTEGER
+                                    && !s.kind.is_zero_reg()))
+                    }
+                    Matcher::XSP => {
+                        s.size() == Size::QWORD
+                            && (s.kind.family() == RegFamily::INTEGERSP
+                                || (!s.kind.is_dynamic()
+                                    && s.kind.family() == RegFamily::INTEGER
+                                    && !s.kind.is_zero_reg()))
+                    }
+                    Matcher::B => s.size() == Size::BYTE && s.kind.family() == RegFamily::SIMD,
+                    Matcher::H => s.size() == Size::WORD && s.kind.family() == RegFamily::SIMD,
+                    Matcher::S => s.size() == Size::DWORD && s.kind.family() == RegFamily::SIMD,
+                    Matcher::D => s.size() == Size::QWORD && s.kind.family() == RegFamily::SIMD,
+                    Matcher::Q => s.size() == Size::OWORD && s.kind.family() == RegFamily::SIMD,
+                    _ => false,
+                },
             },
             CleanArg::JumpTarget { .. } => *self == Matcher::Offset,
-            CleanArg::Immediate { prefixed: true, value } => match self {
-                Matcher::Imm
-                | Matcher::Offset => true,
+            CleanArg::Immediate {
+                prefixed: true,
+                value,
+            } => match self {
+                Matcher::Imm | Matcher::Offset => true,
                 Matcher::LitInt(v) => as_number(value) == Some(u64::from(*v)),
                 Matcher::LitFloat(v) => as_float(value) == Some(f64::from(*v)),
                 _ => false,
             },
-            CleanArg::Immediate { prefixed: false, value} => match self {
+            CleanArg::Immediate {
+                prefixed: false,
+                value,
+            } => match self {
                 Matcher::Imm => true,
                 Matcher::Offset => true,
                 Matcher::Ident => as_ident(value).is_some(),
-                Matcher::Cond => if let Some(i) = as_ident(value) {
-                    COND_MAP.contains_key(&&*i.to_string())
-                } else {
-                    false
-                },
-                Matcher::Lit(s) => if let Some(i) = as_ident(value) {
-                    i == s
-                } else {
-                    false
-                },
+                Matcher::Cond => {
+                    if let Some(i) = as_ident(value) {
+                        COND_MAP.contains_key(&&*i.to_string())
+                    } else {
+                        false
+                    }
+                }
+                Matcher::Lit(s) => {
+                    if let Some(i) = as_ident(value) {
+                        i == s
+                    } else {
+                        false
+                    }
+                }
                 Matcher::LitInt(v) => as_number(value) == Some(u64::from(*v)),
                 Matcher::LitFloat(v) => as_float(value) == Some(f64::from(*v)),
-                _ => false
+                _ => false,
             },
             CleanArg::Modifier { modifier, .. } => {
                 if let Matcher::Mod(list) = self {
@@ -487,14 +567,14 @@ impl Matcher {
                 } else {
                     false
                 }
-            },
+            }
             CleanArg::Dot { .. } => *self == Matcher::Dot,
             CleanArg::Lit { ident } => match self {
                 Matcher::Ident => true,
                 Matcher::Cond => COND_MAP.contains_key(&&*ident.to_string()),
                 Matcher::Lit(s) => ident == s,
-                _ => false
-            }
+                _ => false,
+            },
         }
     }
 
@@ -507,22 +587,20 @@ impl Matcher {
             Matcher::Ident => 1,
             Matcher::Cond => 1,
             Matcher::Imm => 1,
-            Matcher::W |
-            Matcher::X |
-            Matcher::WSP |
-            Matcher::XSP |
-            Matcher::B |
-            Matcher::H |
-            Matcher::S |
-            Matcher::D |
-            Matcher::Q => 1,
-            Matcher::V(_) |
-            Matcher::VStatic(_, _) => 1,
+            Matcher::W
+            | Matcher::X
+            | Matcher::WSP
+            | Matcher::XSP
+            | Matcher::B
+            | Matcher::H
+            | Matcher::S
+            | Matcher::D
+            | Matcher::Q => 1,
+            Matcher::V(_) | Matcher::VStatic(_, _) => 1,
             Matcher::VElement(_) => 2,
             Matcher::VElementStatic(_, _) => 1,
             Matcher::VStaticElement(_, _) => 2,
-            Matcher::RegList(_, _) |
-            Matcher::RegListStatic(_, _, _) => 1,
+            Matcher::RegList(_, _) | Matcher::RegListStatic(_, _, _) => 1,
             Matcher::RegListElement(_, _) => 2,
             Matcher::Offset => 1,
             Matcher::RefBase => 1,
@@ -546,18 +624,22 @@ pub fn match_args(args: &[CleanArg], data: &'static Opdata) -> Option<MatchData>
 
     for matcher in data.matchers {
         match matcher {
-            Matcher::End => if args.peek().is_some() {
-                continue;
-            } else {
-                return Some(ctx);
-            },
-            matcher => if let Some(arg) = args.next() {
-                if !matcher.matches(arg, &mut ctx) {
+            Matcher::End => {
+                if args.peek().is_some() {
+                    continue;
+                } else {
+                    return Some(ctx);
+                }
+            }
+            matcher => {
+                if let Some(arg) = args.next() {
+                    if !matcher.matches(arg, &mut ctx) {
+                        return None;
+                    }
+                } else {
                     return None;
                 }
-            } else {
-                return None;
-            },
+            }
         }
     }
 
@@ -576,63 +658,79 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
     for matcher in data.matchers {
         let arg_count = match matcher {
             Matcher::End => continue,
-            matcher => matcher.flatarg_count()
+            matcher => matcher.flatarg_count(),
         };
 
         if let Some(arg) = source_args.next() {
             match arg {
-                CleanArg::Reference { span, base, kind} => {
-                    new_args.push(FlatArg::Direct { span, reg: base.kind_owned() } );
+                CleanArg::Reference { span, base, kind } => {
+                    new_args.push(FlatArg::Direct {
+                        span,
+                        reg: base.kind_owned(),
+                    });
                     match kind {
                         RefKind::Base => (),
-                        RefKind::Offset(value) =>
-                            new_args.push(FlatArg::Immediate { value } ),
-                        RefKind::PreIndexed(value) =>
-                            new_args.push(FlatArg::Immediate { value } ),
+                        RefKind::Offset(value) => new_args.push(FlatArg::Immediate { value }),
+                        RefKind::PreIndexed(value) => new_args.push(FlatArg::Immediate { value }),
                         RefKind::Indexed(index, modifier) => {
-                            new_args.push(FlatArg::Direct { span, reg: index.kind_owned() } );
+                            new_args.push(FlatArg::Direct {
+                                span,
+                                reg: index.kind_owned(),
+                            });
                             if let Some(modifier) = modifier {
-                                new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                                new_args.push(FlatArg::Modifier {
+                                    span,
+                                    modifier: modifier.op,
+                                });
                                 if let Some(expr) = modifier.expr {
-                                    new_args.push(FlatArg::Immediate { value: expr } );
+                                    new_args.push(FlatArg::Immediate { value: expr });
                                 }
                             }
                         }
                     }
-                },
-                CleanArg::RegList { span, first, element, .. } => {
-                    new_args.push(FlatArg::Direct { span, reg: first.kind_owned() } );
+                }
+                CleanArg::RegList {
+                    span,
+                    first,
+                    element,
+                    ..
+                } => {
+                    new_args.push(FlatArg::Direct {
+                        span,
+                        reg: first.kind_owned(),
+                    });
                     if let Some(element) = element {
-                        new_args.push(FlatArg::Immediate { value: element } );
+                        new_args.push(FlatArg::Immediate { value: element });
                     }
-                },
-                CleanArg::Direct { span, reg } => {
-                    match reg {
-                        Register::Scalar(s) => {
-                            new_args.push(FlatArg::Direct { span, reg: s.kind });
-                        },
-                        Register::Vector(v) => {
-                            new_args.push(FlatArg::Direct { span, reg: v.kind });
-                            if let Some(element) = v.element {
-                                new_args.push(FlatArg::Immediate { value: element });
-                            }
+                }
+                CleanArg::Direct { span, reg } => match reg {
+                    Register::Scalar(s) => {
+                        new_args.push(FlatArg::Direct { span, reg: s.kind });
+                    }
+                    Register::Vector(v) => {
+                        new_args.push(FlatArg::Direct { span, reg: v.kind });
+                        if let Some(element) = v.element {
+                            new_args.push(FlatArg::Immediate { value: element });
                         }
                     }
                 },
                 CleanArg::JumpTarget { jump } => {
-                    new_args.push(FlatArg::JumpTarget { jump } );
-                },
+                    new_args.push(FlatArg::JumpTarget { jump });
+                }
                 CleanArg::Immediate { value, .. } => {
-                    new_args.push(FlatArg::Immediate { value } );
-                },
+                    new_args.push(FlatArg::Immediate { value });
+                }
                 CleanArg::Modifier { span, modifier } => {
                     if arg_count >= 2 {
-                        new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                        new_args.push(FlatArg::Modifier {
+                            span,
+                            modifier: modifier.op,
+                        });
                     }
                     if let Some(expr) = modifier.expr {
                         new_args.push(FlatArg::Immediate { value: expr });
                     }
-                },
+                }
                 CleanArg::Dot { .. } => (),
                 CleanArg::Lit { ident } => {
                     new_args.push(FlatArg::Lit { ident });

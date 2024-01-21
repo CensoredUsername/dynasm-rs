@@ -1,8 +1,8 @@
-use crate::common::Size;
 use super::ast::Modifier;
+use crate::common::Size;
 
 use lazy_static::lazy_static;
-use std::collections::{HashMap, hash_map};
+use std::collections::{hash_map, HashMap};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Matcher {
@@ -83,11 +83,11 @@ pub enum Matcher {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
     // commands that advance the argument pointer
-    R(u8), // encode a register, or reference base, into a 5-bit bitfield.
+    R(u8),     // encode a register, or reference base, into a 5-bit bitfield.
     REven(u8), // same as R, but requires that the register is even.
     RNoZr(u8), // same as R, but does not allow register 31.
-    R4(u8), // encode a register in the range 0-15 into a 4-bit bitfield
-    RNext, // encode that this register should be the previous register, plus one
+    R4(u8),    // encode a register in the range 0-15 into a 4-bit bitfield
+    RNext,     // encode that this register should be the previous register, plus one
 
     // unsigned immediate encodings
     Ubits(u8, u8), // encodes an unsigned immediate starting at bit .0, .1 bits long
@@ -100,14 +100,14 @@ pub enum Command {
     Ufields(&'static [u8]), // an immediate, encoded bitwise with the highest bit going into field 0, up to the lowest going into the last bitfield.
 
     // signed immediate encodings
-    Sbits(u8, u8), // encodes a signed immediate starting at bit .0, .1 bits long
+    Sbits(u8, u8),       // encodes a signed immediate starting at bit .0, .1 bits long
     Sscaled(u8, u8, u8), // encodes a signed immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
 
     // bit slice encodings. These don't advance the current argument. Only the slice argument actually encodes anything
     BUbits(u8), // checks if the pointed value fits in the given amount of bits
-    BUsum(u8), // checks that the pointed value fits between 1 and (1 << .0) - prev
+    BUsum(u8),  // checks that the pointed value fits between 1 and (1 << .0) - prev
     BSscaled(u8, u8),
-    BUrange(u8, u8), // check if the pointed value is between min/max
+    BUrange(u8, u8),    // check if the pointed value is between min/max
     Uslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
     Sslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
 
@@ -118,7 +118,7 @@ pub enum Command {
     Rwidth(u8),
 
     // Extend/Shift fields
-    Rotates(u8), // 2-bits field encoding [LSL, LSR, ASR, ROR]
+    Rotates(u8),  // 2-bits field encoding [LSL, LSR, ASR, ROR]
     ExtendsW(u8), // 3-bits field encoding [UXTB, UXTH, UXTW, UXTX, SXTB, SXTH, SXTW, SXTX]. Additionally, LSL is interpreted as UXTW
     ExtendsX(u8), // 3-bits field encoding [UXTB, UXTH, UXTW, UXTX, SXTB, SXTH, SXTW, SXTX]. Additionally, LSL is interpreted as UXTX
 
@@ -181,7 +181,6 @@ impl Relocation {
     }
 }
 
-
 #[derive(Debug, Clone, Copy)]
 pub struct Opdata {
     /// The base template for the encoding.
@@ -189,7 +188,7 @@ pub struct Opdata {
     /// A set of matchers capable of matching the instruction encoding that this instruction represents.
     pub matchers: &'static [Matcher],
     /// A sequence of encoder commands that check the matched instruction on validity and whose output gets orred together with the original template at runtime.
-    pub commands: &'static [Command]
+    pub commands: &'static [Command],
 }
 
 macro_rules! SingleOp {

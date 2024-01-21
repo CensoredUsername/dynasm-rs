@@ -6,8 +6,7 @@ use std::convert::TryFrom;
 
 /// Error returned when encoding a relocation failed
 #[derive(Debug)]
-pub struct ImpossibleRelocation { }
-
+pub struct ImpossibleRelocation {}
 
 /// Used to inform assemblers on how to implement relocations for each architecture.
 /// When implementing a new architecture, one simply has to implement this trait for
@@ -32,7 +31,6 @@ pub trait Relocation {
     fn page_size() -> usize;
 }
 
-
 /// Specifies what kind of relocation a relocation is.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum RelocationKind {
@@ -56,11 +54,10 @@ impl RelocationKind {
             0 => Self::Relative,
             1 => Self::AbsToRel,
             2 => Self::RelToAbs,
-            x => panic!("Unsupported relocation kind {}", x)
+            x => panic!("Unsupported relocation kind {}", x),
         }
     }
 }
-
 
 /// A descriptor for the size of a relocation. This also doubles as a relocation itself
 /// for relocations in data directives. Can be converted to relocations of any kind of architecture
@@ -85,7 +82,7 @@ impl Relocation for RelocationSize {
             2 => RelocationSize::Word,
             4 => RelocationSize::DWord,
             8 => RelocationSize::QWord,
-            x => panic!("Unsupported relocation size {}", x)
+            x => panic!("Unsupported relocation size {}", x),
         }
     }
     fn from_size(size: RelocationSize) -> Self {
@@ -96,17 +93,20 @@ impl Relocation for RelocationSize {
     }
     fn write_value(&self, buf: &mut [u8], value: isize) -> Result<(), ImpossibleRelocation> {
         match self {
-            RelocationSize::Byte => buf[0] =
-                i8::try_from(value).map_err(|_| ImpossibleRelocation { } )?
-            as u8,
-            RelocationSize::Word => LittleEndian::write_i16(buf,
-                i16::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            RelocationSize::Byte => {
+                buf[0] = i8::try_from(value).map_err(|_| ImpossibleRelocation {})? as u8
+            }
+            RelocationSize::Word => LittleEndian::write_i16(
+                buf,
+                i16::try_from(value).map_err(|_| ImpossibleRelocation {})?,
             ),
-            RelocationSize::DWord => LittleEndian::write_i32(buf,
-                i32::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            RelocationSize::DWord => LittleEndian::write_i32(
+                buf,
+                i32::try_from(value).map_err(|_| ImpossibleRelocation {})?,
             ),
-            RelocationSize::QWord => LittleEndian::write_i64(buf,
-                i64::try_from(value).map_err(|_| ImpossibleRelocation { } )?
+            RelocationSize::QWord => LittleEndian::write_i64(
+                buf,
+                i64::try_from(value).map_err(|_| ImpossibleRelocation {})?,
             ),
         }
         Ok(())

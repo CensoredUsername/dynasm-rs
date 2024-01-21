@@ -145,16 +145,20 @@ fn complex1() {
     #[allow(dead_code)]
     struct Test {
         foo: i32,
-        bar: u32
+        bar: u32,
     }
     #[allow(dead_code)]
     struct SmallTest {
         foo: i8,
-        bar: u8
+        bar: u8,
     }
-    let mut test_array = [Test {foo: 1, bar: 2}, Test {foo: 3, bar: 4}, Test {foo: 5, bar: 6}];
+    let mut test_array = [
+        Test { foo: 1, bar: 2 },
+        Test { foo: 3, bar: 4 },
+        Test { foo: 5, bar: 6 },
+    ];
     let test_array = &mut test_array;
-    let mut test_single = Test {foo: 7, bar: 8};
+    let mut test_single = Test { foo: 7, bar: 8 };
     let test_single = &mut test_single;
     my_dynasm!(ops
         ; mov rax, AWORD MutPointer!(test_array)
@@ -176,7 +180,7 @@ fn complex1() {
     // dynasm in expr position
     match 1 {
         0 => (),
-        _ => dynasm!(ops; inc rax)
+        _ => dynasm!(ops; inc rax),
     }
 
     // fixups
@@ -191,7 +195,8 @@ fn complex1() {
             ; inc r12
         );
         ops.check(end).unwrap();
-    }).unwrap();
+    })
+    .unwrap();
 
     let index = ops.offset();
     my_dynasm!(ops
@@ -208,7 +213,7 @@ fn complex1() {
     println!("");
 
     let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(buf.ptr(index)) };
-    println!("assembled function result: {}", func() );
+    println!("assembled function result: {}", func());
 }
 
 #[test]
