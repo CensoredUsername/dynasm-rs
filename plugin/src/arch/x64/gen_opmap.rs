@@ -1302,6 +1302,10 @@ Ops!(
     b"yomq"       , [0x0F, 0x12        ], X, PREF_F2, SSE3;
     b"yoyo"       , [0x0F, 0x12        ], X, PREF_F2, SSE3;
 ]
+"movdiri" = [
+    b"mdrd"       , [0x0F, 0x38, 0xF9  ], X, ENC_MR, DIRECTSTORES;
+    b"mqrq"       , [0x0F, 0x38, 0xF9  ], X, WITH_REXW | ENC_MR, DIRECTSTORES;
+]
 "movdq2q" = [
     b"xqyo"       , [0x0F, 0xD6        ], X, PREF_F2, SSE2;
 ]
