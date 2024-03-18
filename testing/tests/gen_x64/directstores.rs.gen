@@ -1,0 +1,135 @@
+
+#[test]
+fn enc_directstores_movdiri2154() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri QWORD [rax * 2 + rdx], rcx
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x48, 0x0F, 0x38, 0xF9, 0x0C, 0x42", "movdiri QWORD [rax * 2 + rdx], rcx");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2155() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri QWORD [rax], rcx
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x48, 0x0F, 0x38, 0xF9, 0x08", "movdiri QWORD [rax], rcx");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2156() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri QWORD [rax], rax
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x48, 0x0F, 0x38, 0xF9, 0x00", "movdiri QWORD [rax], rax");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2157() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri QWORD [rax + 16], rdx
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x48, 0x0F, 0x38, 0xF9, 0x50, 0x10", "movdiri QWORD [rax + 16], rdx");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2158() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri DWORD [rax + 16], ecx
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x38, 0xF9, 0x48, 0x10", "movdiri DWORD [rax + 16], ecx");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2159() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri DWORD [rax * 2 + rdx], edx
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x38, 0xF9, 0x14, 0x42", "movdiri DWORD [rax * 2 + rdx], edx");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2160() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri DWORD [rax + 16], eax
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x38, 0xF9, 0x40, 0x10", "movdiri DWORD [rax + 16], eax");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2161() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri DWORD [rax * 2 + rdx], ecx
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x38, 0xF9, 0x0C, 0x42", "movdiri DWORD [rax * 2 + rdx], ecx");
+}
+
+
+
+#[test]
+fn enc_directstores_movdiri2162() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; movdiri DWORD [rax * 2 + rdx], eax
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x38, 0xF9, 0x04, 0x42", "movdiri DWORD [rax * 2 + rdx], eax");
+}
+
+

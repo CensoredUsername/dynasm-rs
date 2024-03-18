@@ -104,6 +104,7 @@ bitflags! {
         const PREFETCHWT1  = 0x0040_0000;
         const CYRIX        = 0x0080_0000;
         const AMD          = 0x0100_0000;
+        const DIRECTSTORES = 0x0200_0000;
     }
 }
 
@@ -139,6 +140,7 @@ impl Features {
             "prefetchwt1" => Some(Features::PREFETCHWT1),
             "cyrix" => Some(Features::CYRIX),
             "amd"   => Some(Features::AMD),
+            "directstores"   => Some(Features::DIRECTSTORES),
             _ => None
         }
     }
@@ -172,6 +174,7 @@ impl Display for Features {
         if self.contains(Features::PREFETCHWT1) { keys.push("prefetchwt1"); }
         if self.contains(Features::CYRIX) { keys.push("cyrix"); }
         if self.contains(Features::AMD)   { keys.push("amd"); }
+        if self.contains(Features::DIRECTSTORES)   { keys.push("directstores"); }
         for (i, k) in keys.into_iter().enumerate() {
             if i != 0 {
                 f.write_str(", ")?;
@@ -241,6 +244,7 @@ const SHA          : u32 = Features::SHA.bits;
 const PREFETCHWT1  : u32 = Features::PREFETCHWT1.bits;
 const CYRIX        : u32 = Features::CYRIX.bits;
 const AMD          : u32 = Features::AMD.bits;
+const DIRECTSTORES : u32 = Features::DIRECTSTORES.bits;
 
 
 lazy_static! {
