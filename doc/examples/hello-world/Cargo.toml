@@ -7,10 +7,12 @@ edition = "2018"
 [[bin]]
 name = "x64"
 path = "src/x64.rs"
+doc = false
 
 [[bin]]
 name = "aarch64"
 path = "src/aarch64.rs"
+doc = false
 
 [dependencies]
 

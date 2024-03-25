@@ -35,10 +35,6 @@ impl Default for ArchAarch64 {
 }
 
 impl Arch for ArchAarch64 {
-    fn name(&self) -> &str {
-        "aarch64"
-    }
-
     fn set_features(&mut self, features: &[syn::Ident]) {
         if let Some(feature) = features.first() {
             emit_error!(feature, "Arch aarch64 has no known features");

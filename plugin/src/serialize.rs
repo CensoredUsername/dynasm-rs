@@ -1,4 +1,3 @@
-use syn;
 use syn::parse;
 use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenStream, TokenTree, Literal};
