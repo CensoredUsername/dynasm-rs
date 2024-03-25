@@ -10,7 +10,6 @@ pub mod x64;
 pub mod aarch64;
 
 pub(crate) trait Arch : Debug + Send {
-    fn name(&self) -> &str;
     fn set_features(&mut self, features: &[syn::Ident]);
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size);
     fn default_align(&self) -> u8;
@@ -18,21 +17,15 @@ pub(crate) trait Arch : Debug + Send {
 }
 
 #[derive(Clone, Debug)]
-pub struct DummyArch {
-    name: &'static str
-}
+pub struct DummyArch {}
 
 impl DummyArch {
-    fn new(name: &'static str) -> DummyArch {
-        DummyArch { name }
+    fn new() -> DummyArch {
+        DummyArch{}
     }
 }
 
 impl Arch for DummyArch {
-    fn name(&self) -> &str {
-        self.name
-    }
-
     fn set_features(&mut self, features: &[syn::Ident]) {
         if let Some(feature) = features.first() {
             emit_error!(feature, "Cannot set features when the assembling architecture is undefined. Define it using a .arch directive");
@@ -59,7 +52,7 @@ pub(crate) fn from_str(s: &str) -> Option<Box<dyn Arch>> {
         "x64" => Some(Box::new(x64::Archx64::default())),
         "x86" => Some(Box::new(x64::Archx86::default())),
         "aarch64" => Some(Box::new(aarch64::ArchAarch64::default())),
-        "unknown" => Some(Box::new(DummyArch::new("unknown"))),
+        "unknown" => Some(Box::new(DummyArch::new())),
         _ => None
     }
 }

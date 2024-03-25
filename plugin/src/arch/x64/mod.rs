@@ -38,10 +38,6 @@ impl Default for Archx64 {
 }
 
 impl Arch for Archx64 {
-    fn name(&self) -> &str {
-        "x64"
-    }
-
     fn set_features(&mut self, features: &[syn::Ident]) {
         let mut new_features = x64data::Features::empty();
         for ident in features {
@@ -94,10 +90,6 @@ impl Default for Archx86 {
 }
 
 impl Arch for Archx86 {
-    fn name(&self) -> &str {
-        "x86"
-    }
-
     fn set_features(&mut self, features: &[syn::Ident]) {
         let mut new_features = x64data::Features::empty();
         for ident in features {
