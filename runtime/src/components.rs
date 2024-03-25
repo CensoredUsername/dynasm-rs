@@ -616,8 +616,7 @@ impl LitPool {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use std::fmt::Debug;
-    use relocations::{Relocation, RelocationSize};
+    use relocations::RelocationSize;
 
     #[test]
     fn test_litpool_size() {
