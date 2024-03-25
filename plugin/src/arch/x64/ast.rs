@@ -1,4 +1,3 @@
-use syn;
 use proc_macro2::Span;
 
 use crate::common::{Size, Jump};

@@ -36,7 +36,6 @@ use crate::components::{MemoryManager, LabelRegistry, RelocRegistry, ManagedRelo
 use crate::relocations::Relocation;
 
 use std::hash::Hash;
-use std::iter::Extend;
 use std::sync::{Arc, RwLock, RwLockReadGuard};
 use std::io;
 use std::error;
