@@ -13,9 +13,13 @@ use crate::mmap::{ExecutableBuffer, MutableBuffer};
 use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
 
 /// A static label represents either a local label or a global label reference.
-/// Global labels are unique names, which can be referenced multiple times, but only defined once.
+///
+/// Global labels are unique names, which can be referenced multiple times, but only defined once
+/// (per-[crate::Assembler]).
+///
 /// Local labels are non-unique names. They can be referenced multiple times, and any reference
 /// indicates if they refer to a label after the reference, or a label before the reference.
+///
 /// A static label records how many local labels with the same name have been emitted beforehand
 /// so we can treat them as local labels as well.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -279,7 +283,7 @@ impl LabelRegistry {
         self.dynamic_labels.get(id.0).and_then(|&e| e).ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
     }
 
-    /// Returns the offset at which the global label `name` was defined, if one was defined.
+    /// Returns the offset at which the global label `label` was defined, if one was defined.
     pub fn resolve_static(&self, label: &StaticLabel) -> Result<AssemblyOffset, DynasmError> {
         self.static_labels.get(label).cloned().ok_or_else(|| DynasmError::UnknownLabel(
             if label.is_global() {

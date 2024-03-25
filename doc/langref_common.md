@@ -106,16 +106,20 @@ dynasm!(ops
 
 In order to describe flow control effectively, dynasm-rs supports labels. However, since the assembly templates can be combined in a variety of ways at the mercy of the program using dynasm-rs, the semantics of these labels are somewhat different from how labels work in a static assembler.
 
-Dynasm-rs distinguishes between three different types of labels: global, local and dynamic labels. Their syntax is as follows:
+Dynasm-rs distinguishes between four different types of labels: global, local, dynamic and extern. Their syntax is as follows:
 
 Table 2: dynasm-rs label types
 
-Type    | Definition   | Reference
---------|--------------|-----------
-Local   | `label:`     | `>label` or `<label`
-GLobal  | `->label:`   | `->label`
-Dynamic | `=>expr`     | `=>expr`
-Extern  | `-`          | `extern expr`
+Type    |  Kind   | Definition   | Reference
+--------|---------|--------------|-----------
+Local   | static  | `label:`     | `>label` or `<label`
+GLobal  | static  | `->label:`   | `->label`
+Dynamic | dynamic | `=>expr`     | `=>expr`
+Extern  | extern  | `-`          | `extern expr`
+
+All labels have their addresses resolved at `Assembler::commit()` time.
+
+Any valid Rust identifier is a valid label name.
 
 ### Local labels
 
@@ -123,11 +127,11 @@ On first sight, local label definitions are similar to how labels are normally u
 
 ### Global labels
 
-Global labels can only be defined once, and all references to a global label will be resolved to this label. Any valid Rust identifier can be used as a local label name.
+Global labels can only be defined once (per-assembler), and all references to a global label will be resolved to this label.
 
 ### Dynamic labels
 
-Dynamic labels are similar to global labels in that they can be defined only once, but instead of a name, they are identified by an expression. New dynamic labels can be created at runtime by the assembler. This expression is evaluated at the point where the label is defined or referenced, and the labels will be resolved at only at commit time.
+Dynamic labels are similar to global labels in that they can be defined only once (per-assembler), but instead of a name, they are identified by an expression. New dynamic labels can be created at runtime by the assembler. This expression is evaluated at the point where the label is defined or referenced, and the labels will be resolved at only at commit time.
 
 ### Extern labels
 
