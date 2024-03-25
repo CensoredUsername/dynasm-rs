@@ -234,7 +234,10 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
     }
 }
 
-/// This trait extends DynasmApi to not only allow assembling, but also labels and various directives
+/// This trait extends DynasmApi to not only allow assembling, but also labels and various directives.
+///
+/// For information on the different kinds of label, consult the common language reference in the
+/// dynasm-rs docs.
 pub trait DynasmLabelApi : DynasmApi {
     /// The relocation info type this assembler uses. 
     type Relocation: Relocation;
