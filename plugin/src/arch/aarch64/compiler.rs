@@ -536,9 +536,9 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 #res | ((#expr) << #offset)
             };
         }
-        ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::DWORD));
+        ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::B_4));
     } else {
-        ctx.state.stmts.push(Stmt::Const(u64::from(bits), Size::DWORD));
+        ctx.state.stmts.push(Stmt::Const(u64::from(bits), Size::B_4));
     }
 
     // generate code to be emitted for relocations

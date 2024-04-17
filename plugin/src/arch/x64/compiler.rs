@@ -100,16 +100,16 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
     // sanitize memory references, determine address size, and size immediates/displacements if possible
     let addr_size = sanitize_indirects_and_sizes(&ctx, &mut args)?;
     let addr_size = addr_size.unwrap_or(match ctx.mode {
-        X86Mode::Long => Size::QWORD,
-        X86Mode::Protected => Size::DWORD
+        X86Mode::Long => Size::B_8,
+        X86Mode::Protected => Size::B_4
     });
 
     // determine if we need an address size override prefix
     let pref_addr = match (ctx.mode, addr_size) {
-        (X86Mode::Long, Size::QWORD) => false,
-        (X86Mode::Long, Size::DWORD) => true,
-        (X86Mode::Protected, Size::DWORD) => false,
-        (X86Mode::Protected, Size::WORD) => true,
+        (X86Mode::Long, Size::B_8) => false,
+        (X86Mode::Long, Size::B_4) => true,
+        (X86Mode::Protected, Size::B_4) => false,
+        (X86Mode::Protected, Size::B_2) => true,
         _ => return Err(Some("Impossible address size".into()))
     };
 
@@ -140,7 +140,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
         let op_size = op_size.expect("Bad formatting data? No wildcard sizes");
 
         match ctx.mode {
-            X86Mode::Protected => if op_size == Size::QWORD {
+            X86Mode::Protected => if op_size == Size::B_8 {
                 return Err(Some(format!("'{}': Does not support 64 bit operands in 32-bit mode", op.to_string())));
             },
             X86Mode::Long => ()
@@ -148,29 +148,29 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         if data.flags.contains(Flags::AUTO_NO32) {
             match (op_size, ctx.mode) {
-                (Size::WORD, _) => pref_size = true,
-                (Size::QWORD, X86Mode::Long) => (),
-                (Size::DWORD, X86Mode::Protected) => (),
-                (Size::DWORD, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", op.to_string()))),
+                (Size::B_2, _) => pref_size = true,
+                (Size::B_8, X86Mode::Long) => (),
+                (Size::B_4, X86Mode::Protected) => (),
+                (Size::B_4, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", op.to_string()))),
                 (_, _) => panic!("bad formatting data"),
             }
         } else if data.flags.contains(Flags::AUTO_REXW) {
-            if op_size == Size::QWORD {
+            if op_size == Size::B_8 {
                 rex_w = true;
-            } else if op_size != Size::DWORD {
+            } else if op_size != Size::B_4 {
                 return Err(Some(format!("'{}': Does not support 16-bit operands", op.to_string())));
             }
         } else if data.flags.contains(Flags::AUTO_VEXL) {
-            if op_size == Size::HWORD {
+            if op_size == Size::B_32 {
                 vex_l = true;
-            } else if op_size != Size::OWORD {
+            } else if op_size != Size::B_16 {
                 panic!("bad formatting data");
             }
-        } else if op_size == Size::WORD {
+        } else if op_size == Size::B_2 {
             pref_size = true;
-        } else if op_size == Size::QWORD {
+        } else if op_size == Size::B_8 {
             rex_w = true;
-        } else if op_size != Size::DWORD {
+        } else if op_size != Size::B_4 {
             panic!("bad formatting data");
         }
     }
@@ -289,7 +289,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         // check addressing mode special cases
         let mode_vsib = index.as_ref().map_or(false, |&(ref i, _, _)| i.kind.family() == RegFamily::XMM);
-        let mode_16bit = addr_size == Size::WORD;
+        let mode_16bit = addr_size == Size::B_2;
         let mode_rip_relative = base.as_ref().map_or(false, |b| b.kind.family() == RegFamily::RIP);
         let mode_rbp_base = base.as_ref().map_or(false, |b| b == &RegId::RBP || b == &RegId::R13 || b.kind.is_dynamic());
 
@@ -318,7 +318,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             }
 
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::B_4}));
             } else if mode == MOD_DISP8 {
                 // no displacement was asked for, but we have to encode one as there's a base
                 buffer.push(Stmt::u8(0));
@@ -341,7 +341,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             compile_modrm_sib(buffer, mode, reg_k, base_k);
 
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::WORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::B_2}));
             } else if mode == MOD_DISP8 {
                 buffer.push(Stmt::u8(0));
             }
@@ -352,7 +352,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
             match ctx.mode {
                 X86Mode::Long => if let Some(disp) = disp {
-                    buffer.push(Stmt::ExprSigned(delimited(disp), Size::DWORD));
+                    buffer.push(Stmt::ExprSigned(delimited(disp), Size::B_4));
                 } else {
                     buffer.push(Stmt::u32(0))
                 },
@@ -361,7 +361,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
                     // but we can work around it with relocations
                     buffer.push(Stmt::u32(0));
                     let disp = disp.unwrap_or_else(|| serialize::reparse(&serialize::expr_zero()).expect("Invalid expression generated"));
-                    relocations.push((Jump::new(JumpKind::Bare(disp), None), 0, Size::DWORD, RelocationKind::Absolute));
+                    relocations.push((Jump::new(JumpKind::Bare(disp), None), 0, Size::B_4, RelocationKind::Absolute));
                 },
             }
 
@@ -418,7 +418,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
             // Disp
             if let Some(disp) = disp {
-                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), if mode == MOD_DISP8 {Size::BYTE} else {Size::B_4}));
             } else if no_base {
                 buffer.push(Stmt::u32(0));
             } else if mode == MOD_DISP8 {
@@ -437,8 +437,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         buffer.push(Stmt::u32(0));
         match ctx.mode {
-            X86Mode::Long      => relocations.push((jump, 0, Size::DWORD, RelocationKind::Relative)),
-            X86Mode::Protected => relocations.push((jump, 0, Size::DWORD, RelocationKind::Absolute))
+            X86Mode::Long      => relocations.push((jump, 0, Size::B_4, RelocationKind::Relative)),
+            X86Mode::Protected => relocations.push((jump, 0, Size::B_4, RelocationKind::Absolute))
         }
     }
 
@@ -650,7 +650,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             // always generate a 32-bit displacement if disp_size isn't set. This means we know
             // the size of disp at this point already.
             // as for the index calculation: that doesn't change size.
-            let true_disp_size = disp_size.unwrap_or(Size::DWORD);
+            let true_disp_size = disp_size.unwrap_or(Size::B_4);
 
             // merge disps [a, b, c] into (a + b + c)
             let scaled_disp = serialize::expr_add_many(span, disps.into_iter().map(delimited));
@@ -725,18 +725,18 @@ fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<
                     }
 
                     // 16-bit addressing has smaller displacements
-                    if addr_size == Some(Size::WORD) {
-                        if size != Size::BYTE && size != Size::WORD {
-                            emit_error!(span, "Invalid displacement size, only BYTE or WORD are possible");
+                    if addr_size == Some(Size::B_2) {
+                        if size != Size::BYTE && size != Size::B_2 {
+                            emit_error!(span, "Invalid displacement size, only BYTE or B_2 are possible");
                         }
-                    } else if size != Size::BYTE && size != Size::DWORD {
-                        emit_error!(span, "Invalid displacement size, only BYTE or DWORD are possible");
+                    } else if size != Size::BYTE && size != Size::B_4 {
+                        emit_error!(span, "Invalid displacement size, only BYTE or B_4 are possible");
                     }
                 } else if let Some(ref disp) = *disp {
                     match derive_size(disp) {
                         Some(Size::BYTE)                         => *disp_size = Some(Size::BYTE),
-                        Some(_) if addr_size == Some(Size::WORD) => *disp_size = Some(Size::WORD),
-                        Some(_)                                  => *disp_size = Some(Size::DWORD),
+                        Some(_) if addr_size == Some(Size::B_2) => *disp_size = Some(Size::B_2),
+                        Some(_)                                  => *disp_size = Some(Size::B_4),
                         None => ()
                     }
                 }
@@ -764,9 +764,9 @@ fn derive_size(expr: &syn::Expr) -> Option<Size> {
             syn::Lit::Byte(_) => Some(Size::BYTE),
             syn::Lit::Int(i) => match i.base10_parse::<u32>() {
                 Ok(x) if x < 0x80 => Some(Size::BYTE),
-                Ok(x) if x < 0x8000 => Some(Size::WORD),
-                Ok(x) if x < 0x8000_0000 => Some(Size::DWORD),
-                _ => Some(Size::QWORD),
+                Ok(x) if x < 0x8000 => Some(Size::B_2),
+                Ok(x) if x < 0x8000_0000 => Some(Size::B_4),
+                _ => Some(Size::B_8),
             },
             _ => None
         },
@@ -775,9 +775,9 @@ fn derive_size(expr: &syn::Expr) -> Option<Size> {
                 syn::Lit::Byte(_) => Some(Size::BYTE),
                 syn::Lit::Int(i) => match i.base10_parse::<u32>() {
                     Ok(x) if x <= 0x80 => Some(Size::BYTE),
-                    Ok(x) if x <= 0x8000 => Some(Size::WORD),
-                    Ok(x) if x <= 0x8000_0000 => Some(Size::DWORD),
-                    _ => Some(Size::QWORD),
+                    Ok(x) if x <= 0x8000 => Some(Size::B_2),
+                    Ok(x) if x <= 0x8000_0000 => Some(Size::B_4),
+                    _ => Some(Size::B_8),
                 },
                 _ => None
             },
@@ -842,9 +842,9 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             return Err(None);
         },
         RegFamily::LEGACY => match size {
-            Size::DWORD => (),
-            Size::QWORD => (), // only valid in long mode, but should only be possible in long mode
-            Size::WORD  => if ctx.mode == X86Mode::Protected || vsib_mode {
+            Size::B_4 => (),
+            Size::B_8 => (), // only valid in long mode, but should only be possible in long mode
+            Size::B_2  => if ctx.mode == X86Mode::Protected || vsib_mode {
                 emit_error!(span, "16-bit addressing is not supported in this mode");
                 return Err(None);
             },
@@ -887,7 +887,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
 
     // VSIB with base
     if vsib_mode {
-        // we're guaranteed that the other register is a legacy register, either DWORD or QWORD size
+        // we're guaranteed that the other register is a legacy register, either B_4 or B_8 size
         // so we just have to check if an index/base swap is necessary
         if base.as_ref().unwrap().kind.family() == RegFamily::XMM {
             // try to swap if possible
@@ -904,7 +904,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
     }
 
     // 16-bit legacy addressing
-    if size == Size::WORD {
+    if size == Size::B_2 {
         // 16-bit addressing has no concept of index.
         let mut first_reg = base.take();
         let mut second_reg = match index.take() {
@@ -939,7 +939,7 @@ fn sanitize_indirect(ctx: &Context, span: Span, nosplit: bool, base: &mut Option
             }
         };
 
-        *base = Some(Register::new_static(Size::WORD, encoded_base));
+        *base = Some(Register::new_static(Size::B_2, encoded_base));
         return Ok(Some(size));
     }
 
@@ -1109,10 +1109,10 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
 
             // vsib addressing. as they have two sizes that must be checked they check one of the sizes here
             (b'k', &CleanArg::Indirect {size, index: Some((ref index, _, _)), ..}) if
-                (size.is_none() || size == Some(Size::DWORD)) &&
+                (size.is_none() || size == Some(Size::B_4)) &&
                 index.kind.family() == RegFamily::XMM => Some(index.size()),
             (b'l', &CleanArg::Indirect {size, index: Some((ref index, _, _)), ..}) if
-                (size.is_none() ||  size == Some(Size::QWORD)) &&
+                (size.is_none() ||  size == Some(Size::B_8)) &&
                 index.kind.family() == RegFamily::XMM => Some(index.size()),
             _ => return Err("argument type mismatch")
         };
@@ -1121,27 +1121,27 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
         if let Some(size) = size {
             if !match (fsize, code) {
                 // immediates can always fit in larger slots
-                (b'w', b'i') => size <= Size::WORD,
-                (b'd', b'i') => size <= Size::DWORD,
-                (b'q', b'i') => size <= Size::QWORD,
-                (b'*', b'i') => size <= Size::DWORD,
+                (b'w', b'i') => size <= Size::B_2,
+                (b'd', b'i') => size <= Size::B_4,
+                (b'q', b'i') => size <= Size::B_8,
+                (b'*', b'i') => size <= Size::B_4,
                 // normal size matches
                 (b'b', _)    => size == Size::BYTE,
-                (b'w', _)    => size == Size::WORD,
-                (b'd', _)    => size == Size::DWORD,
-                (b'q', _)    => size == Size::QWORD,
-                (b'f', _)    => size == Size::FWORD,
-                (b'p', _)    => size == Size::PWORD,
-                (b'o', _)    => size == Size::OWORD,
-                (b'h', _)    => size == Size::HWORD,
+                (b'w', _)    => size == Size::B_2,
+                (b'd', _)    => size == Size::B_4,
+                (b'q', _)    => size == Size::B_8,
+                (b'f', _)    => size == Size::B_6,
+                (b'p', _)    => size == Size::B_10,
+                (b'o', _)    => size == Size::B_16,
+                (b'h', _)    => size == Size::B_32,
                 // what is allowed for wildcards
                 (b'*', b'k') |
                 (b'*', b'l') |
                 (b'*', b'y') |
-                (b'*', b'w') => size == Size::OWORD || size == Size::HWORD,
+                (b'*', b'w') => size == Size::B_16 || size == Size::B_32,
                 (b'*', b'r') |
                 (b'*', b'A' ..= b'P') |
-                (b'*', b'v') => size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
+                (b'*', b'v') => size == Size::B_2 || size == Size::B_4 || size == Size::B_8,
                 (b'*', b'm') => true,
                 (b'*', _)    => panic!("Invalid size wildcard"),
                 (b'?', _)    => true,
@@ -1222,7 +1222,7 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
     }
 
     if let Some(o) = op_size {
-        let ref_im_size = if o > Size::DWORD {Size::DWORD} else {o};
+        let ref_im_size = if o > Size::B_4 {Size::B_4} else {o};
         if let Some(i) = im_size {
             if i > ref_im_size {
                 return Err(Some("Immediate size mismatch".to_string()));
@@ -1240,15 +1240,15 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
         //get the specified operand size from the format string
         let size = match (fsize, code) {
             (b'b', _) => Size::BYTE,
-            (b'w', _) => Size::WORD,
+            (b'w', _) => Size::B_2,
             (_, b'k') |
-            (b'd', _) => Size::DWORD,
+            (b'd', _) => Size::B_4,
             (_, b'l') |
-            (b'q', _) => Size::QWORD,
-            (b'f', _) => Size::FWORD,
-            (b'p', _) => Size::PWORD,
-            (b'o', _) => Size::OWORD,
-            (b'h', _) => Size::HWORD,
+            (b'q', _) => Size::B_8,
+            (b'f', _) => Size::B_6,
+            (b'p', _) => Size::B_10,
+            (b'o', _) => Size::B_16,
+            (b'h', _) => Size::B_32,
             (b'*', b'i') => im_size.unwrap(),
             (b'*', _) => op_size.unwrap(),
             (b'!', _) => Size::BYTE, // will never be used, placeholder

@@ -45,9 +45,9 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
         },
         // ; .byte (expr ("," expr)*)?
         "byte"  => directive_const(invocation_context, stmts, input, Size::BYTE)?,
-        "word"  => directive_const(invocation_context, stmts, input, Size::WORD)?,
-        "dword" => directive_const(invocation_context, stmts, input, Size::DWORD)?,
-        "qword" => directive_const(invocation_context, stmts, input, Size::QWORD)?,
+        "word"  => directive_const(invocation_context, stmts, input, Size::B_2)?,
+        "dword" => directive_const(invocation_context, stmts, input, Size::B_4)?,
+        "qword" => directive_const(invocation_context, stmts, input, Size::B_8)?,
         "bytes" => {
             // ; .bytes expr
             let iterator: syn::Expr = input.parse()?;

@@ -50,9 +50,9 @@ impl Arch for ArchAarch64 {
 
         let relocation = match size {
             Size::BYTE => Relocation::LITERAL8,
-            Size::WORD => Relocation::LITERAL16,
-            Size::DWORD => Relocation::LITERAL32,
-            Size::QWORD => Relocation::LITERAL64,
+            Size::B_2 => Relocation::LITERAL16,
+            Size::B_4 => Relocation::LITERAL32,
+            Size::B_8 => Relocation::LITERAL64,
             _ => {
                 emit_error!(span, "Relocation of unsupported size for the current target architecture");
                 return;

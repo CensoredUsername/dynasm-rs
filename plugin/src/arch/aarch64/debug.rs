@@ -216,10 +216,10 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
 pub fn size_to_string(size: Size) -> &'static str {
     match size {
         Size::BYTE => "B",
-        Size::WORD => "H",
-        Size::DWORD => "S",
-        Size::QWORD => "D",
-        Size::OWORD => "Q",
+        Size::B_2 => "H",
+        Size::B_4 => "S",
+        Size::B_8 => "D",
+        Size::B_16 => "Q",
         _ => unimplemented!()
     }
 }

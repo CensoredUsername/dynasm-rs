@@ -148,7 +148,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
 
                 // sanitizaiton
                 // base can only be a Xn|SP reg
-                if !(base.size() == Size::QWORD && (base.family() == RegFamily::INTEGERSP || (base.family() == RegFamily::INTEGER && !base.kind().is_zero_reg()))) {
+                if !(base.size() == Size::B_8 && (base.family() == RegFamily::INTEGERSP || (base.family() == RegFamily::INTEGER && !base.kind().is_zero_reg()))) {
                     emit_error!(span, "Base register can only be a Xn|SP register");
                     return Err(None);
                 }
@@ -162,7 +162,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
 
                     // limited set of allowed modifiers.
                     if let Some(ref m) = modifier {
-                        if if index.size() == Size::QWORD {m.op != Modifier::LSL && m.op != Modifier::SXTX} else {m.op != Modifier::SXTW && m.op != Modifier::UXTW} {
+                        if if index.size() == Size::B_8 {m.op != Modifier::LSL && m.op != Modifier::SXTX} else {m.op != Modifier::SXTW && m.op != Modifier::UXTW} {
                             emit_error!(span, "Invalid modifier for the selected base register type");
                             return Err(None);
                         }
@@ -440,15 +440,15 @@ impl Matcher {
                         _ => false
                     },
                     Register::Scalar(ref s) => match self {
-                        Matcher::W => s.size() == Size::DWORD && s.kind.family() == RegFamily::INTEGER,
-                        Matcher::X => s.size() == Size::QWORD && s.kind.family() == RegFamily::INTEGER,
-                        Matcher::WSP => s.size() == Size::DWORD && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
-                        Matcher::XSP => s.size() == Size::QWORD && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
+                        Matcher::W => s.size() == Size::B_4 && s.kind.family() == RegFamily::INTEGER,
+                        Matcher::X => s.size() == Size::B_8 && s.kind.family() == RegFamily::INTEGER,
+                        Matcher::WSP => s.size() == Size::B_4 && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
+                        Matcher::XSP => s.size() == Size::B_8 && (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() && s.kind.family() == RegFamily::INTEGER && !s.kind.is_zero_reg())),
                         Matcher::B => s.size() == Size::BYTE && s.kind.family() == RegFamily::SIMD,
-                        Matcher::H => s.size() == Size::WORD && s.kind.family() == RegFamily::SIMD,
-                        Matcher::S => s.size() == Size::DWORD && s.kind.family() == RegFamily::SIMD,
-                        Matcher::D => s.size() == Size::QWORD && s.kind.family() == RegFamily::SIMD,
-                        Matcher::Q => s.size() == Size::OWORD && s.kind.family() == RegFamily::SIMD,
+                        Matcher::H => s.size() == Size::B_2 && s.kind.family() == RegFamily::SIMD,
+                        Matcher::S => s.size() == Size::B_4 && s.kind.family() == RegFamily::SIMD,
+                        Matcher::D => s.size() == Size::B_8 && s.kind.family() == RegFamily::SIMD,
+                        Matcher::Q => s.size() == Size::B_16 && s.kind.family() == RegFamily::SIMD,
                         _ => false
                     }
                 }

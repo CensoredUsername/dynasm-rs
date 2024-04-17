@@ -21,17 +21,17 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
             Stmt::Const(value, size) => {
                 match size {
                     Size::BYTE => const_buffer.push(value as u8),
-                    Size::WORD => {
+                    Size::B_2 => {
                         let mut buffer = [0u8; 2];
                         LittleEndian::write_u16(&mut buffer, value as u16);
                         const_buffer.extend(&buffer);
                     },
-                    Size::DWORD => {
+                    Size::B_4 => {
                         let mut buffer = [0u8; 4];
                         LittleEndian::write_u32(&mut buffer, value as u32);
                         const_buffer.extend(&buffer);
                     },
-                    Size::QWORD => {
+                    Size::B_8 => {
                         let mut buffer = [0u8; 8];
                         LittleEndian::write_u64(&mut buffer, value as u64);
                         const_buffer.extend(&buffer);
@@ -68,14 +68,14 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
         let (method, args) = match stmt {
             Stmt::Const(_, _) => unreachable!(),
             Stmt::ExprUnsigned(expr, Size::BYTE)  => ("push",     vec![expr]),
-            Stmt::ExprUnsigned(expr, Size::WORD)  => ("push_u16", vec![expr]),
-            Stmt::ExprUnsigned(expr, Size::DWORD) => ("push_u32", vec![expr]),
-            Stmt::ExprUnsigned(expr, Size::QWORD) => ("push_u64", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::B_2)  => ("push_u16", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::B_4) => ("push_u32", vec![expr]),
+            Stmt::ExprUnsigned(expr, Size::B_8) => ("push_u64", vec![expr]),
             Stmt::ExprUnsigned(_, _) => unimplemented!(),
             Stmt::ExprSigned(  expr, Size::BYTE)  => ("push_i8",  vec![expr]),
-            Stmt::ExprSigned(  expr, Size::WORD)  => ("push_i16", vec![expr]),
-            Stmt::ExprSigned(  expr, Size::DWORD) => ("push_i32", vec![expr]),
-            Stmt::ExprSigned(  expr, Size::QWORD) => ("push_i64", vec![expr]),
+            Stmt::ExprSigned(  expr, Size::B_2)  => ("push_i16", vec![expr]),
+            Stmt::ExprSigned(  expr, Size::B_4) => ("push_i32", vec![expr]),
+            Stmt::ExprSigned(  expr, Size::B_8) => ("push_i64", vec![expr]),
             Stmt::ExprSigned(_, _) => unimplemented!(),
             Stmt::Extend(data)     => ("extend", vec![Literal::byte_string(&data).into()]),
             Stmt::ExprExtend(expr) => ("extend", vec![expr]),

@@ -10,17 +10,19 @@ use crate::parse_helpers::{ParseOpt, eat_pseudo_keyword};
 use crate::serialize;
 
 /// Enum representing the result size of a value/expression/register/etc in bytes.
-/// Uses the NASM syntax for sizes (a word is 16 bits)
+/// just friendly names really
+#[allow(non_camel_case_types)]
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 pub enum Size {
-    BYTE  = 1,
-    WORD  = 2,
-    DWORD = 4,
-    FWORD = 6,
-    QWORD = 8,
-    PWORD = 10,
-    OWORD = 16,
-    HWORD = 32,
+    BYTE = 1,
+    B_2 = 2,
+    B_4 = 4,
+    B_6 = 6,
+    B_8 = 8,
+    B_10 = 10,
+    B_16 = 16,
+    B_32 = 32,
+    B_64 = 64,
 }
 
 impl Size {
@@ -31,13 +33,14 @@ impl Size {
     pub fn as_literal(self) -> syn::Ident {
         syn::Ident::new(match self {
             Size::BYTE  => "i8",
-            Size::WORD  => "i16",
-            Size::DWORD => "i32",
-            Size::FWORD => "i48",
-            Size::QWORD => "i64",
-            Size::PWORD => "i80",
-            Size::OWORD => "i128",
-            Size::HWORD => "i256"
+            Size::B_2  => "i16",
+            Size::B_4 => "i32",
+            Size::B_6 => "i48",
+            Size::B_8 => "i64",
+            Size::B_10 => "i80",
+            Size::B_16 => "i128",
+            Size::B_32 => "i256",
+            Size::B_64 => "i512",
         }, Span::mixed_site())
     }
 }
@@ -235,15 +238,15 @@ impl Stmt {
     }
 
     pub fn u16(value: u16) -> Stmt {
-        Stmt::Const(u64::from(value), Size::WORD)
+        Stmt::Const(u64::from(value), Size::B_2)
     }
 
     pub fn u32(value: u32) -> Stmt {
-        Stmt::Const(u64::from(value), Size::DWORD)
+        Stmt::Const(u64::from(value), Size::B_4)
     }
 
     pub fn u64(value: u64) -> Stmt {
-        Stmt::Const(value, Size::QWORD)
+        Stmt::Const(value, Size::B_8)
     }
 }
 
