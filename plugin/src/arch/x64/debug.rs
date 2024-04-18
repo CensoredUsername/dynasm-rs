@@ -74,6 +74,7 @@ fn format_arg(ty: u8, mut size: u8, opsize: u8) -> Cow<'static, str> {
             b'p' => "80",
             b'o' => "128",
             b'h' => "256",
+            b't' => "512",
             _ => ""
         }
     }

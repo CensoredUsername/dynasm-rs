@@ -70,7 +70,7 @@ fn is_prefix(ident: &syn::Ident) -> bool {
 
 /// if a size hint is present in the parse stream, returning the indicated size
 fn eat_size_hint(ctx: &Context, input: parse::ParseStream) -> Option<Size> {
-    const X86_SIZES: [(&str, Size); 9] = [
+    const X86_SIZES: [(&str, Size); 10] = [
         ("BYTE", Size::BYTE),
         ("WORD", Size::B_2),
         ("DWORD", Size::B_4),
@@ -79,9 +79,10 @@ fn eat_size_hint(ctx: &Context, input: parse::ParseStream) -> Option<Size> {
         ("QWORD", Size::B_8),
         ("TWORD", Size::B_10),
         ("OWORD", Size::B_16),
-        ("YWORD", Size::B_32)
+        ("YWORD", Size::B_32),
+        ("ZWORD", Size::B_64)
     ];
-    const X64_SIZES: [(&str, Size); 9] = [
+    const X64_SIZES: [(&str, Size); 10] = [
         ("BYTE", Size::BYTE),
         ("WORD", Size::B_2),
         ("DWORD", Size::B_4),
@@ -90,7 +91,8 @@ fn eat_size_hint(ctx: &Context, input: parse::ParseStream) -> Option<Size> {
         ("QWORD", Size::B_8),
         ("TWORD", Size::B_10),
         ("OWORD", Size::B_16),
-        ("YWORD", Size::B_32)
+        ("YWORD", Size::B_32),
+        ("ZWORD", Size::B_64)
     ];
 
     let sizes = match ctx.mode {

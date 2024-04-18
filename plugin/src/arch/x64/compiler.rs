@@ -1039,7 +1039,7 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
     // W: matches CR8
     // X: matches st0
 
-    // b, w, d, q, o, h match a byte, word, doubleword, quadword, octword and hexadecword
+    // b, w, d, q, o, h, t match a byte, word (2 bytes), doubleword (4 bytes), quadword (8 bytes), 16 bytes, 32 bytes and 64 bytes
     // p matches a PWORD (10 bytes)
     // f matches an FWORD (6 bytes)
     // * matches all possible sizes for this operand (w/d for i, w/d/q for r/v, o/h for y/w and everything for m)
@@ -1134,6 +1134,7 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
                 (b'p', _)    => size == Size::B_10,
                 (b'o', _)    => size == Size::B_16,
                 (b'h', _)    => size == Size::B_32,
+                (b't', _)    => size == Size::B_64,
                 // what is allowed for wildcards
                 (b'*', b'k') |
                 (b'*', b'l') |
