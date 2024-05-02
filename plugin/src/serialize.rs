@@ -318,12 +318,7 @@ pub fn expr_offset_of(path: &syn::Path, attr: &syn::Ident, size: Size) -> TokenT
     let size = size.as_literal();
 
     delimited(quote_spanned! { span=>
-        unsafe {
-            let #path {#attr: _, ..};
-            let temp = ::std::mem::MaybeUninit::<#path>::uninit();
-            let rv = &(*temp.as_ptr()).#attr as *const _ as usize - temp.as_ptr() as usize;
-            rv as #size
-        }
+        ::std::mem::offset_of!(#path, #attr) as #size
     })
 }
 
