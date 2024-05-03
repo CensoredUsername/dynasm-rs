@@ -93,8 +93,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
                 ("dynamic_reloc" , vec![expr, target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
             Stmt::BareJumpTarget(expr, Relocation { field_offset, ref_offset, kind, .. })    =>
                 ("bare_reloc"    , vec![expr, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-            Stmt::PrefixStmt(s)
-            | Stmt::Stmt(s) => {
+            Stmt::Stmt(s) => {
                 output.extend(quote! {
                     #s ;
                 });
@@ -147,13 +146,6 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
             _ => ()
         };
 
-        while let Some(Stmt::PrefixStmt(_)) = iter.peek() {
-            // ensure prefix statements still end up before their following emitting statement
-            let s = iter.next().unwrap();
-            let i = reversed.len() - 1;
-            reversed.insert(i, s);
-        }
-
         // otherwise, calculate the size of the current statement and add that to the counter
         let size = match &stmt {
             Stmt::Const(_, size)
@@ -173,7 +165,6 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
             | Stmt::BackwardJumpTarget(_, _)
             | Stmt::DynamicJumpTarget(_, _)
             | Stmt::BareJumpTarget(_, _)
-            | Stmt::PrefixStmt(_)
             | Stmt::Stmt(_) => 0,
         };
 
@@ -223,16 +214,6 @@ pub fn expr_zero() -> TokenTree {
 pub fn expr_string_from_ident(i: &syn::Ident) -> TokenTree {
     let name = i.to_string();
     proc_macro2::Literal::string(&name).into()
-}
-
-// Makes a dynamic scale expression. Useful for x64 generic addressing mode
-pub fn expr_dynscale(scale: &TokenTree, rest: &TokenTree) -> (TokenTree, TokenTree) {
-    let tempval = expr_encode_x64_sib_scale(&scale);
-    (delimited(quote_spanned! { Span::mixed_site()=>
-        let temp = #tempval
-    }), delimited(quote_spanned! { Span::mixed_site()=>
-         #rest | ((temp & 3) << 6)
-    }))
 }
 
 // makes (a, b)
@@ -329,28 +310,6 @@ pub fn expr_size_of(path: &syn::Path) -> TokenTree {
 
     delimited(quote_spanned! { span=>
         ::std::mem::size_of::<#path>()
-    })
-}
-
-// makes the following
-// match size {
-//    8 => 3,
-//    4 => 2,
-//    2 => 1,
-//    1 => 0,
-//    _ => panic!r("Type size not representable as scale")
-//}
-pub fn expr_encode_x64_sib_scale(size: &TokenTree) -> TokenTree {
-    let span = size.span();
-
-    delimited(quote_spanned! { span=>
-        match #size {
-            8 => 3,
-            4 => 2,
-            2 => 1,
-            1 => 0,
-            _ => panic!("Type size not representable as scale")
-        }
     })
 }
 

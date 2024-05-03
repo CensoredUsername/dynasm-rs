@@ -1,7 +1,6 @@
 //! This module contains various infrastructure that is common across all assembler backends
-use proc_macro2::{Span, TokenTree};
+use proc_macro2::{Span, TokenTree, TokenStream, Literal, Group};
 use quote::ToTokens;
-use quote::quote;
 use syn::spanned::Spanned;
 use syn::parse;
 use syn::Token;
@@ -148,11 +147,11 @@ impl Jump {
     pub fn encode(self, field_offset: u8, ref_offset: u8, data: &[u8]) -> Stmt {
         let span = self.span();
 
-        let target_offset = delimited(if let Some(offset) = self.offset {
-            quote!(#offset)
+        let target_offset = if let Some(offset) = self.offset {
+            delimited(offset)
         } else {
-            quote!(0isize)
-        });
+            TokenTree::Literal(Literal::isize_suffixed(0))
+        };
 
         // Create a relocation descriptor, containing all information about the actual jump except for the target itself.
         let relocation = Relocation {
@@ -221,12 +220,8 @@ pub enum Stmt {
     DynamicJumpTarget(TokenTree, Relocation),
     BareJumpTarget(TokenTree, Relocation),
 
-    // a statement that provides some information for the next statement,
-    // and should therefore not be reordered with it
-    PrefixStmt(TokenTree),
-
     // a random statement that has to be inserted between assembly hunks
-    Stmt(TokenTree)
+    Stmt(TokenStream)
 }
 
 // convenience methods
@@ -251,18 +246,31 @@ impl Stmt {
 }
 
 
-// Makes a None-delimited TokenTree item out of anything that can be converted to tokens.
-// This is a useful shortcut to escape issues around not-properly delimited tokenstreams
-// because it is guaranteed to be parsed back properly to its source ast at type-level.
+// Takes an arbitrary tokenstream as input, and ensures it can be interpolated safely.
+// returns a tokentree representing either a single token, or a delimited group.
+//
+// If the given tokenstream contains multiple tokens, it will be parenthesized.
+//
+// this will panic if given an empty tokenstream.
+// this would use delimiter::None if not for https://github.com/rust-lang/rust/issues/67062
 pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
-    let span = expr.span();
-    let mut group = proc_macro2::Group::new(
-        proc_macro2::Delimiter::None, expr.into_token_stream()
+    let stream = expr.into_token_stream();
+
+    // the stream api is very limited, but cloning a stream is luckily cheap.
+    // so to check how many tokens are contained we can do this.
+    let mut iter = stream.clone().into_iter();
+    let first = iter.next().unwrap();
+    if iter.next().is_none() {
+        return first;
+    }
+
+    let span = stream.span();
+    let mut group = Group::new(
+        proc_macro2::Delimiter::Parenthesis, stream
     );
     group.set_span(span);
     proc_macro2::TokenTree::Group(group)
 }
-
 
 /// Create a bitmask with `scale` bits set
 pub fn bitmask(scale: u8) -> u32 {
@@ -274,4 +282,3 @@ pub fn bitmask(scale: u8) -> u32 {
 pub fn bitmask64(scale: u8) -> u64 {
     1u64.checked_shl(u32::from(scale)).unwrap_or(0).wrapping_sub(1)
 }
-

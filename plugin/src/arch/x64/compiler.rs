@@ -1,5 +1,5 @@
 use syn::spanned::Spanned;
-use proc_macro2::{Span, TokenTree};
+use proc_macro2::{Span, TokenTree, Literal};
 use quote::{quote_spanned};
 use proc_macro_error::emit_error;
 
@@ -260,7 +260,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
         };
 
         if let RegKind::Dynamic(_, expr) = rm_k {
-            let last: TokenTree = proc_macro2::Literal::u8_suffixed(*last).into();
+            let last: TokenTree = Literal::u8_suffixed(*last).into();
             buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(&last, &delimited(expr), 7, 0), Size::BYTE));
         } else {
             buffer.push(Stmt::u8(last + (rm_k.encode() & 7)));
@@ -455,7 +455,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
         let ireg = ireg.kind;
         let byte = ireg.encode() << 4;
 
-        let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
+        let mut byte: TokenTree = Literal::u8_suffixed(byte).into();
         if let RegKind::Dynamic(_, expr) = ireg {
             byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 0xF, 4);
         }
@@ -1510,7 +1510,7 @@ fn compile_rex(buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<SizedArg>, rm: 
         return;
     }
 
-    let mut rex: TokenTree = proc_macro2::Literal::u8_suffixed(rex).into();
+    let mut rex: TokenTree = Literal::u8_suffixed(rex).into();
 
     if let RegKind::Dynamic(_, expr) = reg_k {
         rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -1);
@@ -1578,7 +1578,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
             return;
         }
 
-        let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
+        let mut byte1: TokenTree = Literal::u8_suffixed(byte1).into();
         if let RegKind::Dynamic(_, expr) = reg_k {
             byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 4)
         }
@@ -1592,7 +1592,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
     buffer.push(Stmt::u8(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
 
     if mode == X86Mode::Long && (reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic()) {
-        let mut byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
+        let mut byte1: TokenTree = Literal::u8_suffixed(byte1).into();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
             byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 4);
@@ -1609,7 +1609,7 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
     }
 
     if vvvv_k.is_dynamic() {
-        let mut byte2: TokenTree = proc_macro2::Literal::u8_suffixed(byte2).into();
+        let mut byte2: TokenTree = Literal::u8_suffixed(byte2).into();
 
         if let RegKind::Dynamic(_, expr) = vvvv_k {
             byte2 = serialize::expr_mask_shift_inverted_and(&byte2, &delimited(expr), 0xF, 3)
@@ -1630,7 +1630,7 @@ fn compile_modrm_sib(buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegK
         return;
     }
 
-    let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
+    let mut byte: TokenTree = Literal::u8_suffixed(byte).into();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
         byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 3);
@@ -1645,8 +1645,8 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 
-    let mut byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
-    let scale: TokenTree = proc_macro2::Literal::u8_unsuffixed(scale).into();
+    let mut byte: TokenTree = Literal::u8_suffixed(byte).into();
+    let scale: TokenTree = Literal::u8_unsuffixed(scale).into();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
         byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 3);
@@ -1658,12 +1658,17 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr
     let span = scale_expr.span();
     let scale_expr = delimited(scale_expr);
 
-    let (expr1, expr2) = serialize::expr_dynscale(
-        &delimited(quote_spanned!{ span=>
-            #scale_expr * #scale
-        }),
-        &byte
-    );
-    buffer.push(Stmt::PrefixStmt(expr1));
-    buffer.push(Stmt::ExprUnsigned(expr2, Size::BYTE));
+    let expr = delimited(quote_spanned!{ span=>
+        ((
+            match #scale_expr * #scale {
+                8 => 3,
+                4 => 2,
+                2 => 1,
+                1 => 0,
+                _ => panic!("Type size not representable as scale")
+            }
+        & 3) << 6) | #byte
+    });
+
+    buffer.push(Stmt::ExprUnsigned(expr, Size::BYTE));
 }

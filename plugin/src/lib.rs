@@ -113,7 +113,7 @@ impl parse::Parse for Dynasm {
                 if !buffer.is_empty() {
                     // ensure that the statement is actually a proper statement and then emit it for serialization
                     let stmt: syn::Stmt = syn::parse2(buffer)?;
-                    stmts.push(common::Stmt::Stmt(common::delimited(stmt)));
+                    stmts.push(common::Stmt::Stmt(quote!{ #stmt }));
                 }
                 continue;
             }

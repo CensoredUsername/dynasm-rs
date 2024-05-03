@@ -2,8 +2,8 @@ use std::collections::hash_map::Entry;
 
 use syn::parse;
 use syn::Token;
-use quote::quote;
 use proc_macro_error::emit_error;
+use proc_macro2::{TokenTree, Literal};
 
 use crate::common::{Stmt, Size, delimited};
 use crate::arch;
@@ -64,7 +64,7 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
                 delimited(with)
             } else {
                 let with = invocation_context.current_arch.default_align();
-                delimited(quote!(#with))
+                TokenTree::Literal(Literal::u8_unsuffixed(with))
             };
 
             stmts.push(Stmt::Align(delimited(value), with));
