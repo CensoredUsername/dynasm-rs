@@ -115,11 +115,9 @@ Type    |  Kind   | Definition   | Reference
 Local   | static  | `label:`     | `>label` or `<label`
 GLobal  | static  | `->label:`   | `->label`
 Dynamic | dynamic | `=>expr`     | `=>expr`
-Extern  | dynamic | `-`          | `extern expr`
+Extern  | extern  | `-`          | `extern expr`
 
-Static label kinds  ("Local" and "Global") have their addresses resolved at the
-time the assembler code is being emitted, whereas dynamic label kinds
-("Dynamic" and "Extern") are resolved as the dynamic code is being executed.
+All labels have their addresses resolved at `Assembler::commit()` time.
 
 Any valid Rust identifier is a valid label name.
 
