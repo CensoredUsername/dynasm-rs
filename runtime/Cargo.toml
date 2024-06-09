@@ -15,7 +15,7 @@ license.workspace = true
 
 
 [dependencies]
-memmap2 = "^0.5"
+memmap2 = "0.9"
 byteorder = "1"
 fnv = "1.0.3"
 dynasm = { version = "=2.0.0", path = "../plugin" }
