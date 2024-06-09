@@ -19,7 +19,7 @@ proc-macro = true
 
 [dependencies]
 lazy_static = "1"
-bitflags = "1.1.0"
+bitflags = "2"
 byteorder = "1"
 quote = "1"
 proc-macro-error = "1"
