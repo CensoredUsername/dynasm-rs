@@ -36,6 +36,7 @@ pub fn get_mnemnonic_data(name: &str) -> Option<&'static [Opdata]> {
 }
 
 bitflags! {
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Flags: u32 {
         const DEFAULT   = 0x0000_0000; // this instruction has default encoding
         const VEX_OP    = 0x0000_0001; // this instruction requires a VEX prefix to be encoded
@@ -72,11 +73,12 @@ bitflags! {
 
 impl Flags {
     const fn make(bits: u32) -> Flags {
-        Flags { bits }
+        Flags::from_bits_truncate(bits)
     }
 }
 
 bitflags! {
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct Features: u32 {
         const X64_IMPLICIT = 0x0000_0000;
         const FPU          = 0x0000_0001;
@@ -109,7 +111,7 @@ bitflags! {
 
 impl Features {
     const fn make(bits: u32) -> Features {
-        Features { bits }
+        Features::from_bits_truncate(bits)
     }
 
     pub fn from_str(name: &str) -> Option<Features> {
@@ -188,59 +190,59 @@ pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> 
 }
 
 // workaround until bitflags can be used in const
-const DEFAULT    : u32 = Flags::DEFAULT.bits;
-const VEX_OP     : u32 = Flags::VEX_OP.bits;
-const XOP_OP     : u32 = Flags::XOP_OP.bits;
-const IMM_OP     : u32 = Flags::IMM_OP.bits;
-const SHORT_ARG  : u32 = Flags::SHORT_ARG.bits;
-const AUTO_SIZE  : u32 = Flags::AUTO_SIZE.bits;
-const AUTO_NO32  : u32 = Flags::AUTO_NO32.bits;
-const AUTO_REXW  : u32 = Flags::AUTO_REXW.bits;
-const AUTO_VEXL  : u32 = Flags::AUTO_VEXL.bits;
-const WORD_SIZE  : u32 = Flags::WORD_SIZE.bits;
-const WITH_REXW  : u32 = Flags::WITH_REXW.bits;
-const WITH_VEXL  : u32 = Flags::WITH_VEXL.bits;
-const EXACT_SIZE : u32 = Flags::EXACT_SIZE.bits;
-const PREF_66    : u32 = Flags::PREF_66.bits;
-const PREF_67    : u32 = Flags::PREF_67.bits;
-const PREF_F0    : u32 = Flags::PREF_F0.bits;
-const PREF_F2    : u32 = Flags::PREF_F2.bits;
-const PREF_F3    : u32 = Flags::PREF_F3.bits;
-const LOCK       : u32 = Flags::LOCK.bits;
-const REP        : u32 = Flags::REP.bits;
-const REPE       : u32 = Flags::REPE.bits;
-const ENC_MR     : u32 = Flags::ENC_MR.bits;
-const ENC_VM     : u32 = Flags::ENC_VM.bits;
-const ENC_MIB    : u32 = Flags::ENC_MIB.bits;
-const X86_ONLY   : u32 = Flags::X86_ONLY.bits;
+const DEFAULT    : u32 = Flags::DEFAULT.bits();
+const VEX_OP     : u32 = Flags::VEX_OP.bits();
+const XOP_OP     : u32 = Flags::XOP_OP.bits();
+const IMM_OP     : u32 = Flags::IMM_OP.bits();
+const SHORT_ARG  : u32 = Flags::SHORT_ARG.bits();
+const AUTO_SIZE  : u32 = Flags::AUTO_SIZE.bits();
+const AUTO_NO32  : u32 = Flags::AUTO_NO32.bits();
+const AUTO_REXW  : u32 = Flags::AUTO_REXW.bits();
+const AUTO_VEXL  : u32 = Flags::AUTO_VEXL.bits();
+const WORD_SIZE  : u32 = Flags::WORD_SIZE.bits();
+const WITH_REXW  : u32 = Flags::WITH_REXW.bits();
+const WITH_VEXL  : u32 = Flags::WITH_VEXL.bits();
+const EXACT_SIZE : u32 = Flags::EXACT_SIZE.bits();
+const PREF_66    : u32 = Flags::PREF_66.bits();
+const PREF_67    : u32 = Flags::PREF_67.bits();
+const PREF_F0    : u32 = Flags::PREF_F0.bits();
+const PREF_F2    : u32 = Flags::PREF_F2.bits();
+const PREF_F3    : u32 = Flags::PREF_F3.bits();
+const LOCK       : u32 = Flags::LOCK.bits();
+const REP        : u32 = Flags::REP.bits();
+const REPE       : u32 = Flags::REPE.bits();
+const ENC_MR     : u32 = Flags::ENC_MR.bits();
+const ENC_VM     : u32 = Flags::ENC_VM.bits();
+const ENC_MIB    : u32 = Flags::ENC_MIB.bits();
+const X86_ONLY   : u32 = Flags::X86_ONLY.bits();
 
 #[allow(dead_code)]
-const X64_IMPLICIT : u32 = Features::X64_IMPLICIT.bits;
-const FPU          : u32 = Features::FPU.bits;
-const MMX          : u32 = Features::MMX.bits;
-const TDNOW        : u32 = Features::TDNOW.bits;
-const SSE          : u32 = Features::SSE.bits;
-const SSE2         : u32 = Features::SSE2.bits;
-const SSE3         : u32 = Features::SSE3.bits;
-const VMX          : u32 = Features::VMX.bits;
-const SSSE3        : u32 = Features::SSSE3.bits;
-const SSE4A        : u32 = Features::SSE4A.bits;
-const SSE41        : u32 = Features::SSE41.bits;
-const SSE42        : u32 = Features::SSE42.bits;
-const SSE5         : u32 = Features::SSE5.bits;
-const AVX          : u32 = Features::AVX.bits;
-const AVX2         : u32 = Features::AVX2.bits;
-const FMA          : u32 = Features::FMA.bits;
-const BMI1         : u32 = Features::BMI1.bits;
-const BMI2         : u32 = Features::BMI2.bits;
-const TBM          : u32 = Features::TBM.bits;
-const RTM          : u32 = Features::RTM.bits;
-const INVPCID      : u32 = Features::INVPCID.bits;
-const MPX          : u32 = Features::MPX.bits;
-const SHA          : u32 = Features::SHA.bits;
-const PREFETCHWT1  : u32 = Features::PREFETCHWT1.bits;
-const CYRIX        : u32 = Features::CYRIX.bits;
-const AMD          : u32 = Features::AMD.bits;
+const X64_IMPLICIT : u32 = Features::X64_IMPLICIT.bits();
+const FPU          : u32 = Features::FPU.bits();
+const MMX          : u32 = Features::MMX.bits();
+const TDNOW        : u32 = Features::TDNOW.bits();
+const SSE          : u32 = Features::SSE.bits();
+const SSE2         : u32 = Features::SSE2.bits();
+const SSE3         : u32 = Features::SSE3.bits();
+const VMX          : u32 = Features::VMX.bits();
+const SSSE3        : u32 = Features::SSSE3.bits();
+const SSE4A        : u32 = Features::SSE4A.bits();
+const SSE41        : u32 = Features::SSE41.bits();
+const SSE42        : u32 = Features::SSE42.bits();
+const SSE5         : u32 = Features::SSE5.bits();
+const AVX          : u32 = Features::AVX.bits();
+const AVX2         : u32 = Features::AVX2.bits();
+const FMA          : u32 = Features::FMA.bits();
+const BMI1         : u32 = Features::BMI1.bits();
+const BMI2         : u32 = Features::BMI2.bits();
+const TBM          : u32 = Features::TBM.bits();
+const RTM          : u32 = Features::RTM.bits();
+const INVPCID      : u32 = Features::INVPCID.bits();
+const MPX          : u32 = Features::MPX.bits();
+const SHA          : u32 = Features::SHA.bits();
+const PREFETCHWT1  : u32 = Features::PREFETCHWT1.bits();
+const CYRIX        : u32 = Features::CYRIX.bits();
+const AMD          : u32 = Features::AMD.bits();
 
 
 lazy_static! {
