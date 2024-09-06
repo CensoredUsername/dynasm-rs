@@ -22,7 +22,7 @@ lazy_static = "1"
 bitflags = "2"
 byteorder = "1"
 quote = "1"
-proc-macro-error = "1"
+proc-macro-error2 = "2.0"
 
 [dependencies.syn]
 version = "1"

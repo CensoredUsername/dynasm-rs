@@ -10,7 +10,7 @@ use crate::parse_helpers::{as_ident, as_number, as_float, as_signed_number};
 use syn::spanned::Spanned;
 use quote::{quote, quote_spanned};
 use proc_macro2::TokenStream;
-use proc_macro_error::emit_error;
+use proc_macro_error2::emit_error;
 
 pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<(), Option<String>> {
     let mut cursor = 0usize;

@@ -1,4 +1,4 @@
-use proc_macro_error::emit_error;
+use proc_macro_error2::emit_error;
 use proc_macro2::Span;
 
 use super::Context;

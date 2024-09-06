@@ -15,7 +15,7 @@ use syn::parse;
 use syn::{Token, parse_macro_input};
 use proc_macro2::{TokenTree, TokenStream};
 use quote::quote;
-use proc_macro_error::proc_macro_error;
+use proc_macro_error2::proc_macro_error;
 
 use std::collections::HashMap;
 

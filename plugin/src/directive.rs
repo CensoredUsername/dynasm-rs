@@ -2,8 +2,8 @@ use std::collections::hash_map::Entry;
 
 use syn::parse;
 use syn::Token;
-use proc_macro_error::emit_error;
 use proc_macro2::{TokenTree, Literal};
+use proc_macro_error2::emit_error;
 
 use crate::common::{Stmt, Size, delimited};
 use crate::arch;

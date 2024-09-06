@@ -1,7 +1,7 @@
 use syn::{parse, Token};
 use syn::spanned::Spanned;
 use proc_macro2::Span;
-use proc_macro_error::emit_error;
+use proc_macro_error2::emit_error;
 
 use lazy_static::lazy_static;
 

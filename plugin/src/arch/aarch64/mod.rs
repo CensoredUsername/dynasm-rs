@@ -1,5 +1,5 @@
 use syn::parse;
-use proc_macro_error::emit_error;
+use proc_macro_error2::emit_error;
 
 mod ast;
 mod parser;

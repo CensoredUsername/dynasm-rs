@@ -1,7 +1,7 @@
 use syn::spanned::Spanned;
 use proc_macro2::{Span, TokenTree, Literal};
 use quote::{quote_spanned};
-use proc_macro_error::emit_error;
+use proc_macro_error2::emit_error;
 
 use crate::common::{Stmt, Size, Jump, JumpKind, delimited};
 use crate::serialize;
