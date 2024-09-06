@@ -1,5 +1,5 @@
 use syn::parse;
-use proc_macro_error::emit_error;
+use proc_macro_error2::emit_error;
 
 use crate::common::{Size, Stmt, Jump};
 use crate::State;
