@@ -1,5 +1,5 @@
 //! This module contains various infrastructure that is common across all assembler backends
-use proc_macro2::{Span, TokenTree, TokenStream, Literal, Group};
+use proc_macro2::{Span, TokenTree, TokenStream, Literal, Group, Delimiter};
 use quote::ToTokens;
 use syn::spanned::Spanned;
 use syn::parse;
@@ -246,13 +246,13 @@ impl Stmt {
 }
 
 
-// Takes an arbitrary tokenstream as input, and ensures it can be interpolated safely.
-// returns a tokentree representing either a single token, or a delimited group.
-//
-// If the given tokenstream contains multiple tokens, it will be parenthesized.
-//
-// this will panic if given an empty tokenstream.
-// this would use delimiter::None if not for https://github.com/rust-lang/rust/issues/67062
+/// Takes an arbitrary tokenstream as input, and ensures it can be interpolated safely.
+/// returns a tokentree representing either a single token, or a delimited group.
+///
+/// If the given tokenstream contains multiple tokens, it will be parenthesized.
+///
+/// this will panic if given an empty tokenstream.
+/// this would use delimiter::None if not for https://github.com/rust-lang/rust/issues/67062
 pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
     let stream = expr.into_token_stream();
 
@@ -269,7 +269,38 @@ pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
         proc_macro2::Delimiter::Parenthesis, stream
     );
     group.set_span(span);
-    proc_macro2::TokenTree::Group(group)
+    TokenTree::Group(group)
+}
+
+/// Checks if the given tokenstream is a parenthesized expression to work around rustc giving
+/// Unnecessary parenthesis warnings in macro-generated code, if this tokentree were to be used
+/// as the argument to a single argument function
+///
+/// i.e. `function(#arg)` expanding to `function((expr))`, which should instead be expanded to
+/// `function(expr)`
+///
+/// To check if this is valid, we should a: test that this tokentree node is a parenthesis delimited
+/// node and b: there are no commas in its internal tokentree, because then it'd be a tuple, and
+/// this transform would be invalid
+pub fn is_parenthesized(expr: &TokenTree) -> bool {
+    match expr {
+        TokenTree::Group(group) => {
+            if group.delimiter() != Delimiter::Parenthesis {
+                return false
+            }
+
+            for item in group.stream() {
+                if let TokenTree::Punct(punct) = item {
+                    if punct.as_char() == ',' {
+                        return false
+                    }
+                }
+            }
+
+            true
+        },
+        _ => false
+    }
 }
 
 /// Create a bitmask with `scale` bits set
