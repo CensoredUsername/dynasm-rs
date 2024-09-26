@@ -3,6 +3,7 @@ name = "insref"
 version = "0.1.0"
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
 default-run = "main"
+edition = "2021"
 
 [[bin]]
 name = "main"

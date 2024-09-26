@@ -2,7 +2,7 @@
 name = "bf-jit"
 version = "0.1.0"
 authors = ["CensoredUsername <cens.username@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [[bin]]
 name = "bf-jit-x64"
