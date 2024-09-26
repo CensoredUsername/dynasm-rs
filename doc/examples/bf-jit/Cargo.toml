@@ -5,11 +5,11 @@ authors = ["CensoredUsername <cens.username@gmail.com>"]
 edition = "2018"
 
 [[bin]]
-name = "x64"
+name = "bf-jit-x64"
 path = "src/x64.rs"
 
 [[bin]]
-name = "aarch64"
+name = "bf-jit-aarch64"
 path = "src/aarch64.rs"
 
 [dependencies]
