@@ -2,7 +2,7 @@
 
 The purpose of this tool is to ease the creation of programs that require run-time assembling.
 
-It is compatible with stable `rustc` 1.45 and higher.
+It is compatible with stable `rustc` 1.77 and higher.
 
 [![Build status](https://github.com/CensoredUsername/dynasm-rs/actions/workflows/Build_and_test.yml/badge.svg?branch=master)](https://github.com/CensoredUsername/dynasm-rs/actions/workflows/Build_and_test.yml)
 [![](https://img.shields.io/crates/v/dynasm.svg)](https://crates.io/crates/dynasm)
