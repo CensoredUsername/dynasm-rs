@@ -37,6 +37,10 @@ impl ExecutableBuffer {
     /// will only be valid as long as its lock is held. When no locks are held,
     /// the assembler is free to relocate the executable buffer when it requires
     /// more memory than available.
+    ///
+    /// The memory this pointer points to is owned by this `ExecutableBuffer`.
+    /// The programmer is responsible for ensuring that pointers generated from this API do not
+    /// outlive the `ExecutableBuffer`.
     pub fn ptr(&self, offset: AssemblyOffset) -> *const u8 {
         &self[offset.0] as *const u8
     }
