@@ -9,6 +9,7 @@ fn test_local_jumps() {
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
 
     dynasm!(ops
+        ; .arch x64
         ; jmp BYTE >foo
         ; inc rax
         ; foo:
@@ -65,6 +66,7 @@ fn test_global_jumps() {
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
 
     dynasm!(ops
+        ; .arch x64
         ; jmp BYTE ->minusone
         ; jmp BYTE ->plustwo
         ; jmp BYTE ->minusone
@@ -110,6 +112,7 @@ fn test_dynamic_jumps() {
     let plustwo = ops.new_dynamic_label();
 
     dynasm!(ops
+        ; .arch x64
         ; jmp BYTE =>minusone
         ; jmp BYTE =>plustwo
         ; jmp BYTE =>minusone
@@ -152,6 +155,7 @@ fn test_all_jumps() {
 
     // please never do this
     dynasm!(ops
+        ; .arch x64
         ; jmp >label
         ; inc rax
         ; jmp ->label
@@ -192,6 +196,7 @@ fn test_bad_jumps() {
     // forward jump to a backwards label
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     dynasm!(ops
+        ; .arch x64
         ; backwards:
         ; jmp >backwards
         ; forwards:
@@ -201,6 +206,7 @@ fn test_bad_jumps() {
     // backwards jump to a forward label
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     dynasm!(ops
+        ; .arch x64
         ; backwards:
         ; jmp <forwards
         ; forwards:
@@ -210,6 +216,7 @@ fn test_bad_jumps() {
     // local jump to global labels
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     dynasm!(ops
+        ; .arch x64
         ;->backwards:
         ; jmp <backwards
         ;->forwards:
@@ -219,6 +226,7 @@ fn test_bad_jumps() {
     // local jump to global labels
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     dynasm!(ops
+        ; .arch x64
         ;->backwards:
         ; jmp >forwards
         ;->forwards:
@@ -228,6 +236,7 @@ fn test_bad_jumps() {
     // global jump to local labels
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     dynasm!(ops
+        ; .arch x64
         ;backwards:
         ; jmp ->forwards
         ;forwards:
@@ -237,6 +246,7 @@ fn test_bad_jumps() {
     // global jump to local labels
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     dynasm!(ops
+        ; .arch x64
         ;backwards:
         ; jmp ->backwards
         ;forwards:
@@ -247,6 +257,7 @@ fn test_bad_jumps() {
     let mut ops = dynasmrt::VecAssembler::<dynasmrt::x64::X64Relocation>::new(0);
     let label = ops.new_dynamic_label();
     dynasm!(ops
+        ; .arch x64
         ; jmp =>label
     );
     match ops.finalize() {

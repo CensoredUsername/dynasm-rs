@@ -1,22 +1,23 @@
 #![allow(unused_imports)]
 
-#[macro_use]
 extern crate dynasmrt;
 
-use dynasmrt::dynasm;
+use dynasmrt::{dynasm, MutPointer};
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
 // aliases, and dynasm! in item position
 macro_rules! my_dynasm {
     ($ops:ident $($t:tt)*) => {
         dynasm!($ops
+            ; .arch x64
             ; .alias test, rax
             $($t)*
         )
     }
 }
 
-fn complex1() {
+#[test]
+fn complex() {
     let mut ops = dynasmrt::x64::Assembler::new().unwrap();
     let d = 3;
     let c = 4;
@@ -207,11 +208,9 @@ fn complex1() {
     }
     println!("");
 
-    let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(buf.ptr(index)) };
-    println!("assembled function result: {}", func() );
-}
-
-#[test]
-fn complex_complex1() {
-    complex1();
+    #[cfg(target_arch="x86_64")]
+    {
+        let func: extern "C" fn() -> i64 = unsafe { std::mem::transmute(buf.ptr(index)) };
+        println!("assembled function result: {}", func() );
+    }
 }
