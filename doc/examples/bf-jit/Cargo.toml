@@ -13,7 +13,7 @@ name = "bf-jit-aarch64"
 path = "src/aarch64.rs"
 
 [dependencies]
-itertools = "0.5.*"
+itertools = "0.13.0"
 
 [dependencies.dynasmrt]
 path = "../../../runtime"

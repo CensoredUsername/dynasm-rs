@@ -1,0 +1,13 @@
+[package]
+name = "test_aarch64"
+version = "0.1.0"
+authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
+
+[dependencies]
+itertools = "0.5.*"
+
+[dependencies.dynasm]
+path = "../plugin"
+
+[dependencies.dynasmrt]
+path = "../runtime"
