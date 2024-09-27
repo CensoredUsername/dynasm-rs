@@ -281,14 +281,12 @@ impl ModifyExpr {
 #[derive(Debug)]
 pub enum RefItem {
     Direct {
-        span: Span,
         reg: Register
     },
     Immediate {
         value: syn::Expr
     },
     Modifier {
-        span: Span,
         modifier: ModifyExpr
     }
 }
@@ -341,9 +339,7 @@ pub enum RawArg {
         modifier: ModifyExpr
     },
     // a dot
-    Dot {
-        span: Span
-    },
+    Dot {},
     // an ident, not intended to be parsed as an expression
     Lit {
         ident: syn::Ident
@@ -391,12 +387,9 @@ pub enum CleanArg {
         value: syn::Expr,
     },
     Modifier {
-        span: Span,
         modifier: ModifyExpr
     },
-    Dot {
-        span: Span
-    },
+    Dot {},
     Lit {
         ident: syn::Ident
     }
@@ -413,7 +406,6 @@ pub enum FlatArg {
         value: syn::Expr,
     },
     Modifier {
-        span: Span,
         modifier: Modifier,
     },
     JumpTarget {

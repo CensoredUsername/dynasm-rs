@@ -68,11 +68,11 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                     return Err(None);
                 }
 
-                res.push(CleanArg::Modifier { span, modifier });
+                res.push(CleanArg::Modifier { modifier });
             },
             // dot: passthrough
-            RawArg::Dot { span } => {
-                res.push(CleanArg::Dot { span } );
+            RawArg::Dot {} => {
+                res.push(CleanArg::Dot {} );
             },
             // lit: passthrough
             RawArg::Lit { ident } => {
@@ -592,7 +592,7 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
                         RefKind::Indexed(index, modifier) => {
                             new_args.push(FlatArg::Direct { span, reg: index.kind_owned() } );
                             if let Some(modifier) = modifier {
-                                new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                                new_args.push(FlatArg::Modifier { modifier: modifier.op } );
                                 if let Some(expr) = modifier.expr {
                                     new_args.push(FlatArg::Immediate { value: expr } );
                                 }
@@ -625,9 +625,9 @@ fn flatten_args(args: Vec<CleanArg>, data: &Opdata, ctx: &mut MatchData) {
                 CleanArg::Immediate { value, .. } => {
                     new_args.push(FlatArg::Immediate { value } );
                 },
-                CleanArg::Modifier { span, modifier } => {
+                CleanArg::Modifier { modifier } => {
                     if arg_count >= 2 {
-                        new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                        new_args.push(FlatArg::Modifier { modifier: modifier.op } );
                     }
                     if let Some(expr) = modifier.expr {
                         new_args.push(FlatArg::Immediate { value: expr });

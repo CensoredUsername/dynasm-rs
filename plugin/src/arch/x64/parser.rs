@@ -214,8 +214,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
             emit_error!(span, "size hint with direct register");
         }
         return Ok(RawArg::Direct {
-            reg,
-            span
+            reg
         })
     }
 

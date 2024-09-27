@@ -273,7 +273,6 @@ pub enum RawArg {
     },
     // direct register reference, 
     Direct {
-        span: Span,
         reg: Register
     },
     // a jump offset, i.e. ->foo
@@ -309,7 +308,6 @@ pub enum CleanArg {
     },
     // direct register reference, 
     Direct {
-        span: Span,
         reg: Register
     },
     // a jump offset, i.e. ->foo
@@ -334,7 +332,6 @@ pub enum SizedArg {
     // memory reference. size info is lost here as
     // it is never actually encoded
     Indirect {
-        span: Span,
         disp_size: Option<Size>,
         base: Option<Register>,
         index: Option<(Register, isize, Option<syn::Expr>)>,
@@ -342,7 +339,6 @@ pub enum SizedArg {
     },
     // direct register reference, 
     Direct {
-        span: Span,
         reg: Register
     },
     // a jump offset, i.e. ->foo

@@ -22,11 +22,10 @@ pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) ->
 
     // parse any dot args
     while input.peek(Token![.]) {
-        let span = input.cursor().span();
         let _: Token![.] = input.parse()?;
         let arg: syn::Ident = input.parse()?;
 
-        args.push(RawArg::Dot { span } );
+        args.push(RawArg::Dot {} );
         args.push(RawArg::Lit { ident: arg });
     }
 
@@ -206,7 +205,6 @@ fn parse_refitem(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<
     // modifier
     if let Some(modifier) = input.parse_opt()? {
         return Ok(RefItem::Modifier {
-            span: _start,
             modifier
         });
     }
@@ -223,8 +221,7 @@ fn parse_refitem(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<
     // register
     if let Some(reg) = parse_reg(ctx, input)? {
         return Ok(RefItem::Direct {
-            reg,
-            span: _start
+            reg
         })
     }
 

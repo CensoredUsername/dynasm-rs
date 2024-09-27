@@ -522,7 +522,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 // Folds RawArgs into CleanArgs by analyzing the different raw memoryref variants
 fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
     Ok(match arg {
-        RawArg::Direct {span, reg} => CleanArg::Direct {span, reg},
+        RawArg::Direct {reg} => CleanArg::Direct {reg},
         RawArg::JumpTarget {jump, size} => CleanArg::JumpTarget {jump, size},
         RawArg::IndirectJumpTarget {jump, size} => {
             if let JumpKind::Bare(_) = jump.kind {
@@ -1257,16 +1257,16 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
         };
 
         new_args.push(match arg {
-            CleanArg::Direct {span, reg} =>
-                SizedArg::Direct {span, reg},
+            CleanArg::Direct {reg} =>
+                SizedArg::Direct {reg},
             CleanArg::JumpTarget {jump, ..} =>
                 SizedArg::JumpTarget {jump, size},
             CleanArg::IndirectJumpTarget {jump, ..} =>
                 SizedArg::IndirectJumpTarget {jump},
             CleanArg::Immediate {value, ..} =>
                 SizedArg::Immediate {value, size},
-            CleanArg::Indirect {span, disp_size, base, index, disp, ..} =>
-                SizedArg::Indirect {span, disp_size, base, index, disp},
+            CleanArg::Indirect {disp_size, base, index, disp, ..} =>
+                SizedArg::Indirect {disp_size, base, index, disp},
         });
     }
 
