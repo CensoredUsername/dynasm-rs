@@ -10,7 +10,7 @@ use dynasmrt::components::LitPool;
 macro_rules! my_dynasm {
     ($ops:ident $($t:tt)*) => {
         dynasm!($ops
-            ; .arch x64
+            ; .arch aarch64
             ; .alias test, x1
             $($t)*
         )
@@ -35,7 +35,6 @@ fn complex() {
 
     // interesting testcases
     my_dynasm!(ops
-        ; .arch aarch64
         ; aligned:
         // no args
         ; nop

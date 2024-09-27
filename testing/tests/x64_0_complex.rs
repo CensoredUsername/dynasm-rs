@@ -177,7 +177,7 @@ fn complex() {
     // dynasm in expr position
     match 1 {
         0 => (),
-        _ => dynasm!(ops; inc rax)
+        _ => my_dynasm!(ops; inc rax)
     }
 
     // fixups
@@ -194,7 +194,9 @@ fn complex() {
         ops.check(end).unwrap();
     }).unwrap();
 
+    #[allow(unused_variables)]
     let index = ops.offset();
+
     my_dynasm!(ops
         ; mov eax, 10203040
         ; ret
