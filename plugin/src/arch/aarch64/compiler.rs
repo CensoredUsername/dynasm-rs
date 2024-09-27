@@ -574,9 +574,9 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         } else {
             dynamics.push((offset, quote_spanned!{ imm.span()=>
                 {
-                    let value: u64 = !#imm;
+                    let value: u32 = !#imm;
                     let offset = value.trailing_zeros() & 0b10000;
-                    ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
+                    ((0xFFFFu32 & (value >> offset)) as u32) | (offset << 12)
                 }
             }));
             return Ok(());
@@ -606,9 +606,9 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         } else {
             dynamics.push((offset, quote_spanned!{ imm.span()=>
                 {
-                    let value: u64 = #imm;
+                    let value: u32 = #imm;
                     let offset = value.trailing_zeros() & 0b10000;
-                    ((0xFFFFu64 & (value >> offset)) as u32) | (offset << 12)
+                    ((0xFFFFu32 & (value >> offset)) as u32) | (offset << 12)
                 }
             }));
             return Ok(());
