@@ -5,7 +5,7 @@ use quote::{quote, quote_spanned, ToTokens};
 
 use byteorder::{ByteOrder, LittleEndian};
 
-use crate::common::{Size, Stmt, delimited, is_parenthesized, Relocation};
+use crate::common::{Size, Stmt, delimited, strip_parenthesis, Relocation};
 
 use std::convert::TryInto;
 
@@ -103,19 +103,13 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
         // and construct the appropriate method call
         let method = syn::Ident::new(method, Span::mixed_site());
 
-        if args.len() == 1 && is_parenthesized(&args[0]) {
-            // special case for not emitting redundant parenthesis to work around an annoying error
-            let mut args = args;
-            let arg = args.pop().unwrap();
-            output.extend(quote! {
-                #name . #method #arg ;
-            })
+        // work around rustc giving code style warnings about unneeded parenthesis in method calls
+        let mut args = args;
+        args.iter_mut().for_each(strip_parenthesis);
 
-        } else {
-            output.extend(quote! {
-                #name . #method ( #( #args ),* ) ;
-            })
-        }
+        output.extend(quote! {
+            #name . #method ( #( #args ),* ) ;
+        })
     }
 
     // if we have nothing to emit, expand to nothing. Else, wrap it into a block.

@@ -272,7 +272,7 @@ pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
     TokenTree::Group(group)
 }
 
-/// Checks if the given tokenstream is a parenthesized expression to work around rustc giving
+/// Checks if the given `Group` is a parenthesized expression to work around rustc giving
 /// Unnecessary parenthesis warnings in macro-generated code, if this tokentree were to be used
 /// as the argument to a single argument function
 ///
@@ -282,24 +282,33 @@ pub fn delimited<T: ToTokens>(expr: T) -> TokenTree {
 /// To check if this is valid, we should a: test that this tokentree node is a parenthesis delimited
 /// node and b: there are no commas in its internal tokentree, because then it'd be a tuple, and
 /// this transform would be invalid
-pub fn is_parenthesized(expr: &TokenTree) -> bool {
-    match expr {
-        TokenTree::Group(group) => {
-            if group.delimiter() != Delimiter::Parenthesis {
+pub fn is_parenthesized(group: &Group) -> bool {
+    if group.delimiter() != Delimiter::Parenthesis {
+        return false
+    }
+
+    for item in group.stream() {
+        if let TokenTree::Punct(punct) = item {
+            if punct.as_char() == ',' {
                 return false
             }
+        }
+    }
 
-            for item in group.stream() {
-                if let TokenTree::Punct(punct) = item {
-                    if punct.as_char() == ',' {
-                        return false
-                    }
-                }
-            }
+    true
+}
 
-            true
-        },
-        _ => false
+/// Returns the given `TokenTree`, but if it's a parenthesized group, it will change this
+/// to a None-delimited group, if `is_parenthesized` deems this to be a valid transform
+///
+/// this is intended to work around unneeded parenthesis around function arguments warnings
+pub fn strip_parenthesis(expr: &mut TokenTree) {
+    if let TokenTree::Group(group) = &*expr {
+        if is_parenthesized(group) {
+            let mut stripped = TokenTree::Group(Group::new(Delimiter::None, group.stream()));
+            stripped.set_span(group.span());
+            *expr = stripped;
+        }
     }
 }
 
