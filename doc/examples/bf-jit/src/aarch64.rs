@@ -77,10 +77,11 @@ impl Program {
 
         // literal pool
         dynasm!(ops
+            ; .align 8
             ; ->getchar:
-            ; .qword State::getchar as _
+            ; .u64 State::getchar as _
             ; ->putchar:
-            ; .qword State::putchar as _
+            ; .u64 State::putchar as _
         );
 
         let start = prologue!(ops);

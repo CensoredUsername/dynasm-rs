@@ -2,6 +2,8 @@ use std::collections::hash_map::Entry;
 
 use syn::parse;
 use syn::Token;
+use syn::spanned::Spanned;
+use quote::quote_spanned;
 use proc_macro2::{TokenTree, Literal};
 use proc_macro_error2::emit_error;
 
@@ -43,11 +45,17 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
             }
             invocation_context.current_arch.set_features(&features);
         },
-        // ; .byte (expr ("," expr)*)?
-        "byte"  => directive_const(invocation_context, stmts, input, Size::BYTE)?,
-        "word"  => directive_const(invocation_context, stmts, input, Size::B_2)?,
-        "dword" => directive_const(invocation_context, stmts, input, Size::B_4)?,
-        "qword" => directive_const(invocation_context, stmts, input, Size::B_8)?,
+        // ; .u8 (expr ("," expr)*)?
+        "u8"  => directive_unsigned(invocation_context, stmts, input, Size::BYTE)?,
+        "u16" => directive_unsigned(invocation_context, stmts, input, Size::B_2)?,
+        "u32" => directive_unsigned(invocation_context, stmts, input, Size::B_4)?,
+        "u64" => directive_unsigned(invocation_context, stmts, input, Size::B_8)?,
+        "i8"  => directive_signed(invocation_context, stmts, input, Size::BYTE)?,
+        "i16" => directive_signed(invocation_context, stmts, input, Size::B_2)?,
+        "i32" => directive_signed(invocation_context, stmts, input, Size::B_4)?,
+        "i64" => directive_signed(invocation_context, stmts, input, Size::B_8)?,
+        "f32" => directive_float(stmts, input, Size::B_4)?,
+        "f64" => directive_float(stmts, input, Size::B_8)?,
         "bytes" => {
             // ; .bytes expr
             let iterator: syn::Expr = input.parse()?;
@@ -97,7 +105,7 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
     Ok(())
 }
 
-fn directive_const(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
+fn directive_signed(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
     // FIXME: this could be replaced by a Punctuated parser?
     // parse (expr (, expr)*)?
 
@@ -122,6 +130,67 @@ fn directive_const(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>
             let expr: syn::Expr = input.parse()?;
             stmts.push(Stmt::ExprSigned(delimited(expr), size));
         }
+    }
+
+    Ok(())
+}
+
+fn directive_unsigned(invocation_context: &mut DynasmContext, stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
+    // FIXME: this could be replaced by a Punctuated parser?
+    // parse (expr (, expr)*)?
+
+    if input.is_empty() || input.peek(Token![;]) {
+        return Ok(())
+    }
+
+    if let Some(jump) = input.parse_opt()? {
+        invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
+    } else {
+        let expr: syn::Expr = input.parse()?;
+        stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+    }
+
+
+    while input.peek(Token![,]) {
+        let _: Token![,] = input.parse()?;
+
+        if let Some(jump) = input.parse_opt()? {
+            invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
+        } else {
+            let expr: syn::Expr = input.parse()?;
+            stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+        }
+    }
+
+    Ok(())
+}
+
+fn directive_float(stmts: &mut Vec<Stmt>, input: parse::ParseStream, size: Size) -> parse::Result<()> {
+    // FIXME: this could be replaced by a Punctuated parser?
+    // parse (expr (, expr)*)?
+
+    if input.is_empty() || input.peek(Token![;]) {
+        return Ok(())
+    }
+
+    let expr: syn::Expr = input.parse()?;
+    let expr = match size {
+        Size::B_4 => quote_spanned! {expr.span() => f32::to_bits( #expr ) },
+        Size::B_8 => quote_spanned! {expr.span() => f64::to_bits( #expr ) },
+        _ => unreachable!()
+    };
+    stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+
+    while input.peek(Token![,]) {
+        let _: Token![,] = input.parse()?;
+
+        let expr: syn::Expr = input.parse()?;
+        let expr = match size {
+            Size::B_4 => quote_spanned! {expr.span() => f32::to_bits( #expr ) },
+            Size::B_8 => quote_spanned! {expr.span() => f64::to_bits( #expr ) },
+            _ => unreachable!()
+        };
+        stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
     }
 
     Ok(())

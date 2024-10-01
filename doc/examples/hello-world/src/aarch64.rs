@@ -11,9 +11,9 @@ fn main() {
         ; .arch aarch64
         ; ->hello:
         ; .bytes string.as_bytes()
-        ; .align 4
+        ; .align 8
         ; ->print:
-        ; .qword print as _
+        ; .u64 print as _
     );
 
     let hello = ops.offset();

@@ -106,9 +106,9 @@ fn test_cache_coherency_other_cores() {
         ; .arch aarch64
         ; .align 8
         ; -> first_addr:
-        ; .qword first_value.as_ptr() as *mut u8 as _
+        ; .u64 first_value.as_ptr() as *mut u8 as _
         ; -> second_addr:
-        ; .qword second_value.as_ptr() as *mut u8 as _
+        ; .u64 second_value.as_ptr() as *mut u8 as _
     );
     let start = ops.offset();
     dynasm!(ops

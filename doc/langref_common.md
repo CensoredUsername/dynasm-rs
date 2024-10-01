@@ -55,10 +55,16 @@ Name      | Argument format | Description
 `.feature`| A comma-separated list of identifiers. | Set architectural features that are allowed to be used.
 `.alias`  | An name followed by a register | Defines the name as an alias for the wanted register.
 `.align`  | An expression of type usize | Pushes NOPs until the assembling head has reached the desired alignment.
-`.byte`   | One or more expressions of the type `i8`  | Pushes the values into the assembling buffer.
-`.word`   | One or more expressions of the type `i16` | Pushes the values into the assembling buffer.
-`.dword`  | One or more expressions of the type `i32` | Pushes the values into the assembling buffer.
-`.qword`  | One or more expressions of the type `i64` | Pushes the values into the assembling buffer.
+`.u8`   | One or more expressions of the type `u8`  | Pushes the values into the assembling buffer.
+`.u16`   | One or more expressions of the type `u16` | Pushes the values into the assembling buffer.
+`.u32`  | One or more expressions of the type `u32` | Pushes the values into the assembling buffer.
+`.u64`  | One or more expressions of the type `u64` | Pushes the values into the assembling buffer.
+`.i8`   | One or more expressions of the type `i8`  | Pushes the values into the assembling buffer.
+`.i16`   | One or more expressions of the type `i16` | Pushes the values into the assembling buffer.
+`.i32`  | One or more expressions of the type `i32` | Pushes the values into the assembling buffer.
+`.i64`  | One or more expressions of the type `i64` | Pushes the values into the assembling buffer.
+`.f32`  | One or more expressions of the type `f32` | Pushes the values into the assembling buffer.
+`.f64`  | One or more expressions of the type `f64` | Pushes the values into the assembling buffer.
 `.bytes`  | An expression of that implements `IntoIterator<Item=u8>` or `IntoIterator<Item=&u8>` | Extends the assembling buffer with the iterator.
 
 Directives are normally local to the current `dynasm!` invocation. However, if the `filelocal` feature is used they will be processed in lexical order over the whole file. This feature only works on a nightly compiler and might be removed in the future.

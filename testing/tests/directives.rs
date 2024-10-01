@@ -124,39 +124,106 @@ fn test_aliases() {
 }
 
 #[test]
-fn test_data_directives_unaligned() {
+fn test_data_directives_unaligned_unsigned() {
     let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
-        ; .byte 0x00
-        ; .word 0x1111
-        ; .dword 0x22222222
-        ; .qword 0x3333333333333333
+        ; .u8  0x88
+        ; .u16 0x9999
+        ; .u32 0xAAAAAAAA
+        ; .u64 0xBBBBBBBBBBBBBBBB
     );
 
     let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
-    assert_eq!(hex, "00, 11, 11, 22, 22, 22, 22, 33, 33, 33, 33, 33, 33, 33, 33", "Register aliases");
+    assert_eq!(hex, "88, 99, 99, AA, AA, AA, AA, BB, BB, BB, BB, BB, BB, BB, BB", "Data directives");
 }
 
 #[test]
-fn test_data_directives_aligned() {
+fn test_data_directives_unaligned_signed() {
     let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
-        ; .arch x64
-        ; .byte 0x00
-        ; .align 2
-        ; .word 0x1111
-        ; .align 8
-        ; .dword 0x22222222
-        ; .align 8
-        ; .qword 0x3333333333333333
+        ; .i8  -0x44
+        ; .i16 -0x1111
+        ; .i32 -0x22222222
+        ; .i64 -0x3333333333333333
     );
 
     let buf = ops.finalize();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join(", ");
-    assert_eq!(hex, "00, 90, 11, 11, 90, 90, 90, 90, 22, 22, 22, 22, 90, 90, 90, 90, 33, 33, 33, 33, 33, 33, 33, 33", "Register aliases");
+    assert_eq!(hex, "BC, EF, EE, DE, DD, DD, DD, CD, CC, CC, CC, CC, CC, CC, CC", "Data directives");
+}
+
+#[test]
+fn test_data_directives_aligned_unsigned() {
+    let mut ops = dynasmrt::SimpleAssembler::new();
+    dynasm!(ops
+        ; .arch x64
+        ; .u8 0x88
+        ; .align 2
+        ; .u16 0x9999
+        ; .align 8
+        ; .u32 0xAAAAAAAA
+        ; .align 8
+        ; .u64 0xBBBBBBBBBBBBBBBB
+    );
+
+    let buf = ops.finalize();
+    let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
+    let hex = hex.join(", ");
+    assert_eq!(hex, "88, 90, 99, 99, 90, 90, 90, 90, AA, AA, AA, AA, 90, 90, 90, 90, BB, BB, BB, BB, BB, BB, BB, BB", "Data directives");
+}
+
+#[test]
+fn test_data_directives_aligned_signed() {
+    let mut ops = dynasmrt::SimpleAssembler::new();
+    dynasm!(ops
+        ; .arch x64
+        ; .i8 -0x44
+        ; .align 2
+        ; .i16 -0x1111
+        ; .align 8
+        ; .i32 -0x22222222
+        ; .align 8
+        ; .i64 -0x3333333333333333
+    );
+
+    let buf = ops.finalize();
+    let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
+    let hex = hex.join(", ");
+    assert_eq!(hex, "BC, 90, EF, EE, 90, 90, 90, 90, DE, DD, DD, DD, 90, 90, 90, 90, CD, CC, CC, CC, CC, CC, CC, CC", "Data directives");
+}
+
+#[test]
+fn test_data_directives_unaligned_float() {
+    let mut ops = dynasmrt::SimpleAssembler::new();
+    dynasm!(ops
+        ; .arch x64
+        ; .f32 3.14159265359
+        ; .f64 3.14159265359
+    );
+
+    let buf = ops.finalize();
+    let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
+    let hex = hex.join(", ");
+    assert_eq!(hex, "DB, 0F, 49, 40, EA, 2E, 44, 54, FB, 21, 09, 40", "Data directives");
+}
+
+#[test]
+fn test_data_directives_aligned_float() {
+    let mut ops = dynasmrt::SimpleAssembler::new();
+    dynasm!(ops
+        ; .arch x64
+        ; .f32 3.14159265359
+        ; .align 8
+        ; .f64 3.14159265359
+    );
+
+    let buf = ops.finalize();
+    let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
+    let hex = hex.join(", ");
+    assert_eq!(hex, "DB, 0F, 49, 40, 90, 90, 90, 90, EA, 2E, 44, 54, FB, 21, 09, 40", "Data directives");
 }
 
 #[test]
