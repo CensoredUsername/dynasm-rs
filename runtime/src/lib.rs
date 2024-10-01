@@ -7,6 +7,7 @@
 pub mod mmap;
 pub mod components;
 pub mod relocations;
+pub mod cache_control;
 
 /// Helper to implement common traits on register enums.
 macro_rules! reg_impls {
@@ -90,7 +91,9 @@ impl Executor {
     /// the guard is dropped.
     #[inline]
     pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
-        self.execbuffer.read().unwrap()
+        let guard = self.execbuffer.read().unwrap();
+        cache_control::prepare_for_execution();
+        guard
     }
 }
 
@@ -647,6 +650,9 @@ impl<R: Relocation> Assembler<R> {
                 if reloc.adjust(buf, change).is_err() {
                     *error = Some(DynasmError::ImpossibleRelocation(TargetKind::Managed))
                 }
+
+                // we don't need to inform the cache here that we changed something
+                // as the entire allocation is new.
             }
         });
 
@@ -661,7 +667,10 @@ impl<R: Relocation> Assembler<R> {
     pub fn finalize(mut self) -> Result<ExecutableBuffer, Self> {
         self.commit().expect("Errors were encountered when committing before finalization");
         match self.memory.finalize() {
-            Ok(execbuffer) => Ok(execbuffer),
+            Ok(execbuffer) => {
+                cache_control::prepare_for_execution();
+                Ok(execbuffer)
+            },
             Err(memory) => Err(Self {
                 memory,
                 ..self
@@ -842,7 +851,13 @@ pub struct Modifier<'a, R: Relocation> {
 impl<'a, R: Relocation> Modifier<'a, R> {
     /// Move the modifier cursor to the selected location.
     pub fn goto(&mut self, offset: AssemblyOffset) {
+        // resync the caches of anything we modified before
+        cache_control::synchronize_icache(&self.buffer[self.previous_asmoffset .. self.asmoffset]);
+
+        // remove any old managed relocations from what we overwrote
         self.old_managed.remove_between(self.previous_asmoffset, self.asmoffset);
+
+        // set the cursor position
         self.asmoffset = offset.0;
         self.previous_asmoffset = offset.0;
     }
@@ -865,9 +880,12 @@ impl<'a, R: Relocation> Modifier<'a, R> {
         }
     }
 
-    // encode uncommited relocations
+    // encode uncommited relocations. also, invalidate the icache
     fn encode_relocs(&mut self) -> Result<(), DynasmError> {
         let buf_addr = self.buffer.as_ptr() as usize;
+
+        // resync the caches of anything we modified before
+        cache_control::synchronize_icache(&self.buffer[self.previous_asmoffset .. self.asmoffset]);
 
         // If we accrued any errors while assembling before, emit them now.
         if let Some(e) = self.error.take() {
@@ -887,6 +905,10 @@ impl<'a, R: Relocation> Modifier<'a, R> {
                     }
                 ));
             }
+
+            // resynchronize the cache of any relocation we just performed
+            cache_control::synchronize_icache(buf);
+
             if loc.needs_adjustment() {
                 self.new_managed.add(loc);
             }
@@ -899,6 +921,10 @@ impl<'a, R: Relocation> Modifier<'a, R> {
             if loc.patch(buf, buf_addr, target.0).is_err() {
                 return Err(DynasmError::ImpossibleRelocation(TargetKind::Dynamic(id)));
             }
+
+            // resynchronize the cache of any relocation we just performed
+            cache_control::synchronize_icache(buf);
+
             if loc.needs_adjustment() {
                 self.new_managed.add(loc);
             }

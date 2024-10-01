@@ -11,6 +11,7 @@ use fnv::FnvHashMap;
 use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
 use crate::mmap::{ExecutableBuffer, MutableBuffer};
 use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
+use crate::cache_control;
 
 /// A static label represents either a local label or a global label reference.
 ///
@@ -143,6 +144,9 @@ impl MemoryManager {
             // allow modifications to be made
             f(&mut new_buffer, self.execbuffer_addr, new_buffer_addr);
 
+            // resynchronize the entire buffer
+            cache_control::synchronize_icache(&new_buffer);
+
             // swap the buffers
             self.execbuffer_addr = new_buffer_addr;
             *self.execbuffer.write().unwrap() = new_buffer.make_exec().expect("Could not swap buffer protection modes")
@@ -157,6 +161,9 @@ impl MemoryManager {
             // update buffer and length
             buffer.set_len(new_asmoffset);
             buffer[old_asmoffset..].copy_from_slice(&new);
+
+            // ensure that no old data remains in the icache of what we just updated
+            cache_control::synchronize_icache(&buffer[old_asmoffset .. ]);
 
             // repack the buffer
             let buffer = buffer.make_exec().expect("Could not swap buffer protection modes");
