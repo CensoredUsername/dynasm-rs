@@ -121,9 +121,9 @@ tlentry(['FCVTZS', 'FCVTZU', 'SCVTF', 'UCVTF'],
         'D, D, Imm',
     ],
     processors = [
-        'R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)',
-        'R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)',
-        'R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)',
+        'R(0), R(5), CUrange(1, 16), Usubone()(16, 5, 32)',
+        'R(0), R(5), CUrange(1, 32), Usubone(16, 6)',
+        'R(0), R(5), CUrange(1, 64), Usubone(16, 7)',
     ],
 )
 
@@ -159,7 +159,7 @@ tlentry(['SRI', 'SRSHR', 'SRSRA', 'SSHR', 'SSRA', 'URSHR', 'URSRA', 'USHR', 'USR
         'D, D, Imm',
     ],
     processors = [
-        'R(0), R(5), BUrange(1, 64), Usub(16, 7, 128)',
+        'R(0), R(5), CUrange(1, 64), Usubone(16, 7)',
     ],
 )
 
@@ -389,9 +389,9 @@ tlentry(['SQRSHRN', 'SQRSHRUN', 'SQSHRN', 'SQSHRUN', 'UQRSHRN', 'UQSHRN'],
         'S, D, Imm',
     ],
     processors = [
-        'R(0), R(5), BUrange(1, 8), Usub(16, 4, 16)',
-        'R(0), R(5), BUrange(1, 16), Usub(16, 5, 32)',
-        'R(0), R(5), BUrange(1, 32), Usub(16, 6, 64)',
+        'R(0), R(5), CUrange(1, 8), Usubone(16, 4)',
+        'R(0), R(5), CUrange(1, 16), Usubone(16, 5)',
+        'R(0), R(5), CUrange(1, 32), Usubone(16, 6)',
     ],
 )
 
@@ -464,13 +464,13 @@ tlentry(['SM3TT1A', 'SM3TT1B', 'SM3TT2A', 'SM3TT2B'],
 tlentry(['MOVI', 'MVNI'],
     '<Vd>.<T>,#<imm8>,MSL#<amount>', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('cmode', 4, 12), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'V(DWORD), Imm, LitMod(MSL)',
-    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(12, &[8, 16]), Rwidth(30)',
+    processor = 'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(12, &[8, 16]), Rwidth(30)',
 )
 
 tlentry(['MOVI'],
     '<Vd>.<T>,#<imm8>{,LSL#0}', (('Q', 1, 30), ('a', 1, 18), ('b', 1, 17), ('c', 1, 16), ('d', 1, 9), ('e', 1, 8), ('f', 1, 7), ('g', 1, 6), ('h', 1, 5), ('Rd', 5, 0)),
     matcher   = 'V(BYTE), Imm, End, LitMod(LSL)',
-    processor = 'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, BUbits(0), A, Rwidth(30)',
+    processor = 'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, CUbits(0), A, Rwidth(30)',
 )
 
 tlentry(['MVNI'],
@@ -480,8 +480,8 @@ tlentry(['MVNI'],
         'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x10111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
@@ -496,8 +496,8 @@ tlentry(['MOVI'],
         'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x00111100000xxx10x001xxxxxxxxxx', # 16-bit shifted immediate
@@ -512,8 +512,8 @@ tlentry(['ORR'],
         'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x00111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -528,8 +528,8 @@ tlentry(['BIC'],
         'V(DWORD), Imm, End, LitMod(LSL)',
     ],
     processors = [
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
-        'R(0), BUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8]), Rwidth(30)',
+        'R(0), CUbits(8), Uslice(5, 5, 0), Uslice(16, 3, 5), A, Ulist(13, &[0, 8, 16, 24]), Rwidth(30)',
     ],
     bits = [
         '0x10111100000xxx10x101xxxxxxxxxx', # 16-bit variant
@@ -733,9 +733,9 @@ tlentry(['FCVTZS', 'FCVTZU', 'SCVTF', 'UCVTF'],
         'VStatic(QWORD, 2), VStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), Usub(16, 4, 16), Rwidth(30), Static(19, 0b0010)',
-        'R(0), R(5), Usub(16, 5, 32), Rwidth(30), Static(19, 0b0100)',
-        'R(0), R(5), Usub(16, 6, 64), Rwidth(30), Static(19, 0b1000)',
+        'R(0), R(5), Usubone(16, 4), Rwidth(30), Static(19, 0b0010)',
+        'R(0), R(5), Usubone(16, 5), Rwidth(30), Static(19, 0b0100)',
+        'R(0), R(5), Usubone(16, 6), Rwidth(30), Static(19, 0b1000)',
     ],
 )
 
@@ -764,10 +764,10 @@ tlentry(['SRI', 'SRSHR', 'SRSRA', 'SSHR', 'SSRA', 'URSHR', 'URSRA', 'USHR', 'USR
         'VStatic(QWORD, 2), VStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), Usub(16, 3, 8), Rwidth(30), Static(19, 0b0001)',
-        'R(0), R(5), Usub(16, 4, 16), Rwidth(30), Static(19, 0b0010)',
-        'R(0), R(5), Usub(16, 5, 32), Rwidth(30), Static(19, 0b0100)',
-        'R(0), R(5), Usub(16, 6, 64), Rwidth(30), Static(19, 0b1000)',
+        'R(0), R(5), Usubone(16, 3), Rwidth(30), Static(19, 0b0001)',
+        'R(0), R(5), Usubone(16, 4), Rwidth(30), Static(19, 0b0010)',
+        'R(0), R(5), Usubone(16, 5), Rwidth(30), Static(19, 0b0100)',
+        'R(0), R(5), Usubone(16, 6), Rwidth(30), Static(19, 0b1000)',
     ],
 )
 
@@ -1436,9 +1436,9 @@ tlentry(['RSHRN', 'SHRN', 'SQRSHRN', 'SQRSHRUN', 'SQSHRN', 'SQSHRUN', 'UQRSHRN',
         'VStatic(DWORD, 2), VStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), Usub(16, 3, 8), Static(19, 0b0001)',
-        'R(0), R(5), Usub(16, 4, 16), Static(19, 0b0010)',
-        'R(0), R(5), Usub(16, 5, 32), Static(19, 0b0100)',
+        'R(0), R(5), Usubone(16, 3), Static(19, 0b0001)',
+        'R(0), R(5), Usubone(16, 4), Static(19, 0b0010)',
+        'R(0), R(5), Usubone(16, 5), Static(19, 0b0100)',
     ],
 )
 
@@ -1450,9 +1450,9 @@ tlentry(['RSHRN2', 'SHRN2', 'SQRSHRN2', 'SQRSHRUN2', 'SQSHRN2', 'SQSHRUN2', 'UQR
         'VStatic(DWORD, 4), VStatic(QWORD, 2), Imm',
     ],
     processors = [
-        'R(0), R(5), Usub(16, 3, 8), Static(19, 0b0001)',
-        'R(0), R(5), Usub(16, 4, 16), Static(19, 0b0010)',
-        'R(0), R(5), Usub(16, 5, 32), Static(19, 0b0100)',
+        'R(0), R(5), Usubone(16, 3), Static(19, 0b0001)',
+        'R(0), R(5), Usubone(16, 4), Static(19, 0b0010)',
+        'R(0), R(5), Usubone(16, 5), Static(19, 0b0100)',
     ],
 )
 

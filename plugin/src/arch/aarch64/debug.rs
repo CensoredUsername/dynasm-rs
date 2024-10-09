@@ -370,9 +370,10 @@ fn group_commands(commands: &[Command]) -> (usize, Vec<(Command, usize)>) {
             | Command::Uscaled(_, _, _)
             | Command::Ulist(_, _)
             | Command::Urange(_, _, _)
-            | Command::Usub(_, _, _)
-            | Command::Unegmod(_, _)
-            | Command::Usumdec(_, _)
+            | Command::Usubone(_, _)
+            | Command::Usubzero(_, _)
+            | Command::Usubmod(_, _)
+            | Command::Usum(_, _)
             | Command::Ufields(_)
             | Command::Sbits(_, _)
             | Command::Sscaled(_, _,_)
@@ -409,16 +410,17 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Uscaled(_, _, _)
                 | Command::Ulist(_, _)
                 | Command::Urange(_, _, _)
-                | Command::Usub(_, _, _)
-                | Command::Unegmod(_, _)
-                | Command::Usumdec(_, _)
+                | Command::Usubone(_, _, )
+                | Command::Usubzero(_, _, )
+                | Command::Usubmod(_, _, )
+                | Command::Usum(_, _)
                 | Command::Ufields(_)
                 | Command::Sbits(_, _)
                 | Command::Sscaled(_, _,_)
-                | Command::BUbits(_)
-                | Command::BUsum(_)
-                | Command::BSscaled(_, _)
-                | Command::BUrange(_, _)
+                | Command::CUbits(_)
+                | Command::CUsum(_)
+                | Command::CSscaled(_, _)
+                | Command::CUrange(_, _)
                 | Command::Uslice(_, _, _)
                 | Command::Sslice(_, _, _)
                 | Command::Special(_, _) => arg.arg == FlatArgTy::Immediate,
@@ -449,9 +451,9 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Sbits(_, _)
                 | Command::Sscaled(_, _, _)
                 | Command::Sslice(_, _, _)
-                | Command::BUbits(_)
-                | Command::BUsum(_)
-                | Command::BSscaled(_, _)
+                | Command::CUbits(_)
+                | Command::CUsum(_)
+                | Command::CSscaled(_, _)
                 | Command::Rotates(_)
                 | Command::ExtendsW(_)
                 | Command::ExtendsX(_) => true,
@@ -459,10 +461,11 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::RNoZr(_)
                 | Command::REven(_)
                 | Command::RNext
-                | Command::Usub(_, _, _)
-                | Command::Unegmod(_, _)
-                | Command::Usumdec(_, _)
-                | Command::BUrange(_, _)
+                | Command::Usubone(_, _)
+                | Command::Usubzero(_, _)
+                | Command::Usubmod(_, _)
+                | Command::Usum(_, _)
+                | Command::CUrange(_, _)
                 | Command::Special(_, _)
                 | Command::Cond(_)
                 | Command::CondInv(_)
@@ -516,20 +519,21 @@ fn name_args(args: &mut [ArgWithCommands]) {
                     | Command::Uscaled(_, _, _)
                     | Command::Ulist(_, _)
                     | Command::Urange(_, _, _)
-                    | Command::Usub(_, _, _)
-                    | Command::Unegmod(_, _)
-                    | Command::Usumdec(_, _)
+                    | Command::Usubone(_, _)
+                    | Command::Usubzero(_, _)
+                    | Command::Usubmod(_, _)
+                    | Command::Usum(_, _)
                     | Command::Ufields(_)
-                    | Command::BUbits(_)
-                    | Command::BUsum(_)
-                    | Command::BUrange(_, _)
+                    | Command::CUbits(_)
+                    | Command::CUsum(_)
+                    | Command::CUrange(_, _)
                     | Command::Uslice(_, _, _) => {
                         arg.name = Some(format!("uimm{}", imm_name_list[imm_name_idx]));
                         imm_name_idx += 1;
                     },
                     Command::Sbits(_, _)
                     | Command::Sscaled(_, _,_)
-                    | Command::BSscaled(_, _)
+                    | Command::CSscaled(_, _)
                     | Command::Sslice(_, _, _) => {
                         arg.name = Some(format!("simm{}", imm_name_list[imm_name_idx]));
                         imm_name_idx += 1;
@@ -582,22 +586,23 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::RNoZr(_) => write!(buf, "{} is 0-30", name),
             Command::REven(_) => write!(buf, "{} is even", name),
             Command::Ubits(_, bits)
-            | Command::BUbits(bits) => write!(buf, "#{} < {}", name, 1u32 << bits),
-            Command::Uscaled(_, bits, scale) => write!(buf, "#{} < {}, #{} = {} * N", name, 1u32 << (bits + scale), name, 1u32 << scale),
+            | Command::CUbits(bits) => write!(buf, "#{} <= {}", name, (1u32 << bits) - 1),
+            Command::Uscaled(_, bits, scale) => write!(buf, "#{} <= {}, #{} = {} * N", name, (1u32 << (bits + scale)) - 1, name, 1u32 << scale),
             Command::Ulist(_, list) => {
                 let numbers = list.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(", ");
                 write!(buf, "#{} = [{}]", name, numbers)
             },
             Command::Urange(_, min, max)
-            | Command::BUrange(min, max) => write!(buf, "{} <= #{} <= {}", min, name, max),
-            Command::Usub(_, bits, addval) => write!(buf, "{} <= #{} <= {}", u32::from(*addval) + 1 - (1u32 << bits), name, addval),
-            Command::Unegmod(_, bits) => write!(buf, "0 <= #{} < {}", name, 1u32 << bits),
-            Command::Usumdec(_, bits)
-            | Command::BUsum(bits) => write!(buf, "1 <= #{} <= {} - {}", name, 1u32 << bits, prevname),
-            Command::Ufields(fields) => write!(buf, "#{} < {}", name, 1u32 << fields.len()),
-            Command::Sbits(_, bits) => write!(buf, "-{} <= #{} < {}", 1u32 << (bits - 1), name, 1u32 << (bits - 1)),
+            | Command::CUrange(min, max) => write!(buf, "{} <= #{} <= {}", min, name, max),
+            Command::Usubone(_, bits) => write!(buf, "1 <= #{} <= {}", name, (1u32 << bits)),
+            Command::Usubzero(_, bits) => write!(buf, "0 <= #{} <= {}", name, (1u32 << bits) - 1),
+            Command::Usubmod(_, bits) => write!(buf, "0 <= #{} <= {}", name, (1u32 << bits) - 1),
+            Command::Usum(_, bits)
+            | Command::CUsum(bits) => write!(buf, "1 <= #{} <= {} - {}", name, 1u32 << bits, prevname),
+            Command::Ufields(fields) => write!(buf, "#{} <= {}", name, (1u32 << fields.len()) - 1),
+            Command::Sbits(_, bits) => write!(buf, "-{} <= #{} <= {}", 1u32 << (bits - 1), name, (1u32 << (bits - 1)) - 1),
             Command::Sscaled(_, bits, scale)
-            | Command::BSscaled(bits, scale) => write!(buf, "-{} <= #{} < {}, #{} = {} * N", 1u32 << (bits + scale - 1), name, 1u32 << (bits + scale - 1), name, 1u32 << scale),
+            | Command::CSscaled(bits, scale) => write!(buf, "-{} <= #{} <= {}, #{} = {} * N", 1u32 << (bits + scale - 1), name, (1u32 << (bits + scale - 1)) - 1, name, 1u32 << scale),
             Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W)
             | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X)
             | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W)
@@ -760,22 +765,23 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::R4(_) => format!("R(16)"),
                 Command::RNext => format!("RNext()"),
                 Command::Ubits(_, bits)
-                | Command::BUbits(bits) => format!("Range(0, {}, 1)", 1u32 << bits),
+                | Command::CUbits(bits) => format!("Range(0, {}, 1)", 1u32 << bits),
                 Command::Uscaled(_, bits, scale) => format!("Range(0, {}, {})", 1u32 << (bits + scale), 1u32 << scale),
                 Command::Ulist(_, list) => {
                     let numbers = list.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(", ");
                     format!("List({})", numbers)
                 },
                 Command::Urange(_, min, max)
-                | Command::BUrange(min, max) => format!("Range({}, {}+1, 1)", min, max),
-                Command::Usub(_, bits, addval) => format!("Range({}, {}+1, 1)", *addval as u32 + 1 - (1u32 << bits), addval),
-                Command::Unegmod(_, bits) => format!("Range(0, {}, 1)", 1u32 << bits),
-                Command::Usumdec(_, bits)
-                | Command::BUsum(bits) => format!("Range2(1, {}+1, 1)", 1u32 << bits),
+                | Command::CUrange(min, max) => format!("Range({}, {}+1, 1)", min, max),
+                Command::Usubone(_, bits) => format!("Range(1, {}+1, 1)", 1u32 << bits),
+                Command::Usubzero(_, bits) => format!("Range(0, {}, 1)",  1u32 << bits),
+                Command::Usubmod(_, bits) => format!("Range(0, {}, 1)", 1u32 << bits),
+                Command::Usum(_, bits)
+                | Command::CUsum(bits) => format!("Range2(1, {}+1, 1)", 1u32 << bits),
                 Command::Ufields(fields) => format!("Range(0, {}, 1)", 1u32 << fields.len()),
                 Command::Sbits(_, bits) => format!("Range(-{}, {}, 1)", 1u32 << (bits - 1), 1u32 << (bits - 1)),
                 Command::Sscaled(_, bits, scale)
-                | Command::BSscaled(bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits + scale - 1), 1u32 << (bits + scale - 1), 1u32 << scale),
+                | Command::CSscaled(bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits + scale - 1), 1u32 << (bits + scale - 1), 1u32 << scale),
                 Command::Special(_, SpecialComm::WIDE_IMMEDIATE_W) => format!("Special('wide_w')"),
                 | Command::Special(_, SpecialComm::WIDE_IMMEDIATE_X) => format!("Special('wide_x')"),
                 | Command::Special(_, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) => format!("Special('inverted_w')"),

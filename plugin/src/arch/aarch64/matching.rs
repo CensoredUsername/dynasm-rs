@@ -7,7 +7,7 @@ use super::aarch64data::{Opdata, Matcher, COND_MAP, get_mnemonic_data};
 use super::debug::format_opdata_list;
 
 use crate::common::{Size, JumpKind};
-use crate::parse_helpers::{as_ident, as_number, as_float};
+use crate::parse_helpers::{as_ident, as_unsigned_number, as_float};
 
 /// Try finding an appropriate definition that matches the given instruction / arguments.
 pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, args: Vec<RawArg>) -> Result<MatchData, Option<String>> {
@@ -252,7 +252,7 @@ fn sanitize_args(args: Vec<RawArg>) -> Result<Vec<CleanArg>, Option<String>> {
                 }
 
                 // ensure amount is a constant usize
-                let amount = if let Some(amount) = as_number(&amount) {
+                let amount = if let Some(amount) = as_unsigned_number(&amount) {
                     if amount > 32 {
                         emit_error!(span, "Too many registers in register list.");
                         return Err(None);
@@ -434,7 +434,7 @@ impl Matcher {
                         Matcher::VElement(size) =>
                             *size == v.element_size && v.element.is_some(),
                         Matcher::VElementStatic(size, element) =>
-                            *size == v.element_size && v.element.as_ref().and_then(as_number) == Some(u64::from(*element)),
+                            *size == v.element_size && v.element.as_ref().and_then(as_unsigned_number) == Some(u64::from(*element)),
                         Matcher::VStaticElement(size, lanes) =>
                             *size == v.element_size && v.element.is_some() && v.lanes == Some(*lanes),
                         _ => false
@@ -457,7 +457,7 @@ impl Matcher {
             CleanArg::Immediate { prefixed: true, value } => match self {
                 Matcher::Imm
                 | Matcher::Offset => true,
-                Matcher::LitInt(v) => as_number(value) == Some(u64::from(*v)),
+                Matcher::LitInt(v) => as_unsigned_number(value) == Some(u64::from(*v)),
                 Matcher::LitFloat(v) => as_float(value) == Some(f64::from(*v)),
                 _ => false,
             },
@@ -475,7 +475,7 @@ impl Matcher {
                 } else {
                     false
                 },
-                Matcher::LitInt(v) => as_number(value) == Some(u64::from(*v)),
+                Matcher::LitInt(v) => as_unsigned_number(value) == Some(u64::from(*v)),
                 Matcher::LitFloat(v) => as_float(value) == Some(f64::from(*v)),
                 _ => false
             },

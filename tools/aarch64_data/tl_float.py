@@ -50,7 +50,7 @@ tlentry(['SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Dd>,<Wn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'D, W, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), CUrange(1, 32), Usubone(10, 6)', # scale = 64 - scale, max 32
 )
 
 tlentry(['FMOV', 'SCVTF', 'UCVTF'],
@@ -62,7 +62,7 @@ tlentry(['FMOV', 'SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Dd>,<Xn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'D, X, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), Usubone(10, 6)', # scale = 64 - scale
 )
 
 tlentry(['FCMP', 'FCMPE'],
@@ -134,7 +134,7 @@ tlentry(['FMOV', 'SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Hd>,<Wn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'H, W, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), CUrange(1, 32), Usubone(10, 6)', # scale = 64 - scale, max 32
 )
 
 tlentry(['FMOV', 'SCVTF', 'UCVTF'],
@@ -146,7 +146,7 @@ tlentry(['FMOV', 'SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Hd>,<Xn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'H, X, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), Usubone(10, 6)', # scale = 64 - scale
 )
 
 tlentry(['FCMP', 'FCMPE'],
@@ -218,7 +218,7 @@ tlentry(['FMOV', 'SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Sd>,<Wn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'S, W, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), CUrange(1, 32), Usubone(10, 6)', # scale = 64 - scale, max 32
 )
 
 tlentry(['SCVTF', 'UCVTF'],
@@ -230,7 +230,7 @@ tlentry(['SCVTF', 'UCVTF'],
 tlentry(['SCVTF', 'UCVTF'],
     '<Sd>,<Xn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'S, X, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), Usubone(10, 6)', # scale = 64 - scale
 )
 
 tlentry(['FCMP', 'FCMPE'],
@@ -266,7 +266,7 @@ tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', '
 tlentry(['FCVTZS', 'FCVTZU'],
     '<Wd>,<Dn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, D, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), CUrange(1, 32), Usubone(10, 6)', # scale = 64 - scale, max 32
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FMOV'],
@@ -278,7 +278,7 @@ tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', '
 tlentry(['FCVTZS', 'FCVTZU'],
     '<Wd>,<Hn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, H, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), CUrange(1, 32), Usubone(10, 6)', # scale = 64 - scale, max 32
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FMOV'],
@@ -290,7 +290,7 @@ tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', '
 tlentry(['FCVTZS', 'FCVTZU'],
     '<Wd>,<Sn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'W, S, Imm',
-    processor = 'R(0), R(5), BUrange(1, 32), Usub(10, 6, 64)', # scale = 64 - scale, max 32
+    processor = 'R(0), R(5), CUrange(1, 32), Usubone(10, 6)', # scale = 64 - scale, max 32
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FMOV'],
@@ -302,7 +302,7 @@ tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', '
 tlentry(['FCVTZS', 'FCVTZU'],
     '<Xd>,<Dn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, D, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), Usubone(10, 6)', # scale = 64 - scale
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU', 'FMOV'],
@@ -314,7 +314,7 @@ tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', '
 tlentry(['FCVTZS', 'FCVTZU'],
     '<Xd>,<Hn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, H, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), Usubone(10, 6)', # scale = 64 - scale
 )
 
 tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', 'FCVTPU', 'FCVTZS', 'FCVTZU'],
@@ -326,7 +326,7 @@ tlentry(['FCVTAS', 'FCVTAU', 'FCVTMS', 'FCVTMU', 'FCVTNS', 'FCVTNU', 'FCVTPS', '
 tlentry(['FCVTZS', 'FCVTZU'],
     '<Xd>,<Sn>,#<fbits>', (('scale', 6, 10), ('Rn', 5, 5), ('Rd', 5, 0)),
     matcher   = 'X, S, Imm',
-    processor = 'R(0), R(5), Usub(10, 6, 64)', # scale = 64 - scale
+    processor = 'R(0), R(5), Usubone(10, 6)', # scale = 64 - scale
 )
 
 tlentry(['FMOV'],

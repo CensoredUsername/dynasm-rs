@@ -98,7 +98,7 @@ pub fn as_lit_with_negation(expr: &syn::Expr) -> Option<(&syn::Lit, bool)> {
 }
 
 /// checks if an expression is a constant number literal
-pub fn as_number(expr: &syn::Expr) -> Option<u64> {
+pub fn as_unsigned_number(expr: &syn::Expr) -> Option<u64> {
     match as_lit(expr)?  {
         syn::Lit::Int(i) => i.base10_parse().ok(),
         _ => None
@@ -107,6 +107,7 @@ pub fn as_number(expr: &syn::Expr) -> Option<u64> {
 
 /// checks if an expression is a signed number literal
 pub fn as_signed_number(expr: &syn::Expr) -> Option<i64> {
+    // FIXME: this possibly panics on --0x8000_0000_0000_0000
     let (expr, negated) = as_lit_with_negation(expr)?;
     match expr {
         syn::Lit::Int(i) => if let Ok(value) = i.base10_parse::<u64>() {

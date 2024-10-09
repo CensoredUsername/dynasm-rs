@@ -90,26 +90,79 @@ pub enum Command {
     RNext, // encode that this register should be the previous register, plus one
 
     // unsigned immediate encodings
-    Ubits(u8, u8), // encodes an unsigned immediate starting at bit .0, .1 bits long
-    Uscaled(u8, u8, u8), // encodes an unsigned immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
-    Ulist(u8, &'static [u16]), // encodes an immediate that can only be a limited amount of options
-    Urange(u8, u8, u8), // (loc, min, max) asserts the immediate is below or equal to max, encodes the value of (imm-min)
-    Usub(u8, u8, u8), // encodes at .0, .1 bits long, .2 - value. Checks if the value is in the range 1 ..= value
-    Unegmod(u8, u8), // encodes at .0, .1 bits long, -value % (1 << .1). Checks if the value is in the range 0 .. value
-    Usumdec(u8, u8), // encodes at .0, .1 bits long, the value of the previous arg + the value of the current arg - 1
-    Ufields(&'static [u8]), // an immediate, encoded bitwise with the highest bit going into field 0, up to the lowest going into the last bitfield.
+
+    /// format: `(pos, len)`
+    /// `immediate` is in the range `0 .. (1<<len)`.
+    /// `immediate` is encoded directly in a bitfield of length `len` at offset `pos`.
+    Ubits(u8, u8),
+    /// format: `(pos, len, shift)`
+    /// `immediate >> shift` is in the range `0 .. (1 << len)`. Bottom `shift` bits are zero.
+    /// `immediate >> shift` is encoded directly in a bitfield of length `len` at offset `pos`.
+    Uscaled(u8, u8, u8),
+    /// format: `(pos, [options])`
+    /// `immediate` is one of the options in `options`.
+    /// the index of `immediate` in options is encoded directly in a bitfield at offset `pos`.
+    Ulist(u8, &'static [u16]),
+    /// format: `(pos, min, max)`
+    /// `immediate - min` is in the range `0 ..= max - min`.
+    /// `immediate - min` is encoded in a bitfield starting at `pos`
+    Urange(u8, u8, u8),
+
+    /// format: `(pos, len)`
+    /// `immediate` is in the range `1 ..= (1 << len)`.
+    /// `(1 << len) - value)` is encoded in a bitfield of length `len` at offset `pos`.
+    Usubone(u8, u8),
+    /// format: `(pos, len)`
+    /// `immediate`is in the range `0 .. (1 << len)`.
+    /// `(1 << len) - 1 - value)` is encoded in a bitfield of length `len` at offset `pos`.
+    Usubzero(u8, u8),
+    /// format: `(pos, len)`
+    /// `immediate` is in the range `0 .. (1 << len)`.
+    /// `(-value) & ((1 << len) - 1)` is encoded in a bitfield of length `len` at offset `pos`.
+    Usubmod(u8, u8),
+    /// format: `(pos, len)`
+    /// `immediate` is in the range `1 ..= (1 << len) - prev_arg`
+    /// `immediate + prev_arg - 1` is encoded in a a bitfield of length `len` at offset `pos`
+    Usum(u8, u8),
+    /// format: `([offsets])`
+    /// `immediate is in the range `0 .. (1 << offsets.len())`
+    /// `immediate` is encoded with bit N of the number at offsets[N]
+    Ufields(&'static [u8]),
 
     // signed immediate encodings
-    Sbits(u8, u8), // encodes a signed immediate starting at bit .0, .1 bits long
-    Sscaled(u8, u8, u8), // encodes a signed immediate, starting at bit .0, .1 bits long, shifted .2 bits to the right before encoding
 
-    // bit slice encodings. These don't advance the current argument. Only the slice argument actually encodes anything
-    BUbits(u8), // checks if the pointed value fits in the given amount of bits
-    BUsum(u8), // checks that the pointed value fits between 1 and (1 << .0) - prev
-    BSscaled(u8, u8),
-    BUrange(u8, u8), // check if the pointed value is between min/max
-    Uslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
-    Sslice(u8, u8, u8), // encodes at .0, .1 bits long, the bitslice starting at .2 from the current arg
+    /// format: `(pos, len)`
+    /// `immediate + (1 << (len - 1))` is in the range `0 .. (1<<len)`.
+    /// `immediate` is encoded directly in a bitfield of length `len` at offset `pos`.
+    Sbits(u8, u8),
+    /// format: `(pos, len, shift)`
+    /// `(immediate >> shift) + (1 << (len - 1))` is in the range `0 .. (1 << len)`. Bottom `shift` bits are zero.
+    /// `immediate >> shift` is encoded directly in a bitfield of length `len` at offset `pos`.
+    Sscaled(u8, u8, u8),
+
+    // pure validation encodings. These just check some precondition of the current argument, and don't advance to the next.
+
+    /// format: `(len)`
+    /// `immediate` is in the range `0 .. (1<<len)`.
+    CUbits(u8),
+    /// format: `(len)`
+    /// `immediate` is in the range `1 ..= (1 << len) - prev_arg`
+    CUsum(u8),
+    /// format: `(len, shift)`
+    /// `(immediate >> shift) + (1 << (len - 1))` is in the range `1 ..= (1 << len)`. Bottom `shift` bits are zero.
+    CSscaled(u8, u8),
+    /// format: `(min, max)`
+    /// `immediate - min` is in the range `0 ..= max - min`.
+    CUrange(u8, u8),
+
+    // bit slice encodings. These encode part of a value
+
+    /// format: `(pos, len, offset)`
+    /// `immediate >> offset` is encoded in a bitfield of length `len` at offset `pos`.
+    Uslice(u8, u8, u8),
+    /// format: `(pos, len, offset)`
+    /// `immediate >> offset` is encoded in a bitfield of length `len` at offset `pos`.
+    Sslice(u8, u8, u8),
 
     // special immediate encodings
     Special(u8, SpecialComm),

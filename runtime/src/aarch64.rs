@@ -195,6 +195,34 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, Aarch64Relocation>;
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
 
+// these should explicitly never be inlined, as this is the slow path.
+// that's also why these aren't made generic.
+
+/// Handler for `f32` out-of-range aarch64 immediates.
+#[inline(never)]
+pub fn immediate_out_of_range_unsigned_f32(immediate: f32) -> ! {
+    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
+}
+
+/// Handler for `u64` out-of-range aarch64 immediates.
+#[inline(never)]
+pub fn immediate_out_of_range_unsigned_64(immediate: u64) -> ! {
+    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
+}
+
+/// Handler for `u32` out-of-range aarch64 immediates.
+#[inline(never)]
+pub fn immediate_out_of_range_unsigned_32(immediate: u32) -> ! {
+    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
+}
+
+/// Handler for `i32` out-of-range aarch64 immediates.
+#[inline(never)]
+pub fn immediate_out_of_range_signed_32(immediate: i32) -> ! {
+    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
+}
+
+
 /// Helper function for validating that a given value can be encoded as a 32-bit logical immediate
 pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
     let transitions = value ^ value.rotate_right(1);
