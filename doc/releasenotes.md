@@ -2,6 +2,47 @@
 
 The `dynasm-rs` project consists out of two crates: The procedural macro crate `dynasm` and the runtime support crate `dynasmrt`. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards `dynasmrt` depends on `dynasm` itself to simplify this relationship. Any version listings below therefore refers to both the `dynasm` and `dynasmrt` crate version.
 
+Version 3.0.0
+=============
+
+Summary
+-------
+This release brings significant improvements to the `aarch64` experience. The runtime assemblers now
+handle cache invalidation internally where necessary. Furthermore, where previously overly large
+immediates would just wrap during encoding, they are now fully checked and error at compile time, or
+panic at runtime. One major backwards compatibility break is that the syntax for data directives has
+changed. This syntax now uses the relevant rust type names, and supports significantly more types.
+Next to this, several long-standing bugs have been fixed, dependencies have been updated, and the
+crate has moved to rust edition 2021. The minimum supported rust version is now `1.77`.
+
+General
+-------
+- Moved to rust edition 2021
+- Dependencies have been updated.
+- minimum supported rust version increased to `1.77` to allow for the use of `mem::offset_of!`.
+- data directives now use `.u8`, `.i16`, `.f32` syntax.
+- Several documentation improvements have been made.
+- More tests have been introduced.
+
+Architecture support
+--------------------
+- `x64` gained support for the `MOVDIRI` instruction
+- `x64` gained support for the `ZWORD` operand size (needed for AVX512 support in the future)
+- the `aarch64` assemblers now handle cache control internally. It is no longer needed for the user to handle this.
+- Immediates in `aarch64` assembly are now fully size checked, where possible at compile time. Attempting to assemble an impossible immediate at runtime will cause a panic.
+
+Bugfixes
+--------
+- All documentation/example crates now compile on stable rustc.
+- Worked around a [rustc compiler bug](https://github.com/rust-lang/rust/issues/67062) that was causing operator precedence issues in emitted code.
+- Fixed x64/x86 register names used in compiler error debug messages.
+- Renamed several documentation bin targets due to artefact name collision errors in the workspace.
+- Fix unneeded parenthesis warnings in emitted code.
+- Eliminated warnings during plugin build.
+- the aarch64 instruction `mov w0, immu32` now expects a `u32` as immediate instead of an `u64`.
+
+Several of these changes were the result of external contributions, we'd like to thank everyone who contributed to this release.
+
 Version 2.0.0
 =============
 

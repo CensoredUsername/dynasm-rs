@@ -1,5 +1,6 @@
 // I'm sorry
-var path = document.getElementsByClassName("logo-container")[0].childNodes[0].getAttribute("src");
+
+var path = document.currentScript.getAttribute("src");
 var nest_count = (path.match(/\.\./g)||[]).length; 
 
 var base_path = "";
@@ -7,7 +8,7 @@ for (var i = 0; i < nest_count; i++) {
     base_path += "../";
 }
 
-var sidebar = document.getElementsByClassName("sidebar-elems")[0];
+var sidebar = document.getElementsByClassName("sidebar")[0];
 
 var node = document.createElement("div");
 node.innerHTML = '\
@@ -27,9 +28,7 @@ node.innerHTML = '\
     </li>\
   </ul>';
 
-while (node.childNodes.length != 0) {
-  var n = node.childNodes[0];
-  node.removeChild(n);
-  sidebar.appendChild(n);
-}
+node.setAttribute("class", "sidebar-elems")
+
+sidebar.insertBefore(node, sidebar.firstChild);
 
