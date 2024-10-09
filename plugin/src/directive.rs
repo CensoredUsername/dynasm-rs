@@ -95,6 +95,12 @@ pub(crate) fn evaluate_directive(invocation_context: &mut DynasmContext, stmts: 
                 }
             }
         },
+        // these are deprecated, but to prevent bad error messages handle them explicitly
+        // I'd like to provide a warning instead, but proc-macro-error2 emit_warning! seems to not work.
+        "byte"  => emit_error!(directive.span(), "Directive .byte is deprecated, please use .i8 or .u8 instead."),
+        "word"  => emit_error!(directive.span(), "Directive .word is deprecated, please use .i16 or .u16 instead."),
+        "dword" => emit_error!(directive.span(), "Directive .dword is deprecated, please use .i32 or .u32 instead."),
+        "qword" => emit_error!(directive.span(), "Directive .qword is deprecated, please use .i64 or .u64 instead."),
         d => {
             // unknown directive. skip ahead until we hit a ; so the parser can recover
             emit_error!(directive, "unknown directive '{}'", d);

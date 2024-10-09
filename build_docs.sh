@@ -48,13 +48,17 @@ do
              "./testing/tests/${TARGET}.rs"
     fi
     if [ -f "./doc/examples/${EX}/src/x64.rs" ]; then
-        cp "./doc/examples/${EX}/src/x64.rs" "./testing/tests/${TARGET}_x64.rs"
-        echo -n -e "#[cfg(target_arch=\"x64\")]\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
+        echo -n -e "#[cfg(target_arch=\"x86_64\")]\nmod test {\n" > \
+             "./testing/tests/${TARGET}_x64.rs"
+        cat "./doc/examples/${EX}/src/x64.rs" >> "./testing/tests/${TARGET}_x64.rs"
+        echo -n -e "\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n}\n" >> \
              "./testing/tests/${TARGET}_x64.rs"
     fi
     if [ -f "./doc/examples/${EX}/src/aarch64.rs" ]; then
-        cp "./doc/examples/${EX}/src/aarch64.rs" "./testing/tests/${TARGET}_aarch64.rs"
-        echo -n -e "#[cfg(target_arch=\"aarch64\")]\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n" >> \
+        echo -n -e "#[cfg(target_arch=\"aarch64\")]\nmod test {\n" > \
+             "./testing/tests/${TARGET}_aarch64.rs"
+        cat "./doc/examples/${EX}/src/aarch64.rs" >> "./testing/tests/${TARGET}_aarch64.rs"
+        echo -n -e "\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n}\n" >> \
              "./testing/tests/${TARGET}_aarch64.rs"
     fi
 done
