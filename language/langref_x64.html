@@ -6,7 +6,7 @@
     <meta name="generator" content="rustdoc">
     <title>Language Reference</title>
 
-    <link rel="stylesheet" type="text/css" href="./formatting.css">
+    <link rel="stylesheet" href="./formatting.css">
     
 </head>
 <body class="rustdoc">
@@ -19,7 +19,7 @@
 
     <nav class="sidebar">
   <h2 class="location">
-    <a href="#">Language dynasm-rs</a>
+    <a href="#">Dynasm-rs reference</a>
   </h2>
   <div class="sidebar-elems">
     <h3>Components</h3>
@@ -73,31 +73,31 @@
 <section id="main" class="content mod docblock">
 
     <h1 class="title">Language Reference</h1>
-    <h1 id="lexical-structure-definition"><a href="#lexical-structure-definition">Lexical structure definition</a></h1>
+    <h1 id="lexical-structure-definition"><a class="doc-anchor" href="#lexical-structure-definition">§</a>Lexical structure definition</h1>
 <p>Instructions for the <code>x86</code> and <code>x64</code> assembling backend use the following lexical structure</p>
-<h2 id="base-units"><a href="#base-units">Base units</a></h2>
+<h2 id="base-units"><a class="doc-anchor" href="#base-units">§</a>Base units</h2>
 <p>The following base syntax units are recognized by the parser.</p>
 <ul>
-<li><code>prefix : &quot;cs&quot; | &quot;ds&quot; | &quot;es&quot; | &quot;fs&quot; | &quot;gs&quot; | &quot;ss&quot; | &quot;lock&quot; | &quot;rep&quot; | &quot;repne&quot; | &quot;repe&quot; | &quot;repnz&quot; | &quot;repz&quot; ;</code></li>
+<li><code>prefix : "cs" | "ds" | "es" | "fs" | "gs" | "ss" | "lock" | "rep" | "repne" | "repe" | "repnz" | "repz" ;</code></li>
 <li><code>static_reg</code> matches any valid register name as seen in table 4, or any previously defined alias</li>
 <li><code>dynamic_reg_family</code> matches any valid register family from table 4</li>
-<li><code>size : &quot;BYTE&quot; | &quot;WORD&quot; | &quot;DWORD&quot; | &quot;AWORD&quot; | &quot;QWORD&quot; | &quot;OWORD&quot; | &quot;HWORD&quot;</code></li>
-<li><code>nosplit : &quot;NOSPLIT&quot;</code></li>
+<li><code>size : "BYTE" | "WORD" | "DWORD" | "AWORD" | "QWORD" | "OWORD" | "HWORD"</code></li>
+<li><code>nosplit : "NOSPLIT"</code></li>
 </ul>
-<h2 id="instruction"><a href="#instruction">Instruction</a></h2>
-<p><code>instruction : prefix* ident (arg (&quot;,&quot; arg)* )? ;</code></p>
-<h2 id="arguments"><a href="#arguments">Arguments</a></h2>
+<h2 id="instruction"><a class="doc-anchor" href="#instruction">§</a>Instruction</h2>
+<p><code>instruction : prefix* ident (arg ("," arg)* )? ;</code></p>
+<h2 id="arguments"><a class="doc-anchor" href="#arguments">§</a>Arguments</h2>
 <p><code>arg : register | (size? ( memoryref | labelref | typemap | expr ));</code></p>
-<p><code>typemap : register &quot;=&gt;&quot; expr_path (&quot;.&quot; ident | &quot;[&quot; size? regref &quot;]&quot; (&quot;.&quot; ident)?) ;</code></p>
-<p><code>memoryref : &quot;[&quot; nosplit? size? (regref | labelref) &quot;]&quot; ;</code></p>
-<p><code>regref : regrefitem (&quot;+&quot; regrefitem)* ;</code></p>
-<p><code>regrefitem : (register &quot;*&quot; num_lit | num_lit &quot;*&quot; register | register | expr) ;</code></p>
+<p><code>typemap : register "=&gt;" expr_path ("." ident | "[" size? regref "]" ("." ident)?) ;</code></p>
+<p><code>memoryref : "[" nosplit? size? (regref | labelref) "]" ;</code></p>
+<p><code>regref : regrefitem ("+" regrefitem)* ;</code></p>
+<p><code>regrefitem : (register "*" num_lit | num_lit "*" register | register | expr) ;</code></p>
 <p><code>register = static_reg | dynamic_reg ;</code></p>
-<p><code>dynamic_reg = dynamic_reg_family &quot;(&quot; expr &quot;)&quot; ;</code></p>
-<h1 id="reference"><a href="#reference">Reference</a></h1><h2 id="instructions"><a href="#instructions">Instructions</a></h2>
+<p><code>dynamic_reg = dynamic_reg_family "(" expr ")" ;</code></p>
+<h1 id="reference"><a class="doc-anchor" href="#reference">§</a>Reference</h1><h2 id="instructions"><a class="doc-anchor" href="#instructions">§</a>Instructions</h2>
 <p>The language used by dynasm-rs is a nasm-dialect. The largest difference is that instead of prefixing memory operands with segment registers, segment register overrides are prefixed to the entire instruction. Furthermore, it is currently not possible to override the size of the displacement used in memory operands.</p>
 <p>This results in the following syntax for instructions. First, zero or more prefixes can be listed (these prefixes can be found in the base units section). The instruction mnemnonic is then mentioned, followed by zero or more comma separated operands.</p>
-<h3 id="operands"><a href="#operands">Operands</a></h3><h4 id="register"><a href="#register">Register</a></h4>
+<h3 id="operands"><a class="doc-anchor" href="#operands">§</a>Operands</h3><h4 id="register"><a class="doc-anchor" href="#register">§</a>Register</h4>
 <p>There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be postponed to the runtime. Note that this does prevent optimizations to register-specific forms. However, the expression inside a dynamic register reference may be evaluated multiple times by dynasm-rs.</p>
 <p>The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically.</p>
 <p>Table 1: dynasm-rs registers (x64/x86)</p>
@@ -120,11 +120,11 @@
 <tr><td style="text-align: right">(x64) <code>14</code></td><td style="text-align: left"><code>r14b</code></td><td style="text-align: left"></td><td style="text-align: left"><code>r14w</code></td><td style="text-align: left"><code>r14d</code></td><td style="text-align: left"><code>r14</code></td><td style="text-align: left"></td><td style="text-align: left"></td><td style="text-align: left"></td><td style="text-align: left"><code>xmm14</code></td><td style="text-align: left"><code>ymm14</code></td><td style="text-align: left"></td><td style="text-align: left"><code>cr14</code></td><td style="text-align: left"><code>dr14</code></td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: right">(x64) <code>15</code></td><td style="text-align: left"><code>r15b</code></td><td style="text-align: left"></td><td style="text-align: left"><code>r15w</code></td><td style="text-align: left"><code>r15d</code></td><td style="text-align: left"><code>r15</code></td><td style="text-align: left"></td><td style="text-align: left"></td><td style="text-align: left"></td><td style="text-align: left"><code>xmm15</code></td><td style="text-align: left"><code>ymm15</code></td><td style="text-align: left"></td><td style="text-align: left"><code>cr15</code></td><td style="text-align: left"><code>dr15</code></td><td style="text-align: left"></td></tr>
 </tbody></table>
-</div><h4 id="jump-targets"><a href="#jump-targets">Jump targets</a></h4>
+</div><h4 id="jump-targets"><a class="doc-anchor" href="#jump-targets">§</a>Jump targets</h4>
 <p>All flow control instructions have a jump target as argument. A jump target can be either an immediate specifying a relative offset to the end of the current instruction or a label reference. For many instructions, the size of the offset to be encoded is variable, and by default dynasm-rs will pick the largest size possible. This can be overridden using a size prefix on the operand.</p>
-<h4 id="memory-references"><a href="#memory-references">Memory references</a></h4>
+<h4 id="memory-references"><a class="doc-anchor" href="#memory-references">§</a>Memory references</h4>
 <p>Many x64 instructions can taken an indirect memory reference as operand. Such an operand is denoted as an expression containing registers surrounded by square brackets. Note that, unlike the original dynasm, dynasm-rs is insensitive to the order of the different operands in the expression and can perform rudimentary arithmetic to encode forms like <code>[rax * 5]</code>. However, due to the limitations of x64 assembly, there are of course limitations on what can be encoded. These limitations are detected at compile time, but several of them cannot be checked when dynamic registers are used. The size of the dereferenced value can be determined by a size prefix.</p>
-<p>To give more control to how the operand gets encoded, dynasm-rs features both displacement size overrides and a hinting mechanism similar to NASM. By default dynasm will try to infer the wanted displacement size if the displacement is a constant, and if it fails to it will encode a four-byte displacement. However, this behaviour can be altered using a size override after the opening bracket of the memory reference. </p>
+<p>To give more control to how the operand gets encoded, dynasm-rs features both displacement size overrides and a hinting mechanism similar to NASM. By default dynasm will try to infer the wanted displacement size if the displacement is a constant, and if it fails to it will encode a four-byte displacement. However, this behaviour can be altered using a size override after the opening bracket of the memory reference.</p>
 <p>The hinting mechanism by default tries to select the smallest way for a memory reference to be encoded, and any freedom in this is solved with the following rules:</p>
 <ul>
 <li>The first unscaled register that only appears once can be encoded as base will be used as such.</li>
@@ -146,7 +146,7 @@
 <tr><td style="text-align: left"><code>[rip + expr]</code></td><td style="text-align: left">Addresses relative to the instruction pointer at the end of the instruction can also be used, but in this case no scale can be encoded.</td></tr>
 <tr><td style="text-align: left"><code>[-&gt;label]</code></td><td style="text-align: left">Label references can also be dereferenced. This goes for all label types.</td></tr>
 </tbody></table>
-</div><h4 id="type-mapped-references"><a href="#type-mapped-references">Type mapped references</a></h4>
+</div><h4 id="type-mapped-references"><a class="doc-anchor" href="#type-mapped-references">§</a>Type mapped references</h4>
 <p>To ease interoperation with Rust structures, dynasm-rs supports the following syntax for accessing members of pointers to structs and struct arrays. In this syntax, the scale and displacement in a normal memory reference are derived from the size of the type and the offset of the member in the type. Due to the limitations of procedural macros, invalid scales will unfortunately only panic at runtime. Note that dynasm-rs is unable to infer the size of the attribute and it should therefore be determined by a size prefix.</p>
 <p>Just like memory references, type mapped references support displacement size overrides after the opening square bracket. However, as the first register is always encoded as index, they do not support <code>NOSPLIT</code>.</p>
 <p>The syntax for type maps is as follows:</p>
@@ -157,7 +157,7 @@
 <tr><td style="text-align: left"><code>rax =&gt; Type[rbx]</code></td><td style="text-align: left"><code>(rax as *mut [Type])[rbx]</code></td></tr>
 <tr><td style="text-align: left"><code>rax =&gt; Type[rbx + expr].attr</code></td><td style="text-align: left"><code>(rax as *mut [Type])[rbx + expr].attr </code></td></tr>
 </tbody></table>
-</div><h4 id="immediates"><a href="#immediates">Immediates</a></h4>
+</div><h4 id="immediates"><a class="doc-anchor" href="#immediates">§</a>Immediates</h4>
 <p>Any operand which does not match the previously discussed forms will be interpreted as an immediate argument. This operand will be evaluated as an expression at runtime and the resulting value will be encoded. The size of the encoded value can be determined by a size prefix. If such a a prefix is not given, dynasm-rs will try to infer it from the value of the immediate, but this is only possible if the immediate is a simple constant. As this might change in the future, you should use explicit size overrides if the encoded displacement size matters.</p>
 
     </section>

@@ -6,7 +6,7 @@
     <meta name="generator" content="rustdoc">
     <title>Tutorial</title>
 
-    <link rel="stylesheet" type="text/css" href="./formatting.css">
+    <link rel="stylesheet" href="./formatting.css">
     
 </head>
 <body class="rustdoc">
@@ -19,7 +19,7 @@
 
     <nav class="sidebar">
   <h2 class="location">
-    <a href="#">Language dynasm-rs</a>
+    <a href="#">Dynasm-rs reference</a>
   </h2>
   <div class="sidebar-elems">
     <h3>Components</h3>
@@ -73,7 +73,7 @@
 <section id="main" class="content mod docblock">
 
     <h1 class="title">Tutorial</h1>
-    <h1 id="introduction"><a href="#introduction">Introduction</a></h1>
+    <h1 id="introduction"><a class="doc-anchor" href="#introduction">§</a>Introduction</h1>
 <p>Dynasm-rs is a library and syntax extension for assembling code at runtime. For the first part of the tutorial we will be examining the following example program that assembles a simple function at runtime for the x64 instruction set:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
@@ -83,7 +83,7 @@
 
 <span class="kw">fn </span>main() {
     <span class="kw">let </span><span class="kw-2">mut </span>ops = dynasmrt::x64::Assembler::new().unwrap();
-    <span class="kw">let </span>string = <span class="string">&quot;Hello World!&quot;</span>;
+    <span class="kw">let </span>string = <span class="string">"Hello World!"</span>;
 
     <span class="macro">dynasm!</span>(ops
         ; .arch x64
@@ -106,12 +106,12 @@
 
     <span class="kw">let </span>buf = ops.finalize().unwrap();
 
-    <span class="kw">let </span>hello_fn: <span class="kw">extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn</span>() -&gt; bool = <span class="kw">unsafe </span>{ mem::transmute(buf.ptr(hello)) };
+    <span class="kw">let </span>hello_fn: <span class="kw">extern </span><span class="string">"win64" </span><span class="kw">fn</span>() -&gt; bool = <span class="kw">unsafe </span>{ mem::transmute(buf.ptr(hello)) };
 
     <span class="macro">assert!</span>(hello_fn());
 }
 
-<span class="kw">pub extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn </span>print(buffer: <span class="kw-2">*const </span>u8, length: u64) -&gt; bool {
+<span class="kw">pub extern </span><span class="string">"win64" </span><span class="kw">fn </span>print(buffer: <span class="kw-2">*const </span>u8, length: u64) -&gt; bool {
     io::stdout()
         .write_all(<span class="kw">unsafe </span>{ slice::from_raw_parts(buffer, length <span class="kw">as </span>usize) })
         .is_ok()
@@ -160,7 +160,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 </span>; sub rsp, BYTE <span class="number">0x28
 </span>; call rax
 ; add rsp, BYTE <span class="number">0x28</span></code></pre></div>
-<p>Here, a call is made from the dynamically assembled code to the Rust <code>print</code> function. Note the <code>QWORD</code> size prefix which is necessary to determine the appropriate form of the <code>mov</code> instruction to encode as <code>dynasm!</code> does not analyze the immediate expression at runtime. As this example uses the <code>&quot;win64&quot;</code> calling convention, the stack pointer needs to be manipulated too. (Note: the <code>&quot;win64&quot;</code> calling convention is used as this it is currently impossible to use the <code>&quot;sysv64&quot;</code> calling convention on all platforms)</p>
+<p>Here, a call is made from the dynamically assembled code to the Rust <code>print</code> function. Note the <code>QWORD</code> size prefix which is necessary to determine the appropriate form of the <code>mov</code> instruction to encode as <code>dynasm!</code> does not analyze the immediate expression at runtime. As this example uses the <code>"win64"</code> calling convention, the stack pointer needs to be manipulated too. (Note: the <code>"win64"</code> calling convention is used as this it is currently impossible to use the <code>"sysv64"</code> calling convention on all platforms)</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>; ret</code></pre></div>
 <p>And finally the assembled function returns, returning the return value from the <code>print</code> function in <code>rax</code> back to the caller Rust code.</p>
@@ -168,7 +168,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>buf = ops.finalize().unwrap();</code></pre></div>
 <p>With the assembly completed, we now finalize the <code>dynasmrt::x64::Assembler</code>, which will resolve all labels previously used and move the data into a <code>dynasmrt::ExecutableBuffer</code>. This struct, which dereferences to a <code>&amp;[u8]</code>, wraps a buffer of readable and executable memory.</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>hello_fn: <span class="kw">extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn</span>() -&gt; bool = <span class="kw">unsafe </span>{ mem::transmute(buf.ptr(hello)) };</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>hello_fn: <span class="kw">extern </span><span class="string">"win64" </span><span class="kw">fn</span>() -&gt; bool = <span class="kw">unsafe </span>{ mem::transmute(buf.ptr(hello)) };</code></pre></div>
 <p>We can now get a pointer to the executable memory using the <code>dynasmrt::ExecutableBuffer::ptr</code> method, using the value obtained earlier from <code>ops.offset()</code>. We can then transmute this pointer into a function.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">assert!</span>(hello_fn());</code></pre></div>
@@ -177,36 +177,36 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">fn </span>main() {
     <span class="kw">let </span><span class="kw-2">mut </span>ops = dynasmrt::x64::Assembler::new().unwrap();
-    <span class="kw">let </span>string = <span class="string">&quot;Hello World!&quot;</span>;
+    <span class="kw">let </span>string = <span class="string">"Hello World!"</span>;
 
     {
-        ops.global_label(<span class="string">&quot;hello&quot;</span>);
+        ops.global_label(<span class="string">"hello"</span>);
         ops.extend(string.as_bytes());
     };
 
     <span class="kw">let </span>hello = ops.offset();
     {
-        ops.extend(<span class="string">b&quot;H\x8d\r\x00\x00\x00\x00&quot;</span>);
-        ops.global_reloc(<span class="string">&quot;hello&quot;</span>, <span class="number">0isize</span>, <span class="number">4u8</span>, <span class="number">0u8</span>, (<span class="number">4u8</span>,));
-        ops.extend(<span class="string">b&quot;1\xd2\xb2&quot;</span>);
+        ops.extend(<span class="string">b"H\x8d\r\x00\x00\x00\x00"</span>);
+        ops.global_reloc(<span class="string">"hello"</span>, <span class="number">0isize</span>, <span class="number">4u8</span>, <span class="number">0u8</span>, (<span class="number">4u8</span>,));
+        ops.extend(<span class="string">b"1\xd2\xb2"</span>);
         ops.push_i8(string.len() <span class="kw">as _</span>);
-        ops.extend(<span class="string">b&quot;H\xb8&quot;</span>);
+        ops.extend(<span class="string">b"H\xb8"</span>);
         ops.push_i64(print <span class="kw">as _</span>);
-        ops.extend(<span class="string">b&quot;H\x83\xec&quot;</span>);
+        ops.extend(<span class="string">b"H\x83\xec"</span>);
         ops.push_i8(<span class="number">0x28</span>);
-        ops.extend(<span class="string">b&quot;\xff\xd0H\x83\xc4&quot;</span>);
+        ops.extend(<span class="string">b"\xff\xd0H\x83\xc4"</span>);
         ops.push_i8(<span class="number">0x28</span>);
-        ops.extend(<span class="string">b&quot;\xc3&quot;</span>);
+        ops.extend(<span class="string">b"\xc3"</span>);
     };
 
     <span class="kw">let </span>buf = ops.finalize().unwrap();
 
-    <span class="kw">let </span>hello_fn: <span class="kw">extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn</span>() -&gt; bool = <span class="kw">unsafe </span>{ mem::transmute(buf.ptr(hello)) };
+    <span class="kw">let </span>hello_fn: <span class="kw">extern </span><span class="string">"win64" </span><span class="kw">fn</span>() -&gt; bool = <span class="kw">unsafe </span>{ mem::transmute(buf.ptr(hello)) };
 
     <span class="macro">assert!</span>(hello_fn());
 }</code></pre></div>
 <p>As you can see, the encoding has been determined fully at compile time, and the assembly has been reduced to a series of push and extend calls.</p>
-<h1 id="advanced-usage"><a href="#advanced-usage">Advanced usage</a></h1>
+<h1 id="advanced-usage"><a class="doc-anchor" href="#advanced-usage">§</a>Advanced usage</h1>
 <p>To demonstrate some of the more advanced usage, we’ll show how to rewrite a Rust brainfsck interpreter to a jit compiler. The starting point is the following interpreter that can also be found <a href="https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-interpreter">here</a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io::{Read, BufRead, Write, stdin, stdout, BufReader, BufWriter};
@@ -215,17 +215,17 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 
 <span class="kw">const </span>TAPE_SIZE: usize = <span class="number">30000</span>;
 
-<span class="kw">struct </span>Interpreter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">&#39;a</span>&gt;,
-    <span class="kw">pub </span>output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">&#39;a</span>&gt;,
+<span class="kw">struct </span>Interpreter&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">'a</span>&gt;,
+    <span class="kw">pub </span>output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">'a</span>&gt;,
     <span class="kw">pub </span>loops: Vec&lt;usize&gt;,
     <span class="kw">pub </span>tape: [u8; TAPE_SIZE],
     <span class="kw">pub </span>tape_index: usize,
     <span class="kw">pub </span>pos: usize
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Interpreter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>new(input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">&#39;a</span>&gt;, output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">&#39;a</span>&gt;) -&gt; Interpreter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Interpreter&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>new(input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">'a</span>&gt;, output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">'a</span>&gt;) -&gt; Interpreter&lt;<span class="lifetime">'a</span>&gt; {
         Interpreter {
             input: input,
             output: output,
@@ -236,13 +236,13 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
         </span>}
     }
 
-    <span class="kw">fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>, program: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+    <span class="kw">fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>, program: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = program.get(<span class="self">self</span>.pos) {
             <span class="self">self</span>.pos += <span class="number">1</span>;
 
             <span class="kw">match </span>c {
-                <span class="string">b&#39;&lt;&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b&#39;&lt;&#39;</span>);
+                <span class="string">b'&lt;' </span>=&gt; {
+                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b'&lt;'</span>);
                     <span class="self">self</span>.pos += amount;
 
                     <span class="self">self</span>.tape_index = <span class="self">self</span>.tape_index.wrapping_sub(amount + <span class="number">1</span>);
@@ -250,8 +250,8 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                         <span class="self">self</span>.tape_index = <span class="self">self</span>.tape_index.wrapping_add(TAPE_SIZE);
                     }
                 },
-                <span class="string">b&#39;&gt;&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b&#39;&gt;&#39;</span>);
+                <span class="string">b'&gt;' </span>=&gt; {
+                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b'&gt;'</span>);
                     <span class="self">self</span>.pos += amount;
 
                     <span class="self">self</span>.tape_index += amount + <span class="number">1</span>;
@@ -259,58 +259,58 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                         <span class="self">self</span>.tape_index -= TAPE_SIZE;
                     }
                 },
-                <span class="string">b&#39;+&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b&#39;+&#39;</span>);
+                <span class="string">b'+' </span>=&gt; {
+                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b'+'</span>);
                     <span class="self">self</span>.pos += amount;
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(a) = <span class="self">self</span>.tape[<span class="self">self</span>.tape_index].checked_add(amount <span class="kw">as </span>u8 + <span class="number">1</span>) {
                         <span class="self">self</span>.tape[<span class="self">self</span>.tape_index] = a;
                     } <span class="kw">else </span>{
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;An overflow occurred&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"An overflow occurred"</span>);
                     }
                 },
-                <span class="string">b&#39;-&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b&#39;-&#39;</span>);
+                <span class="string">b'-' </span>=&gt; {
+                    <span class="kw">let </span>amount = count_leading_chars(<span class="kw-2">&amp;</span>program[<span class="self">self</span>.pos..], <span class="string">b'-'</span>);
                     <span class="self">self</span>.pos += amount;
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(a) = <span class="self">self</span>.tape[<span class="self">self</span>.tape_index].checked_sub(amount <span class="kw">as </span>u8 + <span class="number">1</span>) {
                         <span class="self">self</span>.tape[<span class="self">self</span>.tape_index] = a;
                     } <span class="kw">else </span>{
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;An overflow occurred&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"An overflow occurred"</span>);
                     }
                 },
-                <span class="string">b&#39;,&#39; </span>=&gt; {
+                <span class="string">b',' </span>=&gt; {
                     <span class="kw">let </span>err = <span class="self">self</span>.output.flush().is_err();
                     <span class="kw">if </span><span class="self">self</span>.input.read_exact(<span class="kw-2">&amp;mut </span><span class="self">self</span>.tape[<span class="self">self</span>.tape_index..<span class="self">self</span>.tape_index + <span class="number">1</span>]).is_err() || err {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;IO error&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"IO error"</span>);
                     }
                 },
-                <span class="string">b&#39;.&#39; </span>=&gt; {
+                <span class="string">b'.' </span>=&gt; {
                     <span class="kw">if </span><span class="self">self</span>.output.write_all(<span class="kw-2">&amp;</span><span class="self">self</span>.tape[<span class="self">self</span>.tape_index..<span class="self">self</span>.tape_index + <span class="number">1</span>]).is_err() {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;IO error&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"IO error"</span>);
                     }
                 },
-                <span class="string">b&#39;[&#39; </span>=&gt; {
+                <span class="string">b'[' </span>=&gt; {
                     <span class="kw">if </span><span class="self">self</span>.tape[<span class="self">self</span>.tape_index] == <span class="number">0 </span>{
                         <span class="kw">let </span><span class="kw-2">mut </span>nesting = <span class="number">1</span>;
                         <span class="kw">let </span>amount = program[<span class="self">self</span>.pos..].iter().take_while(|x| <span class="kw">match </span><span class="kw-2">**</span>x {
-                            <span class="string">b&#39;[&#39; </span>=&gt; {nesting += <span class="number">1</span>; <span class="bool-val">true</span>},
-                            <span class="string">b&#39;]&#39; </span>=&gt; {nesting -= <span class="number">1</span>; nesting != <span class="number">0</span>},
+                            <span class="string">b'[' </span>=&gt; {nesting += <span class="number">1</span>; <span class="bool-val">true</span>},
+                            <span class="string">b']' </span>=&gt; {nesting -= <span class="number">1</span>; nesting != <span class="number">0</span>},
                             <span class="kw">_ </span>=&gt; <span class="bool-val">true
                         </span>}).count() + <span class="number">1</span>;
                         <span class="kw">if </span>nesting != <span class="number">0 </span>{
-                            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;[ without matching ]&quot;</span>);
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"[ without matching ]"</span>);
                         }
                         <span class="self">self</span>.pos += amount;
                     } <span class="kw">else </span>{
                         <span class="self">self</span>.loops.push(<span class="self">self</span>.pos);
                     }
                 },
-                <span class="string">b&#39;]&#39; </span>=&gt; {
+                <span class="string">b']' </span>=&gt; {
                     <span class="kw">if </span><span class="self">self</span>.tape[<span class="self">self</span>.tape_index] == <span class="number">0 </span>{
                         <span class="self">self</span>.loops.pop();
                     } <span class="kw">else if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>loc) = <span class="self">self</span>.loops.last() {
                         <span class="self">self</span>.pos = loc;
                     } <span class="kw">else </span>{
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;] without matching [&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"] without matching ["</span>);
                     }
                 },
                 <span class="kw">_ </span>=&gt; ()
@@ -318,7 +318,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
         }
 
         <span class="kw">if </span><span class="self">self</span>.loops.len() != <span class="number">0 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;[ without matching ]&quot;</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"[ without matching ]"</span>);
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -331,19 +331,19 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 <span class="kw">fn </span>main() {
     <span class="kw">let </span><span class="kw-2">mut </span>args: Vec&lt;<span class="kw">_</span>&gt; = env::args().collect();
     <span class="kw">if </span>args.len() != <span class="number">2 </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;Expected 1 argument, got {}&quot;</span>, args.len());
+        <span class="macro">println!</span>(<span class="string">"Expected 1 argument, got {}"</span>, args.len());
         <span class="kw">return</span>;
     }
     <span class="kw">let </span>path = args.pop().unwrap();
 
     <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="kw">if let </span><span class="prelude-val">Ok</span>(f) = File::open(<span class="kw-2">&amp;</span>path) { f } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;Could not open file {}&quot;</span>, path);
+        <span class="macro">println!</span>(<span class="string">"Could not open file {}"</span>, path);
         <span class="kw">return</span>;
     };
 
     <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
     <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw">_</span>) = f.read_to_end(<span class="kw-2">&amp;mut </span>buf) {
-        <span class="macro">println!</span>(<span class="string">&quot;Failed to read from file&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"Failed to read from file"</span>);
         <span class="kw">return</span>;
     }
 
@@ -352,10 +352,10 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
         Box::new(BufWriter::new(stdout()))
     );
     <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = interp.run(<span class="kw-2">&amp;</span>buf) {
-        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, e);
+        <span class="macro">println!</span>(<span class="string">"{}"</span>, e);
     }
 }</code></pre></div>
-<h2 id="basics"><a href="#basics">Basics</a></h2>
+<h2 id="basics"><a class="doc-anchor" href="#basics">§</a>Basics</h2>
 <p>To kickstart this process, we’ll <code>use</code> the <code>dynasm!</code> macro as well as the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits:</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 </code></pre></div>
@@ -407,7 +407,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +         ; mov r9,  [rsp + 0x48]
 +     );};
 + }
-</code></pre></div><h2 id="state"><a href="#state">State</a></h2>
+</code></pre></div><h2 id="state"><a class="doc-anchor" href="#state">§</a>State</h2>
 <p>Looking at the state of the interpreter, it contains a lot of fields that the jit compiler doesn’t need. We therefore reduce the state and we define a second struct which will hold the compiled machine code:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- struct Interpreter&lt;&#39;a&gt; {
 -     pub input: Box&lt;BufRead + &#39;a&gt;,
@@ -427,7 +427,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     code: dynasmrt::ExecutableBuffer,
 +     start: dynasmrt::AssemblyOffset,
 + }
-</code></pre></div><h2 id="compiler"><a href="#compiler">Compiler</a></h2>
+</code></pre></div><h2 id="compiler"><a class="doc-anchor" href="#compiler">§</a>Compiler</h2>
 <p>With the state defined, we can now start adapting the <code>Interpreter::run</code> method into <code>Program::compile</code>, starting with initalization code. We initialize an assembler and a <code>Vec</code> to hold the loops stack. As we will only parse through the code once, replace the slice indexing by an iterator that allows us to look ahead, courtesy of the <code>itertools</code> crate. We get the starting offset and emit the function prologue and finally we start iterating through the program:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- impl&lt;&#39;a&gt; Interpreter&lt;&#39;a&gt; {
 -     fn new(input: Box&lt;BufRead + &#39;a&gt;, output: Box&lt;Write + &#39;a&gt;) -&gt; Interpreter&lt;&#39;a&gt; {
@@ -453,7 +453,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +         let start = prologue!(ops);
 + 
 +         while let Some(c) = code.next() {
-</code></pre></div><h3 id="tape-movement"><a href="#tape-movement">Tape movement</a></h3>
+</code></pre></div><h3 id="tape-movement"><a class="doc-anchor" href="#tape-movement">§</a>Tape movement</h3>
 <p>We can now replace the the tape movement by an optimized assembly version. Note the local label used to implement tape wraparound:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;&lt;&#39;);
 - self.pos += amount;
@@ -484,7 +484,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     ; sub a_current, TAPE_SIZE as _
 +     ;wrap:
 + );
-</code></pre></div><h3 id="arithmetric"><a href="#arithmetric">Arithmetric</a></h3>
+</code></pre></div><h3 id="arithmetric"><a class="doc-anchor" href="#arithmetric">§</a>Arithmetric</h3>
 <p>The <code>+</code> and <code>-</code> instructions have by far the most simple implementations. Note that when an overflow occurs at runtime, we jump to the <code>-&gt;overflow:</code> global label (Note: overflow is somewhat ill-defined in brainfsck, but in the spirit of Rust I decided that everything that can be checked should be checked):</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;+&#39;);
 - self.pos += amount;
@@ -516,7 +516,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     ; sub BYTE [a_current], amount as _
 +     ; jo -&gt;overflow
 + );
-</code></pre></div><h3 id="io"><a href="#io">I/O</a></h3>
+</code></pre></div><h3 id="io"><a class="doc-anchor" href="#io">§</a>I/O</h3>
 <p>As the input and output fields of state are implemented as trait objects, we need to handle the virtual call to them in Rust code. Therefore, we first define the following wrapper methods on <code>State</code>:</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>impl&lt;&#39;a&gt; State&lt;&#39;a&gt; {
     unsafe extern &quot;win64&quot; fn getchar(state: *mut State, cell: *mut u8) -&gt; u8 {
@@ -548,7 +548,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     ; cmp al, 0
 +     ; jnz -&gt;io_failure
 + );
-</code></pre></div><h3 id="loops"><a href="#loops">Loops</a></h3>
+</code></pre></div><h3 id="loops"><a class="doc-anchor" href="#loops">§</a>Loops</h3>
 <p>The <code>[</code> and <code>]</code> commands have the most complex implementation. When a <code>[</code> is encountered, we need to declare two dynamic labels. One to jump to after the <code>]</code> when the current tape value is 0 and another to jump from the <code>]</code> to just after the <code>[</code> when the current tape value is not 0. Additionally, we special case the sequence <code>[-]</code> which is often used to set the current tape value to 0 and emit optimized machine code for it.</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- if self.tape[self.tape_index] == 0 {
 -     let mut nesting = 1;
@@ -597,7 +597,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 + } else {
 +     return Err(&quot;] without matching [&quot;);
 + },
-</code></pre></div><h3 id="epilogue"><a href="#epilogue">Epilogue</a></h3>
+</code></pre></div><h3 id="epilogue"><a class="doc-anchor" href="#epilogue">§</a>Epilogue</h3>
 <p>With the end of the parsing reached, we must now handle the return and possible error conditions. This is done by returning 0 if the execution was successful, or an error code when an error happened at runtime.</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ my_dynasm!(ops
 +     ;; epilogue!(ops, 0)
@@ -614,7 +614,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     code: code,
 +     start: start
 + })
-</code></pre></div><h2 id="calling-the-compiled-code"><a href="#calling-the-compiled-code">Calling the compiled code</a></h2>
+</code></pre></div><h2 id="calling-the-compiled-code"><a class="doc-anchor" href="#calling-the-compiled-code">§</a>Calling the compiled code</h2>
 <p>First, we add an initializer method to <code>State</code>:</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ fn new(input: Box&lt;BufRead + &#39;a&gt;, output: Box&lt;Write + &#39;a&gt;) -&gt; State&lt;&#39;a&gt; {
 +     State {
@@ -627,7 +627,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 <p>Then, we add a <code>run</code> method on <code>Program</code>. This method does the following:</p>
 <ul>
 <li>Transmute a pointer to the start of our compiled data to a function. This is the one <code>unsafe</code> block always needed when using Dynasm-rs, but it is probably the most dangerous one you’ll ever find.</li>
-<li>Create the input arguments to the function from a <code>State</code>. Since the <code>&quot;win64&quot;</code> calling convention is used these arguments will end up in the registers <code>rcx</code>, <code>rdx</code>, <code>r8</code> and <code>r9</code>.</li>
+<li>Create the input arguments to the function from a <code>State</code>. Since the <code>"win64"</code> calling convention is used these arguments will end up in the registers <code>rcx</code>, <code>rdx</code>, <code>r8</code> and <code>r9</code>.</li>
 <li>Run the function.</li>
 <li>Return a <code>Result</code> based on the error code returned by the function.</li>
 </ul>
@@ -672,7 +672,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     println!(&quot;{}&quot;, e);
 +     return;
 + }
-</code></pre></div><h2 id="result"><a href="#result">Result</a></h2>
+</code></pre></div><h2 id="result"><a class="doc-anchor" href="#result">§</a>Result</h2>
 <p>With these changes, adding the necessary <code>use</code> statements and removing unused functions, you should end up with the following code (you can also find this example <a href="https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-jit">here</a>):</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
@@ -689,7 +689,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 
 <span class="kw">const </span>TAPE_SIZE: usize = <span class="number">30000</span>;
 
-<span class="macro">macro_rules! </span>my_dynasm {
+<span class="macro">macro_rules!</span> my_dynasm {
     (<span class="macro-nonterminal">$ops</span>:ident $(<span class="macro-nonterminal">$t</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">dynasm!</span>(<span class="macro-nonterminal">$ops
             </span>; .arch x64
@@ -703,7 +703,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     }
 }
 
-<span class="macro">macro_rules! </span>prologue {
+<span class="macro">macro_rules!</span> prologue {
     (<span class="macro-nonterminal">$ops</span>:ident) =&gt; {{
         <span class="kw">let </span>start = <span class="macro-nonterminal">$ops</span>.offset();
         <span class="macro">my_dynasm!</span>(<span class="macro-nonterminal">$ops
@@ -716,7 +716,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     }};
 }
 
-<span class="macro">macro_rules! </span>epilogue {
+<span class="macro">macro_rules!</span> epilogue {
     (<span class="macro-nonterminal">$ops</span>:ident, <span class="macro-nonterminal">$e</span>:expr) =&gt; {<span class="macro">my_dynasm!</span>(<span class="macro-nonterminal">$ops
         </span>; mov retval, <span class="macro-nonterminal">$e
         </span>; add rsp, <span class="number">0x28
@@ -724,7 +724,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     );};
 }
 
-<span class="macro">macro_rules! </span>call_extern {
+<span class="macro">macro_rules!</span> call_extern {
     (<span class="macro-nonterminal">$ops</span>:ident, <span class="macro-nonterminal">$addr</span>:expr) =&gt; {<span class="macro">my_dynasm!</span>(<span class="macro-nonterminal">$ops
         </span>; mov [rsp + <span class="number">0x38</span>], rdx
         ; mov rax, QWORD <span class="macro-nonterminal">$addr </span><span class="kw">as _
@@ -736,9 +736,9 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     );};
 }
 
-<span class="kw">struct </span>State&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">&#39;a</span>&gt;,
-    <span class="kw">pub </span>output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">&#39;a</span>&gt;,
+<span class="kw">struct </span>State&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">'a</span>&gt;,
+    <span class="kw">pub </span>output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">'a</span>&gt;,
     tape: [u8; TAPE_SIZE],
 }
 
@@ -749,7 +749,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 
 
 <span class="kw">impl </span>Program {
-    <span class="kw">fn </span>compile(program: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Program, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+    <span class="kw">fn </span>compile(program: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Program, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ops = dynasmrt::x64::Assembler::new().unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>loops = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>code = multipeek(program.iter().cloned());
@@ -758,8 +758,8 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 
         <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = code.next() {
             <span class="kw">match </span>c {
-                <span class="string">b&#39;&lt;&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b&#39;&lt;&#39;</span>).count() + <span class="number">1</span>;
+                <span class="string">b'&lt;' </span>=&gt; {
+                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b'&lt;'</span>).count() + <span class="number">1</span>;
                     <span class="macro">my_dynasm!</span>(ops
                         ; sub a_current, (amount % TAPE_SIZE) <span class="kw">as _
                         </span>; cmp a_current, a_begin
@@ -768,8 +768,8 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                         </span>;wrap:
                     );
                 }
-                <span class="string">b&#39;&gt;&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b&#39;&gt;&#39;</span>).count() + <span class="number">1</span>;
+                <span class="string">b'&gt;' </span>=&gt; {
+                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b'&gt;'</span>).count() + <span class="number">1</span>;
                     <span class="macro">my_dynasm!</span>(ops
                         ; add a_current, (amount % TAPE_SIZE) <span class="kw">as _
                         </span>; cmp a_current, a_end
@@ -778,43 +778,43 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                         </span>;wrap:
                     );
                 },
-                <span class="string">b&#39;+&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b&#39;+&#39;</span>).count() + <span class="number">1</span>;
+                <span class="string">b'+' </span>=&gt; {
+                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b'+'</span>).count() + <span class="number">1</span>;
                     <span class="kw">if </span>amount &gt; u8::MAX <span class="kw">as </span>usize {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;An overflow occurred&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"An overflow occurred"</span>);
                     }
                     <span class="macro">my_dynasm!</span>(ops
                         ; add BYTE [a_current], amount <span class="kw">as _
                         </span>; jo -&gt;overflow
                     );
                 },
-                <span class="string">b&#39;-&#39; </span>=&gt; {
-                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b&#39;-&#39;</span>).count() + <span class="number">1</span>;
+                <span class="string">b'-' </span>=&gt; {
+                    <span class="kw">let </span>amount = code.take_while_ref(|x| <span class="kw-2">*</span>x == <span class="string">b'-'</span>).count() + <span class="number">1</span>;
                     <span class="kw">if </span>amount &gt; u8::MAX <span class="kw">as </span>usize {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;An overflow occurred&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"An overflow occurred"</span>);
                     }
                     <span class="macro">my_dynasm!</span>(ops
                         ; sub BYTE [a_current], amount <span class="kw">as _
                         </span>; jo -&gt;overflow
                     );
                 },
-                <span class="string">b&#39;,&#39; </span>=&gt; {
+                <span class="string">b',' </span>=&gt; {
                     <span class="macro">my_dynasm!</span>(ops
                         ;; <span class="macro">call_extern!</span>(ops, State::getchar)
                         ; cmp al, <span class="number">0
                         </span>; jnz -&gt;io_failure
                     );
                 },
-                <span class="string">b&#39;.&#39; </span>=&gt; {
+                <span class="string">b'.' </span>=&gt; {
                     <span class="macro">my_dynasm!</span>(ops
                         ;; <span class="macro">call_extern!</span>(ops, State::putchar)
                         ; cmp al, <span class="number">0
                         </span>; jnz -&gt;io_failure
                     );
                 },
-                <span class="string">b&#39;[&#39; </span>=&gt; {
-                    <span class="kw">let </span>first = code.peek() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;-&#39;</span>);
-                    <span class="kw">if </span>first &amp;&amp; code.peek() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;]&#39;</span>) {
+                <span class="string">b'[' </span>=&gt; {
+                    <span class="kw">let </span>first = code.peek() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b'-'</span>);
+                    <span class="kw">if </span>first &amp;&amp; code.peek() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b']'</span>) {
                         code.next();
                         code.next();
                         <span class="macro">my_dynasm!</span>(ops
@@ -831,7 +831,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                         );
                     }
                 },
-                <span class="string">b&#39;]&#39; </span>=&gt; {
+                <span class="string">b']' </span>=&gt; {
                     <span class="kw">if let </span><span class="prelude-val">Some</span>((backward_label, forward_label)) = loops.pop() {
                         <span class="macro">my_dynasm!</span>(ops
                             ; cmp BYTE [a_current], <span class="number">0
@@ -839,14 +839,14 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                             ;=&gt;forward_label
                         );
                     } <span class="kw">else </span>{
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;] without matching [&quot;</span>);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"] without matching ["</span>);
                     }
                 },
                 <span class="kw">_ </span>=&gt; (),
             }
         }
         <span class="kw">if </span>loops.len() != <span class="number">0 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;[ without matching ]&quot;</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"[ without matching ]"</span>);
         }
 
         <span class="macro">my_dynasm!</span>(ops
@@ -864,8 +864,8 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
         })
     }
 
-    <span class="kw">fn </span>run(<span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>State) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
-        <span class="kw">let </span>f: <span class="kw">extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>State, <span class="kw-2">*mut </span>u8, <span class="kw-2">*mut </span>u8, <span class="kw-2">*const </span>u8) -&gt; u8 =
+    <span class="kw">fn </span>run(<span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>State) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
+        <span class="kw">let </span>f: <span class="kw">extern </span><span class="string">"win64" </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>State, <span class="kw-2">*mut </span>u8, <span class="kw-2">*mut </span>u8, <span class="kw-2">*const </span>u8) -&gt; u8 =
             <span class="kw">unsafe </span>{ mem::transmute(<span class="self">self</span>.code.ptr(<span class="self">self</span>.start)) };
         <span class="kw">let </span>start = state.tape.as_mut_ptr();
         <span class="kw">let </span>end = <span class="kw">unsafe </span>{ start.offset(TAPE_SIZE <span class="kw">as </span>isize) };
@@ -873,28 +873,28 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
         <span class="kw">if </span>res == <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else if </span>res == <span class="number">1 </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;An overflow occurred&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"An overflow occurred"</span>)
         } <span class="kw">else if </span>res == <span class="number">2 </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;IO error&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"IO error"</span>)
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unknown error code&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Unknown error code"</span>);
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; State&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">unsafe extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn </span>getchar(state: <span class="kw-2">*mut </span>State, cell: <span class="kw-2">*mut </span>u8) -&gt; u8 {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; State&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">unsafe extern </span><span class="string">"win64" </span><span class="kw">fn </span>getchar(state: <span class="kw-2">*mut </span>State, cell: <span class="kw-2">*mut </span>u8) -&gt; u8 {
         <span class="kw">let </span>state = <span class="kw-2">&amp;mut *</span>state;
         <span class="kw">let </span>err = state.output.flush().is_err();
         (state.input.read_exact(slice::from_raw_parts_mut(cell, <span class="number">1</span>)).is_err() || err) <span class="kw">as </span>u8
     }
 
-    <span class="kw">unsafe extern </span><span class="string">&quot;win64&quot; </span><span class="kw">fn </span>putchar(state: <span class="kw-2">*mut </span>State, cell: <span class="kw-2">*mut </span>u8) -&gt; u8 {
+    <span class="kw">unsafe extern </span><span class="string">"win64" </span><span class="kw">fn </span>putchar(state: <span class="kw-2">*mut </span>State, cell: <span class="kw-2">*mut </span>u8) -&gt; u8 {
         <span class="kw">let </span>state = <span class="kw-2">&amp;mut *</span>state;
         state.output.write_all(slice::from_raw_parts(cell, <span class="number">1</span>)).is_err() <span class="kw">as </span>u8
     }
 
-    <span class="kw">fn </span>new(input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">&#39;a</span>&gt;, output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">&#39;a</span>&gt;) -&gt; State&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(input: Box&lt;<span class="kw">dyn </span>BufRead + <span class="lifetime">'a</span>&gt;, output: Box&lt;<span class="kw">dyn </span>Write + <span class="lifetime">'a</span>&gt;) -&gt; State&lt;<span class="lifetime">'a</span>&gt; {
         State {
             input: input,
             output: output,
@@ -907,7 +907,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 <span class="kw">fn </span>main() {
     <span class="kw">let </span><span class="kw-2">mut </span>args: Vec&lt;<span class="kw">_</span>&gt; = env::args().collect();
     <span class="kw">if </span>args.len() != <span class="number">2 </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;Expected 1 argument, got {}&quot;</span>, args.len());
+        <span class="macro">println!</span>(<span class="string">"Expected 1 argument, got {}"</span>, args.len());
         <span class="kw">return</span>;
     }
     <span class="kw">let </span>path = args.pop().unwrap();
@@ -915,13 +915,13 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="kw">if let </span><span class="prelude-val">Ok</span>(f) = File::open(<span class="kw-2">&amp;</span>path) {
         f
     } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;Could not open file {}&quot;</span>, path);
+        <span class="macro">println!</span>(<span class="string">"Could not open file {}"</span>, path);
         <span class="kw">return</span>;
     };
 
     <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
     <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw">_</span>) = f.read_to_end(<span class="kw-2">&amp;mut </span>buf) {
-        <span class="macro">println!</span>(<span class="string">&quot;Failed to read from file&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"Failed to read from file"</span>);
         <span class="kw">return</span>;
     }
 
@@ -930,12 +930,12 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     <span class="kw">let </span>program = <span class="kw">match </span>Program::compile(<span class="kw-2">&amp;</span>buf) {
         <span class="prelude-val">Ok</span>(p) =&gt; p,
         <span class="prelude-val">Err</span>(e) =&gt; {
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, e);
+            <span class="macro">println!</span>(<span class="string">"{}"</span>, e);
             <span class="kw">return</span>;
         }
     };
     <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = program.run(<span class="kw-2">&amp;mut </span>state) {
-        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, e);
+        <span class="macro">println!</span>(<span class="string">"{}"</span>, e);
         <span class="kw">return</span>;
     }
 }</code></pre></div>

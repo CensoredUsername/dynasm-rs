@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../dynasm/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -310,7 +310,7 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
-</pre><pre class="rust"><code><span class="attr">#![cfg_attr(feature = <span class="string">&quot;filelocal&quot;</span>, feature(proc_macro_span))]
+</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(feature = <span class="string">"filelocal"</span>, feature(proc_macro_span))]
 </span><span class="doccomment">//! The dynasm crate contains the procedural macros that power the magic of dynasm-rs. It seamlessly integrates
 //! a full dynamic assembler for several assembly dialects with Rust code.
 //! 
@@ -327,15 +327,15 @@
 <span class="kw">use </span>syn::{Token, parse_macro_input};
 <span class="kw">use </span>proc_macro2::{TokenTree, TokenStream};
 <span class="kw">use </span>quote::quote;
-<span class="kw">use </span>proc_macro_error::proc_macro_error;
+<span class="kw">use </span>proc_macro_error2::proc_macro_error;
 
 <span class="kw">use </span>std::collections::HashMap;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;filelocal&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"filelocal"</span>)]
 </span><span class="kw">use </span>std::sync::{MutexGuard, Mutex};
-<span class="attr">#[cfg(feature = <span class="string">&quot;filelocal&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"filelocal"</span>)]
 </span><span class="kw">use </span>std::path::PathBuf;
-<span class="attr">#[cfg(any(feature = <span class="string">&quot;filelocal&quot;</span>, feature = <span class="string">&quot;dynasm_opmap&quot;</span>, feature = <span class="string">&quot;dynasm_extract&quot;</span>))]
+<span class="attr">#[cfg(any(feature = <span class="string">"filelocal"</span>, feature = <span class="string">"dynasm_opmap"</span>, feature = <span class="string">"dynasm_extract"</span>))]
 </span><span class="kw">use </span>proc_macro2::Span;
 
 <span class="doccomment">/// Module with common infrastructure across assemblers
@@ -396,7 +396,7 @@
 
         <span class="comment">// parse the assembler target declaration
         </span><span class="kw">let </span>target: syn::Expr = input.parse()<span class="question-mark">?</span>;
-        <span class="comment">// and just convert it back to a tokentree since that&#39;s how we&#39;ll always be using it.
+        <span class="comment">// and just convert it back to a tokentree since that's how we'll always be using it.
         </span><span class="kw">let </span>target = common::delimited(target);
 
         <span class="comment">// get file-local data (alias definitions, current architecture)
@@ -406,7 +406,7 @@
         <span class="comment">// prepare the statement buffer
         </span><span class="kw">let </span><span class="kw-2">mut </span>stmts = Vec::new();
 
-        <span class="comment">// if we&#39;re not at the end of the macro, we should be expecting a semicolon and a new directive/statement/label/op
+        <span class="comment">// if we're not at the end of the macro, we should be expecting a semicolon and a new directive/statement/label/op
         </span><span class="kw">while </span>!input.is_empty() {
             <span class="kw">let _</span>: <span class="macro">Token!</span>[;] = input.parse()<span class="question-mark">?</span>;
 
@@ -420,12 +420,12 @@
                     buffer.extend(std::iter::once(input.parse::&lt;TokenTree&gt;()<span class="question-mark">?</span>));
                 }
                 <span class="comment">// glue an extra ; on there
-                </span>buffer.extend(<span class="macro">quote! </span>{ ; } );
+                </span>buffer.extend(<span class="macro">quote!</span> { ; } );
 
                 <span class="kw">if </span>!buffer.is_empty() {
                     <span class="comment">// ensure that the statement is actually a proper statement and then emit it for serialization
                     </span><span class="kw">let </span>stmt: syn::Stmt = syn::parse2(buffer)<span class="question-mark">?</span>;
-                    stmts.push(common::Stmt::Stmt(common::delimited(stmt)));
+                    stmts.push(common::Stmt::Stmt(<span class="macro">quote!</span>{ #stmt }));
                 }
                 <span class="kw">continue</span>;
             }
@@ -488,7 +488,7 @@
 
 <span class="doccomment">/// This is only compiled when the dynasm_opmap feature is used. It exports the internal assembly listings
 /// into a string that can then be included into the documentation for dynasm.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_opmap&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"dynasm_opmap"</span>)]
 #[proc_macro]
 </span><span class="kw">pub fn </span>dynasm_opmap(tokens: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
 
@@ -496,15 +496,15 @@
     </span><span class="kw">let </span>opmap = <span class="macro">parse_macro_input!</span>(tokens <span class="kw">as </span>DynasmOpmap);
 
     <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
-    s.push_str(<span class="string">&quot;% Instruction Reference\n\n&quot;</span>);
+    s.push_str(<span class="string">"% Instruction Reference\n\n"</span>);
 
     s.push_str(<span class="kw-2">&amp;</span><span class="kw">match </span>opmap.arch.as_str() {
-        <span class="string">&quot;x64&quot; </span>| <span class="string">&quot;x86&quot; </span>=&gt; arch::x64::create_opmap(),
-        <span class="string">&quot;aarch64&quot; </span>=&gt; arch::aarch64::create_opmap(),
-        x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, x)
+        <span class="string">"x64" </span>| <span class="string">"x86" </span>=&gt; arch::x64::create_opmap(),
+        <span class="string">"aarch64" </span>=&gt; arch::aarch64::create_opmap(),
+        x =&gt; <span class="macro">panic!</span>(<span class="string">"Unknown architecture {}"</span>, x)
     });
 
-    <span class="kw">let </span>token = <span class="macro">quote::quote_spanned! </span>{ Span::mixed_site()=&gt;
+    <span class="kw">let </span>token = <span class="macro">quote::quote_spanned!</span> { Span::mixed_site()=&gt;
         #s
     };
     token.into()
@@ -512,7 +512,7 @@
 
 <span class="doccomment">/// This is only compiled when the dynasm_extract feature is used. It exports the internal assembly listings
 /// into a string that can then be included into the documentation for dynasm.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_extract&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"dynasm_extract"</span>)]
 #[proc_macro]
 </span><span class="kw">pub fn </span>dynasm_extract(tokens: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
 
@@ -520,27 +520,27 @@
     </span><span class="kw">let </span>opmap = <span class="macro">parse_macro_input!</span>(tokens <span class="kw">as </span>DynasmOpmap);
 
     <span class="kw">let </span>s = <span class="kw">match </span>opmap.arch.as_str() {
-        <span class="string">&quot;x64&quot; </span>| <span class="string">&quot;x86&quot; </span>=&gt; <span class="string">&quot;UNIMPLEMENTED&quot;</span>.into(),
-        <span class="string">&quot;aarch64&quot; </span>=&gt; arch::aarch64::extract_opmap(),
-        x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown architecture {}&quot;</span>, x)
+        <span class="string">"x64" </span>| <span class="string">"x86" </span>=&gt; <span class="string">"UNIMPLEMENTED"</span>.into(),
+        <span class="string">"aarch64" </span>=&gt; arch::aarch64::extract_opmap(),
+        x =&gt; <span class="macro">panic!</span>(<span class="string">"Unknown architecture {}"</span>, x)
     };
 
-    <span class="kw">let </span>token = <span class="macro">quote::quote_spanned! </span>{ Span::mixed_site()=&gt;
+    <span class="kw">let </span>token = <span class="macro">quote::quote_spanned!</span> { Span::mixed_site()=&gt;
         #s
     };
     token.into()
 }
 
-<span class="doccomment">/// As dynasm_opmap takes no args it doesn&#39;t parse to anything
+<span class="doccomment">/// As dynasm_opmap takes no args it doesn't parse to anything
 
-</span><span class="attr">#[cfg(any(feature=<span class="string">&quot;dynasm_extract&quot;</span>, feature=<span class="string">&quot;dynasm_opmap&quot;</span>))]
+</span><span class="attr">#[cfg(any(feature=<span class="string">"dynasm_extract"</span>, feature=<span class="string">"dynasm_opmap"</span>))]
 </span><span class="kw">struct </span>DynasmOpmap {
     <span class="kw">pub </span>arch: String
 }
 
-<span class="doccomment">/// As dynasm_opmap takes no args it doesn&#39;t parse to anything.
+<span class="doccomment">/// As dynasm_opmap takes no args it doesn't parse to anything.
 /// This just exists so syn will give an error when no args are present.
-</span><span class="attr">#[cfg(any(feature=<span class="string">&quot;dynasm_extract&quot;</span>, feature=<span class="string">&quot;dynasm_opmap&quot;</span>))]
+</span><span class="attr">#[cfg(any(feature=<span class="string">"dynasm_extract"</span>, feature=<span class="string">"dynasm_opmap"</span>))]
 </span><span class="kw">impl </span>parse::Parse <span class="kw">for </span>DynasmOpmap {
     <span class="kw">fn </span>parse(input: parse::ParseStream) -&gt; parse::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>arch: syn::Ident = input.parse()<span class="question-mark">?</span>;
@@ -552,9 +552,9 @@
 }
 
 <span class="doccomment">/// This struct contains all non-parsing state that dynasm! requires while parsing and compiling
-</span><span class="kw">struct </span>State&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>stmts: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;common::Stmt&gt;,
-    <span class="kw">pub </span>invocation_context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DynasmContext,
+</span><span class="kw">struct </span>State&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>stmts: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;common::Stmt&gt;,
+    <span class="kw">pub </span>invocation_context: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>DynasmContext,
 }
 
 <span class="comment">// File local data implementation.
@@ -568,19 +568,19 @@
 <span class="kw">impl </span>DynasmContext {
     <span class="kw">fn </span>new() -&gt; DynasmContext {
         DynasmContext {
-            current_arch: arch::from_str(arch::CURRENT_ARCH).expect(<span class="string">&quot;Invalid default architecture&quot;</span>),
+            current_arch: arch::from_str(arch::CURRENT_ARCH).expect(<span class="string">"Invalid default architecture"</span>),
             aliases: HashMap::new()
         }
     }
 }
 
 <span class="comment">// Oneshot context provider
-</span><span class="attr">#[cfg(not(feature = <span class="string">&quot;filelocal&quot;</span>))]
+</span><span class="attr">#[cfg(not(feature = <span class="string">"filelocal"</span>))]
 </span><span class="kw">struct </span>ContextProvider {
     context: DynasmContext
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;filelocal&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"filelocal"</span>))]
 </span><span class="kw">impl </span>ContextProvider {
     <span class="kw">pub fn </span>new() -&gt; ContextProvider {
         ContextProvider {
@@ -594,12 +594,12 @@
 }
 
 <span class="doccomment">/// Filelocal context provider
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;filelocal&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"filelocal"</span>)]
 </span><span class="kw">struct </span>ContextProvider {
-    guard: MutexGuard&lt;<span class="lifetime">&#39;static</span>, HashMap&lt;PathBuf, DynasmContext&gt;&gt;
+    guard: MutexGuard&lt;<span class="lifetime">'static</span>, HashMap&lt;PathBuf, DynasmContext&gt;&gt;
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;filelocal&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"filelocal"</span>)]
 </span><span class="kw">impl </span>ContextProvider {
     <span class="kw">pub fn </span>new() -&gt; ContextProvider {
         ContextProvider {
@@ -618,9 +618,8 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;filelocal&quot;</span>)]
-</span><span class="macro">lazy_static::lazy_static! </span>{
+<span class="attr">#[cfg(feature = <span class="string">"filelocal"</span>)]
+</span><span class="macro">lazy_static::lazy_static!</span> {
     <span class="kw">static </span><span class="kw-2">ref </span>CONTEXT_STORAGE: Mutex&lt;HashMap&lt;PathBuf, DynasmContext&gt;&gt; = Mutex::new(HashMap::new());
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

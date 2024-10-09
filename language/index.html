@@ -6,7 +6,7 @@
     <meta name="generator" content="rustdoc">
     <title>Dynasm-rs</title>
 
-    <link rel="stylesheet" type="text/css" href="./formatting.css">
+    <link rel="stylesheet" href="./formatting.css">
     
 </head>
 <body class="rustdoc">
@@ -19,7 +19,7 @@
 
     <nav class="sidebar">
   <h2 class="location">
-    <a href="#">Language dynasm-rs</a>
+    <a href="#">Dynasm-rs reference</a>
   </h2>
   <div class="sidebar-elems">
     <h3>Components</h3>
@@ -83,7 +83,7 @@ translation of assembly templates into rust code, the second part is a
 machine code.</p>
 <p>Dynasm-rs supports the x86, x64 and aarch64 instruction set architectures.</p>
 <p>Dynasm-rs is inspired by the LuaJIT DynASM project for C and C++.</p>
-<h1 id="documentation"><a href="#documentation">Documentation</a></h1>
+<h1 id="documentation"><a class="doc-anchor" href="#documentation">§</a>Documentation</h1>
 <p>The documentation of dynasm-rs is split up into several parts. To get started, you’re advised
 to read through the <a href="./tutorial.html">tutorial</a>. After this, you can read through the
 <a href="./langref_common.html">language reference</a> to learn about the syntax used by dynasm-rs. You can
@@ -91,9 +91,9 @@ also read through the <a href="../runtime/dynasmrt/index.html">runtime documenta
 runtime API. The instruction references lists all assembly mnemnonics
 and formats supported by dynasm-rs. Finally, documentation on the
 <a href="../plugin/dynasm/index.html">internals on dynasm-rs</a> can be browsed here.</p>
-<h1 id="differences-from-luajit-dynasm"><a href="#differences-from-luajit-dynasm">Differences from LuaJit Dynasm</a></h1>
+<h1 id="differences-from-luajit-dynasm"><a class="doc-anchor" href="#differences-from-luajit-dynasm">§</a>Differences from LuaJit Dynasm</h1>
 <p>The following list summarizes some of the larger differences between LuaJIT dynasm and dynasm-rs.</p>
-<h3 id="general"><a href="#general">general</a></h3>
+<h3 id="general"><a class="doc-anchor" href="#general">§</a>general</h3>
 <ul>
 <li>LuaJIT dynasm uses full program analysis, allowing it to compile local and global labels down to
 enums. Dynasm-rs however uses HashMaps keyed by static strings, meaning label resolution in dynasm-rs
@@ -105,7 +105,7 @@ instructions, dynasm-rs uses the <code>dynasm!</code> procedural macro with line
 <li>LuaJIT has macros in its invocations, dynasm-rs uses rust macros that expand to <code>dynasm!</code> invocations.</li>
 <li>Dynasm-rs doesn’t have typed aliases</li>
 </ul>
-<h3 id="x64x86"><a href="#x64x86">x64/x86</a></h3>
+<h3 id="x64x86"><a class="doc-anchor" href="#x64x86">§</a>x64/x86</h3>
 <ul>
 <li>LuaJIT uses the <code>mov64</code> mnemnonic to encode 64-bit displacement mov. Dynasm-rs uses the <code>movabs</code>
 mnemnonic with a 64-bit immediate parameter to encode this.</li>
@@ -113,7 +113,7 @@ mnemnonic with a 64-bit immediate parameter to encode this.</li>
 <li>The syntax used for type maps is significantly different. In LuaJit dynasm it is <code>Type:reg-&gt;attr</code>
 in dynasm-rs it is <code>reg =&gt; Type.attr</code>.</li>
 </ul>
-<h3 id="aarch64"><a href="#aarch64">aarch64</a></h3>
+<h3 id="aarch64"><a class="doc-anchor" href="#aarch64">§</a>aarch64</h3>
 <ul>
 <li>Unknown.</li>
 </ul>

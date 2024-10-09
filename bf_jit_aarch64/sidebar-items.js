@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["TAPE_SIZE"],"fn":["main"],"macro":["call_extern","epilogue","my_dynasm","prologue"],"struct":["Program","State"]};

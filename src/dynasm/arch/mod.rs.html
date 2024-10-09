@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../dynasm/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -65,15 +65,8 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-</pre><pre class="rust"><code><span class="kw">use </span>syn::parse;
-<span class="kw">use </span>proc_macro_error::emit_error;
+</pre></div><pre class="rust"><code><span class="kw">use </span>syn::parse;
+<span class="kw">use </span>proc_macro_error2::emit_error;
 
 <span class="kw">use </span><span class="kw">crate</span>::common::{Size, Stmt, Jump};
 <span class="kw">use </span><span class="kw">crate</span>::State;
@@ -84,7 +77,6 @@
 <span class="kw">pub mod </span>aarch64;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Arch : Debug + Send {
-    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str;
     <span class="kw">fn </span>set_features(<span class="kw-2">&amp;mut </span><span class="self">self</span>, features: <span class="kw-2">&amp;</span>[syn::Ident]);
     <span class="kw">fn </span>handle_static_reloc(<span class="kw-2">&amp;</span><span class="self">self</span>, stmts: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, reloc: Jump, size: Size);
     <span class="kw">fn </span>default_align(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
@@ -92,30 +84,24 @@
 }
 
 <span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub struct </span>DummyArch {
-    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str
-}
+</span><span class="kw">pub struct </span>DummyArch {}
 
 <span class="kw">impl </span>DummyArch {
-    <span class="kw">fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; DummyArch {
-        DummyArch { name }
+    <span class="kw">fn </span>new() -&gt; DummyArch {
+        DummyArch{}
     }
 }
 
 <span class="kw">impl </span>Arch <span class="kw">for </span>DummyArch {
-    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.name
-    }
-
     <span class="kw">fn </span>set_features(<span class="kw-2">&amp;mut </span><span class="self">self</span>, features: <span class="kw-2">&amp;</span>[syn::Ident]) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(feature) = features.first() {
-            <span class="macro">emit_error!</span>(feature, <span class="string">&quot;Cannot set features when the assembling architecture is undefined. Define it using a .arch directive&quot;</span>);
+            <span class="macro">emit_error!</span>(feature, <span class="string">"Cannot set features when the assembling architecture is undefined. Define it using a .arch directive"</span>);
         }
     }
 
     <span class="kw">fn </span>handle_static_reloc(<span class="kw-2">&amp;</span><span class="self">self</span>, _stmts: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, reloc: Jump, _size: Size) {
         <span class="kw">let </span>span = reloc.span();
-        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Current assembling architecture is undefined. Define it using a .arch directive&quot;</span>);
+        <span class="macro">emit_error!</span>(span, <span class="string">"Current assembling architecture is undefined. Define it using a .arch directive"</span>);
     }
 
     <span class="kw">fn </span>default_align(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
@@ -123,28 +109,27 @@
     </span>}
 
     <span class="kw">fn </span>compile_instruction(<span class="kw-2">&amp;</span><span class="self">self</span>, _state: <span class="kw-2">&amp;mut </span>State, input: parse::ParseStream) -&gt; parse::Result&lt;()&gt; {
-        <span class="macro">emit_error!</span>(input.cursor().span(), <span class="string">&quot;Current assembling architecture is undefined. Define it using a .arch directive&quot;</span>);
+        <span class="macro">emit_error!</span>(input.cursor().span(), <span class="string">"Current assembling architecture is undefined. Define it using a .arch directive"</span>);
         <span class="prelude-val">Ok</span>(())
     }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Arch&gt;&gt; {
     <span class="kw">match </span>s {
-        <span class="string">&quot;x64&quot; </span>=&gt; <span class="prelude-val">Some</span>(Box::new(x64::Archx64::default())),
-        <span class="string">&quot;x86&quot; </span>=&gt; <span class="prelude-val">Some</span>(Box::new(x64::Archx86::default())),
-        <span class="string">&quot;aarch64&quot; </span>=&gt; <span class="prelude-val">Some</span>(Box::new(aarch64::ArchAarch64::default())),
-        <span class="string">&quot;unknown&quot; </span>=&gt; <span class="prelude-val">Some</span>(Box::new(DummyArch::new(<span class="string">&quot;unknown&quot;</span>))),
+        <span class="string">"x64" </span>=&gt; <span class="prelude-val">Some</span>(Box::new(x64::Archx64::default())),
+        <span class="string">"x86" </span>=&gt; <span class="prelude-val">Some</span>(Box::new(x64::Archx86::default())),
+        <span class="string">"aarch64" </span>=&gt; <span class="prelude-val">Some</span>(Box::new(aarch64::ArchAarch64::default())),
+        <span class="string">"unknown" </span>=&gt; <span class="prelude-val">Some</span>(Box::new(DummyArch::new())),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None
     </span>}
 }
 
-<span class="attr">#[cfg(target_arch=<span class="string">&quot;x86_64&quot;</span>)]
-</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x64&quot;</span>;
-<span class="attr">#[cfg(target_arch=<span class="string">&quot;x86&quot;</span>)]
-</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;x86&quot;</span>;
-<span class="attr">#[cfg(target_arch=<span class="string">&quot;aarch64&quot;</span>)]
-</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;aarch64&quot;</span>;
-<span class="attr">#[cfg(not(any(target_arch=<span class="string">&quot;x86&quot;</span>, target_arch=<span class="string">&quot;x86_64&quot;</span>, target_arch=<span class="string">&quot;aarch64&quot;</span>)))]
-</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;unknown&quot;</span>;
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+<span class="attr">#[cfg(target_arch=<span class="string">"x86_64"</span>)]
+</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">"x64"</span>;
+<span class="attr">#[cfg(target_arch=<span class="string">"x86"</span>)]
+</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">"x86"</span>;
+<span class="attr">#[cfg(target_arch=<span class="string">"aarch64"</span>)]
+</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">"aarch64"</span>;
+<span class="attr">#[cfg(not(any(target_arch=<span class="string">"x86"</span>, target_arch=<span class="string">"x86_64"</span>, target_arch=<span class="string">"aarch64"</span>)))]
+</span><span class="kw">pub const </span>CURRENT_ARCH: <span class="kw-2">&amp;</span>str = <span class="string">"unknown"</span>;
+</code></pre></div></section></main></body></html>

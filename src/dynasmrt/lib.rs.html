@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../dynasmrt/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1098,7 +1098,35 @@
 <a href="#1098" id="1098">1098</a>
 <a href="#1099" id="1099">1099</a>
 <a href="#1100" id="1100">1100</a>
-</pre><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+</pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 
 </span><span class="doccomment">//! This crate provides runtime support for dynasm-rs. It contains traits that document the interface used by the dynasm proc_macro to generate code,
 //! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools
@@ -1107,9 +1135,10 @@
 </span><span class="kw">pub mod </span>mmap;
 <span class="kw">pub mod </span>components;
 <span class="kw">pub mod </span>relocations;
+<span class="kw">pub mod </span>cache_control;
 
 <span class="doccomment">/// Helper to implement common traits on register enums.
-</span><span class="macro">macro_rules! </span>reg_impls {
+</span><span class="macro">macro_rules!</span> reg_impls {
     (<span class="macro-nonterminal">$r</span>:ty) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::Register </span><span class="kw">for </span><span class="macro-nonterminal">$r </span>{
             <span class="kw">fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
@@ -1136,7 +1165,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::relocations::Relocation;
 
 <span class="kw">use </span>std::hash::Hash;
-<span class="kw">use </span>std::iter::Extend;
 <span class="kw">use </span>std::sync::{Arc, RwLock, RwLockReadGuard};
 <span class="kw">use </span>std::io;
 <span class="kw">use </span>std::error;
@@ -1146,13 +1174,13 @@
 <span class="doccomment">/// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
 </span><span class="attr">#[macro_export]
-</span><span class="macro">macro_rules! </span>Pointer {
+</span><span class="macro">macro_rules!</span> Pointer {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {<span class="macro-nonterminal">$e </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>};
 }
 
 <span class="doccomment">/// Preforms the same action as the `Pointer!` macro, but casts to a *mut pointer.
 </span><span class="attr">#[macro_export]
-</span><span class="macro">macro_rules! </span>MutPointer {
+</span><span class="macro">macro_rules!</span> MutPointer {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {<span class="macro-nonterminal">$e </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>};
 }
 
@@ -1191,7 +1219,9 @@
     /// the guard is dropped.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RwLockReadGuard&lt;ExecutableBuffer&gt; {
-        <span class="self">self</span>.execbuffer.read().unwrap()
+        <span class="kw">let </span>guard = <span class="self">self</span>.execbuffer.read().unwrap();
+        cache_control::prepare_for_execution();
+        guard
     }
 }
 
@@ -1200,9 +1230,9 @@
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>LabelKind {
     <span class="doccomment">/// A local label, like `label:`
-    </span>Local(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    </span>Local(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
     <span class="doccomment">/// A global label, like `-&gt;label:`
-    </span>Global(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    </span>Global(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
     <span class="doccomment">/// A dynamic label, like `=&gt;value:`
     </span>Dynamic(DynamicLabel)
 }
@@ -1210,9 +1240,9 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>LabelKind {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Local(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;label {}&quot;</span>, s),
-            <span class="self">Self</span>::Global(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;label -&gt;{}&quot;</span>, s),
-            <span class="self">Self</span>::Dynamic(id) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;label =&gt;{}&quot;</span>, id.get_id())
+            <span class="self">Self</span>::Local(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"label {}"</span>, s),
+            <span class="self">Self</span>::Global(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"label -&gt;{}"</span>, s),
+            <span class="self">Self</span>::Dynamic(id) =&gt; <span class="macro">write!</span>(f, <span class="string">"label =&gt;{}"</span>, id.get_id())
         }
     }
 }
@@ -1222,9 +1252,9 @@
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>TargetKind {
     <span class="doccomment">/// This targets a local label with the specified name.
-    </span>Local(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    </span>Local(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
     <span class="doccomment">/// This targets a global label with the specified name.
-    </span>Global(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    </span>Global(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
     <span class="doccomment">/// This targets the specified dynamic label.
     </span>Dynamic(DynamicLabel),
     <span class="doccomment">/// This targets the specified address.
@@ -1236,11 +1266,11 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TargetKind {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Local(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;target [&gt;&lt;]{}&quot;</span>, s),
-            <span class="self">Self</span>::Global(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;target -&gt;{}&quot;</span>, s),
-            <span class="self">Self</span>::Dynamic(id) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;target =&gt;{}&quot;</span>, id.get_id()),
-            <span class="self">Self</span>::Extern(value) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;target extern {}&quot;</span>, value),
-            <span class="self">Self</span>::Managed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;while adjusting managed relocation&quot;</span>),
+            <span class="self">Self</span>::Local(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"target [&gt;&lt;]{}"</span>, s),
+            <span class="self">Self</span>::Global(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"target -&gt;{}"</span>, s),
+            <span class="self">Self</span>::Dynamic(id) =&gt; <span class="macro">write!</span>(f, <span class="string">"target =&gt;{}"</span>, id.get_id()),
+            <span class="self">Self</span>::Extern(value) =&gt; <span class="macro">write!</span>(f, <span class="string">"target extern {}"</span>, value),
+            <span class="self">Self</span>::Managed =&gt; <span class="macro">write!</span>(f, <span class="string">"while adjusting managed relocation"</span>),
         }
     }
 }
@@ -1262,10 +1292,10 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>DynasmError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            DynasmError::CheckFailed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;An assembly modification check failed&quot;</span>),
-            DynasmError::DuplicateLabel(l) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Duplicate label defined: &#39;{}&#39;&quot;</span>, l),
-            DynasmError::UnknownLabel(l) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Unknown label: &#39;{}&#39;&quot;</span>, l),
-            DynasmError::ImpossibleRelocation(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Impossible relocation: &#39;{}&#39;&quot;</span>, s),
+            DynasmError::CheckFailed =&gt; <span class="macro">write!</span>(f, <span class="string">"An assembly modification check failed"</span>),
+            DynasmError::DuplicateLabel(l) =&gt; <span class="macro">write!</span>(f, <span class="string">"Duplicate label defined: '{}'"</span>, l),
+            DynasmError::UnknownLabel(l) =&gt; <span class="macro">write!</span>(f, <span class="string">"Unknown label: '{}'"</span>, l),
+            DynasmError::ImpossibleRelocation(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"Impossible relocation: '{}'"</span>, s),
         }
     }
 }
@@ -1273,10 +1303,10 @@
 <span class="kw">impl </span>error::Error <span class="kw">for </span>DynasmError {
     <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            DynasmError::CheckFailed =&gt; <span class="string">&quot;An assembly modification offset check failed&quot;</span>,
-            DynasmError::DuplicateLabel(<span class="kw">_</span>) =&gt; <span class="string">&quot;Duplicate label defined&quot;</span>,
-            DynasmError::UnknownLabel(<span class="kw">_</span>) =&gt; <span class="string">&quot;Unknown label&quot;</span>,
-            DynasmError::ImpossibleRelocation(<span class="kw">_</span>) =&gt; <span class="string">&quot;Impossible relocation&quot;</span>,
+            DynasmError::CheckFailed =&gt; <span class="string">"An assembly modification offset check failed"</span>,
+            DynasmError::DuplicateLabel(<span class="kw">_</span>) =&gt; <span class="string">"Duplicate label defined"</span>,
+            DynasmError::UnknownLabel(<span class="kw">_</span>) =&gt; <span class="string">"Unknown label"</span>,
+            DynasmError::ImpossibleRelocation(<span class="kw">_</span>) =&gt; <span class="string">"Impossible relocation"</span>,
         }
     }
 }
@@ -1284,7 +1314,7 @@
 
 <span class="doccomment">/// This trait represents the interface that must be implemented to allow
 /// the dynasm preprocessor to assemble into a datastructure.
-</span><span class="kw">pub trait </span>DynasmApi: Extend&lt;u8&gt; + <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; {
+</span><span class="kw">pub trait </span>DynasmApi: Extend&lt;u8&gt; + <span class="kw">for</span>&lt;<span class="lifetime">'a</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; {
     <span class="doccomment">/// Report the current offset into the assembling target
     </span><span class="kw">fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AssemblyOffset;
     <span class="doccomment">/// Push a byte into the assembling target
@@ -1329,33 +1359,36 @@
     }
     <span class="doccomment">/// This function is called in when a runtime error has to be generated. It panics.
     </span><span class="attr">#[inline]
-    </span><span class="kw">fn </span>runtime_error(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; ! {
-        <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, msg);
+    </span><span class="kw">fn </span>runtime_error(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; ! {
+        <span class="macro">panic!</span>(<span class="string">"{}"</span>, msg);
     }
 }
 
-<span class="doccomment">/// This trait extends DynasmApi to not only allow assembling, but also labels and various directives
+<span class="doccomment">/// This trait extends DynasmApi to not only allow assembling, but also labels and various directives.
+///
+/// For information on the different kinds of label, consult the common language reference in the
+/// dynasm-rs docs.
 </span><span class="kw">pub trait </span>DynasmLabelApi : DynasmApi {
     <span class="doccomment">/// The relocation info type this assembler uses. 
     </span><span class="kw">type </span>Relocation: Relocation;
 
     <span class="doccomment">/// Record the definition of a local label
-    </span><span class="kw">fn </span>local_label(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
+    </span><span class="kw">fn </span>local_label(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str);
     <span class="doccomment">/// Record the definition of a global label
-    </span><span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
+    </span><span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str);
     <span class="doccomment">/// Record the definition of a dynamic label
     </span><span class="kw">fn </span>dynamic_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel);
 
     <span class="doccomment">/// Record a relocation spot for a forward reference to a local label
-    </span><span class="kw">fn </span>forward_reloc( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+    </span><span class="kw">fn </span>forward_reloc( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
         <span class="self">self</span>.forward_relocation(name, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
     }
     <span class="doccomment">/// Record a relocation spot for a backward reference to a local label
-    </span><span class="kw">fn </span>backward_reloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+    </span><span class="kw">fn </span>backward_reloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
         <span class="self">self</span>.backward_relocation(name, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
     }
     <span class="doccomment">/// Record a relocation spot for a reference to a global label
-    </span><span class="kw">fn </span>global_reloc(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+    </span><span class="kw">fn </span>global_reloc(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
         <span class="self">self</span>.global_relocation(name, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
     }
     <span class="doccomment">/// Record a relocation spot for a reference to a dynamic label
@@ -1368,11 +1401,11 @@
     }
 
     <span class="doccomment">/// Equivalent of forward_reloc, but takes a non-encoded relocation
-    </span><span class="kw">fn </span>forward_relocation( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
+    </span><span class="kw">fn </span>forward_relocation( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
     <span class="doccomment">/// Equivalent of backward_reloc, but takes a non-encoded relocation
-    </span><span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
+    </span><span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
     <span class="doccomment">/// Equivalent of global_reloc, but takes a non-encoded relocation
-    </span><span class="kw">fn </span>global_relocation(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
+    </span><span class="kw">fn </span>global_relocation(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
     <span class="doccomment">/// Equivalent of dynamic_reloc, but takes a non-encoded relocation
     </span><span class="kw">fn </span>dynamic_relocation( <span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel,   target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
     <span class="doccomment">/// Equivalent of bare_reloc, but takes a non-encoded relocation
@@ -1380,7 +1413,7 @@
 }
 
 
-<span class="doccomment">/// An assembler that is purely a `Vec&lt;u8&gt;`. It doesn&#39;t support labels or architecture-specific directives,
+<span class="doccomment">/// An assembler that is purely a `Vec&lt;u8&gt;`. It doesn't support labels or architecture-specific directives,
 /// but can be used to easily inspect generated code. It is intended to be used in testcases.
 </span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>SimpleAssembler {
@@ -1413,8 +1446,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; <span class="kw">for </span>SimpleAssembler {
-    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; <span class="kw">for </span>SimpleAssembler {
+    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; {
         <span class="self">self</span>.ops.extend(iter)
     }
 }
@@ -1549,7 +1582,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.ops)
     }
 
-    <span class="doccomment">/// Equivalent of finalize, but allows the VecAssembler&#39;s internal allocations to be reused for the next assembler.
+    <span class="doccomment">/// Equivalent of finalize, but allows the VecAssembler's internal allocations to be reused for the next assembler.
     </span><span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, DynasmError&gt; {
         <span class="self">self</span>.commit()<span class="question-mark">?</span>;
         <span class="self">self</span>.labels.clear();
@@ -1557,7 +1590,7 @@
     }
 
     <span class="doccomment">/// Equivalent of take, but instead of allocating a new vector it simply provides a draining iterator over the internal contents.
-    </span><span class="kw">pub fn </span>drain&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>Iterator&lt;Item=u8&gt; + <span class="lifetime">&#39;a</span>, DynasmError&gt; {
+    </span><span class="kw">pub fn </span>drain&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>Iterator&lt;Item=u8&gt; + <span class="lifetime">'a</span>, DynasmError&gt; {
         <span class="self">self</span>.commit()<span class="question-mark">?</span>;
         <span class="self">self</span>.labels.clear();
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.ops.drain(..))
@@ -1570,8 +1603,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; <span class="kw">for </span>VecAssembler&lt;R&gt; {
-    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, R: Relocation&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; <span class="kw">for </span>VecAssembler&lt;R&gt; {
+    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; {
         <span class="self">self</span>.ops.extend(iter)
     }
 }
@@ -1596,11 +1629,11 @@
 <span class="kw">impl</span>&lt;R: Relocation&gt; DynasmLabelApi <span class="kw">for </span>VecAssembler&lt;R&gt; {
     <span class="kw">type </span>Relocation = R;
 
-    <span class="kw">fn </span>local_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+    <span class="kw">fn </span>local_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
         <span class="kw">let </span>offset = <span class="self">self</span>.offset();
         <span class="self">self</span>.labels.define_local(name, offset);
     }
-    <span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+    <span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
         <span class="kw">let </span>offset = <span class="self">self</span>.offset();
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.labels.define_global(name, offset) {
             <span class="self">self</span>.error = <span class="prelude-val">Some</span>(e)
@@ -1612,7 +1645,7 @@
             <span class="self">self</span>.error = <span class="prelude-val">Some</span>(e)
         }
     }
-    <span class="kw">fn </span>global_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>global_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = StaticLabel::global(name);
         <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
@@ -1621,7 +1654,7 @@
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="self">self</span>.relocs.add_dynamic(id, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
     }
-    <span class="kw">fn </span>forward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>forward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = <span class="kw">match </span><span class="self">self</span>.labels.place_local_reference(name) {
             <span class="prelude-val">Some</span>(label) =&gt; label.next(),
@@ -1629,7 +1662,7 @@
         };
         <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
     }
-    <span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = <span class="kw">match </span><span class="self">self</span>.labels.place_local_reference(name) {
             <span class="prelude-val">Some</span>(label) =&gt; label,
@@ -1699,7 +1732,7 @@
         <span class="comment">// swap out a buffer from base
         </span><span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.memory.write();
         <span class="kw">let </span>buffer = mem::replace(<span class="kw-2">&amp;mut *</span>lock, ExecutableBuffer::default());
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = buffer.make_mut().expect(<span class="string">&quot;Could not swap buffer protection modes&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = buffer.make_mut().expect(<span class="string">"Could not swap buffer protection modes"</span>);
 
         <span class="comment">// construct the modifier
         </span><span class="kw">let </span><span class="kw-2">mut </span>modifier = Modifier {
@@ -1722,7 +1755,7 @@
         </span>modifier.encode_relocs()<span class="question-mark">?</span>;
 
         <span class="comment">// repack the buffer
-        </span><span class="kw">let </span>buffer = buffer.make_exec().expect(<span class="string">&quot;Could not swap buffer protection modes&quot;</span>);
+        </span><span class="kw">let </span>buffer = buffer.make_exec().expect(<span class="string">"Could not swap buffer protection modes"</span>);
         <span class="kw-2">*</span>lock = buffer;
 
         <span class="comment">// call it a day
@@ -1745,7 +1778,10 @@
                 <span class="kw">if </span>reloc.adjust(buf, change).is_err() {
                     <span class="kw-2">*</span>error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Managed))
                 }
-            }
+
+                <span class="comment">// we don't need to inform the cache here that we changed something
+                // as the entire allocation is new.
+            </span>}
         });
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(e) = <span class="self">self</span>.error.take() {
@@ -1757,9 +1793,12 @@
     <span class="doccomment">/// Finalize this assembler, returning the internal `ExecutableBuffer` if no `Executor` instances exist.
     /// This panics if any uncommitted changes caused errors near the end. To handle these, call `commit()` explicitly beforehand.
     </span><span class="kw">pub fn </span>finalize(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ExecutableBuffer, <span class="self">Self</span>&gt; {
-        <span class="self">self</span>.commit().expect(<span class="string">&quot;Errors were encountered when committing before finalization&quot;</span>);
+        <span class="self">self</span>.commit().expect(<span class="string">"Errors were encountered when committing before finalization"</span>);
         <span class="kw">match </span><span class="self">self</span>.memory.finalize() {
-            <span class="prelude-val">Ok</span>(execbuffer) =&gt; <span class="prelude-val">Ok</span>(execbuffer),
+            <span class="prelude-val">Ok</span>(execbuffer) =&gt; {
+                cache_control::prepare_for_execution();
+                <span class="prelude-val">Ok</span>(execbuffer)
+            },
             <span class="prelude-val">Err</span>(memory) =&gt; <span class="prelude-val">Err</span>(<span class="self">Self </span>{
                 memory,
                 ..<span class="self">self
@@ -1835,8 +1874,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; <span class="kw">for </span>Assembler&lt;R&gt; {
-    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, R: Relocation&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; <span class="kw">for </span>Assembler&lt;R&gt; {
+    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt; {
         <span class="self">self</span>.ops.extend(iter)
     }
 }
@@ -1863,11 +1902,11 @@
 <span class="kw">impl</span>&lt;R: Relocation&gt; DynasmLabelApi <span class="kw">for </span>Assembler&lt;R&gt; {
     <span class="kw">type </span>Relocation = R;
 
-    <span class="kw">fn </span>local_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+    <span class="kw">fn </span>local_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
         <span class="kw">let </span>offset = <span class="self">self</span>.offset();
         <span class="self">self</span>.labels.define_local(name, offset);
     }
-    <span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+    <span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
         <span class="kw">let </span>offset = <span class="self">self</span>.offset();
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.labels.define_global(name, offset) {
             <span class="self">self</span>.error = <span class="prelude-val">Some</span>(e)
@@ -1879,7 +1918,7 @@
             <span class="self">self</span>.error = <span class="prelude-val">Some</span>(e)
         }
     }
-    <span class="kw">fn </span>global_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>global_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = StaticLabel::global(name);
         <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
@@ -1888,7 +1927,7 @@
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="self">self</span>.relocs.add_dynamic(id, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
     }
-    <span class="kw">fn </span>forward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>forward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = <span class="kw">match </span><span class="self">self</span>.labels.place_local_reference(name) {
             <span class="prelude-val">Some</span>(label) =&gt; label.next(),
@@ -1896,7 +1935,7 @@
         };
         <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
     }
-    <span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = <span class="kw">match </span><span class="self">self</span>.labels.place_local_reference(name) {
             <span class="prelude-val">Some</span>(label) =&gt; label,
@@ -1924,24 +1963,30 @@
 /// into the emitted assembly, initialized to the start, that can be moved around either with the
 /// `goto` function, or just by assembling new code into this `Modifier`.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>Modifier&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; {
+</span><span class="kw">pub struct </span>Modifier&lt;<span class="lifetime">'a</span>, R: Relocation&gt; {
     asmoffset: usize,
     previous_asmoffset: usize,
-    buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+    buffer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>[u8],
 
-    labels: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>LabelRegistry,
-    relocs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RelocRegistry&lt;R&gt;,
-    old_managed: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ManagedRelocs&lt;R&gt;,
+    labels: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>LabelRegistry,
+    relocs: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>RelocRegistry&lt;R&gt;,
+    old_managed: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>ManagedRelocs&lt;R&gt;,
     new_managed: ManagedRelocs&lt;R&gt;,
 
     error: <span class="prelude-ty">Option</span>&lt;DynasmError&gt;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; Modifier&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, R: Relocation&gt; Modifier&lt;<span class="lifetime">'a</span>, R&gt; {
     <span class="doccomment">/// Move the modifier cursor to the selected location.
     </span><span class="kw">pub fn </span>goto(<span class="kw-2">&amp;mut </span><span class="self">self</span>, offset: AssemblyOffset) {
-        <span class="self">self</span>.old_managed.remove_between(<span class="self">self</span>.previous_asmoffset, <span class="self">self</span>.asmoffset);
-        <span class="self">self</span>.asmoffset = offset.<span class="number">0</span>;
+        <span class="comment">// resync the caches of anything we modified before
+        </span>cache_control::synchronize_icache(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer[<span class="self">self</span>.previous_asmoffset .. <span class="self">self</span>.asmoffset]);
+
+        <span class="comment">// remove any old managed relocations from what we overwrote
+        </span><span class="self">self</span>.old_managed.remove_between(<span class="self">self</span>.previous_asmoffset, <span class="self">self</span>.asmoffset);
+
+        <span class="comment">// set the cursor position
+        </span><span class="self">self</span>.asmoffset = offset.<span class="number">0</span>;
         <span class="self">self</span>.previous_asmoffset = offset.<span class="number">0</span>;
     }
 
@@ -1963,9 +2008,12 @@
         }
     }
 
-    <span class="comment">// encode uncommited relocations
+    <span class="comment">// encode uncommited relocations. also, invalidate the icache
     </span><span class="kw">fn </span>encode_relocs(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), DynasmError&gt; {
         <span class="kw">let </span>buf_addr = <span class="self">self</span>.buffer.as_ptr() <span class="kw">as </span>usize;
+
+        <span class="comment">// resync the caches of anything we modified before
+        </span>cache_control::synchronize_icache(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer[<span class="self">self</span>.previous_asmoffset .. <span class="self">self</span>.asmoffset]);
 
         <span class="comment">// If we accrued any errors while assembling before, emit them now.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(e) = <span class="self">self</span>.error.take() {
@@ -1985,6 +2033,10 @@
                     }
                 ));
             }
+
+            <span class="comment">// resynchronize the cache of any relocation we just performed
+            </span>cache_control::synchronize_icache(buf);
+
             <span class="kw">if </span>loc.needs_adjustment() {
                 <span class="self">self</span>.new_managed.add(loc);
             }
@@ -1997,6 +2049,10 @@
             <span class="kw">if </span>loc.patch(buf, buf_addr, target.<span class="number">0</span>).is_err() {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(DynasmError::ImpossibleRelocation(TargetKind::Dynamic(id)));
             }
+
+            <span class="comment">// resynchronize the cache of any relocation we just performed
+            </span>cache_control::synchronize_icache(buf);
+
             <span class="kw">if </span>loc.needs_adjustment() {
                 <span class="self">self</span>.new_managed.add(loc);
             }
@@ -2011,7 +2067,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; Extend&lt;u8&gt; <span class="kw">for </span>Modifier&lt;<span class="lifetime">&#39;a</span>,R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, R: Relocation&gt; Extend&lt;u8&gt; <span class="kw">for </span>Modifier&lt;<span class="lifetime">'a</span>,R&gt; {
     <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=u8&gt; {
         <span class="kw">for </span>(src, dst) <span class="kw">in </span>iter.into_iter().zip(<span class="self">self</span>.buffer[<span class="self">self</span>.asmoffset ..].iter_mut()) {
             <span class="kw-2">*</span>dst = src;
@@ -2020,8 +2076,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, R: Relocation&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>u8&gt; <span class="kw">for </span>Modifier&lt;<span class="lifetime">&#39;a</span>, R&gt; {
-    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>u8&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, R: Relocation&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>u8&gt; <span class="kw">for </span>Modifier&lt;<span class="lifetime">'a</span>, R&gt; {
+    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'b </span>u8&gt; {
         <span class="kw">for </span>(src, dst) <span class="kw">in </span>iter.into_iter().zip(<span class="self">self</span>.buffer[<span class="self">self</span>.asmoffset ..].iter_mut()) {
             <span class="kw-2">*</span>dst = <span class="kw-2">*</span>src;
             <span class="self">self</span>.asmoffset += <span class="number">1</span>;
@@ -2029,7 +2085,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; DynasmApi <span class="kw">for </span>Modifier&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, R: Relocation&gt; DynasmApi <span class="kw">for </span>Modifier&lt;<span class="lifetime">'a</span>, R&gt; {
     <span class="kw">fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AssemblyOffset {
         AssemblyOffset(<span class="self">self</span>.asmoffset)
     }
@@ -2049,14 +2105,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R: Relocation&gt; DynasmLabelApi <span class="kw">for </span>Modifier&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, R: Relocation&gt; DynasmLabelApi <span class="kw">for </span>Modifier&lt;<span class="lifetime">'a</span>, R&gt; {
     <span class="kw">type </span>Relocation = R;
 
-    <span class="kw">fn </span>local_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+    <span class="kw">fn </span>local_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
         <span class="kw">let </span>offset = <span class="self">self</span>.offset();
         <span class="self">self</span>.labels.define_local(name, offset);
     }
-    <span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+    <span class="kw">fn </span>global_label( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
         <span class="kw">let </span>offset = <span class="self">self</span>.offset();
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.labels.define_global(name, offset) {
             <span class="self">self</span>.error = <span class="prelude-val">Some</span>(e);
@@ -2068,7 +2124,7 @@
             <span class="self">self</span>.error = <span class="prelude-val">Some</span>(e);
         }
     }
-    <span class="kw">fn </span>global_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>global_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = StaticLabel::global(name);
         <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
@@ -2077,7 +2133,7 @@
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="self">self</span>.relocs.add_dynamic(id, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
     }
-    <span class="kw">fn </span>forward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>forward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = <span class="kw">match </span><span class="self">self</span>.labels.place_local_reference(name) {
             <span class="prelude-val">Some</span>(label) =&gt; label.next(),
@@ -2085,7 +2141,7 @@
         };
         <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
     }
-    <span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
+    <span class="kw">fn </span>backward_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: R) {
         <span class="kw">let </span>location = <span class="self">self</span>.offset();
         <span class="kw">let </span>label = <span class="kw">match </span><span class="self">self</span>.labels.place_local_reference(name) {
             <span class="prelude-val">Some</span>(label) =&gt; label,
@@ -2116,13 +2172,13 @@
 /// in advance. Due to limitations of the label resolution algorithms, this
 /// assembler does not allow labels to be used.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>UncommittedModifier&lt;<span class="lifetime">&#39;a</span>&gt; {
-    buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;,
+</span><span class="kw">pub struct </span>UncommittedModifier&lt;<span class="lifetime">'a</span>&gt; {
+    buffer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;,
     base_offset: usize,
     offset: usize
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; UncommittedModifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; UncommittedModifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// create a new uncommittedmodifier
     </span><span class="kw">pub fn </span>new(buffer: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, base_offset: AssemblyOffset) -&gt; UncommittedModifier {
         UncommittedModifier {
@@ -2156,7 +2212,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DynasmApi <span class="kw">for </span>UncommittedModifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; DynasmApi <span class="kw">for </span>UncommittedModifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AssemblyOffset {
         AssemblyOffset(<span class="self">self</span>.offset)
     }
@@ -2176,7 +2232,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Extend&lt;u8&gt; <span class="kw">for </span>UncommittedModifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Extend&lt;u8&gt; <span class="kw">for </span>UncommittedModifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=u8&gt; {
         <span class="kw">for </span>i <span class="kw">in </span>iter {
             <span class="self">self</span>.push(i)
@@ -2184,8 +2240,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>u8&gt; <span class="kw">for </span>UncommittedModifier&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>u8&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>u8&gt; <span class="kw">for </span>UncommittedModifier&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>extend&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) <span class="kw">where </span>T: IntoIterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'b </span>u8&gt; {
         <span class="self">self</span>.extend(iter.into_iter().cloned())
     }
 }
@@ -2198,5 +2254,4 @@
     /// the enum to an u8, but allows you to be generic over the register family.
     </span><span class="kw">fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

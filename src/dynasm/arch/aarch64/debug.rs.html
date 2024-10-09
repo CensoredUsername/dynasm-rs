@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\debug.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>debug.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\debug.rs`."><title>debug.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -813,14 +813,20 @@
 <a href="#813" id="813">813</a>
 <a href="#814" id="814">814</a>
 <a href="#815" id="815">815</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::ast::Modifier;
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::ast::Modifier;
 <span class="kw">use </span><span class="kw">super</span>::aarch64data::{Opdata, Matcher, Command, Relocation, SpecialComm};
 <span class="kw">use </span><span class="kw">crate</span>::common::Size;
 
 <span class="kw">use </span>std::fmt::Write;
 
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_opmap&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"dynasm_opmap"</span>)]
 </span><span class="kw">pub fn </span>create_opmap() -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
 
@@ -834,17 +840,17 @@
         </span><span class="kw">let </span>formats = data.into_iter()
             .map(|x| format_opdata(mnemnonic, x))
             .flat_map(|x| x)
-            .map(|x| x.replace(<span class="string">&quot;&gt;&gt;&gt; &quot;</span>, <span class="string">&quot;&quot;</span>))
+            .map(|x| x.replace(<span class="string">"&gt;&gt;&gt; "</span>, <span class="string">""</span>))
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
         <span class="comment">// push mnemnonic name as title
-        </span><span class="macro">write!</span>(s, <span class="string">&quot;### {}\n```insref\n{}\n```\n&quot;</span>, mnemnonic, formats.join(<span class="string">&quot;\n&quot;</span>)).unwrap();
+        </span><span class="macro">write!</span>(s, <span class="string">"### {}\n```insref\n{}\n```\n"</span>, mnemnonic, formats.join(<span class="string">"\n"</span>)).unwrap();
     }
     s
 }
 
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_extract&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"dynasm_extract"</span>)]
 </span><span class="kw">pub fn </span>extract_opmap() -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
 
@@ -862,7 +868,7 @@
         );
     }
 
-    buf.join(<span class="string">&quot;\n&quot;</span>)
+    buf.join(<span class="string">"\n"</span>)
 }
 
 
@@ -873,7 +879,7 @@
         forms.extend(format_opdata(name, data));
     }
 
-    forms.join(<span class="string">&quot;\n&quot;</span>)
+    forms.join(<span class="string">"\n"</span>)
 }
 
 <span class="kw">pub fn </span>format_opdata(name: <span class="kw-2">&amp;</span>str, data: <span class="kw-2">&amp;</span>Opdata) -&gt; Vec&lt;String&gt; {
@@ -887,11 +893,11 @@
     <span class="kw">let </span><span class="kw-2">mut </span>forms = Vec::new();
 
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0 </span>.. form_count {
-        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">format!</span>(<span class="string">&quot;&gt;&gt;&gt; {}&quot;</span>, name);
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">format!</span>(<span class="string">"&gt;&gt;&gt; {}"</span>, name);
 
         <span class="kw">let </span>(constraints, names) = <span class="kw">match </span>constraints_and_names(data) {
             <span class="prelude-val">Ok</span>(o) =&gt; o,
-            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encountered a faulty op listing for {}: {}&quot;</span>, name, e)
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(<span class="string">"Encountered a faulty op listing for {}: {}"</span>, name, e)
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
@@ -902,22 +908,22 @@
         <span class="kw">for </span>matcher <span class="kw">in </span>data.matchers {
             <span class="kw">if let </span>Matcher::End = matcher {
                 end_count += <span class="number">1</span>;
-                buf.push_str(<span class="string">&quot; {&quot;</span>);
+                buf.push_str(<span class="string">" {"</span>);
                 <span class="kw">continue</span>;
             } <span class="kw">else if let </span>Matcher::Dot = matcher {
                 after_dot = <span class="bool-val">true</span>;
-                buf.push_str(<span class="string">&quot;.&quot;</span>);
+                buf.push_str(<span class="string">"."</span>);
                 <span class="kw">continue</span>;
             }
 
             <span class="kw">if </span>first {
                 <span class="kw">if </span>!after_dot {
-                    buf.push_str(<span class="string">&quot; &quot;</span>);
+                    buf.push_str(<span class="string">" "</span>);
                     first = <span class="bool-val">false</span>;
                 }
                 after_dot = <span class="bool-val">false</span>;
             } <span class="kw">else </span>{
-                buf.push_str(<span class="string">&quot;, &quot;</span>);
+                buf.push_str(<span class="string">", "</span>);
             }
 
             <span class="kw">let </span>(arg_names, rest) = names.split_at(matcher.flatarg_count());
@@ -925,46 +931,46 @@
 
             <span class="kw">match </span>matcher {
                 Matcher::Dot =&gt; (),
-                Matcher::Lit(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{}&quot;</span>, s).unwrap(),
-                Matcher::LitInt(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{}&quot;</span>, v).unwrap(),
-                Matcher::LitFloat(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{}&quot;</span>, v).unwrap(),
-                Matcher::Ident =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::Cond =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;cond&gt;&quot;</span>).unwrap(),
-                Matcher::Imm =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::W =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;W{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::X =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;X{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::WSP =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;W{}|WSP&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::XSP =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;X{}|SP&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::B =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;B{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::H =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;H{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::S =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;S{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::D =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;D{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::Q =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;Q{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::Lit(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{}"</span>, s).unwrap(),
+                Matcher::LitInt(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{}"</span>, v).unwrap(),
+                Matcher::LitFloat(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{}"</span>, v).unwrap(),
+                Matcher::Ident =&gt; <span class="macro">write!</span>(buf, <span class="string">"{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::Cond =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;cond&gt;"</span>).unwrap(),
+                Matcher::Imm =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::W =&gt;   <span class="macro">write!</span>(buf, <span class="string">"W{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::X =&gt;   <span class="macro">write!</span>(buf, <span class="string">"X{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::WSP =&gt; <span class="macro">write!</span>(buf, <span class="string">"W{}|WSP"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::XSP =&gt; <span class="macro">write!</span>(buf, <span class="string">"X{}|SP"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::B =&gt;   <span class="macro">write!</span>(buf, <span class="string">"B{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::H =&gt;   <span class="macro">write!</span>(buf, <span class="string">"H{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::S =&gt;   <span class="macro">write!</span>(buf, <span class="string">"S{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::D =&gt;   <span class="macro">write!</span>(buf, <span class="string">"D{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::Q =&gt;   <span class="macro">write!</span>(buf, <span class="string">"Q{}"</span>, arg_names[<span class="number">0</span>]).unwrap(),
                 Matcher::V(s) =&gt; {
                     <span class="kw">let </span>width = <span class="kw">if </span>i == <span class="number">0 </span>{ <span class="number">16 </span>} <span class="kw">else </span>{ <span class="number">8 </span>};
-                    <span class="macro">write!</span>(buf, <span class="string">&quot;V{}.{}{}&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes()).unwrap();
+                    <span class="macro">write!</span>(buf, <span class="string">"V{}.{}{}"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes()).unwrap();
                 },
-                Matcher::VStatic(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;V{}.{}{}&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), c).unwrap(),
-                Matcher::VElement(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;V{}.{}[{}]&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), arg_names[<span class="number">1</span>]).unwrap(),
-                Matcher::VElementStatic(s, element) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;V{}.{}[{}]&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), element).unwrap(),
-                Matcher::VStaticElement(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;V{}.{}{}[{}]&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), c, arg_names[<span class="number">1</span>]).unwrap(),
+                Matcher::VStatic(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">"V{}.{}{}"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), c).unwrap(),
+                Matcher::VElement(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">"V{}.{}[{}]"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), arg_names[<span class="number">1</span>]).unwrap(),
+                Matcher::VElementStatic(s, element) =&gt; <span class="macro">write!</span>(buf, <span class="string">"V{}.{}[{}]"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), element).unwrap(),
+                Matcher::VStaticElement(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">"V{}.{}{}[{}]"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), c, arg_names[<span class="number">1</span>]).unwrap(),
                 Matcher::RegList(a, s) =&gt; {
                     <span class="kw">let </span>width = <span class="kw">if </span>i == <span class="number">0 </span>{ <span class="number">16 </span>} <span class="kw">else </span>{ <span class="number">8 </span>};
-                    <span class="macro">write!</span>(buf, <span class="string">&quot;{{V{}.{}{} * {}}}&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes(), a).unwrap();
+                    <span class="macro">write!</span>(buf, <span class="string">"{{V{}.{}{} * {}}}"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes(), a).unwrap();
                 },
-                Matcher::RegListStatic(a, s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{{V{}.{}{} * {}}}&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), c, a).unwrap(),
-                Matcher::RegListElement(a, s) =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;{{V{}.{} * {}}}[{}]&quot;</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), a, arg_names[<span class="number">1</span>]).unwrap(),
+                Matcher::RegListStatic(a, s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{{V{}.{}{} * {}}}"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), c, a).unwrap(),
+                Matcher::RegListElement(a, s) =&gt;   <span class="macro">write!</span>(buf, <span class="string">"{{V{}.{} * {}}}[{}]"</span>, arg_names[<span class="number">0</span>], size_to_string(<span class="kw-2">*</span>s), a, arg_names[<span class="number">1</span>]).unwrap(),
                 Matcher::Offset =&gt; buf.push_str(<span class="kw-2">&amp;</span>arg_names[<span class="number">0</span>]),
-                Matcher::RefBase =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;[X{}|SP]&quot;</span>, arg_names[<span class="number">0</span>]).unwrap(),
-                Matcher::RefOffset =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;[X{}|SP {{, #{} }} ]&quot;</span>, arg_names[<span class="number">0</span>], arg_names[<span class="number">1</span>]).unwrap(),
-                Matcher::RefPre =&gt;    <span class="macro">write!</span>(buf, <span class="string">&quot;[X{}|SP, #{}]!&quot;</span>, arg_names[<span class="number">0</span>], arg_names[<span class="number">1</span>]).unwrap(),
-                Matcher::RefIndex =&gt;  <span class="macro">write!</span>(buf, <span class="string">&quot;[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]&quot;</span>, arg_names[<span class="number">0</span>], arg_names[<span class="number">1</span>], arg_names[<span class="number">1</span>], arg_names[<span class="number">3</span>]).unwrap(),
+                Matcher::RefBase =&gt;   <span class="macro">write!</span>(buf, <span class="string">"[X{}|SP]"</span>, arg_names[<span class="number">0</span>]).unwrap(),
+                Matcher::RefOffset =&gt; <span class="macro">write!</span>(buf, <span class="string">"[X{}|SP {{, #{} }} ]"</span>, arg_names[<span class="number">0</span>], arg_names[<span class="number">1</span>]).unwrap(),
+                Matcher::RefPre =&gt;    <span class="macro">write!</span>(buf, <span class="string">"[X{}|SP, #{}]!"</span>, arg_names[<span class="number">0</span>], arg_names[<span class="number">1</span>]).unwrap(),
+                Matcher::RefIndex =&gt;  <span class="macro">write!</span>(buf, <span class="string">"[X{}|SP, W{}|X{} {{ , UXTW|LSL|SXTW|SXTX {{ #{} }} }} ]"</span>, arg_names[<span class="number">0</span>], arg_names[<span class="number">1</span>], arg_names[<span class="number">1</span>], arg_names[<span class="number">3</span>]).unwrap(),
                 Matcher::LitMod(m) =&gt; {
                     buf.push_str(m.as_str());
                     <span class="kw">if </span>!m.expr_required() {
-                        <span class="macro">write!</span>(buf, <span class="string">&quot; {{ #{} }}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">" {{ #{} }}"</span>, arg_names[<span class="number">0</span>]).unwrap();
                     } <span class="kw">else </span>{
-                        <span class="macro">write!</span>(buf, <span class="string">&quot; #{}&quot;</span>, arg_names[<span class="number">0</span>]).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">" #{}"</span>, arg_names[<span class="number">0</span>]).unwrap();
                     }
                 },
                 Matcher::Mod(mods) =&gt; {
@@ -982,26 +988,26 @@
                     }
                     <span class="kw">if </span>!unsigned_extends.is_empty() {
                         <span class="kw">if </span>unsigned_extends.len() &gt; <span class="number">1 </span>{
-                            unsigned_extends = <span class="macro">format!</span>(<span class="string">&quot;UXT[{}]&quot;</span>, unsigned_extends);
+                            unsigned_extends = <span class="macro">format!</span>(<span class="string">"UXT[{}]"</span>, unsigned_extends);
                         } <span class="kw">else </span>{
-                            unsigned_extends = <span class="macro">format!</span>(<span class="string">&quot;UXT{}&quot;</span>, unsigned_extends);
+                            unsigned_extends = <span class="macro">format!</span>(<span class="string">"UXT{}"</span>, unsigned_extends);
                         }
                         rest.push(<span class="kw-2">&amp;</span>unsigned_extends);
                     }
                     <span class="kw">if </span>!signed_extends.is_empty() {
                         <span class="kw">if </span>signed_extends.len() &gt; <span class="number">1 </span>{
-                            signed_extends = <span class="macro">format!</span>(<span class="string">&quot;SXT[{}]&quot;</span>, signed_extends);
+                            signed_extends = <span class="macro">format!</span>(<span class="string">"SXT[{}]"</span>, signed_extends);
                         } <span class="kw">else </span>{
-                            signed_extends = <span class="macro">format!</span>(<span class="string">&quot;SXT{}&quot;</span>, signed_extends);
+                            signed_extends = <span class="macro">format!</span>(<span class="string">"SXT{}"</span>, signed_extends);
                         }
                         rest.push(<span class="kw-2">&amp;</span>signed_extends);
                     }
-                    buf.push_str(<span class="kw-2">&amp;</span>rest.join(<span class="string">&quot;|&quot;</span>));
+                    buf.push_str(<span class="kw-2">&amp;</span>rest.join(<span class="string">"|"</span>));
 
                     <span class="kw">if </span>!required {
-                        <span class="macro">write!</span>(buf, <span class="string">&quot; {{ #{} }}&quot;</span>, arg_names[<span class="number">1</span>]).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">" {{ #{} }}"</span>, arg_names[<span class="number">1</span>]).unwrap();
                     } <span class="kw">else </span>{
-                        <span class="macro">write!</span>(buf, <span class="string">&quot; #{}&quot;</span>, arg_names[<span class="number">1</span>]).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">" #{}"</span>, arg_names[<span class="number">1</span>]).unwrap();
                     }
                 },
                 Matcher::End =&gt; ()
@@ -1010,13 +1016,13 @@
         }
 
         <span class="kw">for _ in </span><span class="number">0 </span>.. end_count {
-            buf.push_str(<span class="string">&quot; }&quot;</span>);
+            buf.push_str(<span class="string">" }"</span>);
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = constraints {
             <span class="kw">let </span><span class="kw-2">mut </span>len = c.len() + buf.len();
             <span class="kw">while </span>len &lt; <span class="number">100 </span>{
-                buf.push(<span class="string">&#39; &#39;</span>);
+                buf.push(<span class="string">' '</span>);
                 len += <span class="number">1</span>;
             }
             buf.push_str(<span class="kw-2">&amp;</span>c);
@@ -1028,30 +1034,30 @@
     forms
 }
 
-<span class="kw">pub fn </span>size_to_string(size: Size) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+<span class="kw">pub fn </span>size_to_string(size: Size) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
     <span class="kw">match </span>size {
-        Size::BYTE =&gt; <span class="string">&quot;B&quot;</span>,
-        Size::WORD =&gt; <span class="string">&quot;H&quot;</span>,
-        Size::DWORD =&gt; <span class="string">&quot;S&quot;</span>,
-        Size::QWORD =&gt; <span class="string">&quot;D&quot;</span>,
-        Size::OWORD =&gt; <span class="string">&quot;Q&quot;</span>,
+        Size::BYTE =&gt; <span class="string">"B"</span>,
+        Size::B_2 =&gt; <span class="string">"H"</span>,
+        Size::B_4 =&gt; <span class="string">"S"</span>,
+        Size::B_8 =&gt; <span class="string">"D"</span>,
+        Size::B_16 =&gt; <span class="string">"Q"</span>,
         <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>()
     }
 }
 
-<span class="kw">fn </span>constraints_and_names(opdata: <span class="kw-2">&amp;</span>Opdata) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;String&gt;, Vec&lt;String&gt;), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">fn </span>constraints_and_names(opdata: <span class="kw-2">&amp;</span>Opdata) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;String&gt;, Vec&lt;String&gt;), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
     <span class="kw">let </span>data = group_opdata(opdata)<span class="question-mark">?</span>;
     <span class="kw">let </span>constraints = format_constraints(<span class="kw-2">&amp;</span>data);
-    <span class="kw">let </span>names = data.into_iter().map(|a| a.name.unwrap_or_else(|| <span class="string">&quot;?&quot;</span>.into())).collect();
+    <span class="kw">let </span>names = data.into_iter().map(|a| a.name.unwrap_or_else(|| <span class="string">"?"</span>.into())).collect();
     <span class="prelude-val">Ok</span>((constraints, names))
 }
 
-<span class="kw">fn </span>group_opdata(opdata: <span class="kw-2">&amp;</span>Opdata) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ArgWithCommands&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">fn </span>group_opdata(opdata: <span class="kw-2">&amp;</span>Opdata) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ArgWithCommands&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
     <span class="kw">let </span>args = flatten_matchers(opdata.matchers);
     <span class="kw">let </span>(max_cursor, commands) = group_commands(opdata.commands);
 
     <span class="kw">if </span>args.len() != max_cursor {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;arg / command count mismatch&quot;</span>);
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"arg / command count mismatch"</span>);
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>args: Vec&lt;<span class="kw">_</span>&gt; = args.into_iter().map(|(arg, can_be_default)| ArgWithCommands {
@@ -1185,9 +1191,10 @@
             | Command::Uscaled(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
             | Command::Ulist(<span class="kw">_</span>, <span class="kw">_</span>)
             | Command::Urange(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-            | Command::Usub(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-            | Command::Unegmod(<span class="kw">_</span>, <span class="kw">_</span>)
-            | Command::Usumdec(<span class="kw">_</span>, <span class="kw">_</span>)
+            | Command::Usubone(<span class="kw">_</span>, <span class="kw">_</span>)
+            | Command::Usubzero(<span class="kw">_</span>, <span class="kw">_</span>)
+            | Command::Usubmod(<span class="kw">_</span>, <span class="kw">_</span>)
+            | Command::Usum(<span class="kw">_</span>, <span class="kw">_</span>)
             | Command::Ufields(<span class="kw">_</span>)
             | Command::Sbits(<span class="kw">_</span>, <span class="kw">_</span>)
             | Command::Sscaled(<span class="kw">_</span>, <span class="kw">_</span>,<span class="kw">_</span>)
@@ -1207,10 +1214,10 @@
 }
 
 <span class="doccomment">/// checks if the commands for each arg type make sense
-</span><span class="kw">fn </span>check_command_sanity(args: <span class="kw-2">&amp;</span>[ArgWithCommands]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+</span><span class="kw">fn </span>check_command_sanity(args: <span class="kw-2">&amp;</span>[ArgWithCommands]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
     <span class="kw">for </span>arg <span class="kw">in </span>args {
         <span class="kw">if </span>arg.commands.is_empty() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Arg with no commands&quot;</span>)
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"Arg with no commands"</span>)
         }
 
         <span class="kw">for </span>command <span class="kw">in </span><span class="kw-2">&amp;</span>arg.commands {
@@ -1224,16 +1231,17 @@
                 | Command::Uscaled(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Ulist(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Urange(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::Usub(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::Unegmod(<span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::Usumdec(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::Usubone(<span class="kw">_</span>, <span class="kw">_</span>, )
+                | Command::Usubzero(<span class="kw">_</span>, <span class="kw">_</span>, )
+                | Command::Usubmod(<span class="kw">_</span>, <span class="kw">_</span>, )
+                | Command::Usum(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Ufields(<span class="kw">_</span>)
                 | Command::Sbits(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Sscaled(<span class="kw">_</span>, <span class="kw">_</span>,<span class="kw">_</span>)
-                | Command::BUbits(<span class="kw">_</span>)
-                | Command::BUsum(<span class="kw">_</span>)
-                | Command::BSscaled(<span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::BUrange(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::CUbits(<span class="kw">_</span>)
+                | Command::CUsum(<span class="kw">_</span>)
+                | Command::CSscaled(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::CUrange(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Uslice(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Sslice(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Special(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; arg.arg == FlatArgTy::Immediate,
@@ -1250,7 +1258,7 @@
             };
 
             <span class="kw">if </span>!check {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;command / argtype mismatch&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"command / argtype mismatch"</span>);
             }
 
             <span class="kw">let </span>check = <span class="kw">match </span>command {
@@ -1264,9 +1272,9 @@
                 | Command::Sbits(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Sscaled(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Sslice(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::BUbits(<span class="kw">_</span>)
-                | Command::BUsum(<span class="kw">_</span>)
-                | Command::BSscaled(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::CUbits(<span class="kw">_</span>)
+                | Command::CUsum(<span class="kw">_</span>)
+                | Command::CSscaled(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Rotates(<span class="kw">_</span>)
                 | Command::ExtendsW(<span class="kw">_</span>)
                 | Command::ExtendsX(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
@@ -1274,10 +1282,11 @@
                 | Command::RNoZr(<span class="kw">_</span>)
                 | Command::REven(<span class="kw">_</span>)
                 | Command::RNext
-                | Command::Usub(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::Unegmod(<span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::Usumdec(<span class="kw">_</span>, <span class="kw">_</span>)
-                | Command::BUrange(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::Usubone(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::Usubzero(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::Usubmod(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::Usum(<span class="kw">_</span>, <span class="kw">_</span>)
+                | Command::CUrange(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Special(<span class="kw">_</span>, <span class="kw">_</span>)
                 | Command::Cond(<span class="kw">_</span>)
                 | Command::CondInv(<span class="kw">_</span>)
@@ -1289,7 +1298,7 @@
             };
 
             <span class="kw">if </span>!check {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;default mismatch&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"default mismatch"</span>);
             }
         }
     }
@@ -1300,9 +1309,9 @@
 <span class="doccomment">/// assign names to the args being used
 </span><span class="kw">fn </span>name_args(args: <span class="kw-2">&amp;mut </span>[ArgWithCommands]) {
     <span class="comment">// iirc no op uses more than 4 unconstrained literals / immediates
-    </span><span class="kw">let </span>reg_name_list = [<span class="string">&quot;n&quot;</span>, <span class="string">&quot;m&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>];
+    </span><span class="kw">let </span>reg_name_list = [<span class="string">"n"</span>, <span class="string">"m"</span>, <span class="string">"a"</span>, <span class="string">"b"</span>];
     <span class="kw">let </span><span class="kw-2">mut </span>reg_name_idx = <span class="number">0</span>;
-    <span class="kw">let </span>imm_name_list = [<span class="string">&quot;&quot;</span>, <span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>];
+    <span class="kw">let </span>imm_name_list = [<span class="string">""</span>, <span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"3"</span>];
     <span class="kw">let </span><span class="kw-2">mut </span>imm_name_idx = <span class="number">0</span>;
 
     <span class="kw">for </span>arg <span class="kw">in </span>args {
@@ -1317,7 +1326,7 @@
                         reg_name_idx += <span class="number">1</span>;
                     },
                     Command::RNext =&gt; {
-                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}+1&quot;</span>, reg_name_list[reg_name_idx - <span class="number">1</span>]));
+                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"{}+1"</span>, reg_name_list[reg_name_idx - <span class="number">1</span>]));
                     },
                     <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
                 }
@@ -1326,31 +1335,32 @@
                 <span class="kw">match </span><span class="kw-2">&amp;</span>arg.commands[<span class="number">0</span>] {
                     Command::Cond(<span class="kw">_</span>)
                     | Command::CondInv(<span class="kw">_</span>) =&gt; arg.name = <span class="prelude-val">None</span>,
-                    Command::LitList(<span class="kw">_</span>, name) =&gt; arg.name = <span class="prelude-val">Some</span>(name.trim_end_matches(<span class="string">&#39;S&#39;</span>).to_lowercase()),
+                    Command::LitList(<span class="kw">_</span>, name) =&gt; arg.name = <span class="prelude-val">Some</span>(name.trim_end_matches(<span class="string">'S'</span>).to_lowercase()),
                     Command::Ubits(<span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Uscaled(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Ulist(<span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Urange(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-                    | Command::Usub(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
-                    | Command::Unegmod(<span class="kw">_</span>, <span class="kw">_</span>)
-                    | Command::Usumdec(<span class="kw">_</span>, <span class="kw">_</span>)
+                    | Command::Usubone(<span class="kw">_</span>, <span class="kw">_</span>)
+                    | Command::Usubzero(<span class="kw">_</span>, <span class="kw">_</span>)
+                    | Command::Usubmod(<span class="kw">_</span>, <span class="kw">_</span>)
+                    | Command::Usum(<span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Ufields(<span class="kw">_</span>)
-                    | Command::BUbits(<span class="kw">_</span>)
-                    | Command::BUsum(<span class="kw">_</span>)
-                    | Command::BUrange(<span class="kw">_</span>, <span class="kw">_</span>)
+                    | Command::CUbits(<span class="kw">_</span>)
+                    | Command::CUsum(<span class="kw">_</span>)
+                    | Command::CUrange(<span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Uslice(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;uimm{}&quot;</span>, imm_name_list[imm_name_idx]));
+                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"uimm{}"</span>, imm_name_list[imm_name_idx]));
                         imm_name_idx += <span class="number">1</span>;
                     },
                     Command::Sbits(<span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Sscaled(<span class="kw">_</span>, <span class="kw">_</span>,<span class="kw">_</span>)
-                    | Command::BSscaled(<span class="kw">_</span>, <span class="kw">_</span>)
+                    | Command::CSscaled(<span class="kw">_</span>, <span class="kw">_</span>)
                     | Command::Sslice(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;simm{}&quot;</span>, imm_name_list[imm_name_idx]));
+                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"simm{}"</span>, imm_name_list[imm_name_idx]));
                         imm_name_idx += <span class="number">1</span>;
                     },
                     Command::Special(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;imm{}&quot;</span>, imm_name_list[imm_name_idx]));
+                        arg.name = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"imm{}"</span>, imm_name_list[imm_name_idx]));
                         imm_name_idx += <span class="number">1</span>;
                     },
                     <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
@@ -1358,13 +1368,13 @@
             },
             FlatArgTy::Modifier =&gt; arg.name = <span class="prelude-val">None</span>,
             FlatArgTy::JumpTarget =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>arg.commands[<span class="number">0</span>] {
-                Command::Offset(<span class="kw">_</span>) =&gt; arg.name = <span class="prelude-val">Some</span>(<span class="string">&quot;&lt;offset&gt;&quot;</span>.to_string()),
+                Command::Offset(<span class="kw">_</span>) =&gt; arg.name = <span class="prelude-val">Some</span>(<span class="string">"&lt;offset&gt;"</span>.to_string()),
                 <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
             },
             FlatArgTy::Lit =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>arg.commands[<span class="number">0</span>] {
                 Command::Cond(<span class="kw">_</span>)
                 | Command::CondInv(<span class="kw">_</span>) =&gt; arg.name = <span class="prelude-val">None</span>,
-                Command::LitList(<span class="kw">_</span>, name) =&gt; arg.name = <span class="prelude-val">Some</span>(name.trim_end_matches(<span class="string">&#39;S&#39;</span>).to_lowercase()),
+                Command::LitList(<span class="kw">_</span>, name) =&gt; arg.name = <span class="prelude-val">Some</span>(name.trim_end_matches(<span class="string">'S'</span>).to_lowercase()),
                 <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
             }
         }
@@ -1373,7 +1383,7 @@
 
 <span class="kw">fn </span>format_constraints(args: <span class="kw-2">&amp;</span>[ArgWithCommands]) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>constraints = String::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>prevname = <span class="string">&quot;?&quot;</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>prevname = <span class="string">"?"</span>;
 
     <span class="kw">for </span>arg <span class="kw">in </span>args {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = arg.name {
@@ -1386,58 +1396,59 @@
         <span class="prelude-val">None
     </span>} <span class="kw">else </span>{
         <span class="kw">let </span>len = constraints.len();
-        <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot; ({})&quot;</span>, <span class="kw-2">&amp;</span>constraints[<span class="number">0 </span>.. len - <span class="number">2</span>]))
+        <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">" ({})"</span>, <span class="kw-2">&amp;</span>constraints[<span class="number">0 </span>.. len - <span class="number">2</span>]))
     }
 }
 
 <span class="kw">fn </span>emit_constraints(name: <span class="kw-2">&amp;</span>str, prevname: <span class="kw-2">&amp;</span>str, commands: <span class="kw-2">&amp;</span>[Command], buf: <span class="kw-2">&amp;mut </span>String) {
     <span class="kw">for </span>command <span class="kw">in </span>commands {
         <span class="kw">match </span>command {
-            Command::R4(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{} is 0-15&quot;</span>, name),
-            Command::RNoZr(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{} is 0-30&quot;</span>, name),
-            Command::REven(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{} is even&quot;</span>, name),
+            Command::R4(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{} is 0-15"</span>, name),
+            Command::RNoZr(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{} is 0-30"</span>, name),
+            Command::REven(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{} is even"</span>, name),
             Command::Ubits(<span class="kw">_</span>, bits)
-            | Command::BUbits(bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} &lt; {}&quot;</span>, name, <span class="number">1u32 </span>&lt;&lt; bits),
-            Command::Uscaled(<span class="kw">_</span>, bits, scale) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} &lt; {}, #{} = {} * N&quot;</span>, name, <span class="number">1u32 </span>&lt;&lt; (bits + scale), name, <span class="number">1u32 </span>&lt;&lt; scale),
+            | Command::CUbits(bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} &lt;= {}"</span>, name, (<span class="number">1u32 </span>&lt;&lt; bits) - <span class="number">1</span>),
+            Command::Uscaled(<span class="kw">_</span>, bits, scale) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} &lt;= {}, #{} = {} * N"</span>, name, (<span class="number">1u32 </span>&lt;&lt; (bits + scale)) - <span class="number">1</span>, name, <span class="number">1u32 </span>&lt;&lt; scale),
             Command::Ulist(<span class="kw">_</span>, list) =&gt; {
-                <span class="kw">let </span>numbers = list.iter().map(|n| n.to_string()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>);
-                <span class="macro">write!</span>(buf, <span class="string">&quot;#{} = [{}]&quot;</span>, name, numbers)
+                <span class="kw">let </span>numbers = list.iter().map(|n| n.to_string()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">", "</span>);
+                <span class="macro">write!</span>(buf, <span class="string">"#{} = [{}]"</span>, name, numbers)
             },
             Command::Urange(<span class="kw">_</span>, min, max)
-            | Command::BUrange(min, max) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{} &lt;= #{} &lt;= {}&quot;</span>, min, name, max),
-            Command::Usub(<span class="kw">_</span>, bits, addval) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{} &lt;= #{} &lt;= {}&quot;</span>, u32::from(<span class="kw-2">*</span>addval) + <span class="number">1 </span>- (<span class="number">1u32 </span>&lt;&lt; bits), name, addval),
-            Command::Unegmod(<span class="kw">_</span>, bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;0 &lt;= #{} &lt; {}&quot;</span>, name, <span class="number">1u32 </span>&lt;&lt; bits),
-            Command::Usumdec(<span class="kw">_</span>, bits)
-            | Command::BUsum(bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;1 &lt;= #{} &lt;= {} - {}&quot;</span>, name, <span class="number">1u32 </span>&lt;&lt; bits, prevname),
-            Command::Ufields(fields) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} &lt; {}&quot;</span>, name, <span class="number">1u32 </span>&lt;&lt; fields.len()),
-            Command::Sbits(<span class="kw">_</span>, bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;-{} &lt;= #{} &lt; {}&quot;</span>, <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>), name, <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>)),
+            | Command::CUrange(min, max) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{} &lt;= #{} &lt;= {}"</span>, min, name, max),
+            Command::Usubone(<span class="kw">_</span>, bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">"1 &lt;= #{} &lt;= {}"</span>, name, (<span class="number">1u32 </span>&lt;&lt; bits)),
+            Command::Usubzero(<span class="kw">_</span>, bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">"0 &lt;= #{} &lt;= {}"</span>, name, (<span class="number">1u32 </span>&lt;&lt; bits) - <span class="number">1</span>),
+            Command::Usubmod(<span class="kw">_</span>, bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">"0 &lt;= #{} &lt;= {}"</span>, name, (<span class="number">1u32 </span>&lt;&lt; bits) - <span class="number">1</span>),
+            Command::Usum(<span class="kw">_</span>, bits)
+            | Command::CUsum(bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">"1 &lt;= #{} &lt;= {} - {}"</span>, name, <span class="number">1u32 </span>&lt;&lt; bits, prevname),
+            Command::Ufields(fields) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} &lt;= {}"</span>, name, (<span class="number">1u32 </span>&lt;&lt; fields.len()) - <span class="number">1</span>),
+            Command::Sbits(<span class="kw">_</span>, bits) =&gt; <span class="macro">write!</span>(buf, <span class="string">"-{} &lt;= #{} &lt;= {}"</span>, <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>), name, (<span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>)) - <span class="number">1</span>),
             Command::Sscaled(<span class="kw">_</span>, bits, scale)
-            | Command::BSscaled(bits, scale) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;-{} &lt;= #{} &lt; {}, #{} = {} * N&quot;</span>, <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), name, <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), name, <span class="number">1u32 </span>&lt;&lt; scale),
+            | Command::CSscaled(bits, scale) =&gt; <span class="macro">write!</span>(buf, <span class="string">"-{} &lt;= #{} &lt;= {}, #{} = {} * N"</span>, <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), name, (<span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>)) - <span class="number">1</span>, name, <span class="number">1u32 </span>&lt;&lt; scale),
             Command::Special(<span class="kw">_</span>, SpecialComm::WIDE_IMMEDIATE_W)
             | Command::Special(<span class="kw">_</span>, SpecialComm::WIDE_IMMEDIATE_X)
             | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_W)
-            | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} is a wide immediate&quot;</span>, name),
+            | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} is a wide immediate"</span>, name),
             Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_W)
-            | Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_X) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} is a logical immediate&quot;</span>, name),
+            | Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_X) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} is a logical immediate"</span>, name),
             Command::Special(<span class="kw">_</span>, SpecialComm::FLOAT_IMMEDIATE)
-            | Command::Special(<span class="kw">_</span>, SpecialComm::SPLIT_FLOAT_IMMEDIATE) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} is a floating point immediate&quot;</span>, name),
-            Command::Special(<span class="kw">_</span>, SpecialComm::STRETCHED_IMMEDIATE) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;#{} is a stretched immediate&quot;</span>, name),
-            Command::Offset(Relocation::B) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 26 bit, 4-byte aligned&quot;</span>),
-            Command::Offset(Relocation::BCOND) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 19 bit, 4-byte aligned&quot;</span>),
-            Command::Offset(Relocation::ADR) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 21 bit&quot;</span>),
-            Command::Offset(Relocation::ADRP) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 21 bit, 4K-page aligned&quot;</span>),
-            Command::Offset(Relocation::TBZ) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 14 bit, 4-byte aligned&quot;</span>),
-            Command::Offset(Relocation::LITERAL32) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 32 bit&gt;&quot;</span>),
-            Command::Offset(Relocation::LITERAL64) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;offset is 64 bit&gt;&quot;</span>),
+            | Command::Special(<span class="kw">_</span>, SpecialComm::SPLIT_FLOAT_IMMEDIATE) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} is a floating point immediate"</span>, name),
+            Command::Special(<span class="kw">_</span>, SpecialComm::STRETCHED_IMMEDIATE) =&gt; <span class="macro">write!</span>(buf, <span class="string">"#{} is a stretched immediate"</span>, name),
+            Command::Offset(Relocation::B) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 26 bit, 4-byte aligned"</span>),
+            Command::Offset(Relocation::BCOND) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 19 bit, 4-byte aligned"</span>),
+            Command::Offset(Relocation::ADR) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 21 bit"</span>),
+            Command::Offset(Relocation::ADRP) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 21 bit, 4K-page aligned"</span>),
+            Command::Offset(Relocation::TBZ) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 14 bit, 4-byte aligned"</span>),
+            Command::Offset(Relocation::LITERAL32) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 32 bit&gt;"</span>),
+            Command::Offset(Relocation::LITERAL64) =&gt; <span class="macro">write!</span>(buf, <span class="string">"offset is 64 bit&gt;"</span>),
             <span class="kw">_ </span>=&gt; <span class="kw">continue
         </span>}.unwrap();
 
-        <span class="macro">write!</span>(buf, <span class="string">&quot;, &quot;</span>).unwrap();
+        <span class="macro">write!</span>(buf, <span class="string">", "</span>).unwrap();
         <span class="kw">break</span>;
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_extract&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"dynasm_extract"</span>)]
 </span><span class="kw">pub fn </span>extract_opdata(name: <span class="kw-2">&amp;</span>str, data: <span class="kw-2">&amp;</span>Opdata) -&gt; Vec&lt;String&gt; {
 
     <span class="kw">let </span>has_simd_full_width = data.matchers.iter().any(|m| <span class="kw">match </span>m {
@@ -1449,7 +1460,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>forms = Vec::new();
 
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0 </span>.. form_count {
-        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}&quot;</span>, name);
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">format!</span>(<span class="string">"\"{}"</span>, name);
 
         <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>after_dot = <span class="bool-val">false</span>;
@@ -1462,69 +1473,69 @@
         <span class="kw">for </span>matcher <span class="kw">in </span>data.matchers {
             <span class="kw">if let </span>Matcher::End = matcher {
                 end_count += <span class="number">1</span>;
-                buf.push_str(<span class="string">&quot; &lt;&quot;</span>);
+                buf.push_str(<span class="string">" &lt;"</span>);
                 <span class="kw">continue</span>;
             } <span class="kw">else if let </span>Matcher::Dot = matcher {
                 after_dot = <span class="bool-val">true</span>;
-                buf.push_str(<span class="string">&quot;.&quot;</span>);
+                buf.push_str(<span class="string">"."</span>);
                 <span class="kw">continue</span>;
             }
 
             <span class="kw">if </span>first {
                 <span class="kw">if </span>!after_dot {
-                    buf.push_str(<span class="string">&quot; &quot;</span>);
+                    buf.push_str(<span class="string">" "</span>);
                     first = <span class="bool-val">false</span>;
                 }
                 after_dot = <span class="bool-val">false</span>;
             } <span class="kw">else </span>{
-                buf.push_str(<span class="string">&quot;, &quot;</span>);
+                buf.push_str(<span class="string">", "</span>);
             }
 
             <span class="kw">match </span>matcher {
                 Matcher::Dot =&gt; (),
-                Matcher::Lit(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{}&quot;</span>, s).unwrap(),
-                Matcher::LitInt(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{}&quot;</span>, v).unwrap(),
-                Matcher::LitFloat(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{:.5}&quot;</span>, v).unwrap(),
+                Matcher::Lit(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{}"</span>, s).unwrap(),
+                Matcher::LitInt(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{}"</span>, v).unwrap(),
+                Matcher::LitFloat(v) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{:.5}"</span>, v).unwrap(),
                 Matcher::Ident
-                | Matcher::Cond =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;Ident,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::Imm =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;Imm,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::W =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;W,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::X =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;X,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::WSP =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;WSP,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::XSP =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;XSP,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::B =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;B,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::H =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;H,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::S =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;S,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::D =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;D,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::Q =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;Q,{}&gt;&quot;</span>, arg_idx).unwrap(),
+                | Matcher::Cond =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;Ident,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::Imm =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;Imm,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::W =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;W,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::X =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;X,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::WSP =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;WSP,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::XSP =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;XSP,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::B =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;B,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::H =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;H,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::S =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;S,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::D =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;D,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::Q =&gt;   <span class="macro">write!</span>(buf, <span class="string">"&lt;Q,{}&gt;"</span>, arg_idx).unwrap(),
                 Matcher::V(s) =&gt; {
                     <span class="kw">let </span>width = <span class="kw">if </span>i == <span class="number">0 </span>{ <span class="number">16 </span>} <span class="kw">else </span>{ <span class="number">8 </span>};
-                    <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;V,{}&gt;.{}{}&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes()).unwrap();
+                    <span class="macro">write!</span>(buf, <span class="string">"&lt;V,{}&gt;.{}{}"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes()).unwrap();
                 },
-                Matcher::VStatic(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;V,{}&gt;.{}{}&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), c).unwrap(),
-                Matcher::VElement(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;V,{}&gt;.{}[&lt;Imm,{}&gt;]&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), arg_idx + <span class="number">1</span>).unwrap(),
-                Matcher::VElementStatic(s, element) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;V,{}&gt;.{}[{}]&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), element).unwrap(),
-                Matcher::VStaticElement(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;V,{}&gt;.{}{}[&lt;Imm,{}&gt;]&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), c, arg_idx + <span class="number">1</span>).unwrap(),
+                Matcher::VStatic(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;V,{}&gt;.{}{}"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), c).unwrap(),
+                Matcher::VElement(s) =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;V,{}&gt;.{}[&lt;Imm,{}&gt;]"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), arg_idx + <span class="number">1</span>).unwrap(),
+                Matcher::VElementStatic(s, element) =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;V,{}&gt;.{}[{}]"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), element).unwrap(),
+                Matcher::VStaticElement(s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;V,{}&gt;.{}{}[&lt;Imm,{}&gt;]"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), c, arg_idx + <span class="number">1</span>).unwrap(),
                 Matcher::RegList(a, s) =&gt; {
                     <span class="kw">let </span>width = <span class="kw">if </span>i == <span class="number">0 </span>{ <span class="number">16 </span>} <span class="kw">else </span>{ <span class="number">8 </span>};
-                    <span class="macro">write!</span>(buf, <span class="string">&quot;{{&lt;V,{}&gt;.{}{} * {}}}&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes(), a).unwrap();
+                    <span class="macro">write!</span>(buf, <span class="string">"{{&lt;V,{}&gt;.{}{} * {}}}"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), width / s.in_bytes(), a).unwrap();
                 },
-                Matcher::RegListStatic(a, s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;{{&lt;V,{}&gt;.{}{} * {}}}&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), c, a).unwrap(),
-                Matcher::RegListElement(a, s) =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;{{&lt;V,{}&gt;.{} * {}}}[&lt;Imm,{}&gt;]&quot;</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), a, arg_idx + <span class="number">1</span>).unwrap(),
-                Matcher::Offset =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;Off,{}&gt;&quot;</span>, arg_idx).unwrap(),
-                Matcher::RefBase =&gt;   <span class="macro">write!</span>(buf, <span class="string">&quot;[&lt;XSP,{}&gt;]&quot;</span>, arg_idx).unwrap(),
-                Matcher::RefOffset =&gt; <span class="macro">write!</span>(buf, <span class="string">&quot;[&lt;XSP,{}&gt; &lt;, &lt;Imm,{}&gt; &gt; ]&quot;</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap(),
-                Matcher::RefPre =&gt;    <span class="macro">write!</span>(buf, <span class="string">&quot;[&lt;XSP,{}&gt;, &lt;Imm,{}&gt;]!&quot;</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap(),
+                Matcher::RegListStatic(a, s, c) =&gt; <span class="macro">write!</span>(buf, <span class="string">"{{&lt;V,{}&gt;.{}{} * {}}}"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), c, a).unwrap(),
+                Matcher::RegListElement(a, s) =&gt;   <span class="macro">write!</span>(buf, <span class="string">"{{&lt;V,{}&gt;.{} * {}}}[&lt;Imm,{}&gt;]"</span>, arg_idx, size_to_string(<span class="kw-2">*</span>s), a, arg_idx + <span class="number">1</span>).unwrap(),
+                Matcher::Offset =&gt; <span class="macro">write!</span>(buf, <span class="string">"&lt;Off,{}&gt;"</span>, arg_idx).unwrap(),
+                Matcher::RefBase =&gt;   <span class="macro">write!</span>(buf, <span class="string">"[&lt;XSP,{}&gt;]"</span>, arg_idx).unwrap(),
+                Matcher::RefOffset =&gt; <span class="macro">write!</span>(buf, <span class="string">"[&lt;XSP,{}&gt; &lt;, &lt;Imm,{}&gt; &gt; ]"</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap(),
+                Matcher::RefPre =&gt;    <span class="macro">write!</span>(buf, <span class="string">"[&lt;XSP,{}&gt;, &lt;Imm,{}&gt;]!"</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap(),
                 Matcher::RefIndex =&gt; {
-                    constraints.push(<span class="macro">format!</span>(<span class="string">&quot;{}: ModWX()&quot;</span>, arg_idx + <span class="number">2</span>));
-                    <span class="macro">write!</span>(buf, <span class="string">&quot;[&lt;XSP,{}&gt;, &lt;WX,{}&gt; &lt; , &lt;Mod,{}&gt; &lt; &lt;Imm,{}&gt; &gt; &gt; ]&quot;</span>, arg_idx, arg_idx + <span class="number">1</span>, arg_idx + <span class="number">2</span>, arg_idx + <span class="number">3</span>).unwrap();
+                    constraints.push(<span class="macro">format!</span>(<span class="string">"{}: ModWX()"</span>, arg_idx + <span class="number">2</span>));
+                    <span class="macro">write!</span>(buf, <span class="string">"[&lt;XSP,{}&gt;, &lt;WX,{}&gt; &lt; , &lt;Mod,{}&gt; &lt; &lt;Imm,{}&gt; &gt; &gt; ]"</span>, arg_idx, arg_idx + <span class="number">1</span>, arg_idx + <span class="number">2</span>, arg_idx + <span class="number">3</span>).unwrap();
                 },
                 Matcher::LitMod(m) =&gt; {
                     buf.push_str(m.as_str());
                     <span class="kw">if </span>!m.expr_required() {
-                        <span class="macro">write!</span>(buf, <span class="string">&quot; {{ &lt;Imm,{}&gt; }}&quot;</span>, arg_idx).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">" {{ &lt;Imm,{}&gt; }}"</span>, arg_idx).unwrap();
                     } <span class="kw">else </span>{
-                        <span class="macro">write!</span>(buf, <span class="string">&quot; &lt;Imm,{}&gt;&quot;</span>, arg_idx).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">" &lt;Imm,{}&gt;"</span>, arg_idx).unwrap();
                     }
                 },
                 Matcher::Mod(mods) =&gt; {
@@ -1532,15 +1543,15 @@
                     <span class="kw">let </span><span class="kw-2">mut </span>options = Vec::new();
                     <span class="kw">for </span>m <span class="kw">in </span><span class="kw-2">*</span>mods {
                         required = required || m.expr_required();
-                        options.push(<span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, m.as_str()));
+                        options.push(<span class="macro">format!</span>(<span class="string">"\"{}\""</span>, m.as_str()));
                     }
 
-                    constraints.push(<span class="macro">format!</span>(<span class="string">&quot;{}: List({})&quot;</span>, arg_idx, options.join(<span class="string">&quot;, &quot;</span>)));
+                    constraints.push(<span class="macro">format!</span>(<span class="string">"{}: List({})"</span>, arg_idx, options.join(<span class="string">", "</span>)));
 
                     <span class="kw">if </span>!required {
-                        <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;Mod,{}&gt; &lt; &lt;Imm,{}&gt; &gt;&quot;</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">"&lt;Mod,{}&gt; &lt; &lt;Imm,{}&gt; &gt;"</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap();
                     } <span class="kw">else </span>{
-                        <span class="macro">write!</span>(buf, <span class="string">&quot;&lt;Mod,{}&gt; &lt;Imm,{}&gt;&quot;</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap();
+                        <span class="macro">write!</span>(buf, <span class="string">"&lt;Mod,{}&gt; &lt;Imm,{}&gt;"</span>, arg_idx, arg_idx + <span class="number">1</span>).unwrap();
                     }
                 },
                 Matcher::End =&gt; ()
@@ -1550,10 +1561,10 @@
         }
 
         <span class="kw">for _ in </span><span class="number">0 </span>.. end_count {
-            buf.push_str(<span class="string">&quot; &gt;&quot;</span>);
+            buf.push_str(<span class="string">" &gt;"</span>);
         }
 
-        <span class="macro">write!</span>(buf, <span class="string">&quot;\&quot;\t {{{}}}&quot;</span>, constraints.join(<span class="string">&quot;, &quot;</span>)).unwrap();
+        <span class="macro">write!</span>(buf, <span class="string">"\"\t {{{}}}"</span>, constraints.join(<span class="string">", "</span>)).unwrap();
 
         forms.push(buf);
     }
@@ -1561,7 +1572,7 @@
     forms
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_extract&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"dynasm_extract"</span>)]
 </span><span class="kw">fn </span>extract_constraints(args: <span class="kw-2">&amp;</span>[ArgWithCommands]) -&gt; Vec&lt;String&gt; {
     <span class="kw">use </span><span class="kw">super</span>::aarch64data::{COND_MAP, SPECIAL_IDENT_MAP};
 
@@ -1569,63 +1580,63 @@
     <span class="kw">for </span>(i, arg) <span class="kw">in </span>args.iter().enumerate() {
         <span class="kw">for </span>command <span class="kw">in </span><span class="kw-2">&amp;</span>arg.commands {
             <span class="kw">let </span>constraint = <span class="kw">match </span>command {
-                Command::R(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;R(32)&quot;</span>),
-                Command::REven(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;R(32, 2)&quot;</span>),
-                Command::RNoZr(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;R(31)&quot;</span>),
-                Command::R4(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;R(16)&quot;</span>),
-                Command::RNext =&gt; <span class="macro">format!</span>(<span class="string">&quot;RNext()&quot;</span>),
+                Command::R(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">"R(32)"</span>),
+                Command::REven(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">"R(32, 2)"</span>),
+                Command::RNoZr(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">"R(31)"</span>),
+                Command::R4(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">"R(16)"</span>),
+                Command::RNext =&gt; <span class="macro">format!</span>(<span class="string">"RNext()"</span>),
                 Command::Ubits(<span class="kw">_</span>, bits)
-                | Command::BUbits(bits) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(0, {}, 1)&quot;</span>, <span class="number">1u32 </span>&lt;&lt; bits),
-                Command::Uscaled(<span class="kw">_</span>, bits, scale) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(0, {}, {})&quot;</span>, <span class="number">1u32 </span>&lt;&lt; (bits + scale), <span class="number">1u32 </span>&lt;&lt; scale),
+                | Command::CUbits(bits) =&gt; <span class="macro">format!</span>(<span class="string">"Range(0, {}, 1)"</span>, <span class="number">1u32 </span>&lt;&lt; bits),
+                Command::Uscaled(<span class="kw">_</span>, bits, scale) =&gt; <span class="macro">format!</span>(<span class="string">"Range(0, {}, {})"</span>, <span class="number">1u32 </span>&lt;&lt; (bits + scale), <span class="number">1u32 </span>&lt;&lt; scale),
                 Command::Ulist(<span class="kw">_</span>, list) =&gt; {
-                    <span class="kw">let </span>numbers = list.iter().map(|n| n.to_string()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>);
-                    <span class="macro">format!</span>(<span class="string">&quot;List({})&quot;</span>, numbers)
+                    <span class="kw">let </span>numbers = list.iter().map(|n| n.to_string()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">", "</span>);
+                    <span class="macro">format!</span>(<span class="string">"List({})"</span>, numbers)
                 },
                 Command::Urange(<span class="kw">_</span>, min, max)
-                | Command::BUrange(min, max) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range({}, {}+1, 1)&quot;</span>, min, max),
-                Command::Usub(<span class="kw">_</span>, bits, addval) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range({}, {}+1, 1)&quot;</span>, <span class="kw-2">*</span>addval <span class="kw">as </span>u32 + <span class="number">1 </span>- (<span class="number">1u32 </span>&lt;&lt; bits), addval),
-                Command::Unegmod(<span class="kw">_</span>, bits) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(0, {}, 1)&quot;</span>, <span class="number">1u32 </span>&lt;&lt; bits),
-                Command::Usumdec(<span class="kw">_</span>, bits)
-                | Command::BUsum(bits) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range2(1, {}+1, 1)&quot;</span>, <span class="number">1u32 </span>&lt;&lt; bits),
-                Command::Ufields(fields) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(0, {}, 1)&quot;</span>, <span class="number">1u32 </span>&lt;&lt; fields.len()),
-                Command::Sbits(<span class="kw">_</span>, bits) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, 1)&quot;</span>, <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>), <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>)),
+                | Command::CUrange(min, max) =&gt; <span class="macro">format!</span>(<span class="string">"Range({}, {}+1, 1)"</span>, min, max),
+                Command::Usubone(<span class="kw">_</span>, bits) =&gt; <span class="macro">format!</span>(<span class="string">"Range(1, {}+1, 1)"</span>, <span class="number">1u32 </span>&lt;&lt; bits),
+                Command::Usubzero(<span class="kw">_</span>, bits) =&gt; <span class="macro">format!</span>(<span class="string">"Range(0, {}, 1)"</span>,  <span class="number">1u32 </span>&lt;&lt; bits),
+                Command::Usubmod(<span class="kw">_</span>, bits) =&gt; <span class="macro">format!</span>(<span class="string">"Range(0, {}, 1)"</span>, <span class="number">1u32 </span>&lt;&lt; bits),
+                Command::Usum(<span class="kw">_</span>, bits)
+                | Command::CUsum(bits) =&gt; <span class="macro">format!</span>(<span class="string">"Range2(1, {}+1, 1)"</span>, <span class="number">1u32 </span>&lt;&lt; bits),
+                Command::Ufields(fields) =&gt; <span class="macro">format!</span>(<span class="string">"Range(0, {}, 1)"</span>, <span class="number">1u32 </span>&lt;&lt; fields.len()),
+                Command::Sbits(<span class="kw">_</span>, bits) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, 1)"</span>, <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>), <span class="number">1u32 </span>&lt;&lt; (bits - <span class="number">1</span>)),
                 Command::Sscaled(<span class="kw">_</span>, bits, scale)
-                | Command::BSscaled(bits, scale) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), <span class="number">1u32 </span>&lt;&lt; scale),
-                Command::Special(<span class="kw">_</span>, SpecialComm::WIDE_IMMEDIATE_W) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;wide_w&#39;)&quot;</span>),
-                | Command::Special(<span class="kw">_</span>, SpecialComm::WIDE_IMMEDIATE_X) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;wide_x&#39;)&quot;</span>),
-                | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;inverted_w&#39;)&quot;</span>),
-                | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;inverted_x&#39;)&quot;</span>),
-                Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_W) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;logical_w&#39;)&quot;</span>),
-                | Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_X) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;logical_x&#39;)&quot;</span>),
+                | Command::CSscaled(bits, scale) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), <span class="number">1u32 </span>&lt;&lt; (bits + scale - <span class="number">1</span>), <span class="number">1u32 </span>&lt;&lt; scale),
+                Command::Special(<span class="kw">_</span>, SpecialComm::WIDE_IMMEDIATE_W) =&gt; <span class="macro">format!</span>(<span class="string">"Special('wide_w')"</span>),
+                | Command::Special(<span class="kw">_</span>, SpecialComm::WIDE_IMMEDIATE_X) =&gt; <span class="macro">format!</span>(<span class="string">"Special('wide_x')"</span>),
+                | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_W) =&gt; <span class="macro">format!</span>(<span class="string">"Special('inverted_w')"</span>),
+                | Command::Special(<span class="kw">_</span>, SpecialComm::INVERTED_WIDE_IMMEDIATE_X) =&gt; <span class="macro">format!</span>(<span class="string">"Special('inverted_x')"</span>),
+                Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_W) =&gt; <span class="macro">format!</span>(<span class="string">"Special('logical_w')"</span>),
+                | Command::Special(<span class="kw">_</span>, SpecialComm::LOGICAL_IMMEDIATE_X) =&gt; <span class="macro">format!</span>(<span class="string">"Special('logical_x')"</span>),
                 Command::Special(<span class="kw">_</span>, SpecialComm::FLOAT_IMMEDIATE)
-                | Command::Special(<span class="kw">_</span>, SpecialComm::SPLIT_FLOAT_IMMEDIATE) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;float&#39;)&quot;</span>),
-                Command::Special(<span class="kw">_</span>, SpecialComm::STRETCHED_IMMEDIATE) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Special(&#39;stretched&#39;)&quot;</span>),
-                Command::Offset(Relocation::B) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1</span>&lt;&lt;<span class="number">27</span>, <span class="number">1</span>&lt;&lt;<span class="number">27</span>, <span class="number">4</span>),
-                Command::Offset(Relocation::BCOND) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1</span>&lt;&lt;<span class="number">18</span>, <span class="number">1</span>&lt;&lt;<span class="number">18</span>, <span class="number">4</span>),
-                Command::Offset(Relocation::ADR) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>, <span class="number">1</span>),
-                Command::Offset(Relocation::ADRP) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">32</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">32</span>, <span class="number">4096</span>),
-                Command::Offset(Relocation::TBZ) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1</span>&lt;&lt;<span class="number">15</span>, <span class="number">1</span>&lt;&lt;<span class="number">15</span>, <span class="number">4</span>),
-                Command::Offset(Relocation::LITERAL32) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1</span>&lt;&lt;<span class="number">31</span>, <span class="number">1</span>&lt;&lt;<span class="number">31</span>, <span class="number">1</span>),
-                Command::Offset(Relocation::LITERAL64) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Range(-{}, {}, {})&quot;</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">63</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">63</span>, <span class="number">1</span>),
+                | Command::Special(<span class="kw">_</span>, SpecialComm::SPLIT_FLOAT_IMMEDIATE) =&gt; <span class="macro">format!</span>(<span class="string">"Special('float')"</span>),
+                Command::Special(<span class="kw">_</span>, SpecialComm::STRETCHED_IMMEDIATE) =&gt; <span class="macro">format!</span>(<span class="string">"Special('stretched')"</span>),
+                Command::Offset(Relocation::B) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1</span>&lt;&lt;<span class="number">27</span>, <span class="number">1</span>&lt;&lt;<span class="number">27</span>, <span class="number">4</span>),
+                Command::Offset(Relocation::BCOND) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1</span>&lt;&lt;<span class="number">18</span>, <span class="number">1</span>&lt;&lt;<span class="number">18</span>, <span class="number">4</span>),
+                Command::Offset(Relocation::ADR) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>, <span class="number">1</span>),
+                Command::Offset(Relocation::ADRP) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">32</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">32</span>, <span class="number">4096</span>),
+                Command::Offset(Relocation::TBZ) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1</span>&lt;&lt;<span class="number">15</span>, <span class="number">1</span>&lt;&lt;<span class="number">15</span>, <span class="number">4</span>),
+                Command::Offset(Relocation::LITERAL32) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1</span>&lt;&lt;<span class="number">31</span>, <span class="number">1</span>&lt;&lt;<span class="number">31</span>, <span class="number">1</span>),
+                Command::Offset(Relocation::LITERAL64) =&gt; <span class="macro">format!</span>(<span class="string">"Range(-{}, {}, {})"</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">63</span>, <span class="number">1u64</span>&lt;&lt;<span class="number">63</span>, <span class="number">1</span>),
                 Command::Cond(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = COND_MAP.keys().map(|k| <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, k)).collect();
-                    <span class="macro">format!</span>(<span class="string">&quot;List({})&quot;</span>, keys.join(<span class="string">&quot;, &quot;</span>))
+                    <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = COND_MAP.keys().map(|k| <span class="macro">format!</span>(<span class="string">"\"{}\""</span>, k)).collect();
+                    <span class="macro">format!</span>(<span class="string">"List({})"</span>, keys.join(<span class="string">", "</span>))
                 },
                 Command::CondInv(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = COND_MAP.iter().filter_map(|(k, v)| <span class="kw">if </span><span class="kw-2">*</span>v &lt; <span class="number">14 </span>{ <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, k)) } <span class="kw">else </span>{ <span class="prelude-val">None </span>}).collect();
-                    <span class="macro">format!</span>(<span class="string">&quot;List({})&quot;</span>, keys.join(<span class="string">&quot;, &quot;</span>))
+                    <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = COND_MAP.iter().filter_map(|(k, v)| <span class="kw">if </span><span class="kw-2">*</span>v &lt; <span class="number">14 </span>{ <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"\"{}\""</span>, k)) } <span class="kw">else </span>{ <span class="prelude-val">None </span>}).collect();
+                    <span class="macro">format!</span>(<span class="string">"List({})"</span>, keys.join(<span class="string">", "</span>))
                 },
                 Command::LitList(<span class="kw">_</span>, name) =&gt; {
-                    <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = SPECIAL_IDENT_MAP[name].keys().map(|k| <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, k)).collect();
-                    <span class="macro">format!</span>(<span class="string">&quot;List({})&quot;</span>, keys.join(<span class="string">&quot;, &quot;</span>))
+                    <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = SPECIAL_IDENT_MAP[name].keys().map(|k| <span class="macro">format!</span>(<span class="string">"\"{}\""</span>, k)).collect();
+                    <span class="macro">format!</span>(<span class="string">"List({})"</span>, keys.join(<span class="string">", "</span>))
                 }
                 <span class="kw">_ </span>=&gt; <span class="kw">continue
             </span>};
-            constraints.push(<span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, i, constraint));
+            constraints.push(<span class="macro">format!</span>(<span class="string">"{}: {}"</span>, i, constraint));
 
             <span class="kw">break</span>;
         }
     }
     constraints
-}</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+}</code></pre></div></section></main></body></html>

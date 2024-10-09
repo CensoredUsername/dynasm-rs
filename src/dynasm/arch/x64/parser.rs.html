@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\parser.rs`."><title>parser.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -685,10 +685,11 @@
 <a href="#685" id="685">685</a>
 <a href="#686" id="686">686</a>
 <a href="#687" id="687">687</a>
-</pre><pre class="rust"><code><span class="kw">use </span>syn::{parse, Token};
+<a href="#688" id="688">688</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>syn::{parse, Token};
 <span class="kw">use </span>syn::spanned::Spanned;
 <span class="kw">use </span>proc_macro2::Span;
-<span class="kw">use </span>proc_macro_error::emit_error;
+<span class="kw">use </span>proc_macro_error2::emit_error;
 
 <span class="kw">use </span>lazy_static::lazy_static;
 
@@ -705,7 +706,7 @@
  */
 
 // parses a full instruction
-// syntax for a single op: PREFIX* ident (SIZE? expr (&quot;,&quot; SIZE? expr)*)? &quot;;&quot;
+// syntax for a single op: PREFIX* ident (SIZE? expr ("," SIZE? expr)*)? ";"
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>parse_instruction(ctx: <span class="kw-2">&amp;mut </span>Context, input: parse::ParseStream) -&gt; parse::Result&lt;(Instruction, Vec&lt;RawArg&gt;)&gt; {
     <span class="kw">let </span>span = input.cursor().span();
 
@@ -732,7 +733,7 @@
         }
     }
 
-    <span class="comment">// let span = span.join(input.cursor().span()); // FIXME can&#39;t join spans ATM
+    <span class="comment">// let span = span.join(input.cursor().span()); // FIXME can't join spans ATM
 
     </span><span class="prelude-val">Ok</span>((
         Instruction {
@@ -746,10 +747,10 @@
 <span class="doccomment">/// checks if the given ident is a valid x86 prefix
 </span><span class="kw">fn </span>is_prefix(ident: <span class="kw-2">&amp;</span>syn::Ident) -&gt; bool {
     <span class="kw">const </span>PREFIXES: [<span class="kw-2">&amp;</span>str; <span class="number">12</span>] = [
-        <span class="string">&quot;lock&quot;</span>,
-        <span class="string">&quot;rep&quot;</span>, <span class="string">&quot;repe&quot;</span>, <span class="string">&quot;repz&quot;</span>,
-        <span class="string">&quot;repne&quot;</span>, <span class="string">&quot;repnz&quot;</span>,
-        <span class="string">&quot;ss&quot;</span>, <span class="string">&quot;cs&quot;</span>, <span class="string">&quot;ds&quot;</span>, <span class="string">&quot;es&quot;</span>, <span class="string">&quot;fs&quot;</span>, <span class="string">&quot;gs&quot;
+        <span class="string">"lock"</span>,
+        <span class="string">"rep"</span>, <span class="string">"repe"</span>, <span class="string">"repz"</span>,
+        <span class="string">"repne"</span>, <span class="string">"repnz"</span>,
+        <span class="string">"ss"</span>, <span class="string">"cs"</span>, <span class="string">"ds"</span>, <span class="string">"es"</span>, <span class="string">"fs"</span>, <span class="string">"gs"
     </span>];
 
     PREFIXES.contains(<span class="kw-2">&amp;</span>ident.to_string().as_str())
@@ -757,27 +758,29 @@
 
 <span class="doccomment">/// if a size hint is present in the parse stream, returning the indicated size
 </span><span class="kw">fn </span>eat_size_hint(ctx: <span class="kw-2">&amp;</span>Context, input: parse::ParseStream) -&gt; <span class="prelude-ty">Option</span>&lt;Size&gt; {
-    <span class="kw">const </span>X86_SIZES: [(<span class="kw-2">&amp;</span>str, Size); <span class="number">9</span>] = [
-        (<span class="string">&quot;BYTE&quot;</span>, Size::BYTE),
-        (<span class="string">&quot;WORD&quot;</span>, Size::WORD),
-        (<span class="string">&quot;DWORD&quot;</span>, Size::DWORD),
-        (<span class="string">&quot;AWORD&quot;</span>, Size::DWORD),
-        (<span class="string">&quot;FWORD&quot;</span>, Size::FWORD),
-        (<span class="string">&quot;QWORD&quot;</span>, Size::QWORD),
-        (<span class="string">&quot;TWORD&quot;</span>, Size::PWORD),
-        (<span class="string">&quot;OWORD&quot;</span>, Size::OWORD),
-        (<span class="string">&quot;YWORD&quot;</span>, Size::HWORD)
+    <span class="kw">const </span>X86_SIZES: [(<span class="kw-2">&amp;</span>str, Size); <span class="number">10</span>] = [
+        (<span class="string">"BYTE"</span>, Size::BYTE),
+        (<span class="string">"WORD"</span>, Size::B_2),
+        (<span class="string">"DWORD"</span>, Size::B_4),
+        (<span class="string">"AWORD"</span>, Size::B_4),
+        (<span class="string">"FWORD"</span>, Size::B_6),
+        (<span class="string">"QWORD"</span>, Size::B_8),
+        (<span class="string">"TWORD"</span>, Size::B_10),
+        (<span class="string">"OWORD"</span>, Size::B_16),
+        (<span class="string">"YWORD"</span>, Size::B_32),
+        (<span class="string">"ZWORD"</span>, Size::B_64)
     ];
-    <span class="kw">const </span>X64_SIZES: [(<span class="kw-2">&amp;</span>str, Size); <span class="number">9</span>] = [
-        (<span class="string">&quot;BYTE&quot;</span>, Size::BYTE),
-        (<span class="string">&quot;WORD&quot;</span>, Size::WORD),
-        (<span class="string">&quot;DWORD&quot;</span>, Size::DWORD),
-        (<span class="string">&quot;FWORD&quot;</span>, Size::FWORD),
-        (<span class="string">&quot;AWORD&quot;</span>, Size::QWORD),
-        (<span class="string">&quot;QWORD&quot;</span>, Size::QWORD),
-        (<span class="string">&quot;TWORD&quot;</span>, Size::PWORD),
-        (<span class="string">&quot;OWORD&quot;</span>, Size::OWORD),
-        (<span class="string">&quot;YWORD&quot;</span>, Size::HWORD)
+    <span class="kw">const </span>X64_SIZES: [(<span class="kw-2">&amp;</span>str, Size); <span class="number">10</span>] = [
+        (<span class="string">"BYTE"</span>, Size::BYTE),
+        (<span class="string">"WORD"</span>, Size::B_2),
+        (<span class="string">"DWORD"</span>, Size::B_4),
+        (<span class="string">"FWORD"</span>, Size::B_6),
+        (<span class="string">"AWORD"</span>, Size::B_8),
+        (<span class="string">"QWORD"</span>, Size::B_8),
+        (<span class="string">"TWORD"</span>, Size::B_10),
+        (<span class="string">"OWORD"</span>, Size::B_16),
+        (<span class="string">"YWORD"</span>, Size::B_32),
+        (<span class="string">"ZWORD"</span>, Size::B_64)
     ];
 
     <span class="kw">let </span>sizes = <span class="kw">match </span>ctx.mode {
@@ -797,7 +800,7 @@
     <span class="comment">// sizehint
     </span><span class="kw">let </span>size = eat_size_hint(ctx, input);
 
-    <span class="kw">let </span>_start = input.cursor().span(); <span class="comment">// FIXME can&#39;t join spans yet
+    <span class="kw">let </span>_start = input.cursor().span(); <span class="comment">// FIXME can't join spans yet
 
     // bare label
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(jump) = input.parse_opt()<span class="question-mark">? </span>{
@@ -823,7 +826,7 @@
         }
 
         <span class="comment">// memory reference
-        </span><span class="kw">let </span>nosplit = eat_pseudo_keyword(inner, <span class="string">&quot;NOSPLIT&quot;</span>);
+        </span><span class="kw">let </span>nosplit = eat_pseudo_keyword(inner, <span class="string">"NOSPLIT"</span>);
         <span class="kw">let </span>disp_size = eat_size_hint(ctx, inner);
         <span class="kw">let </span>expr: syn::Expr = inner.parse()<span class="question-mark">?</span>;
 
@@ -840,7 +843,7 @@
 
     }
 
-    <span class="comment">// it&#39;s a normal (register/immediate/typemapped) operand
+    <span class="comment">// it's a normal (register/immediate/typemapped) operand
     </span><span class="kw">let </span>arg: syn::Expr = input.parse()<span class="question-mark">?</span>;
 
     <span class="comment">// typemapped: expr =&gt; type [expr] . ident
@@ -850,7 +853,7 @@
         <span class="kw">let </span>base = <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, base)) = parse_reg(ctx, <span class="kw-2">&amp;</span>arg) {
             base
         } <span class="kw">else </span>{
-            <span class="macro">emit_error!</span>(arg, <span class="string">&quot;Expected register&quot;</span>);
+            <span class="macro">emit_error!</span>(arg, <span class="string">"Expected register"</span>);
             <span class="kw">return </span><span class="prelude-val">Ok</span>(RawArg::Invalid);
         };
 
@@ -865,7 +868,7 @@
             <span class="kw">let </span>_brackets = <span class="macro">syn::bracketed!</span>(inner <span class="kw">in </span>input);
             <span class="kw">let </span>inner = <span class="kw-2">&amp;</span>inner;
 
-            nosplit = eat_pseudo_keyword(inner, <span class="string">&quot;NOSPLIT&quot;</span>);
+            nosplit = eat_pseudo_keyword(inner, <span class="string">"NOSPLIT"</span>);
             disp_size = eat_size_hint(ctx, inner);
             <span class="kw">let </span>index_expr: syn::Expr = inner.parse()<span class="question-mark">?</span>;
 
@@ -882,7 +885,7 @@
         </span>};
 
         <span class="kw">return </span><span class="prelude-val">Ok</span>(RawArg::TypeMappedRaw {
-            span: arg.span(), <span class="comment">// FIXME can&#39;t join spans yet
+            span: arg.span(), <span class="comment">// FIXME can't join spans yet
             </span>nosplit,
             value_size: size,
             disp_size,
@@ -896,11 +899,10 @@
     <span class="comment">// direct register
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>((span, reg)) = parse_reg(ctx, <span class="kw-2">&amp;</span>arg) {
         <span class="kw">if </span>size.is_some() {
-            <span class="macro">emit_error!</span>(span, <span class="string">&quot;size hint with direct register&quot;</span>);
+            <span class="macro">emit_error!</span>(span, <span class="string">"size hint with direct register"</span>);
         }
         <span class="kw">return </span><span class="prelude-val">Ok</span>(RawArg::Direct {
-            reg,
-            span
+            reg
         })
     }
 
@@ -952,7 +954,7 @@
         }<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>((
-            expr.span(), <span class="comment">// FIXME:can&#39;t join spans atm
+            expr.span(), <span class="comment">// FIXME:can't join spans atm
             </span>Register::new_dynamic(size, family, args[<span class="number">0</span>].clone())
         ))
     } <span class="kw">else </span>{
@@ -967,7 +969,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>items = Vec::new();
 
-    <span class="comment">// detect what kind of equation we&#39;re dealing with
+    <span class="comment">// detect what kind of equation we're dealing with
     </span><span class="kw">for </span>node <span class="kw">in </span>adds {
         <span class="comment">// simple reg
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, reg)) = parse_reg(ctx, <span class="kw-2">&amp;</span>node) {
@@ -1018,359 +1020,358 @@
 
 <span class="comment">// why
 </span><span class="macro">lazy_static!</span>{
-    <span class="kw">static </span><span class="kw-2">ref </span>X64_REGISTERS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (RegId, Size)&gt; = {
+    <span class="kw">static </span><span class="kw-2">ref </span>X64_REGISTERS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, (RegId, Size)&gt; = {
         <span class="kw">use </span><span class="self">self</span>::RegId::<span class="kw-2">*</span>;
         <span class="kw">use </span><span class="kw">crate</span>::common::Size::<span class="kw-2">*</span>;
 
         <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, (RegId, Size))] = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;rax&quot;</span>, (RAX, QWORD)),
-            (<span class="string">&quot;r0&quot; </span>, (RAX, QWORD)),
-            (<span class="string">&quot;rcx&quot;</span>, (RCX, QWORD)),
-            (<span class="string">&quot;r1&quot; </span>, (RCX, QWORD)),
-            (<span class="string">&quot;rdx&quot;</span>, (RDX, QWORD)),
-            (<span class="string">&quot;r2&quot; </span>, (RDX, QWORD)),
-            (<span class="string">&quot;rbx&quot;</span>, (RBX, QWORD)),
-            (<span class="string">&quot;r3&quot; </span>, (RBX, QWORD)),
-            (<span class="string">&quot;rsp&quot;</span>, (RSP, QWORD)),
-            (<span class="string">&quot;r4&quot; </span>, (RSP, QWORD)),
-            (<span class="string">&quot;rbp&quot;</span>, (RBP, QWORD)),
-            (<span class="string">&quot;r5&quot; </span>, (RBP, QWORD)),
-            (<span class="string">&quot;rsi&quot;</span>, (RSI, QWORD)),
-            (<span class="string">&quot;r6&quot; </span>, (RSI, QWORD)),
-            (<span class="string">&quot;rdi&quot;</span>, (RDI, QWORD)),
-            (<span class="string">&quot;r7&quot; </span>, (RDI, QWORD)),
-            (<span class="string">&quot;r8&quot; </span>, (R8,  QWORD)),
-            (<span class="string">&quot;r9&quot; </span>, (R9,  QWORD)),
-            (<span class="string">&quot;r10&quot;</span>, (R10, QWORD)),
-            (<span class="string">&quot;r11&quot;</span>, (R11, QWORD)),
-            (<span class="string">&quot;r12&quot;</span>, (R12, QWORD)),
-            (<span class="string">&quot;r13&quot;</span>, (R13, QWORD)),
-            (<span class="string">&quot;r14&quot;</span>, (R14, QWORD)),
-            (<span class="string">&quot;r15&quot;</span>, (R15, QWORD)),
+            (<span class="string">"rax"</span>, (RAX, B_8)),
+            (<span class="string">"r0" </span>, (RAX, B_8)),
+            (<span class="string">"rcx"</span>, (RCX, B_8)),
+            (<span class="string">"r1" </span>, (RCX, B_8)),
+            (<span class="string">"rdx"</span>, (RDX, B_8)),
+            (<span class="string">"r2" </span>, (RDX, B_8)),
+            (<span class="string">"rbx"</span>, (RBX, B_8)),
+            (<span class="string">"r3" </span>, (RBX, B_8)),
+            (<span class="string">"rsp"</span>, (RSP, B_8)),
+            (<span class="string">"r4" </span>, (RSP, B_8)),
+            (<span class="string">"rbp"</span>, (RBP, B_8)),
+            (<span class="string">"r5" </span>, (RBP, B_8)),
+            (<span class="string">"rsi"</span>, (RSI, B_8)),
+            (<span class="string">"r6" </span>, (RSI, B_8)),
+            (<span class="string">"rdi"</span>, (RDI, B_8)),
+            (<span class="string">"r7" </span>, (RDI, B_8)),
+            (<span class="string">"r8" </span>, (R8,  B_8)),
+            (<span class="string">"r9" </span>, (R9,  B_8)),
+            (<span class="string">"r10"</span>, (R10, B_8)),
+            (<span class="string">"r11"</span>, (R11, B_8)),
+            (<span class="string">"r12"</span>, (R12, B_8)),
+            (<span class="string">"r13"</span>, (R13, B_8)),
+            (<span class="string">"r14"</span>, (R14, B_8)),
+            (<span class="string">"r15"</span>, (R15, B_8)),
 
-            (<span class="string">&quot;eax&quot; </span>, (RAX, DWORD)),
-            (<span class="string">&quot;r0d&quot; </span>, (RAX, DWORD)),
-            (<span class="string">&quot;ecx&quot; </span>, (RCX, DWORD)),
-            (<span class="string">&quot;r1d&quot; </span>, (RCX, DWORD)),
-            (<span class="string">&quot;edx&quot; </span>, (RDX, DWORD)),
-            (<span class="string">&quot;r2d&quot; </span>, (RDX, DWORD)),
-            (<span class="string">&quot;ebx&quot; </span>, (RBX, DWORD)),
-            (<span class="string">&quot;r3d&quot; </span>, (RBX, DWORD)),
-            (<span class="string">&quot;esp&quot; </span>, (RSP, DWORD)),
-            (<span class="string">&quot;r4d&quot; </span>, (RSP, DWORD)),
-            (<span class="string">&quot;ebp&quot; </span>, (RBP, DWORD)),
-            (<span class="string">&quot;r5d&quot; </span>, (RBP, DWORD)),
-            (<span class="string">&quot;esi&quot; </span>, (RSI, DWORD)),
-            (<span class="string">&quot;r6d&quot; </span>, (RSI, DWORD)),
-            (<span class="string">&quot;edi&quot; </span>, (RDI, DWORD)),
-            (<span class="string">&quot;r7d&quot; </span>, (RDI, DWORD)),
-            (<span class="string">&quot;r8d&quot; </span>, (R8,  DWORD)),
-            (<span class="string">&quot;r9d&quot; </span>, (R9,  DWORD)),
-            (<span class="string">&quot;r10d&quot;</span>, (R10, DWORD)),
-            (<span class="string">&quot;r11d&quot;</span>, (R11, DWORD)),
-            (<span class="string">&quot;r12d&quot;</span>, (R12, DWORD)),
-            (<span class="string">&quot;r13d&quot;</span>, (R13, DWORD)),
-            (<span class="string">&quot;r14d&quot;</span>, (R14, DWORD)),
-            (<span class="string">&quot;r15d&quot;</span>, (R15, DWORD)),
+            (<span class="string">"eax" </span>, (RAX, B_4)),
+            (<span class="string">"r0d" </span>, (RAX, B_4)),
+            (<span class="string">"ecx" </span>, (RCX, B_4)),
+            (<span class="string">"r1d" </span>, (RCX, B_4)),
+            (<span class="string">"edx" </span>, (RDX, B_4)),
+            (<span class="string">"r2d" </span>, (RDX, B_4)),
+            (<span class="string">"ebx" </span>, (RBX, B_4)),
+            (<span class="string">"r3d" </span>, (RBX, B_4)),
+            (<span class="string">"esp" </span>, (RSP, B_4)),
+            (<span class="string">"r4d" </span>, (RSP, B_4)),
+            (<span class="string">"ebp" </span>, (RBP, B_4)),
+            (<span class="string">"r5d" </span>, (RBP, B_4)),
+            (<span class="string">"esi" </span>, (RSI, B_4)),
+            (<span class="string">"r6d" </span>, (RSI, B_4)),
+            (<span class="string">"edi" </span>, (RDI, B_4)),
+            (<span class="string">"r7d" </span>, (RDI, B_4)),
+            (<span class="string">"r8d" </span>, (R8,  B_4)),
+            (<span class="string">"r9d" </span>, (R9,  B_4)),
+            (<span class="string">"r10d"</span>, (R10, B_4)),
+            (<span class="string">"r11d"</span>, (R11, B_4)),
+            (<span class="string">"r12d"</span>, (R12, B_4)),
+            (<span class="string">"r13d"</span>, (R13, B_4)),
+            (<span class="string">"r14d"</span>, (R14, B_4)),
+            (<span class="string">"r15d"</span>, (R15, B_4)),
 
-            (<span class="string">&quot;ax&quot;  </span>, (RAX, WORD)),
-            (<span class="string">&quot;r0w&quot; </span>, (RAX, WORD)),
-            (<span class="string">&quot;cx&quot;  </span>, (RCX, WORD)),
-            (<span class="string">&quot;r1w&quot; </span>, (RCX, WORD)),
-            (<span class="string">&quot;dx&quot;  </span>, (RDX, WORD)),
-            (<span class="string">&quot;r2w&quot; </span>, (RDX, WORD)),
-            (<span class="string">&quot;bx&quot;  </span>, (RBX, WORD)),
-            (<span class="string">&quot;r3w&quot; </span>, (RBX, WORD)),
-            (<span class="string">&quot;sp&quot;  </span>, (RSP, WORD)),
-            (<span class="string">&quot;r4w&quot; </span>, (RSP, WORD)),
-            (<span class="string">&quot;bp&quot;  </span>, (RBP, WORD)),
-            (<span class="string">&quot;r5w&quot; </span>, (RBP, WORD)),
-            (<span class="string">&quot;si&quot;  </span>, (RSI, WORD)),
-            (<span class="string">&quot;r6w&quot; </span>, (RSI, WORD)),
-            (<span class="string">&quot;di&quot;  </span>, (RDI, WORD)),
-            (<span class="string">&quot;r7w&quot; </span>, (RDI, WORD)),
-            (<span class="string">&quot;r8w&quot; </span>, (R8,  WORD)),
-            (<span class="string">&quot;r9w&quot; </span>, (R9,  WORD)),
-            (<span class="string">&quot;r10w&quot;</span>, (R10, WORD)),
-            (<span class="string">&quot;r11w&quot;</span>, (R11, WORD)),
-            (<span class="string">&quot;r12w&quot;</span>, (R12, WORD)),
-            (<span class="string">&quot;r13w&quot;</span>, (R13, WORD)),
-            (<span class="string">&quot;r14w&quot;</span>, (R14, WORD)),
-            (<span class="string">&quot;r15w&quot;</span>, (R15, WORD)),
+            (<span class="string">"ax"  </span>, (RAX, B_2)),
+            (<span class="string">"r0w" </span>, (RAX, B_2)),
+            (<span class="string">"cx"  </span>, (RCX, B_2)),
+            (<span class="string">"r1w" </span>, (RCX, B_2)),
+            (<span class="string">"dx"  </span>, (RDX, B_2)),
+            (<span class="string">"r2w" </span>, (RDX, B_2)),
+            (<span class="string">"bx"  </span>, (RBX, B_2)),
+            (<span class="string">"r3w" </span>, (RBX, B_2)),
+            (<span class="string">"sp"  </span>, (RSP, B_2)),
+            (<span class="string">"r4w" </span>, (RSP, B_2)),
+            (<span class="string">"bp"  </span>, (RBP, B_2)),
+            (<span class="string">"r5w" </span>, (RBP, B_2)),
+            (<span class="string">"si"  </span>, (RSI, B_2)),
+            (<span class="string">"r6w" </span>, (RSI, B_2)),
+            (<span class="string">"di"  </span>, (RDI, B_2)),
+            (<span class="string">"r7w" </span>, (RDI, B_2)),
+            (<span class="string">"r8w" </span>, (R8,  B_2)),
+            (<span class="string">"r9w" </span>, (R9,  B_2)),
+            (<span class="string">"r10w"</span>, (R10, B_2)),
+            (<span class="string">"r11w"</span>, (R11, B_2)),
+            (<span class="string">"r12w"</span>, (R12, B_2)),
+            (<span class="string">"r13w"</span>, (R13, B_2)),
+            (<span class="string">"r14w"</span>, (R14, B_2)),
+            (<span class="string">"r15w"</span>, (R15, B_2)),
 
-            (<span class="string">&quot;al&quot;  </span>, (RAX, BYTE)),
-            (<span class="string">&quot;r0b&quot; </span>, (RAX, BYTE)),
-            (<span class="string">&quot;cl&quot;  </span>, (RCX, BYTE)),
-            (<span class="string">&quot;r1b&quot; </span>, (RCX, BYTE)),
-            (<span class="string">&quot;dl&quot;  </span>, (RDX, BYTE)),
-            (<span class="string">&quot;r2b&quot; </span>, (RDX, BYTE)),
-            (<span class="string">&quot;bl&quot;  </span>, (RBX, BYTE)),
-            (<span class="string">&quot;r3b&quot; </span>, (RBX, BYTE)),
-            (<span class="string">&quot;spl&quot; </span>, (RSP, BYTE)),
-            (<span class="string">&quot;r4b&quot; </span>, (RSP, BYTE)),
-            (<span class="string">&quot;bpl&quot; </span>, (RBP, BYTE)),
-            (<span class="string">&quot;r5b&quot; </span>, (RBP, BYTE)),
-            (<span class="string">&quot;sil&quot; </span>, (RSI, BYTE)),
-            (<span class="string">&quot;r6b&quot; </span>, (RSI, BYTE)),
-            (<span class="string">&quot;dil&quot; </span>, (RDI, BYTE)),
-            (<span class="string">&quot;r7b&quot; </span>, (RDI, BYTE)),
-            (<span class="string">&quot;r8b&quot; </span>, (R8,  BYTE)),
-            (<span class="string">&quot;r9b&quot; </span>, (R9,  BYTE)),
-            (<span class="string">&quot;r10b&quot;</span>, (R10, BYTE)),
-            (<span class="string">&quot;r11b&quot;</span>, (R11, BYTE)),
-            (<span class="string">&quot;r12b&quot;</span>, (R12, BYTE)),
-            (<span class="string">&quot;r13b&quot;</span>, (R13, BYTE)),
-            (<span class="string">&quot;r14b&quot;</span>, (R14, BYTE)),
-            (<span class="string">&quot;r15b&quot;</span>, (R15, BYTE)),
+            (<span class="string">"al"  </span>, (RAX, BYTE)),
+            (<span class="string">"r0b" </span>, (RAX, BYTE)),
+            (<span class="string">"cl"  </span>, (RCX, BYTE)),
+            (<span class="string">"r1b" </span>, (RCX, BYTE)),
+            (<span class="string">"dl"  </span>, (RDX, BYTE)),
+            (<span class="string">"r2b" </span>, (RDX, BYTE)),
+            (<span class="string">"bl"  </span>, (RBX, BYTE)),
+            (<span class="string">"r3b" </span>, (RBX, BYTE)),
+            (<span class="string">"spl" </span>, (RSP, BYTE)),
+            (<span class="string">"r4b" </span>, (RSP, BYTE)),
+            (<span class="string">"bpl" </span>, (RBP, BYTE)),
+            (<span class="string">"r5b" </span>, (RBP, BYTE)),
+            (<span class="string">"sil" </span>, (RSI, BYTE)),
+            (<span class="string">"r6b" </span>, (RSI, BYTE)),
+            (<span class="string">"dil" </span>, (RDI, BYTE)),
+            (<span class="string">"r7b" </span>, (RDI, BYTE)),
+            (<span class="string">"r8b" </span>, (R8,  BYTE)),
+            (<span class="string">"r9b" </span>, (R9,  BYTE)),
+            (<span class="string">"r10b"</span>, (R10, BYTE)),
+            (<span class="string">"r11b"</span>, (R11, BYTE)),
+            (<span class="string">"r12b"</span>, (R12, BYTE)),
+            (<span class="string">"r13b"</span>, (R13, BYTE)),
+            (<span class="string">"r14b"</span>, (R14, BYTE)),
+            (<span class="string">"r15b"</span>, (R15, BYTE)),
 
-            (<span class="string">&quot;rip&quot;</span>, (RIP, QWORD)),
-            (<span class="string">&quot;eip&quot;</span>, (RIP, DWORD)),
+            (<span class="string">"rip"</span>, (RIP, B_8)),
+            (<span class="string">"eip"</span>, (RIP, B_4)),
 
-            (<span class="string">&quot;ah&quot;</span>, (AH, BYTE)),
-            (<span class="string">&quot;ch&quot;</span>, (CH, BYTE)),
-            (<span class="string">&quot;dh&quot;</span>, (DH, BYTE)),
-            (<span class="string">&quot;bh&quot;</span>, (BH, BYTE)),
+            (<span class="string">"ah"</span>, (AH, BYTE)),
+            (<span class="string">"ch"</span>, (CH, BYTE)),
+            (<span class="string">"dh"</span>, (DH, BYTE)),
+            (<span class="string">"bh"</span>, (BH, BYTE)),
 
-            (<span class="string">&quot;st0&quot;</span>, (ST0, PWORD)),
-            (<span class="string">&quot;st1&quot;</span>, (ST1, PWORD)),
-            (<span class="string">&quot;st2&quot;</span>, (ST2, PWORD)),
-            (<span class="string">&quot;st3&quot;</span>, (ST3, PWORD)),
-            (<span class="string">&quot;st4&quot;</span>, (ST4, PWORD)),
-            (<span class="string">&quot;st5&quot;</span>, (ST5, PWORD)),
-            (<span class="string">&quot;st6&quot;</span>, (ST6, PWORD)),
-            (<span class="string">&quot;st7&quot;</span>, (ST7, PWORD)),
+            (<span class="string">"st0"</span>, (ST0, B_10)),
+            (<span class="string">"st1"</span>, (ST1, B_10)),
+            (<span class="string">"st2"</span>, (ST2, B_10)),
+            (<span class="string">"st3"</span>, (ST3, B_10)),
+            (<span class="string">"st4"</span>, (ST4, B_10)),
+            (<span class="string">"st5"</span>, (ST5, B_10)),
+            (<span class="string">"st6"</span>, (ST6, B_10)),
+            (<span class="string">"st7"</span>, (ST7, B_10)),
 
-            (<span class="string">&quot;mm0&quot;</span>, (MMX0, QWORD)),
-            (<span class="string">&quot;mm1&quot;</span>, (MMX1, QWORD)),
-            (<span class="string">&quot;mm2&quot;</span>, (MMX2, QWORD)),
-            (<span class="string">&quot;mm3&quot;</span>, (MMX3, QWORD)),
-            (<span class="string">&quot;mm4&quot;</span>, (MMX4, QWORD)),
-            (<span class="string">&quot;mm5&quot;</span>, (MMX5, QWORD)),
-            (<span class="string">&quot;mm6&quot;</span>, (MMX6, QWORD)),
-            (<span class="string">&quot;mm7&quot;</span>, (MMX7, QWORD)),
+            (<span class="string">"mm0"</span>, (MMX0, B_8)),
+            (<span class="string">"mm1"</span>, (MMX1, B_8)),
+            (<span class="string">"mm2"</span>, (MMX2, B_8)),
+            (<span class="string">"mm3"</span>, (MMX3, B_8)),
+            (<span class="string">"mm4"</span>, (MMX4, B_8)),
+            (<span class="string">"mm5"</span>, (MMX5, B_8)),
+            (<span class="string">"mm6"</span>, (MMX6, B_8)),
+            (<span class="string">"mm7"</span>, (MMX7, B_8)),
 
-            (<span class="string">&quot;xmm0&quot; </span>, (XMM0 , OWORD)),
-            (<span class="string">&quot;xmm1&quot; </span>, (XMM1 , OWORD)),
-            (<span class="string">&quot;xmm2&quot; </span>, (XMM2 , OWORD)),
-            (<span class="string">&quot;xmm3&quot; </span>, (XMM3 , OWORD)),
-            (<span class="string">&quot;xmm4&quot; </span>, (XMM4 , OWORD)),
-            (<span class="string">&quot;xmm5&quot; </span>, (XMM5 , OWORD)),
-            (<span class="string">&quot;xmm6&quot; </span>, (XMM6 , OWORD)),
-            (<span class="string">&quot;xmm7&quot; </span>, (XMM7 , OWORD)),
-            (<span class="string">&quot;xmm8&quot; </span>, (XMM8 , OWORD)),
-            (<span class="string">&quot;xmm9&quot; </span>, (XMM9 , OWORD)),
-            (<span class="string">&quot;xmm10&quot;</span>, (XMM10, OWORD)),
-            (<span class="string">&quot;xmm11&quot;</span>, (XMM11, OWORD)),
-            (<span class="string">&quot;xmm12&quot;</span>, (XMM12, OWORD)),
-            (<span class="string">&quot;xmm13&quot;</span>, (XMM13, OWORD)),
-            (<span class="string">&quot;xmm14&quot;</span>, (XMM14, OWORD)),
-            (<span class="string">&quot;xmm15&quot;</span>, (XMM15, OWORD)),
+            (<span class="string">"xmm0" </span>, (XMM0 , B_16)),
+            (<span class="string">"xmm1" </span>, (XMM1 , B_16)),
+            (<span class="string">"xmm2" </span>, (XMM2 , B_16)),
+            (<span class="string">"xmm3" </span>, (XMM3 , B_16)),
+            (<span class="string">"xmm4" </span>, (XMM4 , B_16)),
+            (<span class="string">"xmm5" </span>, (XMM5 , B_16)),
+            (<span class="string">"xmm6" </span>, (XMM6 , B_16)),
+            (<span class="string">"xmm7" </span>, (XMM7 , B_16)),
+            (<span class="string">"xmm8" </span>, (XMM8 , B_16)),
+            (<span class="string">"xmm9" </span>, (XMM9 , B_16)),
+            (<span class="string">"xmm10"</span>, (XMM10, B_16)),
+            (<span class="string">"xmm11"</span>, (XMM11, B_16)),
+            (<span class="string">"xmm12"</span>, (XMM12, B_16)),
+            (<span class="string">"xmm13"</span>, (XMM13, B_16)),
+            (<span class="string">"xmm14"</span>, (XMM14, B_16)),
+            (<span class="string">"xmm15"</span>, (XMM15, B_16)),
 
-            (<span class="string">&quot;ymm0&quot; </span>, (XMM0 , HWORD)),
-            (<span class="string">&quot;ymm1&quot; </span>, (XMM1 , HWORD)),
-            (<span class="string">&quot;ymm2&quot; </span>, (XMM2 , HWORD)),
-            (<span class="string">&quot;ymm3&quot; </span>, (XMM3 , HWORD)),
-            (<span class="string">&quot;ymm4&quot; </span>, (XMM4 , HWORD)),
-            (<span class="string">&quot;ymm5&quot; </span>, (XMM5 , HWORD)),
-            (<span class="string">&quot;ymm6&quot; </span>, (XMM6 , HWORD)),
-            (<span class="string">&quot;ymm7&quot; </span>, (XMM7 , HWORD)),
-            (<span class="string">&quot;ymm8&quot; </span>, (XMM8 , HWORD)),
-            (<span class="string">&quot;ymm9&quot; </span>, (XMM9 , HWORD)),
-            (<span class="string">&quot;ymm10&quot;</span>, (XMM10, HWORD)),
-            (<span class="string">&quot;ymm11&quot;</span>, (XMM11, HWORD)),
-            (<span class="string">&quot;ymm12&quot;</span>, (XMM12, HWORD)),
-            (<span class="string">&quot;ymm13&quot;</span>, (XMM13, HWORD)),
-            (<span class="string">&quot;ymm14&quot;</span>, (XMM14, HWORD)),
-            (<span class="string">&quot;ymm15&quot;</span>, (XMM15, HWORD)),
+            (<span class="string">"ymm0" </span>, (XMM0 , B_32)),
+            (<span class="string">"ymm1" </span>, (XMM1 , B_32)),
+            (<span class="string">"ymm2" </span>, (XMM2 , B_32)),
+            (<span class="string">"ymm3" </span>, (XMM3 , B_32)),
+            (<span class="string">"ymm4" </span>, (XMM4 , B_32)),
+            (<span class="string">"ymm5" </span>, (XMM5 , B_32)),
+            (<span class="string">"ymm6" </span>, (XMM6 , B_32)),
+            (<span class="string">"ymm7" </span>, (XMM7 , B_32)),
+            (<span class="string">"ymm8" </span>, (XMM8 , B_32)),
+            (<span class="string">"ymm9" </span>, (XMM9 , B_32)),
+            (<span class="string">"ymm10"</span>, (XMM10, B_32)),
+            (<span class="string">"ymm11"</span>, (XMM11, B_32)),
+            (<span class="string">"ymm12"</span>, (XMM12, B_32)),
+            (<span class="string">"ymm13"</span>, (XMM13, B_32)),
+            (<span class="string">"ymm14"</span>, (XMM14, B_32)),
+            (<span class="string">"ymm15"</span>, (XMM15, B_32)),
 
-            (<span class="string">&quot;es&quot;</span>, (ES, WORD)),
-            (<span class="string">&quot;cs&quot;</span>, (CS, WORD)),
-            (<span class="string">&quot;ss&quot;</span>, (SS, WORD)),
-            (<span class="string">&quot;ds&quot;</span>, (DS, WORD)),
-            (<span class="string">&quot;fs&quot;</span>, (FS, WORD)),
-            (<span class="string">&quot;gs&quot;</span>, (GS, WORD)),
+            (<span class="string">"es"</span>, (ES, B_2)),
+            (<span class="string">"cs"</span>, (CS, B_2)),
+            (<span class="string">"ss"</span>, (SS, B_2)),
+            (<span class="string">"ds"</span>, (DS, B_2)),
+            (<span class="string">"fs"</span>, (FS, B_2)),
+            (<span class="string">"gs"</span>, (GS, B_2)),
 
-            (<span class="string">&quot;cr0&quot; </span>, (CR0 , QWORD)),
-            (<span class="string">&quot;cr1&quot; </span>, (CR1 , QWORD)),
-            (<span class="string">&quot;cr2&quot; </span>, (CR2 , QWORD)),
-            (<span class="string">&quot;cr3&quot; </span>, (CR3 , QWORD)),
-            (<span class="string">&quot;cr4&quot; </span>, (CR4 , QWORD)),
-            (<span class="string">&quot;cr5&quot; </span>, (CR5 , QWORD)),
-            (<span class="string">&quot;cr6&quot; </span>, (CR6 , QWORD)),
-            (<span class="string">&quot;cr7&quot; </span>, (CR7 , QWORD)),
-            (<span class="string">&quot;cr8&quot; </span>, (CR8 , QWORD)),
-            (<span class="string">&quot;cr9&quot; </span>, (CR9 , QWORD)),
-            (<span class="string">&quot;cr10&quot;</span>, (CR10, QWORD)),
-            (<span class="string">&quot;cr11&quot;</span>, (CR11, QWORD)),
-            (<span class="string">&quot;cr12&quot;</span>, (CR12, QWORD)),
-            (<span class="string">&quot;cr13&quot;</span>, (CR13, QWORD)),
-            (<span class="string">&quot;cr14&quot;</span>, (CR14, QWORD)),
-            (<span class="string">&quot;cr15&quot;</span>, (CR15, QWORD)),
+            (<span class="string">"cr0" </span>, (CR0 , B_8)),
+            (<span class="string">"cr1" </span>, (CR1 , B_8)),
+            (<span class="string">"cr2" </span>, (CR2 , B_8)),
+            (<span class="string">"cr3" </span>, (CR3 , B_8)),
+            (<span class="string">"cr4" </span>, (CR4 , B_8)),
+            (<span class="string">"cr5" </span>, (CR5 , B_8)),
+            (<span class="string">"cr6" </span>, (CR6 , B_8)),
+            (<span class="string">"cr7" </span>, (CR7 , B_8)),
+            (<span class="string">"cr8" </span>, (CR8 , B_8)),
+            (<span class="string">"cr9" </span>, (CR9 , B_8)),
+            (<span class="string">"cr10"</span>, (CR10, B_8)),
+            (<span class="string">"cr11"</span>, (CR11, B_8)),
+            (<span class="string">"cr12"</span>, (CR12, B_8)),
+            (<span class="string">"cr13"</span>, (CR13, B_8)),
+            (<span class="string">"cr14"</span>, (CR14, B_8)),
+            (<span class="string">"cr15"</span>, (CR15, B_8)),
 
-            (<span class="string">&quot;dr0&quot; </span>, (DR0 , QWORD)),
-            (<span class="string">&quot;dr1&quot; </span>, (DR1 , QWORD)),
-            (<span class="string">&quot;dr2&quot; </span>, (DR2 , QWORD)),
-            (<span class="string">&quot;dr3&quot; </span>, (DR3 , QWORD)),
-            (<span class="string">&quot;dr4&quot; </span>, (DR4 , QWORD)),
-            (<span class="string">&quot;dr5&quot; </span>, (DR5 , QWORD)),
-            (<span class="string">&quot;dr6&quot; </span>, (DR6 , QWORD)),
-            (<span class="string">&quot;dr7&quot; </span>, (DR7 , QWORD)),
-            (<span class="string">&quot;dr8&quot; </span>, (DR8 , QWORD)),
-            (<span class="string">&quot;dr9&quot; </span>, (DR9 , QWORD)),
-            (<span class="string">&quot;dr10&quot;</span>, (DR10, QWORD)),
-            (<span class="string">&quot;dr11&quot;</span>, (DR11, QWORD)),
-            (<span class="string">&quot;dr12&quot;</span>, (DR12, QWORD)),
-            (<span class="string">&quot;dr13&quot;</span>, (DR13, QWORD)),
-            (<span class="string">&quot;dr14&quot;</span>, (DR14, QWORD)),
-            (<span class="string">&quot;dr15&quot;</span>, (DR15, QWORD)),
+            (<span class="string">"dr0" </span>, (DR0 , B_8)),
+            (<span class="string">"dr1" </span>, (DR1 , B_8)),
+            (<span class="string">"dr2" </span>, (DR2 , B_8)),
+            (<span class="string">"dr3" </span>, (DR3 , B_8)),
+            (<span class="string">"dr4" </span>, (DR4 , B_8)),
+            (<span class="string">"dr5" </span>, (DR5 , B_8)),
+            (<span class="string">"dr6" </span>, (DR6 , B_8)),
+            (<span class="string">"dr7" </span>, (DR7 , B_8)),
+            (<span class="string">"dr8" </span>, (DR8 , B_8)),
+            (<span class="string">"dr9" </span>, (DR9 , B_8)),
+            (<span class="string">"dr10"</span>, (DR10, B_8)),
+            (<span class="string">"dr11"</span>, (DR11, B_8)),
+            (<span class="string">"dr12"</span>, (DR12, B_8)),
+            (<span class="string">"dr13"</span>, (DR13, B_8)),
+            (<span class="string">"dr14"</span>, (DR14, B_8)),
+            (<span class="string">"dr15"</span>, (DR15, B_8)),
 
-            (<span class="string">&quot;bnd0&quot;</span>, (BND0, OWORD)),
-            (<span class="string">&quot;bnd1&quot;</span>, (BND1, OWORD)),
-            (<span class="string">&quot;bnd2&quot;</span>, (BND2, OWORD)),
-            (<span class="string">&quot;bnd3&quot;</span>, (BND3, OWORD)),
+            (<span class="string">"bnd0"</span>, (BND0, B_16)),
+            (<span class="string">"bnd1"</span>, (BND1, B_16)),
+            (<span class="string">"bnd2"</span>, (BND2, B_16)),
+            (<span class="string">"bnd3"</span>, (BND3, B_16)),
         ];
         MAP.iter().cloned().collect()
     };
-    <span class="kw">static </span><span class="kw-2">ref </span>X86_REGISTERS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (RegId, Size)&gt; = {
+    <span class="kw">static </span><span class="kw-2">ref </span>X86_REGISTERS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, (RegId, Size)&gt; = {
         <span class="kw">use </span><span class="self">self</span>::RegId::<span class="kw-2">*</span>;
         <span class="kw">use </span><span class="kw">crate</span>::common::Size::<span class="kw-2">*</span>;
 
         <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, (RegId, Size))] = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;eax&quot;</span>, (RAX, DWORD)),
-            (<span class="string">&quot;ecx&quot;</span>, (RCX, DWORD)),
-            (<span class="string">&quot;edx&quot;</span>, (RDX, DWORD)),
-            (<span class="string">&quot;ebx&quot;</span>, (RBX, DWORD)),
-            (<span class="string">&quot;esp&quot;</span>, (RSP, DWORD)),
-            (<span class="string">&quot;ebp&quot;</span>, (RBP, DWORD)),
-            (<span class="string">&quot;esi&quot;</span>, (RSI, DWORD)),
-            (<span class="string">&quot;edi&quot;</span>, (RDI, DWORD)),
+            (<span class="string">"eax"</span>, (RAX, B_4)),
+            (<span class="string">"ecx"</span>, (RCX, B_4)),
+            (<span class="string">"edx"</span>, (RDX, B_4)),
+            (<span class="string">"ebx"</span>, (RBX, B_4)),
+            (<span class="string">"esp"</span>, (RSP, B_4)),
+            (<span class="string">"ebp"</span>, (RBP, B_4)),
+            (<span class="string">"esi"</span>, (RSI, B_4)),
+            (<span class="string">"edi"</span>, (RDI, B_4)),
 
-            (<span class="string">&quot;ax&quot;</span>, (RAX, WORD)),
-            (<span class="string">&quot;cx&quot;</span>, (RCX, WORD)),
-            (<span class="string">&quot;dx&quot;</span>, (RDX, WORD)),
-            (<span class="string">&quot;bx&quot;</span>, (RBX, WORD)),
-            (<span class="string">&quot;sp&quot;</span>, (RSP, WORD)),
-            (<span class="string">&quot;bp&quot;</span>, (RBP, WORD)),
-            (<span class="string">&quot;si&quot;</span>, (RSI, WORD)),
-            (<span class="string">&quot;di&quot;</span>, (RDI, WORD)),
+            (<span class="string">"ax"</span>, (RAX, B_2)),
+            (<span class="string">"cx"</span>, (RCX, B_2)),
+            (<span class="string">"dx"</span>, (RDX, B_2)),
+            (<span class="string">"bx"</span>, (RBX, B_2)),
+            (<span class="string">"sp"</span>, (RSP, B_2)),
+            (<span class="string">"bp"</span>, (RBP, B_2)),
+            (<span class="string">"si"</span>, (RSI, B_2)),
+            (<span class="string">"di"</span>, (RDI, B_2)),
 
-            (<span class="string">&quot;al&quot;</span>, (RAX, BYTE)),
-            (<span class="string">&quot;cl&quot;</span>, (RCX, BYTE)),
-            (<span class="string">&quot;dl&quot;</span>, (RDX, BYTE)),
-            (<span class="string">&quot;bl&quot;</span>, (RBX, BYTE)),
+            (<span class="string">"al"</span>, (RAX, BYTE)),
+            (<span class="string">"cl"</span>, (RCX, BYTE)),
+            (<span class="string">"dl"</span>, (RDX, BYTE)),
+            (<span class="string">"bl"</span>, (RBX, BYTE)),
 
-            (<span class="string">&quot;eip&quot;</span>, (RIP, DWORD)),
+            (<span class="string">"eip"</span>, (RIP, B_4)),
 
-            (<span class="string">&quot;ah&quot;</span>, (AH, BYTE)),
-            (<span class="string">&quot;ch&quot;</span>, (CH, BYTE)),
-            (<span class="string">&quot;dh&quot;</span>, (DH, BYTE)),
-            (<span class="string">&quot;bh&quot;</span>, (BH, BYTE)),
+            (<span class="string">"ah"</span>, (AH, BYTE)),
+            (<span class="string">"ch"</span>, (CH, BYTE)),
+            (<span class="string">"dh"</span>, (DH, BYTE)),
+            (<span class="string">"bh"</span>, (BH, BYTE)),
 
-            (<span class="string">&quot;st0&quot;</span>, (ST0, PWORD)),
-            (<span class="string">&quot;st1&quot;</span>, (ST1, PWORD)),
-            (<span class="string">&quot;st2&quot;</span>, (ST2, PWORD)),
-            (<span class="string">&quot;st3&quot;</span>, (ST3, PWORD)),
-            (<span class="string">&quot;st4&quot;</span>, (ST4, PWORD)),
-            (<span class="string">&quot;st5&quot;</span>, (ST5, PWORD)),
-            (<span class="string">&quot;st6&quot;</span>, (ST6, PWORD)),
-            (<span class="string">&quot;st7&quot;</span>, (ST7, PWORD)),
+            (<span class="string">"st0"</span>, (ST0, B_10)),
+            (<span class="string">"st1"</span>, (ST1, B_10)),
+            (<span class="string">"st2"</span>, (ST2, B_10)),
+            (<span class="string">"st3"</span>, (ST3, B_10)),
+            (<span class="string">"st4"</span>, (ST4, B_10)),
+            (<span class="string">"st5"</span>, (ST5, B_10)),
+            (<span class="string">"st6"</span>, (ST6, B_10)),
+            (<span class="string">"st7"</span>, (ST7, B_10)),
 
-            (<span class="string">&quot;mm0&quot;</span>, (MMX0, QWORD)),
-            (<span class="string">&quot;mm1&quot;</span>, (MMX1, QWORD)),
-            (<span class="string">&quot;mm2&quot;</span>, (MMX2, QWORD)),
-            (<span class="string">&quot;mm3&quot;</span>, (MMX3, QWORD)),
-            (<span class="string">&quot;mm4&quot;</span>, (MMX4, QWORD)),
-            (<span class="string">&quot;mm5&quot;</span>, (MMX5, QWORD)),
-            (<span class="string">&quot;mm6&quot;</span>, (MMX6, QWORD)),
-            (<span class="string">&quot;mm7&quot;</span>, (MMX7, QWORD)),
+            (<span class="string">"mm0"</span>, (MMX0, B_8)),
+            (<span class="string">"mm1"</span>, (MMX1, B_8)),
+            (<span class="string">"mm2"</span>, (MMX2, B_8)),
+            (<span class="string">"mm3"</span>, (MMX3, B_8)),
+            (<span class="string">"mm4"</span>, (MMX4, B_8)),
+            (<span class="string">"mm5"</span>, (MMX5, B_8)),
+            (<span class="string">"mm6"</span>, (MMX6, B_8)),
+            (<span class="string">"mm7"</span>, (MMX7, B_8)),
 
-            (<span class="string">&quot;xmm0&quot;</span>, (XMM0, OWORD)),
-            (<span class="string">&quot;xmm1&quot;</span>, (XMM1, OWORD)),
-            (<span class="string">&quot;xmm2&quot;</span>, (XMM2, OWORD)),
-            (<span class="string">&quot;xmm3&quot;</span>, (XMM3, OWORD)),
-            (<span class="string">&quot;xmm4&quot;</span>, (XMM4, OWORD)),
-            (<span class="string">&quot;xmm5&quot;</span>, (XMM5, OWORD)),
-            (<span class="string">&quot;xmm6&quot;</span>, (XMM6, OWORD)),
-            (<span class="string">&quot;xmm7&quot;</span>, (XMM7, OWORD)),
+            (<span class="string">"xmm0"</span>, (XMM0, B_16)),
+            (<span class="string">"xmm1"</span>, (XMM1, B_16)),
+            (<span class="string">"xmm2"</span>, (XMM2, B_16)),
+            (<span class="string">"xmm3"</span>, (XMM3, B_16)),
+            (<span class="string">"xmm4"</span>, (XMM4, B_16)),
+            (<span class="string">"xmm5"</span>, (XMM5, B_16)),
+            (<span class="string">"xmm6"</span>, (XMM6, B_16)),
+            (<span class="string">"xmm7"</span>, (XMM7, B_16)),
 
-            (<span class="string">&quot;ymm0&quot;</span>, (XMM0, HWORD)),
-            (<span class="string">&quot;ymm1&quot;</span>, (XMM1, HWORD)),
-            (<span class="string">&quot;ymm2&quot;</span>, (XMM2, HWORD)),
-            (<span class="string">&quot;ymm3&quot;</span>, (XMM3, HWORD)),
-            (<span class="string">&quot;ymm4&quot;</span>, (XMM4, HWORD)),
-            (<span class="string">&quot;ymm5&quot;</span>, (XMM5, HWORD)),
-            (<span class="string">&quot;ymm6&quot;</span>, (XMM6, HWORD)),
-            (<span class="string">&quot;ymm7&quot;</span>, (XMM7, HWORD)),
+            (<span class="string">"ymm0"</span>, (XMM0, B_32)),
+            (<span class="string">"ymm1"</span>, (XMM1, B_32)),
+            (<span class="string">"ymm2"</span>, (XMM2, B_32)),
+            (<span class="string">"ymm3"</span>, (XMM3, B_32)),
+            (<span class="string">"ymm4"</span>, (XMM4, B_32)),
+            (<span class="string">"ymm5"</span>, (XMM5, B_32)),
+            (<span class="string">"ymm6"</span>, (XMM6, B_32)),
+            (<span class="string">"ymm7"</span>, (XMM7, B_32)),
 
-            (<span class="string">&quot;es&quot;</span>, (ES, WORD)),
-            (<span class="string">&quot;cs&quot;</span>, (CS, WORD)),
-            (<span class="string">&quot;ss&quot;</span>, (SS, WORD)),
-            (<span class="string">&quot;ds&quot;</span>, (DS, WORD)),
-            (<span class="string">&quot;fs&quot;</span>, (FS, WORD)),
-            (<span class="string">&quot;gs&quot;</span>, (GS, WORD)),
+            (<span class="string">"es"</span>, (ES, B_2)),
+            (<span class="string">"cs"</span>, (CS, B_2)),
+            (<span class="string">"ss"</span>, (SS, B_2)),
+            (<span class="string">"ds"</span>, (DS, B_2)),
+            (<span class="string">"fs"</span>, (FS, B_2)),
+            (<span class="string">"gs"</span>, (GS, B_2)),
 
-            (<span class="string">&quot;cr0&quot;</span>, (CR0, DWORD)),
-            (<span class="string">&quot;cr1&quot;</span>, (CR1, DWORD)),
-            (<span class="string">&quot;cr2&quot;</span>, (CR2, DWORD)),
-            (<span class="string">&quot;cr3&quot;</span>, (CR3, DWORD)),
-            (<span class="string">&quot;cr4&quot;</span>, (CR4, DWORD)),
-            (<span class="string">&quot;cr5&quot;</span>, (CR5, DWORD)),
-            (<span class="string">&quot;cr6&quot;</span>, (CR6, DWORD)),
-            (<span class="string">&quot;cr7&quot;</span>, (CR7, DWORD)),
+            (<span class="string">"cr0"</span>, (CR0, B_4)),
+            (<span class="string">"cr1"</span>, (CR1, B_4)),
+            (<span class="string">"cr2"</span>, (CR2, B_4)),
+            (<span class="string">"cr3"</span>, (CR3, B_4)),
+            (<span class="string">"cr4"</span>, (CR4, B_4)),
+            (<span class="string">"cr5"</span>, (CR5, B_4)),
+            (<span class="string">"cr6"</span>, (CR6, B_4)),
+            (<span class="string">"cr7"</span>, (CR7, B_4)),
 
-            (<span class="string">&quot;dr0&quot;</span>, (DR0, DWORD)),
-            (<span class="string">&quot;dr1&quot;</span>, (DR1, DWORD)),
-            (<span class="string">&quot;dr2&quot;</span>, (DR2, DWORD)),
-            (<span class="string">&quot;dr3&quot;</span>, (DR3, DWORD)),
-            (<span class="string">&quot;dr4&quot;</span>, (DR4, DWORD)),
-            (<span class="string">&quot;dr5&quot;</span>, (DR5, DWORD)),
-            (<span class="string">&quot;dr6&quot;</span>, (DR6, DWORD)),
-            (<span class="string">&quot;dr7&quot;</span>, (DR7, DWORD)),
+            (<span class="string">"dr0"</span>, (DR0, B_4)),
+            (<span class="string">"dr1"</span>, (DR1, B_4)),
+            (<span class="string">"dr2"</span>, (DR2, B_4)),
+            (<span class="string">"dr3"</span>, (DR3, B_4)),
+            (<span class="string">"dr4"</span>, (DR4, B_4)),
+            (<span class="string">"dr5"</span>, (DR5, B_4)),
+            (<span class="string">"dr6"</span>, (DR6, B_4)),
+            (<span class="string">"dr7"</span>, (DR7, B_4)),
 
-            (<span class="string">&quot;bnd0&quot;</span>, (BND0, OWORD)),
-            (<span class="string">&quot;bnd1&quot;</span>, (BND1, OWORD)),
-            (<span class="string">&quot;bnd2&quot;</span>, (BND2, OWORD)),
-            (<span class="string">&quot;bnd3&quot;</span>, (BND3, OWORD)),
+            (<span class="string">"bnd0"</span>, (BND0, B_16)),
+            (<span class="string">"bnd1"</span>, (BND1, B_16)),
+            (<span class="string">"bnd2"</span>, (BND2, B_16)),
+            (<span class="string">"bnd3"</span>, (BND3, B_16)),
         ];
         MAP.iter().cloned().collect()
     };
-    <span class="kw">static </span><span class="kw-2">ref </span>X64_FAMILIES:  HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (Size, RegFamily)&gt; = {
+    <span class="kw">static </span><span class="kw-2">ref </span>X64_FAMILIES:  HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, (Size, RegFamily)&gt; = {
         <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, (Size, RegFamily))] = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;Rb&quot;</span>, (Size::BYTE,  RegFamily::LEGACY)),
-            (<span class="string">&quot;Rh&quot;</span>, (Size::BYTE,  RegFamily::HIGHBYTE)),
-            (<span class="string">&quot;Rw&quot;</span>, (Size::WORD,  RegFamily::LEGACY)),
-            (<span class="string">&quot;Rd&quot;</span>, (Size::DWORD, RegFamily::LEGACY)),
-            (<span class="string">&quot;Ra&quot;</span>, (Size::QWORD, RegFamily::LEGACY)),
-            (<span class="string">&quot;Rq&quot;</span>, (Size::QWORD, RegFamily::LEGACY)),
-            (<span class="string">&quot;Rf&quot;</span>, (Size::PWORD, RegFamily::FP)),
-            (<span class="string">&quot;Rm&quot;</span>, (Size::QWORD, RegFamily::MMX)),
-            (<span class="string">&quot;Rx&quot;</span>, (Size::OWORD, RegFamily::XMM)),
-            (<span class="string">&quot;Ry&quot;</span>, (Size::HWORD, RegFamily::XMM)),
-            (<span class="string">&quot;Rs&quot;</span>, (Size::WORD,  RegFamily::SEGMENT)),
-            (<span class="string">&quot;RC&quot;</span>, (Size::QWORD, RegFamily::CONTROL)),
-            (<span class="string">&quot;RD&quot;</span>, (Size::QWORD, RegFamily::DEBUG)),
-            (<span class="string">&quot;RB&quot;</span>, (Size::OWORD, RegFamily::BOUND)),
+            (<span class="string">"Rb"</span>, (Size::BYTE,  RegFamily::LEGACY)),
+            (<span class="string">"Rh"</span>, (Size::BYTE,  RegFamily::HIGHBYTE)),
+            (<span class="string">"Rw"</span>, (Size::B_2,  RegFamily::LEGACY)),
+            (<span class="string">"Rd"</span>, (Size::B_4, RegFamily::LEGACY)),
+            (<span class="string">"Ra"</span>, (Size::B_8, RegFamily::LEGACY)),
+            (<span class="string">"Rq"</span>, (Size::B_8, RegFamily::LEGACY)),
+            (<span class="string">"Rf"</span>, (Size::B_10, RegFamily::FP)),
+            (<span class="string">"Rm"</span>, (Size::B_8, RegFamily::MMX)),
+            (<span class="string">"Rx"</span>, (Size::B_16, RegFamily::XMM)),
+            (<span class="string">"Ry"</span>, (Size::B_32, RegFamily::XMM)),
+            (<span class="string">"Rs"</span>, (Size::B_2,  RegFamily::SEGMENT)),
+            (<span class="string">"RC"</span>, (Size::B_8, RegFamily::CONTROL)),
+            (<span class="string">"RD"</span>, (Size::B_8, RegFamily::DEBUG)),
+            (<span class="string">"RB"</span>, (Size::B_16, RegFamily::BOUND)),
         ];
         MAP.iter().cloned().collect()
     };
-    <span class="kw">static </span><span class="kw-2">ref </span>X86_FAMILIES:  HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (Size, RegFamily)&gt; = {
+    <span class="kw">static </span><span class="kw-2">ref </span>X86_FAMILIES:  HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, (Size, RegFamily)&gt; = {
         <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, (Size, RegFamily))] = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;Rb&quot;</span>,(Size::BYTE,  RegFamily::LEGACY)),
-            (<span class="string">&quot;Rh&quot;</span>,(Size::BYTE,  RegFamily::HIGHBYTE)),
-            (<span class="string">&quot;Rw&quot;</span>,(Size::WORD,  RegFamily::LEGACY)),
-            (<span class="string">&quot;Ra&quot;</span>,(Size::DWORD, RegFamily::LEGACY)),
-            (<span class="string">&quot;Rd&quot;</span>,(Size::DWORD, RegFamily::LEGACY)),
-            (<span class="string">&quot;Rf&quot;</span>,(Size::PWORD, RegFamily::FP)),
-            (<span class="string">&quot;Rm&quot;</span>,(Size::QWORD, RegFamily::MMX)),
-            (<span class="string">&quot;Rx&quot;</span>,(Size::OWORD, RegFamily::XMM)),
-            (<span class="string">&quot;Ry&quot;</span>,(Size::HWORD, RegFamily::XMM)),
-            (<span class="string">&quot;Rs&quot;</span>,(Size::WORD,  RegFamily::SEGMENT)),
-            (<span class="string">&quot;RC&quot;</span>,(Size::DWORD, RegFamily::CONTROL)),
-            (<span class="string">&quot;RD&quot;</span>,(Size::DWORD, RegFamily::DEBUG)),
-            (<span class="string">&quot;RB&quot;</span>,(Size::OWORD, RegFamily::BOUND)),
+            (<span class="string">"Rb"</span>,(Size::BYTE,  RegFamily::LEGACY)),
+            (<span class="string">"Rh"</span>,(Size::BYTE,  RegFamily::HIGHBYTE)),
+            (<span class="string">"Rw"</span>,(Size::B_2,  RegFamily::LEGACY)),
+            (<span class="string">"Ra"</span>,(Size::B_4, RegFamily::LEGACY)),
+            (<span class="string">"Rd"</span>,(Size::B_4, RegFamily::LEGACY)),
+            (<span class="string">"Rf"</span>,(Size::B_10, RegFamily::FP)),
+            (<span class="string">"Rm"</span>,(Size::B_8, RegFamily::MMX)),
+            (<span class="string">"Rx"</span>,(Size::B_16, RegFamily::XMM)),
+            (<span class="string">"Ry"</span>,(Size::B_32, RegFamily::XMM)),
+            (<span class="string">"Rs"</span>,(Size::B_2,  RegFamily::SEGMENT)),
+            (<span class="string">"RC"</span>,(Size::B_4, RegFamily::CONTROL)),
+            (<span class="string">"RD"</span>,(Size::B_4, RegFamily::DEBUG)),
+            (<span class="string">"RB"</span>,(Size::B_16, RegFamily::BOUND)),
         ];
         MAP.iter().cloned().collect()
     };
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

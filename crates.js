@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["dynasm","dynasmrt"];
+window.ALL_CRATES = ["bf_int","bf_jit_aarch64","bf_jit_x64","bitflags","byteorder","dynasm","dynasmrt","either","export","fnv","itertools","lazy_static","main","memmap2","proc_macro2","proc_macro_error","proc_macro_error_attr","quote","syn","testing","unicode_ident"];

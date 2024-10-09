@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\directive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>directive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../dynasm/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\directive.rs`."><title>directive.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -142,12 +142,89 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::hash_map::Entry;
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::hash_map::Entry;
 
 <span class="kw">use </span>syn::parse;
 <span class="kw">use </span>syn::Token;
-<span class="kw">use </span>quote::quote;
-<span class="kw">use </span>proc_macro_error::emit_error;
+<span class="kw">use </span>syn::spanned::Spanned;
+<span class="kw">use </span>quote::quote_spanned;
+<span class="kw">use </span>proc_macro2::{TokenTree, Literal};
+<span class="kw">use </span>proc_macro_error2::emit_error;
 
 <span class="kw">use </span><span class="kw">crate</span>::common::{Stmt, Size, delimited};
 <span class="kw">use </span><span class="kw">crate</span>::arch;
@@ -160,17 +237,17 @@
     <span class="kw">match </span>directive.to_string().as_str() {
         <span class="comment">// TODO: oword, qword, float, double, long double
 
-        </span><span class="string">&quot;arch&quot; </span>=&gt; {
+        </span><span class="string">"arch" </span>=&gt; {
             <span class="comment">// ; .arch ident
             </span><span class="kw">let </span>arch: syn::Ident = input.parse()<span class="question-mark">?</span>;
             <span class="kw">if let </span><span class="prelude-val">Some</span>(a) = arch::from_str(arch.to_string().as_str()) {
                 invocation_context.current_arch = a;
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(arch, <span class="string">&quot;Unknown architecture &#39;{}&#39;&quot;</span>, arch);
+                <span class="macro">emit_error!</span>(arch, <span class="string">"Unknown architecture '{}'"</span>, arch);
             }
         },
-        <span class="string">&quot;feature&quot; </span>=&gt; {
-            <span class="comment">// ; .feature ident (&quot;,&quot; ident) *
+        <span class="string">"feature" </span>=&gt; {
+            <span class="comment">// ; .feature ident ("," ident) *
             </span><span class="kw">let </span><span class="kw-2">mut </span>features = Vec::new();
             <span class="kw">let </span>ident: syn::Ident = input.parse()<span class="question-mark">?</span>;
             features.push(ident);
@@ -182,23 +259,29 @@
             }
 
             <span class="comment">// ;.feature none  cancels all features
-            </span><span class="kw">if </span>features.len() == <span class="number">1 </span>&amp;&amp; features[<span class="number">0</span>] == <span class="string">&quot;none&quot; </span>{
+            </span><span class="kw">if </span>features.len() == <span class="number">1 </span>&amp;&amp; features[<span class="number">0</span>] == <span class="string">"none" </span>{
                 features.pop();
             }
             invocation_context.current_arch.set_features(<span class="kw-2">&amp;</span>features);
         },
-        <span class="comment">// ; .byte (expr (&quot;,&quot; expr)*)?
-        </span><span class="string">&quot;byte&quot;  </span>=&gt; directive_const(invocation_context, stmts, input, Size::BYTE)<span class="question-mark">?</span>,
-        <span class="string">&quot;word&quot;  </span>=&gt; directive_const(invocation_context, stmts, input, Size::WORD)<span class="question-mark">?</span>,
-        <span class="string">&quot;dword&quot; </span>=&gt; directive_const(invocation_context, stmts, input, Size::DWORD)<span class="question-mark">?</span>,
-        <span class="string">&quot;qword&quot; </span>=&gt; directive_const(invocation_context, stmts, input, Size::QWORD)<span class="question-mark">?</span>,
-        <span class="string">&quot;bytes&quot; </span>=&gt; {
+        <span class="comment">// ; .u8 (expr ("," expr)*)?
+        </span><span class="string">"u8"  </span>=&gt; directive_unsigned(invocation_context, stmts, input, Size::BYTE)<span class="question-mark">?</span>,
+        <span class="string">"u16" </span>=&gt; directive_unsigned(invocation_context, stmts, input, Size::B_2)<span class="question-mark">?</span>,
+        <span class="string">"u32" </span>=&gt; directive_unsigned(invocation_context, stmts, input, Size::B_4)<span class="question-mark">?</span>,
+        <span class="string">"u64" </span>=&gt; directive_unsigned(invocation_context, stmts, input, Size::B_8)<span class="question-mark">?</span>,
+        <span class="string">"i8"  </span>=&gt; directive_signed(invocation_context, stmts, input, Size::BYTE)<span class="question-mark">?</span>,
+        <span class="string">"i16" </span>=&gt; directive_signed(invocation_context, stmts, input, Size::B_2)<span class="question-mark">?</span>,
+        <span class="string">"i32" </span>=&gt; directive_signed(invocation_context, stmts, input, Size::B_4)<span class="question-mark">?</span>,
+        <span class="string">"i64" </span>=&gt; directive_signed(invocation_context, stmts, input, Size::B_8)<span class="question-mark">?</span>,
+        <span class="string">"f32" </span>=&gt; directive_float(stmts, input, Size::B_4)<span class="question-mark">?</span>,
+        <span class="string">"f64" </span>=&gt; directive_float(stmts, input, Size::B_8)<span class="question-mark">?</span>,
+        <span class="string">"bytes" </span>=&gt; {
             <span class="comment">// ; .bytes expr
             </span><span class="kw">let </span>iterator: syn::Expr = input.parse()<span class="question-mark">?</span>;
             stmts.push(Stmt::ExprExtend(delimited(iterator)));
         },
-        <span class="string">&quot;align&quot; </span>=&gt; {
-            <span class="comment">// ; .align expr (&quot;,&quot; expr)
+        <span class="string">"align" </span>=&gt; {
+            <span class="comment">// ; .align expr ("," expr)
             // this might need to be architecture dependent
             </span><span class="kw">let </span>value: syn::Expr = input.parse()<span class="question-mark">?</span>;
 
@@ -208,12 +291,12 @@
                 delimited(with)
             } <span class="kw">else </span>{
                 <span class="kw">let </span>with = invocation_context.current_arch.default_align();
-                delimited(<span class="macro">quote!</span>(#with))
+                TokenTree::Literal(Literal::u8_unsuffixed(with))
             };
 
             stmts.push(Stmt::Align(delimited(value), with));
         },
-        <span class="string">&quot;alias&quot; </span>=&gt; {
+        <span class="string">"alias" </span>=&gt; {
             <span class="comment">// ; .alias ident, ident
             // consider changing this to ; .alias ident = ident next breaking change
             </span><span class="kw">let </span>alias = input.parse::&lt;syn::Ident&gt;()<span class="question-mark">?</span>;
@@ -224,16 +307,22 @@
 
             <span class="kw">match </span>invocation_context.aliases.entry(alias_name) {
                 Entry::Occupied(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">emit_error!</span>(alias, <span class="string">&quot;Duplicate alias definition, alias &#39;{}&#39; was already defined&quot;</span>, alias);
+                    <span class="macro">emit_error!</span>(alias, <span class="string">"Duplicate alias definition, alias '{}' was already defined"</span>, alias);
                 },
                 Entry::Vacant(v) =&gt; {
                     v.insert(reg.to_string());
                 }
             }
         },
+        <span class="comment">// these are deprecated, but to prevent bad error messages handle them explicitly
+        // I'd like to provide a warning instead, but proc-macro-error2 emit_warning! seems to not work.
+        </span><span class="string">"byte"  </span>=&gt; <span class="macro">emit_error!</span>(directive.span(), <span class="string">"Directive .byte is deprecated, please use .i8 or .u8 instead."</span>),
+        <span class="string">"word"  </span>=&gt; <span class="macro">emit_error!</span>(directive.span(), <span class="string">"Directive .word is deprecated, please use .i16 or .u16 instead."</span>),
+        <span class="string">"dword" </span>=&gt; <span class="macro">emit_error!</span>(directive.span(), <span class="string">"Directive .dword is deprecated, please use .i32 or .u32 instead."</span>),
+        <span class="string">"qword" </span>=&gt; <span class="macro">emit_error!</span>(directive.span(), <span class="string">"Directive .qword is deprecated, please use .i64 or .u64 instead."</span>),
         d =&gt; {
             <span class="comment">// unknown directive. skip ahead until we hit a ; so the parser can recover
-            </span><span class="macro">emit_error!</span>(directive, <span class="string">&quot;unknown directive &#39;{}&#39;&quot;</span>, d);
+            </span><span class="macro">emit_error!</span>(directive, <span class="string">"unknown directive '{}'"</span>, d);
             skip_until_semicolon(input);
         }
     }
@@ -241,7 +330,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn </span>directive_const(invocation_context: <span class="kw-2">&amp;mut </span>DynasmContext, stmts: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, input: parse::ParseStream, size: Size) -&gt; parse::Result&lt;()&gt; {
+<span class="kw">fn </span>directive_signed(invocation_context: <span class="kw-2">&amp;mut </span>DynasmContext, stmts: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, input: parse::ParseStream, size: Size) -&gt; parse::Result&lt;()&gt; {
     <span class="comment">// FIXME: this could be replaced by a Punctuated parser?
     // parse (expr (, expr)*)?
 
@@ -271,13 +360,74 @@
     <span class="prelude-val">Ok</span>(())
 }
 
+<span class="kw">fn </span>directive_unsigned(invocation_context: <span class="kw-2">&amp;mut </span>DynasmContext, stmts: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, input: parse::ParseStream, size: Size) -&gt; parse::Result&lt;()&gt; {
+    <span class="comment">// FIXME: this could be replaced by a Punctuated parser?
+    // parse (expr (, expr)*)?
+
+    </span><span class="kw">if </span>input.is_empty() || input.peek(<span class="macro">Token!</span>[;]) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(jump) = input.parse_opt()<span class="question-mark">? </span>{
+        invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>expr: syn::Expr = input.parse()<span class="question-mark">?</span>;
+        stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+    }
+
+
+    <span class="kw">while </span>input.peek(<span class="macro">Token!</span>[,]) {
+        <span class="kw">let _</span>: <span class="macro">Token!</span>[,] = input.parse()<span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(jump) = input.parse_opt()<span class="question-mark">? </span>{
+            invocation_context.current_arch.handle_static_reloc(stmts, jump, size);
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>expr: syn::Expr = input.parse()<span class="question-mark">?</span>;
+            stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+        }
+    }
+
+    <span class="prelude-val">Ok</span>(())
+}
+
+<span class="kw">fn </span>directive_float(stmts: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, input: parse::ParseStream, size: Size) -&gt; parse::Result&lt;()&gt; {
+    <span class="comment">// FIXME: this could be replaced by a Punctuated parser?
+    // parse (expr (, expr)*)?
+
+    </span><span class="kw">if </span>input.is_empty() || input.peek(<span class="macro">Token!</span>[;]) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">let </span>expr: syn::Expr = input.parse()<span class="question-mark">?</span>;
+    <span class="kw">let </span>expr = <span class="kw">match </span>size {
+        Size::B_4 =&gt; <span class="macro">quote_spanned!</span> {expr.span() =&gt; f32::to_bits( #expr ) },
+        Size::B_8 =&gt; <span class="macro">quote_spanned!</span> {expr.span() =&gt; f64::to_bits( #expr ) },
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
+    };
+    stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+
+    <span class="kw">while </span>input.peek(<span class="macro">Token!</span>[,]) {
+        <span class="kw">let _</span>: <span class="macro">Token!</span>[,] = input.parse()<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>expr: syn::Expr = input.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>expr = <span class="kw">match </span>size {
+            Size::B_4 =&gt; <span class="macro">quote_spanned!</span> {expr.span() =&gt; f32::to_bits( #expr ) },
+            Size::B_8 =&gt; <span class="macro">quote_spanned!</span> {expr.span() =&gt; f64::to_bits( #expr ) },
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
+        };
+        stmts.push(Stmt::ExprUnsigned(delimited(expr), size));
+    }
+
+    <span class="prelude-val">Ok</span>(())
+}
+
 <span class="doccomment">/// In case a directive is unknown, try to skip up to the next ; and resume parsing.
 </span><span class="kw">fn </span>skip_until_semicolon(input: parse::ParseStream) {
     <span class="kw">let _ </span>= input.step(|cursor| {
         <span class="kw">let </span><span class="kw-2">mut </span>rest = <span class="kw-2">*</span>cursor;
         <span class="kw">while let </span><span class="prelude-val">Some</span>((tt, next)) = rest.token_tree() {
             <span class="kw">match </span>tt {
-                ::proc_macro2::TokenTree::Punct(<span class="kw-2">ref </span>punct) <span class="kw">if </span>punct.as_char() == <span class="string">&#39;;&#39; </span>=&gt; {
+                ::proc_macro2::TokenTree::Punct(<span class="kw-2">ref </span>punct) <span class="kw">if </span>punct.as_char() == <span class="string">';' </span>=&gt; {
                     <span class="kw">return </span><span class="prelude-val">Ok</span>(((), rest));
                 }
                 <span class="kw">_ </span>=&gt; rest = next,
@@ -286,5 +436,4 @@
         <span class="prelude-val">Ok</span>(((), rest))
     });
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

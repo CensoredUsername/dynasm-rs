@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\compiler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compiler.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\compiler.rs`."><title>compiler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1666,10 +1666,16 @@
 <a href="#1666" id="1666">1666</a>
 <a href="#1667" id="1667">1667</a>
 <a href="#1668" id="1668">1668</a>
-</pre><pre class="rust"><code><span class="kw">use </span>syn::spanned::Spanned;
-<span class="kw">use </span>proc_macro2::{Span, TokenTree};
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>syn::spanned::Spanned;
+<span class="kw">use </span>proc_macro2::{Span, TokenTree, Literal};
 <span class="kw">use </span>quote::{quote_spanned};
-<span class="kw">use </span>proc_macro_error::emit_error;
+<span class="kw">use </span>proc_macro_error2::emit_error;
 
 <span class="kw">use </span><span class="kw">crate</span>::common::{Stmt, Size, Jump, JumpKind, delimited};
 <span class="kw">use </span><span class="kw">crate</span>::serialize;
@@ -1692,29 +1698,29 @@
 
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Opdata {
-    <span class="kw">pub </span>args:  <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8],  <span class="comment">// format string of arg format
-    </span><span class="kw">pub </span>ops:   <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8],
+    <span class="kw">pub </span>args:  <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[u8],  <span class="comment">// format string of arg format
+    </span><span class="kw">pub </span>ops:   <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[u8],
     <span class="kw">pub </span>reg:   u8,
     <span class="kw">pub </span>flags: Flags,
     <span class="kw">pub </span>features: Features
 }
 
-<span class="kw">pub struct </span>FormatStringIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
-    inner: iter::Cloned&lt;slice::Iter&lt;<span class="lifetime">&#39;a</span>, u8&gt;&gt;
+<span class="kw">pub struct </span>FormatStringIterator&lt;<span class="lifetime">'a</span>&gt; {
+    inner: iter::Cloned&lt;slice::Iter&lt;<span class="lifetime">'a</span>, u8&gt;&gt;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FormatStringIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; FormatStringIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; FormatStringIterator&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(buf: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; FormatStringIterator&lt;<span class="lifetime">'a</span>&gt; {
         FormatStringIterator { inner: buf.iter().cloned() }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>FormatStringIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>FormatStringIterator&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">type </span>Item = (u8, u8);
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(u8, u8)&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ty) = <span class="self">self</span>.inner.next() {
-            <span class="kw">let </span>size = <span class="self">self</span>.inner.next().expect(<span class="string">&quot;Invalid format string data&quot;</span>);
+            <span class="kw">let </span>size = <span class="self">self</span>.inner.next().expect(<span class="string">"Invalid format string data"</span>);
             <span class="prelude-val">Some</span>((ty, size))
         } <span class="kw">else </span>{
             <span class="prelude-val">None
@@ -1768,17 +1774,17 @@
     <span class="comment">// sanitize memory references, determine address size, and size immediates/displacements if possible
     </span><span class="kw">let </span>addr_size = sanitize_indirects_and_sizes(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>args)<span class="question-mark">?</span>;
     <span class="kw">let </span>addr_size = addr_size.unwrap_or(<span class="kw">match </span>ctx.mode {
-        X86Mode::Long =&gt; Size::QWORD,
-        X86Mode::Protected =&gt; Size::DWORD
+        X86Mode::Long =&gt; Size::B_8,
+        X86Mode::Protected =&gt; Size::B_4
     });
 
     <span class="comment">// determine if we need an address size override prefix
     </span><span class="kw">let </span>pref_addr = <span class="kw">match </span>(ctx.mode, addr_size) {
-        (X86Mode::Long, Size::QWORD) =&gt; <span class="bool-val">false</span>,
-        (X86Mode::Long, Size::DWORD) =&gt; <span class="bool-val">true</span>,
-        (X86Mode::Protected, Size::DWORD) =&gt; <span class="bool-val">false</span>,
-        (X86Mode::Protected, Size::WORD) =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Impossible address size&quot;</span>.into()))
+        (X86Mode::Long, Size::B_8) =&gt; <span class="bool-val">false</span>,
+        (X86Mode::Long, Size::B_4) =&gt; <span class="bool-val">true</span>,
+        (X86Mode::Protected, Size::B_4) =&gt; <span class="bool-val">false</span>,
+        (X86Mode::Protected, Size::B_2) =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Impossible address size"</span>.into()))
     };
 
     <span class="comment">// find a matching op
@@ -1787,7 +1793,7 @@
     <span class="comment">// determine if the features required for this op are fulfilled
     </span><span class="kw">if </span>!ctx.features.contains(data.features) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(
-            <span class="string">&quot;This instruction uses features that are not indicated to be available: {}&quot;</span>,
+            <span class="string">"This instruction uses features that are not indicated to be available: {}"</span>,
             data.features - ctx.features
         )));
     }
@@ -1804,42 +1810,42 @@
 
     <span class="comment">// determine if size prefixes are necessary
     </span><span class="kw">if </span>data.flags.intersects(Flags::AUTO_SIZE | Flags::AUTO_NO32 | Flags::AUTO_REXW | Flags::AUTO_VEXL) {
-        <span class="comment">// if any of these flags are true an operand size should&#39;ve been calculated
-        </span><span class="kw">let </span>op_size = op_size.expect(<span class="string">&quot;Bad formatting data? No wildcard sizes&quot;</span>);
+        <span class="comment">// if any of these flags are true an operand size should've been calculated
+        </span><span class="kw">let </span>op_size = op_size.expect(<span class="string">"Bad formatting data? No wildcard sizes"</span>);
 
         <span class="kw">match </span>ctx.mode {
-            X86Mode::Protected =&gt; <span class="kw">if </span>op_size == Size::QWORD {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 64 bit operands in 32-bit mode&quot;</span>, op.to_string())));
+            X86Mode::Protected =&gt; <span class="kw">if </span>op_size == Size::B_8 {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 64 bit operands in 32-bit mode"</span>, op.to_string())));
             },
             X86Mode::Long =&gt; ()
         }
 
         <span class="kw">if </span>data.flags.contains(Flags::AUTO_NO32) {
             <span class="kw">match </span>(op_size, ctx.mode) {
-                (Size::WORD, <span class="kw">_</span>) =&gt; pref_size = <span class="bool-val">true</span>,
-                (Size::QWORD, X86Mode::Long) =&gt; (),
-                (Size::DWORD, X86Mode::Protected) =&gt; (),
-                (Size::DWORD, X86Mode::Long) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 32 bit operands in 64-bit mode&quot;</span>, op.to_string()))),
-                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;bad formatting data&quot;</span>),
+                (Size::B_2, <span class="kw">_</span>) =&gt; pref_size = <span class="bool-val">true</span>,
+                (Size::B_8, X86Mode::Long) =&gt; (),
+                (Size::B_4, X86Mode::Protected) =&gt; (),
+                (Size::B_4, X86Mode::Long) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 32 bit operands in 64-bit mode"</span>, op.to_string()))),
+                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">"bad formatting data"</span>),
             }
         } <span class="kw">else if </span>data.flags.contains(Flags::AUTO_REXW) {
-            <span class="kw">if </span>op_size == Size::QWORD {
+            <span class="kw">if </span>op_size == Size::B_8 {
                 rex_w = <span class="bool-val">true</span>;
-            } <span class="kw">else if </span>op_size != Size::DWORD {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 16-bit operands&quot;</span>, op.to_string())));
+            } <span class="kw">else if </span>op_size != Size::B_4 {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 16-bit operands"</span>, op.to_string())));
             }
         } <span class="kw">else if </span>data.flags.contains(Flags::AUTO_VEXL) {
-            <span class="kw">if </span>op_size == Size::HWORD {
+            <span class="kw">if </span>op_size == Size::B_32 {
                 vex_l = <span class="bool-val">true</span>;
-            } <span class="kw">else if </span>op_size != Size::OWORD {
-                <span class="macro">panic!</span>(<span class="string">&quot;bad formatting data&quot;</span>);
+            } <span class="kw">else if </span>op_size != Size::B_16 {
+                <span class="macro">panic!</span>(<span class="string">"bad formatting data"</span>);
             }
-        } <span class="kw">else if </span>op_size == Size::WORD {
+        } <span class="kw">else if </span>op_size == Size::B_2 {
             pref_size = <span class="bool-val">true</span>;
-        } <span class="kw">else if </span>op_size == Size::QWORD {
+        } <span class="kw">else if </span>op_size == Size::B_8 {
             rex_w = <span class="bool-val">true</span>;
-        } <span class="kw">else if </span>op_size != Size::DWORD {
-            <span class="macro">panic!</span>(<span class="string">&quot;bad formatting data&quot;</span>);
+        } <span class="kw">else if </span>op_size != Size::B_4 {
+            <span class="macro">panic!</span>(<span class="string">"bad formatting data"</span>);
         }
     }
 
@@ -1860,7 +1866,7 @@
     <span class="comment">// split args
     </span><span class="kw">let </span>(<span class="kw-2">mut </span>rm, reg, vvvv, ireg, <span class="kw-2">mut </span>args) = extract_args(data, args);
 
-    <span class="comment">// we&#39;ll need this to keep track of where relocations need to be made
+    <span class="comment">// we'll need this to keep track of where relocations need to be made
     // (target, offset, size, kind)
     </span><span class="kw">let </span><span class="kw-2">mut </span>relocations = Vec::new();
 
@@ -1868,7 +1874,7 @@
 
     <span class="comment">// deal with ops that encode the final byte in an immediate
     </span><span class="kw">let </span>immediate_opcode = <span class="kw">if </span>data.flags.intersects(Flags::IMM_OP) {
-        <span class="kw">let </span>(<span class="kw-2">&amp;</span>imm, rest) = ops.split_last().expect(<span class="string">&quot;bad formatting data&quot;</span>);
+        <span class="kw">let </span>(<span class="kw-2">&amp;</span>imm, rest) = ops.split_last().expect(<span class="string">"bad formatting data"</span>);
         ops = rest;
         <span class="prelude-val">Some</span>(imm)
     } <span class="kw">else </span>{
@@ -1894,7 +1900,7 @@
         </span>} <span class="kw">else                           </span>{ <span class="number">0
         </span>};
         <span class="comment">// map_sel is stored in the first byte of the opcode
-        </span><span class="kw">let </span>(<span class="kw-2">&amp;</span>map_sel, tail) = ops.split_first().expect(<span class="string">&quot;bad formatting data&quot;</span>);
+        </span><span class="kw">let </span>(<span class="kw-2">&amp;</span>map_sel, tail) = ops.split_first().expect(<span class="string">"bad formatting data"</span>);
         ops = tail;
         compile_vex_xop(ctx.mode, buffer, data, <span class="kw-2">&amp;</span>reg, <span class="kw-2">&amp;</span>rm, map_sel, rex_w, <span class="kw-2">&amp;</span>vvvv, vex_l, prefix);
     <span class="comment">// otherwise, the size/mod prefixes have to be pushed and check if a rex prefix has to be generated.
@@ -1909,7 +1915,7 @@
             <span class="comment">// Certain SSE/AVX legacy encoded operations are not available in 32-bit mode
             // as they require a REX.W prefix to be encoded, which is impossible. We catch those cases here
             </span><span class="kw">if </span>ctx.mode == X86Mode::Protected {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;: Does not support 64 bit operand size in 32-bit mode&quot;</span>, op.to_string())))
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 64 bit operand size in 32-bit mode"</span>, op.to_string())))
             }
             compile_rex(buffer, rex_w, <span class="kw-2">&amp;</span>reg, <span class="kw-2">&amp;</span>rm);
         }
@@ -1917,18 +1923,18 @@
 
     <span class="comment">// if rm is embedded in the last opcode byte, push it here
     </span><span class="kw">if </span>data.flags.contains(Flags::SHORT_ARG) {
-        <span class="kw">let </span>(last, head) = ops.split_last().expect(<span class="string">&quot;bad formatting data&quot;</span>);
+        <span class="kw">let </span>(last, head) = ops.split_last().expect(<span class="string">"bad formatting data"</span>);
         ops = head;
         buffer.push(Stmt::Extend(Vec::from(ops)));
 
         <span class="kw">let </span>rm_k = <span class="kw">if let </span><span class="prelude-val">Some</span>(SizedArg::Direct {reg, ..}) = rm.take() {
             reg.kind
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;bad formatting data&quot;</span>)
+            <span class="macro">panic!</span>(<span class="string">"bad formatting data"</span>)
         };
 
         <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = rm_k {
-            <span class="kw">let </span>last: TokenTree = proc_macro2::Literal::u8_suffixed(<span class="kw-2">*</span>last).into();
+            <span class="kw">let </span>last: TokenTree = Literal::u8_suffixed(<span class="kw-2">*</span>last).into();
             buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(<span class="kw-2">&amp;</span>last, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">7</span>, <span class="number">0</span>), Size::BYTE));
         } <span class="kw">else </span>{
             buffer.push(Stmt::u8(last + (rm_k.encode() &amp; <span class="number">7</span>)));
@@ -1957,7 +1963,7 @@
 
         <span class="comment">// check addressing mode special cases
         </span><span class="kw">let </span>mode_vsib = index.as_ref().map_or(<span class="bool-val">false</span>, |<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>i, <span class="kw">_</span>, <span class="kw">_</span>)| i.kind.family() == RegFamily::XMM);
-        <span class="kw">let </span>mode_16bit = addr_size == Size::WORD;
+        <span class="kw">let </span>mode_16bit = addr_size == Size::B_2;
         <span class="kw">let </span>mode_rip_relative = base.as_ref().map_or(<span class="bool-val">false</span>, |b| b.kind.family() == RegFamily::RIP);
         <span class="kw">let </span>mode_rbp_base = base.as_ref().map_or(<span class="bool-val">false</span>, |b| b == <span class="kw-2">&amp;</span>RegId::RBP || b == <span class="kw-2">&amp;</span>RegId::R13 || b.kind.is_dynamic());
 
@@ -1986,9 +1992,9 @@
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(disp) = disp {
-                buffer.push(Stmt::ExprSigned(delimited(disp), <span class="kw">if </span>mode == MOD_DISP8 {Size::BYTE} <span class="kw">else </span>{Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), <span class="kw">if </span>mode == MOD_DISP8 {Size::BYTE} <span class="kw">else </span>{Size::B_4}));
             } <span class="kw">else if </span>mode == MOD_DISP8 {
-                <span class="comment">// no displacement was asked for, but we have to encode one as there&#39;s a base
+                <span class="comment">// no displacement was asked for, but we have to encode one as there's a base
                 </span>buffer.push(Stmt::u8(<span class="number">0</span>));
             } <span class="kw">else </span>{
                 <span class="comment">// MODE_NOBASE requires a dword displacement, and if we got here no displacement was asked for.
@@ -2009,7 +2015,7 @@
             </span>compile_modrm_sib(buffer, mode, reg_k, base_k);
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(disp) = disp {
-                buffer.push(Stmt::ExprSigned(delimited(disp), <span class="kw">if </span>mode == MOD_DISP8 {Size::BYTE} <span class="kw">else </span>{Size::WORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), <span class="kw">if </span>mode == MOD_DISP8 {Size::BYTE} <span class="kw">else </span>{Size::B_2}));
             } <span class="kw">else if </span>mode == MOD_DISP8 {
                 buffer.push(Stmt::u8(<span class="number">0</span>));
             }
@@ -2020,16 +2026,16 @@
 
             <span class="kw">match </span>ctx.mode {
                 X86Mode::Long =&gt; <span class="kw">if let </span><span class="prelude-val">Some</span>(disp) = disp {
-                    buffer.push(Stmt::ExprSigned(delimited(disp), Size::DWORD));
+                    buffer.push(Stmt::ExprSigned(delimited(disp), Size::B_4));
                 } <span class="kw">else </span>{
                     buffer.push(Stmt::u32(<span class="number">0</span>))
                 },
                 X86Mode::Protected =&gt; {
-                    <span class="comment">// x86 doesn&#39;t actually allow RIP-relative addressing
+                    <span class="comment">// x86 doesn't actually allow RIP-relative addressing
                     // but we can work around it with relocations
                     </span>buffer.push(Stmt::u32(<span class="number">0</span>));
-                    <span class="kw">let </span>disp = disp.unwrap_or_else(|| serialize::reparse(<span class="kw-2">&amp;</span>serialize::expr_zero()).expect(<span class="string">&quot;Invalid expression generated&quot;</span>));
-                    relocations.push((Jump::new(JumpKind::Bare(disp), <span class="prelude-val">None</span>), <span class="number">0</span>, Size::DWORD, RelocationKind::Absolute));
+                    <span class="kw">let </span>disp = disp.unwrap_or_else(|| serialize::reparse(<span class="kw-2">&amp;</span>serialize::expr_zero()).expect(<span class="string">"Invalid expression generated"</span>));
+                    relocations.push((Jump::new(JumpKind::Bare(disp), <span class="prelude-val">None</span>), <span class="number">0</span>, Size::B_4, RelocationKind::Absolute));
                 },
             }
 
@@ -2049,7 +2055,7 @@
                 MOD_DISP32
             };
 
-            <span class="comment">// if there&#39;s an index we need to escape into the SIB byte
+            <span class="comment">// if there's an index we need to escape into the SIB byte
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>((index, scale, scale_expr)) = index {
                 <span class="comment">// to encode the lack of a base we encode RBP
                 </span><span class="kw">let </span>base = <span class="kw">if let </span><span class="prelude-val">Some</span>(base) = base {
@@ -2086,7 +2092,7 @@
 
             <span class="comment">// Disp
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>(disp) = disp {
-                buffer.push(Stmt::ExprSigned(delimited(disp), <span class="kw">if </span>mode == MOD_DISP8 {Size::BYTE} <span class="kw">else </span>{Size::DWORD}));
+                buffer.push(Stmt::ExprSigned(delimited(disp), <span class="kw">if </span>mode == MOD_DISP8 {Size::BYTE} <span class="kw">else </span>{Size::B_4}));
             } <span class="kw">else if </span>no_base {
                 buffer.push(Stmt::u32(<span class="number">0</span>));
             } <span class="kw">else if </span>mode == MOD_DISP8 {
@@ -2105,8 +2111,8 @@
 
         buffer.push(Stmt::u32(<span class="number">0</span>));
         <span class="kw">match </span>ctx.mode {
-            X86Mode::Long      =&gt; relocations.push((jump, <span class="number">0</span>, Size::DWORD, RelocationKind::Relative)),
-            X86Mode::Protected =&gt; relocations.push((jump, <span class="number">0</span>, Size::DWORD, RelocationKind::Absolute))
+            X86Mode::Long      =&gt; relocations.push((jump, <span class="number">0</span>, Size::B_4, RelocationKind::Relative)),
+            X86Mode::Protected =&gt; relocations.push((jump, <span class="number">0</span>, Size::B_4, RelocationKind::Absolute))
         }
     }
 
@@ -2123,7 +2129,7 @@
         <span class="kw">let </span>ireg = ireg.kind;
         <span class="kw">let </span>byte = ireg.encode() &lt;&lt; <span class="number">4</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
+        <span class="kw">let </span><span class="kw-2">mut </span>byte: TokenTree = Literal::u8_suffixed(byte).into();
         <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = ireg {
             byte = serialize::expr_mask_shift_or(<span class="kw-2">&amp;</span>byte, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">0xF</span>, <span class="number">4</span>);
         }
@@ -2133,7 +2139,7 @@
             <span class="kw">if let </span>SizedArg::Immediate {value, size: Size::BYTE} = args.remove(<span class="number">0</span>) {
                 byte = serialize::expr_mask_shift_or(<span class="kw-2">&amp;</span>byte, <span class="kw-2">&amp;</span>delimited(value), <span class="number">0xF</span>, <span class="number">0</span>);
             } <span class="kw">else </span>{
-                <span class="macro">panic!</span>(<span class="string">&quot;bad formatting data&quot;</span>)
+                <span class="macro">panic!</span>(<span class="string">"bad formatting data"</span>)
             }
         }
         buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
@@ -2162,13 +2168,13 @@
                 </span><span class="kw">if let </span>JumpKind::Bare(<span class="kw">_</span>) = <span class="kw-2">&amp;</span>jump.kind {
                     <span class="kw">match </span>ctx.mode {
                         X86Mode::Protected =&gt; relocations.push((jump, <span class="number">0</span>, size, RelocationKind::Extern)),
-                        X86Mode::Long =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Extern relocations are not supported in x64 mode&quot;</span>.to_string()))
+                        X86Mode::Long =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Extern relocations are not supported in x64 mode"</span>.to_string()))
                     }
                 } <span class="kw">else </span>{
                     relocations.push((jump, <span class="number">0</span>, size, RelocationKind::Relative));
                 }
             },
-            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;bad immediate data&quot;</span>)
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"bad immediate data"</span>)
         };
     }
 
@@ -2190,11 +2196,11 @@
 <span class="comment">// Folds RawArgs into CleanArgs by analyzing the different raw memoryref variants
 </span><span class="kw">fn </span>clean_memoryref(arg: RawArg) -&gt; <span class="prelude-ty">Result</span>&lt;CleanArg, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
     <span class="prelude-val">Ok</span>(<span class="kw">match </span>arg {
-        RawArg::Direct {span, reg} =&gt; CleanArg::Direct {span, reg},
+        RawArg::Direct {reg} =&gt; CleanArg::Direct {reg},
         RawArg::JumpTarget {jump, size} =&gt; CleanArg::JumpTarget {jump, size},
         RawArg::IndirectJumpTarget {jump, size} =&gt; {
             <span class="kw">if let </span>JumpKind::Bare(<span class="kw">_</span>) = jump.kind {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Extern indirect jumps are not supported. Use a displacement&quot;</span>.to_string()))
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Extern indirect jumps are not supported. Use a displacement"</span>.to_string()))
             }
             CleanArg::IndirectJumpTarget {jump, size}
         },
@@ -2236,7 +2242,7 @@
                 }
             }
 
-            <span class="comment">// identify an index candidate (and a base if one wasn&#39;t found yet)
+            <span class="comment">// identify an index candidate (and a base if one wasn't found yet)
             </span><span class="kw">let </span>index = <span class="kw">if </span>base.is_none() {
                 <span class="comment">// we have to look for a base candidate first as not all index candidates
                 // are viable base candidates
@@ -2257,13 +2263,13 @@
 
 
             <span class="kw">if </span>!joined_regs.is_empty() {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Impossible memory argument&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Impossible memory argument"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="comment">// merge disps
             </span><span class="kw">let </span>disp = serialize::expr_add_many(span, disps.into_iter().map(delimited));
-            <span class="kw">let </span>disp = disp.map(|d| serialize::reparse(<span class="kw-2">&amp;</span>d).expect(<span class="string">&quot;Invalid expression generated internally&quot;</span>));
+            <span class="kw">let </span>disp = disp.map(|d| serialize::reparse(<span class="kw-2">&amp;</span>d).expect(<span class="string">"Invalid expression generated internally"</span>));
 
             <span class="comment">// finalize the memoryref
             </span>CleanArg::Indirect {
@@ -2305,7 +2311,7 @@
             </span><span class="kw">let </span>index = joined_regs.pop();
 
             <span class="kw">if </span>!joined_regs.is_empty() {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Impossible memory argument&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Impossible memory argument"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
@@ -2314,11 +2320,11 @@
 
             // Displacement size calculation intermezzo:
             // in typemaps, the following equations are the relations for the scale and displacement.
-            // Now as we can&#39;t figure these out at compile time (this&#39;d be nice), by default we&#39;ll
-            // always generate a 32-bit displacement if disp_size isn&#39;t set. This means we know
+            // Now as we can't figure these out at compile time (this'd be nice), by default we'll
+            // always generate a 32-bit displacement if disp_size isn't set. This means we know
             // the size of disp at this point already.
-            // as for the index calculation: that doesn&#39;t change size.
-            </span><span class="kw">let </span>true_disp_size = disp_size.unwrap_or(Size::DWORD);
+            // as for the index calculation: that doesn't change size.
+            </span><span class="kw">let </span>true_disp_size = disp_size.unwrap_or(Size::B_4);
 
             <span class="comment">// merge disps [a, b, c] into (a + b + c)
             </span><span class="kw">let </span>scaled_disp = serialize::expr_add_many(span, disps.into_iter().map(delimited));
@@ -2340,10 +2346,10 @@
                 attr_disp
             };
 
-            <span class="kw">let </span>disp = disp.map(|d| serialize::reparse(<span class="kw-2">&amp;</span>d).expect(<span class="string">&quot;Invalid expression generated internally&quot;</span>));
+            <span class="kw">let </span>disp = disp.map(|d| serialize::reparse(<span class="kw-2">&amp;</span>d).expect(<span class="string">"Invalid expression generated internally"</span>));
 
             <span class="kw">let </span>index = index.map(|(r, s)| {
-                <span class="kw">let </span>scale_expr = serialize::reparse(<span class="kw-2">&amp;</span>serialize::expr_size_of(<span class="kw-2">&amp;</span>scale)).expect(<span class="string">&quot;Invalid expression generated internally&quot;</span>);
+                <span class="kw">let </span>scale_expr = serialize::reparse(<span class="kw-2">&amp;</span>serialize::expr_size_of(<span class="kw-2">&amp;</span>scale)).expect(<span class="string">"Invalid expression generated internally"</span>);
                 (r, s, <span class="prelude-val">Some</span>(scale_expr))
             });
 
@@ -2373,7 +2379,7 @@
             CleanArg::Indirect {span, nosplit, <span class="kw-2">ref mut </span>disp_size, <span class="kw-2">ref mut </span>base, <span class="kw-2">ref mut </span>index, <span class="kw-2">ref </span>disp, ..} =&gt; {
 
                 <span class="kw">if </span>encountered_indirect {
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Multiple memory references in a single instruction&quot;</span>)
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Multiple memory references in a single instruction"</span>)
                 }
                 encountered_indirect = <span class="bool-val">true</span>;
 
@@ -2382,29 +2388,29 @@
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, scale, <span class="kw">_</span>)) = <span class="kw-2">*</span>index {
                     <span class="kw">if </span>encode_scale(scale).is_none() {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Impossible scale&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Impossible scale"</span>);
                     }
                 }
 
                 <span class="comment">// if specified, sanitize the displacement size. Else, derive one
                 </span><span class="kw">if let </span><span class="prelude-val">Some</span>(size) = <span class="kw-2">*</span>disp_size {
                     <span class="kw">if </span>disp.is_none() {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Displacement size without displacement&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Displacement size without displacement"</span>);
                     }
 
                     <span class="comment">// 16-bit addressing has smaller displacements
-                    </span><span class="kw">if </span>addr_size == <span class="prelude-val">Some</span>(Size::WORD) {
-                        <span class="kw">if </span>size != Size::BYTE &amp;&amp; size != Size::WORD {
-                            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Invalid displacement size, only BYTE or WORD are possible&quot;</span>);
+                    </span><span class="kw">if </span>addr_size == <span class="prelude-val">Some</span>(Size::B_2) {
+                        <span class="kw">if </span>size != Size::BYTE &amp;&amp; size != Size::B_2 {
+                            <span class="macro">emit_error!</span>(span, <span class="string">"Invalid displacement size, only BYTE or B_2 are possible"</span>);
                         }
-                    } <span class="kw">else if </span>size != Size::BYTE &amp;&amp; size != Size::DWORD {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Invalid displacement size, only BYTE or DWORD are possible&quot;</span>);
+                    } <span class="kw">else if </span>size != Size::BYTE &amp;&amp; size != Size::B_4 {
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Invalid displacement size, only BYTE or B_4 are possible"</span>);
                     }
                 } <span class="kw">else if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>disp) = <span class="kw-2">*</span>disp {
                     <span class="kw">match </span>derive_size(disp) {
                         <span class="prelude-val">Some</span>(Size::BYTE)                         =&gt; <span class="kw-2">*</span>disp_size = <span class="prelude-val">Some</span>(Size::BYTE),
-                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if </span>addr_size == <span class="prelude-val">Some</span>(Size::WORD) =&gt; <span class="kw-2">*</span>disp_size = <span class="prelude-val">Some</span>(Size::WORD),
-                        <span class="prelude-val">Some</span>(<span class="kw">_</span>)                                  =&gt; <span class="kw-2">*</span>disp_size = <span class="prelude-val">Some</span>(Size::DWORD),
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if </span>addr_size == <span class="prelude-val">Some</span>(Size::B_2) =&gt; <span class="kw-2">*</span>disp_size = <span class="prelude-val">Some</span>(Size::B_2),
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>)                                  =&gt; <span class="kw-2">*</span>disp_size = <span class="prelude-val">Some</span>(Size::B_4),
                         <span class="prelude-val">None </span>=&gt; ()
                     }
                 }
@@ -2432,9 +2438,9 @@
             syn::Lit::Byte(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::BYTE),
             syn::Lit::Int(i) =&gt; <span class="kw">match </span>i.base10_parse::&lt;u32&gt;() {
                 <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x80 </span>=&gt; <span class="prelude-val">Some</span>(Size::BYTE),
-                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::WORD),
-                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x8000_0000 </span>=&gt; <span class="prelude-val">Some</span>(Size::DWORD),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Size::QWORD),
+                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_2),
+                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x8000_0000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Size::B_8),
             },
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None
         </span>},
@@ -2443,9 +2449,9 @@
                 syn::Lit::Byte(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::BYTE),
                 syn::Lit::Int(i) =&gt; <span class="kw">match </span>i.base10_parse::&lt;u32&gt;() {
                     <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x80 </span>=&gt; <span class="prelude-val">Some</span>(Size::BYTE),
-                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::WORD),
-                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x8000_0000 </span>=&gt; <span class="prelude-val">Some</span>(Size::DWORD),
-                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Size::QWORD),
+                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_2),
+                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x8000_0000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Size::B_8),
                 },
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None
             </span>},
@@ -2456,7 +2462,7 @@
 }
 
 <span class="doccomment">/// Validates that the base/index combination can actually be encoded and returns the effective address size.
-/// If the address size can&#39;t be determined (purely displacement, or VSIB without base), the result is None.
+/// If the address size can't be determined (purely displacement, or VSIB without base), the result is None.
 </span><span class="kw">fn </span>sanitize_indirect(ctx: <span class="kw-2">&amp;</span>Context, span: Span, nosplit: bool, base: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Register&gt;,
                      index: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;(Register, isize, <span class="prelude-ty">Option</span>&lt;syn::Expr&gt;)&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Size&gt;, <span class="prelude-ty">Option</span>&lt;String&gt;&gt;
 {
@@ -2482,7 +2488,7 @@
         },
         (<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>((f1, s1)), <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>((f2, s2))) =&gt; <span class="kw">if </span>f1 == f2 {
             <span class="kw">if </span>s1 != s2 {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Registers of differing sizes&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Registers of differing sizes"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
             size = s1;
@@ -2498,7 +2504,7 @@
             size = s1;
             family = f1;
         } <span class="kw">else </span>{
-            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Register type combination not supported&quot;</span>);
+            <span class="macro">emit_error!</span>(span, <span class="string">"Register type combination not supported"</span>);
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
     }
@@ -2506,37 +2512,37 @@
     <span class="comment">// filter out combinations that are impossible to encode
     </span><span class="kw">match </span>family {
         RegFamily::RIP =&gt; <span class="kw">if </span>b.is_some() &amp;&amp; i.is_some() {
-            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Register type combination not supported&quot;</span>);
+            <span class="macro">emit_error!</span>(span, <span class="string">"Register type combination not supported"</span>);
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         },
         RegFamily::LEGACY =&gt; <span class="kw">match </span>size {
-            Size::DWORD =&gt; (),
-            Size::QWORD =&gt; (), <span class="comment">// only valid in long mode, but should only be possible in long mode
-            </span>Size::WORD  =&gt; <span class="kw">if </span>ctx.mode == X86Mode::Protected || vsib_mode {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;16-bit addressing is not supported in this mode&quot;</span>);
+            Size::B_4 =&gt; (),
+            Size::B_8 =&gt; (), <span class="comment">// only valid in long mode, but should only be possible in long mode
+            </span>Size::B_2  =&gt; <span class="kw">if </span>ctx.mode == X86Mode::Protected || vsib_mode {
+                <span class="macro">emit_error!</span>(span, <span class="string">"16-bit addressing is not supported in this mode"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="kw">_ </span>=&gt; {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Register type not supported&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Register type not supported"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         },
         RegFamily::XMM =&gt; <span class="kw">if </span>b.is_some() &amp;&amp; i.is_some() {
-            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Register type combination not supported&quot;</span>);
+            <span class="macro">emit_error!</span>(span, <span class="string">"Register type combination not supported"</span>);
         },
         <span class="kw">_ </span>=&gt; {
-            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Register type not supported&quot;</span>);
+            <span class="macro">emit_error!</span>(span, <span class="string">"Register type not supported"</span>);
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
     }
 
     <span class="comment">// RIP-relative encoding
     </span><span class="kw">if </span>family == RegFamily::RIP {
-        <span class="comment">// we&#39;re guaranteed that RIP is only present as one register.
+        <span class="comment">// we're guaranteed that RIP is only present as one register.
         </span><span class="kw">match </span>index.take() {
             <span class="prelude-val">Some</span>((index, <span class="number">1</span>, <span class="prelude-val">None</span>)) =&gt; <span class="kw-2">*</span>base = <span class="prelude-val">Some</span>(index),
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;RIP cannot be scaled&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"RIP cannot be scaled"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
             <span class="prelude-val">None </span>=&gt; ()
@@ -2555,7 +2561,7 @@
 
     <span class="comment">// VSIB with base
     </span><span class="kw">if </span>vsib_mode {
-        <span class="comment">// we&#39;re guaranteed that the other register is a legacy register, either DWORD or QWORD size
+        <span class="comment">// we're guaranteed that the other register is a legacy register, either B_4 or B_8 size
         // so we just have to check if an index/base swap is necessary
         </span><span class="kw">if </span>base.as_ref().unwrap().kind.family() == RegFamily::XMM {
             <span class="comment">// try to swap if possible
@@ -2563,7 +2569,7 @@
             </span><span class="kw">if let </span>(<span class="kw-2">ref mut </span>i, <span class="number">1</span>, <span class="prelude-val">None</span>) = index.as_mut().unwrap() {
                 swap(i, base.as_mut().unwrap())
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;vsib addressing requires a general purpose register as base&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"vsib addressing requires a general purpose register as base"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         }
@@ -2572,14 +2578,14 @@
     }
 
     <span class="comment">// 16-bit legacy addressing
-    </span><span class="kw">if </span>size == Size::WORD {
+    </span><span class="kw">if </span>size == Size::B_2 {
         <span class="comment">// 16-bit addressing has no concept of index.
         </span><span class="kw">let </span><span class="kw-2">mut </span>first_reg = base.take();
         <span class="kw">let </span><span class="kw-2">mut </span>second_reg = <span class="kw">match </span>index.take() {
             <span class="prelude-val">Some</span>((i, <span class="number">1</span>, <span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">Some</span>(i),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;16-bit addressing with scaled index&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"16-bit addressing with scaled index"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
         };
@@ -2602,12 +2608,12 @@
             (r, <span class="prelude-val">None</span>) <span class="kw">if </span>r == <span class="kw-2">&amp;</span>RegId::RBP =&gt; RegId::from_number(<span class="number">6</span>),
             (r, <span class="prelude-val">None</span>) <span class="kw">if </span>r == <span class="kw-2">&amp;</span>RegId::RBX =&gt; RegId::from_number(<span class="number">7</span>),
             <span class="kw">_ </span>=&gt; {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Impossible register combination&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Impossible register combination"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         };
 
-        <span class="kw-2">*</span>base = <span class="prelude-val">Some</span>(Register::new_static(Size::WORD, encoded_base));
+        <span class="kw-2">*</span>base = <span class="prelude-val">Some</span>(Register::new_static(Size::B_2, encoded_base));
         <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(size));
     }
 
@@ -2633,7 +2639,7 @@
                 <span class="kw-2">*</span>index = base.take().map(|reg| (reg, <span class="number">1</span>, <span class="prelude-val">None</span>));
                 <span class="kw-2">*</span>base = <span class="prelude-val">Some</span>(i);
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;&#39;rsp&#39; cannot be used as index field&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"'rsp' cannot be used as index field"</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
         } <span class="kw">else </span>{
@@ -2650,14 +2656,14 @@
     </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(size))
 }
 
-<span class="kw">fn </span>match_op_format(ctx: <span class="kw-2">&amp;</span>Context, ident: <span class="kw-2">&amp;</span>syn::Ident, args: <span class="kw-2">&amp;</span>[CleanArg]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+<span class="kw">fn </span>match_op_format(ctx: <span class="kw-2">&amp;</span>Context, ident: <span class="kw-2">&amp;</span>syn::Ident, args: <span class="kw-2">&amp;</span>[CleanArg]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
     <span class="kw">let </span>name = ident.to_string();
     <span class="kw">let </span>name = name.as_str();
 
     <span class="kw">let </span>data = <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = get_mnemnonic_data(name) {
         data
     } <span class="kw">else </span>{
-        <span class="macro">emit_error!</span>(ident, <span class="string">&quot;&#39;{}&#39; is not a valid instruction&quot;</span>, name);
+        <span class="macro">emit_error!</span>(ident, <span class="string">"'{}' is not a valid instruction"</span>, name);
         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
     };
 
@@ -2668,19 +2674,19 @@
     }
 
     <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;: argument type/size mismatch, expected one of the following forms:\n{}&quot;</span>, name, format_opdata_list(name, data))
+        <span class="macro">format!</span>(<span class="string">"'{}': argument type/size mismatch, expected one of the following forms:\n{}"</span>, name, format_opdata_list(name, data))
     ))
 }
 
-<span class="kw">fn </span>match_format_string(ctx: <span class="kw-2">&amp;</span>Context, fmt: <span class="kw-2">&amp;</span>Opdata, args: <span class="kw-2">&amp;</span>[CleanArg]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">fn </span>match_format_string(ctx: <span class="kw-2">&amp;</span>Context, fmt: <span class="kw-2">&amp;</span>Opdata, args: <span class="kw-2">&amp;</span>[CleanArg]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
     <span class="kw">let </span>fmtstr = <span class="kw-2">&amp;</span>fmt.args;
 
     <span class="kw">if </span>ctx.mode != X86Mode::Protected &amp;&amp; fmt.flags.intersects(Flags::X86_ONLY) {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Not available in 32-bit mode&quot;</span>);
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"Not available in 32-bit mode"</span>);
     }
 
     <span class="kw">if </span>fmtstr.len() != args.len() * <span class="number">2 </span>{
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;argument length mismatch&quot;</span>);
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"argument length mismatch"</span>);
     }
     <span class="comment">// i : immediate
     // o : instruction offset
@@ -2707,122 +2713,123 @@
     // W: matches CR8
     // X: matches st0
 
-    // b, w, d, q, o, h match a byte, word, doubleword, quadword, octword and hexadecword
+    // b, w, d, q, o, h, t match a byte, word (2 bytes), doubleword (4 bytes), quadword (8 bytes), 16 bytes, 32 bytes and 64 bytes
     // p matches a PWORD (10 bytes)
     // f matches an FWORD (6 bytes)
     // * matches all possible sizes for this operand (w/d for i, w/d/q for r/v, o/h for y/w and everything for m)
     // ! matches a lack of size, only useful in combination with m
-    // ? matches any size and doesn&#39;t participate in the operand size calculation
+    // ? matches any size and doesn't participate in the operand size calculation
     </span><span class="kw">let </span><span class="kw-2">mut </span>args = args.iter();
     <span class="kw">for </span>(code, fsize) <span class="kw">in </span>FormatStringIterator::new(fmtstr) {
         <span class="kw">let </span>arg = args.next().unwrap();
 
         <span class="kw">let </span>size = <span class="kw">match </span>(code, arg) {
             <span class="comment">// immediates
-            </span>(<span class="string">b&#39;i&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Immediate{size, ..})  |
-            (<span class="string">b&#39;o&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Immediate{size, ..})  |
-            (<span class="string">b&#39;o&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::JumpTarget{size, ..}) =&gt; size,
+            </span>(<span class="string">b'i'</span>, <span class="kw-2">&amp;</span>CleanArg::Immediate{size, ..})  |
+            (<span class="string">b'o'</span>, <span class="kw-2">&amp;</span>CleanArg::Immediate{size, ..})  |
+            (<span class="string">b'o'</span>, <span class="kw-2">&amp;</span>CleanArg::JumpTarget{size, ..}) =&gt; size,
 
             <span class="comment">// specific legacy regs
-            </span>(x @ <span class="string">b&#39;A&#39; </span>..= <span class="string">b&#39;P&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(x @ <span class="string">b'A' </span>..= <span class="string">b'P'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::LEGACY &amp;&amp;
-                reg.kind.code() == <span class="prelude-val">Some</span>(x - <span class="string">b&#39;A&#39;</span>) =&gt; <span class="prelude-val">Some</span>(reg.size()),
+                reg.kind.code() == <span class="prelude-val">Some</span>(x - <span class="string">b'A'</span>) =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// specific segment regs
-            </span>(x @ <span class="string">b&#39;Q&#39; </span>..= <span class="string">b&#39;V&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(x @ <span class="string">b'Q' </span>..= <span class="string">b'V'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::SEGMENT &amp;&amp;
-                reg.kind.code() == <span class="prelude-val">Some</span>(x - <span class="string">b&#39;Q&#39;</span>) =&gt; <span class="prelude-val">Some</span>(reg.size()),
+                reg.kind.code() == <span class="prelude-val">Some</span>(x - <span class="string">b'Q'</span>) =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// CR8 can be specially referenced
-            </span>(<span class="string">b&#39;W&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'W'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind == RegId::CR8 =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// top of the fp stack is also often used
-            </span>(<span class="string">b&#39;X&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'X'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind == RegId::ST0 =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// generic legacy regs
-            </span>(<span class="string">b&#39;r&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
-            (<span class="string">b&#39;v&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'r'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
+            (<span class="string">b'v'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::LEGACY ||
                 reg.kind.family() == RegFamily::HIGHBYTE =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// other reg types often mixed with memory refs
-            </span>(<span class="string">b&#39;x&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
-            (<span class="string">b&#39;u&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'x'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
+            (<span class="string">b'u'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::MMX =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b&#39;y&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
-            (<span class="string">b&#39;w&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'y'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
+            (<span class="string">b'w'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::XMM =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// other reg types
-            </span>(<span class="string">b&#39;f&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'f'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::FP =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b&#39;s&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b's'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::SEGMENT =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b&#39;c&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'c'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::CONTROL =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b&#39;d&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'd'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::DEBUG =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b&#39;b&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'b'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::BOUND =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// memory offsets
-            </span>(<span class="string">b&#39;m&#39;</span>,          <span class="kw-2">&amp;</span>CleanArg::Indirect {size, <span class="kw-2">ref </span>index, ..}) |
-            (<span class="string">b&#39;u&#39; </span>..= <span class="string">b&#39;w&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Indirect {size, <span class="kw-2">ref </span>index, ..}) <span class="kw">if
+            </span>(<span class="string">b'm'</span>,          <span class="kw-2">&amp;</span>CleanArg::Indirect {size, <span class="kw-2">ref </span>index, ..}) |
+            (<span class="string">b'u' </span>..= <span class="string">b'w'</span>, <span class="kw-2">&amp;</span>CleanArg::Indirect {size, <span class="kw-2">ref </span>index, ..}) <span class="kw">if
                 </span>index.is_none() || index.as_ref().unwrap().<span class="number">0</span>.kind.family() != RegFamily::XMM =&gt; size,
 
-            (<span class="string">b&#39;m&#39;</span>,          <span class="kw-2">&amp;</span>CleanArg::IndirectJumpTarget {size, ..}) |
-            (<span class="string">b&#39;u&#39; </span>..= <span class="string">b&#39;w&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::IndirectJumpTarget {size, ..}) =&gt; size,
+            (<span class="string">b'm'</span>,          <span class="kw-2">&amp;</span>CleanArg::IndirectJumpTarget {size, ..}) |
+            (<span class="string">b'u' </span>..= <span class="string">b'w'</span>, <span class="kw-2">&amp;</span>CleanArg::IndirectJumpTarget {size, ..}) =&gt; size,
 
             <span class="comment">// vsib addressing. as they have two sizes that must be checked they check one of the sizes here
-            </span>(<span class="string">b&#39;k&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Indirect {size, index: <span class="prelude-val">Some</span>((<span class="kw-2">ref </span>index, <span class="kw">_</span>, <span class="kw">_</span>)), ..}) <span class="kw">if
-                </span>(size.is_none() || size == <span class="prelude-val">Some</span>(Size::DWORD)) &amp;&amp;
+            </span>(<span class="string">b'k'</span>, <span class="kw-2">&amp;</span>CleanArg::Indirect {size, index: <span class="prelude-val">Some</span>((<span class="kw-2">ref </span>index, <span class="kw">_</span>, <span class="kw">_</span>)), ..}) <span class="kw">if
+                </span>(size.is_none() || size == <span class="prelude-val">Some</span>(Size::B_4)) &amp;&amp;
                 index.kind.family() == RegFamily::XMM =&gt; <span class="prelude-val">Some</span>(index.size()),
-            (<span class="string">b&#39;l&#39;</span>, <span class="kw-2">&amp;</span>CleanArg::Indirect {size, index: <span class="prelude-val">Some</span>((<span class="kw-2">ref </span>index, <span class="kw">_</span>, <span class="kw">_</span>)), ..}) <span class="kw">if
-                </span>(size.is_none() ||  size == <span class="prelude-val">Some</span>(Size::QWORD)) &amp;&amp;
+            (<span class="string">b'l'</span>, <span class="kw-2">&amp;</span>CleanArg::Indirect {size, index: <span class="prelude-val">Some</span>((<span class="kw-2">ref </span>index, <span class="kw">_</span>, <span class="kw">_</span>)), ..}) <span class="kw">if
+                </span>(size.is_none() ||  size == <span class="prelude-val">Some</span>(Size::B_8)) &amp;&amp;
                 index.kind.family() == RegFamily::XMM =&gt; <span class="prelude-val">Some</span>(index.size()),
-            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;argument type mismatch&quot;</span>)
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"argument type mismatch"</span>)
         };
 
         <span class="comment">// if size is none it always matches (and will later be coerced to a more specific type if the match is successful)
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(size) = size {
             <span class="kw">if </span>!<span class="kw">match </span>(fsize, code) {
                 <span class="comment">// immediates can always fit in larger slots
-                </span>(<span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; size &lt;= Size::WORD,
-                (<span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; size &lt;= Size::DWORD,
-                (<span class="string">b&#39;q&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; size &lt;= Size::QWORD,
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; size &lt;= Size::DWORD,
+                </span>(<span class="string">b'w'</span>, <span class="string">b'i'</span>) =&gt; size &lt;= Size::B_2,
+                (<span class="string">b'd'</span>, <span class="string">b'i'</span>) =&gt; size &lt;= Size::B_4,
+                (<span class="string">b'q'</span>, <span class="string">b'i'</span>) =&gt; size &lt;= Size::B_8,
+                (<span class="string">b'*'</span>, <span class="string">b'i'</span>) =&gt; size &lt;= Size::B_4,
                 <span class="comment">// normal size matches
-                </span>(<span class="string">b&#39;b&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::BYTE,
-                (<span class="string">b&#39;w&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::WORD,
-                (<span class="string">b&#39;d&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::DWORD,
-                (<span class="string">b&#39;q&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::QWORD,
-                (<span class="string">b&#39;f&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::FWORD,
-                (<span class="string">b&#39;p&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::PWORD,
-                (<span class="string">b&#39;o&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::OWORD,
-                (<span class="string">b&#39;h&#39;</span>, <span class="kw">_</span>)    =&gt; size == Size::HWORD,
+                </span>(<span class="string">b'b'</span>, <span class="kw">_</span>)    =&gt; size == Size::BYTE,
+                (<span class="string">b'w'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_2,
+                (<span class="string">b'd'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_4,
+                (<span class="string">b'q'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_8,
+                (<span class="string">b'f'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_6,
+                (<span class="string">b'p'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_10,
+                (<span class="string">b'o'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_16,
+                (<span class="string">b'h'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_32,
+                (<span class="string">b't'</span>, <span class="kw">_</span>)    =&gt; size == Size::B_64,
                 <span class="comment">// what is allowed for wildcards
-                </span>(<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;k&#39;</span>) |
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;l&#39;</span>) |
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;y&#39;</span>) |
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;w&#39;</span>) =&gt; size == Size::OWORD || size == Size::HWORD,
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;r&#39;</span>) |
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;A&#39; </span>..= <span class="string">b&#39;P&#39;</span>) |
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;v&#39;</span>) =&gt; size == Size::WORD || size == Size::DWORD || size == Size::QWORD,
-                (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;m&#39;</span>) =&gt; <span class="bool-val">true</span>,
-                (<span class="string">b&#39;*&#39;</span>, <span class="kw">_</span>)    =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid size wildcard&quot;</span>),
-                (<span class="string">b&#39;?&#39;</span>, <span class="kw">_</span>)    =&gt; <span class="bool-val">true</span>,
-                (<span class="string">b&#39;!&#39;</span>, <span class="kw">_</span>)    =&gt; <span class="bool-val">false</span>,
-                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid format string&quot;</span>)
+                </span>(<span class="string">b'*'</span>, <span class="string">b'k'</span>) |
+                (<span class="string">b'*'</span>, <span class="string">b'l'</span>) |
+                (<span class="string">b'*'</span>, <span class="string">b'y'</span>) |
+                (<span class="string">b'*'</span>, <span class="string">b'w'</span>) =&gt; size == Size::B_16 || size == Size::B_32,
+                (<span class="string">b'*'</span>, <span class="string">b'r'</span>) |
+                (<span class="string">b'*'</span>, <span class="string">b'A' </span>..= <span class="string">b'P'</span>) |
+                (<span class="string">b'*'</span>, <span class="string">b'v'</span>) =&gt; size == Size::B_2 || size == Size::B_4 || size == Size::B_8,
+                (<span class="string">b'*'</span>, <span class="string">b'm'</span>) =&gt; <span class="bool-val">true</span>,
+                (<span class="string">b'*'</span>, <span class="kw">_</span>)    =&gt; <span class="macro">panic!</span>(<span class="string">"Invalid size wildcard"</span>),
+                (<span class="string">b'?'</span>, <span class="kw">_</span>)    =&gt; <span class="bool-val">true</span>,
+                (<span class="string">b'!'</span>, <span class="kw">_</span>)    =&gt; <span class="bool-val">false</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"invalid format string"</span>)
             } {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;argument size mismatch&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"argument size mismatch"</span>);
             }
-        } <span class="kw">else if </span>fsize != <span class="string">b&#39;*&#39; </span>&amp;&amp; fmt.flags.contains(Flags::EXACT_SIZE) {
+        } <span class="kw">else if </span>fsize != <span class="string">b'*' </span>&amp;&amp; fmt.flags.contains(Flags::EXACT_SIZE) {
             <span class="comment">// Basically, this format is a more specific version of an instruction
             // that also has more general versions. This should only be picked
             // if the size constraints are met, not if the size is unspecified
-            </span><span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;alternate variant exists&quot;</span>);
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"alternate variant exists"</span>);
         }
     }
 
@@ -2832,7 +2839,7 @@
 
 <span class="kw">fn </span>size_operands(fmt: <span class="kw-2">&amp;</span>Opdata, args: Vec&lt;CleanArg&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;Size&gt;, Vec&lt;SizedArg&gt;), <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
     <span class="comment">// sizing operands requires two passes.
-    // In the first one, we determine the effective operand size if necessary (if *&#39;s are present)
+    // In the first one, we determine the effective operand size if necessary (if *'s are present)
     // In the second one, we create the final sized AST
 
     </span><span class="kw">let </span><span class="kw-2">mut </span>has_arg = <span class="bool-val">false</span>;
@@ -2841,7 +2848,7 @@
 
     <span class="comment">// operand size determination loop
     </span><span class="kw">for </span>(arg, (<span class="kw">_</span>, fsize)) <span class="kw">in </span>args.iter().zip(FormatStringIterator::new(<span class="kw-2">&amp;</span>fmt.args)) {
-        <span class="kw">if </span>fsize != <span class="string">b&#39;*&#39; </span>{
+        <span class="kw">if </span>fsize != <span class="string">b'*' </span>{
             <span class="kw">continue</span>;
         }
 
@@ -2850,7 +2857,7 @@
                 has_arg = <span class="bool-val">true</span>;
                 <span class="kw">let </span>size = reg.size();
                 <span class="kw">if </span>op_size.map_or(<span class="bool-val">false</span>, |s| s != size,) {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Conflicting operand sizes&quot;</span>.to_string()));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Conflicting operand sizes"</span>.to_string()));
                 }
                 op_size = <span class="prelude-val">Some</span>(size);
             },
@@ -2858,7 +2865,7 @@
                 has_arg = <span class="bool-val">true</span>;
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(size) = size {
                     <span class="kw">if </span>op_size.map_or(<span class="bool-val">false</span>, |s| s != size) {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Conflicting operand sizes&quot;</span>.to_string()));
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Conflicting operand sizes"</span>.to_string()));
                     }
                     op_size = <span class="prelude-val">Some</span>(size);
                 }
@@ -2874,7 +2881,7 @@
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(size) = size {
                     <span class="kw">if </span>op_size.map_or(<span class="bool-val">false</span>, |s| s != size) {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Conflicting operand sizes&quot;</span>.to_string()));
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Conflicting operand sizes"</span>.to_string()));
                     }
                     op_size = <span class="prelude-val">Some</span>(size);
                 }
@@ -2882,7 +2889,7 @@
             CleanArg::Immediate {size, ..} |
             CleanArg::JumpTarget {size, ..} =&gt; {
                 <span class="kw">if </span>im_size.is_some() {
-                    <span class="macro">panic!</span>(<span class="string">&quot;Bad formatting data? multiple immediates with wildcard size&quot;</span>);
+                    <span class="macro">panic!</span>(<span class="string">"Bad formatting data? multiple immediates with wildcard size"</span>);
                 }
                 im_size = size;
             }
@@ -2890,15 +2897,15 @@
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(o) = op_size {
-        <span class="kw">let </span>ref_im_size = <span class="kw">if </span>o &gt; Size::DWORD {Size::DWORD} <span class="kw">else </span>{o};
+        <span class="kw">let </span>ref_im_size = <span class="kw">if </span>o &gt; Size::B_4 {Size::B_4} <span class="kw">else </span>{o};
         <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = im_size {
             <span class="kw">if </span>i &gt; ref_im_size {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Immediate size mismatch&quot;</span>.to_string()));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Immediate size mismatch"</span>.to_string()));
             }
         }
         im_size = <span class="prelude-val">Some</span>(ref_im_size);
     } <span class="kw">else if </span>has_arg {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Unknown operand size&quot;</span>.to_string()));
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Unknown operand size"</span>.to_string()));
     }
 
     <span class="comment">// fill-in loop. default should never be used.
@@ -2907,82 +2914,82 @@
 
         <span class="comment">//get the specified operand size from the format string
         </span><span class="kw">let </span>size = <span class="kw">match </span>(fsize, code) {
-            (<span class="string">b&#39;b&#39;</span>, <span class="kw">_</span>) =&gt; Size::BYTE,
-            (<span class="string">b&#39;w&#39;</span>, <span class="kw">_</span>) =&gt; Size::WORD,
-            (<span class="kw">_</span>, <span class="string">b&#39;k&#39;</span>) |
-            (<span class="string">b&#39;d&#39;</span>, <span class="kw">_</span>) =&gt; Size::DWORD,
-            (<span class="kw">_</span>, <span class="string">b&#39;l&#39;</span>) |
-            (<span class="string">b&#39;q&#39;</span>, <span class="kw">_</span>) =&gt; Size::QWORD,
-            (<span class="string">b&#39;f&#39;</span>, <span class="kw">_</span>) =&gt; Size::FWORD,
-            (<span class="string">b&#39;p&#39;</span>, <span class="kw">_</span>) =&gt; Size::PWORD,
-            (<span class="string">b&#39;o&#39;</span>, <span class="kw">_</span>) =&gt; Size::OWORD,
-            (<span class="string">b&#39;h&#39;</span>, <span class="kw">_</span>) =&gt; Size::HWORD,
-            (<span class="string">b&#39;*&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; im_size.unwrap(),
-            (<span class="string">b&#39;*&#39;</span>, <span class="kw">_</span>) =&gt; op_size.unwrap(),
-            (<span class="string">b&#39;!&#39;</span>, <span class="kw">_</span>) =&gt; Size::BYTE, <span class="comment">// will never be used, placeholder
+            (<span class="string">b'b'</span>, <span class="kw">_</span>) =&gt; Size::BYTE,
+            (<span class="string">b'w'</span>, <span class="kw">_</span>) =&gt; Size::B_2,
+            (<span class="kw">_</span>, <span class="string">b'k'</span>) |
+            (<span class="string">b'd'</span>, <span class="kw">_</span>) =&gt; Size::B_4,
+            (<span class="kw">_</span>, <span class="string">b'l'</span>) |
+            (<span class="string">b'q'</span>, <span class="kw">_</span>) =&gt; Size::B_8,
+            (<span class="string">b'f'</span>, <span class="kw">_</span>) =&gt; Size::B_6,
+            (<span class="string">b'p'</span>, <span class="kw">_</span>) =&gt; Size::B_10,
+            (<span class="string">b'o'</span>, <span class="kw">_</span>) =&gt; Size::B_16,
+            (<span class="string">b'h'</span>, <span class="kw">_</span>) =&gt; Size::B_32,
+            (<span class="string">b'*'</span>, <span class="string">b'i'</span>) =&gt; im_size.unwrap(),
+            (<span class="string">b'*'</span>, <span class="kw">_</span>) =&gt; op_size.unwrap(),
+            (<span class="string">b'!'</span>, <span class="kw">_</span>) =&gt; Size::BYTE, <span class="comment">// will never be used, placeholder
             </span><span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
         };
 
         new_args.push(<span class="kw">match </span>arg {
-            CleanArg::Direct {span, reg} =&gt;
-                SizedArg::Direct {span, reg},
+            CleanArg::Direct {reg} =&gt;
+                SizedArg::Direct {reg},
             CleanArg::JumpTarget {jump, ..} =&gt;
                 SizedArg::JumpTarget {jump, size},
             CleanArg::IndirectJumpTarget {jump, ..} =&gt;
                 SizedArg::IndirectJumpTarget {jump},
             CleanArg::Immediate {value, ..} =&gt;
                 SizedArg::Immediate {value, size},
-            CleanArg::Indirect {span, disp_size, base, index, disp, ..} =&gt;
-                SizedArg::Indirect {span, disp_size, base, index, disp},
+            CleanArg::Indirect {disp_size, base, index, disp, ..} =&gt;
+                SizedArg::Indirect {disp_size, base, index, disp},
         });
     }
 
     <span class="prelude-val">Ok</span>((op_size, new_args))
 }
 
-<span class="kw">fn </span>get_legacy_prefixes(fmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata, idents: Vec&lt;syn::Ident&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;u8&gt;, <span class="prelude-ty">Option</span>&lt;u8&gt;), <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+<span class="kw">fn </span>get_legacy_prefixes(fmt: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata, idents: Vec&lt;syn::Ident&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;u8&gt;, <span class="prelude-ty">Option</span>&lt;u8&gt;), <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>group1 = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>group2 = <span class="prelude-val">None</span>;
 
     <span class="kw">for </span>prefix <span class="kw">in </span>idents {
         <span class="kw">let </span>name = prefix.to_string();
         <span class="kw">let </span>(group, value) = <span class="kw">match </span>name.as_str() {
-            <span class="string">&quot;rep&quot;   </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::REP) {
+            <span class="string">"rep"   </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::REP) {
                 (<span class="kw-2">&amp;mut </span>group1, <span class="number">0xF3</span>)
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(prefix, <span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, name);
+                <span class="macro">emit_error!</span>(prefix, <span class="string">"Cannot use prefix {} on this instruction"</span>, name);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
-            <span class="string">&quot;repe&quot;  </span>|
-            <span class="string">&quot;repz&quot;  </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::REPE) {
+            <span class="string">"repe"  </span>|
+            <span class="string">"repz"  </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::REPE) {
                 (<span class="kw-2">&amp;mut </span>group1, <span class="number">0xF3</span>)
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(prefix, <span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, name);
+                <span class="macro">emit_error!</span>(prefix, <span class="string">"Cannot use prefix {} on this instruction"</span>, name);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
-            <span class="string">&quot;repnz&quot; </span>|
-            <span class="string">&quot;repne&quot; </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::REPE) {
+            <span class="string">"repnz" </span>|
+            <span class="string">"repne" </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::REPE) {
                 (<span class="kw-2">&amp;mut </span>group1, <span class="number">0xF2</span>)
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(prefix, <span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, name);
+                <span class="macro">emit_error!</span>(prefix, <span class="string">"Cannot use prefix {} on this instruction"</span>, name);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
-            <span class="string">&quot;lock&quot;  </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::LOCK) {
+            <span class="string">"lock"  </span>=&gt; <span class="kw">if </span>fmt.flags.contains(Flags::LOCK) {
                 (<span class="kw-2">&amp;mut </span>group1, <span class="number">0xF0</span>)
             } <span class="kw">else </span>{
-                <span class="macro">emit_error!</span>(prefix, <span class="string">&quot;Cannot use prefix {} on this instruction&quot;</span>, name);
+                <span class="macro">emit_error!</span>(prefix, <span class="string">"Cannot use prefix {} on this instruction"</span>, name);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             },
-            <span class="string">&quot;ss&quot;    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x36</span>),
-            <span class="string">&quot;cs&quot;    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x2E</span>),
-            <span class="string">&quot;ds&quot;    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x3E</span>),
-            <span class="string">&quot;es&quot;    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x26</span>),
-            <span class="string">&quot;fs&quot;    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x64</span>),
-            <span class="string">&quot;gs&quot;    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x65</span>),
-            <span class="kw">_       </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;unimplemented prefix&quot;</span>)
+            <span class="string">"ss"    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x36</span>),
+            <span class="string">"cs"    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x2E</span>),
+            <span class="string">"ds"    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x3E</span>),
+            <span class="string">"es"    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x26</span>),
+            <span class="string">"fs"    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x64</span>),
+            <span class="string">"gs"    </span>=&gt; (<span class="kw-2">&amp;mut </span>group2, <span class="number">0x65</span>),
+            <span class="kw">_       </span>=&gt; <span class="macro">panic!</span>(<span class="string">"unimplemented prefix"</span>)
         };
         <span class="kw">if </span>group.is_some() {
-            <span class="macro">emit_error!</span>(prefix, <span class="string">&quot;Duplicate prefix group&quot;</span>);
+            <span class="macro">emit_error!</span>(prefix, <span class="string">"Duplicate prefix group"</span>);
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
         <span class="kw-2">*</span>group = <span class="prelude-val">Some</span>(value);
@@ -2991,12 +2998,12 @@
     <span class="prelude-val">Ok</span>((group1, group2))
 }
 
-<span class="kw">fn </span>check_rex(ctx: <span class="kw-2">&amp;</span>Context, fmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata, args: <span class="kw-2">&amp;</span>[SizedArg], rex_w: bool) -&gt; <span class="prelude-ty">Result</span>&lt;bool, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+<span class="kw">fn </span>check_rex(ctx: <span class="kw-2">&amp;</span>Context, fmt: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata, args: <span class="kw-2">&amp;</span>[SizedArg], rex_w: bool) -&gt; <span class="prelude-ty">Result</span>&lt;bool, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
     <span class="comment">// performs checks for not encodable arg combinations
     // output arg indicates if a rex prefix can be encoded
     </span><span class="kw">if </span>ctx.mode == X86Mode::Protected {
         <span class="kw">if </span>rex_w {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;Does not support 64 bit operand size in 32-bit mode&quot;</span>.to_string()));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"Does not support 64 bit operand size in 32-bit mode"</span>.to_string()));
         } <span class="kw">else </span>{
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
         }
@@ -3007,7 +3014,7 @@
 
     <span class="kw">for </span>(arg, (c, <span class="kw">_</span>)) <span class="kw">in </span>args.iter().zip(FormatStringIterator::new(fmt.args)) {
         <span class="comment">// only scan args that are actually encoded
-        </span><span class="kw">if let </span><span class="string">b&#39;a&#39; </span>..= <span class="string">b&#39;z&#39; </span>= c {
+        </span><span class="kw">if let </span><span class="string">b'a' </span>..= <span class="string">b'z' </span>= c {
             <span class="kw">match </span><span class="kw-2">*</span>arg {
                 SizedArg::Direct {<span class="kw-2">ref </span>reg, ..} =&gt; {
                     <span class="kw">if </span>reg.kind.family() == RegFamily::HIGHBYTE {
@@ -3032,17 +3039,17 @@
     }
 
     <span class="kw">if </span>requires_rex &amp;&amp; requires_no_rex {
-        <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;High byte register combined with extended registers or 64-bit operand size&quot;</span>.to_string()))
+        <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="string">"High byte register combined with extended registers or 64-bit operand size"</span>.to_string()))
     } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(requires_rex)
     }
 }
 
-<span class="kw">fn </span>extract_args(fmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata, args: Vec&lt;SizedArg&gt;) -&gt; (<span class="prelude-ty">Option</span>&lt;SizedArg&gt;, <span class="prelude-ty">Option</span>&lt;SizedArg&gt;, <span class="prelude-ty">Option</span>&lt;SizedArg&gt;, <span class="prelude-ty">Option</span>&lt;SizedArg&gt;, Vec&lt;SizedArg&gt;) {
+<span class="kw">fn </span>extract_args(fmt: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata, args: Vec&lt;SizedArg&gt;) -&gt; (<span class="prelude-ty">Option</span>&lt;SizedArg&gt;, <span class="prelude-ty">Option</span>&lt;SizedArg&gt;, <span class="prelude-ty">Option</span>&lt;SizedArg&gt;, <span class="prelude-ty">Option</span>&lt;SizedArg&gt;, Vec&lt;SizedArg&gt;) {
     <span class="comment">// way operand order works:
 
-    // if there&#39;s a memory/reg operand, this operand goes into modrm.r/m
-    // if there&#39;s a segment/control/debug register, it goes into reg.
+    // if there's a memory/reg operand, this operand goes into modrm.r/m
+    // if there's a segment/control/debug register, it goes into reg.
 
     // default argument encoding order is as follows:
     // no encoding flag: m, rm, rvm, rvim
@@ -3057,27 +3064,27 @@
 
     <span class="kw">for </span>(arg, (c, <span class="kw">_</span>)) <span class="kw">in </span>args.into_iter().zip(FormatStringIterator::new(fmt.args)) {
         <span class="kw">match </span>c {
-            <span class="string">b&#39;m&#39; </span>| <span class="string">b&#39;u&#39; </span>| <span class="string">b&#39;v&#39; </span>| <span class="string">b&#39;w&#39; </span>| <span class="string">b&#39;k&#39; </span>| <span class="string">b&#39;l&#39;  </span>=&gt; <span class="kw">if </span>memarg.is_some() {
-                <span class="macro">panic!</span>(<span class="string">&quot;multiple memory arguments in format string&quot;</span>);
+            <span class="string">b'm' </span>| <span class="string">b'u' </span>| <span class="string">b'v' </span>| <span class="string">b'w' </span>| <span class="string">b'k' </span>| <span class="string">b'l'  </span>=&gt; <span class="kw">if </span>memarg.is_some() {
+                <span class="macro">panic!</span>(<span class="string">"multiple memory arguments in format string"</span>);
             } <span class="kw">else </span>{
                 memarg = <span class="prelude-val">Some</span>(regs.len());
                 regs.push(arg)
             },
-            <span class="string">b&#39;f&#39; </span>| <span class="string">b&#39;x&#39; </span>| <span class="string">b&#39;r&#39; </span>| <span class="string">b&#39;y&#39; </span>| <span class="string">b&#39;b&#39; </span>=&gt; regs.push(arg),
-            <span class="string">b&#39;c&#39; </span>| <span class="string">b&#39;d&#39; </span>| <span class="string">b&#39;s&#39;        </span>=&gt; <span class="kw">if </span>regarg.is_some() {
-                <span class="macro">panic!</span>(<span class="string">&quot;multiple segment, debug or control registers in format string&quot;</span>);
+            <span class="string">b'f' </span>| <span class="string">b'x' </span>| <span class="string">b'r' </span>| <span class="string">b'y' </span>| <span class="string">b'b' </span>=&gt; regs.push(arg),
+            <span class="string">b'c' </span>| <span class="string">b'd' </span>| <span class="string">b's'        </span>=&gt; <span class="kw">if </span>regarg.is_some() {
+                <span class="macro">panic!</span>(<span class="string">"multiple segment, debug or control registers in format string"</span>);
             } <span class="kw">else </span>{
                 regarg = <span class="prelude-val">Some</span>(regs.len());
                 regs.push(arg)
             },
-            <span class="string">b&#39;i&#39; </span>| <span class="string">b&#39;o&#39; </span>=&gt; immediates.push(arg),
-            <span class="kw">_ </span>=&gt; () <span class="comment">// hardcoded regs don&#39;t have to be encoded
+            <span class="string">b'i' </span>| <span class="string">b'o' </span>=&gt; immediates.push(arg),
+            <span class="kw">_ </span>=&gt; () <span class="comment">// hardcoded regs don't have to be encoded
         </span>}
     }
 
     <span class="kw">let </span>len = regs.len();
     <span class="kw">if </span>len &gt; <span class="number">4 </span>{
-        <span class="macro">panic!</span>(<span class="string">&quot;too many arguments&quot;</span>);
+        <span class="macro">panic!</span>(<span class="string">"too many arguments"</span>);
     }
     <span class="kw">let </span><span class="kw-2">mut </span>regs = regs.drain(..).fuse();
 
@@ -3177,7 +3184,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let </span><span class="kw-2">mut </span>rex: TokenTree = proc_macro2::Literal::u8_suffixed(rex).into();
+    <span class="kw">let </span><span class="kw-2">mut </span>rex: TokenTree = Literal::u8_suffixed(rex).into();
 
     <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = reg_k {
         rex = serialize::expr_mask_shift_or(<span class="kw-2">&amp;</span>rex, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">8</span>, -<span class="number">1</span>);
@@ -3191,7 +3198,7 @@
     buffer.push(Stmt::ExprUnsigned(rex, Size::BYTE));
 }
 
-<span class="kw">fn </span>compile_vex_xop(mode: X86Mode, buffer: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata, reg: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SizedArg&gt;,
+<span class="kw">fn </span>compile_vex_xop(mode: X86Mode, buffer: <span class="kw-2">&amp;mut </span>Vec&lt;Stmt&gt;, data: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata, reg: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SizedArg&gt;,
 rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SizedArg&gt;, map_sel: u8, rex_w: bool, vvvv: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SizedArg&gt;, vex_l: bool, prefix: u8) {
     <span class="kw">let </span><span class="kw-2">mut </span>reg_k   = RegKind::from_number(<span class="number">0</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>index_k = RegKind::from_number(<span class="number">0</span>);
@@ -3245,7 +3252,7 @@ rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Siz
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
+        <span class="kw">let </span><span class="kw-2">mut </span>byte1: TokenTree = Literal::u8_suffixed(byte1).into();
         <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = reg_k {
             byte1 = serialize::expr_mask_shift_inverted_and(<span class="kw-2">&amp;</span>byte1, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">8</span>, <span class="number">4</span>)
         }
@@ -3259,7 +3266,7 @@ rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Siz
     buffer.push(Stmt::u8(<span class="kw">if </span>data.flags.contains(Flags::VEX_OP) {<span class="number">0xC4</span>} <span class="kw">else </span>{<span class="number">0x8F</span>}));
 
     <span class="kw">if </span>mode == X86Mode::Long &amp;&amp; (reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic()) {
-        <span class="kw">let </span><span class="kw-2">mut </span>byte1: TokenTree = proc_macro2::Literal::u8_suffixed(byte1).into();
+        <span class="kw">let </span><span class="kw-2">mut </span>byte1: TokenTree = Literal::u8_suffixed(byte1).into();
 
         <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = reg_k {
             byte1 = serialize::expr_mask_shift_inverted_and(<span class="kw-2">&amp;</span>byte1, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">8</span>, <span class="number">4</span>);
@@ -3276,7 +3283,7 @@ rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Siz
     }
 
     <span class="kw">if </span>vvvv_k.is_dynamic() {
-        <span class="kw">let </span><span class="kw-2">mut </span>byte2: TokenTree = proc_macro2::Literal::u8_suffixed(byte2).into();
+        <span class="kw">let </span><span class="kw-2">mut </span>byte2: TokenTree = Literal::u8_suffixed(byte2).into();
 
         <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = vvvv_k {
             byte2 = serialize::expr_mask_shift_inverted_and(<span class="kw-2">&amp;</span>byte2, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">0xF</span>, <span class="number">3</span>)
@@ -3297,7 +3304,7 @@ rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Siz
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let </span><span class="kw-2">mut </span>byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
+    <span class="kw">let </span><span class="kw-2">mut </span>byte: TokenTree = Literal::u8_suffixed(byte).into();
 
     <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = reg1 {
         byte = serialize::expr_mask_shift_or(<span class="kw-2">&amp;</span>byte, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">7</span>, <span class="number">3</span>);
@@ -3312,8 +3319,8 @@ rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Siz
     <span class="kw">let </span>byte = (reg1.encode()  &amp; <span class="number">7</span>) &lt;&lt; <span class="number">3 </span>|
                (reg2.encode()  &amp; <span class="number">7</span>)      ;
 
-    <span class="kw">let </span><span class="kw-2">mut </span>byte: TokenTree = proc_macro2::Literal::u8_suffixed(byte).into();
-    <span class="kw">let </span>scale: TokenTree = proc_macro2::Literal::u8_unsuffixed(scale).into();
+    <span class="kw">let </span><span class="kw-2">mut </span>byte: TokenTree = Literal::u8_suffixed(byte).into();
+    <span class="kw">let </span>scale: TokenTree = Literal::u8_unsuffixed(scale).into();
 
     <span class="kw">if let </span>RegKind::Dynamic(<span class="kw">_</span>, expr) = reg1 {
         byte = serialize::expr_mask_shift_or(<span class="kw-2">&amp;</span>byte, <span class="kw-2">&amp;</span>delimited(expr), <span class="number">7</span>, <span class="number">3</span>);
@@ -3325,14 +3332,18 @@ rm: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Siz
     <span class="kw">let </span>span = scale_expr.span();
     <span class="kw">let </span>scale_expr = delimited(scale_expr);
 
-    <span class="kw">let </span>(expr1, expr2) = serialize::expr_dynscale(
-        <span class="kw-2">&amp;</span>delimited(<span class="macro">quote_spanned!</span>{ span=&gt;
-            #scale_expr * #scale
-        }),
-        <span class="kw-2">&amp;</span>byte
-    );
-    buffer.push(Stmt::PrefixStmt(expr1));
-    buffer.push(Stmt::ExprUnsigned(expr2, Size::BYTE));
+    <span class="kw">let </span>expr = delimited(<span class="macro">quote_spanned!</span>{ span=&gt;
+        ((
+            <span class="kw">match </span>#scale_expr * #scale {
+                <span class="number">8 </span>=&gt; <span class="number">3</span>,
+                <span class="number">4 </span>=&gt; <span class="number">2</span>,
+                <span class="number">2 </span>=&gt; <span class="number">1</span>,
+                <span class="number">1 </span>=&gt; <span class="number">0</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Type size not representable as scale"</span>)
+            }
+        &amp; <span class="number">3</span>) &lt;&lt; <span class="number">6</span>) | #byte
+    });
+
+    buffer.push(Stmt::ExprUnsigned(expr, Size::BYTE));
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

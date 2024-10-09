@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ExecutableBuffer","A structure holding a buffer of executable memory. It also derefs to a `&[u8]`. This structure does not allocate when its size is 0."],["MutableBuffer","ExecutableBuffer equivalent that holds a buffer of mutable memory instead of executable memory. It also derefs to a `&mut [u8]`. This structure does not allocate when its size is 0."]]};
+window.SIDEBAR_ITEMS = {"struct":["ExecutableBuffer","MutableBuffer"]};

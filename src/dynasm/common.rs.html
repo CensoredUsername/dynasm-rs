@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../dynasm/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\common.rs`."><title>common.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -272,10 +272,59 @@
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
-</pre><pre class="rust"><code><span class="doccomment">//! This module contains various infrastructure that is common across all assembler backends
-</span><span class="kw">use </span>proc_macro2::{Span, TokenTree};
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! This module contains various infrastructure that is common across all assembler backends
+</span><span class="kw">use </span>proc_macro2::{Span, TokenTree, TokenStream, Literal, Group, Delimiter};
 <span class="kw">use </span>quote::ToTokens;
-<span class="kw">use </span>quote::quote;
 <span class="kw">use </span>syn::spanned::Spanned;
 <span class="kw">use </span>syn::parse;
 <span class="kw">use </span>syn::Token;
@@ -284,17 +333,19 @@
 <span class="kw">use </span><span class="kw">crate</span>::serialize;
 
 <span class="doccomment">/// Enum representing the result size of a value/expression/register/etc in bytes.
-/// Uses the NASM syntax for sizes (a word is 16 bits)
-</span><span class="attr">#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
+/// just friendly names really
+</span><span class="attr">#[allow(non_camel_case_types)]
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Copy)]
 </span><span class="kw">pub enum </span>Size {
-    BYTE  = <span class="number">1</span>,
-    WORD  = <span class="number">2</span>,
-    DWORD = <span class="number">4</span>,
-    FWORD = <span class="number">6</span>,
-    QWORD = <span class="number">8</span>,
-    PWORD = <span class="number">10</span>,
-    OWORD = <span class="number">16</span>,
-    HWORD = <span class="number">32</span>,
+    BYTE = <span class="number">1</span>,
+    B_2 = <span class="number">2</span>,
+    B_4 = <span class="number">4</span>,
+    B_6 = <span class="number">6</span>,
+    B_8 = <span class="number">8</span>,
+    B_10 = <span class="number">10</span>,
+    B_16 = <span class="number">16</span>,
+    B_32 = <span class="number">32</span>,
+    B_64 = <span class="number">64</span>,
 }
 
 <span class="kw">impl </span>Size {
@@ -304,15 +355,16 @@
 
     <span class="kw">pub fn </span>as_literal(<span class="self">self</span>) -&gt; syn::Ident {
         syn::Ident::new(<span class="kw">match </span><span class="self">self </span>{
-            Size::BYTE  =&gt; <span class="string">&quot;i8&quot;</span>,
-            Size::WORD  =&gt; <span class="string">&quot;i16&quot;</span>,
-            Size::DWORD =&gt; <span class="string">&quot;i32&quot;</span>,
-            Size::FWORD =&gt; <span class="string">&quot;i48&quot;</span>,
-            Size::QWORD =&gt; <span class="string">&quot;i64&quot;</span>,
-            Size::PWORD =&gt; <span class="string">&quot;i80&quot;</span>,
-            Size::OWORD =&gt; <span class="string">&quot;i128&quot;</span>,
-            Size::HWORD =&gt; <span class="string">&quot;i256&quot;
-        </span>}, Span::mixed_site())
+            Size::BYTE  =&gt; <span class="string">"i8"</span>,
+            Size::B_2  =&gt; <span class="string">"i16"</span>,
+            Size::B_4 =&gt; <span class="string">"i32"</span>,
+            Size::B_6 =&gt; <span class="string">"i48"</span>,
+            Size::B_8 =&gt; <span class="string">"i64"</span>,
+            Size::B_10 =&gt; <span class="string">"i80"</span>,
+            Size::B_16 =&gt; <span class="string">"i128"</span>,
+            Size::B_32 =&gt; <span class="string">"i256"</span>,
+            Size::B_64 =&gt; <span class="string">"i512"</span>,
+        }, Span::mixed_site())
     }
 }
 
@@ -331,17 +383,17 @@
     <span class="comment">// note: these symbol choices try to avoid stuff that is a valid starting symbol for parse_expr
     // in order to allow the full range of expressions to be used. the only currently existing ambiguity is
     // with the symbol &lt;, as this symbol is also the starting symbol for the universal calling syntax &lt;Type as Trait&gt;.method(args)
-    </span>Global(syn::Ident),   <span class="comment">// -&gt; label ([&quot;+&quot; &quot;-&quot;] offset)?
-    </span>Backward(syn::Ident), <span class="comment">//  &gt; label ([&quot;+&quot; &quot;-&quot;] offset)?
-    </span>Forward(syn::Ident),  <span class="comment">//  &lt; label ([&quot;+&quot; &quot;-&quot;] offset)?
-    </span>Dynamic(syn::Expr),   <span class="comment">// =&gt;expr | =&gt; (expr) ([&quot;+&quot; &quot;-&quot;] offset)?
+    </span>Global(syn::Ident),   <span class="comment">// -&gt; label (["+" "-"] offset)?
+    </span>Backward(syn::Ident), <span class="comment">//  &gt; label (["+" "-"] offset)?
+    </span>Forward(syn::Ident),  <span class="comment">//  &lt; label (["+" "-"] offset)?
+    </span>Dynamic(syn::Expr),   <span class="comment">// =&gt;expr | =&gt; (expr) (["+" "-"] offset)?
     </span>Bare(syn::Expr)       <span class="comment">// jump to this address
 </span>}
 
 <span class="kw">impl </span>ParseOpt <span class="kw">for </span>Jump {
     <span class="kw">fn </span>parse(input: parse::ParseStream) -&gt; parse::Result&lt;<span class="prelude-ty">Option</span>&lt;Jump&gt;&gt; {
         <span class="comment">// extern label
-        </span><span class="kw">if </span>eat_pseudo_keyword(input, <span class="string">&quot;extern&quot;</span>) {
+        </span><span class="kw">if </span>eat_pseudo_keyword(input, <span class="string">"extern"</span>) {
             <span class="kw">let </span>expr: syn::Expr = input.parse()<span class="question-mark">?</span>;
 
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Jump { kind: JumpKind::Bare(expr), offset: <span class="prelude-val">None </span>}));
@@ -415,15 +467,15 @@
     }
 
     <span class="doccomment">/// Takes a jump and encodes it as a relocation starting `start_offset` bytes ago, relative to `ref_offset`.
-    /// Any data detailing the type of relocation emitted should be contained in `data`, which is emitted as a tuple of u8&#39;s.
+    /// Any data detailing the type of relocation emitted should be contained in `data`, which is emitted as a tuple of u8's.
     </span><span class="kw">pub fn </span>encode(<span class="self">self</span>, field_offset: u8, ref_offset: u8, data: <span class="kw-2">&amp;</span>[u8]) -&gt; Stmt {
         <span class="kw">let </span>span = <span class="self">self</span>.span();
 
-        <span class="kw">let </span>target_offset = delimited(<span class="kw">if let </span><span class="prelude-val">Some</span>(offset) = <span class="self">self</span>.offset {
-            <span class="macro">quote!</span>(#offset)
+        <span class="kw">let </span>target_offset = <span class="kw">if let </span><span class="prelude-val">Some</span>(offset) = <span class="self">self</span>.offset {
+            delimited(offset)
         } <span class="kw">else </span>{
-            <span class="macro">quote!</span>(<span class="number">0isize</span>)
-        });
+            TokenTree::Literal(Literal::isize_suffixed(<span class="number">0</span>))
+        };
 
         <span class="comment">// Create a relocation descriptor, containing all information about the actual jump except for the target itself.
         </span><span class="kw">let </span>relocation = Relocation {
@@ -492,12 +544,8 @@
     DynamicJumpTarget(TokenTree, Relocation),
     BareJumpTarget(TokenTree, Relocation),
 
-    <span class="comment">// a statement that provides some information for the next statement,
-    // and should therefore not be reordered with it
-    </span>PrefixStmt(TokenTree),
-
     <span class="comment">// a random statement that has to be inserted between assembly hunks
-    </span>Stmt(TokenTree)
+    </span>Stmt(TokenStream)
 }
 
 <span class="comment">// convenience methods
@@ -509,31 +557,84 @@
     }
 
     <span class="kw">pub fn </span>u16(value: u16) -&gt; Stmt {
-        Stmt::Const(u64::from(value), Size::WORD)
+        Stmt::Const(u64::from(value), Size::B_2)
     }
 
     <span class="kw">pub fn </span>u32(value: u32) -&gt; Stmt {
-        Stmt::Const(u64::from(value), Size::DWORD)
+        Stmt::Const(u64::from(value), Size::B_4)
     }
 
     <span class="kw">pub fn </span>u64(value: u64) -&gt; Stmt {
-        Stmt::Const(value, Size::QWORD)
+        Stmt::Const(value, Size::B_8)
     }
 }
 
 
-<span class="comment">// Makes a None-delimited TokenTree item out of anything that can be converted to tokens.
-// This is a useful shortcut to escape issues around not-properly delimited tokenstreams
-// because it is guaranteed to be parsed back properly to its source ast at type-level.
+<span class="doccomment">/// Takes an arbitrary tokenstream as input, and ensures it can be interpolated safely.
+/// returns a tokentree representing either a single token, or a delimited group.
+///
+/// If the given tokenstream contains multiple tokens, it will be parenthesized.
+///
+/// this will panic if given an empty tokenstream.
+/// this would use delimiter::None if not for https://github.com/rust-lang/rust/issues/67062
 </span><span class="kw">pub fn </span>delimited&lt;T: ToTokens&gt;(expr: T) -&gt; TokenTree {
-    <span class="kw">let </span>span = expr.span();
-    <span class="kw">let </span><span class="kw-2">mut </span>group = proc_macro2::Group::new(
-        proc_macro2::Delimiter::None, expr.into_token_stream()
+    <span class="kw">let </span>stream = expr.into_token_stream();
+
+    <span class="comment">// the stream api is very limited, but cloning a stream is luckily cheap.
+    // so to check how many tokens are contained we can do this.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>iter = stream.clone().into_iter();
+    <span class="kw">let </span>first = iter.next().unwrap();
+    <span class="kw">if </span>iter.next().is_none() {
+        <span class="kw">return </span>first;
+    }
+
+    <span class="kw">let </span>span = stream.span();
+    <span class="kw">let </span><span class="kw-2">mut </span>group = Group::new(
+        proc_macro2::Delimiter::Parenthesis, stream
     );
     group.set_span(span);
-    proc_macro2::TokenTree::Group(group)
+    TokenTree::Group(group)
 }
 
+<span class="doccomment">/// Checks if the given `Group` is a parenthesized expression to work around rustc giving
+/// Unnecessary parenthesis warnings in macro-generated code, if this tokentree were to be used
+/// as the argument to a single argument function
+///
+/// i.e. `function(#arg)` expanding to `function((expr))`, which should instead be expanded to
+/// `function(expr)`
+///
+/// To check if this is valid, we should a: test that this tokentree node is a parenthesis delimited
+/// node and b: there are no commas in its internal tokentree, because then it'd be a tuple, and
+/// this transform would be invalid
+</span><span class="kw">pub fn </span>is_parenthesized(group: <span class="kw-2">&amp;</span>Group) -&gt; bool {
+    <span class="kw">if </span>group.delimiter() != Delimiter::Parenthesis {
+        <span class="kw">return </span><span class="bool-val">false
+    </span>}
+
+    <span class="kw">for </span>item <span class="kw">in </span>group.stream() {
+        <span class="kw">if let </span>TokenTree::Punct(punct) = item {
+            <span class="kw">if </span>punct.as_char() == <span class="string">',' </span>{
+                <span class="kw">return </span><span class="bool-val">false
+            </span>}
+        }
+    }
+
+    <span class="bool-val">true
+</span>}
+
+<span class="doccomment">/// Returns the given `TokenTree`, but if it's a parenthesized group, it will change this
+/// to a None-delimited group, if `is_parenthesized` deems this to be a valid transform
+///
+/// this is intended to work around unneeded parenthesis around function arguments warnings
+</span><span class="kw">pub fn </span>strip_parenthesis(expr: <span class="kw-2">&amp;mut </span>TokenTree) {
+    <span class="kw">if let </span>TokenTree::Group(group) = <span class="kw-2">&amp;*</span>expr {
+        <span class="kw">if </span>is_parenthesized(group) {
+            <span class="kw">let </span><span class="kw-2">mut </span>stripped = TokenTree::Group(Group::new(Delimiter::None, group.stream()));
+            stripped.set_span(group.span());
+            <span class="kw-2">*</span>expr = stripped;
+        }
+    }
+}
 
 <span class="doccomment">/// Create a bitmask with `scale` bits set
 </span><span class="kw">pub fn </span>bitmask(scale: u8) -&gt; u32 {
@@ -545,6 +646,4 @@
 </span><span class="kw">pub fn </span>bitmask64(scale: u8) -&gt; u64 {
     <span class="number">1u64</span>.checked_shl(u32::from(scale)).unwrap_or(<span class="number">0</span>).wrapping_sub(<span class="number">1</span>)
 }
-
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

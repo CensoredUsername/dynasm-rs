@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\debug.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>debug.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\debug.rs`."><title>debug.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -148,7 +148,8 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<a href="#151" id="151">151</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">super</span>::compiler::{Opdata, FormatStringIterator};
 <span class="kw">use </span><span class="kw">super</span>::x64data::Flags;
@@ -158,118 +159,119 @@
     <span class="kw">for </span>data <span class="kw">in </span>data {
         forms.extend(format_opdata(name, data));
     }
-    forms.join(<span class="string">&quot;\n&quot;</span>)
+    forms.join(<span class="string">"\n"</span>)
 }
 
 <span class="kw">pub fn </span>format_opdata(name: <span class="kw-2">&amp;</span>str, data: <span class="kw-2">&amp;</span>Opdata) -&gt; Vec&lt;String&gt; {
-    <span class="kw">let </span>opsizes = <span class="kw">if </span>data.flags.contains(Flags::AUTO_SIZE) {<span class="kw-2">&amp;</span><span class="string">b&quot;qwd&quot;</span>[..]}
-             <span class="kw">else if </span>data.flags.contains(Flags::AUTO_NO32) {<span class="kw-2">&amp;</span><span class="string">b&quot;qw&quot;</span>[..]}
-             <span class="kw">else if </span>data.flags.contains(Flags::AUTO_REXW) {<span class="kw-2">&amp;</span><span class="string">b&quot;qd&quot;</span>[..]}
-             <span class="kw">else if </span>data.flags.contains(Flags::AUTO_VEXL) {<span class="kw-2">&amp;</span><span class="string">b&quot;ho&quot;</span>[..]}
-             <span class="kw">else if </span>name == <span class="string">&quot;monitorx&quot;                    </span>{<span class="kw-2">&amp;</span><span class="string">b&quot;qwd&quot;</span>[..]}
-             <span class="kw">else                                          </span>{<span class="kw-2">&amp;</span><span class="string">b&quot;!&quot;</span>[..]};
+    <span class="kw">let </span>opsizes = <span class="kw">if </span>data.flags.contains(Flags::AUTO_SIZE) {<span class="kw-2">&amp;</span><span class="string">b"qwd"</span>[..]}
+             <span class="kw">else if </span>data.flags.contains(Flags::AUTO_NO32) {<span class="kw-2">&amp;</span><span class="string">b"qw"</span>[..]}
+             <span class="kw">else if </span>data.flags.contains(Flags::AUTO_REXW) {<span class="kw-2">&amp;</span><span class="string">b"qd"</span>[..]}
+             <span class="kw">else if </span>data.flags.contains(Flags::AUTO_VEXL) {<span class="kw-2">&amp;</span><span class="string">b"ho"</span>[..]}
+             <span class="kw">else if </span>name == <span class="string">"monitorx"                    </span>{<span class="kw-2">&amp;</span><span class="string">b"qwd"</span>[..]}
+             <span class="kw">else                                          </span>{<span class="kw-2">&amp;</span><span class="string">b"!"</span>[..]};
 
     <span class="kw">let </span><span class="kw-2">mut </span>forms = Vec::new();
     <span class="kw">for </span>opsize <span class="kw">in </span>opsizes.iter().cloned() {
         <span class="kw">let </span><span class="kw-2">mut </span>buf = String::new();
-        buf.push_str(<span class="string">&quot;&gt;&gt;&gt; &quot;</span>);
+        buf.push_str(<span class="string">"&gt;&gt;&gt; "</span>);
         buf.push_str(name);
         <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
         <span class="kw">for </span>(ty, size) <span class="kw">in </span>FormatStringIterator::new(data.args) {
             <span class="kw">if </span>first {
-                buf.push_str(<span class="string">&quot; &quot;</span>);
+                buf.push_str(<span class="string">" "</span>);
                 first = <span class="bool-val">false</span>;
             } <span class="kw">else </span>{
-                buf.push_str(<span class="string">&quot;, &quot;</span>);
+                buf.push_str(<span class="string">", "</span>);
             }
             buf.push_str(<span class="kw-2">&amp;</span>format_arg(ty, size, opsize))
         }
         <span class="kw">if </span>data.flags.contains(Flags::X86_ONLY) {
             <span class="kw">for _ in </span>buf.len() .. <span class="number">45 </span>{
-                buf.push(<span class="string">&#39; &#39;</span>);
+                buf.push(<span class="string">' '</span>);
             }
-            buf.push_str(<span class="string">&quot; (x86 only)&quot;</span>);
+            buf.push_str(<span class="string">" (x86 only)"</span>);
         }
         <span class="kw">if </span>!data.features.is_empty() {
             <span class="kw">for _ in </span>buf.len() .. <span class="number">45 </span>{
-                buf.push(<span class="string">&#39; &#39;</span>);
+                buf.push(<span class="string">' '</span>);
             }
-            buf.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; ({})&quot;</span>, data.features));
+            buf.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">" ({})"</span>, data.features));
         }
         forms.push(buf);
     }
     forms
 }
 
-<span class="kw">static </span>REGS: [<span class="kw-2">&amp;</span>str; <span class="number">16</span>] = [<span class="string">&quot;a&quot;</span>,  <span class="string">&quot;d&quot;</span>,  <span class="string">&quot;c&quot;</span>,   <span class="string">&quot;b&quot;</span>,   <span class="string">&quot;bp&quot;</span>,  <span class="string">&quot;sp&quot;</span>,  <span class="string">&quot;si&quot;</span>,  <span class="string">&quot;di&quot;</span>,
-                                   <span class="string">&quot;r8&quot;</span>, <span class="string">&quot;r9&quot;</span>, <span class="string">&quot;r10&quot;</span>, <span class="string">&quot;r11&quot;</span>, <span class="string">&quot;r12&quot;</span>, <span class="string">&quot;r13&quot;</span>, <span class="string">&quot;r14&quot;</span>, <span class="string">&quot;r15&quot;</span>];
-<span class="kw">static </span>SEGREGS: [<span class="kw-2">&amp;</span>str; <span class="number">6</span>] = [<span class="string">&quot;es&quot;</span>, <span class="string">&quot;cs&quot;</span>, <span class="string">&quot;ss&quot;</span>, <span class="string">&quot;ds&quot;</span>, <span class="string">&quot;fs&quot;</span>, <span class="string">&quot;gs&quot;</span>];
+<span class="kw">static </span>REGS: [<span class="kw-2">&amp;</span>str; <span class="number">16</span>] = [<span class="string">"a"</span>,  <span class="string">"c"</span>,  <span class="string">"d"</span>,   <span class="string">"b"</span>,   <span class="string">"sp"</span>,  <span class="string">"bp"</span>,  <span class="string">"si"</span>,  <span class="string">"di"</span>,
+                                   <span class="string">"r8"</span>, <span class="string">"r9"</span>, <span class="string">"r10"</span>, <span class="string">"r11"</span>, <span class="string">"r12"</span>, <span class="string">"r13"</span>, <span class="string">"r14"</span>, <span class="string">"r15"</span>];
+<span class="kw">static </span>SEGREGS: [<span class="kw-2">&amp;</span>str; <span class="number">6</span>] = [<span class="string">"es"</span>, <span class="string">"cs"</span>, <span class="string">"ss"</span>, <span class="string">"ds"</span>, <span class="string">"fs"</span>, <span class="string">"gs"</span>];
 
-<span class="kw">fn </span>format_arg(ty: u8, <span class="kw-2">mut </span>size: u8, opsize: u8) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
-    <span class="kw">if </span>size == <span class="string">b&#39;*&#39; </span>{
-        size = <span class="kw">if </span>opsize == <span class="string">b&#39;q&#39; </span>&amp;&amp; (ty == <span class="string">b&#39;i&#39; </span>|| ty == <span class="string">b&#39;o&#39;</span>) {
-            <span class="string">b&#39;d&#39;
+<span class="kw">fn </span>format_arg(ty: u8, <span class="kw-2">mut </span>size: u8, opsize: u8) -&gt; Cow&lt;<span class="lifetime">'static</span>, str&gt; {
+    <span class="kw">if </span>size == <span class="string">b'*' </span>{
+        size = <span class="kw">if </span>opsize == <span class="string">b'q' </span>&amp;&amp; (ty == <span class="string">b'i' </span>|| ty == <span class="string">b'o'</span>) {
+            <span class="string">b'd'
         </span>} <span class="kw">else </span>{
             opsize
         };
     }
 
-    <span class="kw">fn </span>format_size(size: u8) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    <span class="kw">fn </span>format_size(size: u8) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">match </span>size {
-            <span class="string">b&#39;b&#39; </span>=&gt; <span class="string">&quot;8&quot;</span>,
-            <span class="string">b&#39;w&#39; </span>=&gt; <span class="string">&quot;16&quot;</span>,
-            <span class="string">b&#39;d&#39; </span>=&gt; <span class="string">&quot;32&quot;</span>,
-            <span class="string">b&#39;f&#39; </span>=&gt; <span class="string">&quot;48&quot;</span>,
-            <span class="string">b&#39;q&#39; </span>=&gt; <span class="string">&quot;64&quot;</span>,
-            <span class="string">b&#39;p&#39; </span>=&gt; <span class="string">&quot;80&quot;</span>,
-            <span class="string">b&#39;o&#39; </span>=&gt; <span class="string">&quot;128&quot;</span>,
-            <span class="string">b&#39;h&#39; </span>=&gt; <span class="string">&quot;256&quot;</span>,
-            <span class="kw">_ </span>=&gt; <span class="string">&quot;&quot;
+            <span class="string">b'b' </span>=&gt; <span class="string">"8"</span>,
+            <span class="string">b'w' </span>=&gt; <span class="string">"16"</span>,
+            <span class="string">b'd' </span>=&gt; <span class="string">"32"</span>,
+            <span class="string">b'f' </span>=&gt; <span class="string">"48"</span>,
+            <span class="string">b'q' </span>=&gt; <span class="string">"64"</span>,
+            <span class="string">b'p' </span>=&gt; <span class="string">"80"</span>,
+            <span class="string">b'o' </span>=&gt; <span class="string">"128"</span>,
+            <span class="string">b'h' </span>=&gt; <span class="string">"256"</span>,
+            <span class="string">b't' </span>=&gt; <span class="string">"512"</span>,
+            <span class="kw">_ </span>=&gt; <span class="string">""
         </span>}
     }
 
     <span class="kw">match </span>ty {
-        <span class="string">b&#39;i&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;imm{}&quot;</span>,      format_size(size)).into(),
-        <span class="string">b&#39;o&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;rel{}off&quot;</span>,   format_size(size)).into(),
-        <span class="string">b&#39;m&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;mem{}&quot;</span>,      format_size(size)).into(),
-        <span class="string">b&#39;k&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;vm32addr{}&quot;</span>, format_size(size)).into(),
-        <span class="string">b&#39;l&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;vm64addr{}&quot;</span>, format_size(size)).into(),
-        <span class="string">b&#39;r&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;reg{}&quot;</span>,      format_size(size)).into(),
-        <span class="string">b&#39;f&#39; </span>=&gt; <span class="string">&quot;st&quot;</span>.into(),
-        <span class="string">b&#39;x&#39; </span>=&gt; <span class="string">&quot;mm&quot;</span>.into(),
-        <span class="string">b&#39;y&#39; </span>=&gt; (<span class="kw">if </span>size == <span class="string">b&#39;h&#39; </span>{<span class="string">&quot;ymm&quot;</span>} <span class="kw">else </span>{<span class="string">&quot;xmm&quot;</span>}).into(),
-        <span class="string">b&#39;s&#39; </span>=&gt; <span class="string">&quot;segreg&quot;</span>.into(),
-        <span class="string">b&#39;c&#39; </span>=&gt; <span class="string">&quot;creg&quot;</span>.into(),
-        <span class="string">b&#39;d&#39; </span>=&gt; <span class="string">&quot;dreg&quot;</span>.into(),
-        <span class="string">b&#39;b&#39; </span>=&gt; <span class="string">&quot;bndreg&quot;</span>.into(),
-        <span class="string">b&#39;v&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;reg/mem{}&quot;</span>, format_size(size)).into(),
-        <span class="string">b&#39;u&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;mm/mem{}&quot;</span>, format_size(size)).into(),
-        <span class="string">b&#39;w&#39; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}mm/mem{}&quot;</span>, <span class="kw">if </span>size == <span class="string">b&#39;h&#39; </span>{<span class="string">&quot;y&quot;</span>} <span class="kw">else </span>{<span class="string">&quot;x&quot;</span>}, format_size(size)).into(),
-        <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;P&#39; </span>=&gt; {
-            <span class="kw">let </span>i = ty <span class="kw">as </span>usize - <span class="string">&#39;A&#39; </span><span class="kw">as </span>usize;
+        <span class="string">b'i' </span>=&gt; <span class="macro">format!</span>(<span class="string">"imm{}"</span>,      format_size(size)).into(),
+        <span class="string">b'o' </span>=&gt; <span class="macro">format!</span>(<span class="string">"rel{}off"</span>,   format_size(size)).into(),
+        <span class="string">b'm' </span>=&gt; <span class="macro">format!</span>(<span class="string">"mem{}"</span>,      format_size(size)).into(),
+        <span class="string">b'k' </span>=&gt; <span class="macro">format!</span>(<span class="string">"vm32addr{}"</span>, format_size(size)).into(),
+        <span class="string">b'l' </span>=&gt; <span class="macro">format!</span>(<span class="string">"vm64addr{}"</span>, format_size(size)).into(),
+        <span class="string">b'r' </span>=&gt; <span class="macro">format!</span>(<span class="string">"reg{}"</span>,      format_size(size)).into(),
+        <span class="string">b'f' </span>=&gt; <span class="string">"st"</span>.into(),
+        <span class="string">b'x' </span>=&gt; <span class="string">"mm"</span>.into(),
+        <span class="string">b'y' </span>=&gt; (<span class="kw">if </span>size == <span class="string">b'h' </span>{<span class="string">"ymm"</span>} <span class="kw">else </span>{<span class="string">"xmm"</span>}).into(),
+        <span class="string">b's' </span>=&gt; <span class="string">"segreg"</span>.into(),
+        <span class="string">b'c' </span>=&gt; <span class="string">"creg"</span>.into(),
+        <span class="string">b'd' </span>=&gt; <span class="string">"dreg"</span>.into(),
+        <span class="string">b'b' </span>=&gt; <span class="string">"bndreg"</span>.into(),
+        <span class="string">b'v' </span>=&gt; <span class="macro">format!</span>(<span class="string">"reg/mem{}"</span>, format_size(size)).into(),
+        <span class="string">b'u' </span>=&gt; <span class="macro">format!</span>(<span class="string">"mm/mem{}"</span>, format_size(size)).into(),
+        <span class="string">b'w' </span>=&gt; <span class="macro">format!</span>(<span class="string">"{}mm/mem{}"</span>, <span class="kw">if </span>size == <span class="string">b'h' </span>{<span class="string">"y"</span>} <span class="kw">else </span>{<span class="string">"x"</span>}, format_size(size)).into(),
+        <span class="string">b'A'</span>..=<span class="string">b'P' </span>=&gt; {
+            <span class="kw">let </span>i = ty <span class="kw">as </span>usize - <span class="string">'A' </span><span class="kw">as </span>usize;
             <span class="kw">match </span>size {
-                <span class="string">b&#39;b&#39; </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">&quot;{}l&quot;</span>, REGS[i]).into() }
+                <span class="string">b'b' </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">"{}l"</span>, REGS[i]).into() }
                    <span class="kw">else if </span>i &lt; <span class="number">8 </span>{ REGS[i].into() }
-                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">&quot;{}b&quot;</span>, REGS[i]).into() },
-                <span class="string">b&#39;w&#39; </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">&quot;{}x&quot;</span>, REGS[i]).into() }
+                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">"{}b"</span>, REGS[i]).into() },
+                <span class="string">b'w' </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">"{}x"</span>, REGS[i]).into() }
                    <span class="kw">else if </span>i &lt; <span class="number">8 </span>{ REGS[i].into() }
-                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">&quot;{}w&quot;</span>, REGS[i]).into() },
-                <span class="string">b&#39;d&#39; </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">&quot;e{}x&quot;</span>,REGS[i]).into() }
-                   <span class="kw">else if </span>i &lt; <span class="number">8 </span>{ <span class="macro">format!</span>(<span class="string">&quot;e{}&quot;</span>, REGS[i]).into() }
-                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">&quot;{}d&quot;</span>, REGS[i]).into() },
-                <span class="string">b&#39;q&#39; </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">&quot;r{}x&quot;</span>,REGS[i]).into() }
-                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">&quot;r{}&quot;</span>, REGS[i]).into() },
-                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid formatting data&quot;</span>)
+                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">"{}w"</span>, REGS[i]).into() },
+                <span class="string">b'd' </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">"e{}x"</span>,REGS[i]).into() }
+                   <span class="kw">else if </span>i &lt; <span class="number">8 </span>{ <span class="macro">format!</span>(<span class="string">"e{}"</span>, REGS[i]).into() }
+                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">"{}d"</span>, REGS[i]).into() },
+                <span class="string">b'q' </span>=&gt; <span class="kw">if </span>i &lt; <span class="number">4 </span>{ <span class="macro">format!</span>(<span class="string">"r{}x"</span>,REGS[i]).into() }
+                   <span class="kw">else          </span>{ <span class="macro">format!</span>(<span class="string">"r{}"</span>, REGS[i]).into() },
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"invalid formatting data"</span>)
             }
         },
-        <span class="string">b&#39;Q&#39;</span>..=<span class="string">b&#39;V&#39; </span>=&gt; SEGREGS[ty <span class="kw">as </span>usize - <span class="string">&#39;Q&#39; </span><span class="kw">as </span>usize].into(),
-        <span class="string">b&#39;W&#39; </span>=&gt; <span class="string">&quot;cr8&quot;</span>.into(),
-        <span class="string">b&#39;X&#39; </span>=&gt; <span class="string">&quot;st0&quot;</span>.into(),
-        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid formatting data&quot;</span>)
+        <span class="string">b'Q'</span>..=<span class="string">b'V' </span>=&gt; SEGREGS[ty <span class="kw">as </span>usize - <span class="string">'Q' </span><span class="kw">as </span>usize].into(),
+        <span class="string">b'W' </span>=&gt; <span class="string">"cr8"</span>.into(),
+        <span class="string">b'X' </span>=&gt; <span class="string">"st0"</span>.into(),
+        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"invalid formatting data"</span>)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;dynasm_opmap&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"dynasm_opmap"</span>)]
 </span><span class="kw">pub fn </span>create_opmap() -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
 
@@ -283,20 +285,19 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>formats = data.into_iter()
             .map(|x| format_opdata(mnemnonic, x))
             .flat_map(|x| x)
-            .map(|x| x.replace(<span class="string">&quot;&gt;&gt;&gt; &quot;</span>, <span class="string">&quot;&quot;</span>))
+            .map(|x| x.replace(<span class="string">"&gt;&gt;&gt; "</span>, <span class="string">""</span>))
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
         formats.sort();
 
         <span class="comment">// push mnemnonic name as title
-        </span>s.push_str(<span class="string">&quot;### &quot;</span>);
+        </span>s.push_str(<span class="string">"### "</span>);
         s.push_str(mnemnonic);
-        s.push_str(<span class="string">&quot;\n```insref\n&quot;</span>);
+        s.push_str(<span class="string">"\n```insref\n"</span>);
 
         <span class="comment">// push the formats
-        </span>s.push_str(<span class="kw-2">&amp;</span>formats.join(<span class="string">&quot;\n&quot;</span>));
-        s.push_str(<span class="string">&quot;\n```\n&quot;</span>);
+        </span>s.push_str(<span class="kw-2">&amp;</span>formats.join(<span class="string">"\n"</span>));
+        s.push_str(<span class="string">"\n```\n"</span>);
     }
     s
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

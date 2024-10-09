@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\parser.rs`."><title>parser.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -692,10 +692,7 @@
 <a href="#692" id="692">692</a>
 <a href="#693" id="693">693</a>
 <a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-</pre><pre class="rust"><code><span class="kw">use </span>syn::{parse, Token};
+</pre></div><pre class="rust"><code><span class="kw">use </span>syn::{parse, Token};
 
 <span class="kw">use </span>lazy_static::lazy_static;
 
@@ -708,7 +705,7 @@
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="comment">// parses a full instruction
-// syntax for a single op: ident (&quot;.&quot; expr)* (arg (&quot;,&quot; arg)*)? &quot;;&quot;
+// syntax for a single op: ident ("." expr)* (arg ("," arg)*)? ";"
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>parse_instruction(ctx: <span class="kw-2">&amp;mut </span>Context, input: parse::ParseStream) -&gt; parse::Result&lt;(Instruction, Vec&lt;RawArg&gt;)&gt; {
     <span class="kw">let </span>span = input.cursor().span();
 
@@ -719,11 +716,10 @@
 
     <span class="comment">// parse any dot args
     </span><span class="kw">while </span>input.peek(<span class="macro">Token!</span>[.]) {
-        <span class="kw">let </span>span = input.cursor().span();
         <span class="kw">let _</span>: <span class="macro">Token!</span>[.] = input.parse()<span class="question-mark">?</span>;
         <span class="kw">let </span>arg: syn::Ident = input.parse()<span class="question-mark">?</span>;
 
-        args.push(RawArg::Dot { span } );
+        args.push(RawArg::Dot {} );
         args.push(RawArg::Lit { ident: arg });
     }
 
@@ -738,7 +734,7 @@
         }
     }
 
-    <span class="comment">// let span = span.join(input.cursor().span()); // FIXME can&#39;t join spans ATM
+    <span class="comment">// let span = span.join(input.cursor().span()); // FIXME can't join spans ATM
 
     </span><span class="prelude-val">Ok</span>((
         Instruction {
@@ -751,7 +747,7 @@
 
 <span class="doccomment">/// tries to parse a full arg definition
 </span><span class="kw">fn </span>parse_arg(ctx: <span class="kw-2">&amp;mut </span>Context, input: parse::ParseStream) -&gt; parse::Result&lt;RawArg&gt; {
-    <span class="kw">let </span>_start = input.cursor().span(); <span class="comment">// FIXME can&#39;t join spans yet
+    <span class="kw">let </span>_start = input.cursor().span(); <span class="comment">// FIXME can't join spans yet
 
     // a label
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(jump) = input.parse_opt()<span class="question-mark">? </span>{
@@ -800,13 +796,13 @@
         <span class="kw">let _ </span>= <span class="macro">syn::braced!</span>(inner <span class="kw">in </span>input);
         <span class="kw">let </span>inner = <span class="kw-2">&amp;</span>inner;
 
-        <span class="kw">let </span>first = parse_reg(ctx, inner)<span class="question-mark">?</span>.ok_or_else(|| inner.error(<span class="string">&quot;Expected register&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>first = parse_reg(ctx, inner)<span class="question-mark">?</span>.ok_or_else(|| inner.error(<span class="string">"Expected register"</span>))<span class="question-mark">?</span>;
 
         <span class="comment">// parses {reg - reg}
         </span><span class="kw">let </span><span class="kw-2">mut </span>ast = <span class="kw">if </span>inner.peek(<span class="macro">Token!</span>[-]) {
             <span class="kw">let _</span>: <span class="macro">Token!</span>[-] = inner.parse()<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>last = parse_reg(ctx, inner)<span class="question-mark">?</span>.ok_or_else(|| inner.error(<span class="string">&quot;Expected register&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>last = parse_reg(ctx, inner)<span class="question-mark">?</span>.ok_or_else(|| inner.error(<span class="string">"Expected register"</span>))<span class="question-mark">?</span>;
 
             RawArg::DashList {
                 span,
@@ -835,7 +831,7 @@
             <span class="kw">while </span>inner.peek(<span class="macro">Token!</span>[,]) {
                 <span class="kw">let _</span>: <span class="macro">Token!</span>[,] = inner.parse()<span class="question-mark">?</span>;
 
-                items.push(parse_reg(ctx, inner)<span class="question-mark">?</span>.ok_or_else(|| inner.error(<span class="string">&quot;Expected register&quot;</span>))<span class="question-mark">?</span>);
+                items.push(parse_reg(ctx, inner)<span class="question-mark">?</span>.ok_or_else(|| inner.error(<span class="string">"Expected register"</span>))<span class="question-mark">?</span>);
             }
 
             RawArg::CommaList {
@@ -898,12 +894,11 @@
 }
 
 <span class="kw">fn </span>parse_refitem(ctx: <span class="kw-2">&amp;mut </span>Context, input: parse::ParseStream) -&gt; parse::Result&lt;RefItem&gt; {
-    <span class="kw">let </span>_start = input.cursor().span(); <span class="comment">// FIXME can&#39;t join spans yet
+    <span class="kw">let </span>_start = input.cursor().span(); <span class="comment">// FIXME can't join spans yet
 
     // modifier
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(modifier) = input.parse_opt()<span class="question-mark">? </span>{
         <span class="kw">return </span><span class="prelude-val">Ok</span>(RefItem::Modifier {
-            span: _start,
             modifier
         });
     }
@@ -920,8 +915,7 @@
     <span class="comment">// register
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(reg) = parse_reg(ctx, input)<span class="question-mark">? </span>{
         <span class="kw">return </span><span class="prelude-val">Ok</span>(RefItem::Direct {
-            reg,
-            span: _start
+            reg
         })
     }
 
@@ -949,7 +943,7 @@
                 <span class="kw">return </span><span class="prelude-val">Ok</span>((ident, rest));
             }
         }
-        <span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;expected identifier&quot;</span>))
+        <span class="prelude-val">Err</span>(cursor.error(<span class="string">"expected identifier"</span>))
     }) {
         <span class="prelude-val">Ok</span>(name) =&gt; name,
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
@@ -985,7 +979,7 @@
     } <span class="kw">else </span>{
         <span class="comment">// parse possible vector trailers
 
-        // parse the elementsize/lanes specifier (&quot;.&quot; [BHSDQ][124816])
+        // parse the elementsize/lanes specifier ("." [BHSDQ][124816])
         // note: actual ARM register width specifiers put the lane count before
         // the size, but this cannot be parsed by the Rust tokenizer
         </span><span class="kw">let _</span>: <span class="macro">Token!</span>[.] = input.parse()<span class="question-mark">?</span>;
@@ -994,17 +988,17 @@
                 <span class="kw">let </span>ident = ident.to_string();
 
                 <span class="kw">if </span>!ident.is_char_boundary(<span class="number">1</span>) {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;Invalid width specifier&quot;</span>));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">"Invalid width specifier"</span>));
                 }
 
                 <span class="kw">let </span>(first, trailer) = ident.split_at(<span class="number">1</span>);
                 <span class="kw">let </span>element_size = <span class="kw">match </span>first {
-                    <span class="string">&quot;B&quot; </span>| <span class="string">&quot;b&quot; </span>=&gt; Size::BYTE,
-                    <span class="string">&quot;H&quot; </span>| <span class="string">&quot;h&quot; </span>=&gt; Size::WORD,
-                    <span class="string">&quot;S&quot; </span>| <span class="string">&quot;s&quot; </span>=&gt; Size::DWORD,
-                    <span class="string">&quot;D&quot; </span>| <span class="string">&quot;d&quot; </span>=&gt; Size::QWORD,
-                    <span class="string">&quot;Q&quot; </span>| <span class="string">&quot;q&quot; </span>=&gt; Size::OWORD,
-                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;Invalid width specifier&quot;</span>))
+                    <span class="string">"B" </span>| <span class="string">"b" </span>=&gt; Size::BYTE,
+                    <span class="string">"H" </span>| <span class="string">"h" </span>=&gt; Size::B_2,
+                    <span class="string">"S" </span>| <span class="string">"s" </span>=&gt; Size::B_4,
+                    <span class="string">"D" </span>| <span class="string">"d" </span>=&gt; Size::B_8,
+                    <span class="string">"Q" </span>| <span class="string">"q" </span>=&gt; Size::B_16,
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">"Invalid width specifier"</span>))
                 };
 
                 <span class="kw">let </span>lanes = <span class="kw">if </span>trailer.is_empty() {
@@ -1016,13 +1010,13 @@
                         <span class="prelude-val">Ok</span>(<span class="number">4</span>) =&gt; <span class="number">4</span>,
                         <span class="prelude-val">Ok</span>(<span class="number">8</span>) =&gt; <span class="number">8</span>,
                         <span class="prelude-val">Ok</span>(<span class="number">16</span>)=&gt; <span class="number">16</span>,
-                        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;Invalid width specifier&quot;</span>))
+                        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">"Invalid width specifier"</span>))
                     })
                 };
 
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(((element_size, lanes), rest));
             }
-            <span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;Expected a width/lane specifier&quot;</span>))
+            <span class="prelude-val">Err</span>(cursor.error(<span class="string">"Expected a width/lane specifier"</span>))
         })<span class="question-mark">?</span>;
 
         <span class="comment">// parse the element specifier
@@ -1073,324 +1067,323 @@
         input.step(|cursor| {
             <span class="kw">if let </span><span class="prelude-val">Some</span>((ident, rest)) = cursor.ident() {
                 <span class="kw">let </span>modifier = <span class="kw">match </span><span class="kw-2">&amp;*</span>ident.to_string() {
-                    <span class="string">&quot;LSL&quot;  </span>| <span class="string">&quot;lsl&quot;  </span>=&gt; Modifier::LSL,
-                    <span class="string">&quot;LSR&quot;  </span>| <span class="string">&quot;lsr&quot;  </span>=&gt; Modifier::LSR,
-                    <span class="string">&quot;ASR&quot;  </span>| <span class="string">&quot;asr&quot;  </span>=&gt; Modifier::ASR,
-                    <span class="string">&quot;ROR&quot;  </span>| <span class="string">&quot;ror&quot;  </span>=&gt; Modifier::ROR,
-                    <span class="string">&quot;SXTX&quot; </span>| <span class="string">&quot;sxtx&quot; </span>=&gt; Modifier::SXTX,
-                    <span class="string">&quot;SXTW&quot; </span>| <span class="string">&quot;sxtw&quot; </span>=&gt; Modifier::SXTW,
-                    <span class="string">&quot;SXTH&quot; </span>| <span class="string">&quot;sxth&quot; </span>=&gt; Modifier::SXTH,
-                    <span class="string">&quot;SXTB&quot; </span>| <span class="string">&quot;sxtb&quot; </span>=&gt; Modifier::SXTB,
-                    <span class="string">&quot;UXTX&quot; </span>| <span class="string">&quot;uxtx&quot; </span>=&gt; Modifier::UXTX,
-                    <span class="string">&quot;UXTW&quot; </span>| <span class="string">&quot;uxtw&quot; </span>=&gt; Modifier::UXTW,
-                    <span class="string">&quot;UXTH&quot; </span>| <span class="string">&quot;uxth&quot; </span>=&gt; Modifier::UXTH,
-                    <span class="string">&quot;UXTB&quot; </span>| <span class="string">&quot;uxtb&quot; </span>=&gt; Modifier::UXTB,
-                    <span class="string">&quot;MSL&quot;  </span>| <span class="string">&quot;msl&quot;  </span>=&gt; Modifier::MSL,
-                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;Unknown modifier&quot;</span>))
+                    <span class="string">"LSL"  </span>| <span class="string">"lsl"  </span>=&gt; Modifier::LSL,
+                    <span class="string">"LSR"  </span>| <span class="string">"lsr"  </span>=&gt; Modifier::LSR,
+                    <span class="string">"ASR"  </span>| <span class="string">"asr"  </span>=&gt; Modifier::ASR,
+                    <span class="string">"ROR"  </span>| <span class="string">"ror"  </span>=&gt; Modifier::ROR,
+                    <span class="string">"SXTX" </span>| <span class="string">"sxtx" </span>=&gt; Modifier::SXTX,
+                    <span class="string">"SXTW" </span>| <span class="string">"sxtw" </span>=&gt; Modifier::SXTW,
+                    <span class="string">"SXTH" </span>| <span class="string">"sxth" </span>=&gt; Modifier::SXTH,
+                    <span class="string">"SXTB" </span>| <span class="string">"sxtb" </span>=&gt; Modifier::SXTB,
+                    <span class="string">"UXTX" </span>| <span class="string">"uxtx" </span>=&gt; Modifier::UXTX,
+                    <span class="string">"UXTW" </span>| <span class="string">"uxtw" </span>=&gt; Modifier::UXTW,
+                    <span class="string">"UXTH" </span>| <span class="string">"uxth" </span>=&gt; Modifier::UXTH,
+                    <span class="string">"UXTB" </span>| <span class="string">"uxtb" </span>=&gt; Modifier::UXTB,
+                    <span class="string">"MSL"  </span>| <span class="string">"msl"  </span>=&gt; Modifier::MSL,
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(cursor.error(<span class="string">"Unknown modifier"</span>))
                 };
 
                 <span class="prelude-val">Ok</span>((modifier, rest))
             } <span class="kw">else </span>{
-                <span class="prelude-val">Err</span>(cursor.error(<span class="string">&quot;Expected modifier&quot;</span>))
+                <span class="prelude-val">Err</span>(cursor.error(<span class="string">"Expected modifier"</span>))
             }
         })
     }
 }
 
 <span class="macro">lazy_static!</span>{
-    <span class="kw">static </span><span class="kw-2">ref </span>AARCH64_REGISTERS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (RegId, <span class="prelude-ty">Option</span>&lt;Size&gt;)&gt; = {
+    <span class="kw">static </span><span class="kw-2">ref </span>AARCH64_REGISTERS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, (RegId, <span class="prelude-ty">Option</span>&lt;Size&gt;)&gt; = {
         <span class="kw">use </span><span class="self">self</span>::RegId::<span class="kw-2">*</span>;
         <span class="kw">use </span><span class="kw">crate</span>::common::Size::<span class="kw-2">*</span>;
 
         <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, (RegId, <span class="prelude-ty">Option</span>&lt;Size&gt;))] = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;x0&quot; </span>, (X0 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x1&quot; </span>, (X1 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x2&quot; </span>, (X2 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x3&quot; </span>, (X3 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x4&quot; </span>, (X4 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x5&quot; </span>, (X5 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x6&quot; </span>, (X6 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x7&quot; </span>, (X7 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x8&quot; </span>, (X8 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x9&quot; </span>, (X9 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x10&quot;</span>, (X10, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x11&quot;</span>, (X11, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x12&quot;</span>, (X12, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x13&quot;</span>, (X13, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x14&quot;</span>, (X14, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x15&quot;</span>, (X15, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x16&quot;</span>, (X16, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x17&quot;</span>, (X17, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x18&quot;</span>, (X18, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x19&quot;</span>, (X19, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x20&quot;</span>, (X20, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x21&quot;</span>, (X21, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x22&quot;</span>, (X22, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x23&quot;</span>, (X23, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x24&quot;</span>, (X24, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x25&quot;</span>, (X25, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x26&quot;</span>, (X26, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x27&quot;</span>, (X27, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x28&quot;</span>, (X28, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x29&quot;</span>, (X29, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;x30&quot;</span>, (X30, <span class="prelude-val">Some</span>(QWORD))),
+            (<span class="string">"x0" </span>, (X0 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x1" </span>, (X1 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x2" </span>, (X2 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x3" </span>, (X3 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x4" </span>, (X4 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x5" </span>, (X5 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x6" </span>, (X6 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x7" </span>, (X7 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x8" </span>, (X8 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x9" </span>, (X9 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x10"</span>, (X10, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x11"</span>, (X11, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x12"</span>, (X12, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x13"</span>, (X13, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x14"</span>, (X14, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x15"</span>, (X15, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x16"</span>, (X16, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x17"</span>, (X17, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x18"</span>, (X18, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x19"</span>, (X19, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x20"</span>, (X20, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x21"</span>, (X21, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x22"</span>, (X22, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x23"</span>, (X23, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x24"</span>, (X24, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x25"</span>, (X25, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x26"</span>, (X26, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x27"</span>, (X27, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x28"</span>, (X28, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x29"</span>, (X29, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"x30"</span>, (X30, <span class="prelude-val">Some</span>(B_8))),
 
-            (<span class="string">&quot;w0&quot; </span>, (X0 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w1&quot; </span>, (X1 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w2&quot; </span>, (X2 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w3&quot; </span>, (X3 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w4&quot; </span>, (X4 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w5&quot; </span>, (X5 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w6&quot; </span>, (X6 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w7&quot; </span>, (X7 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w8&quot; </span>, (X8 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w9&quot; </span>, (X9 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w10&quot;</span>, (X10, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w11&quot;</span>, (X11, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w12&quot;</span>, (X12, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w13&quot;</span>, (X13, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w14&quot;</span>, (X14, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w15&quot;</span>, (X15, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w16&quot;</span>, (X16, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w17&quot;</span>, (X17, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w18&quot;</span>, (X18, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w19&quot;</span>, (X19, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w20&quot;</span>, (X20, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w21&quot;</span>, (X21, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w22&quot;</span>, (X22, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w23&quot;</span>, (X23, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w24&quot;</span>, (X24, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w25&quot;</span>, (X25, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w26&quot;</span>, (X26, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w27&quot;</span>, (X27, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w28&quot;</span>, (X28, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w29&quot;</span>, (X29, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;w30&quot;</span>, (X30, <span class="prelude-val">Some</span>(DWORD))),
+            (<span class="string">"w0" </span>, (X0 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w1" </span>, (X1 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w2" </span>, (X2 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w3" </span>, (X3 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w4" </span>, (X4 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w5" </span>, (X5 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w6" </span>, (X6 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w7" </span>, (X7 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w8" </span>, (X8 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w9" </span>, (X9 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w10"</span>, (X10, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w11"</span>, (X11, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w12"</span>, (X12, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w13"</span>, (X13, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w14"</span>, (X14, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w15"</span>, (X15, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w16"</span>, (X16, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w17"</span>, (X17, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w18"</span>, (X18, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w19"</span>, (X19, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w20"</span>, (X20, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w21"</span>, (X21, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w22"</span>, (X22, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w23"</span>, (X23, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w24"</span>, (X24, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w25"</span>, (X25, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w26"</span>, (X26, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w27"</span>, (X27, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w28"</span>, (X28, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w29"</span>, (X29, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"w30"</span>, (X30, <span class="prelude-val">Some</span>(B_4))),
 
-            (<span class="string">&quot;sp&quot;</span>,  (SP,  <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;wsp&quot;</span>, (SP,  <span class="prelude-val">Some</span>(DWORD))),
+            (<span class="string">"sp"</span>,  (SP,  <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"wsp"</span>, (SP,  <span class="prelude-val">Some</span>(B_4))),
 
-            (<span class="string">&quot;xzr&quot;</span>, (XZR, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;wzr&quot;</span>, (XZR, <span class="prelude-val">Some</span>(DWORD))),
+            (<span class="string">"xzr"</span>, (XZR, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"wzr"</span>, (XZR, <span class="prelude-val">Some</span>(B_4))),
 
-            (<span class="string">&quot;b0&quot; </span>, (V0 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b1&quot; </span>, (V1 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b2&quot; </span>, (V2 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b3&quot; </span>, (V3 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b4&quot; </span>, (V4 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b5&quot; </span>, (V5 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b6&quot; </span>, (V6 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b7&quot; </span>, (V7 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b8&quot; </span>, (V8 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b9&quot; </span>, (V9 , <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b10&quot;</span>, (V10, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b11&quot;</span>, (V11, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b12&quot;</span>, (V12, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b13&quot;</span>, (V13, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b14&quot;</span>, (V14, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b15&quot;</span>, (V15, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b16&quot;</span>, (V16, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b17&quot;</span>, (V17, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b18&quot;</span>, (V18, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b19&quot;</span>, (V19, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b20&quot;</span>, (V20, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b21&quot;</span>, (V21, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b22&quot;</span>, (V22, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b23&quot;</span>, (V23, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b24&quot;</span>, (V24, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b25&quot;</span>, (V25, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b26&quot;</span>, (V26, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b27&quot;</span>, (V27, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b28&quot;</span>, (V28, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b29&quot;</span>, (V29, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b30&quot;</span>, (V30, <span class="prelude-val">Some</span>(BYTE))),
-            (<span class="string">&quot;b31&quot;</span>, (V31, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b0" </span>, (V0 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b1" </span>, (V1 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b2" </span>, (V2 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b3" </span>, (V3 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b4" </span>, (V4 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b5" </span>, (V5 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b6" </span>, (V6 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b7" </span>, (V7 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b8" </span>, (V8 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b9" </span>, (V9 , <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b10"</span>, (V10, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b11"</span>, (V11, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b12"</span>, (V12, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b13"</span>, (V13, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b14"</span>, (V14, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b15"</span>, (V15, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b16"</span>, (V16, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b17"</span>, (V17, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b18"</span>, (V18, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b19"</span>, (V19, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b20"</span>, (V20, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b21"</span>, (V21, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b22"</span>, (V22, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b23"</span>, (V23, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b24"</span>, (V24, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b25"</span>, (V25, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b26"</span>, (V26, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b27"</span>, (V27, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b28"</span>, (V28, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b29"</span>, (V29, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b30"</span>, (V30, <span class="prelude-val">Some</span>(BYTE))),
+            (<span class="string">"b31"</span>, (V31, <span class="prelude-val">Some</span>(BYTE))),
 
-            (<span class="string">&quot;h0&quot; </span>, (V0 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h1&quot; </span>, (V1 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h2&quot; </span>, (V2 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h3&quot; </span>, (V3 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h4&quot; </span>, (V4 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h5&quot; </span>, (V5 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h6&quot; </span>, (V6 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h7&quot; </span>, (V7 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h8&quot; </span>, (V8 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h9&quot; </span>, (V9 , <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h10&quot;</span>, (V10, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h11&quot;</span>, (V11, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h12&quot;</span>, (V12, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h13&quot;</span>, (V13, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h14&quot;</span>, (V14, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h15&quot;</span>, (V15, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h16&quot;</span>, (V16, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h17&quot;</span>, (V17, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h18&quot;</span>, (V18, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h19&quot;</span>, (V19, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h20&quot;</span>, (V20, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h21&quot;</span>, (V21, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h22&quot;</span>, (V22, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h23&quot;</span>, (V23, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h24&quot;</span>, (V24, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h25&quot;</span>, (V25, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h26&quot;</span>, (V26, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h27&quot;</span>, (V27, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h28&quot;</span>, (V28, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h29&quot;</span>, (V29, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h30&quot;</span>, (V30, <span class="prelude-val">Some</span>(WORD))),
-            (<span class="string">&quot;h31&quot;</span>, (V31, <span class="prelude-val">Some</span>(WORD))),
+            (<span class="string">"h0" </span>, (V0 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h1" </span>, (V1 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h2" </span>, (V2 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h3" </span>, (V3 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h4" </span>, (V4 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h5" </span>, (V5 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h6" </span>, (V6 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h7" </span>, (V7 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h8" </span>, (V8 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h9" </span>, (V9 , <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h10"</span>, (V10, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h11"</span>, (V11, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h12"</span>, (V12, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h13"</span>, (V13, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h14"</span>, (V14, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h15"</span>, (V15, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h16"</span>, (V16, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h17"</span>, (V17, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h18"</span>, (V18, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h19"</span>, (V19, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h20"</span>, (V20, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h21"</span>, (V21, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h22"</span>, (V22, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h23"</span>, (V23, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h24"</span>, (V24, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h25"</span>, (V25, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h26"</span>, (V26, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h27"</span>, (V27, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h28"</span>, (V28, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h29"</span>, (V29, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h30"</span>, (V30, <span class="prelude-val">Some</span>(B_2))),
+            (<span class="string">"h31"</span>, (V31, <span class="prelude-val">Some</span>(B_2))),
 
-            (<span class="string">&quot;s0&quot; </span>, (V0 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s1&quot; </span>, (V1 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s2&quot; </span>, (V2 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s3&quot; </span>, (V3 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s4&quot; </span>, (V4 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s5&quot; </span>, (V5 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s6&quot; </span>, (V6 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s7&quot; </span>, (V7 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s8&quot; </span>, (V8 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s9&quot; </span>, (V9 , <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s10&quot;</span>, (V10, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s11&quot;</span>, (V11, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s12&quot;</span>, (V12, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s13&quot;</span>, (V13, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s14&quot;</span>, (V14, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s15&quot;</span>, (V15, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s16&quot;</span>, (V16, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s17&quot;</span>, (V17, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s18&quot;</span>, (V18, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s19&quot;</span>, (V19, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s20&quot;</span>, (V20, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s21&quot;</span>, (V21, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s22&quot;</span>, (V22, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s23&quot;</span>, (V23, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s24&quot;</span>, (V24, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s25&quot;</span>, (V25, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s26&quot;</span>, (V26, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s27&quot;</span>, (V27, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s28&quot;</span>, (V28, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s29&quot;</span>, (V29, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s30&quot;</span>, (V30, <span class="prelude-val">Some</span>(DWORD))),
-            (<span class="string">&quot;s31&quot;</span>, (V31, <span class="prelude-val">Some</span>(DWORD))),
+            (<span class="string">"s0" </span>, (V0 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s1" </span>, (V1 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s2" </span>, (V2 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s3" </span>, (V3 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s4" </span>, (V4 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s5" </span>, (V5 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s6" </span>, (V6 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s7" </span>, (V7 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s8" </span>, (V8 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s9" </span>, (V9 , <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s10"</span>, (V10, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s11"</span>, (V11, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s12"</span>, (V12, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s13"</span>, (V13, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s14"</span>, (V14, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s15"</span>, (V15, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s16"</span>, (V16, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s17"</span>, (V17, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s18"</span>, (V18, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s19"</span>, (V19, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s20"</span>, (V20, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s21"</span>, (V21, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s22"</span>, (V22, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s23"</span>, (V23, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s24"</span>, (V24, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s25"</span>, (V25, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s26"</span>, (V26, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s27"</span>, (V27, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s28"</span>, (V28, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s29"</span>, (V29, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s30"</span>, (V30, <span class="prelude-val">Some</span>(B_4))),
+            (<span class="string">"s31"</span>, (V31, <span class="prelude-val">Some</span>(B_4))),
 
-            (<span class="string">&quot;d0&quot; </span>, (V0 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d1&quot; </span>, (V1 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d2&quot; </span>, (V2 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d3&quot; </span>, (V3 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d4&quot; </span>, (V4 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d5&quot; </span>, (V5 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d6&quot; </span>, (V6 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d7&quot; </span>, (V7 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d8&quot; </span>, (V8 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d9&quot; </span>, (V9 , <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d10&quot;</span>, (V10, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d11&quot;</span>, (V11, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d12&quot;</span>, (V12, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d13&quot;</span>, (V13, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d14&quot;</span>, (V14, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d15&quot;</span>, (V15, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d16&quot;</span>, (V16, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d17&quot;</span>, (V17, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d18&quot;</span>, (V18, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d19&quot;</span>, (V19, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d20&quot;</span>, (V20, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d21&quot;</span>, (V21, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d22&quot;</span>, (V22, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d23&quot;</span>, (V23, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d24&quot;</span>, (V24, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d25&quot;</span>, (V25, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d26&quot;</span>, (V26, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d27&quot;</span>, (V27, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d28&quot;</span>, (V28, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d29&quot;</span>, (V29, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d30&quot;</span>, (V30, <span class="prelude-val">Some</span>(QWORD))),
-            (<span class="string">&quot;d31&quot;</span>, (V31, <span class="prelude-val">Some</span>(QWORD))),
+            (<span class="string">"d0" </span>, (V0 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d1" </span>, (V1 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d2" </span>, (V2 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d3" </span>, (V3 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d4" </span>, (V4 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d5" </span>, (V5 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d6" </span>, (V6 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d7" </span>, (V7 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d8" </span>, (V8 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d9" </span>, (V9 , <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d10"</span>, (V10, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d11"</span>, (V11, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d12"</span>, (V12, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d13"</span>, (V13, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d14"</span>, (V14, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d15"</span>, (V15, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d16"</span>, (V16, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d17"</span>, (V17, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d18"</span>, (V18, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d19"</span>, (V19, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d20"</span>, (V20, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d21"</span>, (V21, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d22"</span>, (V22, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d23"</span>, (V23, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d24"</span>, (V24, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d25"</span>, (V25, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d26"</span>, (V26, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d27"</span>, (V27, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d28"</span>, (V28, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d29"</span>, (V29, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d30"</span>, (V30, <span class="prelude-val">Some</span>(B_8))),
+            (<span class="string">"d31"</span>, (V31, <span class="prelude-val">Some</span>(B_8))),
 
-            (<span class="string">&quot;q0&quot; </span>, (V0 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q1&quot; </span>, (V1 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q2&quot; </span>, (V2 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q3&quot; </span>, (V3 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q4&quot; </span>, (V4 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q5&quot; </span>, (V5 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q6&quot; </span>, (V6 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q7&quot; </span>, (V7 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q8&quot; </span>, (V8 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q9&quot; </span>, (V9 , <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q10&quot;</span>, (V10, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q11&quot;</span>, (V11, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q12&quot;</span>, (V12, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q13&quot;</span>, (V13, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q14&quot;</span>, (V14, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q15&quot;</span>, (V15, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q16&quot;</span>, (V16, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q17&quot;</span>, (V17, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q18&quot;</span>, (V18, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q19&quot;</span>, (V19, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q20&quot;</span>, (V20, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q21&quot;</span>, (V21, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q22&quot;</span>, (V22, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q23&quot;</span>, (V23, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q24&quot;</span>, (V24, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q25&quot;</span>, (V25, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q26&quot;</span>, (V26, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q27&quot;</span>, (V27, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q28&quot;</span>, (V28, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q29&quot;</span>, (V29, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q30&quot;</span>, (V30, <span class="prelude-val">Some</span>(OWORD))),
-            (<span class="string">&quot;q31&quot;</span>, (V31, <span class="prelude-val">Some</span>(OWORD))),
+            (<span class="string">"q0" </span>, (V0 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q1" </span>, (V1 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q2" </span>, (V2 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q3" </span>, (V3 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q4" </span>, (V4 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q5" </span>, (V5 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q6" </span>, (V6 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q7" </span>, (V7 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q8" </span>, (V8 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q9" </span>, (V9 , <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q10"</span>, (V10, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q11"</span>, (V11, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q12"</span>, (V12, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q13"</span>, (V13, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q14"</span>, (V14, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q15"</span>, (V15, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q16"</span>, (V16, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q17"</span>, (V17, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q18"</span>, (V18, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q19"</span>, (V19, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q20"</span>, (V20, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q21"</span>, (V21, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q22"</span>, (V22, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q23"</span>, (V23, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q24"</span>, (V24, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q25"</span>, (V25, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q26"</span>, (V26, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q27"</span>, (V27, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q28"</span>, (V28, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q29"</span>, (V29, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q30"</span>, (V30, <span class="prelude-val">Some</span>(B_16))),
+            (<span class="string">"q31"</span>, (V31, <span class="prelude-val">Some</span>(B_16))),
 
-            (<span class="string">&quot;v0&quot; </span>, (V0 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v1&quot; </span>, (V1 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v2&quot; </span>, (V2 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v3&quot; </span>, (V3 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v4&quot; </span>, (V4 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v5&quot; </span>, (V5 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v6&quot; </span>, (V6 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v7&quot; </span>, (V7 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v8&quot; </span>, (V8 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v9&quot; </span>, (V9 , <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v10&quot;</span>, (V10, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v11&quot;</span>, (V11, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v12&quot;</span>, (V12, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v13&quot;</span>, (V13, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v14&quot;</span>, (V14, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v15&quot;</span>, (V15, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v16&quot;</span>, (V16, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v17&quot;</span>, (V17, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v18&quot;</span>, (V18, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v19&quot;</span>, (V19, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v20&quot;</span>, (V20, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v21&quot;</span>, (V21, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v22&quot;</span>, (V22, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v23&quot;</span>, (V23, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v24&quot;</span>, (V24, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v25&quot;</span>, (V25, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v26&quot;</span>, (V26, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v27&quot;</span>, (V27, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v28&quot;</span>, (V28, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v29&quot;</span>, (V29, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v30&quot;</span>, (V30, <span class="prelude-val">None</span>)),
-            (<span class="string">&quot;v31&quot;</span>, (V31, <span class="prelude-val">None</span>)),
+            (<span class="string">"v0" </span>, (V0 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v1" </span>, (V1 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v2" </span>, (V2 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v3" </span>, (V3 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v4" </span>, (V4 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v5" </span>, (V5 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v6" </span>, (V6 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v7" </span>, (V7 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v8" </span>, (V8 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v9" </span>, (V9 , <span class="prelude-val">None</span>)),
+            (<span class="string">"v10"</span>, (V10, <span class="prelude-val">None</span>)),
+            (<span class="string">"v11"</span>, (V11, <span class="prelude-val">None</span>)),
+            (<span class="string">"v12"</span>, (V12, <span class="prelude-val">None</span>)),
+            (<span class="string">"v13"</span>, (V13, <span class="prelude-val">None</span>)),
+            (<span class="string">"v14"</span>, (V14, <span class="prelude-val">None</span>)),
+            (<span class="string">"v15"</span>, (V15, <span class="prelude-val">None</span>)),
+            (<span class="string">"v16"</span>, (V16, <span class="prelude-val">None</span>)),
+            (<span class="string">"v17"</span>, (V17, <span class="prelude-val">None</span>)),
+            (<span class="string">"v18"</span>, (V18, <span class="prelude-val">None</span>)),
+            (<span class="string">"v19"</span>, (V19, <span class="prelude-val">None</span>)),
+            (<span class="string">"v20"</span>, (V20, <span class="prelude-val">None</span>)),
+            (<span class="string">"v21"</span>, (V21, <span class="prelude-val">None</span>)),
+            (<span class="string">"v22"</span>, (V22, <span class="prelude-val">None</span>)),
+            (<span class="string">"v23"</span>, (V23, <span class="prelude-val">None</span>)),
+            (<span class="string">"v24"</span>, (V24, <span class="prelude-val">None</span>)),
+            (<span class="string">"v25"</span>, (V25, <span class="prelude-val">None</span>)),
+            (<span class="string">"v26"</span>, (V26, <span class="prelude-val">None</span>)),
+            (<span class="string">"v27"</span>, (V27, <span class="prelude-val">None</span>)),
+            (<span class="string">"v28"</span>, (V28, <span class="prelude-val">None</span>)),
+            (<span class="string">"v29"</span>, (V29, <span class="prelude-val">None</span>)),
+            (<span class="string">"v30"</span>, (V30, <span class="prelude-val">None</span>)),
+            (<span class="string">"v31"</span>, (V31, <span class="prelude-val">None</span>)),
         ];
         MAP.iter().cloned().collect()
     };
 
-    <span class="kw">static </span><span class="kw-2">ref </span>AARCH64_FAMILIES: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, (RegFamily, <span class="prelude-ty">Option</span>&lt;Size&gt;)&gt; = {
+    <span class="kw">static </span><span class="kw-2">ref </span>AARCH64_FAMILIES: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, (RegFamily, <span class="prelude-ty">Option</span>&lt;Size&gt;)&gt; = {
         <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, (RegFamily, <span class="prelude-ty">Option</span>&lt;Size&gt;))] = <span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;X&quot;</span>,   (RegFamily::INTEGER,   <span class="prelude-val">Some</span>(Size::QWORD))),
-            (<span class="string">&quot;W&quot;</span>,   (RegFamily::INTEGER,   <span class="prelude-val">Some</span>(Size::DWORD))),
-            (<span class="string">&quot;XSP&quot;</span>, (RegFamily::INTEGERSP, <span class="prelude-val">Some</span>(Size::QWORD))),
-            (<span class="string">&quot;WSP&quot;</span>, (RegFamily::INTEGERSP, <span class="prelude-val">Some</span>(Size::DWORD))),
+            (<span class="string">"X"</span>,   (RegFamily::INTEGER,   <span class="prelude-val">Some</span>(Size::B_8))),
+            (<span class="string">"W"</span>,   (RegFamily::INTEGER,   <span class="prelude-val">Some</span>(Size::B_4))),
+            (<span class="string">"XSP"</span>, (RegFamily::INTEGERSP, <span class="prelude-val">Some</span>(Size::B_8))),
+            (<span class="string">"WSP"</span>, (RegFamily::INTEGERSP, <span class="prelude-val">Some</span>(Size::B_4))),
 
-            (<span class="string">&quot;B&quot;</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::BYTE))),
-            (<span class="string">&quot;H&quot;</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::WORD))),
-            (<span class="string">&quot;S&quot;</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::DWORD))),
-            (<span class="string">&quot;D&quot;</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::QWORD))),
-            (<span class="string">&quot;Q&quot;</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::OWORD))),
+            (<span class="string">"B"</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::BYTE))),
+            (<span class="string">"H"</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::B_2))),
+            (<span class="string">"S"</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::B_4))),
+            (<span class="string">"D"</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::B_8))),
+            (<span class="string">"Q"</span>, (RegFamily::SIMD, <span class="prelude-val">Some</span>(Size::B_16))),
 
-            (<span class="string">&quot;V&quot;</span>, (RegFamily::SIMD, <span class="prelude-val">None</span>)),
+            (<span class="string">"V"</span>, (RegFamily::SIMD, <span class="prelude-val">None</span>)),
         ];
         MAP.iter().cloned().collect()
     };
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

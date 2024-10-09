@@ -6,7 +6,7 @@
     <meta name="generator" content="rustdoc">
     <title>Language Reference</title>
 
-    <link rel="stylesheet" type="text/css" href="./formatting.css">
+    <link rel="stylesheet" href="./formatting.css">
     
 </head>
 <body class="rustdoc">
@@ -19,7 +19,7 @@
 
     <nav class="sidebar">
   <h2 class="location">
-    <a href="#">Language dynasm-rs</a>
+    <a href="#">Dynasm-rs reference</a>
   </h2>
   <div class="sidebar-elems">
     <h3>Components</h3>
@@ -73,36 +73,36 @@
 <section id="main" class="content mod docblock">
 
     <h1 class="title">Language Reference</h1>
-    <h1 id="lexical-structure-definition"><a href="#lexical-structure-definition">Lexical structure definition</a></h1>
+    <h1 id="lexical-structure-definition"><a class="doc-anchor" href="#lexical-structure-definition">§</a>Lexical structure definition</h1>
 <p>Instructions for the <code>aarch64</code> assembling backend use the following lexical structure</p>
-<h2 id="base-units"><a href="#base-units">Base units</a></h2>
+<h2 id="base-units"><a class="doc-anchor" href="#base-units">§</a>Base units</h2>
 <p>The following base syntax units are recognized by the parser.</p>
 <ul>
 <li><code>static_reg_name</code> matches any valid register name as seen in table 1, or any previously defined alias</li>
 <li><code>dynamic_reg_family</code> matches any valid register family from table 1</li>
 <li><code>vector_reg_name</code> matches <code>v0</code> up to <code>v31</code></li>
-<li><code>modifier : &quot;LSL&quot; | &quot;LSR&quot; | &quot;ASR&quot; | &quot;ROR&quot; | &quot;UXTB&quot; | &quot;UXTH&quot; | &quot;UXTW&quot; | &quot;UXTX&quot; | &quot;SXTB&quot; | &quot;SXTH&quot; | &quot;SXTW&quot; | &quot;SXTX&quot; | &quot;MSL&quot; ;</code></li>
+<li><code>modifier : "LSL" | "LSR" | "ASR" | "ROR" | "UXTB" | "UXTH" | "UXTW" | "UXTX" | "SXTB" | "SXTH" | "SXTW" | "SXTX" | "MSL" ;</code></li>
 </ul>
-<h2 id="instruction"><a href="#instruction">Instruction</a></h2>
-<p><code>instruction : ident (&quot;.&quot; ident)* (arg (&quot;,&quot; arg)* )? ;</code></p>
-<h2 id="arguments"><a href="#arguments">Arguments</a></h2>
+<h2 id="instruction"><a class="doc-anchor" href="#instruction">§</a>Instruction</h2>
+<p><code>instruction : ident ("." ident)* (arg ("," arg)* )? ;</code></p>
+<h2 id="arguments"><a class="doc-anchor" href="#arguments">§</a>Arguments</h2>
 <p><code>arg : register | registerlist | labelref | reference | modifier_expr | immediate ;</code></p>
 <p><code>register : scalar_reg | vector_reg ;</code></p>
-<p><code>scalar_reg : static_reg_name | dynamic_reg_family &quot;(&quot; expr &quot;)&quot;</code></p>
-<p><code>vector_reg : ( vector_reg_name | &quot;V&quot; &quot;(&quot; expr &quot;)&quot; ) &quot;.&quot; vector_width_spec element_specifier ? ;</code></p>
-<p><code>register_list : &quot;{ comma_list | dash_list | amount_list &quot;}&quot; element_specifier ? ;</code></p>
-<p><code>comma_list : register (&quot;,&quot; register) * ;</code></p>
-<p><code>dash_list : register &quot;-&quot; register ;</code></p>
-<p><code>amount_list : register &quot;*&quot; expr ;</code></p>
-<p><code>element_specifier : &quot;[&quot; expr &quot;]&quot; ;</code></p>
-<p><code>reference : &quot;[&quot; refitem (&quot;,&quot; refitem)* &quot;]&quot; !&quot;? ;</code></p>
+<p><code>scalar_reg : static_reg_name | dynamic_reg_family "(" expr ")"</code></p>
+<p><code>vector_reg : ( vector_reg_name | "V" "(" expr ")" ) "." vector_width_spec element_specifier ? ;</code></p>
+<p><code>register_list : "{ comma_list | dash_list | amount_list "}" element_specifier ? ;</code></p>
+<p><code>comma_list : register ("," register) * ;</code></p>
+<p><code>dash_list : register "-" register ;</code></p>
+<p><code>amount_list : register "*" expr ;</code></p>
+<p><code>element_specifier : "[" expr "]" ;</code></p>
+<p><code>reference : "[" refitem ("," refitem)* "]" !"? ;</code></p>
 <p><code>refitem : register | modifier_expr | immediate ;</code></p>
 <p><code>modifier_expr : modifier immediate? ;</code></p>
-<p><code>immediate : &quot;#&quot;? expr ;</code></p>
-<h1 id="reference"><a href="#reference">Reference</a></h1><h2 id="instructions"><a href="#instructions">Instructions</a></h2>
+<p><code>immediate : "#"? expr ;</code></p>
+<h1 id="reference"><a class="doc-anchor" href="#reference">§</a>Reference</h1><h2 id="instructions"><a class="doc-anchor" href="#instructions">§</a>Instructions</h2>
 <p>The language used by dynasm-rs in aarch64 mode is close to the assembly dialect described in official ARM documentation. Several additions have been made to support dynamic registers and to ensure the Rust parser can handle parsing the language.</p>
 <p>The largest difference is in the notation of vector registers. In ARM assembly, the lane count comes before the element size as in <code>v1.16b</code>. But in dynasm-rs, this is reversed as bare identifiers cannot start with numbers. So the used notation ends up being <code>v1.b16</code>. Next to this, the register section will describe the syntax used for addressing registers.</p>
-<h3 id="operands"><a href="#operands">Operands</a></h3><h4 id="register"><a href="#register">Register</a></h4>
+<h3 id="operands"><a class="doc-anchor" href="#operands">§</a>Operands</h3><h4 id="register"><a class="doc-anchor" href="#register">§</a>Register</h4>
 <p>There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be made at runtime. Note that this does prevent optimizations to register-specific forms. However, the expression inside a dynamic register reference may be evaluated multiple times.</p>
 <p>The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically.</p>
 <p>Table 1: dynasm-rs registers (aarch64)</p>
@@ -154,7 +154,7 @@
 </ul>
 <p>This means that the base for for adressing a register statically looks like <code>V1.B</code> or <code>V(num).B</code>. Additionally, many instructions also require the lane count to be specified for the vector register access.
 As discussed before, this is appended after the element size specifier like <code>V1.B8</code> or <code>V(num).B16</code>. Finally, vector registers can support a lane element specifier if an instruction aims to only use a certain lane of a vector register. In this case the lane count is always optional. This lane is defined by an index expression postfixed to the vector register like <code>V1.B[1]</code> or <code>V(num).B[lane]</code>.</p>
-<h4 id="register-lists"><a href="#register-lists">Register lists</a></h4>
+<h4 id="register-lists"><a class="doc-anchor" href="#register-lists">§</a>Register lists</h4>
 <p>Several vector instructions in aarch64 address a list of registers as single operands. There are several syntaxes supported by dynasm-rs for register lists:</p>
 <p>Table 2: dynasm-rs register list types</p>
 <div><table><thead><tr><th style="text-align: right">Type</th><th style="text-align: left">Example</th></tr></thead><tbody>
@@ -164,9 +164,9 @@ As discussed before, this is appended after the element size specifier like <cod
 </tbody></table>
 </div>
 <p>Each of these list notations is interpreted exactly the same by dynasm-rs. The first two are also standard ARM notation, the third format is added by dynasm-rs to handle dynamic registers in register lists as otherwise the amount could only be calculated at runtime. Just like vector registers, register lists support an optional element specifier after them: <code>{ Vn.B * 4 }[1]</code>.</p>
-<h4 id="jump-targets"><a href="#jump-targets">Jump targets</a></h4>
+<h4 id="jump-targets"><a class="doc-anchor" href="#jump-targets">§</a>Jump targets</h4>
 <p>All flow control instructions and instructions featuring PC-relative addressing have a jump target as argument. This jump target will feature a label reference as described in the common language reference. Note that this reference must be encoded in a limited amount of bits due to the fixed-width aarch64 instruction set, so check the instruction reference to see what the maximum offset range is.</p>
-<h4 id="memory-references"><a href="#memory-references">Memory references</a></h4>
+<h4 id="memory-references"><a class="doc-anchor" href="#memory-references">§</a>Memory references</h4>
 <p>As a load-store architecture, the aarch64 instruction set only has a limited amount of instructions capable of addressing memory. Further more, it supports a limited set of addressing modes. The available addressing modes for each instruction are listed directly in the instruction reference. All possible addressing modes are summarized in the table below as well.</p>
 <p>Table 3: dynasm-rs memory reference formats</p>
 <div><table><thead><tr><th style="text-align: left">Syntax</th><th style="text-align: left">Explanation</th></tr></thead><tbody>
@@ -177,7 +177,7 @@ As discussed before, this is appended after the element size specifier like <cod
 <tr><td style="text-align: left"><code>[Xn|SP, Wm|Xm {, MOD { #imm } } ]</code></td><td style="text-align: left">A <code>WSP</code> family register is used as base with an (optionally shifted) index register to compute the final address to be resolved.</td></tr>
 <tr><td style="text-align: left"><code>[Xn|SP], Xm </code></td><td style="text-align: left">A <code>WSP</code> family register is used as the base address to be resolved. Then the second register is added to the base register and written back.</td></tr>
 </tbody></table>
-</div><h4 id="modifiers"><a href="#modifiers">Modifiers</a></h4>
+</div><h4 id="modifiers"><a class="doc-anchor" href="#modifiers">§</a>Modifiers</h4>
 <p>Several instructions in aarch64, as well as the indexed register addressing mode, support a so-called modifier that change the way the core interprets another argument. The instruction reference shows the supported modifiers for each instruction, and the following table lists all of them:</p>
 <p>Table 4: aarch64 modifiers</p>
 <div><table><thead><tr><th style="text-align: right">Modifier</th><th style="text-align: left">immediate required</th><th style="text-align: left">description</th></tr></thead><tbody>
@@ -197,7 +197,7 @@ As discussed before, this is appended after the element size specifier like <cod
 </tbody></table>
 </div>
 <p>Modifiers can also take an immediate as argument. For shifting modifiers the immediate is required, for extending modifiers it is optional and acts as an extra shift left if provided.</p>
-<h4 id="immediates"><a href="#immediates">Immediates</a></h4>
+<h4 id="immediates"><a class="doc-anchor" href="#immediates">§</a>Immediates</h4>
 <p>Dynasm-rs supports both ARM immediate notation <code>#1</code> and bare immediate notation <code>1</code>. As a fixed width instruction set, immediates are bitfields in the respective instructions and will have a limited range.
 This range can be found for any immediate in the instruction reference. Additionally. Several special immediate classes are distinguished in the aarch64 instruction set. The following table lists all of these.</p>
 <p>Table 5: aarch64 special immediate types</p>

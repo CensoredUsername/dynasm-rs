@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["TAPE_SIZE"],"fn":["count_leading_chars","main"],"struct":["Interpreter"]};

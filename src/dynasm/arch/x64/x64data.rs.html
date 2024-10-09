@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\x64data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x64data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\x64data.rs`."><title>x64data.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -250,7 +250,13 @@
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, hash_map};
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, hash_map};
 
 <span class="kw">use </span><span class="kw">super</span>::compiler::Opdata;
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display};
@@ -258,18 +264,18 @@
 <span class="kw">use </span>lazy_static::lazy_static;
 <span class="kw">use </span>bitflags::bitflags;
 
-<span class="macro">macro_rules! </span>constify {
+<span class="macro">macro_rules!</span> constify {
     (<span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$e</span>:expr) =&gt; { {<span class="kw">const </span>C: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$t </span>= <span class="kw-2">&amp;</span><span class="macro-nonterminal">$e</span>; C} }
 }
 
-<span class="macro">macro_rules! </span>OpInner {
+<span class="macro">macro_rules!</span> OpInner {
     (<span class="macro-nonterminal">$fmt</span>:expr, <span class="macro-nonterminal">$ops</span>:expr, <span class="macro-nonterminal">$reg</span>:expr)          =&gt; { Opdata {args: <span class="macro-nonterminal">$fmt</span>, ops: <span class="macro">constify!</span>([u8], <span class="macro-nonterminal">$ops</span>), reg: <span class="macro-nonterminal">$reg</span>, flags: Flags::DEFAULT,  features: Features::X64_IMPLICIT}  };
     (<span class="macro-nonterminal">$fmt</span>:expr, <span class="macro-nonterminal">$ops</span>:expr, <span class="macro-nonterminal">$reg</span>:expr, <span class="macro-nonterminal">$f</span>:expr) =&gt; { Opdata {args: <span class="macro-nonterminal">$fmt</span>, ops: <span class="macro">constify!</span>([u8], <span class="macro-nonterminal">$ops</span>), reg: <span class="macro-nonterminal">$reg</span>, flags: Flags::make(<span class="macro-nonterminal">$f</span>), features: Features::X64_IMPLICIT}  };
     (<span class="macro-nonterminal">$fmt</span>:expr, <span class="macro-nonterminal">$ops</span>:expr, <span class="macro-nonterminal">$reg</span>:expr, <span class="macro-nonterminal">$f</span>:expr, <span class="macro-nonterminal">$ft</span>:expr) =&gt; { Opdata {args: <span class="macro-nonterminal">$fmt</span>, ops: <span class="macro">constify!</span>([u8], <span class="macro-nonterminal">$ops</span>), reg: <span class="macro-nonterminal">$reg</span>, flags: Flags::make(<span class="macro-nonterminal">$f</span>), features: Features::make(<span class="macro-nonterminal">$ft</span>)}  };
 
 }
 
-<span class="macro">macro_rules! </span>Ops {
+<span class="macro">macro_rules!</span> Ops {
     ( $( <span class="macro-nonterminal">$name</span>:tt = [ $( $( <span class="macro-nonterminal">$e</span>:expr ),+ ; )+ ] )* ) =&gt; {
         [ $(
             (
@@ -283,12 +289,13 @@
     };
 }
 
-<span class="kw">pub fn </span>get_mnemnonic_data(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Opdata]&gt; {
+<span class="kw">pub fn </span>get_mnemnonic_data(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; {
     OPMAP.get(<span class="kw-2">&amp;</span>name).cloned()
 }
 
-<span class="macro">bitflags! </span>{
-    <span class="kw">pub struct </span>Flags: u32 {
+<span class="macro">bitflags!</span> {
+    <span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    </span><span class="kw">pub struct </span>Flags: u32 {
         <span class="kw">const </span>DEFAULT   = <span class="number">0x0000_0000</span>; <span class="comment">// this instruction has default encoding
         </span><span class="kw">const </span>VEX_OP    = <span class="number">0x0000_0001</span>; <span class="comment">// this instruction requires a VEX prefix to be encoded
         </span><span class="kw">const </span>XOP_OP    = <span class="number">0x0000_0002</span>; <span class="comment">// this instruction requires a XOP prefix to be encoded
@@ -324,12 +331,13 @@
 
 <span class="kw">impl </span>Flags {
     <span class="kw">const fn </span>make(bits: u32) -&gt; Flags {
-        Flags { bits }
+        Flags::from_bits_truncate(bits)
     }
 }
 
-<span class="macro">bitflags! </span>{
-    <span class="kw">pub struct </span>Features: u32 {
+<span class="macro">bitflags!</span> {
+    <span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    </span><span class="kw">pub struct </span>Features: u32 {
         <span class="kw">const </span>X64_IMPLICIT = <span class="number">0x0000_0000</span>;
         <span class="kw">const </span>FPU          = <span class="number">0x0000_0001</span>;
           <span class="kw">const </span>MMX          = <span class="number">0x0000_0002</span>;
@@ -356,41 +364,43 @@
         <span class="kw">const </span>PREFETCHWT1  = <span class="number">0x0040_0000</span>;
         <span class="kw">const </span>CYRIX        = <span class="number">0x0080_0000</span>;
         <span class="kw">const </span>AMD          = <span class="number">0x0100_0000</span>;
+        <span class="kw">const </span>DIRECTSTORES = <span class="number">0x0200_0000</span>;
     }
 }
 
 <span class="kw">impl </span>Features {
     <span class="kw">const fn </span>make(bits: u32) -&gt; Features {
-        Features { bits }
+        Features::from_bits_truncate(bits)
     }
 
     <span class="kw">pub fn </span>from_str(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Features&gt; {
         <span class="kw">match </span>name {
-            <span class="string">&quot;fpu&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::FPU),
-            <span class="string">&quot;mmx&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::MMX),
-            <span class="string">&quot;tdnow&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::TDNOW),
-            <span class="string">&quot;sse&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE),
-            <span class="string">&quot;sse2&quot;  </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE2),
-            <span class="string">&quot;sse3&quot;  </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE3),
-            <span class="string">&quot;vmx&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::VMX),
-            <span class="string">&quot;ssse3&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::SSSE3),
-            <span class="string">&quot;sse4a&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE4A),
-            <span class="string">&quot;sse41&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE41),
-            <span class="string">&quot;sse42&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE42),
-            <span class="string">&quot;sse5&quot;  </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE5),
-            <span class="string">&quot;avx&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::AVX),
-            <span class="string">&quot;avx2&quot;  </span>=&gt; <span class="prelude-val">Some</span>(Features::AVX2),
-            <span class="string">&quot;fma&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::FMA),
-            <span class="string">&quot;bmi1&quot;  </span>=&gt; <span class="prelude-val">Some</span>(Features::BMI1),
-            <span class="string">&quot;bmi2&quot;  </span>=&gt; <span class="prelude-val">Some</span>(Features::BMI2),
-            <span class="string">&quot;tbm&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::TBM),
-            <span class="string">&quot;rtm&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::RTM),
-            <span class="string">&quot;invpcid&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::INVPCID),
-            <span class="string">&quot;mpx&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::MPX),
-            <span class="string">&quot;sha&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::SHA),
-            <span class="string">&quot;prefetchwt1&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::PREFETCHWT1),
-            <span class="string">&quot;cyrix&quot; </span>=&gt; <span class="prelude-val">Some</span>(Features::CYRIX),
-            <span class="string">&quot;amd&quot;   </span>=&gt; <span class="prelude-val">Some</span>(Features::AMD),
+            <span class="string">"fpu"   </span>=&gt; <span class="prelude-val">Some</span>(Features::FPU),
+            <span class="string">"mmx"   </span>=&gt; <span class="prelude-val">Some</span>(Features::MMX),
+            <span class="string">"tdnow" </span>=&gt; <span class="prelude-val">Some</span>(Features::TDNOW),
+            <span class="string">"sse"   </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE),
+            <span class="string">"sse2"  </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE2),
+            <span class="string">"sse3"  </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE3),
+            <span class="string">"vmx"   </span>=&gt; <span class="prelude-val">Some</span>(Features::VMX),
+            <span class="string">"ssse3" </span>=&gt; <span class="prelude-val">Some</span>(Features::SSSE3),
+            <span class="string">"sse4a" </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE4A),
+            <span class="string">"sse41" </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE41),
+            <span class="string">"sse42" </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE42),
+            <span class="string">"sse5"  </span>=&gt; <span class="prelude-val">Some</span>(Features::SSE5),
+            <span class="string">"avx"   </span>=&gt; <span class="prelude-val">Some</span>(Features::AVX),
+            <span class="string">"avx2"  </span>=&gt; <span class="prelude-val">Some</span>(Features::AVX2),
+            <span class="string">"fma"   </span>=&gt; <span class="prelude-val">Some</span>(Features::FMA),
+            <span class="string">"bmi1"  </span>=&gt; <span class="prelude-val">Some</span>(Features::BMI1),
+            <span class="string">"bmi2"  </span>=&gt; <span class="prelude-val">Some</span>(Features::BMI2),
+            <span class="string">"tbm"   </span>=&gt; <span class="prelude-val">Some</span>(Features::TBM),
+            <span class="string">"rtm"   </span>=&gt; <span class="prelude-val">Some</span>(Features::RTM),
+            <span class="string">"invpcid" </span>=&gt; <span class="prelude-val">Some</span>(Features::INVPCID),
+            <span class="string">"mpx"   </span>=&gt; <span class="prelude-val">Some</span>(Features::MPX),
+            <span class="string">"sha"   </span>=&gt; <span class="prelude-val">Some</span>(Features::SHA),
+            <span class="string">"prefetchwt1" </span>=&gt; <span class="prelude-val">Some</span>(Features::PREFETCHWT1),
+            <span class="string">"cyrix" </span>=&gt; <span class="prelude-val">Some</span>(Features::CYRIX),
+            <span class="string">"amd"   </span>=&gt; <span class="prelude-val">Some</span>(Features::AMD),
+            <span class="string">"directstores"   </span>=&gt; <span class="prelude-val">Some</span>(Features::DIRECTSTORES),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None
         </span>}
     }
@@ -399,34 +409,35 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>Features {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span><span class="kw-2">mut </span>keys = Vec::new();
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::FPU)   { keys.push(<span class="string">&quot;fpu&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::MMX)   { keys.push(<span class="string">&quot;mmx&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::TDNOW) { keys.push(<span class="string">&quot;tdnow&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE)   { keys.push(<span class="string">&quot;sse&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE2)  { keys.push(<span class="string">&quot;sse2&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE3)  { keys.push(<span class="string">&quot;sse3&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::VMX)   { keys.push(<span class="string">&quot;vmx&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSSE3) { keys.push(<span class="string">&quot;ssse3&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE4A) { keys.push(<span class="string">&quot;sse4a&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE41) { keys.push(<span class="string">&quot;sse41&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE42) { keys.push(<span class="string">&quot;sse42&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE5)  { keys.push(<span class="string">&quot;sse5&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::AVX)   { keys.push(<span class="string">&quot;avx&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::AVX2)  { keys.push(<span class="string">&quot;avx2&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::FMA)   { keys.push(<span class="string">&quot;fma&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::BMI1)  { keys.push(<span class="string">&quot;bmi1&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::BMI2)  { keys.push(<span class="string">&quot;bmi2&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::TBM)   { keys.push(<span class="string">&quot;tbm&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::RTM)   { keys.push(<span class="string">&quot;rtm&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::INVPCID) { keys.push(<span class="string">&quot;invpcid&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::MPX)   { keys.push(<span class="string">&quot;mpx&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::SHA)   { keys.push(<span class="string">&quot;sha&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::PREFETCHWT1) { keys.push(<span class="string">&quot;prefetchwt1&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::CYRIX) { keys.push(<span class="string">&quot;cyrix&quot;</span>); }
-        <span class="kw">if </span><span class="self">self</span>.contains(Features::AMD)   { keys.push(<span class="string">&quot;amd&quot;</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::FPU)   { keys.push(<span class="string">"fpu"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::MMX)   { keys.push(<span class="string">"mmx"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::TDNOW) { keys.push(<span class="string">"tdnow"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE)   { keys.push(<span class="string">"sse"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE2)  { keys.push(<span class="string">"sse2"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE3)  { keys.push(<span class="string">"sse3"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::VMX)   { keys.push(<span class="string">"vmx"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSSE3) { keys.push(<span class="string">"ssse3"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE4A) { keys.push(<span class="string">"sse4a"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE41) { keys.push(<span class="string">"sse41"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE42) { keys.push(<span class="string">"sse42"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SSE5)  { keys.push(<span class="string">"sse5"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::AVX)   { keys.push(<span class="string">"avx"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::AVX2)  { keys.push(<span class="string">"avx2"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::FMA)   { keys.push(<span class="string">"fma"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::BMI1)  { keys.push(<span class="string">"bmi1"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::BMI2)  { keys.push(<span class="string">"bmi2"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::TBM)   { keys.push(<span class="string">"tbm"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::RTM)   { keys.push(<span class="string">"rtm"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::INVPCID) { keys.push(<span class="string">"invpcid"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::MPX)   { keys.push(<span class="string">"mpx"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::SHA)   { keys.push(<span class="string">"sha"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::PREFETCHWT1) { keys.push(<span class="string">"prefetchwt1"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::CYRIX) { keys.push(<span class="string">"cyrix"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::AMD)   { keys.push(<span class="string">"amd"</span>); }
+        <span class="kw">if </span><span class="self">self</span>.contains(Features::DIRECTSTORES)   { keys.push(<span class="string">"directstores"</span>); }
         <span class="kw">for </span>(i, k) <span class="kw">in </span>keys.into_iter().enumerate() {
             <span class="kw">if </span>i != <span class="number">0 </span>{
-                f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">", "</span>)<span class="question-mark">?</span>;
             }
             f.write_str(k)<span class="question-mark">?</span>;
         }
@@ -435,72 +446,72 @@
 }
 
 <span class="attr">#[allow(dead_code)]
-</span><span class="kw">pub fn </span>mnemnonics() -&gt; hash_map::Keys&lt;<span class="lifetime">&#39;static</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Opdata]&gt; {
+</span><span class="kw">pub fn </span>mnemnonics() -&gt; hash_map::Keys&lt;<span class="lifetime">'static</span>, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; {
     OPMAP.keys()
 }
 
 <span class="comment">// workaround until bitflags can be used in const
-</span><span class="kw">const </span>DEFAULT    : u32 = Flags::DEFAULT.bits;
-<span class="kw">const </span>VEX_OP     : u32 = Flags::VEX_OP.bits;
-<span class="kw">const </span>XOP_OP     : u32 = Flags::XOP_OP.bits;
-<span class="kw">const </span>IMM_OP     : u32 = Flags::IMM_OP.bits;
-<span class="kw">const </span>SHORT_ARG  : u32 = Flags::SHORT_ARG.bits;
-<span class="kw">const </span>AUTO_SIZE  : u32 = Flags::AUTO_SIZE.bits;
-<span class="kw">const </span>AUTO_NO32  : u32 = Flags::AUTO_NO32.bits;
-<span class="kw">const </span>AUTO_REXW  : u32 = Flags::AUTO_REXW.bits;
-<span class="kw">const </span>AUTO_VEXL  : u32 = Flags::AUTO_VEXL.bits;
-<span class="kw">const </span>WORD_SIZE  : u32 = Flags::WORD_SIZE.bits;
-<span class="kw">const </span>WITH_REXW  : u32 = Flags::WITH_REXW.bits;
-<span class="kw">const </span>WITH_VEXL  : u32 = Flags::WITH_VEXL.bits;
-<span class="kw">const </span>EXACT_SIZE : u32 = Flags::EXACT_SIZE.bits;
-<span class="kw">const </span>PREF_66    : u32 = Flags::PREF_66.bits;
-<span class="kw">const </span>PREF_67    : u32 = Flags::PREF_67.bits;
-<span class="kw">const </span>PREF_F0    : u32 = Flags::PREF_F0.bits;
-<span class="kw">const </span>PREF_F2    : u32 = Flags::PREF_F2.bits;
-<span class="kw">const </span>PREF_F3    : u32 = Flags::PREF_F3.bits;
-<span class="kw">const </span>LOCK       : u32 = Flags::LOCK.bits;
-<span class="kw">const </span>REP        : u32 = Flags::REP.bits;
-<span class="kw">const </span>REPE       : u32 = Flags::REPE.bits;
-<span class="kw">const </span>ENC_MR     : u32 = Flags::ENC_MR.bits;
-<span class="kw">const </span>ENC_VM     : u32 = Flags::ENC_VM.bits;
-<span class="kw">const </span>ENC_MIB    : u32 = Flags::ENC_MIB.bits;
-<span class="kw">const </span>X86_ONLY   : u32 = Flags::X86_ONLY.bits;
+</span><span class="kw">const </span>DEFAULT    : u32 = Flags::DEFAULT.bits();
+<span class="kw">const </span>VEX_OP     : u32 = Flags::VEX_OP.bits();
+<span class="kw">const </span>XOP_OP     : u32 = Flags::XOP_OP.bits();
+<span class="kw">const </span>IMM_OP     : u32 = Flags::IMM_OP.bits();
+<span class="kw">const </span>SHORT_ARG  : u32 = Flags::SHORT_ARG.bits();
+<span class="kw">const </span>AUTO_SIZE  : u32 = Flags::AUTO_SIZE.bits();
+<span class="kw">const </span>AUTO_NO32  : u32 = Flags::AUTO_NO32.bits();
+<span class="kw">const </span>AUTO_REXW  : u32 = Flags::AUTO_REXW.bits();
+<span class="kw">const </span>AUTO_VEXL  : u32 = Flags::AUTO_VEXL.bits();
+<span class="kw">const </span>WORD_SIZE  : u32 = Flags::WORD_SIZE.bits();
+<span class="kw">const </span>WITH_REXW  : u32 = Flags::WITH_REXW.bits();
+<span class="kw">const </span>WITH_VEXL  : u32 = Flags::WITH_VEXL.bits();
+<span class="kw">const </span>EXACT_SIZE : u32 = Flags::EXACT_SIZE.bits();
+<span class="kw">const </span>PREF_66    : u32 = Flags::PREF_66.bits();
+<span class="kw">const </span>PREF_67    : u32 = Flags::PREF_67.bits();
+<span class="kw">const </span>PREF_F0    : u32 = Flags::PREF_F0.bits();
+<span class="kw">const </span>PREF_F2    : u32 = Flags::PREF_F2.bits();
+<span class="kw">const </span>PREF_F3    : u32 = Flags::PREF_F3.bits();
+<span class="kw">const </span>LOCK       : u32 = Flags::LOCK.bits();
+<span class="kw">const </span>REP        : u32 = Flags::REP.bits();
+<span class="kw">const </span>REPE       : u32 = Flags::REPE.bits();
+<span class="kw">const </span>ENC_MR     : u32 = Flags::ENC_MR.bits();
+<span class="kw">const </span>ENC_VM     : u32 = Flags::ENC_VM.bits();
+<span class="kw">const </span>ENC_MIB    : u32 = Flags::ENC_MIB.bits();
+<span class="kw">const </span>X86_ONLY   : u32 = Flags::X86_ONLY.bits();
 
 <span class="attr">#[allow(dead_code)]
-</span><span class="kw">const </span>X64_IMPLICIT : u32 = Features::X64_IMPLICIT.bits;
-<span class="kw">const </span>FPU          : u32 = Features::FPU.bits;
-<span class="kw">const </span>MMX          : u32 = Features::MMX.bits;
-<span class="kw">const </span>TDNOW        : u32 = Features::TDNOW.bits;
-<span class="kw">const </span>SSE          : u32 = Features::SSE.bits;
-<span class="kw">const </span>SSE2         : u32 = Features::SSE2.bits;
-<span class="kw">const </span>SSE3         : u32 = Features::SSE3.bits;
-<span class="kw">const </span>VMX          : u32 = Features::VMX.bits;
-<span class="kw">const </span>SSSE3        : u32 = Features::SSSE3.bits;
-<span class="kw">const </span>SSE4A        : u32 = Features::SSE4A.bits;
-<span class="kw">const </span>SSE41        : u32 = Features::SSE41.bits;
-<span class="kw">const </span>SSE42        : u32 = Features::SSE42.bits;
-<span class="kw">const </span>SSE5         : u32 = Features::SSE5.bits;
-<span class="kw">const </span>AVX          : u32 = Features::AVX.bits;
-<span class="kw">const </span>AVX2         : u32 = Features::AVX2.bits;
-<span class="kw">const </span>FMA          : u32 = Features::FMA.bits;
-<span class="kw">const </span>BMI1         : u32 = Features::BMI1.bits;
-<span class="kw">const </span>BMI2         : u32 = Features::BMI2.bits;
-<span class="kw">const </span>TBM          : u32 = Features::TBM.bits;
-<span class="kw">const </span>RTM          : u32 = Features::RTM.bits;
-<span class="kw">const </span>INVPCID      : u32 = Features::INVPCID.bits;
-<span class="kw">const </span>MPX          : u32 = Features::MPX.bits;
-<span class="kw">const </span>SHA          : u32 = Features::SHA.bits;
-<span class="kw">const </span>PREFETCHWT1  : u32 = Features::PREFETCHWT1.bits;
-<span class="kw">const </span>CYRIX        : u32 = Features::CYRIX.bits;
-<span class="kw">const </span>AMD          : u32 = Features::AMD.bits;
+</span><span class="kw">const </span>X64_IMPLICIT : u32 = Features::X64_IMPLICIT.bits();
+<span class="kw">const </span>FPU          : u32 = Features::FPU.bits();
+<span class="kw">const </span>MMX          : u32 = Features::MMX.bits();
+<span class="kw">const </span>TDNOW        : u32 = Features::TDNOW.bits();
+<span class="kw">const </span>SSE          : u32 = Features::SSE.bits();
+<span class="kw">const </span>SSE2         : u32 = Features::SSE2.bits();
+<span class="kw">const </span>SSE3         : u32 = Features::SSE3.bits();
+<span class="kw">const </span>VMX          : u32 = Features::VMX.bits();
+<span class="kw">const </span>SSSE3        : u32 = Features::SSSE3.bits();
+<span class="kw">const </span>SSE4A        : u32 = Features::SSE4A.bits();
+<span class="kw">const </span>SSE41        : u32 = Features::SSE41.bits();
+<span class="kw">const </span>SSE42        : u32 = Features::SSE42.bits();
+<span class="kw">const </span>SSE5         : u32 = Features::SSE5.bits();
+<span class="kw">const </span>AVX          : u32 = Features::AVX.bits();
+<span class="kw">const </span>AVX2         : u32 = Features::AVX2.bits();
+<span class="kw">const </span>FMA          : u32 = Features::FMA.bits();
+<span class="kw">const </span>BMI1         : u32 = Features::BMI1.bits();
+<span class="kw">const </span>BMI2         : u32 = Features::BMI2.bits();
+<span class="kw">const </span>TBM          : u32 = Features::TBM.bits();
+<span class="kw">const </span>RTM          : u32 = Features::RTM.bits();
+<span class="kw">const </span>INVPCID      : u32 = Features::INVPCID.bits();
+<span class="kw">const </span>MPX          : u32 = Features::MPX.bits();
+<span class="kw">const </span>SHA          : u32 = Features::SHA.bits();
+<span class="kw">const </span>PREFETCHWT1  : u32 = Features::PREFETCHWT1.bits();
+<span class="kw">const </span>CYRIX        : u32 = Features::CYRIX.bits();
+<span class="kw">const </span>AMD          : u32 = Features::AMD.bits();
+<span class="kw">const </span>DIRECTSTORES : u32 = Features::DIRECTSTORES.bits();
 
 
-<span class="macro">lazy_static! </span>{
-    <span class="kw">static </span><span class="kw-2">ref </span>OPMAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Opdata]&gt; = {
+<span class="macro">lazy_static!</span> {
+    <span class="kw">static </span><span class="kw-2">ref </span>OPMAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; = {
         <span class="kw">const </span>X: u8 = <span class="number">0xFF</span>;
-        <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>[Opdata])] = <span class="kw-2">&amp;</span><span class="macro">include!</span>(<span class="string">&quot;gen_opmap.rs&quot;</span>);
+        <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>[Opdata])] = <span class="kw-2">&amp;</span><span class="macro">include!</span>(<span class="string">"gen_opmap.rs"</span>);
         MAP.iter().cloned().collect()
     };
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

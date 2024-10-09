@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\matching.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>matching.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../dynasm/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\matching.rs`."><title>matching.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -645,7 +645,7 @@
 <a href="#645" id="645">645</a>
 <a href="#646" id="646">646</a>
 <a href="#647" id="647">647</a>
-</pre><pre class="rust"><code><span class="kw">use </span>proc_macro_error::emit_error;
+</pre></div><pre class="rust"><code><span class="kw">use </span>proc_macro_error2::emit_error;
 <span class="kw">use </span>proc_macro2::Span;
 
 <span class="kw">use </span><span class="kw">super</span>::Context;
@@ -654,7 +654,7 @@
 <span class="kw">use </span><span class="kw">super</span>::debug::format_opdata_list;
 
 <span class="kw">use </span><span class="kw">crate</span>::common::{Size, JumpKind};
-<span class="kw">use </span><span class="kw">crate</span>::parse_helpers::{as_ident, as_number, as_float};
+<span class="kw">use </span><span class="kw">crate</span>::parse_helpers::{as_ident, as_unsigned_number, as_float};
 
 <span class="doccomment">/// Try finding an appropriate definition that matches the given instruction / arguments.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>match_instruction(_ctx: <span class="kw-2">&amp;mut </span>Context, instruction: <span class="kw-2">&amp;</span>Instruction, args: Vec&lt;RawArg&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;MatchData, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
@@ -666,7 +666,7 @@
     <span class="kw">let </span>opdata = <span class="kw">if let </span><span class="prelude-val">Some</span>(o) = get_mnemonic_data(<span class="kw-2">&amp;</span>name) {
         o
     } <span class="kw">else </span>{
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown instruction mnemonic &#39;{}&#39;&quot;</span>, name)));
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"Unknown instruction mnemonic '{}'"</span>, name)));
     };
 
     <span class="comment">// matching loop
@@ -681,7 +681,7 @@
     }
 
     <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;: instruction format mismatch, expected one of the following forms:\n{}&quot;</span>, <span class="kw-2">&amp;</span>name, format_opdata_list(<span class="kw-2">&amp;</span>name, opdata))
+        <span class="macro">format!</span>(<span class="string">"'{}': instruction format mismatch, expected one of the following forms:\n{}"</span>, <span class="kw-2">&amp;</span>name, format_opdata_list(<span class="kw-2">&amp;</span>name, opdata))
     ))
 }
 
@@ -703,7 +703,7 @@
             <span class="comment">// offsets: validate that only relative jumps are allowed (no extern relocations)
             </span>RawArg::JumpTarget { jump } =&gt; {
                 <span class="kw">if let </span>JumpKind::Bare(<span class="kw">_</span>) = jump.kind {
-                    <span class="macro">emit_error!</span>(jump.span(), <span class="string">&quot;Extern relocations are not allowed in aarch64&quot;</span>);
+                    <span class="macro">emit_error!</span>(jump.span(), <span class="string">"Extern relocations are not allowed in aarch64"</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
                 res.push(CleanArg::JumpTarget { jump });
@@ -711,15 +711,15 @@
             <span class="comment">// modifier: LSL LSR ASR ROR and MSL require an immediate.
             </span>RawArg::Modifier { span, modifier } =&gt; {
                 <span class="kw">if </span>modifier.expr.is_none() &amp;&amp; modifier.op.expr_required() {
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate.&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"LSL, LSR, ASR, ROR and MSL modifiers require a shift immediate."</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
-                res.push(CleanArg::Modifier { span, modifier });
+                res.push(CleanArg::Modifier { modifier });
             },
             <span class="comment">// dot: passthrough
-            </span>RawArg::Dot { span } =&gt; {
-                res.push(CleanArg::Dot { span } );
+            </span>RawArg::Dot {} =&gt; {
+                res.push(CleanArg::Dot {} );
             },
             <span class="comment">// lit: passthrough
             </span>RawArg::Lit { ident } =&gt; {
@@ -742,10 +742,10 @@
                 </span><span class="kw">let </span>base = <span class="kw">match </span>items.next() {
                     <span class="prelude-val">Some</span>(RefItem::Direct { reg, .. }) =&gt; reg,
                     <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;First item in a reference list has to be a register&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"First item in a reference list has to be a register"</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     },
-                    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Cannot create empty references in the parser&quot;</span>)
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">"Cannot create empty references in the parser"</span>)
                 };
 
                 <span class="comment">// second item is either a register or an offset
@@ -757,7 +757,7 @@
                         kind = RefKind::Offset(value);
                     },
                     <span class="prelude-val">Some</span>(RefItem::Modifier { .. }) =&gt; {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Cannot have a modifier without index register or offset&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Cannot have a modifier without index register or offset"</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     },
                     <span class="prelude-val">None </span>=&gt; hit_end = <span class="bool-val">true
@@ -770,7 +770,7 @@
                             <span class="kw-2">*</span>modifier = <span class="prelude-val">Some</span>(m)
                         },
                         <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Too many items in reference list&quot;</span>);
+                            <span class="macro">emit_error!</span>(span, <span class="string">"Too many items in reference list"</span>);
                             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                         },
                         <span class="prelude-val">None </span>=&gt; hit_end = <span class="bool-val">true
@@ -779,7 +779,7 @@
 
                 <span class="comment">// there should not be any more items in the reference
                 </span><span class="kw">if </span>!hit_end &amp;&amp; items.next().is_some() {
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Too many items in reference list&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Too many items in reference list"</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
@@ -788,35 +788,35 @@
                     <span class="kw">if let </span>RefKind::Offset(offset) = kind {
                         kind = RefKind::PreIndexed(offset);
                     } <span class="kw">else </span>{
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Cannot use pre-indexed addressing without an immediate offset.&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Cannot use pre-indexed addressing without an immediate offset."</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                 }
 
                 <span class="comment">// sanitizaiton
                 // base can only be a Xn|SP reg
-                </span><span class="kw">if </span>!(base.size() == Size::QWORD &amp;&amp; (base.family() == RegFamily::INTEGERSP || (base.family() == RegFamily::INTEGER &amp;&amp; !base.kind().is_zero_reg()))) {
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Base register can only be a Xn|SP register&quot;</span>);
+                </span><span class="kw">if </span>!(base.size() == Size::B_8 &amp;&amp; (base.family() == RegFamily::INTEGERSP || (base.family() == RegFamily::INTEGER &amp;&amp; !base.kind().is_zero_reg()))) {
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Base register can only be a Xn|SP register"</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
                 <span class="comment">// index can only be a Xn or Wn reg
                 </span><span class="kw">if let </span>RefKind::Indexed(<span class="kw-2">ref </span>index, <span class="kw-2">ref </span>modifier) = kind {
                     <span class="kw">if </span>index.family() != RegFamily::INTEGER {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Index register can only be a Xn or Wn register&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Index register can only be a Xn or Wn register"</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
 
                     <span class="comment">// limited set of allowed modifiers.
                     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>m) = modifier {
-                        <span class="kw">if if </span>index.size() == Size::QWORD {m.op != Modifier::LSL &amp;&amp; m.op != Modifier::SXTX} <span class="kw">else </span>{m.op != Modifier::SXTW &amp;&amp; m.op != Modifier::UXTW} {
-                            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Invalid modifier for the selected base register type&quot;</span>);
+                        <span class="kw">if if </span>index.size() == Size::B_8 {m.op != Modifier::LSL &amp;&amp; m.op != Modifier::SXTX} <span class="kw">else </span>{m.op != Modifier::SXTW &amp;&amp; m.op != Modifier::UXTW} {
+                            <span class="macro">emit_error!</span>(span, <span class="string">"Invalid modifier for the selected base register type"</span>);
                             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                         }
 
                         <span class="comment">// LSL requires a stated immediate
                         </span><span class="kw">if </span>m.op.expr_required() &amp;&amp; m.expr.is_none() {
-                            <span class="macro">emit_error!</span>(span, <span class="string">&quot;LSL reference modifier requires an immediate&quot;</span>);
+                            <span class="macro">emit_error!</span>(span, <span class="string">"LSL reference modifier requires an immediate"</span>);
                             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                         }
                     }
@@ -855,7 +855,7 @@
             // then, canonicalize it to first register / count and confirm it is a valid bare vector register
             </span>RawArg::CommaList { span, items, element } =&gt; {
                 <span class="kw">if </span>items.len() &gt; <span class="number">32 </span>{
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Too many registers in register list.&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Too many registers in register list."</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
                 <span class="kw">let </span>amount = items.len() <span class="kw">as </span>u8;
@@ -873,7 +873,7 @@
                     s.sanitize(span, <span class="kw-2">&amp;</span>item)<span class="question-mark">?</span>;
                     next_code = (next_code + <span class="number">1</span>) % <span class="number">32</span>;
                     <span class="kw">if </span>item.kind().encode() != next_code {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Registers in register list are not monotonically incrementing&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Registers in register list are not monotonically incrementing"</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                 }
@@ -890,23 +890,23 @@
                 sanitize_register(span, <span class="kw-2">&amp;</span>first)<span class="question-mark">?</span>;
                 <span class="kw">if let </span>Register::Vector(v) = <span class="kw-2">&amp;</span>first {
                     <span class="kw">if </span>v.element.is_some() {
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Cannot use element specifiers inside of register lists.&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Cannot use element specifiers inside of register lists."</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                 } <span class="kw">else </span>{
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Can only use vector registers in register lists.&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Can only use vector registers in register lists."</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
 
                 <span class="comment">// ensure amount is a constant usize
-                </span><span class="kw">let </span>amount = <span class="kw">if let </span><span class="prelude-val">Some</span>(amount) = as_number(<span class="kw-2">&amp;</span>amount) {
+                </span><span class="kw">let </span>amount = <span class="kw">if let </span><span class="prelude-val">Some</span>(amount) = as_unsigned_number(<span class="kw-2">&amp;</span>amount) {
                     <span class="kw">if </span>amount &gt; <span class="number">32 </span>{
-                        <span class="macro">emit_error!</span>(span, <span class="string">&quot;Too many registers in register list.&quot;</span>);
+                        <span class="macro">emit_error!</span>(span, <span class="string">"Too many registers in register list."</span>);
                         <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                     }
                     amount <span class="kw">as </span>u8
                 } <span class="kw">else </span>{
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Register list requires a contant amount of registers specified&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Register list requires a contant amount of registers specified"</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 };
 
@@ -941,18 +941,18 @@
         sanitize_register(span, register)<span class="question-mark">?</span>;
         <span class="kw">if let </span>Register::Vector(v) = register {
             <span class="kw">if </span>v.element.is_some() {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Cannot use element specifiers inside of register lists.&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Cannot use element specifiers inside of register lists."</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="kw">if </span>v.kind.is_dynamic() {
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Cannot use dynamic registers inside of a comma/dash register list.&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Cannot use dynamic registers inside of a comma/dash register list."</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(size) = <span class="self">self</span>.element_size {
                 <span class="kw">if </span>size != v.element_size {
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Inconsistent element sizes.&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Inconsistent element sizes."</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
             } <span class="kw">else </span>{
@@ -961,14 +961,14 @@
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(lanes) = <span class="self">self</span>.lanes {
                 <span class="kw">if </span>lanes != v.lanes {
-                    <span class="macro">emit_error!</span>(span, <span class="string">&quot;Inconsistent lane count.&quot;</span>);
+                    <span class="macro">emit_error!</span>(span, <span class="string">"Inconsistent lane count."</span>);
                     <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
                 }
             } <span class="kw">else </span>{
                 <span class="self">self</span>.lanes = <span class="prelude-val">Some</span>(v.lanes);
             }
         } <span class="kw">else </span>{
-            <span class="macro">emit_error!</span>(span, <span class="string">&quot;Can only use vector registers in register lists.&quot;</span>);
+            <span class="macro">emit_error!</span>(span, <span class="string">"Can only use vector registers in register lists."</span>);
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>);
         }
         <span class="prelude-val">Ok</span>(())
@@ -980,7 +980,7 @@
     <span class="kw">if let </span>Register::Vector(v) = register {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(total) = v.full_size() {
             <span class="kw">if </span>total &gt; <span class="number">16 </span>{
-                <span class="macro">emit_error!</span>(span, <span class="string">&quot;Overly wide vector register.&quot;</span>);
+                <span class="macro">emit_error!</span>(span, <span class="string">"Overly wide vector register."</span>);
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">None</span>)
             }
         }
@@ -993,12 +993,12 @@
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>MatchData {
     <span class="kw">pub </span>simd_full_width: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="kw">pub </span>data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata,
+    <span class="kw">pub </span>data: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata,
     <span class="kw">pub </span>args: Vec&lt;FlatArg&gt;,
 }
 
 <span class="kw">impl </span>MatchData {
-    <span class="kw">pub fn </span>new(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata) -&gt; MatchData {
+    <span class="kw">pub fn </span>new(data: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata) -&gt; MatchData {
         MatchData {
             simd_full_width: <span class="prelude-val">None</span>,
             data,
@@ -1081,21 +1081,21 @@
                         Matcher::VElement(size) =&gt;
                             <span class="kw-2">*</span>size == v.element_size &amp;&amp; v.element.is_some(),
                         Matcher::VElementStatic(size, element) =&gt;
-                            <span class="kw-2">*</span>size == v.element_size &amp;&amp; v.element.as_ref().and_then(as_number) == <span class="prelude-val">Some</span>(u64::from(<span class="kw-2">*</span>element)),
+                            <span class="kw-2">*</span>size == v.element_size &amp;&amp; v.element.as_ref().and_then(as_unsigned_number) == <span class="prelude-val">Some</span>(u64::from(<span class="kw-2">*</span>element)),
                         Matcher::VStaticElement(size, lanes) =&gt;
                             <span class="kw-2">*</span>size == v.element_size &amp;&amp; v.element.is_some() &amp;&amp; v.lanes == <span class="prelude-val">Some</span>(<span class="kw-2">*</span>lanes),
                         <span class="kw">_ </span>=&gt; <span class="bool-val">false
                     </span>},
                     Register::Scalar(<span class="kw-2">ref </span>s) =&gt; <span class="kw">match </span><span class="self">self </span>{
-                        Matcher::W =&gt; s.size() == Size::DWORD &amp;&amp; s.kind.family() == RegFamily::INTEGER,
-                        Matcher::X =&gt; s.size() == Size::QWORD &amp;&amp; s.kind.family() == RegFamily::INTEGER,
-                        Matcher::WSP =&gt; s.size() == Size::DWORD &amp;&amp; (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() &amp;&amp; s.kind.family() == RegFamily::INTEGER &amp;&amp; !s.kind.is_zero_reg())),
-                        Matcher::XSP =&gt; s.size() == Size::QWORD &amp;&amp; (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() &amp;&amp; s.kind.family() == RegFamily::INTEGER &amp;&amp; !s.kind.is_zero_reg())),
+                        Matcher::W =&gt; s.size() == Size::B_4 &amp;&amp; s.kind.family() == RegFamily::INTEGER,
+                        Matcher::X =&gt; s.size() == Size::B_8 &amp;&amp; s.kind.family() == RegFamily::INTEGER,
+                        Matcher::WSP =&gt; s.size() == Size::B_4 &amp;&amp; (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() &amp;&amp; s.kind.family() == RegFamily::INTEGER &amp;&amp; !s.kind.is_zero_reg())),
+                        Matcher::XSP =&gt; s.size() == Size::B_8 &amp;&amp; (s.kind.family() == RegFamily::INTEGERSP || (!s.kind.is_dynamic() &amp;&amp; s.kind.family() == RegFamily::INTEGER &amp;&amp; !s.kind.is_zero_reg())),
                         Matcher::B =&gt; s.size() == Size::BYTE &amp;&amp; s.kind.family() == RegFamily::SIMD,
-                        Matcher::H =&gt; s.size() == Size::WORD &amp;&amp; s.kind.family() == RegFamily::SIMD,
-                        Matcher::S =&gt; s.size() == Size::DWORD &amp;&amp; s.kind.family() == RegFamily::SIMD,
-                        Matcher::D =&gt; s.size() == Size::QWORD &amp;&amp; s.kind.family() == RegFamily::SIMD,
-                        Matcher::Q =&gt; s.size() == Size::OWORD &amp;&amp; s.kind.family() == RegFamily::SIMD,
+                        Matcher::H =&gt; s.size() == Size::B_2 &amp;&amp; s.kind.family() == RegFamily::SIMD,
+                        Matcher::S =&gt; s.size() == Size::B_4 &amp;&amp; s.kind.family() == RegFamily::SIMD,
+                        Matcher::D =&gt; s.size() == Size::B_8 &amp;&amp; s.kind.family() == RegFamily::SIMD,
+                        Matcher::Q =&gt; s.size() == Size::B_16 &amp;&amp; s.kind.family() == RegFamily::SIMD,
                         <span class="kw">_ </span>=&gt; <span class="bool-val">false
                     </span>}
                 }
@@ -1104,7 +1104,7 @@
             CleanArg::Immediate { prefixed: <span class="bool-val">true</span>, value } =&gt; <span class="kw">match </span><span class="self">self </span>{
                 Matcher::Imm
                 | Matcher::Offset =&gt; <span class="bool-val">true</span>,
-                Matcher::LitInt(v) =&gt; as_number(value) == <span class="prelude-val">Some</span>(u64::from(<span class="kw-2">*</span>v)),
+                Matcher::LitInt(v) =&gt; as_unsigned_number(value) == <span class="prelude-val">Some</span>(u64::from(<span class="kw-2">*</span>v)),
                 Matcher::LitFloat(v) =&gt; as_float(value) == <span class="prelude-val">Some</span>(f64::from(<span class="kw-2">*</span>v)),
                 <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
             },
@@ -1122,7 +1122,7 @@
                 } <span class="kw">else </span>{
                     <span class="bool-val">false
                 </span>},
-                Matcher::LitInt(v) =&gt; as_number(value) == <span class="prelude-val">Some</span>(u64::from(<span class="kw-2">*</span>v)),
+                Matcher::LitInt(v) =&gt; as_unsigned_number(value) == <span class="prelude-val">Some</span>(u64::from(<span class="kw-2">*</span>v)),
                 Matcher::LitFloat(v) =&gt; as_float(value) == <span class="prelude-val">Some</span>(f64::from(<span class="kw-2">*</span>v)),
                 <span class="kw">_ </span>=&gt; <span class="bool-val">false
             </span>},
@@ -1186,7 +1186,7 @@
 }
 
 <span class="doccomment">/// Check if the args string matches the data matching template
-</span><span class="kw">pub fn </span>match_args(args: <span class="kw-2">&amp;</span>[CleanArg], data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Opdata) -&gt; <span class="prelude-ty">Option</span>&lt;MatchData&gt; {
+</span><span class="kw">pub fn </span>match_args(args: <span class="kw-2">&amp;</span>[CleanArg], data: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Opdata) -&gt; <span class="prelude-ty">Option</span>&lt;MatchData&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>ctx = MatchData::new(data);
 
     <span class="kw">let </span><span class="kw-2">mut </span>args = args.iter().peekable();
@@ -1239,7 +1239,7 @@
                         RefKind::Indexed(index, modifier) =&gt; {
                             new_args.push(FlatArg::Direct { span, reg: index.kind_owned() } );
                             <span class="kw">if let </span><span class="prelude-val">Some</span>(modifier) = modifier {
-                                new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                                new_args.push(FlatArg::Modifier { modifier: modifier.op } );
                                 <span class="kw">if let </span><span class="prelude-val">Some</span>(expr) = modifier.expr {
                                     new_args.push(FlatArg::Immediate { value: expr } );
                                 }
@@ -1272,9 +1272,9 @@
                 CleanArg::Immediate { value, .. } =&gt; {
                     new_args.push(FlatArg::Immediate { value } );
                 },
-                CleanArg::Modifier { span, modifier } =&gt; {
+                CleanArg::Modifier { modifier } =&gt; {
                     <span class="kw">if </span>arg_count &gt;= <span class="number">2 </span>{
-                        new_args.push(FlatArg::Modifier { span, modifier: modifier.op } );
+                        new_args.push(FlatArg::Modifier { modifier: modifier.op } );
                     }
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(expr) = modifier.expr {
                         new_args.push(FlatArg::Immediate { value: expr });
@@ -1292,5 +1292,4 @@
         ctx.args.extend(new_args.drain(..))
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

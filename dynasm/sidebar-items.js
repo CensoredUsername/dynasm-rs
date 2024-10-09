@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":[["dynasm","The whole point. This macro compiles given assembly/Rust templates down to `DynasmApi` and `DynasmLabelApi` compliant calls to an assembler."],["dynasm_backwards","Similar to `dynasm!`, but the calls to the assembler are executed in piecewise reversed order. This is to allow the system to be used with assemblers that assemble backwards. Currently this is not supported by the `dynasmrt` crate, but this allows experimentation with it out of tree."]]};
+window.SIDEBAR_ITEMS = {"macro":["dynasm","dynasm_backwards"]};

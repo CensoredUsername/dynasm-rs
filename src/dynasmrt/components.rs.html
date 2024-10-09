@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\components.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>components.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../dynasmrt/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\components.rs`."><title>components.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -684,7 +684,17 @@
 <a href="#684" id="684">684</a>
 <a href="#685" id="685">685</a>
 <a href="#686" id="686">686</a>
-</pre><pre class="rust"><code><span class="doccomment">//! This module provides several reusable compoments for implementing assemblers
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! This module provides several reusable compoments for implementing assemblers
 
 </span><span class="kw">use </span>std::io;
 <span class="kw">use </span>std::collections::hash_map::Entry;
@@ -697,22 +707,27 @@
 <span class="kw">use crate</span>::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
 <span class="kw">use </span><span class="kw">crate</span>::mmap::{ExecutableBuffer, MutableBuffer};
 <span class="kw">use </span><span class="kw">crate</span>::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
+<span class="kw">use </span><span class="kw">crate</span>::cache_control;
 
 <span class="doccomment">/// A static label represents either a local label or a global label reference.
-/// Global labels are unique names, which can be referenced multiple times, but only defined once.
+///
+/// Global labels are unique names, which can be referenced multiple times, but only defined once
+/// (per-[crate::Assembler]).
+///
 /// Local labels are non-unique names. They can be referenced multiple times, and any reference
 /// indicates if they refer to a label after the reference, or a label before the reference.
+///
 /// A static label records how many local labels with the same name have been emitted beforehand
 /// so we can treat them as local labels as well.
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>StaticLabel {
-    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
     version: usize,
 }
 
 <span class="kw">impl </span>StaticLabel {
     <span class="doccomment">/// Create a new static label for a global label
-    </span><span class="kw">pub fn </span>global(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; StaticLabel {
+    </span><span class="kw">pub fn </span>global(name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; StaticLabel {
         StaticLabel {
             name,
             version: <span class="number">0
@@ -720,7 +735,7 @@
     }
 
     <span class="doccomment">/// Create a new static label for a local label, with the given version id to distinguish it.
-    </span><span class="kw">pub fn </span>local(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, version: usize) -&gt; StaticLabel {
+    </span><span class="kw">pub fn </span>local(name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, version: usize) -&gt; StaticLabel {
         StaticLabel {
             name,
             version
@@ -745,7 +760,7 @@
     </span>}
 
     <span class="doccomment">/// Returns the representation of the first local label used with the given name.
-    </span><span class="kw">pub fn </span>first(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; StaticLabel {
+    </span><span class="kw">pub fn </span>first(name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; StaticLabel {
         StaticLabel {
             name,
             version: <span class="number">1
@@ -753,7 +768,7 @@
     }
 
     <span class="doccomment">/// Returns the name of this static label
-    </span><span class="kw">pub fn </span>get_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>get_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="self">self</span>.name
     }
 }
@@ -764,7 +779,7 @@
     <span class="comment">// buffer where the end result is copied into
     </span>execbuffer: Arc&lt;RwLock&lt;ExecutableBuffer&gt;&gt;,
 
-    <span class="comment">// size of the allocated mmap (so we don&#39;t have to go through RwLock to get it)
+    <span class="comment">// size of the allocated mmap (so we don't have to go through RwLock to get it)
     </span>execbuffer_size: usize,
     <span class="comment">// length of the allocated mmap that has been written into
     </span>asmoffset: usize,
@@ -814,7 +829,7 @@
             }
 
             <span class="comment">// create a larger writable buffer
-            </span><span class="kw">let </span><span class="kw-2">mut </span>new_buffer = MutableBuffer::new(<span class="self">self</span>.execbuffer_size).expect(<span class="string">&quot;Could not allocate a larger buffer&quot;</span>);
+            </span><span class="kw">let </span><span class="kw-2">mut </span>new_buffer = MutableBuffer::new(<span class="self">self</span>.execbuffer_size).expect(<span class="string">"Could not allocate a larger buffer"</span>);
             new_buffer.set_len(new_asmoffset);
 
             <span class="comment">// copy over the data
@@ -825,23 +840,29 @@
             <span class="comment">// allow modifications to be made
             </span>f(<span class="kw-2">&amp;mut </span>new_buffer, <span class="self">self</span>.execbuffer_addr, new_buffer_addr);
 
+            <span class="comment">// resynchronize the entire buffer
+            </span>cache_control::synchronize_icache(<span class="kw-2">&amp;</span>new_buffer);
+
             <span class="comment">// swap the buffers
             </span><span class="self">self</span>.execbuffer_addr = new_buffer_addr;
-            <span class="kw-2">*</span><span class="self">self</span>.execbuffer.write().unwrap() = new_buffer.make_exec().expect(<span class="string">&quot;Could not swap buffer protection modes&quot;</span>)
+            <span class="kw-2">*</span><span class="self">self</span>.execbuffer.write().unwrap() = new_buffer.make_exec().expect(<span class="string">"Could not swap buffer protection modes"</span>)
 
         } <span class="kw">else </span>{
 
             <span class="comment">// temporarily change the buffer protection modes and copy in new data
             </span><span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.write();
             <span class="kw">let </span>buffer = mem::replace(<span class="kw-2">&amp;mut *</span>lock, ExecutableBuffer::default());
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = buffer.make_mut().expect(<span class="string">&quot;Could not swap buffer protection modes&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>buffer = buffer.make_mut().expect(<span class="string">"Could not swap buffer protection modes"</span>);
 
             <span class="comment">// update buffer and length
             </span>buffer.set_len(new_asmoffset);
             buffer[old_asmoffset..].copy_from_slice(<span class="kw-2">&amp;</span>new);
 
+            <span class="comment">// ensure that no old data remains in the icache of what we just updated
+            </span>cache_control::synchronize_icache(<span class="kw-2">&amp;</span>buffer[old_asmoffset .. ]);
+
             <span class="comment">// repack the buffer
-            </span><span class="kw">let </span>buffer = buffer.make_exec().expect(<span class="string">&quot;Could not swap buffer protection modes&quot;</span>);
+            </span><span class="kw">let </span>buffer = buffer.make_exec().expect(<span class="string">"Could not swap buffer protection modes"</span>);
             <span class="kw-2">*</span>lock = buffer;
         }
 
@@ -882,7 +903,7 @@
     <span class="comment">// mapping of dynamic label ids to offsets
     </span>dynamic_labels: Vec&lt;<span class="prelude-ty">Option</span>&lt;AssemblyOffset&gt;&gt;,
     <span class="comment">// mapping of local label -&gt; current generation. Generation starts at 1.
-    </span>local_versions: FnvHashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, usize&gt;,
+    </span>local_versions: FnvHashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, usize&gt;,
 }
 
 <span class="kw">impl </span>LabelRegistry {
@@ -929,7 +950,7 @@
     }
 
     <span class="doccomment">/// Define a the global label `name` to be located at `offset`.
-    </span><span class="kw">pub fn </span>define_global(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, offset: AssemblyOffset) -&gt; <span class="prelude-ty">Result</span>&lt;(), DynasmError&gt; {
+    </span><span class="kw">pub fn </span>define_global(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, offset: AssemblyOffset) -&gt; <span class="prelude-ty">Result</span>&lt;(), DynasmError&gt; {
         <span class="kw">match </span><span class="self">self</span>.static_labels.entry(StaticLabel::global(name)) {
             Entry::Occupied(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(DynasmError::DuplicateLabel(LabelKind::Global(name))),
             Entry::Vacant(v) =&gt; {
@@ -940,7 +961,7 @@
     }
 
     <span class="doccomment">/// Define a the local label `name` to be located at `offset`.
-    </span><span class="kw">pub fn </span>define_local(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, offset: AssemblyOffset) {
+    </span><span class="kw">pub fn </span>define_local(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, offset: AssemblyOffset) {
         <span class="kw">let </span>generation = <span class="kw">match </span><span class="self">self</span>.local_versions.entry(name) {
             Entry::Occupied(<span class="kw-2">mut </span>o) =&gt; {
                 <span class="kw-2">*</span>o.get_mut() += <span class="number">1</span>;
@@ -956,7 +977,7 @@
 
     <span class="doccomment">/// Turns a local label into a static label, by adding some extra information to it
     /// so we know what local label it is even after another has been defined
-    </span><span class="kw">pub fn </span>place_local_reference(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;StaticLabel&gt; {
+    </span><span class="kw">pub fn </span>place_local_reference(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;StaticLabel&gt; {
         <span class="self">self</span>.local_versions.get(name).map(|<span class="kw-2">&amp;</span>version| StaticLabel::local(name, version))
     }
 
@@ -965,7 +986,7 @@
         <span class="self">self</span>.dynamic_labels.get(id.<span class="number">0</span>).and_then(|<span class="kw-2">&amp;</span>e| e).ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
     }
 
-    <span class="doccomment">/// Returns the offset at which the global label `name` was defined, if one was defined.
+    <span class="doccomment">/// Returns the offset at which the global label `label` was defined, if one was defined.
     </span><span class="kw">pub fn </span>resolve_static(<span class="kw-2">&amp;</span><span class="self">self</span>, label: <span class="kw-2">&amp;</span>StaticLabel) -&gt; <span class="prelude-ty">Result</span>&lt;AssemblyOffset, DynasmError&gt; {
         <span class="self">self</span>.static_labels.get(label).cloned().ok_or_else(|| DynasmError::UnknownLabel(
             <span class="kw">if </span>label.is_global() {
@@ -1090,13 +1111,13 @@
 
     <span class="doccomment">/// Return an iterator through all defined relocations targeting global labels and the labels they target.
     /// These relocations are removed from the registry.
-    </span><span class="kw">pub fn </span>take_statics&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, StaticLabel)&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub fn </span>take_statics&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, StaticLabel)&gt; + <span class="lifetime">'a </span>{
         <span class="self">self</span>.static_targets.drain(..)
     }
 
     <span class="doccomment">/// Return an iterator through all defined relocations targeting dynamic labels and the labels they target.
     /// These relocations are removed from the registry.
-    </span><span class="kw">pub fn </span>take_dynamics&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, DynamicLabel)&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub fn </span>take_dynamics&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, DynamicLabel)&gt; + <span class="lifetime">'a </span>{
         <span class="self">self</span>.dynamic_targets.drain(..)
     }
 }
@@ -1143,7 +1164,7 @@
     }
 
     <span class="doccomment">/// Iterate through all defined managed relocations.
-    </span><span class="kw">pub fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PatchLoc&lt;R&gt;&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub fn </span>iter&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PatchLoc&lt;R&gt;&gt; + <span class="lifetime">'a </span>{
         <span class="self">self</span>.managed.values()
     } 
 }
@@ -1156,9 +1177,9 @@
     U32(u32),
     U64(u64),
     Dynamic(RelocationSize, DynamicLabel),
-    Global(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
-    Forward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
-    Backward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    Global(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
+    Forward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
+    Backward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
     Align(u8, usize),
 }
 
@@ -1236,21 +1257,21 @@
     }
 
     <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    </span><span class="kw">pub fn </span>push_global(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, size: RelocationSize) -&gt; isize {
+    </span><span class="kw">pub fn </span>push_global(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize) -&gt; isize {
         <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
         <span class="self">self</span>.entries.push(LitPoolEntry::Global(size, name));
         offset
     }
 
     <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    </span><span class="kw">pub fn </span>push_forward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, size: RelocationSize) -&gt; isize {
+    </span><span class="kw">pub fn </span>push_forward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize) -&gt; isize {
         <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
         <span class="self">self</span>.entries.push(LitPoolEntry::Forward(size, name));
         offset
     }
 
     <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-    </span><span class="kw">pub fn </span>push_backward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, size: RelocationSize) -&gt; isize {
+    </span><span class="kw">pub fn </span>push_backward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize) -&gt; isize {
         <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
         <span class="self">self</span>.entries.push(LitPoolEntry::Backward(size, name));
         offset
@@ -1298,8 +1319,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>std::fmt::Debug;
-    <span class="kw">use </span>relocations::{Relocation, RelocationSize};
+    <span class="kw">use </span>relocations::RelocationSize;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_litpool_size() {
@@ -1327,7 +1347,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>pool = components::LitPool::new();
 
-        ops.local_label(<span class="string">&quot;backward1&quot;</span>);
+        ops.local_label(<span class="string">"backward1"</span>);
 
         <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x12</span>), <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x34</span>), <span class="number">1</span>);
@@ -1339,22 +1359,22 @@
 
         <span class="macro">assert_eq!</span>(pool.push_u64(<span class="number">0x3456_789A_BCDE_F012</span>), <span class="number">16</span>);
 
-        <span class="macro">assert_eq!</span>(pool.push_forward(<span class="string">&quot;forward1&quot;</span>, RelocationSize::Byte), <span class="number">24</span>);
+        <span class="macro">assert_eq!</span>(pool.push_forward(<span class="string">"forward1"</span>, RelocationSize::Byte), <span class="number">24</span>);
 
         pool.align(<span class="number">4</span>, <span class="number">0xCC</span>);
 
-        <span class="macro">assert_eq!</span>(pool.push_global(<span class="string">&quot;global1&quot;</span>, RelocationSize::Word), <span class="number">28</span>);
+        <span class="macro">assert_eq!</span>(pool.push_global(<span class="string">"global1"</span>, RelocationSize::Word), <span class="number">28</span>);
 
         <span class="macro">assert_eq!</span>(pool.push_dynamic(dynamic1, RelocationSize::DWord), <span class="number">32</span>);
 
-        <span class="macro">assert_eq!</span>(pool.push_backward(<span class="string">&quot;backward1&quot;</span>, RelocationSize::QWord), <span class="number">40</span>);
+        <span class="macro">assert_eq!</span>(pool.push_backward(<span class="string">"backward1"</span>, RelocationSize::QWord), <span class="number">40</span>);
 
         pool.emit(<span class="kw-2">&amp;mut </span>ops);
 
         <span class="macro">assert_eq!</span>(ops.offset().<span class="number">0</span>, <span class="number">48</span>);
 
-        ops.local_label(<span class="string">&quot;forward1&quot;</span>);
-        ops.global_label(<span class="string">&quot;global1&quot;</span>);
+        ops.local_label(<span class="string">"forward1"</span>);
+        ops.global_label(<span class="string">"global1"</span>);
         ops.dynamic_label(dynamic1);
 
         <span class="macro">assert_eq!</span>(ops.commit(), <span class="prelude-val">Ok</span>(()));
@@ -1370,5 +1390,4 @@
         ] <span class="kw">as </span><span class="kw-2">&amp;</span>[u8]);
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>
