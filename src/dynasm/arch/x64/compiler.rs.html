@@ -1672,6 +1672,11 @@
 <a href="#1672" id="1672">1672</a>
 <a href="#1673" id="1673">1673</a>
 <a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>syn::spanned::Spanned;
 <span class="kw">use </span>proc_macro2::{Span, TokenTree, Literal};
 <span class="kw">use </span>quote::{quote_spanned};
@@ -2427,31 +2432,36 @@
 
 <span class="comment">// Tries to find the maximum size necessary to hold the result of an expression.
 </span><span class="kw">fn </span>derive_size(expr: <span class="kw-2">&amp;</span>syn::Expr) -&gt; <span class="prelude-ty">Option</span>&lt;Size&gt; {
-    <span class="comment">// strip any wrapping Group nodes due to delimiting
+    <span class="comment">// strip any wrapping Group or Paren nodes due to delimiting
     </span><span class="kw">let </span><span class="kw-2">mut </span>inner = expr;
-    <span class="kw">while let </span>syn::Expr::Group(syn::ExprGroup { expr, .. }) = inner {
-        inner = expr;
+    <span class="kw">loop </span>{
+        inner = <span class="kw">match </span>inner {
+            syn::Expr::Group(syn::ExprGroup { expr, ..}) =&gt; expr,
+            syn::Expr::Paren(syn::ExprParen { expr, .. }) =&gt; expr,
+            <span class="kw">_ </span>=&gt; <span class="kw">break
+        </span>}
     }
 
     <span class="kw">match </span>inner {
         syn::Expr::Lit(syn::ExprLit { <span class="kw-2">ref </span>lit, .. } ) =&gt; <span class="kw">match </span>lit {
             syn::Lit::Byte(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::BYTE),
-            syn::Lit::Int(i) =&gt; <span class="kw">match </span>i.base10_parse::&lt;u32&gt;() {
-                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x80 </span>=&gt; <span class="prelude-val">Some</span>(Size::BYTE),
-                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_2),
-                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt; <span class="number">0x8000_0000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Size::B_8),
+            syn::Lit::Int(i) =&gt; <span class="kw">match </span>i.base10_parse::&lt;i32&gt;() {
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::B_8),
+                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &gt; <span class="number">0x7FFF </span>|| x &lt; -<span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
+                <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &gt; <span class="number">0x7F </span>|| x &lt; -<span class="number">0x80 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_2),
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::BYTE),
             },
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None
         </span>},
         syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(<span class="kw">_</span>), <span class="kw-2">ref </span>expr, .. } ) =&gt; <span class="kw">match </span><span class="kw-2">&amp;**</span>expr {
             syn::Expr::Lit(syn::ExprLit { <span class="kw-2">ref </span>lit, .. } ) =&gt; <span class="kw">match </span>lit {
                 syn::Lit::Byte(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::BYTE),
-                syn::Lit::Int(i) =&gt; <span class="kw">match </span>i.base10_parse::&lt;u32&gt;() {
-                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x80 </span>=&gt; <span class="prelude-val">Some</span>(Size::BYTE),
-                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x8000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_2),
-                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &lt;= <span class="number">0x8000_0000 </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
-                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(Size::B_8),
+                syn::Lit::Int(i) =&gt; <span class="kw">match </span>i.base10_parse::&lt;i64&gt;() {
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::B_8),
+                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &gt; <span class="number">0x8000_0000 </span>|| x &lt; -<span class="number">0x7FFF_FFFF </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
+                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &gt; <span class="number">0x8000 </span>|| x &lt; -<span class="number">0x7FFF </span>=&gt; <span class="prelude-val">Some</span>(Size::B_4),
+                    <span class="prelude-val">Ok</span>(x) <span class="kw">if </span>x &gt; <span class="number">0x80 </span>|| x &lt; -<span class="number">0x7F </span>=&gt; <span class="prelude-val">Some</span>(Size::B_2),
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Size::BYTE),
                 },
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None
             </span>},

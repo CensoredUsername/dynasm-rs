@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-1.0.109\src\custom_keyword.rs`."><title>custom_keyword.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-2.0.79\src\custom_keyword.rs`."><title>custom_keyword.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -251,6 +251,13 @@
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Define a type that supports parsing and printing a given identifier as if it
 /// were a keyword.
 ///
@@ -344,31 +351,34 @@
     (<span class="macro-nonterminal">$ident</span>:ident) =&gt; {
         <span class="attr">#[allow(non_camel_case_types)]
         </span><span class="kw">pub struct </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">pub </span>span: <span class="macro-nonterminal">$crate::__private::Span</span>,
+            <span class="attr">#[allow(dead_code)]
+            </span><span class="kw">pub </span>span: <span class="macro-nonterminal">$crate::__private::Span</span>,
         }
 
         <span class="attr">#[doc(hidden)]
         #[allow(dead_code, non_snake_case)]
-        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$ident</span>&lt;__S: <span class="macro-nonterminal">$crate::__private::IntoSpans</span>&lt;[<span class="macro-nonterminal">$crate::__private::Span</span>; <span class="number">1</span>]&gt;&gt;(
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$ident</span>&lt;__S: <span class="macro-nonterminal">$crate::__private::IntoSpans</span>&lt;<span class="macro-nonterminal">$crate::__private::Span</span>&gt;&gt;(
             span: __S,
         ) -&gt; <span class="macro-nonterminal">$ident </span>{
             <span class="macro-nonterminal">$ident </span>{
-                span: <span class="macro-nonterminal">$crate::__private::IntoSpans::into_spans</span>(span)[<span class="number">0</span>],
+                span: <span class="macro-nonterminal">$crate::__private::IntoSpans::into_spans</span>(span),
             }
         }
 
-        <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::Default </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-                <span class="macro-nonterminal">$ident </span>{
-                    span: <span class="macro-nonterminal">$crate::__private::Span::call_site</span>(),
+        <span class="kw">const _</span>: () = {
+            <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::Default </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
+                <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+                    <span class="macro-nonterminal">$ident </span>{
+                        span: <span class="macro-nonterminal">$crate::__private::Span::call_site</span>(),
+                    }
                 }
             }
-        }
 
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_parse_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_to_tokens_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_clone_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_extra_traits_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_parse_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_to_tokens_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_clone_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_extra_traits_for_custom_keyword!</span>(<span class="macro-nonterminal">$ident</span>);
+        };
     };
 }
 
@@ -379,17 +389,17 @@
 </span><span class="macro">macro_rules!</span> impl_parse_for_custom_keyword {
     (<span class="macro-nonterminal">$ident</span>:ident) =&gt; {
         <span class="comment">// For peek.
-        </span><span class="kw">impl </span><span class="macro-nonterminal">$crate::token::CustomToken </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
+        </span><span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::CustomToken </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
             <span class="kw">fn </span>peek(cursor: <span class="macro-nonterminal">$crate::buffer::Cursor</span>) -&gt; <span class="macro-nonterminal">$crate::__private::bool </span>{
                 <span class="kw">if let </span><span class="macro-nonterminal">$crate::__private::Some</span>((ident, _rest)) = cursor.ident() {
-                    ident == <span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>)
+                    ident == <span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>)
                 } <span class="kw">else </span>{
                     <span class="bool-val">false
                 </span>}
             }
 
             <span class="kw">fn </span>display() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span><span class="macro-nonterminal">$crate::__private::str </span>{
-                <span class="macro">concat!</span>(<span class="string">"`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>), <span class="string">"`"</span>)
+                <span class="macro-nonterminal">$</span><span class="macro">crate::__private::concat!</span>(<span class="string">"`"</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>), <span class="string">"`"</span>)
             }
         }
 
@@ -397,15 +407,15 @@
             <span class="kw">fn </span>parse(input: <span class="macro-nonterminal">$crate::parse::ParseStream</span>) -&gt; <span class="macro-nonterminal">$crate::parse::Result</span>&lt;<span class="macro-nonterminal">$ident</span>&gt; {
                 input.step(|cursor| {
                     <span class="kw">if let </span><span class="macro-nonterminal">$crate::__private::Some</span>((ident, rest)) = cursor.ident() {
-                        <span class="kw">if </span>ident == <span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>) {
+                        <span class="kw">if </span>ident == <span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>) {
                             <span class="kw">return </span><span class="macro-nonterminal">$crate::__private::Ok</span>((<span class="macro-nonterminal">$ident </span>{ span: ident.span() }, rest));
                         }
                     }
-                    <span class="macro-nonterminal">$crate::__private::Err</span>(cursor.error(<span class="macro">concat!</span>(
+                    <span class="macro-nonterminal">$crate::__private::Err</span>(cursor.error(<span class="macro-nonterminal">$</span><span class="macro">crate::__private::concat!</span>(
                         <span class="string">"expected `"</span>,
-                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>),
-                        <span class="string">"`"
-                    </span>)))
+                        <span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>),
+                        <span class="string">"`"</span>,
+                    )))
                 })
             }
         }
@@ -428,7 +438,7 @@
     (<span class="macro-nonterminal">$ident</span>:ident) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::ToTokens </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
             <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::TokenStream2</span>) {
-                <span class="kw">let </span>ident = <span class="macro-nonterminal">$crate::Ident::new</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>), <span class="self">self</span>.span);
+                <span class="kw">let </span>ident = <span class="macro-nonterminal">$crate::Ident::new</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>), <span class="self">self</span>.span);
                 <span class="macro-nonterminal">$crate::__private::TokenStreamExt::append</span>(tokens, ident);
             }
         }
@@ -475,10 +485,14 @@
 </span><span class="macro">macro_rules!</span> impl_extra_traits_for_custom_keyword {
     (<span class="macro-nonterminal">$ident</span>:ident) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::Debug </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::fmt::Result </span>{
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::FmtResult </span>{
                 <span class="macro-nonterminal">$crate::__private::Formatter::write_str</span>(
                     f,
-                    <span class="macro">concat!</span>(<span class="string">"Keyword ["</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>), <span class="string">"]"</span>),
+                    <span class="macro-nonterminal">$</span><span class="macro">crate::__private::concat!</span>(
+                        <span class="string">"Keyword ["</span>,
+                        <span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>),
+                        <span class="string">"]"</span>,
+                    ),
                 )
             }
         }

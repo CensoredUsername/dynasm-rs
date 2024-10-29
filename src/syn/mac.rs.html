@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-1.0.109\src\mac.rs`."><title>mac.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-2.0.79\src\mac.rs`."><title>mac.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -217,21 +217,28 @@
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::error::Result;
+<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::parse::{Parse, ParseStream, Parser};
+<span class="kw">use </span><span class="kw">crate</span>::path::Path;
 <span class="kw">use </span><span class="kw">crate</span>::token::{Brace, Bracket, Paren};
+<span class="kw">use </span>proc_macro2::extra::DelimSpan;
+<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+</span><span class="kw">use </span>proc_macro2::Delimiter;
 <span class="kw">use </span>proc_macro2::TokenStream;
 <span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">use </span>proc_macro2::{Delimiter, Group, Span, TokenTree};
-
-<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::parse::{Parse, ParseStream, Parser, <span class="prelude-ty">Result</span>};
+</span><span class="kw">use </span>proc_macro2::TokenTree;
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A macro invocation: `println!("{}", mac)`.
-    ///
-    /// *This type is available only if Syn is built with the `"derive"` or `"full"`
-    /// feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
     </span><span class="kw">pub struct </span>Macro {
         <span class="kw">pub </span>path: Path,
         <span class="kw">pub </span>bang_token: <span class="macro">Token!</span>[!],
@@ -242,10 +249,7 @@
 
 <span class="macro">ast_enum!</span> {
     <span class="doccomment">/// A grouping token that surrounds a macro body: `m!(...)` or `m!{...}` or `m![...]`.
-    ///
-    /// *This type is available only if Syn is built with the `"derive"` or `"full"`
-    /// feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
     </span><span class="kw">pub enum </span>MacroDelimiter {
         Paren(Paren),
         Brace(Brace),
@@ -253,20 +257,22 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">fn </span>delimiter_span_close(macro_delimiter: <span class="kw-2">&amp;</span>MacroDelimiter) -&gt; Span {
-    <span class="kw">let </span>delimiter = <span class="kw">match </span>macro_delimiter {
-        MacroDelimiter::Paren(<span class="kw">_</span>) =&gt; Delimiter::Parenthesis,
-        MacroDelimiter::Brace(<span class="kw">_</span>) =&gt; Delimiter::Brace,
-        MacroDelimiter::Bracket(<span class="kw">_</span>) =&gt; Delimiter::Bracket,
-    };
-    <span class="kw">let </span><span class="kw-2">mut </span>group = Group::new(delimiter, TokenStream::new());
-    group.set_span(<span class="kw">match </span>macro_delimiter {
-        MacroDelimiter::Paren(token) =&gt; token.span,
-        MacroDelimiter::Brace(token) =&gt; token.span,
-        MacroDelimiter::Bracket(token) =&gt; token.span,
-    });
-    group.span_close()
+<span class="kw">impl </span>MacroDelimiter {
+    <span class="kw">pub fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DelimSpan {
+        <span class="kw">match </span><span class="self">self </span>{
+            MacroDelimiter::Paren(token) =&gt; <span class="kw-2">&amp;</span>token.span,
+            MacroDelimiter::Brace(token) =&gt; <span class="kw-2">&amp;</span>token.span,
+            MacroDelimiter::Bracket(token) =&gt; <span class="kw-2">&amp;</span>token.span,
+        }
+    }
+
+    <span class="attr">#[cfg(all(feature = <span class="string">"full"</span>, any(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_brace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            MacroDelimiter::Brace(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            MacroDelimiter::Paren(<span class="kw">_</span>) | MacroDelimiter::Bracket(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        }
+    }
 }
 
 <span class="kw">impl </span>Macro {
@@ -353,7 +359,7 @@
     /// }
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
     </span><span class="kw">pub fn </span>parse_body&lt;T: Parse&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
         <span class="self">self</span>.parse_body_with(T::parse)
     }
@@ -361,18 +367,18 @@
     <span class="doccomment">/// Parse the tokens within the macro invocation's delimiters using the
     /// given parser.
     </span><span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
     </span><span class="kw">pub fn </span>parse_body_with&lt;F: Parser&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, parser: F) -&gt; <span class="prelude-ty">Result</span>&lt;F::Output&gt; {
-        <span class="kw">let </span>scope = delimiter_span_close(<span class="kw-2">&amp;</span><span class="self">self</span>.delimiter);
+        <span class="kw">let </span>scope = <span class="self">self</span>.delimiter.span().close();
         <span class="kw">crate</span>::parse::parse_scoped(parser, scope, <span class="self">self</span>.tokens.clone())
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">pub fn </span>parse_delimiter(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;(MacroDelimiter, TokenStream)&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_delimiter(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;(MacroDelimiter, TokenStream)&gt; {
     input.step(|cursor| {
         <span class="kw">if let </span><span class="prelude-val">Some</span>((TokenTree::Group(g), rest)) = cursor.token_tree() {
-            <span class="kw">let </span>span = g.span();
+            <span class="kw">let </span>span = g.delim_span();
             <span class="kw">let </span>delimiter = <span class="kw">match </span>g.delimiter() {
                 Delimiter::Parenthesis =&gt; MacroDelimiter::Paren(Paren(span)),
                 Delimiter::Brace =&gt; MacroDelimiter::Brace(Brace(span)),
@@ -389,11 +395,13 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">pub mod </span>parsing {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::parse::{Parse, ParseStream, <span class="prelude-ty">Result</span>};
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>parsing {
+    <span class="kw">use </span><span class="kw">crate</span>::error::Result;
+    <span class="kw">use </span><span class="kw">crate</span>::mac::{parse_delimiter, Macro};
+    <span class="kw">use </span><span class="kw">crate</span>::parse::{Parse, ParseStream};
+    <span class="kw">use </span><span class="kw">crate</span>::path::Path;
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
     </span><span class="kw">impl </span>Parse <span class="kw">for </span>Macro {
         <span class="kw">fn </span>parse(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
             <span class="kw">let </span>tokens;
@@ -413,26 +421,30 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"printing"</span>)]
 </span><span class="kw">mod </span>printing {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>proc_macro2::TokenStream;
+    <span class="kw">use </span><span class="kw">crate</span>::mac::{Macro, MacroDelimiter};
+    <span class="kw">use </span><span class="kw">crate</span>::path;
+    <span class="kw">use </span><span class="kw">crate</span>::path::printing::PathStyle;
+    <span class="kw">use </span><span class="kw">crate</span>::token;
+    <span class="kw">use </span>proc_macro2::{Delimiter, TokenStream};
     <span class="kw">use </span>quote::ToTokens;
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    <span class="kw">impl </span>MacroDelimiter {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>surround(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream, inner: TokenStream) {
+            <span class="kw">let </span>(delim, span) = <span class="kw">match </span><span class="self">self </span>{
+                MacroDelimiter::Paren(paren) =&gt; (Delimiter::Parenthesis, paren.span),
+                MacroDelimiter::Brace(brace) =&gt; (Delimiter::Brace, brace.span),
+                MacroDelimiter::Bracket(bracket) =&gt; (Delimiter::Bracket, bracket.span),
+            };
+            token::printing::delim(delim, span.join(), tokens, inner);
+        }
+    }
+
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
     </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>Macro {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            <span class="self">self</span>.path.to_tokens(tokens);
+            path::printing::print_path(tokens, <span class="kw-2">&amp;</span><span class="self">self</span>.path, PathStyle::Mod);
             <span class="self">self</span>.bang_token.to_tokens(tokens);
-            <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.delimiter {
-                MacroDelimiter::Paren(paren) =&gt; {
-                    paren.surround(tokens, |tokens| <span class="self">self</span>.tokens.to_tokens(tokens));
-                }
-                MacroDelimiter::Brace(brace) =&gt; {
-                    brace.surround(tokens, |tokens| <span class="self">self</span>.tokens.to_tokens(tokens));
-                }
-                MacroDelimiter::Bracket(bracket) =&gt; {
-                    bracket.surround(tokens, |tokens| <span class="self">self</span>.tokens.to_tokens(tokens));
-                }
-            }
+            <span class="self">self</span>.delimiter.surround(tokens, <span class="self">self</span>.tokens.clone());
         }
     }
 }

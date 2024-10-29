@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-1.0.109\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-2.0.79\src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -982,6 +982,40 @@
 <a href="#982" id="982">982</a>
 <a href="#983" id="983">983</a>
 <a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/syn)&amp;ensp;[![crates-io]](https://crates.io/crates/syn)&amp;ensp;[![docs-rs]](crate)
 //!
 //! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github
@@ -1046,7 +1080,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! syn = "1.0"
+//! syn = "2.0"
 //! quote = "1.0"
 //!
 //! [lib]
@@ -1078,9 +1112,8 @@
 //! ```
 //!
 //! The [`heapsize`] example directory shows a complete working implementation
-//! of a derive macro. It works on any Rust compiler 1.31+. The example derives
-//! a `HeapSize` trait which computes an estimate of the amount of heap memory
-//! owned by a value.
+//! of a derive macro. The example derives a `HeapSize` trait which computes an
+//! estimate of the amount of heap memory owned by a value.
 //!
 //! [`heapsize`]: https://github.com/dtolnay/syn/tree/master/examples/heapsize
 //!
@@ -1234,9 +1267,11 @@
 //!   dynamic library libproc_macro from rustc toolchain.
 
 </span><span class="comment">// Syn types in rustdoc of other crates get linked to here.
-</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/syn/1.0.109"</span>)]
-#![cfg_attr(doc_cfg, feature(doc_cfg))]
+</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/syn/2.0.79"</span>)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![deny(unsafe_op_in_unsafe_fn)]
 #![allow(non_camel_case_types)]
+#![cfg_attr(not(check_cfg), allow(unexpected_cfgs))]
 #![allow(
     clippy::bool_to_int_with_if,
     clippy::cast_lossless,
@@ -1244,14 +1279,21 @@
     clippy::cast_possible_wrap,
     clippy::cast_ptr_alignment,
     clippy::default_trait_access,
+    clippy::derivable_impls,
+    clippy::diverging_sub_expression,
     clippy::doc_markdown,
     clippy::expl_impl_clone_on_copy,
     clippy::explicit_auto_deref,
     clippy::if_not_else,
     clippy::inherent_to_string,
+    clippy::into_iter_without_iter,
     clippy::items_after_statements,
     clippy::large_enum_variant,
-    clippy::manual_assert,
+    clippy::let_underscore_untyped, <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/10410
+    </span>clippy::manual_assert,
+    clippy::manual_let_else,
+    clippy::manual_map,
+    clippy::match_like_matches_macro,
     clippy::match_on_vec_items,
     clippy::match_same_arms,
     clippy::match_wildcard_for_single_variants, <span class="comment">// clippy bug: https://github.com/rust-lang/rust-clippy/issues/6984
@@ -1261,28 +1303,28 @@
     clippy::must_use_candidate,
     clippy::needless_doctest_main,
     clippy::needless_pass_by_value,
+    clippy::needless_update,
     clippy::never_loop,
+    clippy::range_plus_one,
     clippy::redundant_else,
     clippy::return_self_not_must_use,
     clippy::similar_names,
     clippy::single_match_else,
+    clippy::struct_excessive_bools,
     clippy::too_many_arguments,
     clippy::too_many_lines,
     clippy::trivially_copy_pass_by_ref,
+    clippy::unconditional_recursion, <span class="comment">// https://github.com/rust-lang/rust-clippy/issues/12133
+    </span>clippy::uninhabited_references,
+    clippy::uninlined_format_args,
+    clippy::unnecessary_box_returns,
     clippy::unnecessary_unwrap,
     clippy::used_underscore_binding,
-    clippy::wildcard_imports
+    clippy::wildcard_imports,
 )]
 
-#[cfg(all(
-    not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"wasi"</span>))),
-    feature = <span class="string">"proc-macro"
-</span>))]
+#[cfg(feature = <span class="string">"proc-macro"</span>)]
 </span><span class="kw">extern crate </span>proc_macro;
-<span class="kw">extern crate </span>proc_macro2;
-
-<span class="attr">#[cfg(feature = <span class="string">"printing"</span>)]
-</span><span class="kw">extern crate </span>quote;
 
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>macros;
@@ -1294,155 +1336,312 @@
 <span class="attr">#[macro_use]
 </span><span class="kw">pub mod </span>token;
 
-<span class="kw">mod </span>ident;
-<span class="kw">pub use </span><span class="kw">crate</span>::ident::Ident;
-
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 </span><span class="kw">mod </span>attr;
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::attr::{
-    AttrStyle, Attribute, AttributeArgs, Meta, MetaList, MetaNameValue, NestedMeta,
-};
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::attr::{AttrStyle, Attribute, Meta, MetaList, MetaNameValue};
 
 <span class="kw">mod </span>bigint;
+
+<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+</span><span class="kw">pub mod </span>buffer;
+
+<span class="attr">#[cfg(any(
+    all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"full"</span>),
+    all(feature = <span class="string">"printing"</span>, any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>)),
+))]
+</span><span class="kw">mod </span>classify;
+
+<span class="kw">mod </span>custom_keyword;
+
+<span class="kw">mod </span>custom_punctuation;
 
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 </span><span class="kw">mod </span>data;
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::data::{
-    Field, Fields, FieldsNamed, FieldsUnnamed, Variant, VisCrate, VisPublic, VisRestricted,
-    Visibility,
-};
-
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">mod </span>expr;
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::expr::{
-    Arm, FieldValue, GenericMethodArgument, Label, MethodTurbofish, RangeLimits,
-};
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::expr::{
-    Expr, ExprArray, ExprAssign, ExprAssignOp, ExprAsync, ExprAwait, ExprBinary, ExprBlock,
-    ExprBox, ExprBreak, ExprCall, ExprCast, ExprClosure, ExprContinue, ExprField, ExprForLoop,
-    ExprGroup, ExprIf, ExprIndex, ExprLet, ExprLit, ExprLoop, ExprMacro, ExprMatch, ExprMethodCall,
-    ExprParen, ExprPath, ExprRange, ExprReference, ExprRepeat, ExprReturn, ExprStruct, ExprTry,
-    ExprTryBlock, ExprTuple, ExprType, ExprUnary, ExprUnsafe, ExprWhile, ExprYield, Index, Member,
-};
-
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">mod </span>generics;
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::generics::{
-    BoundLifetimes, ConstParam, GenericParam, Generics, LifetimeDef, PredicateEq,
-    PredicateLifetime, PredicateType, TraitBound, TraitBoundModifier, TypeParam, TypeParamBound,
-    WhereClause, WherePredicate,
-};
-<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"printing"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::generics::{ImplGenerics, Turbofish, TypeGenerics};
-
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">mod </span>item;
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::item::{
-    FnArg, ForeignItem, ForeignItemFn, ForeignItemMacro, ForeignItemStatic, ForeignItemType,
-    ImplItem, ImplItemConst, ImplItemMacro, ImplItemMethod, ImplItemType, Item, ItemConst,
-    ItemEnum, ItemExternCrate, ItemFn, ItemForeignMod, ItemImpl, ItemMacro, ItemMacro2, ItemMod,
-    ItemStatic, ItemStruct, ItemTrait, ItemTraitAlias, ItemType, ItemUnion, ItemUse, Receiver,
-    Signature, TraitItem, TraitItemConst, TraitItemMacro, TraitItemMethod, TraitItemType, UseGlob,
-    UseGroup, UseName, UsePath, UseRename, UseTree,
-};
-
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">mod </span>file;
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::file::File;
-
-<span class="kw">mod </span>lifetime;
-<span class="kw">pub use </span><span class="kw">crate</span>::lifetime::Lifetime;
-
-<span class="kw">mod </span>lit;
-<span class="kw">pub use </span><span class="kw">crate</span>::lit::{
-    Lit, LitBool, LitByte, LitByteStr, LitChar, LitFloat, LitInt, LitStr, StrStyle,
-};
-
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">mod </span>mac;
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::mac::{Macro, MacroDelimiter};
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::data::{Field, Fields, FieldsNamed, FieldsUnnamed, Variant};
 
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 </span><span class="kw">mod </span>derive;
 <span class="attr">#[cfg(feature = <span class="string">"derive"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"derive"</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::derive::{Data, DataEnum, DataStruct, DataUnion, DeriveInput};
+
+<span class="kw">mod </span>drops;
+
+<span class="kw">mod </span>error;
+<span class="kw">pub use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
+
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+</span><span class="kw">mod </span>expr;
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::expr::{Arm, Label, RangeLimits};
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::expr::{
+    Expr, ExprBinary, ExprCall, ExprCast, ExprField, ExprIndex, ExprLit, ExprMacro, ExprMethodCall,
+    ExprParen, ExprPath, ExprReference, ExprStruct, ExprUnary, FieldValue, Index, Member,
+};
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::expr::{
+    ExprArray, ExprAssign, ExprAsync, ExprAwait, ExprBlock, ExprBreak, ExprClosure, ExprConst,
+    ExprContinue, ExprForLoop, ExprGroup, ExprIf, ExprInfer, ExprLet, ExprLoop, ExprMatch,
+    ExprRange, ExprRepeat, ExprReturn, ExprTry, ExprTryBlock, ExprTuple, ExprUnsafe, ExprWhile,
+    ExprYield,
+};
+
+<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+</span><span class="kw">pub mod </span>ext;
+
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+</span><span class="kw">mod </span>file;
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::file::File;
+
+<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"printing"</span>))]
+</span><span class="kw">mod </span>fixup;
+
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+</span><span class="kw">mod </span>generics;
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::generics::{
+    BoundLifetimes, ConstParam, GenericParam, Generics, LifetimeParam, PredicateLifetime,
+    PredicateType, TraitBound, TraitBoundModifier, TypeParam, TypeParamBound, WhereClause,
+    WherePredicate,
+};
+<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"printing"</span>))]
+#[cfg_attr(
+    docsrs,
+    doc(cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"printing"</span>)))
+)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::generics::{ImplGenerics, Turbofish, TypeGenerics};
+
+<span class="kw">mod </span>ident;
+<span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::ident::Ident;
+
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+</span><span class="kw">mod </span>item;
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::item::{
+    FnArg, ForeignItem, ForeignItemFn, ForeignItemMacro, ForeignItemStatic, ForeignItemType,
+    ImplItem, ImplItemConst, ImplItemFn, ImplItemMacro, ImplItemType, ImplRestriction, Item,
+    ItemConst, ItemEnum, ItemExternCrate, ItemFn, ItemForeignMod, ItemImpl, ItemMacro, ItemMod,
+    ItemStatic, ItemStruct, ItemTrait, ItemTraitAlias, ItemType, ItemUnion, ItemUse, Receiver,
+    Signature, StaticMutability, TraitItem, TraitItemConst, TraitItemFn, TraitItemMacro,
+    TraitItemType, UseGlob, UseGroup, UseName, UsePath, UseRename, UseTree, Variadic,
+};
+
+<span class="kw">mod </span>lifetime;
+<span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::lifetime::Lifetime;
+
+<span class="kw">mod </span>lit;
+<span class="attr">#[doc(hidden)] </span><span class="comment">// https://github.com/dtolnay/syn/issues/1566
+</span><span class="kw">pub use </span><span class="kw">crate</span>::lit::StrStyle;
+<span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::lit::{
+    Lit, LitBool, LitByte, LitByteStr, LitCStr, LitChar, LitFloat, LitInt, LitStr,
+};
+
+<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+</span><span class="kw">mod </span>lookahead;
+
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+</span><span class="kw">mod </span>mac;
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::mac::{Macro, MacroDelimiter};
+
+<span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>)))]
+#[cfg_attr(
+    docsrs,
+    doc(cfg(all(feature = <span class="string">"parsing"</span>, any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))
+)]
+</span><span class="kw">pub mod </span>meta;
 
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 </span><span class="kw">mod </span>op;
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::op::{BinOp, UnOp};
 
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">mod </span>stmt;
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::stmt::{Block, Local, Stmt};
+<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+</span><span class="kw">pub mod </span>parse;
 
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">mod </span>ty;
-<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::ty::{
-    Abi, BareFnArg, ReturnType, Type, TypeArray, TypeBareFn, TypeGroup, TypeImplTrait, TypeInfer,
-    TypeMacro, TypeNever, TypeParen, TypePath, TypePtr, TypeReference, TypeSlice, TypeTraitObject,
-    TypeTuple, Variadic,
-};
+<span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"proc-macro"</span>))]
+</span><span class="kw">mod </span>parse_macro_input;
+
+<span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>))]
+</span><span class="kw">mod </span>parse_quote;
 
 <span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
 </span><span class="kw">mod </span>pat;
 <span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::pat::{
-    FieldPat, Pat, PatBox, PatIdent, PatLit, PatMacro, PatOr, PatPath, PatRange, PatReference,
-    PatRest, PatSlice, PatStruct, PatTuple, PatTupleStruct, PatType, PatWild,
+    FieldPat, Pat, PatConst, PatIdent, PatLit, PatMacro, PatOr, PatParen, PatPath, PatRange,
+    PatReference, PatRest, PatSlice, PatStruct, PatTuple, PatTupleStruct, PatType, PatWild,
 };
 
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 </span><span class="kw">mod </span>path;
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::path::{
-    AngleBracketedGenericArguments, Binding, Constraint, GenericArgument,
+    AngleBracketedGenericArguments, AssocConst, AssocType, Constraint, GenericArgument,
     ParenthesizedGenericArguments, Path, PathArguments, PathSegment, QSelf,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
-</span><span class="kw">pub mod </span>buffer;
-<span class="kw">mod </span>drops;
-<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
-</span><span class="kw">pub mod </span>ext;
+<span class="attr">#[cfg(all(
+    any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>),
+    any(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>)
+))]
+</span><span class="kw">mod </span>precedence;
+
+<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"printing"</span>))]
+</span><span class="kw">mod </span>print;
+
 <span class="kw">pub mod </span>punctuated;
+
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+</span><span class="kw">mod </span>restriction;
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::restriction::{FieldMutability, VisRestricted, Visibility};
+
+<span class="kw">mod </span>sealed;
+
+<span class="kw">mod </span>span;
+
+<span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>))))]
+</span><span class="kw">pub mod </span>spanned;
+
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+</span><span class="kw">mod </span>stmt;
+<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::stmt::{Block, Local, LocalInit, Stmt, StmtMacro};
+
+<span class="kw">mod </span>thread;
+
 <span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"extra-traits"</span>))]
 </span><span class="kw">mod </span>tt;
 
-<span class="comment">// Not public API except the `parse_quote!` macro.
-</span><span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-#[doc(hidden)]
-</span><span class="kw">pub mod </span>parse_quote;
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+</span><span class="kw">mod </span>ty;
+<span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::ty::{
+    Abi, BareFnArg, BareVariadic, ReturnType, Type, TypeArray, TypeBareFn, TypeGroup,
+    TypeImplTrait, TypeInfer, TypeMacro, TypeNever, TypeParen, TypePath, TypePtr, TypeReference,
+    TypeSlice, TypeTraitObject, TypeTuple,
+};
 
-<span class="comment">// Not public API except the `parse_macro_input!` macro.
-</span><span class="attr">#[cfg(all(
-    not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"wasi"</span>))),
-    feature = <span class="string">"parsing"</span>,
-    feature = <span class="string">"proc-macro"
-</span>))]
-#[doc(hidden)]
-</span><span class="kw">pub mod </span>parse_macro_input;
-
-<span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>))]
-#[cfg_attr(doc_cfg, doc(cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"printing"</span>))))]
-</span><span class="kw">pub mod </span>spanned;
+<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"parsing"</span>))]
+</span><span class="kw">mod </span>verbatim;
 
 <span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"full"</span>))]
 </span><span class="kw">mod </span>whitespace;
 
-<span class="kw">mod </span>gen {
+<span class="attr">#[rustfmt::skip] </span><span class="comment">// https://github.com/rust-lang/rustfmt/issues/6176
+</span><span class="kw">mod </span>gen {
+    <span class="doccomment">/// Syntax tree traversal to transform the nodes of an owned syntax tree.
+    ///
+    /// Each method of the [`Fold`] trait is a hook that can be overridden to
+    /// customize the behavior when transforming the corresponding type of node.
+    /// By default, every method recursively visits the substructure of the
+    /// input by invoking the right visitor method of each of its fields.
+    ///
+    /// [`Fold`]: fold::Fold
+    ///
+    /// ```
+    /// # use syn::{Attribute, BinOp, Expr, ExprBinary};
+    /// #
+    /// pub trait Fold {
+    ///     /* ... */
+    ///
+    ///     fn fold_expr_binary(&amp;mut self, node: ExprBinary) -&gt; ExprBinary {
+    ///         fold_expr_binary(self, node)
+    ///     }
+    ///
+    ///     /* ... */
+    ///     # fn fold_attribute(&amp;mut self, node: Attribute) -&gt; Attribute;
+    ///     # fn fold_expr(&amp;mut self, node: Expr) -&gt; Expr;
+    ///     # fn fold_bin_op(&amp;mut self, node: BinOp) -&gt; BinOp;
+    /// }
+    ///
+    /// pub fn fold_expr_binary&lt;V&gt;(v: &amp;mut V, node: ExprBinary) -&gt; ExprBinary
+    /// where
+    ///     V: Fold + ?Sized,
+    /// {
+    ///     ExprBinary {
+    ///         attrs: node
+    ///             .attrs
+    ///             .into_iter()
+    ///             .map(|attr| v.fold_attribute(attr))
+    ///             .collect(),
+    ///         left: Box::new(v.fold_expr(*node.left)),
+    ///         op: v.fold_bin_op(node.op),
+    ///         right: Box::new(v.fold_expr(*node.right)),
+    ///     }
+    /// }
+    ///
+    /// /* ... */
+    /// ```
+    ///
+    /// &lt;br&gt;
+    ///
+    /// # Example
+    ///
+    /// This fold inserts parentheses to fully parenthesizes any expression.
+    ///
+    /// ```
+    /// // [dependencies]
+    /// // quote = "1.0"
+    /// // syn = { version = "2.0", features = ["fold", "full"] }
+    ///
+    /// use quote::quote;
+    /// use syn::fold::{fold_expr, Fold};
+    /// use syn::{token, Expr, ExprParen};
+    ///
+    /// struct ParenthesizeEveryExpr;
+    ///
+    /// impl Fold for ParenthesizeEveryExpr {
+    ///     fn fold_expr(&amp;mut self, expr: Expr) -&gt; Expr {
+    ///         Expr::Paren(ExprParen {
+    ///             attrs: Vec::new(),
+    ///             expr: Box::new(fold_expr(self, expr)),
+    ///             paren_token: token::Paren::default(),
+    ///         })
+    ///     }
+    /// }
+    ///
+    /// fn main() {
+    ///     let code = quote! { a() + b(1) * c.d };
+    ///     let expr: Expr = syn::parse2(code).unwrap();
+    ///     let parenthesized = ParenthesizeEveryExpr.fold_expr(expr);
+    ///     println!("{}", quote!(#parenthesized));
+    ///
+    ///     // Output: (((a)()) + (((b)((1))) * ((c).d)))
+    /// }
+    /// ```
+    </span><span class="attr">#[cfg(feature = <span class="string">"fold"</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"fold"</span>)))]
+    #[rustfmt::skip]
+    </span><span class="kw">pub mod </span>fold;
+
     <span class="doccomment">/// Syntax tree traversal to walk a shared borrow of a syntax tree.
     ///
     /// Each method of the [`Visit`] trait is a hook that can be overridden to
@@ -1483,8 +1682,6 @@
     /// /* ... */
     /// ```
     ///
-    /// *This module is available only if Syn is built with the `"visit"` feature.*
-    ///
     /// &lt;br&gt;
     ///
     /// # Example
@@ -1495,7 +1692,7 @@
     /// ```
     /// // [dependencies]
     /// // quote = "1.0"
-    /// // syn = { version = "1.0", features = ["full", "visit"] }
+    /// // syn = { version = "2.0", features = ["full", "visit"] }
     ///
     /// use quote::quote;
     /// use syn::visit::{self, Visit};
@@ -1560,7 +1757,7 @@
     /// }
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">"visit"</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"visit"</span>)))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"visit"</span>)))]
     #[rustfmt::skip]
     </span><span class="kw">pub mod </span>visit;
 
@@ -1605,9 +1802,6 @@
     /// /* ... */
     /// ```
     ///
-    /// *This module is available only if Syn is built with the `"visit-mut"`
-    /// feature.*
-    ///
     /// &lt;br&gt;
     ///
     /// # Example
@@ -1618,7 +1812,7 @@
     /// ```
     /// // [dependencies]
     /// // quote = "1.0"
-    /// // syn = { version = "1.0", features = ["full", "visit-mut"] }
+    /// // syn = { version = "2.0", features = ["full", "visit-mut"] }
     ///
     /// use quote::quote;
     /// use syn::visit_mut::{self, VisitMut};
@@ -1657,100 +1851,17 @@
     /// }
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">"visit-mut"</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"visit-mut"</span>)))]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"visit-mut"</span>)))]
     #[rustfmt::skip]
     </span><span class="kw">pub mod </span>visit_mut;
-
-    <span class="doccomment">/// Syntax tree traversal to transform the nodes of an owned syntax tree.
-    ///
-    /// Each method of the [`Fold`] trait is a hook that can be overridden to
-    /// customize the behavior when transforming the corresponding type of node.
-    /// By default, every method recursively visits the substructure of the
-    /// input by invoking the right visitor method of each of its fields.
-    ///
-    /// [`Fold`]: fold::Fold
-    ///
-    /// ```
-    /// # use syn::{Attribute, BinOp, Expr, ExprBinary};
-    /// #
-    /// pub trait Fold {
-    ///     /* ... */
-    ///
-    ///     fn fold_expr_binary(&amp;mut self, node: ExprBinary) -&gt; ExprBinary {
-    ///         fold_expr_binary(self, node)
-    ///     }
-    ///
-    ///     /* ... */
-    ///     # fn fold_attribute(&amp;mut self, node: Attribute) -&gt; Attribute;
-    ///     # fn fold_expr(&amp;mut self, node: Expr) -&gt; Expr;
-    ///     # fn fold_bin_op(&amp;mut self, node: BinOp) -&gt; BinOp;
-    /// }
-    ///
-    /// pub fn fold_expr_binary&lt;V&gt;(v: &amp;mut V, node: ExprBinary) -&gt; ExprBinary
-    /// where
-    ///     V: Fold + ?Sized,
-    /// {
-    ///     ExprBinary {
-    ///         attrs: node
-    ///             .attrs
-    ///             .into_iter()
-    ///             .map(|attr| v.fold_attribute(attr))
-    ///             .collect(),
-    ///         left: Box::new(v.fold_expr(*node.left)),
-    ///         op: v.fold_bin_op(node.op),
-    ///         right: Box::new(v.fold_expr(*node.right)),
-    ///     }
-    /// }
-    ///
-    /// /* ... */
-    /// ```
-    ///
-    /// *This module is available only if Syn is built with the `"fold"` feature.*
-    ///
-    /// &lt;br&gt;
-    ///
-    /// # Example
-    ///
-    /// This fold inserts parentheses to fully parenthesizes any expression.
-    ///
-    /// ```
-    /// // [dependencies]
-    /// // quote = "1.0"
-    /// // syn = { version = "1.0", features = ["fold", "full"] }
-    ///
-    /// use quote::quote;
-    /// use syn::fold::{fold_expr, Fold};
-    /// use syn::{token, Expr, ExprParen};
-    ///
-    /// struct ParenthesizeEveryExpr;
-    ///
-    /// impl Fold for ParenthesizeEveryExpr {
-    ///     fn fold_expr(&amp;mut self, expr: Expr) -&gt; Expr {
-    ///         Expr::Paren(ExprParen {
-    ///             attrs: Vec::new(),
-    ///             expr: Box::new(fold_expr(self, expr)),
-    ///             paren_token: token::Paren::default(),
-    ///         })
-    ///     }
-    /// }
-    ///
-    /// fn main() {
-    ///     let code = quote! { a() + b(1) * c.d };
-    ///     let expr: Expr = syn::parse2(code).unwrap();
-    ///     let parenthesized = ParenthesizeEveryExpr.fold_expr(expr);
-    ///     println!("{}", quote!(#parenthesized));
-    ///
-    ///     // Output: (((a)()) + (((b)((1))) * ((c).d)))
-    /// }
-    /// ```
-    </span><span class="attr">#[cfg(feature = <span class="string">"fold"</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"fold"</span>)))]
-    #[rustfmt::skip]
-    </span><span class="kw">pub mod </span>fold;
 
     <span class="attr">#[cfg(feature = <span class="string">"clone-impls"</span>)]
     #[rustfmt::skip]
     </span><span class="kw">mod </span>clone;
+
+    <span class="attr">#[cfg(feature = <span class="string">"extra-traits"</span>)]
+    #[rustfmt::skip]
+    </span><span class="kw">mod </span>debug;
 
     <span class="attr">#[cfg(feature = <span class="string">"extra-traits"</span>)]
     #[rustfmt::skip]
@@ -1759,48 +1870,24 @@
     <span class="attr">#[cfg(feature = <span class="string">"extra-traits"</span>)]
     #[rustfmt::skip]
     </span><span class="kw">mod </span>hash;
-
-    <span class="attr">#[cfg(feature = <span class="string">"extra-traits"</span>)]
-    #[rustfmt::skip]
-    </span><span class="kw">mod </span>debug;
-
-    <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
-    #[path = <span class="string">"../gen_helper.rs"</span>]
-    </span><span class="kw">mod </span>helper;
 }
-<span class="kw">pub use </span><span class="kw">crate</span>::gen::<span class="kw-2">*</span>;
+
+<span class="attr">#[cfg(feature = <span class="string">"fold"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"fold"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::gen::fold;
+
+<span class="attr">#[cfg(feature = <span class="string">"visit"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"visit"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::gen::visit;
+
+<span class="attr">#[cfg(feature = <span class="string">"visit-mut"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"visit-mut"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::gen::visit_mut;
 
 <span class="comment">// Not public API.
 </span><span class="attr">#[doc(hidden)]
 #[path = <span class="string">"export.rs"</span>]
 </span><span class="kw">pub mod </span>__private;
-
-<span class="kw">mod </span>custom_keyword;
-<span class="kw">mod </span>custom_punctuation;
-<span class="kw">mod </span>sealed;
-<span class="kw">mod </span>span;
-<span class="kw">mod </span>thread;
-
-<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">mod </span>lookahead;
-
-<span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
-</span><span class="kw">pub mod </span>parse;
-
-<span class="attr">#[cfg(feature = <span class="string">"full"</span>)]
-</span><span class="kw">mod </span>reserved;
-
-<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"parsing"</span>))]
-</span><span class="kw">mod </span>verbatim;
-
-<span class="attr">#[cfg(all(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>), feature = <span class="string">"printing"</span>))]
-</span><span class="kw">mod </span>print;
-
-<span class="comment">////////////////////////////////////////////////////////////////////////////////
-
-</span><span class="kw">mod </span>error;
-<span class="kw">pub use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
 
 <span class="doccomment">/// Parse tokens of source code into the chosen syntax tree node.
 ///
@@ -1814,9 +1901,6 @@
 /// `proc_macro2::TokenStream`, use [`syn::parse2`] instead.
 ///
 /// [`syn::parse2`]: parse2
-///
-/// *This function is available only if Syn is built with both the `"parsing"` and
-/// `"proc-macro"` features.*
 ///
 /// # Examples
 ///
@@ -1843,12 +1927,8 @@
 ///     expanded.into()
 /// }
 /// ```
-</span><span class="attr">#[cfg(all(
-    not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"wasi"</span>))),
-    feature = <span class="string">"parsing"</span>,
-    feature = <span class="string">"proc-macro"
-</span>))]
-#[cfg_attr(doc_cfg, doc(cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"proc-macro"</span>))))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"proc-macro"</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"proc-macro"</span>))))]
 </span><span class="kw">pub fn </span>parse&lt;T: parse::Parse&gt;(tokens: proc_macro::TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
     parse::Parser::parse(T::parse, tokens)
 }
@@ -1865,17 +1945,13 @@
 /// instead.
 ///
 /// [`syn::parse`]: parse()
-///
-/// *This function is available only if Syn is built with the `"parsing"` feature.*
 </span><span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
 </span><span class="kw">pub fn </span>parse2&lt;T: parse::Parse&gt;(tokens: proc_macro2::TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
     parse::Parser::parse2(T::parse, tokens)
 }
 
 <span class="doccomment">/// Parse a string of Rust code into the chosen syntax tree node.
-///
-/// *This function is available only if Syn is built with the `"parsing"` feature.*
 ///
 /// # Hygiene
 ///
@@ -1897,14 +1973,12 @@
 /// # run().unwrap();
 /// ```
 </span><span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
 </span><span class="kw">pub fn </span>parse_str&lt;T: parse::Parse&gt;(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
     parse::Parser::parse_str(T::parse, s)
 }
 
-<span class="comment">// FIXME the name parse_file makes it sound like you might pass in a path to a
-// file, rather than the content.
-</span><span class="doccomment">/// Parse the content of a file of Rust code.
+<span class="doccomment">/// Parse the content of a file of Rust code.
 ///
 /// This is different from `syn::parse_str::&lt;File&gt;(content)` in two ways:
 ///
@@ -1913,21 +1987,15 @@
 ///
 /// If present, either of these would be an error using `from_str`.
 ///
-/// *This function is available only if Syn is built with the `"parsing"` and
-/// `"full"` features.*
-///
 /// # Examples
 ///
 /// ```no_run
 /// use std::error::Error;
-/// use std::fs::File;
+/// use std::fs;
 /// use std::io::Read;
 ///
-/// fn run() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {
-///     let mut file = File::open("path/to/code.rs")?;
-///     let mut content = String::new();
-///     file.read_to_string(&amp;mut content)?;
-///
+/// fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+///     let content = fs::read_to_string("path/to/code.rs")?;
 ///     let ast = syn::parse_file(&amp;content)?;
 ///     if let Some(shebang) = ast.shebang {
 ///         println!("{}", shebang);
@@ -1940,7 +2008,7 @@
 /// # run().unwrap();
 /// ```
 </span><span class="attr">#[cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"full"</span>))]
-#[cfg_attr(doc_cfg, doc(cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"full"</span>))))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">"parsing"</span>, feature = <span class="string">"full"</span>))))]
 </span><span class="kw">pub fn </span>parse_file(<span class="kw-2">mut </span>content: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;File&gt; {
     <span class="comment">// Strip the BOM if it is present
     </span><span class="kw">const </span>BOM: <span class="kw-2">&amp;</span>str = <span class="string">"\u{feff}"</span>;

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\itertools-0.5.10\src\size_hint.rs`."><title>size_hint.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\itertools-0.13.0\src\size_hint.rs`."><title>size_hint.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -92,20 +92,18 @@
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Arithmetic on **Iterator** *.size_hint()* values.
+</pre></div><pre class="rust"><code><span class="doccomment">//! Arithmetic on `Iterator.size_hint()` values.
 //!
 
-</span><span class="kw">use </span>std::usize;
-<span class="kw">use </span>std::cmp;
+</span><span class="kw">use </span>std::cmp;
 
-<span class="doccomment">/// **SizeHint** is the return type of **Iterator::size_hint()**.
+<span class="doccomment">/// `SizeHint` is the return type of `Iterator::size_hint()`.
 </span><span class="kw">pub type </span>SizeHint = (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;);
 
-<span class="doccomment">/// Add **SizeHint** correctly.
+<span class="doccomment">/// Add `SizeHint` correctly.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>add(a: SizeHint, b: SizeHint) -&gt; SizeHint {
-    <span class="kw">let </span>min = a.<span class="number">0</span>.checked_add(b.<span class="number">0</span>).unwrap_or(usize::MAX);
+    <span class="kw">let </span>min = a.<span class="number">0</span>.saturating_add(b.<span class="number">0</span>);
     <span class="kw">let </span>max = <span class="kw">match </span>(a.<span class="number">1</span>, b.<span class="number">1</span>) {
         (<span class="prelude-val">Some</span>(x), <span class="prelude-val">Some</span>(y)) =&gt; x.checked_add(y),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
@@ -114,7 +112,7 @@
     (min, max)
 }
 
-<span class="doccomment">/// Add **x** correctly to a **SizeHint**.
+<span class="doccomment">/// Add `x` correctly to a `SizeHint`.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>add_scalar(sh: SizeHint, x: usize) -&gt; SizeHint {
     <span class="kw">let </span>(<span class="kw-2">mut </span>low, <span class="kw-2">mut </span>hi) = sh;
@@ -123,9 +121,8 @@
     (low, hi)
 }
 
-<span class="doccomment">/// Sbb **x** correctly to a **SizeHint**.
+<span class="doccomment">/// Subtract `x` correctly from a `SizeHint`.
 </span><span class="attr">#[inline]
-#[allow(dead_code)]
 </span><span class="kw">pub fn </span>sub_scalar(sh: SizeHint, x: usize) -&gt; SizeHint {
     <span class="kw">let </span>(<span class="kw-2">mut </span>low, <span class="kw-2">mut </span>hi) = sh;
     low = low.saturating_sub(x);
@@ -133,30 +130,24 @@
     (low, hi)
 }
 
-
-<span class="doccomment">/// Multiply **SizeHint** correctly
-///
-/// ```ignore
-/// use std::usize;
-/// use itertools::size_hint;
-///
-/// assert_eq!(size_hint::mul((3, Some(4)), (3, Some(4))),
-///            (9, Some(16)));
-///
-/// assert_eq!(size_hint::mul((3, Some(4)), (usize::MAX, None)),
-///            (usize::MAX, None));
-///
-/// assert_eq!(size_hint::mul((3, None), (0, Some(0))),
-///            (0, Some(0)));
-/// ```
+<span class="doccomment">/// Multiply `SizeHint` correctly
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>mul(a: SizeHint, b: SizeHint) -&gt; SizeHint {
-    <span class="kw">let </span>low = a.<span class="number">0</span>.checked_mul(b.<span class="number">0</span>).unwrap_or(usize::MAX);
+    <span class="kw">let </span>low = a.<span class="number">0</span>.saturating_mul(b.<span class="number">0</span>);
     <span class="kw">let </span>hi = <span class="kw">match </span>(a.<span class="number">1</span>, b.<span class="number">1</span>) {
         (<span class="prelude-val">Some</span>(x), <span class="prelude-val">Some</span>(y)) =&gt; x.checked_mul(y),
         (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
+    (low, hi)
+}
+
+<span class="doccomment">/// Multiply `x` correctly with a `SizeHint`.
+</span><span class="attr">#[inline]
+</span><span class="kw">pub fn </span>mul_scalar(sh: SizeHint, x: usize) -&gt; SizeHint {
+    <span class="kw">let </span>(<span class="kw-2">mut </span>low, <span class="kw-2">mut </span>hi) = sh;
+    low = low.saturating_mul(x);
+    hi = hi.and_then(|elt| elt.checked_mul(x));
     (low, hi)
 }
 
@@ -187,5 +178,12 @@
         <span class="kw">_ </span>=&gt; a_upper.or(b_upper),
     };
     (lower, upper)
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>mul_size_hints() {
+    <span class="macro">assert_eq!</span>(mul((<span class="number">3</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)), (<span class="number">3</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>))), (<span class="number">9</span>, <span class="prelude-val">Some</span>(<span class="number">16</span>)));
+    <span class="macro">assert_eq!</span>(mul((<span class="number">3</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)), (usize::MAX, <span class="prelude-val">None</span>)), (usize::MAX, <span class="prelude-val">None</span>));
+    <span class="macro">assert_eq!</span>(mul((<span class="number">3</span>, <span class="prelude-val">None</span>), (<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>))), (<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)));
 }
 </code></pre></div></section></main></body></html>

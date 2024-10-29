@@ -278,6 +278,7 @@
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
 
 <span class="kw">use </span>itertools::Itertools;
@@ -357,10 +358,11 @@
 
         <span class="comment">// literal pool
         </span><span class="macro">dynasm!</span>(ops
-            ; -&gt;getchar:
-            ; .qword State::getchar <span class="kw">as _
+            ; .align <span class="number">8
+            </span>; -&gt;getchar:
+            ; .u64 State::getchar <span class="kw">as _
             </span>; -&gt;putchar:
-            ; .qword State::putchar <span class="kw">as _
+            ; .u64 State::putchar <span class="kw">as _
         </span>);
 
         <span class="kw">let </span>start = <span class="macro">prologue!</span>(ops);

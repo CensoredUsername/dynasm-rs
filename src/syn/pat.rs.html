@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-1.0.109\src\pat.rs`."><title>pat.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-2.0.79\src\pat.rs`."><title>pat.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -925,34 +925,67 @@
 <a href="#925" id="925">925</a>
 <a href="#926" id="926">926</a>
 <a href="#927" id="927">927</a>
-</pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::attr::Attribute;
+<span class="kw">use </span><span class="kw">crate</span>::expr::Member;
+<span class="kw">use </span><span class="kw">crate</span>::ident::Ident;
+<span class="kw">use </span><span class="kw">crate</span>::path::{Path, QSelf};
 <span class="kw">use </span><span class="kw">crate</span>::punctuated::Punctuated;
+<span class="kw">use </span><span class="kw">crate</span>::token;
+<span class="kw">use </span><span class="kw">crate</span>::ty::Type;
 <span class="kw">use </span>proc_macro2::TokenStream;
+
+<span class="kw">pub use </span><span class="kw">crate</span>::expr::{
+    ExprConst <span class="kw">as </span>PatConst, ExprLit <span class="kw">as </span>PatLit, ExprMacro <span class="kw">as </span>PatMacro, ExprPath <span class="kw">as </span>PatPath,
+    ExprRange <span class="kw">as </span>PatRange,
+};
 
 <span class="macro">ast_enum_of_structs!</span> {
     <span class="doccomment">/// A pattern in a local binding, function signature, match expression, or
     /// various other places.
     ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    ///
     /// # Syntax tree enum
     ///
     /// This type is a [syntax tree enum].
     ///
-    /// [syntax tree enum]: Expr#syntax-tree-enums
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
-    #[cfg_attr(not(syn_no_non_exhaustive), non_exhaustive)]
+    /// [syntax tree enum]: crate::expr::Expr#syntax-tree-enums
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+    #[non_exhaustive]
     </span><span class="kw">pub enum </span>Pat {
-        <span class="doccomment">/// A box pattern: `box v`.
-        </span>Box(PatBox),
+        <span class="doccomment">/// A const block: `const { ... }`.
+        </span>Const(PatConst),
 
         <span class="doccomment">/// A pattern that binds a new variable: `ref mut binding @ SUBPATTERN`.
         </span>Ident(PatIdent),
 
         <span class="doccomment">/// A literal pattern: `0`.
-        ///
-        /// This holds an `Expr` rather than a `Lit` because negative numbers
-        /// are represented as an `Expr::Unary`.
         </span>Lit(PatLit),
 
         <span class="doccomment">/// A macro in pattern position.
@@ -960,6 +993,9 @@
 
         <span class="doccomment">/// A pattern that matches any one of a set of cases.
         </span>Or(PatOr),
+
+        <span class="doccomment">/// A parenthesized pattern: `(A | B)`.
+        </span>Paren(PatParen),
 
         <span class="doccomment">/// A path pattern like `Color::Red`, optionally qualified with a
         /// self-type.
@@ -976,7 +1012,7 @@
         <span class="doccomment">/// A reference pattern: `&amp;mut var`.
         </span>Reference(PatReference),
 
-        <span class="doccomment">/// The dots in a tuple or slice pattern: `[0, 1, ..]`
+        <span class="doccomment">/// The dots in a tuple or slice pattern: `[0, 1, ..]`.
         </span>Rest(PatRest),
 
         <span class="doccomment">/// A dynamically sized slice pattern: `[a, b, ref i @ .., y, z]`.
@@ -1000,17 +1036,16 @@
         <span class="doccomment">/// A pattern that matches any value: `_`.
         </span>Wild(PatWild),
 
-        <span class="comment">// Not public API.
-        //
-        // For testing exhaustiveness in downstream code, use the following idiom:
+        <span class="comment">// For testing exhaustiveness in downstream code, use the following idiom:
         //
         //     match pat {
+        //         #![cfg_attr(test, deny(non_exhaustive_omitted_patterns))]
+        //
         //         Pat::Box(pat) =&gt; {...}
         //         Pat::Ident(pat) =&gt; {...}
         //         ...
         //         Pat::Wild(pat) =&gt; {...}
         //
-        //         #[cfg_attr(test, deny(non_exhaustive_omitted_patterns))]
         //         _ =&gt; { /* some sane fallback */ }
         //     }
         //
@@ -1018,22 +1053,7 @@
         // a variant. You will be notified by a test failure when a variant is
         // added, so that you can add code to handle it, but your library will
         // continue to compile and work for downstream users in the interim.
-        </span><span class="attr">#[cfg(syn_no_non_exhaustive)]
-        #[doc(hidden)]
-        </span>__NonExhaustive,
-    }
-}
-
-<span class="macro">ast_struct!</span> {
-    <span class="doccomment">/// A box pattern: `box v`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
-    </span><span class="kw">pub struct </span>PatBox {
-        <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
-        <span class="kw">pub </span>box_token: <span class="macro">Token!</span>[<span class="kw">box</span>],
-        <span class="kw">pub </span>pat: Box&lt;Pat&gt;,
-    }
+    </span>}
 }
 
 <span class="macro">ast_struct!</span> {
@@ -1041,9 +1061,7 @@
     ///
     /// It may also be a unit struct or struct variant (e.g. `None`), or a
     /// constant; these cannot be distinguished syntactically.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatIdent {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>by_ref: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[<span class="kw-2">ref</span>]&gt;,
@@ -1054,35 +1072,8 @@
 }
 
 <span class="macro">ast_struct!</span> {
-    <span class="doccomment">/// A literal pattern: `0`.
-    ///
-    /// This holds an `Expr` rather than a `Lit` because negative numbers
-    /// are represented as an `Expr::Unary`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
-    </span><span class="kw">pub struct </span>PatLit {
-        <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
-        <span class="kw">pub </span>expr: Box&lt;Expr&gt;,
-    }
-}
-
-<span class="macro">ast_struct!</span> {
-    <span class="doccomment">/// A macro in pattern position.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
-    </span><span class="kw">pub struct </span>PatMacro {
-        <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
-        <span class="kw">pub </span>mac: Macro,
-    }
-}
-
-<span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A pattern that matches any one of a set of cases.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatOr {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>leading_vert: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[|]&gt;,
@@ -1091,41 +1082,18 @@
 }
 
 <span class="macro">ast_struct!</span> {
-    <span class="doccomment">/// A path pattern like `Color::Red`, optionally qualified with a
-    /// self-type.
-    ///
-    /// Unqualified path patterns can legally refer to variants, structs,
-    /// constants or associated constants. Qualified path patterns like
-    /// `&lt;A&gt;::B::C` and `&lt;A as Trait&gt;::B::C` can only legally refer to
-    /// associated constants.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
-    </span><span class="kw">pub struct </span>PatPath {
+    <span class="doccomment">/// A parenthesized pattern: `(A | B)`.
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="kw">pub struct </span>PatParen {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
-        <span class="kw">pub </span>qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;,
-        <span class="kw">pub </span>path: Path,
-    }
-}
-
-<span class="macro">ast_struct!</span> {
-    <span class="doccomment">/// A range pattern: `1..=2`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
-    </span><span class="kw">pub struct </span>PatRange {
-        <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
-        <span class="kw">pub </span>lo: Box&lt;Expr&gt;,
-        <span class="kw">pub </span>limits: RangeLimits,
-        <span class="kw">pub </span>hi: Box&lt;Expr&gt;,
+        <span class="kw">pub </span>paren_token: token::Paren,
+        <span class="kw">pub </span>pat: Box&lt;Pat&gt;,
     }
 }
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A reference pattern: `&amp;mut var`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatReference {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>and_token: <span class="macro">Token!</span>[<span class="kw-2">&amp;</span>],
@@ -1135,10 +1103,8 @@
 }
 
 <span class="macro">ast_struct!</span> {
-    <span class="doccomment">/// The dots in a tuple or slice pattern: `[0, 1, ..]`
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    <span class="doccomment">/// The dots in a tuple or slice pattern: `[0, 1, ..]`.
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatRest {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>dot2_token: <span class="macro">Token!</span>[..],
@@ -1147,9 +1113,7 @@
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A dynamically sized slice pattern: `[a, b, ref i @ .., y, z]`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatSlice {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>bracket_token: token::Bracket,
@@ -1159,23 +1123,20 @@
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A struct or struct variant pattern: `Variant { x, y, .. }`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatStruct {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
+        <span class="kw">pub </span>qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;,
         <span class="kw">pub </span>path: Path,
         <span class="kw">pub </span>brace_token: token::Brace,
         <span class="kw">pub </span>fields: Punctuated&lt;FieldPat, <span class="macro">Token!</span>[,]&gt;,
-        <span class="kw">pub </span>dot2_token: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[..]&gt;,
+        <span class="kw">pub </span>rest: <span class="prelude-ty">Option</span>&lt;PatRest&gt;,
     }
 }
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A tuple pattern: `(a, b)`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatTuple {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>paren_token: token::Paren,
@@ -1185,21 +1146,19 @@
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A tuple struct or tuple variant pattern: `Variant(x, y, .., z)`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatTupleStruct {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
+        <span class="kw">pub </span>qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;,
         <span class="kw">pub </span>path: Path,
-        <span class="kw">pub </span>pat: PatTuple,
+        <span class="kw">pub </span>paren_token: token::Paren,
+        <span class="kw">pub </span>elems: Punctuated&lt;Pat, <span class="macro">Token!</span>[,]&gt;,
     }
 }
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A type ascription pattern: `foo: f64`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatType {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>pat: Box&lt;Pat&gt;,
@@ -1210,9 +1169,7 @@
 
 <span class="macro">ast_struct!</span> {
     <span class="doccomment">/// A pattern that matches any value: `_`.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>PatWild {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>underscore_token: <span class="macro">Token!</span>[<span class="kw">_</span>],
@@ -1224,9 +1181,7 @@
     ///
     /// Patterns like the fields of Foo `{ x, ref y, ref mut z }` are treated
     /// the same as `x: x, y: ref y, z: ref mut z` but there is no colon token.
-    ///
-    /// *This type is available only if Syn is built with the `"full"` feature.*
-    </span><span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full"</span>)))]
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"full"</span>)))]
     </span><span class="kw">pub struct </span>FieldPat {
         <span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
         <span class="kw">pub </span>member: Member,
@@ -1236,31 +1191,65 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"parsing"</span>)]
-</span><span class="kw">pub mod </span>parsing {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::ext::IdentExt;
-    <span class="kw">use </span><span class="kw">crate</span>::parse::{Parse, ParseBuffer, ParseStream, <span class="prelude-ty">Result</span>};
-    <span class="kw">use </span><span class="kw">crate</span>::path;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>parsing {
+    <span class="kw">use </span><span class="kw">crate</span>::attr::Attribute;
+    <span class="kw">use </span><span class="kw">crate</span>::error::{<span class="self">self</span>, <span class="prelude-ty">Result</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::expr::{
+        Expr, ExprConst, ExprLit, ExprMacro, ExprPath, ExprRange, Member, RangeLimits,
+    };
+    <span class="kw">use </span><span class="kw">crate</span>::ext::IdentExt <span class="kw">as _</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::ident::Ident;
+    <span class="kw">use </span><span class="kw">crate</span>::lit::Lit;
+    <span class="kw">use </span><span class="kw">crate</span>::mac::{<span class="self">self</span>, Macro};
+    <span class="kw">use </span><span class="kw">crate</span>::parse::{Parse, ParseBuffer, ParseStream};
+    <span class="kw">use </span><span class="kw">crate</span>::pat::{
+        FieldPat, Pat, PatIdent, PatOr, PatParen, PatReference, PatRest, PatSlice, PatStruct,
+        PatTuple, PatTupleStruct, PatType, PatWild,
+    };
+    <span class="kw">use </span><span class="kw">crate</span>::path::{<span class="self">self</span>, Path, QSelf};
+    <span class="kw">use </span><span class="kw">crate</span>::punctuated::Punctuated;
+    <span class="kw">use </span><span class="kw">crate</span>::stmt::Block;
+    <span class="kw">use </span><span class="kw">crate</span>::token;
+    <span class="kw">use </span><span class="kw">crate</span>::verbatim;
+    <span class="kw">use </span>proc_macro2::TokenStream;
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
-    </span><span class="kw">impl </span>Parse <span class="kw">for </span>Pat {
-        <span class="kw">fn </span>parse(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+    </span><span class="kw">impl </span>Pat {
+        <span class="doccomment">/// Parse a pattern that does _not_ involve `|` at the top level.
+        ///
+        /// This parser matches the behavior of the `$:pat_param` macro_rules
+        /// matcher, and on editions prior to Rust 2021, the behavior of
+        /// `$:pat`.
+        ///
+        /// In Rust syntax, some examples of where this syntax would occur are
+        /// in the argument pattern of functions and closures. Patterns using
+        /// `|` are not allowed to occur in these positions.
+        ///
+        /// ```compile_fail
+        /// fn f(Some(_) | None: Option&lt;T&gt;) {
+        ///     let _ = |Some(_) | None: Option&lt;T&gt;| {};
+        ///     //       ^^^^^^^^^^^^^^^^^^^^^^^^^??? :(
+        /// }
+        /// ```
+        ///
+        /// ```console
+        /// error: top-level or-patterns are not allowed in function parameters
+        ///  --&gt; src/main.rs:1:6
+        ///   |
+        /// 1 | fn f(Some(_) | None: Option&lt;T&gt;) {
+        ///   |      ^^^^^^^^^^^^^^ help: wrap the pattern in parentheses: `(Some(_) | None)`
+        /// ```
+        </span><span class="kw">pub fn </span>parse_single(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
             <span class="kw">let </span>begin = input.fork();
             <span class="kw">let </span>lookahead = input.lookahead1();
-            <span class="kw">if </span>{
-                <span class="kw">let </span>ahead = input.fork();
-                ahead.parse::&lt;<span class="prelude-ty">Option</span>&lt;Ident&gt;&gt;()<span class="question-mark">?</span>.is_some()
-                    &amp;&amp; (ahead.peek(<span class="macro">Token!</span>[::])
-                        || ahead.peek(<span class="macro">Token!</span>[!])
-                        || ahead.peek(token::Brace)
-                        || ahead.peek(token::Paren)
-                        || ahead.peek(<span class="macro">Token!</span>[..])
-                            &amp;&amp; ahead.parse::&lt;RangeLimits&gt;().is_ok()
-                            &amp;&amp; !(ahead.is_empty() || ahead.peek(<span class="macro">Token!</span>[,])))
-            } || {
-                <span class="kw">let </span>ahead = input.fork();
-                ahead.parse::&lt;<span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[<span class="self">self</span>]&gt;&gt;()<span class="question-mark">?</span>.is_some() &amp;&amp; ahead.peek(<span class="macro">Token!</span>[::])
-            } || lookahead.peek(<span class="macro">Token!</span>[::])
+            <span class="kw">if </span>lookahead.peek(Ident)
+                &amp;&amp; (input.peek2(<span class="macro">Token!</span>[::])
+                    || input.peek2(<span class="macro">Token!</span>[!])
+                    || input.peek2(token::Brace)
+                    || input.peek2(token::Paren)
+                    || input.peek2(<span class="macro">Token!</span>[..]))
+                || input.peek(<span class="macro">Token!</span>[<span class="self">self</span>]) &amp;&amp; input.peek2(<span class="macro">Token!</span>[::])
+                || lookahead.peek(<span class="macro">Token!</span>[::])
                 || lookahead.peek(<span class="macro">Token!</span>[&lt;])
                 || input.peek(<span class="macro">Token!</span>[<span class="self">Self</span>])
                 || input.peek(<span class="macro">Token!</span>[<span class="kw">super</span>])
@@ -1270,7 +1259,7 @@
             } <span class="kw">else if </span>lookahead.peek(<span class="macro">Token!</span>[<span class="kw">_</span>]) {
                 input.call(pat_wild).map(Pat::Wild)
             } <span class="kw">else if </span>input.peek(<span class="macro">Token!</span>[<span class="kw">box</span>]) {
-                input.call(pat_box).map(Pat::Box)
+                pat_box(begin, input)
             } <span class="kw">else if </span>input.peek(<span class="macro">Token!</span>[-]) || lookahead.peek(Lit) || lookahead.peek(<span class="macro">Token!</span>[<span class="kw">const</span>])
             {
                 pat_lit_or_range(input)
@@ -1283,67 +1272,135 @@
             } <span class="kw">else if </span>lookahead.peek(<span class="macro">Token!</span>[<span class="kw-2">&amp;</span>]) {
                 input.call(pat_reference).map(Pat::Reference)
             } <span class="kw">else if </span>lookahead.peek(token::Paren) {
-                input.call(pat_tuple).map(Pat::Tuple)
+                input.call(pat_paren_or_tuple)
             } <span class="kw">else if </span>lookahead.peek(token::Bracket) {
                 input.call(pat_slice).map(Pat::Slice)
             } <span class="kw">else if </span>lookahead.peek(<span class="macro">Token!</span>[..]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[...]) {
-                pat_range_half_open(input, begin)
+                pat_range_half_open(input)
             } <span class="kw">else if </span>lookahead.peek(<span class="macro">Token!</span>[<span class="kw">const</span>]) {
                 input.call(pat_const).map(Pat::Verbatim)
             } <span class="kw">else </span>{
                 <span class="prelude-val">Err</span>(lookahead.error())
             }
         }
+
+        <span class="doccomment">/// Parse a pattern, possibly involving `|`, but not a leading `|`.
+        </span><span class="kw">pub fn </span>parse_multi(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+            multi_pat_impl(input, <span class="prelude-val">None</span>)
+        }
+
+        <span class="doccomment">/// Parse a pattern, possibly involving `|`, possibly including a
+        /// leading `|`.
+        ///
+        /// This parser matches the behavior of the Rust 2021 edition's `$:pat`
+        /// macro_rules matcher.
+        ///
+        /// In Rust syntax, an example of where this syntax would occur is in
+        /// the pattern of a `match` arm, where the language permits an optional
+        /// leading `|`, although it is not idiomatic to write one there in
+        /// handwritten code.
+        ///
+        /// ```
+        /// # let wat = None;
+        /// match wat {
+        ///     | None | Some(false) =&gt; {}
+        ///     | Some(true) =&gt; {}
+        /// }
+        /// ```
+        ///
+        /// The compiler accepts it only to facilitate some situations in
+        /// macro-generated code where a macro author might need to write:
+        ///
+        /// ```
+        /// # macro_rules! doc {
+        /// #     ($value:expr, ($($conditions1:pat),*), ($($conditions2:pat),*), $then:expr) =&gt; {
+        /// match $value {
+        ///     $(| $conditions1)* $(| $conditions2)* =&gt; $then
+        /// }
+        /// #     };
+        /// # }
+        /// #
+        /// # doc!(true, (true), (false), {});
+        /// # doc!(true, (), (true, false), {});
+        /// # doc!(true, (true, false), (), {});
+        /// ```
+        ///
+        /// Expressing the same thing correctly in the case that either one (but
+        /// not both) of `$conditions1` and `$conditions2` might be empty,
+        /// without leading `|`, is complex.
+        ///
+        /// Use [`Pat::parse_multi`] instead if you are not intending to support
+        /// macro-generated macro input.
+        </span><span class="kw">pub fn </span>parse_multi_with_leading_vert(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="kw">let </span>leading_vert: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[|]&gt; = input.parse()<span class="question-mark">?</span>;
+            multi_pat_impl(input, leading_vert)
+        }
+    }
+
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+    </span><span class="kw">impl </span>Parse <span class="kw">for </span>PatType {
+        <span class="kw">fn </span>parse(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="prelude-val">Ok</span>(PatType {
+                attrs: Vec::new(),
+                pat: Box::new(Pat::parse_single(input)<span class="question-mark">?</span>),
+                colon_token: input.parse()<span class="question-mark">?</span>,
+                ty: input.parse()<span class="question-mark">?</span>,
+            })
+        }
+    }
+
+    <span class="kw">fn </span>multi_pat_impl(input: ParseStream, leading_vert: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[|]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>pat = Pat::parse_single(input)<span class="question-mark">?</span>;
+        <span class="kw">if </span>leading_vert.is_some()
+            || input.peek(<span class="macro">Token!</span>[|]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[||]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[|=])
+        {
+            <span class="kw">let </span><span class="kw-2">mut </span>cases = Punctuated::new();
+            cases.push_value(pat);
+            <span class="kw">while </span>input.peek(<span class="macro">Token!</span>[|]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[||]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[|=]) {
+                <span class="kw">let </span>punct = input.parse()<span class="question-mark">?</span>;
+                cases.push_punct(punct);
+                <span class="kw">let </span>pat = Pat::parse_single(input)<span class="question-mark">?</span>;
+                cases.push_value(pat);
+            }
+            pat = Pat::Or(PatOr {
+                attrs: Vec::new(),
+                leading_vert,
+                cases,
+            });
+        }
+        <span class="prelude-val">Ok</span>(pat)
     }
 
     <span class="kw">fn </span>pat_path_or_macro_or_struct_or_range(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
-        <span class="kw">let </span>begin = input.fork();
-        <span class="kw">let </span>(qself, path) = path::parsing::qpath(input, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>expr_style = <span class="bool-val">true</span>;
+        <span class="kw">let </span>(qself, path) = path::parsing::qpath(input, expr_style)<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>qself.is_none() &amp;&amp; input.peek(<span class="macro">Token!</span>[!]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[!=]) {
-            <span class="kw">let </span><span class="kw-2">mut </span>contains_arguments = <span class="bool-val">false</span>;
-            <span class="kw">for </span>segment <span class="kw">in </span><span class="kw-2">&amp;</span>path.segments {
-                <span class="kw">match </span>segment.arguments {
-                    PathArguments::None =&gt; {}
-                    PathArguments::AngleBracketed(<span class="kw">_</span>) | PathArguments::Parenthesized(<span class="kw">_</span>) =&gt; {
-                        contains_arguments = <span class="bool-val">true</span>;
-                    }
-                }
-            }
-
-            <span class="kw">if </span>!contains_arguments {
-                <span class="kw">let </span>bang_token: <span class="macro">Token!</span>[!] = input.parse()<span class="question-mark">?</span>;
-                <span class="kw">let </span>(delimiter, tokens) = mac::parse_delimiter(input)<span class="question-mark">?</span>;
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(Pat::Macro(PatMacro {
-                    attrs: Vec::new(),
-                    mac: Macro {
-                        path,
-                        bang_token,
-                        delimiter,
-                        tokens,
-                    },
-                }));
-            }
+        <span class="kw">if </span>qself.is_none()
+            &amp;&amp; input.peek(<span class="macro">Token!</span>[!])
+            &amp;&amp; !input.peek(<span class="macro">Token!</span>[!=])
+            &amp;&amp; path.is_mod_style()
+        {
+            <span class="kw">let </span>bang_token: <span class="macro">Token!</span>[!] = input.parse()<span class="question-mark">?</span>;
+            <span class="kw">let </span>(delimiter, tokens) = mac::parse_delimiter(input)<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Pat::Macro(ExprMacro {
+                attrs: Vec::new(),
+                mac: Macro {
+                    path,
+                    bang_token,
+                    delimiter,
+                    tokens,
+                },
+            }));
         }
 
         <span class="kw">if </span>input.peek(token::Brace) {
-            <span class="kw">let </span>pat = pat_struct(begin.fork(), input, path)<span class="question-mark">?</span>;
-            <span class="kw">if </span>qself.is_some() {
-                <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(begin, input)))
-            } <span class="kw">else </span>{
-                <span class="prelude-val">Ok</span>(pat)
-            }
+            pat_struct(input, qself, path).map(Pat::Struct)
         } <span class="kw">else if </span>input.peek(token::Paren) {
-            <span class="kw">let </span>pat = pat_tuple_struct(input, path)<span class="question-mark">?</span>;
-            <span class="kw">if </span>qself.is_some() {
-                <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(begin, input)))
-            } <span class="kw">else </span>{
-                <span class="prelude-val">Ok</span>(Pat::TupleStruct(pat))
-            }
+            pat_tuple_struct(input, qself, path).map(Pat::TupleStruct)
         } <span class="kw">else if </span>input.peek(<span class="macro">Token!</span>[..]) {
-            pat_range(input, begin, qself, path)
+            pat_range(input, qself, path)
         } <span class="kw">else </span>{
-            <span class="prelude-val">Ok</span>(Pat::Path(PatPath {
+            <span class="prelude-val">Ok</span>(Pat::Path(ExprPath {
                 attrs: Vec::new(),
                 qself,
                 path,
@@ -1358,12 +1415,10 @@
         })
     }
 
-    <span class="kw">fn </span>pat_box(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;PatBox&gt; {
-        <span class="prelude-val">Ok</span>(PatBox {
-            attrs: Vec::new(),
-            box_token: input.parse()<span class="question-mark">?</span>,
-            pat: input.parse()<span class="question-mark">?</span>,
-        })
+    <span class="kw">fn </span>pat_box(begin: ParseBuffer, input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
+        input.parse::&lt;<span class="macro">Token!</span>[<span class="kw">box</span>]&gt;()<span class="question-mark">?</span>;
+        Pat::parse_single(input)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(<span class="kw-2">&amp;</span>begin, input)))
     }
 
     <span class="kw">fn </span>pat_ident(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;PatIdent&gt; {
@@ -1371,11 +1426,17 @@
             attrs: Vec::new(),
             by_ref: input.parse()<span class="question-mark">?</span>,
             mutability: input.parse()<span class="question-mark">?</span>,
-            ident: input.call(Ident::parse_any)<span class="question-mark">?</span>,
+            ident: {
+                <span class="kw">if </span>input.peek(<span class="macro">Token!</span>[<span class="self">self</span>]) {
+                    input.call(Ident::parse_any)<span class="question-mark">?
+                </span>} <span class="kw">else </span>{
+                    input.parse()<span class="question-mark">?
+                </span>}
+            },
             subpat: {
                 <span class="kw">if </span>input.peek(<span class="macro">Token!</span>[@]) {
                     <span class="kw">let </span>at_token: <span class="macro">Token!</span>[@] = input.parse()<span class="question-mark">?</span>;
-                    <span class="kw">let </span>subpat: Pat = input.parse()<span class="question-mark">?</span>;
+                    <span class="kw">let </span>subpat = Pat::parse_single(input)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>((at_token, Box::new(subpat)))
                 } <span class="kw">else </span>{
                     <span class="prelude-val">None
@@ -1384,27 +1445,47 @@
         })
     }
 
-    <span class="kw">fn </span>pat_tuple_struct(input: ParseStream, path: Path) -&gt; <span class="prelude-ty">Result</span>&lt;PatTupleStruct&gt; {
+    <span class="kw">fn </span>pat_tuple_struct(
+        input: ParseStream,
+        qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;,
+        path: Path,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PatTupleStruct&gt; {
+        <span class="kw">let </span>content;
+        <span class="kw">let </span>paren_token = <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>elems = Punctuated::new();
+        <span class="kw">while </span>!content.is_empty() {
+            <span class="kw">let </span>value = Pat::parse_multi_with_leading_vert(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>;
+            elems.push_value(value);
+            <span class="kw">if </span>content.is_empty() {
+                <span class="kw">break</span>;
+            }
+            <span class="kw">let </span>punct = content.parse()<span class="question-mark">?</span>;
+            elems.push_punct(punct);
+        }
+
         <span class="prelude-val">Ok</span>(PatTupleStruct {
             attrs: Vec::new(),
+            qself,
             path,
-            pat: input.call(pat_tuple)<span class="question-mark">?</span>,
+            paren_token,
+            elems,
         })
     }
 
-    <span class="kw">fn </span>pat_struct(begin: ParseBuffer, input: ParseStream, path: Path) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
+    <span class="kw">fn </span>pat_struct(input: ParseStream, qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;, path: Path) -&gt; <span class="prelude-ty">Result</span>&lt;PatStruct&gt; {
         <span class="kw">let </span>content;
         <span class="kw">let </span>brace_token = <span class="macro">braced!</span>(content <span class="kw">in </span>input);
 
         <span class="kw">let </span><span class="kw-2">mut </span>fields = Punctuated::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>dot2_token = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>rest = <span class="prelude-val">None</span>;
         <span class="kw">while </span>!content.is_empty() {
             <span class="kw">let </span>attrs = content.call(Attribute::parse_outer)<span class="question-mark">?</span>;
             <span class="kw">if </span>content.peek(<span class="macro">Token!</span>[..]) {
-                dot2_token = <span class="prelude-val">Some</span>(content.parse()<span class="question-mark">?</span>);
-                <span class="kw">if </span>!attrs.is_empty() {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(begin, input)));
-                }
+                rest = <span class="prelude-val">Some</span>(PatRest {
+                    attrs,
+                    dot2_token: content.parse()<span class="question-mark">?</span>,
+                });
                 <span class="kw">break</span>;
             }
             <span class="kw">let </span><span class="kw-2">mut </span>value = content.call(field_pat)<span class="question-mark">?</span>;
@@ -1417,38 +1498,36 @@
             fields.push_punct(punct);
         }
 
-        <span class="prelude-val">Ok</span>(Pat::Struct(PatStruct {
+        <span class="prelude-val">Ok</span>(PatStruct {
             attrs: Vec::new(),
+            qself,
             path,
             brace_token,
             fields,
-            dot2_token,
-        }))
-    }
-
-    <span class="kw">impl </span>Member {
-        <span class="kw">fn </span>is_unnamed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-                Member::Named(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-                Member::Unnamed(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            }
-        }
+            rest,
+        })
     }
 
     <span class="kw">fn </span>field_pat(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;FieldPat&gt; {
+        <span class="kw">let </span>begin = input.fork();
         <span class="kw">let </span>boxed: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[<span class="kw">box</span>]&gt; = input.parse()<span class="question-mark">?</span>;
         <span class="kw">let </span>by_ref: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[<span class="kw-2">ref</span>]&gt; = input.parse()<span class="question-mark">?</span>;
         <span class="kw">let </span>mutability: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[<span class="kw-2">mut</span>]&gt; = input.parse()<span class="question-mark">?</span>;
-        <span class="kw">let </span>member: Member = input.parse()<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>member = <span class="kw">if </span>boxed.is_some() || by_ref.is_some() || mutability.is_some() {
+            input.parse().map(Member::Named)
+        } <span class="kw">else </span>{
+            input.parse()
+        }<span class="question-mark">?</span>;
 
         <span class="kw">if </span>boxed.is_none() &amp;&amp; by_ref.is_none() &amp;&amp; mutability.is_none() &amp;&amp; input.peek(<span class="macro">Token!</span>[:])
-            || member.is_unnamed()
+            || !member.is_named()
         {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(FieldPat {
                 attrs: Vec::new(),
                 member,
-                colon_token: input.parse()<span class="question-mark">?</span>,
-                pat: Box::new(multi_pat_with_leading_vert(input)<span class="question-mark">?</span>),
+                colon_token: <span class="prelude-val">Some</span>(input.parse()<span class="question-mark">?</span>),
+                pat: Box::new(Pat::parse_multi_with_leading_vert(input)<span class="question-mark">?</span>),
             });
         }
 
@@ -1457,21 +1536,17 @@
             Member::Unnamed(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="kw">let </span><span class="kw-2">mut </span>pat = Pat::Ident(PatIdent {
-            attrs: Vec::new(),
-            by_ref,
-            mutability,
-            ident: ident.clone(),
-            subpat: <span class="prelude-val">None</span>,
-        });
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(boxed) = boxed {
-            pat = Pat::Box(PatBox {
+        <span class="kw">let </span>pat = <span class="kw">if </span>boxed.is_some() {
+            Pat::Verbatim(verbatim::between(<span class="kw-2">&amp;</span>begin, input))
+        } <span class="kw">else </span>{
+            Pat::Ident(PatIdent {
                 attrs: Vec::new(),
-                box_token: boxed,
-                pat: Box::new(pat),
-            });
-        }
+                by_ref,
+                mutability,
+                ident: ident.clone(),
+                subpat: <span class="prelude-val">None</span>,
+            })
+        };
 
         <span class="prelude-val">Ok</span>(FieldPat {
             attrs: Vec::new(),
@@ -1481,35 +1556,34 @@
         })
     }
 
-    <span class="kw">fn </span>pat_range(
-        input: ParseStream,
-        begin: ParseBuffer,
-        qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;,
-        path: Path,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
-        <span class="kw">let </span>limits: RangeLimits = input.parse()<span class="question-mark">?</span>;
-        <span class="kw">let </span>hi = input.call(pat_lit_expr)<span class="question-mark">?</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(hi) = hi {
-            <span class="prelude-val">Ok</span>(Pat::Range(PatRange {
-                attrs: Vec::new(),
-                lo: Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself,
-                    path,
-                })),
-                limits,
-                hi,
-            }))
-        } <span class="kw">else </span>{
-            <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(begin, input)))
+    <span class="kw">fn </span>pat_range(input: ParseStream, qself: <span class="prelude-ty">Option</span>&lt;QSelf&gt;, path: Path) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
+        <span class="kw">let </span>limits = RangeLimits::parse_obsolete(input)<span class="question-mark">?</span>;
+        <span class="kw">let </span>end = input.call(pat_range_bound)<span class="question-mark">?</span>;
+        <span class="kw">if let </span>(RangeLimits::Closed(<span class="kw">_</span>), <span class="prelude-val">None</span>) = (<span class="kw-2">&amp;</span>limits, <span class="kw-2">&amp;</span>end) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(input.error(<span class="string">"expected range upper bound"</span>));
         }
+        <span class="prelude-val">Ok</span>(Pat::Range(ExprRange {
+            attrs: Vec::new(),
+            start: <span class="prelude-val">Some</span>(Box::new(Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself,
+                path,
+            }))),
+            limits,
+            end: end.map(PatRangeBound::into_expr),
+        }))
     }
 
-    <span class="kw">fn </span>pat_range_half_open(input: ParseStream, begin: ParseBuffer) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
+    <span class="kw">fn </span>pat_range_half_open(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
         <span class="kw">let </span>limits: RangeLimits = input.parse()<span class="question-mark">?</span>;
-        <span class="kw">let </span>hi = input.call(pat_lit_expr)<span class="question-mark">?</span>;
-        <span class="kw">if </span>hi.is_some() {
-            <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(begin, input)))
+        <span class="kw">let </span>end = input.call(pat_range_bound)<span class="question-mark">?</span>;
+        <span class="kw">if </span>end.is_some() {
+            <span class="prelude-val">Ok</span>(Pat::Range(ExprRange {
+                attrs: Vec::new(),
+                start: <span class="prelude-val">None</span>,
+                limits,
+                end: end.map(PatRangeBound::into_expr),
+            }))
         } <span class="kw">else </span>{
             <span class="kw">match </span>limits {
                 RangeLimits::HalfOpen(dot2_token) =&gt; <span class="prelude-val">Ok</span>(Pat::Rest(PatRest {
@@ -1521,26 +1595,34 @@
         }
     }
 
-    <span class="kw">fn </span>pat_tuple(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;PatTuple&gt; {
+    <span class="kw">fn </span>pat_paren_or_tuple(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
         <span class="kw">let </span>content;
         <span class="kw">let </span>paren_token = <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
 
         <span class="kw">let </span><span class="kw-2">mut </span>elems = Punctuated::new();
         <span class="kw">while </span>!content.is_empty() {
-            <span class="kw">let </span>value = multi_pat_with_leading_vert(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>;
-            elems.push_value(value);
+            <span class="kw">let </span>value = Pat::parse_multi_with_leading_vert(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>;
             <span class="kw">if </span>content.is_empty() {
+                <span class="kw">if </span>elems.is_empty() &amp;&amp; !<span class="macro">matches!</span>(value, Pat::Rest(<span class="kw">_</span>)) {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Pat::Paren(PatParen {
+                        attrs: Vec::new(),
+                        paren_token,
+                        pat: Box::new(value),
+                    }));
+                }
+                elems.push_value(value);
                 <span class="kw">break</span>;
             }
+            elems.push_value(value);
             <span class="kw">let </span>punct = content.parse()<span class="question-mark">?</span>;
             elems.push_punct(punct);
         }
 
-        <span class="prelude-val">Ok</span>(PatTuple {
+        <span class="prelude-val">Ok</span>(Pat::Tuple(PatTuple {
             attrs: Vec::new(),
             paren_token,
             elems,
-        })
+        }))
     }
 
     <span class="kw">fn </span>pat_reference(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;PatReference&gt; {
@@ -1548,52 +1630,69 @@
             attrs: Vec::new(),
             and_token: input.parse()<span class="question-mark">?</span>,
             mutability: input.parse()<span class="question-mark">?</span>,
-            pat: input.parse()<span class="question-mark">?</span>,
+            pat: Box::new(Pat::parse_single(input)<span class="question-mark">?</span>),
         })
     }
 
     <span class="kw">fn </span>pat_lit_or_range(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
-        <span class="kw">let </span>begin = input.fork();
-        <span class="kw">let </span>lo = input.call(pat_lit_expr)<span class="question-mark">?</span>.unwrap();
+        <span class="kw">let </span>start = input.call(pat_range_bound)<span class="question-mark">?</span>.unwrap();
         <span class="kw">if </span>input.peek(<span class="macro">Token!</span>[..]) {
-            <span class="kw">let </span>limits: RangeLimits = input.parse()<span class="question-mark">?</span>;
-            <span class="kw">let </span>hi = input.call(pat_lit_expr)<span class="question-mark">?</span>;
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(hi) = hi {
-                <span class="prelude-val">Ok</span>(Pat::Range(PatRange {
-                    attrs: Vec::new(),
-                    lo,
-                    limits,
-                    hi,
-                }))
-            } <span class="kw">else </span>{
-                <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim::between(begin, input)))
+            <span class="kw">let </span>limits = RangeLimits::parse_obsolete(input)<span class="question-mark">?</span>;
+            <span class="kw">let </span>end = input.call(pat_range_bound)<span class="question-mark">?</span>;
+            <span class="kw">if let </span>(RangeLimits::Closed(<span class="kw">_</span>), <span class="prelude-val">None</span>) = (<span class="kw-2">&amp;</span>limits, <span class="kw-2">&amp;</span>end) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(input.error(<span class="string">"expected range upper bound"</span>));
             }
-        } <span class="kw">else if let </span>Expr::Verbatim(verbatim) = <span class="kw-2">*</span>lo {
-            <span class="prelude-val">Ok</span>(Pat::Verbatim(verbatim))
-        } <span class="kw">else </span>{
-            <span class="prelude-val">Ok</span>(Pat::Lit(PatLit {
+            <span class="prelude-val">Ok</span>(Pat::Range(ExprRange {
                 attrs: Vec::new(),
-                expr: lo,
+                start: <span class="prelude-val">Some</span>(start.into_expr()),
+                limits,
+                end: end.map(PatRangeBound::into_expr),
             }))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(start.into_pat())
         }
     }
 
-    <span class="kw">fn </span>pat_lit_expr(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;Expr&gt;&gt;&gt; {
+    <span class="comment">// Patterns that can appear on either side of a range pattern.
+    </span><span class="kw">enum </span>PatRangeBound {
+        Const(ExprConst),
+        Lit(ExprLit),
+        Path(ExprPath),
+    }
+
+    <span class="kw">impl </span>PatRangeBound {
+        <span class="kw">fn </span>into_expr(<span class="self">self</span>) -&gt; Box&lt;Expr&gt; {
+            Box::new(<span class="kw">match </span><span class="self">self </span>{
+                PatRangeBound::Const(pat) =&gt; Expr::Const(pat),
+                PatRangeBound::Lit(pat) =&gt; Expr::Lit(pat),
+                PatRangeBound::Path(pat) =&gt; Expr::Path(pat),
+            })
+        }
+
+        <span class="kw">fn </span>into_pat(<span class="self">self</span>) -&gt; Pat {
+            <span class="kw">match </span><span class="self">self </span>{
+                PatRangeBound::Const(pat) =&gt; Pat::Const(pat),
+                PatRangeBound::Lit(pat) =&gt; Pat::Lit(pat),
+                PatRangeBound::Path(pat) =&gt; Pat::Path(pat),
+            }
+        }
+    }
+
+    <span class="kw">fn </span>pat_range_bound(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;PatRangeBound&gt;&gt; {
         <span class="kw">if </span>input.is_empty()
             || input.peek(<span class="macro">Token!</span>[|])
             || input.peek(<span class="macro">Token!</span>[=])
             || input.peek(<span class="macro">Token!</span>[:]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[::])
             || input.peek(<span class="macro">Token!</span>[,])
             || input.peek(<span class="macro">Token!</span>[;])
+            || input.peek(<span class="macro">Token!</span>[<span class="kw">if</span>])
         {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let </span>neg: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[-]&gt; = input.parse()<span class="question-mark">?</span>;
-
         <span class="kw">let </span>lookahead = input.lookahead1();
         <span class="kw">let </span>expr = <span class="kw">if </span>lookahead.peek(Lit) {
-            Expr::Lit(input.parse()<span class="question-mark">?</span>)
+            PatRangeBound::Lit(input.parse()<span class="question-mark">?</span>)
         } <span class="kw">else if </span>lookahead.peek(Ident)
             || lookahead.peek(<span class="macro">Token!</span>[::])
             || lookahead.peek(<span class="macro">Token!</span>[&lt;])
@@ -1602,22 +1701,14 @@
             || lookahead.peek(<span class="macro">Token!</span>[<span class="kw">super</span>])
             || lookahead.peek(<span class="macro">Token!</span>[<span class="kw">crate</span>])
         {
-            Expr::Path(input.parse()<span class="question-mark">?</span>)
+            PatRangeBound::Path(input.parse()<span class="question-mark">?</span>)
         } <span class="kw">else if </span>lookahead.peek(<span class="macro">Token!</span>[<span class="kw">const</span>]) {
-            Expr::Verbatim(input.call(expr::parsing::expr_const)<span class="question-mark">?</span>)
+            PatRangeBound::Const(input.parse()<span class="question-mark">?</span>)
         } <span class="kw">else </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(lookahead.error());
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Box::new(<span class="kw">if let </span><span class="prelude-val">Some</span>(neg) = neg {
-            Expr::Unary(ExprUnary {
-                attrs: Vec::new(),
-                op: UnOp::Neg(neg),
-                expr: Box::new(expr),
-            })
-        } <span class="kw">else </span>{
-            expr
-        })))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(expr))
     }
 
     <span class="kw">fn </span>pat_slice(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;PatSlice&gt; {
@@ -1626,7 +1717,20 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>elems = Punctuated::new();
         <span class="kw">while </span>!content.is_empty() {
-            <span class="kw">let </span>value = multi_pat_with_leading_vert(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>;
+            <span class="kw">let </span>value = Pat::parse_multi_with_leading_vert(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>;
+            <span class="kw">match </span>value {
+                Pat::Range(pat) <span class="kw">if </span>pat.start.is_none() || pat.end.is_none() =&gt; {
+                    <span class="kw">let </span>(start, end) = <span class="kw">match </span>pat.limits {
+                        RangeLimits::HalfOpen(dot_dot) =&gt; (dot_dot.spans[<span class="number">0</span>], dot_dot.spans[<span class="number">1</span>]),
+                        RangeLimits::Closed(dot_dot_eq) =&gt; {
+                            (dot_dot_eq.spans[<span class="number">0</span>], dot_dot_eq.spans[<span class="number">2</span>])
+                        }
+                    };
+                    <span class="kw">let </span>msg = <span class="string">"range pattern is not allowed unparenthesized inside slice pattern"</span>;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(error::new2(start, end, msg));
+                }
+                <span class="kw">_ </span>=&gt; {}
+            }
             elems.push_value(value);
             <span class="kw">if </span>content.is_empty() {
                 <span class="kw">break</span>;
@@ -1651,57 +1755,23 @@
         content.call(Attribute::parse_inner)<span class="question-mark">?</span>;
         content.call(Block::parse_within)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(verbatim::between(begin, input))
-    }
-
-    <span class="kw">pub fn </span>multi_pat(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
-        multi_pat_impl(input, <span class="prelude-val">None</span>)
-    }
-
-    <span class="kw">pub fn </span>multi_pat_with_leading_vert(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
-        <span class="kw">let </span>leading_vert: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[|]&gt; = input.parse()<span class="question-mark">?</span>;
-        multi_pat_impl(input, leading_vert)
-    }
-
-    <span class="kw">fn </span>multi_pat_impl(input: ParseStream, leading_vert: <span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[|]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Pat&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>pat: Pat = input.parse()<span class="question-mark">?</span>;
-        <span class="kw">if </span>leading_vert.is_some()
-            || input.peek(<span class="macro">Token!</span>[|]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[||]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[|=])
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>cases = Punctuated::new();
-            cases.push_value(pat);
-            <span class="kw">while </span>input.peek(<span class="macro">Token!</span>[|]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[||]) &amp;&amp; !input.peek(<span class="macro">Token!</span>[|=]) {
-                <span class="kw">let </span>punct = input.parse()<span class="question-mark">?</span>;
-                cases.push_punct(punct);
-                <span class="kw">let </span>pat: Pat = input.parse()<span class="question-mark">?</span>;
-                cases.push_value(pat);
-            }
-            pat = Pat::Or(PatOr {
-                attrs: Vec::new(),
-                leading_vert,
-                cases,
-            });
-        }
-        <span class="prelude-val">Ok</span>(pat)
+        <span class="prelude-val">Ok</span>(verbatim::between(<span class="kw-2">&amp;</span>begin, input))
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"printing"</span>)]
 </span><span class="kw">mod </span>printing {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::attr::FilterAttrs;
+    <span class="kw">use </span><span class="kw">crate</span>::pat::{
+        FieldPat, Pat, PatIdent, PatOr, PatParen, PatReference, PatRest, PatSlice, PatStruct,
+        PatTuple, PatTupleStruct, PatType, PatWild,
+    };
+    <span class="kw">use </span><span class="kw">crate</span>::path;
+    <span class="kw">use </span><span class="kw">crate</span>::path::printing::PathStyle;
     <span class="kw">use </span>proc_macro2::TokenStream;
     <span class="kw">use </span>quote::{ToTokens, TokenStreamExt};
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatWild {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.underscore_token.to_tokens(tokens);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
     </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatIdent {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
@@ -1715,69 +1785,26 @@
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatStruct {
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatOr {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.path.to_tokens(tokens);
-            <span class="self">self</span>.brace_token.surround(tokens, |tokens| {
-                <span class="self">self</span>.fields.to_tokens(tokens);
-                <span class="comment">// NOTE: We need a comma before the dot2 token if it is present.
-                </span><span class="kw">if </span>!<span class="self">self</span>.fields.empty_or_trailing() &amp;&amp; <span class="self">self</span>.dot2_token.is_some() {
-                    &lt;<span class="macro">Token!</span>[,]&gt;::default().to_tokens(tokens);
-                }
-                <span class="self">self</span>.dot2_token.to_tokens(tokens);
-            });
+            <span class="self">self</span>.leading_vert.to_tokens(tokens);
+            <span class="self">self</span>.cases.to_tokens(tokens);
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatTupleStruct {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.path.to_tokens(tokens);
-            <span class="self">self</span>.pat.to_tokens(tokens);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatType {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.pat.to_tokens(tokens);
-            <span class="self">self</span>.colon_token.to_tokens(tokens);
-            <span class="self">self</span>.ty.to_tokens(tokens);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatPath {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            path::printing::print_path(tokens, <span class="kw-2">&amp;</span><span class="self">self</span>.qself, <span class="kw-2">&amp;</span><span class="self">self</span>.path);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatTuple {
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatParen {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
             <span class="self">self</span>.paren_token.surround(tokens, |tokens| {
-                <span class="self">self</span>.elems.to_tokens(tokens);
+                <span class="self">self</span>.pat.to_tokens(tokens);
             });
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatBox {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.box_token.to_tokens(tokens);
-            <span class="self">self</span>.pat.to_tokens(tokens);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
     </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatReference {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
@@ -1787,7 +1814,7 @@
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
     </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatRest {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
@@ -1795,25 +1822,7 @@
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatLit {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.expr.to_tokens(tokens);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatRange {
-        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-            tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.lo.to_tokens(tokens);
-            <span class="self">self</span>.limits.to_tokens(tokens);
-            <span class="self">self</span>.hi.to_tokens(tokens);
-        }
-    }
-
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
     </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatSlice {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
@@ -1823,24 +1832,71 @@
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatMacro {
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatStruct {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.mac.to_tokens(tokens);
+            path::printing::print_qpath(tokens, <span class="kw-2">&amp;</span><span class="self">self</span>.qself, <span class="kw-2">&amp;</span><span class="self">self</span>.path, PathStyle::Expr);
+            <span class="self">self</span>.brace_token.surround(tokens, |tokens| {
+                <span class="self">self</span>.fields.to_tokens(tokens);
+                <span class="comment">// NOTE: We need a comma before the dot2 token if it is present.
+                </span><span class="kw">if </span>!<span class="self">self</span>.fields.empty_or_trailing() &amp;&amp; <span class="self">self</span>.rest.is_some() {
+                    &lt;<span class="macro">Token!</span>[,]&gt;::default().to_tokens(tokens);
+                }
+                <span class="self">self</span>.rest.to_tokens(tokens);
+            });
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
-    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatOr {
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatTuple {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());
-            <span class="self">self</span>.leading_vert.to_tokens(tokens);
-            <span class="self">self</span>.cases.to_tokens(tokens);
+            <span class="self">self</span>.paren_token.surround(tokens, |tokens| {
+                <span class="self">self</span>.elems.to_tokens(tokens);
+                <span class="comment">// If there is only one element, a trailing comma is needed to
+                // distinguish PatTuple from PatParen, unless this is `(..)`
+                // which is a tuple pattern even without comma.
+                </span><span class="kw">if </span><span class="self">self</span>.elems.len() == <span class="number">1
+                    </span>&amp;&amp; !<span class="self">self</span>.elems.trailing_punct()
+                    &amp;&amp; !<span class="macro">matches!</span>(<span class="self">self</span>.elems[<span class="number">0</span>], Pat::Rest { .. })
+                {
+                    &lt;<span class="macro">Token!</span>[,]&gt;::default().to_tokens(tokens);
+                }
+            });
         }
     }
 
-    <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatTupleStruct {
+        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
+            tokens.append_all(<span class="self">self</span>.attrs.outer());
+            path::printing::print_qpath(tokens, <span class="kw-2">&amp;</span><span class="self">self</span>.qself, <span class="kw-2">&amp;</span><span class="self">self</span>.path, PathStyle::Expr);
+            <span class="self">self</span>.paren_token.surround(tokens, |tokens| {
+                <span class="self">self</span>.elems.to_tokens(tokens);
+            });
+        }
+    }
+
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatType {
+        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
+            tokens.append_all(<span class="self">self</span>.attrs.outer());
+            <span class="self">self</span>.pat.to_tokens(tokens);
+            <span class="self">self</span>.colon_token.to_tokens(tokens);
+            <span class="self">self</span>.ty.to_tokens(tokens);
+        }
+    }
+
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
+    </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>PatWild {
+        <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
+            tokens.append_all(<span class="self">self</span>.attrs.outer());
+            <span class="self">self</span>.underscore_token.to_tokens(tokens);
+        }
+    }
+
+    <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"printing"</span>)))]
     </span><span class="kw">impl </span>ToTokens <span class="kw">for </span>FieldPat {
         <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
             tokens.append_all(<span class="self">self</span>.attrs.outer());

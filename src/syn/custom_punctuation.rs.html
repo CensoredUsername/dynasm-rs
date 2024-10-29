@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-1.0.109\src\custom_punctuation.rs`."><title>custom_punctuation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-2.0.79\src\custom_punctuation.rs`."><title>custom_punctuation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -298,6 +298,10 @@
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Define a type that supports parsing and printing a multi-character symbol
 /// as if it were a punctuation token.
 ///
@@ -378,7 +382,8 @@
 </span><span class="macro">macro_rules!</span> custom_punctuation {
     (<span class="macro-nonterminal">$ident</span>:ident, $(<span class="macro-nonterminal">$tt</span>:tt)+) =&gt; {
         <span class="kw">pub struct </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">pub </span>spans: <span class="macro-nonterminal">$</span><span class="macro">crate::custom_punctuation_repr!</span>($(<span class="macro-nonterminal">$tt</span>)+),
+            <span class="attr">#[allow(dead_code)]
+            </span><span class="kw">pub </span>spans: <span class="macro-nonterminal">$</span><span class="macro">crate::custom_punctuation_repr!</span>($(<span class="macro-nonterminal">$tt</span>)+),
         }
 
         <span class="attr">#[doc(hidden)]
@@ -392,16 +397,18 @@
             }
         }
 
-        <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::Default </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-                <span class="macro-nonterminal">$ident</span>(<span class="macro-nonterminal">$crate::__private::Span::call_site</span>())
+        <span class="kw">const _</span>: () = {
+            <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::Default </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
+                <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+                    <span class="macro-nonterminal">$ident</span>(<span class="macro-nonterminal">$crate::__private::Span::call_site</span>())
+                }
             }
-        }
 
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_parse_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_to_tokens_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_clone_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
-        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_extra_traits_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_parse_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_to_tokens_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_clone_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
+            <span class="macro-nonterminal">$</span><span class="macro">crate::impl_extra_traits_for_custom_punctuation!</span>(<span class="macro-nonterminal">$ident</span>, $(<span class="macro-nonterminal">$tt</span>)+);
+        };
     };
 }
 
@@ -411,20 +418,20 @@
 #[macro_export]
 </span><span class="macro">macro_rules!</span> impl_parse_for_custom_punctuation {
     (<span class="macro-nonterminal">$ident</span>:ident, $(<span class="macro-nonterminal">$tt</span>:tt)+) =&gt; {
-        <span class="kw">impl </span><span class="macro-nonterminal">$crate::token::CustomToken </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>peek(cursor: <span class="macro-nonterminal">$crate::buffer::Cursor</span>) -&gt; bool {
-                <span class="macro-nonterminal">$crate::token::parsing::peek_punct</span>(cursor, <span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+))
+        <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::CustomToken </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
+            <span class="kw">fn </span>peek(cursor: <span class="macro-nonterminal">$crate::buffer::Cursor</span>) -&gt; <span class="macro-nonterminal">$crate::__private::bool </span>{
+                <span class="macro-nonterminal">$crate::__private::peek_punct</span>(cursor, <span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+))
             }
 
             <span class="kw">fn </span>display() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span><span class="macro-nonterminal">$crate::__private::str </span>{
-                <span class="macro">concat!</span>(<span class="string">"`"</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+), <span class="string">"`"</span>)
+                <span class="macro-nonterminal">$</span><span class="macro">crate::__private::concat!</span>(<span class="string">"`"</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+), <span class="string">"`"</span>)
             }
         }
 
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::parse::Parse </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
             <span class="kw">fn </span>parse(input: <span class="macro-nonterminal">$crate::parse::ParseStream</span>) -&gt; <span class="macro-nonterminal">$crate::parse::Result</span>&lt;<span class="macro-nonterminal">$ident</span>&gt; {
                 <span class="kw">let </span>spans: <span class="macro-nonterminal">$</span><span class="macro">crate::custom_punctuation_repr!</span>($(<span class="macro-nonterminal">$tt</span>)+) =
-                    <span class="macro-nonterminal">$crate::token::parsing::punct</span>(input, <span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+))<span class="question-mark">?</span>;
+                    <span class="macro-nonterminal">$crate::__private::parse_punct</span>(input, <span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+))<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$ident</span>(spans))
             }
         }
@@ -447,7 +454,7 @@
     (<span class="macro-nonterminal">$ident</span>:ident, $(<span class="macro-nonterminal">$tt</span>:tt)+) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::ToTokens </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
             <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::TokenStream2</span>) {
-                <span class="macro-nonterminal">$crate::token::printing::punct</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+), <span class="kw-2">&amp;</span><span class="self">self</span>.spans, tokens)
+                <span class="macro-nonterminal">$crate::__private::print_punct</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::stringify_punct!</span>($(<span class="macro-nonterminal">$tt</span>)+), <span class="kw-2">&amp;</span><span class="self">self</span>.spans, tokens)
             }
         }
     };
@@ -493,8 +500,8 @@
 </span><span class="macro">macro_rules!</span> impl_extra_traits_for_custom_punctuation {
     (<span class="macro-nonterminal">$ident</span>:ident, $(<span class="macro-nonterminal">$tt</span>:tt)+) =&gt; {
         <span class="kw">impl </span><span class="macro-nonterminal">$crate::__private::Debug </span><span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::fmt::Result </span>{
-                <span class="macro-nonterminal">$crate::__private::Formatter::write_str</span>(f, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$ident</span>))
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$crate::__private::Formatter</span>) -&gt; <span class="macro-nonterminal">$crate::__private::FmtResult </span>{
+                <span class="macro-nonterminal">$crate::__private::Formatter::write_str</span>(f, <span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$ident</span>))
             }
         }
 
@@ -534,50 +541,51 @@
 #[macro_export]
 #[rustfmt::skip]
 </span><span class="macro">macro_rules!</span> custom_punctuation_len {
-    (<span class="macro-nonterminal">$mode</span>:ident, +)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, +=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, <span class="kw-2">&amp;</span>)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &amp;&amp;)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &amp;=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, @)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, !)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ^)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ^=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, :)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, ::)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ,)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, /)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, /=)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, $)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, .)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ..)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ...)   =&gt; { <span class="number">3 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ..=)   =&gt; { <span class="number">3 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, =)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ==)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, =&gt;)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &gt;=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &gt;)     =&gt; { <span class="number">1 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, &lt;-)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &lt;=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &lt;)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, <span class="kw-2">*</span>=)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, -)     =&gt; { <span class="number">1 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, -=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, !=)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, !)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, |)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, |=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ||)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, ::)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, %)     =&gt; { <span class="number">1 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, %=)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, +)     =&gt; { <span class="number">1 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, +=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, #)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, <span class="question-mark">?</span>)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, -&gt;)    =&gt; { <span class="number">2 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, &lt;-)    =&gt; { <span class="number">2 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, %)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, %=)    =&gt; { <span class="number">2 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, =&gt;)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ;)     =&gt; { <span class="number">1 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &lt;&lt;)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &lt;&lt;=)   =&gt; { <span class="number">3 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &gt;&gt;)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, &gt;&gt;=)   =&gt; { <span class="number">3 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, /)     =&gt; { <span class="number">1 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, /=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, <span class="kw-2">*</span>)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, -)     =&gt; { <span class="number">1 </span>};
-    (<span class="macro-nonterminal">$mode</span>:ident, -=)    =&gt; { <span class="number">2 </span>};
+    (<span class="macro-nonterminal">$mode</span>:ident, <span class="kw-2">*</span>=)    =&gt; { <span class="number">2 </span>};
     (<span class="macro-nonterminal">$mode</span>:ident, ~)     =&gt; { <span class="number">1 </span>};
     (lenient, <span class="macro-nonterminal">$tt</span>:tt)    =&gt; { <span class="number">0 </span>};
     (strict, <span class="macro-nonterminal">$tt</span>:tt)     =&gt; {{ <span class="macro-nonterminal">$</span><span class="macro">crate::custom_punctuation_unexpected!</span>(<span class="macro-nonterminal">$tt</span>); <span class="number">0 </span>}};
@@ -595,7 +603,7 @@
 #[macro_export]
 </span><span class="macro">macro_rules!</span> stringify_punct {
     ($(<span class="macro-nonterminal">$tt</span>:tt)+) =&gt; {
-        <span class="macro">concat!</span>($(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$tt</span>)),+)
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__private::concat!</span>($(<span class="macro-nonterminal">$</span><span class="macro">crate::__private::stringify!</span>(<span class="macro-nonterminal">$tt</span>)),+)
     };
 }
 </code></pre></div></section></main></body></html>

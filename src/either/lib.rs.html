@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\either-1.11.0\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="either" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\either-1.13.0\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="either" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1517,6 +1517,62 @@
 <a href="#1517" id="1517">1517</a>
 <a href="#1518" id="1518">1518</a>
 <a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The enum [`Either`] with variants `Left` and `Right` is a general purpose
 //! sum type with two cases.
 //!
@@ -1525,10 +1581,10 @@
 //! **Crate features:**
 //!
 //! * `"use_std"`
-//! Enabled by default. Disable to make the library `#![no_std]`.
+//!   Enabled by default. Disable to make the library `#![no_std]`.
 //!
 //! * `"serde"`
-//! Disabled by default. Enable to `#[derive(Serialize, Deserialize)]` for `Either`
+//!   Disabled by default. Enable to `#[derive(Serialize, Deserialize)]` for `Either`
 //!
 
 </span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/either/1/"</span>)]
@@ -2608,6 +2664,62 @@
         <span class="kw">match </span><span class="self">self </span>{
             Left(l) =&gt; Left(f(l)),
             Right(r) =&gt; Right(f(r)),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;L, R&gt; Either&lt;<span class="kw-2">&amp;</span>L, <span class="kw-2">&amp;</span>R&gt; {
+    <span class="doccomment">/// Maps an `Either&lt;&amp;L, &amp;R&gt;` to an `Either&lt;L, R&gt;` by cloning the contents of
+    /// either branch.
+    </span><span class="kw">pub fn </span>cloned(<span class="self">self</span>) -&gt; Either&lt;L, R&gt;
+    <span class="kw">where
+        </span>L: Clone,
+        R: Clone,
+    {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Left(l) =&gt; Either::Left(l.clone()),
+            <span class="self">Self</span>::Right(r) =&gt; Either::Right(r.clone()),
+        }
+    }
+
+    <span class="doccomment">/// Maps an `Either&lt;&amp;L, &amp;R&gt;` to an `Either&lt;L, R&gt;` by copying the contents of
+    /// either branch.
+    </span><span class="kw">pub fn </span>copied(<span class="self">self</span>) -&gt; Either&lt;L, R&gt;
+    <span class="kw">where
+        </span>L: Copy,
+        R: Copy,
+    {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Left(l) =&gt; Either::Left(<span class="kw-2">*</span>l),
+            <span class="self">Self</span>::Right(r) =&gt; Either::Right(<span class="kw-2">*</span>r),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;L, R&gt; Either&lt;<span class="kw-2">&amp;mut </span>L, <span class="kw-2">&amp;mut </span>R&gt; {
+    <span class="doccomment">/// Maps an `Either&lt;&amp;mut L, &amp;mut R&gt;` to an `Either&lt;L, R&gt;` by cloning the contents of
+    /// either branch.
+    </span><span class="kw">pub fn </span>cloned(<span class="self">self</span>) -&gt; Either&lt;L, R&gt;
+    <span class="kw">where
+        </span>L: Clone,
+        R: Clone,
+    {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Left(l) =&gt; Either::Left(l.clone()),
+            <span class="self">Self</span>::Right(r) =&gt; Either::Right(r.clone()),
+        }
+    }
+
+    <span class="doccomment">/// Maps an `Either&lt;&amp;mut L, &amp;mut R&gt;` to an `Either&lt;L, R&gt;` by copying the contents of
+    /// either branch.
+    </span><span class="kw">pub fn </span>copied(<span class="self">self</span>) -&gt; Either&lt;L, R&gt;
+    <span class="kw">where
+        </span>L: Copy,
+        R: Copy,
+    {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Left(l) =&gt; Either::Left(<span class="kw-2">*</span>l),
+            <span class="self">Self</span>::Right(r) =&gt; Either::Right(<span class="kw-2">*</span>r),
         }
     }
 }

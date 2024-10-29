@@ -74,6 +74,11 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
+<h1 id="version-301"><a class="doc-anchor" href="#version-301">§</a>Version 3.0.1</h1><h2 id="bugfix"><a class="doc-anchor" href="#bugfix">§</a>Bugfix</h2>
+<ul>
+<li><code>x64</code> immediate const evaluation now handles negative displacements properly again, generating
+8-bit displacements where possible.</li>
+</ul>
 <h1 id="version-300"><a class="doc-anchor" href="#version-300">§</a>Version 3.0.0</h1><h2 id="summary"><a class="doc-anchor" href="#summary">§</a>Summary</h2>
 <p>This release brings significant improvements to the <code>aarch64</code> experience. The runtime assemblers now
 handle cache invalidation internally where necessary. Furthermore, where previously overly large

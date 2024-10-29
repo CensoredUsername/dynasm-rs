@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-1.0.109\src\group.rs`."><title>group.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `C:\Users\maurits\.cargo\registry\src\index.crates.io-6f17d22bba15001f\syn-2.0.79\src\group.rs`."><title>group.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="syn" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -280,38 +280,56 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::Result;
 <span class="kw">use </span><span class="kw">crate</span>::parse::ParseBuffer;
 <span class="kw">use </span><span class="kw">crate</span>::token;
-<span class="kw">use </span>proc_macro2::{Delimiter, Span};
+<span class="kw">use </span>proc_macro2::extra::DelimSpan;
+<span class="kw">use </span>proc_macro2::Delimiter;
 
 <span class="comment">// Not public API.
 </span><span class="attr">#[doc(hidden)]
 </span><span class="kw">pub struct </span>Parens&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub </span>token: token::Paren,
-    <span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>token: token::Paren,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="comment">// Not public API.
 </span><span class="attr">#[doc(hidden)]
 </span><span class="kw">pub struct </span>Braces&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub </span>token: token::Brace,
-    <span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>token: token::Brace,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="comment">// Not public API.
 </span><span class="attr">#[doc(hidden)]
 </span><span class="kw">pub struct </span>Brackets&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub </span>token: token::Bracket,
-    <span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>token: token::Bracket,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="comment">// Not public API.
 </span><span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 #[doc(hidden)]
 </span><span class="kw">pub struct </span>Group&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub </span>token: token::Group,
-    <span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>token: token::Group,
+    <span class="attr">#[doc(hidden)]
+    </span><span class="kw">pub </span>content: ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="comment">// Not public API.
@@ -344,7 +362,7 @@
 <span class="attr">#[cfg(any(feature = <span class="string">"full"</span>, feature = <span class="string">"derive"</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_group&lt;<span class="lifetime">'a</span>&gt;(input: <span class="kw-2">&amp;</span>ParseBuffer&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Group&lt;<span class="lifetime">'a</span>&gt;&gt; {
     parse_delimited(input, Delimiter::None).map(|(span, content)| Group {
-        token: token::Group(span),
+        token: token::Group(span.join()),
         content,
     })
 }
@@ -352,10 +370,10 @@
 <span class="kw">fn </span>parse_delimited&lt;<span class="lifetime">'a</span>&gt;(
     input: <span class="kw-2">&amp;</span>ParseBuffer&lt;<span class="lifetime">'a</span>&gt;,
     delimiter: Delimiter,
-) -&gt; <span class="prelude-ty">Result</span>&lt;(Span, ParseBuffer&lt;<span class="lifetime">'a</span>&gt;)&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;(DelimSpan, ParseBuffer&lt;<span class="lifetime">'a</span>&gt;)&gt; {
     input.step(|cursor| {
         <span class="kw">if let </span><span class="prelude-val">Some</span>((content, span, rest)) = cursor.group(delimiter) {
-            <span class="kw">let </span>scope = <span class="kw">crate</span>::buffer::close_span_of_group(<span class="kw-2">*</span>cursor);
+            <span class="kw">let </span>scope = span.close();
             <span class="kw">let </span>nested = <span class="kw">crate</span>::parse::advance_step_cursor(cursor, content);
             <span class="kw">let </span>unexpected = <span class="kw">crate</span>::parse::get_unexpected(input);
             <span class="kw">let </span>content = <span class="kw">crate</span>::parse::new_parse_buffer(scope, nested, unexpected);
@@ -401,7 +419,7 @@
 ///             struct_token: input.parse()?,
 ///             ident: input.parse()?,
 ///             paren_token: parenthesized!(content in input),
-///             fields: content.parse_terminated(Type::parse)?,
+///             fields: content.parse_terminated(Type::parse, Token![,])?,
 ///             semi_token: input.parse()?,
 ///         })
 ///     }
@@ -415,7 +433,7 @@
 /// # }
 /// ```
 </span><span class="attr">#[macro_export]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
 </span><span class="macro">macro_rules!</span> parenthesized {
     (<span class="macro-nonterminal">$content</span>:ident <span class="kw">in </span><span class="macro-nonterminal">$cursor</span>:expr) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$crate::__private::parse_parens</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$cursor</span>) {
@@ -467,7 +485,7 @@
 ///             struct_token: input.parse()?,
 ///             ident: input.parse()?,
 ///             brace_token: braced!(content in input),
-///             fields: content.parse_terminated(Field::parse)?,
+///             fields: content.parse_terminated(Field::parse, Token![,])?,
 ///         })
 ///     }
 /// }
@@ -493,7 +511,7 @@
 /// # }
 /// ```
 </span><span class="attr">#[macro_export]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
 </span><span class="macro">macro_rules!</span> braced {
     (<span class="macro-nonterminal">$content</span>:ident <span class="kw">in </span><span class="macro-nonterminal">$cursor</span>:expr) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$crate::__private::parse_braces</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$cursor</span>) {
@@ -548,7 +566,7 @@
 /// # }
 /// ```
 </span><span class="attr">#[macro_export]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"parsing"</span>)))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"parsing"</span>)))]
 </span><span class="macro">macro_rules!</span> bracketed {
     (<span class="macro-nonterminal">$content</span>:ident <span class="kw">in </span><span class="macro-nonterminal">$cursor</span>:expr) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$crate::__private::parse_brackets</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$cursor</span>) {
