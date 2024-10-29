@@ -82,7 +82,6 @@ fn bugreport_4() {
 // Precedence issue around typemapped operands due to proc_macro2::Delimiter::None being broken.
 #[test]
 fn bugreport_5() {
-    #![allow(unused_parens)]
     #[allow(dead_code)]
     struct Test {
         a: u32,
@@ -99,4 +98,23 @@ fn bugreport_5() {
     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
     let hex: String = hex.join(", ");
     assert_eq!(hex, "0x48, 0x89, 0x83, 0x1C, 0x00, 0x00, 0x00", "bugreport_5");
+}
+
+// Bad sizing of constant immediates in x64 mode
+#[test]
+fn bugreport_6() {
+    let mut ops = dynasmrt::x64::Assembler::new().unwrap();
+    dynasm!(ops
+       ; .arch x64
+       ; lea rax, [rbx + 1]
+       ; lea rax, [rbx + 0x80]
+       ; lea rax, [rbx - 1]
+       ; lea rax, [rbx + -1]
+       ; lea rax, [rbx - 0x81]
+    );
+
+    let buf = ops.finalize().unwrap();
+    let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+    let hex: String = hex.join(", ");
+    assert_eq!(hex, "0x48, 0x8D, 0x43, 0x01, 0x48, 0x8D, 0x83, 0x80, 0x00, 0x00, 0x00, 0x48, 0x8D, 0x43, 0xFF, 0x48, 0x8D, 0x43, 0xFF, 0x48, 0x8D, 0x83, 0x7F, 0xFF, 0xFF, 0xFF", "bugreport_6");
 }

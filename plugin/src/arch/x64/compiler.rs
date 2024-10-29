@@ -753,31 +753,36 @@ fn sanitize_indirects_and_sizes(ctx: &Context, args: &mut [CleanArg]) -> Result<
 
 // Tries to find the maximum size necessary to hold the result of an expression.
 fn derive_size(expr: &syn::Expr) -> Option<Size> {
-    // strip any wrapping Group nodes due to delimiting
+    // strip any wrapping Group or Paren nodes due to delimiting
     let mut inner = expr;
-    while let syn::Expr::Group(syn::ExprGroup { expr, .. }) = inner {
-        inner = expr;
+    loop {
+        inner = match inner {
+            syn::Expr::Group(syn::ExprGroup { expr, ..}) => expr,
+            syn::Expr::Paren(syn::ExprParen { expr, .. }) => expr,
+            _ => break
+        }
     }
 
     match inner {
         syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => match lit {
             syn::Lit::Byte(_) => Some(Size::BYTE),
-            syn::Lit::Int(i) => match i.base10_parse::<u32>() {
-                Ok(x) if x < 0x80 => Some(Size::BYTE),
-                Ok(x) if x < 0x8000 => Some(Size::B_2),
-                Ok(x) if x < 0x8000_0000 => Some(Size::B_4),
-                _ => Some(Size::B_8),
+            syn::Lit::Int(i) => match i.base10_parse::<i32>() {
+                Err(_) => Some(Size::B_8),
+                Ok(x) if x > 0x7FFF || x < -0x8000 => Some(Size::B_4),
+                Ok(x) if x > 0x7F || x < -0x80 => Some(Size::B_2),
+                Ok(_) => Some(Size::BYTE),
             },
             _ => None
         },
         syn::Expr::Unary(syn::ExprUnary { op: syn::UnOp::Neg(_), ref expr, .. } ) => match &**expr {
             syn::Expr::Lit(syn::ExprLit { ref lit, .. } ) => match lit {
                 syn::Lit::Byte(_) => Some(Size::BYTE),
-                syn::Lit::Int(i) => match i.base10_parse::<u32>() {
-                    Ok(x) if x <= 0x80 => Some(Size::BYTE),
-                    Ok(x) if x <= 0x8000 => Some(Size::B_2),
-                    Ok(x) if x <= 0x8000_0000 => Some(Size::B_4),
-                    _ => Some(Size::B_8),
+                syn::Lit::Int(i) => match i.base10_parse::<i64>() {
+                    Err(_) => Some(Size::B_8),
+                    Ok(x) if x > 0x8000_0000 || x < -0x7FFF_FFFF => Some(Size::B_4),
+                    Ok(x) if x > 0x8000 || x < -0x7FFF => Some(Size::B_4),
+                    Ok(x) if x > 0x80 || x < -0x7F => Some(Size::B_2),
+                    Ok(_) => Some(Size::BYTE),
                 },
                 _ => None
             },
