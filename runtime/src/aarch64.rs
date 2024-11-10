@@ -25,7 +25,7 @@
 use crate::Register;
 use crate::relocations::{Relocation, RelocationSize, RelocationKind, ImpossibleRelocation, fits_signed_bitfield};
 use byteorder::{ByteOrder, LittleEndian};
-use std::convert::TryFrom;
+use core::convert::TryFrom;
 
 /// Relocation implementation for the aarch64 architecture.
 #[derive(Debug, Clone)]
@@ -188,6 +188,7 @@ impl Relocation for Aarch64Relocation {
 }
 
 /// An aarch64 Assembler. This is aliased here for backwards compatability.
+#[cfg(feature = "std")]
 pub type Assembler = crate::Assembler<Aarch64Relocation>;
 /// An aarch64 AssemblyModifier. This is aliased here for backwards compatability.
 pub type AssemblyModifier<'a> = crate::Modifier<'a, Aarch64Relocation>;

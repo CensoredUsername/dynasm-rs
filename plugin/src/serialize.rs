@@ -251,7 +251,7 @@ pub fn expr_size_of_scale(ty: &syn::Path, value: &TokenTree, size: Size) -> Toke
     let size = size.as_literal();
 
     delimited(quote_spanned! { span=>
-        (::std::mem::size_of::<#ty>() as #size) * #value
+        (::core::mem::size_of::<#ty>() as #size) * #value
     })
 }
 
@@ -303,17 +303,17 @@ pub fn expr_offset_of(path: &syn::Path, attr: &syn::Ident, size: Size) -> TokenT
     let size = size.as_literal();
 
     delimited(quote_spanned! { span=>
-        ::std::mem::offset_of!(#path, #attr) as #size
+        ::core::mem::offset_of!(#path, #attr) as #size
     })
 }
 
-// returns std::mem::size_of<path>()
+// returns core::mem::size_of<path>()
 pub fn expr_size_of(path: &syn::Path) -> TokenTree {
     // generate a P<Expr> that returns the size of type at path
     let span = path.span();
 
     delimited(quote_spanned! { span=>
-        ::std::mem::size_of::<#path>()
+        ::core::mem::size_of::<#path>()
     })
 }
 

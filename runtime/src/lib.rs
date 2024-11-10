@@ -1,9 +1,21 @@
+#![cfg_attr(not(any(feature = "std", test)), no_std)]
 #![warn(missing_docs)]
+#![warn(
+    clippy::alloc_instead_of_core,
+    clippy::std_instead_of_core,
+    clippy::std_instead_of_alloc
+)]
 
 //! This crate provides runtime support for dynasm-rs. It contains traits that document the interface used by the dynasm proc_macro to generate code,
 //! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools
 //! to write your own Assemblers using these components.
 
+extern crate alloc;
+
+#[cfg(test)]
+extern crate std;
+
+#[cfg(feature = "std")]
 pub mod mmap;
 pub mod components;
 pub mod relocations;
@@ -30,18 +42,28 @@ pub mod x64;
 pub mod x86;
 pub mod aarch64;
 
+#[cfg(feature = "std")]
 pub use crate::mmap::ExecutableBuffer;
 pub use dynasm::{dynasm, dynasm_backwards};
 
-use crate::components::{MemoryManager, LabelRegistry, RelocRegistry, ManagedRelocs, PatchLoc, StaticLabel};
+use crate::components::{LabelRegistry, RelocRegistry, ManagedRelocs, PatchLoc, StaticLabel};
+#[cfg(feature = "std")]
+use crate::components::MemoryManager;
 use crate::relocations::Relocation;
 
-use std::hash::Hash;
-use std::sync::{Arc, RwLock, RwLockReadGuard};
+use core::hash::Hash;
+use core::error;
+use core::fmt::{self, Debug};
+#[cfg(feature = "std")]
+use core::mem;
+#[cfg(feature = "std")]
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::sync::{RwLock, RwLockReadGuard};
+#[cfg(feature = "std")]
 use std::io;
-use std::error;
-use std::fmt::{self, Debug};
-use std::mem;
 
 /// This macro takes a *const pointer from the source operand, and then casts it to the desired return type.
 /// this allows it to be used as an easy shorthand for passing pointers as dynasm immediate arguments.
@@ -78,12 +100,14 @@ impl DynamicLabel {
 /// A read-only shared reference to the executable buffer inside an `Assembler`. By
 /// locking it the internal `ExecutableBuffer` can be accessed and executed.
 #[derive(Debug, Clone)]
+#[cfg(feature = "std")]
 pub struct Executor {
     execbuffer: Arc<RwLock<ExecutableBuffer>>
 }
 
 /// A read-only lockable reference to the internal `ExecutableBuffer` of an `Assembler`.
 /// To gain access to this buffer, it must be locked.
+#[cfg(feature = "std")]
 impl Executor {
     /// Gain read-access to the internal `ExecutableBuffer`. While the returned guard
     /// is alive, it can be used to read and execute from the `ExecutableBuffer`.
@@ -458,7 +482,7 @@ impl<R: Relocation> VecAssembler<R> {
     pub fn take(&mut self) -> Result<Vec<u8>, DynasmError> {
         self.commit()?;
         self.labels.clear();
-        Ok(std::mem::take(&mut self.ops))
+        Ok(core::mem::take(&mut self.ops))
     }
 
     /// Equivalent of take, but instead of allocating a new vector it simply provides a draining iterator over the internal contents.
@@ -560,6 +584,7 @@ impl<R: Relocation> DynasmLabelApi for VecAssembler<R> {
 /// incremental compilation and multithreaded execution with simultaneous compilation.
 /// Its implementation guarantees no memory is executable and writable at the same time.
 #[derive(Debug)]
+#[cfg(feature = "std")]
 pub struct Assembler<R: Relocation> {
     ops: Vec<u8>,
     memory: MemoryManager,
@@ -569,6 +594,7 @@ pub struct Assembler<R: Relocation> {
     error: Option<DynasmError>,
 }
 
+#[cfg(feature = "std")]
 impl<R: Relocation> Assembler<R> {
     /// Create a new, empty assembler, with initial allocation size `page_size`.
     pub fn new() -> io::Result<Self> {
@@ -740,18 +766,21 @@ impl<R: Relocation> Assembler<R> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<R: Relocation> Extend<u8> for Assembler<R> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=u8> {
         self.ops.extend(iter)
     }
 }
 
+#[cfg(feature = "std")]
 impl<'a, R: Relocation> Extend<&'a u8> for Assembler<R> {
     fn extend<T>(&mut self, iter: T) where T: IntoIterator<Item=&'a u8> {
         self.ops.extend(iter)
     }
 }
 
+#[cfg(feature = "std")]
 impl<R: Relocation> DynasmApi for Assembler<R> {
     fn offset(&self) -> AssemblyOffset {
         AssemblyOffset(self.memory.committed() + self.ops.len())
@@ -771,6 +800,7 @@ impl<R: Relocation> DynasmApi for Assembler<R> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<R: Relocation> DynasmLabelApi for Assembler<R> {
     type Relocation = R;
 
@@ -881,6 +911,7 @@ impl<'a, R: Relocation> Modifier<'a, R> {
     }
 
     // encode uncommited relocations. also, invalidate the icache
+    #[allow(unused)]
     fn encode_relocs(&mut self) -> Result<(), DynasmError> {
         let buf_addr = self.buffer.as_ptr() as usize;
 
