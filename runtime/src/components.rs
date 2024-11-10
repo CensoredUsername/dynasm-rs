@@ -1,17 +1,36 @@
 //! This module provides several reusable compoments for implementing assemblers
 
-use std::io;
+#[cfg(feature = "std")]
 use std::collections::hash_map::Entry;
-use std::collections::BTreeMap;
-use std::sync::{Arc, RwLock, RwLockWriteGuard};
-use std::mem;
+use alloc::collections::BTreeMap;
+#[cfg(feature = "std")]
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+#[cfg(feature = "std")]
+use core::mem;
 
+#[cfg(feature = "std")]
+use std::io;
+#[cfg(feature = "std")]
+use std::sync::{RwLock, RwLockWriteGuard};
+
+#[cfg(feature = "std")]
 use fnv::FnvHashMap;
 
+#[cfg(not(feature = "std"))]
+type FnvHashMap<K, V> = hashbrown::HashMap<K, V, fnv::FnvBuildHasher>;
+
+#[cfg(not(feature = "std"))]
+use hashbrown::hash_map::Entry;
+
 use crate::{DynamicLabel, AssemblyOffset, DynasmError, LabelKind, DynasmLabelApi};
-use crate::mmap::{ExecutableBuffer, MutableBuffer};
 use crate::relocations::{Relocation, RelocationKind, RelocationSize, ImpossibleRelocation};
+
+#[cfg(feature = "std")]
 use crate::cache_control;
+
+#[cfg(feature = "std")]
+use crate::mmap::{ExecutableBuffer, MutableBuffer};
 
 /// A static label represents either a local label or a global label reference.
 ///
@@ -79,6 +98,7 @@ impl StaticLabel {
 
 /// This struct implements a protection-swapping assembling buffer
 #[derive(Debug)]
+#[cfg(feature = "std")]
 pub struct MemoryManager {
     // buffer where the end result is copied into
     execbuffer: Arc<RwLock<ExecutableBuffer>>,
@@ -92,6 +112,7 @@ pub struct MemoryManager {
     execbuffer_addr: usize
 }
 
+#[cfg(feature = "std")]
 impl MemoryManager {
     /// Create a new memory manager, with `initial_mmap_size` data allocated
     pub fn new(initial_mmap_size: usize) -> io::Result<Self> {
@@ -333,7 +354,7 @@ impl<R: Relocation> PatchLoc<R> {
     /// Returns a range that covers the entire relocation in its assembling buffer
     /// `buf_offset` is a value that is subtracted from this range when the buffer you want to slice
     /// with this range is only a part of a bigger buffer.
-    pub fn range(&self, buf_offset: usize) -> std::ops::Range<usize> {
+    pub fn range(&self, buf_offset: usize) -> core::ops::Range<usize> {
         let field_offset = self.location.0 - buf_offset -  self.field_offset as usize;
         field_offset .. field_offset + self.relocation.size()
     }
@@ -646,7 +667,7 @@ mod tests {
     }
 
     fn test_litpool<R: Relocation + Debug>() {
-        let mut ops = Assembler::<R>::new().unwrap();
+        let mut ops = VecAssembler::<R>::new(0x0);
         let dynamic1 = ops.new_dynamic_label();
 
         let mut pool = components::LitPool::new();

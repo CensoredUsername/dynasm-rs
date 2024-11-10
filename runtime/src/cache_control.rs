@@ -29,7 +29,7 @@ pub fn synchronize_icache(slice: &[u8]) {
 
 #[cfg(target_arch="aarch64")]
 mod aarch64 {
-    use std::arch::asm;
+    use core::arch::asm;
 
     /// return the cache line sizes as reported by the processor as a tuple of (dcache, icache)
     fn get_cacheline_sizes() -> (usize, usize) {
