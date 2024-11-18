@@ -287,7 +287,7 @@ impl LabelRegistry {
 
     /// Returns the offset at which the dynamic label `id` was defined, if one was defined.
     pub fn resolve_dynamic(&self, id: DynamicLabel) -> Result<AssemblyOffset, DynasmError> {
-        self.dynamic_labels.get(id.0).and_then(|&e| e).ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
+        self.dynamic_labels.get(id.0).and_then(|&e| e).ok_or(DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
     }
 
     /// Returns the offset at which the global label `label` was defined, if one was defined.
