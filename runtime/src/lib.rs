@@ -610,7 +610,7 @@ impl<R: Relocation> Assembler<R> {
         let mut modifier = Modifier {
             asmoffset: 0,
             previous_asmoffset: 0,
-            buffer: &mut *buffer,
+            buffer: &mut buffer,
 
             labels: &mut self.labels,
             relocs: &mut self.relocs,
