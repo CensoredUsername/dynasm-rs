@@ -713,7 +713,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
                         ::dynasmrt::aarch64::immediate_out_of_range_unsigned_32(!value);
                     }
 
-                    ((0xFFFFu32 & (value >> offset)) as u32) | (offset << 12)
+                    (0xFFFFu32 & (value >> offset)) | (offset << 12)
                 }
             }));
             return Ok(());
@@ -755,7 +755,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
                         ::dynasmrt::aarch64::immediate_out_of_range_unsigned_32(value);
                     }
 
-                    ((0xFFFFu32 & (value >> offset)) as u32) | (offset << 12)
+                    (0xFFFFu32 & (value >> offset)) | (offset << 12)
                 }
             }));
             return Ok(());
