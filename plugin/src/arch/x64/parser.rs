@@ -252,7 +252,7 @@ fn parse_reg(ctx: &Context, expr: &syn::Expr) -> Option<(Span, Register)> {
             return None;
         }
 
-        let called = if let Some(called) = as_ident(&&*func) {
+        let called = if let Some(called) = as_ident(&*func) {
             called
         } else {
             return None;

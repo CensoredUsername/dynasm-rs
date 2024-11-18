@@ -138,7 +138,7 @@ impl MemoryManager {
 
             // copy over the data
             new_buffer[.. old_asmoffset].copy_from_slice(&self.execbuffer.read().unwrap());
-            new_buffer[old_asmoffset..].copy_from_slice(&new);
+            new_buffer[old_asmoffset..].copy_from_slice(new);
             let new_buffer_addr = new_buffer.as_ptr() as usize;
 
             // allow modifications to be made
@@ -160,7 +160,7 @@ impl MemoryManager {
 
             // update buffer and length
             buffer.set_len(new_asmoffset);
-            buffer[old_asmoffset..].copy_from_slice(&new);
+            buffer[old_asmoffset..].copy_from_slice(new);
 
             // ensure that no old data remains in the icache of what we just updated
             cache_control::synchronize_icache(&buffer[old_asmoffset .. ]);

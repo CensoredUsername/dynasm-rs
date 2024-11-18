@@ -98,7 +98,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
     let mut args = args.into_iter().map(clean_memoryref).collect::<Result<Vec<CleanArg>, _>>()?;
 
     // sanitize memory references, determine address size, and size immediates/displacements if possible
-    let addr_size = sanitize_indirects_and_sizes(&ctx, &mut args)?;
+    let addr_size = sanitize_indirects_and_sizes(ctx, &mut args)?;
     let addr_size = addr_size.unwrap_or(match ctx.mode {
         X86Mode::Long => Size::B_8,
         X86Mode::Protected => Size::B_4
@@ -1178,7 +1178,7 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
     let mut im_size = None;
 
     // operand size determination loop
-    for (arg, (_, fsize)) in args.iter().zip(FormatStringIterator::new(&fmt.args)) {
+    for (arg, (_, fsize)) in args.iter().zip(FormatStringIterator::new(fmt.args)) {
         if fsize != b'*' {
             continue;
         }
@@ -1241,7 +1241,7 @@ fn size_operands(fmt: &Opdata, args: Vec<CleanArg>) -> Result<(Option<Size>, Vec
 
     // fill-in loop. default should never be used.
     let mut new_args = Vec::new();
-    for (arg, (code, fsize)) in args.into_iter().zip(FormatStringIterator::new(&fmt.args)) {
+    for (arg, (code, fsize)) in args.into_iter().zip(FormatStringIterator::new(fmt.args)) {
 
         //get the specified operand size from the format string
         let size = match (fsize, code) {
