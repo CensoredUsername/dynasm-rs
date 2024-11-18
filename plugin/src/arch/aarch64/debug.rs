@@ -91,13 +91,13 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 continue;
             } else if let Matcher::Dot = matcher {
                 after_dot = true;
-                buf.push_str(".");
+                buf.push('.');
                 continue;
             }
 
             if first {
                 if !after_dot {
-                    buf.push_str(" ");
+                    buf.push(' ');
                     first = false;
                 }
                 after_dot = false;
@@ -656,13 +656,13 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> Vec<String> {
                 continue;
             } else if let Matcher::Dot = matcher {
                 after_dot = true;
-                buf.push_str(".");
+                buf.push('.');
                 continue;
             }
 
             if first {
                 if !after_dot {
-                    buf.push_str(" ");
+                    buf.push(' ');
                     first = false;
                 }
                 after_dot = false;
