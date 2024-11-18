@@ -32,7 +32,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
                     },
                     Size::B_8 => {
                         let mut buffer = [0u8; 8];
-                        LittleEndian::write_u64(&mut buffer, value as u64);
+                        LittleEndian::write_u64(&mut buffer, value);
                         const_buffer.extend(&buffer);
                     },
                     _ => unimplemented!()

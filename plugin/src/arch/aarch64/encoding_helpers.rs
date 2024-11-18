@@ -96,7 +96,7 @@ pub fn encode_wide_immediate_32bit(value: u32) -> Option<u32> {
     let offset = value.trailing_zeros() & 0b1_0000;
     let masked = 0xFFFF & (value >> offset);
     if (masked << offset) == value {
-        Some((masked as u32) | (offset << 12))
+        Some(masked | (offset << 12))
     } else {
         None
     }

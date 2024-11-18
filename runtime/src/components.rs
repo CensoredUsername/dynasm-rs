@@ -516,13 +516,13 @@ impl LitPool {
 
     /// Add extra alignment for the next value in the literal pool
     pub fn align(&mut self, size: usize, with: u8) {
-        let misalign = self.offset % (size as usize);
+        let misalign = self.offset % size;
         if misalign == 0 {
             return;
         }
 
         self.entries.push(LitPoolEntry::Align(with, size));
-        self.offset += size as usize - misalign;
+        self.offset += size - misalign;
     }
 
     /// Encode `value` into the literal pool.

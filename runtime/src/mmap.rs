@@ -62,7 +62,7 @@ impl ExecutableBuffer {
 
     /// Query the backing size of this executable buffer
     pub fn size(&self) -> usize {
-        self.buffer.as_ref().map(|b| b.len()).unwrap_or(0) as usize
+        self.buffer.as_ref().map(|b| b.len()).unwrap_or(0)
     }
 
     /// Change this executable buffer into a mutable buffer.
@@ -98,7 +98,7 @@ impl MutableBuffer {
 
     /// Query the backing size of this mutable buffer
     pub fn size(&self) -> usize {
-        self.buffer.as_ref().map(|b| b.len()).unwrap_or(0) as usize
+        self.buffer.as_ref().map(|b| b.len()).unwrap_or(0)
     }
 
     /// Set the length of the usable part of this mutable buffer. The length

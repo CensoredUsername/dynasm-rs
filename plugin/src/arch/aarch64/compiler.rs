@@ -328,7 +328,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                     if let Some((biased, _)) = static_range_check(value, 0, mask, 0)? {
                         for (i, &field) in bitfields.iter().rev().enumerate() {
-                            statics.push((field as u8, (biased >> i) & 1));
+                            statics.push((field, (biased >> i) & 1));
                         }
 
                     } else {
@@ -336,12 +336,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                         for (i, &field) in bitfields.iter().rev().enumerate() {
                             if i == 0 {
-                                dynamics.push((field as u8, quote_spanned!{ value.span()=>
+                                dynamics.push((field, quote_spanned!{ value.span()=>
                                     { let _dyn_imm: u32 = #value; #check; (_dyn_imm >> #i) & 1 }
                                 }));
 
                             } else {
-                                dynamics.push((field as u8, quote_spanned!{ value.span()=>
+                                dynamics.push((field, quote_spanned!{ value.span()=>
                                     (#value >> #i) & 1
                                 }));
                             }
@@ -678,7 +678,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
     match special {
         SpecialComm::INVERTED_WIDE_IMMEDIATE_X => if let Some(number) = None::<u64> { // as_unsigned_number(imm) {
             if let Some(encoded) = encoding_helpers::encode_wide_immediate_64bit(!number) {
-                statics.push((offset, encoded as u32));
+                statics.push((offset, encoded));
                 return Ok(());
             }
         } else {
@@ -699,7 +699,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         SpecialComm::INVERTED_WIDE_IMMEDIATE_W => if let Some(number) = as_unsigned_number(imm) {
             if number <= u64::from(u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(!(number as u32)) {
-                    statics.push((offset, encoded as u32));
+                    statics.push((offset, encoded));
                     return Ok(());
                 }
             }
@@ -720,7 +720,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         },
         SpecialComm::WIDE_IMMEDIATE_X => if let Some(number) = as_unsigned_number(imm) {
             if let Some(encoded) = encoding_helpers::encode_wide_immediate_64bit(number) {
-                statics.push((offset, encoded as u32));
+                statics.push((offset, encoded));
                 return Ok(());
             }
         } else {
@@ -741,7 +741,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         SpecialComm::WIDE_IMMEDIATE_W => if let Some(number) = as_unsigned_number(imm) {
             if number <= u64::from(u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(number as u32) {
-                    statics.push((offset, encoded as u32));
+                    statics.push((offset, encoded));
                     return Ok(());
                 }
             }
@@ -762,8 +762,8 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
         },
         SpecialComm::STRETCHED_IMMEDIATE => if let Some(number) = as_unsigned_number(imm) {
             if let Some(encoded) = encoding_helpers::encode_stretched_immediate(number) {
-                statics.push((offset, encoded & 0x1F as u32));
-                statics.push((offset + 6, encoded & 0xE0 as u32));
+                statics.push((offset, encoded & 0x1F));
+                statics.push((offset + 6, encoded & 0xE0));
                 return Ok(());
             }
         } else {
