@@ -125,7 +125,7 @@ pub enum Command {
     /// `immediate + prev_arg - 1` is encoded in a a bitfield of length `len` at offset `pos`
     Usum(u8, u8),
     /// format: `([offsets])`
-    /// `immediate is in the range `0 .. (1 << offsets.len())`
+    /// `immediate` is in the range `0 .. (1 << offsets.len())`
     /// `immediate` is encoded with bit N of the number at offsets[N]
     Ufields(&'static [u8]),
 
