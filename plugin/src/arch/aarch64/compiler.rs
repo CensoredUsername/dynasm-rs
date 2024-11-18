@@ -697,7 +697,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             return Ok(());
         },
         SpecialComm::INVERTED_WIDE_IMMEDIATE_W => if let Some(number) = as_unsigned_number(imm) {
-            if number <= u64::from(std::u32::MAX) {
+            if number <= u64::from(u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(!(number as u32)) {
                     statics.push((offset, encoded as u32));
                     return Ok(());
@@ -739,7 +739,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             return Ok(());
         },
         SpecialComm::WIDE_IMMEDIATE_W => if let Some(number) = as_unsigned_number(imm) {
-            if number <= u64::from(std::u32::MAX) {
+            if number <= u64::from(u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_wide_immediate_32bit(number as u32) {
                     statics.push((offset, encoded as u32));
                     return Ok(());
@@ -788,7 +788,7 @@ fn handle_special_immediates(offset: u8, special: SpecialComm, imm: &syn::Expr, 
             return Ok(());
         },
         SpecialComm::LOGICAL_IMMEDIATE_W => if let Some(number) = as_unsigned_number(imm) {
-            if number <= u64::from(std::u32::MAX) {
+            if number <= u64::from(u32::MAX) {
                 if let Some(encoded) = encoding_helpers::encode_logical_immediate_32bit(number as u32) {
                     statics.push((offset, u32::from(encoded)));
                     return Ok(());
