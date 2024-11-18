@@ -288,7 +288,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
         };
 
         // check addressing mode special cases
-        let mode_vsib = index.as_ref().map_or(false, |&(ref i, _, _)| i.kind.family() == RegFamily::XMM);
+        let mode_vsib = index.as_ref().map_or(false, |(i, _, _)| i.kind.family() == RegFamily::XMM);
         let mode_16bit = addr_size == Size::B_2;
         let mode_rip_relative = base.as_ref().map_or(false, |b| b.kind.family() == RegFamily::RIP);
         let mode_rbp_base = base.as_ref().map_or(false, |b| b == &RegId::RBP || b == &RegId::R13 || b.kind.is_dynamic());
@@ -549,7 +549,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             let mut base_reg_index = None;
             for (i, reg) in regs.iter().enumerate() {
                 if !(regs.iter().enumerate().any(|(j, other)| i != j && reg == other) ||
-                     scaled.iter().any(|&(ref other, _)| reg == other)) {
+                     scaled.iter().any(|(other, _)| reg == other)) {
                     base_reg_index = Some(i);
                     break;
                 }
@@ -561,7 +561,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             let mut joined_regs = Vec::new();
             for (reg, s) in scaled {
                 // does this register already have a spot?
-                if let Some(i) = joined_regs.iter().position(|&(ref other, _)| &reg == other) {
+                if let Some(i) = joined_regs.iter().position(|(other, _)| &reg == other) {
                     joined_regs[i].1 += s;
                 } else {
                     joined_regs.push((reg, s));
@@ -626,7 +626,7 @@ fn clean_memoryref(arg: RawArg) -> Result<CleanArg, Option<String>> {
             let mut joined_regs = Vec::new();
             for (reg, s) in scaled {
                 // does this register already have a spot?
-                if let Some(i) = joined_regs.iter().position(|&(ref other, _)| &reg == other) {
+                if let Some(i) = joined_regs.iter().position(|(other, _)| &reg == other) {
                     joined_regs[i].1 += s;
                 } else {
                     joined_regs.push((reg, s));
@@ -1061,47 +1061,47 @@ fn match_format_string(ctx: &Context, fmt: &Opdata, args: &[CleanArg]) -> Result
             (b'o', &CleanArg::JumpTarget{size, ..}) => size,
 
             // specific legacy regs
-            (x @ b'A' ..= b'P', &CleanArg::Direct{ref reg, ..}) if
+            (x @ b'A' ..= b'P', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::LEGACY &&
                 reg.kind.code() == Some(x - b'A') => Some(reg.size()),
 
             // specific segment regs
-            (x @ b'Q' ..= b'V', &CleanArg::Direct{ref reg, ..}) if
+            (x @ b'Q' ..= b'V', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::SEGMENT &&
                 reg.kind.code() == Some(x - b'Q') => Some(reg.size()),
 
             // CR8 can be specially referenced
-            (b'W', &CleanArg::Direct{ref reg, ..}) if
+            (b'W', CleanArg::Direct{reg, ..}) if
                 reg.kind == RegId::CR8 => Some(reg.size()),
 
             // top of the fp stack is also often used
-            (b'X', &CleanArg::Direct{ref reg, ..}) if
+            (b'X', CleanArg::Direct{reg, ..}) if
                 reg.kind == RegId::ST0 => Some(reg.size()),
 
             // generic legacy regs
-            (b'r', &CleanArg::Direct{ref reg, ..}) |
-            (b'v', &CleanArg::Direct{ref reg, ..}) if
+            (b'r', CleanArg::Direct{reg, ..}) |
+            (b'v', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::LEGACY ||
                 reg.kind.family() == RegFamily::HIGHBYTE => Some(reg.size()),
 
             // other reg types often mixed with memory refs
-            (b'x', &CleanArg::Direct{ref reg, ..}) |
-            (b'u', &CleanArg::Direct{ref reg, ..}) if
+            (b'x', CleanArg::Direct{reg, ..}) |
+            (b'u', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::MMX => Some(reg.size()),
-            (b'y', &CleanArg::Direct{ref reg, ..}) |
-            (b'w', &CleanArg::Direct{ref reg, ..}) if
+            (b'y', CleanArg::Direct{reg, ..}) |
+            (b'w', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::XMM => Some(reg.size()),
 
             // other reg types
-            (b'f', &CleanArg::Direct{ref reg, ..}) if
+            (b'f', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::FP => Some(reg.size()),
-            (b's', &CleanArg::Direct{ref reg, ..}) if
+            (b's', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::SEGMENT => Some(reg.size()),
-            (b'c', &CleanArg::Direct{ref reg, ..}) if
+            (b'c', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::CONTROL => Some(reg.size()),
-            (b'd', &CleanArg::Direct{ref reg, ..}) if
+            (b'd', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::DEBUG => Some(reg.size()),
-            (b'b', &CleanArg::Direct{ref reg, ..}) if
+            (b'b', CleanArg::Direct{reg, ..}) if
                 reg.kind.family() == RegFamily::BOUND => Some(reg.size()),
 
             // memory offsets
