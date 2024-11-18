@@ -27,7 +27,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> Vec<String> {
         let mut first = true;
         for (ty, size) in FormatStringIterator::new(data.args) {
             if first {
-                buf.push_str(" ");
+                buf.push(' ');
                 first = false;
             } else {
                 buf.push_str(", ");
