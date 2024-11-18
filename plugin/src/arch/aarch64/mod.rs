@@ -23,15 +23,9 @@ struct Context<'a, 'b: 'a> {
     pub state: &'a mut State<'b>
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ArchAarch64 {
 
-}
-
-impl Default for ArchAarch64 {
-    fn default() -> ArchAarch64 {
-        ArchAarch64 { }
-    }
 }
 
 impl Arch for ArchAarch64 {
