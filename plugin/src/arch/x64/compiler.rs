@@ -141,7 +141,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         match ctx.mode {
             X86Mode::Protected => if op_size == Size::B_8 {
-                return Err(Some(format!("'{}': Does not support 64 bit operands in 32-bit mode", op.to_string())));
+                return Err(Some(format!("'{}': Does not support 64 bit operands in 32-bit mode", op)));
             },
             X86Mode::Long => ()
         }
@@ -151,14 +151,14 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
                 (Size::B_2, _) => pref_size = true,
                 (Size::B_8, X86Mode::Long) => (),
                 (Size::B_4, X86Mode::Protected) => (),
-                (Size::B_4, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", op.to_string()))),
+                (Size::B_4, X86Mode::Long) => return Err(Some(format!("'{}': Does not support 32 bit operands in 64-bit mode", op))),
                 (_, _) => panic!("bad formatting data"),
             }
         } else if data.flags.contains(Flags::AUTO_REXW) {
             if op_size == Size::B_8 {
                 rex_w = true;
             } else if op_size != Size::B_4 {
-                return Err(Some(format!("'{}': Does not support 16-bit operands", op.to_string())));
+                return Err(Some(format!("'{}': Does not support 16-bit operands", op)));
             }
         } else if data.flags.contains(Flags::AUTO_VEXL) {
             if op_size == Size::B_32 {
@@ -241,7 +241,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             // Certain SSE/AVX legacy encoded operations are not available in 32-bit mode
             // as they require a REX.W prefix to be encoded, which is impossible. We catch those cases here
             if ctx.mode == X86Mode::Protected {
-                return Err(Some(format!("'{}': Does not support 64 bit operand size in 32-bit mode", op.to_string())))
+                return Err(Some(format!("'{}': Does not support 64 bit operand size in 32-bit mode", op)))
             }
             compile_rex(buffer, rex_w, &reg, &rm);
         }
