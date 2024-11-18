@@ -10,7 +10,7 @@ use crate::AssemblyOffset;
 
 /// A structure holding a buffer of executable memory. It also derefs to a `&[u8]`.
 /// This structure does not allocate when its size is 0.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ExecutableBuffer {
     // length of the buffer that has actually been written to
     length: usize,
@@ -20,7 +20,7 @@ pub struct ExecutableBuffer {
 
 /// ExecutableBuffer equivalent that holds a buffer of mutable memory instead of executable memory. It also derefs to a `&mut [u8]`.
 /// This structure does not allocate when its size is 0.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct MutableBuffer {
     // length of the buffer that has actually been written to
     length: usize,
@@ -119,24 +119,6 @@ impl MutableBuffer {
             length: self.length,
             buffer
         })
-    }
-}
-
-impl Default for ExecutableBuffer {
-    fn default() -> ExecutableBuffer {
-        ExecutableBuffer {
-            length: 0,
-            buffer: None
-        }
-    }
-}
-
-impl Default for MutableBuffer {
-    fn default() -> MutableBuffer {
-        MutableBuffer {
-            length: 0,
-            buffer: None
-        }
     }
 }
 
