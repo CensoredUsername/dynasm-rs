@@ -1,0 +1,3 @@
+[submodule "tools/riscv_data/riscv-opcodes"]
+	path = tools/riscv_data/riscv-opcodes
+	url = git@github.com:riscv/riscv-opcodes.git
