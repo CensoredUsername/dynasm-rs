@@ -11,6 +11,7 @@ use crate::arch::Arch;
 
 pub mod ast;
 pub mod parser;
+pub mod riscvdata;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RiscVTarget {
