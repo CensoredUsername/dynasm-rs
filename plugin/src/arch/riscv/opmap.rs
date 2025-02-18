@@ -6,355 +6,355 @@ Ops!(
 
 "amoadd.d" = [
     // amoadd.d rd, rs1, rs2, aq, rl (a)
-    Single(0x0000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.d.aq" = [
     // amoadd.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x0400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.d.aqrl" = [
     // amoadd.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x0600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.d.rl" = [
     // amoadd.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x0200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.w" = [
     // amoadd.w rd, rs1, rs2, aq, rl (a)
-    Single(0x0000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.w.aq" = [
     // amoadd.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x0400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.w.aqrl" = [
     // amoadd.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x0600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoadd.w.rl" = [
     // amoadd.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x0200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.d" = [
     // amoand.d rd, rs1, rs2, aq, rl (a)
-    Single(0x6000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.d.aq" = [
     // amoand.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x6400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.d.aqrl" = [
     // amoand.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x6600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.d.rl" = [
     // amoand.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x6200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.w" = [
     // amoand.w rd, rs1, rs2, aq, rl (a)
-    Single(0x6000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.w.aq" = [
     // amoand.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x6400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.w.aqrl" = [
     // amoand.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x6600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoand.w.rl" = [
     // amoand.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x6200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x6200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.d" = [
     // amomax.d rd, rs1, rs2, aq, rl (a)
-    Single(0xA000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.d.aq" = [
     // amomax.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0xA400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.d.aqrl" = [
     // amomax.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0xA600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.d.rl" = [
     // amomax.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0xA200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.w" = [
     // amomax.w rd, rs1, rs2, aq, rl (a)
-    Single(0xA000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.w.aq" = [
     // amomax.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0xA400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.w.aqrl" = [
     // amomax.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0xA600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomax.w.rl" = [
     // amomax.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0xA200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xA200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.d" = [
     // amomaxu.d rd, rs1, rs2, aq, rl (a)
-    Single(0xE000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.d.aq" = [
     // amomaxu.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0xE400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.d.aqrl" = [
     // amomaxu.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0xE600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.d.rl" = [
     // amomaxu.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0xE200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.w" = [
     // amomaxu.w rd, rs1, rs2, aq, rl (a)
-    Single(0xE000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.w.aq" = [
     // amomaxu.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0xE400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.w.aqrl" = [
     // amomaxu.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0xE600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomaxu.w.rl" = [
     // amomaxu.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0xE200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xE200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.d" = [
     // amomin.d rd, rs1, rs2, aq, rl (a)
-    Single(0x8000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.d.aq" = [
     // amomin.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x8400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.d.aqrl" = [
     // amomin.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x8600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.d.rl" = [
     // amomin.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x8200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.w" = [
     // amomin.w rd, rs1, rs2, aq, rl (a)
-    Single(0x8000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.w.aq" = [
     // amomin.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x8400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.w.aqrl" = [
     // amomin.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x8600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amomin.w.rl" = [
     // amomin.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x8200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x8200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.d" = [
     // amominu.d rd, rs1, rs2, aq, rl (a)
-    Single(0xC000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.d.aq" = [
     // amominu.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0xC400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.d.aqrl" = [
     // amominu.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0xC600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.d.rl" = [
     // amominu.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0xC200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.w" = [
     // amominu.w rd, rs1, rs2, aq, rl (a)
-    Single(0xC000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.w.aq" = [
     // amominu.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0xC400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.w.aqrl" = [
     // amominu.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0xC600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amominu.w.rl" = [
     // amominu.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0xC200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0xC200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.d" = [
     // amoor.d rd, rs1, rs2, aq, rl (a)
-    Single(0x4000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.d.aq" = [
     // amoor.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x4400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.d.aqrl" = [
     // amoor.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x4600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.d.rl" = [
     // amoor.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x4200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.w" = [
     // amoor.w rd, rs1, rs2, aq, rl (a)
-    Single(0x4000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.w.aq" = [
     // amoor.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x4400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.w.aqrl" = [
     // amoor.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x4600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoor.w.rl" = [
     // amoor.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x4200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x4200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.d" = [
     // amoswap.d rd, rs1, rs2, aq, rl (a)
-    Single(0x0800302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0800302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.d.aq" = [
     // amoswap.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x0C00302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0C00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.d.aqrl" = [
     // amoswap.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x0E00302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0E00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.d.rl" = [
     // amoswap.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x0A00302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0A00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.w" = [
     // amoswap.w rd, rs1, rs2, aq, rl (a)
-    Single(0x0800202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0800202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.w.aq" = [
     // amoswap.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x0C00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0C00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.w.aqrl" = [
     // amoswap.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x0E00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0E00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoswap.w.rl" = [
     // amoswap.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x0A00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x0A00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.d" = [
     // amoxor.d rd, rs1, rs2, aq, rl (a)
-    Single(0x2000302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2000302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.d.aq" = [
     // amoxor.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x2400302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2400302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.d.aqrl" = [
     // amoxor.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x2600302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2600302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.d.rl" = [
     // amoxor.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x2200302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2200302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.w" = [
     // amoxor.w rd, rs1, rs2, aq, rl (a)
-    Single(0x2000202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2000202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.w.aq" = [
     // amoxor.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x2400202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2400202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.w.aqrl" = [
     // amoxor.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x2600202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2600202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "amoxor.w.rl" = [
     // amoxor.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x2200202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x2200202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "lr.d" = [
     // lr.d rd, rs1, aq, rl (a)
-    Single(0x1000302F),        RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1000302F),        RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.d.aq" = [
     // lr.d.aq rd, rs1, aq, rl (a)
-    Single(0x1400302F),        RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1400302F),        RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.d.aqrl" = [
     // lr.d.aqrl rd, rs1, aq, rl (a)
-    Single(0x1600302F),        RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1600302F),        RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.d.rl" = [
     // lr.d.rl rd, rs1, aq, rl (a)
-    Single(0x1200302F),        RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1200302F),        RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.w" = [
     // lr.w rd, rs1, aq, rl (a)
-    Single(0x1000202F), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1000202F), RV32 | RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.w.aq" = [
     // lr.w.aq rd, rs1, aq, rl (a)
-    Single(0x1400202F), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1400202F), RV32 | RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.w.aqrl" = [
     // lr.w.aqrl rd, rs1, aq, rl (a)
-    Single(0x1600202F), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1600202F), RV32 | RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "lr.w.rl" = [
     // lr.w.rl rd, rs1, aq, rl (a)
-    Single(0x1200202F), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_A];
+    Single(0x1200202F), RV32 | RV64, [X, Ref] => [R(7), R(15)], [Ex_A];
 ],
 "sc.d" = [
     // sc.d rd, rs1, rs2, aq, rl (a)
-    Single(0x1800302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1800302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.d.aq" = [
     // sc.d.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x1C00302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1C00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.d.aqrl" = [
     // sc.d.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x1E00302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1E00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.d.rl" = [
     // sc.d.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x1A00302F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1A00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.w" = [
     // sc.w rd, rs1, rs2, aq, rl (a)
-    Single(0x1800202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1800202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.w.aq" = [
     // sc.w.aq rd, rs1, rs2, aq, rl (a)
-    Single(0x1C00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1C00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.w.aqrl" = [
     // sc.w.aqrl rd, rs1, rs2, aq, rl (a)
-    Single(0x1E00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1E00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 "sc.w.rl" = [
     // sc.w.rl rd, rs1, rs2, aq, rl (a)
-    Single(0x1A00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_A];
+    Single(0x1A00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_A];
 ],
 
 // Extension(s) c
@@ -393,11 +393,11 @@ Ops!(
 ],
 "c.beqz" = [
     // c.beqz rs1_p, c_bimm9lo, c_bimm9hi (c)
-    Compressed(0xC001), RV32 | RV64, [X, Imm] => [Rpop(7), SImm(9, 1), Bits(2, &[7, 6, 2, 1, 5]), Bits(10, &[8, 4, 3]), Next], [Ex_C];
+    Compressed(0xC001), RV32 | RV64, [X, Offset] => [Rpop(7), Offset(BC)], [Ex_C];
 ],
 "c.bnez" = [
     // c.bnez rs1_p, c_bimm9lo, c_bimm9hi (c)
-    Compressed(0xE001), RV32 | RV64, [X, Imm] => [Rpop(7), SImm(9, 1), Bits(2, &[7, 6, 2, 1, 5]), Bits(10, &[8, 4, 3]), Next], [Ex_C];
+    Compressed(0xE001), RV32 | RV64, [X, Offset] => [Rpop(7), Offset(BC)], [Ex_C];
 ],
 "c.ebreak" = [
     // c.ebreak  (c)
@@ -405,11 +405,11 @@ Ops!(
 ],
 "c.j" = [
     // c.j c_imm12 (c)
-    Compressed(0xA001), RV32 | RV64, [Imm] => [SImm(12, 1), Bits(2, &[11, 4, 9, 8, 10, 6, 7, 3, 2, 1, 5]), Next], [Ex_C];
+    Compressed(0xA001), RV32 | RV64, [Offset] => [Offset(JC)], [Ex_C];
 ],
 "c.jal" = [
     // c.jal c_imm12 (c)
-    Compressed(0x2001), RV32       , [Imm] => [SImm(12, 1), Bits(2, &[11, 4, 9, 8, 10, 6, 7, 3, 2, 1, 5]), Next], [Ex_C];
+    Compressed(0x2001), RV32       , [Offset] => [Offset(JC)], [Ex_C];
 ],
 "c.jalr" = [
     // c.jalr c_rs1_n0 (c)
@@ -421,7 +421,7 @@ Ops!(
 ],
 "c.ld" = [
     // c.ld rd_p, rs1_p, c_uimm8lo, c_uimm8hi (c)
-    Compressed(0x6000),        RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C];
+    Compressed(0x6000),        RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C];
 ],
 "c.ldsp" = [
     // c.ldsp rd_n0, c_uimm9sphi, c_uimm9splo (c)
@@ -437,7 +437,7 @@ Ops!(
 ],
 "c.lw" = [
     // c.lw rd_p, rs1_p, c_uimm7lo, c_uimm7hi (c)
-    Compressed(0x4000), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(7, 2), BitRange(5, 3, 5), BitRange(10, 2, 3), Next], [Ex_C];
+    Compressed(0x4000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C];
 ],
 "c.lwsp" = [
     // c.lwsp rd_n0, c_uimm8sphi, c_uimm8splo (c)
@@ -449,7 +449,7 @@ Ops!(
 ],
 "c.nop" = [
     // c.nop c_nzimm6hi, c_nzimm6lo (c)
-    Compressed(0x0001), RV32 | RV64, [Imm] => [SImmNo0(6, 0), BitRange(2, 5, 0), BitRange(12, 1, 5), Next], [Ex_C];
+    Compressed(0x0001), RV32 | RV64, [] => [], [Ex_C];
 ],
 "c.or" = [
     // c.or rd_rs1_p, rs2_p (c)
@@ -457,7 +457,7 @@ Ops!(
 ],
 "c.sd" = [
     // c.sd rs1_p, rs2_p, c_uimm8hi, c_uimm8lo (c)
-    Compressed(0xE000),        RV64, [X, X, Imm] => [Rpop(7), Rpop(2), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C];
+    Compressed(0xE000),        RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C];
 ],
 "c.sdsp" = [
     // c.sdsp c_rs2, c_uimm9sp_s (c)
@@ -466,22 +466,16 @@ Ops!(
 "c.slli" = [
     // c.slli rd_rs1_n0, c_nzuimm6lo (subformat of rv64_c::c.slli) (c)
     Compressed(0x0002), RV32       , [X, Imm] => [Rno0(7), UImmNo0(5, 0), BitRange(2, 5, 0), Next], [Ex_C];
-    // c.slli rd_rs1_n0, c_nzuimm6lo (subformat of rv64_c::c.slli) (c)
-    Compressed(0x0002), RV32       , [X, Imm] => [Rno0(7), UImmNo0(5, 0), BitRange(2, 5, 0), Next], [Ex_C];
     // c.slli rd_rs1_n0, c_nzuimm6hi, c_nzuimm6lo (c)
     Compressed(0x0002),        RV64, [X, Imm] => [Rno0(7), UImmNo0(6, 0), BitRange(2, 5, 0), BitRange(12, 1, 5), Next], [Ex_C];
 ],
 "c.srai" = [
     // c.srai rd_rs1_p, c_nzuimm5 (subformat of rv64_c::c.srai) (c)
     Compressed(0x8401), RV32       , [X, Imm] => [Rpop(7), UImmNo0(5, 0), BitRange(2, 5, 0), Next], [Ex_C];
-    // c.srai rd_rs1_p, c_nzuimm5 (subformat of rv64_c::c.srai) (c)
-    Compressed(0x8401), RV32       , [X, Imm] => [Rpop(7), UImmNo0(5, 0), BitRange(2, 5, 0), Next], [Ex_C];
     // c.srai rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi (c)
     Compressed(0x8401),        RV64, [X, Imm] => [Rpop(7), UImmNo0(6, 0), BitRange(2, 5, 0), BitRange(12, 1, 5), Next], [Ex_C];
 ],
 "c.srli" = [
-    // c.srli rd_rs1_p, c_nzuimm5 (subformat of rv64_c::c.srli) (c)
-    Compressed(0x8001), RV32       , [X, Imm] => [Rpop(7), UImmNo0(5, 0), BitRange(2, 5, 0), Next], [Ex_C];
     // c.srli rd_rs1_p, c_nzuimm5 (subformat of rv64_c::c.srli) (c)
     Compressed(0x8001), RV32       , [X, Imm] => [Rpop(7), UImmNo0(5, 0), BitRange(2, 5, 0), Next], [Ex_C];
     // c.srli rd_rs1_p, c_nzuimm6lo, c_nzuimm6hi (c)
@@ -497,7 +491,7 @@ Ops!(
 ],
 "c.sw" = [
     // c.sw rs1_p, rs2_p, c_uimm7lo, c_uimm7hi (c)
-    Compressed(0xC000), RV32 | RV64, [X, X, Imm] => [Rpop(7), Rpop(2), UImm(7, 2), BitRange(5, 3, 5), BitRange(10, 2, 3), Next], [Ex_C];
+    Compressed(0xC000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C];
 ],
 "c.swsp" = [
     // c.swsp c_rs2, c_uimm8sp_s (c)
@@ -512,38 +506,38 @@ Ops!(
 
 "c.fld" = [
     // c.fld rd_p, rs1_p, c_uimm8lo, c_uimm8hi (c_d)
-    Compressed(0x2000), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C | Ex_D];
+    Compressed(0x2000), RV32 | RV64, [F, RefOffset] => [Rpop(2), Rpop(7), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C | Ex_D];
 ],
 "c.fldsp" = [
     // c.fldsp rd, c_uimm9sphi, c_uimm9splo (c_d)
-    Compressed(0x2002), RV32 | RV64, [X, Imm] => [R(7), UImm(9, 3), Bits(2, &[4, 3, 8, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C | Ex_D];
+    Compressed(0x2002), RV32 | RV64, [F, Imm] => [R(7), UImm(9, 3), Bits(2, &[4, 3, 8, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C | Ex_D];
 ],
 "c.fsd" = [
     // c.fsd rs1_p, rs2_p, c_uimm8lo, c_uimm8hi (c_d)
-    Compressed(0xA000), RV32 | RV64, [X, X, Imm] => [Rpop(7), Rpop(2), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C | Ex_D];
+    Compressed(0xA000), RV32 | RV64, [F, RefOffset] => [Rpop(2), Rpop(7), UImm(8, 3), BitRange(5, 2, 6), BitRange(10, 3, 3), Next], [Ex_C | Ex_D];
 ],
 "c.fsdsp" = [
     // c.fsdsp c_rs2, c_uimm9sp_s (c_d)
-    Compressed(0xA002), RV32 | RV64, [X, Imm] => [R(2), UImm(9, 3), Bits(7, &[5, 4, 3, 8, 7, 6]), Next], [Ex_C | Ex_D];
+    Compressed(0xA002), RV32 | RV64, [F, Imm] => [R(2), UImm(9, 3), Bits(7, &[5, 4, 3, 8, 7, 6]), Next], [Ex_C | Ex_D];
 ],
 
 // Extension(s) c_f
 
 "c.flw" = [
     // c.flw rd_p, rs1_p, c_uimm7lo, c_uimm7hi (c_f)
-    Compressed(0x6000), RV32       , [X, X, Imm] => [Rpop(2), Rpop(7), UImm(7, 2), BitRange(5, 3, 5), BitRange(10, 2, 3), Next], [Ex_C | Ex_F];
+    Compressed(0x6000), RV32       , [F, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C | Ex_F];
 ],
 "c.flwsp" = [
     // c.flwsp rd, c_uimm8sphi, c_uimm8splo (c_f)
-    Compressed(0x6002), RV32       , [X, Imm] => [R(7), UImm(8, 2), Bits(2, &[4, 3, 2, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C | Ex_F];
+    Compressed(0x6002), RV32       , [F, Imm] => [R(7), UImm(8, 2), Bits(2, &[4, 3, 2, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C | Ex_F];
 ],
 "c.fsw" = [
     // c.fsw rs1_p, rs2_p, c_uimm7lo, c_uimm7hi (c_f)
-    Compressed(0xE000), RV32       , [X, X, Imm] => [Rpop(7), Rpop(2), UImm(7, 2), BitRange(5, 3, 5), BitRange(10, 2, 3), Next], [Ex_C | Ex_F];
+    Compressed(0xE000), RV32       , [F, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C | Ex_F];
 ],
 "c.fswsp" = [
     // c.fswsp c_rs2, c_uimm8sp_s (c_f)
-    Compressed(0xE002), RV32       , [X, Imm] => [R(2), UImm(8, 2), Bits(7, &[5, 4, 3, 2, 7, 6]), Next], [Ex_C | Ex_F];
+    Compressed(0xE002), RV32       , [F, Imm] => [R(2), UImm(8, 2), Bits(7, &[5, 4, 3, 2, 7, 6]), Next], [Ex_C | Ex_F];
 ],
 
 // Extension(s) c_zicfiss
@@ -590,19 +584,19 @@ Ops!(
 ],
 "fclass.d" = [
     // fclass.d rd, rs1 (d)
-    Single(0xE2001053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xE2001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.l" = [
     // fcvt.d.l rd, rs1, rm (d)
-    Single(0xD2200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xD2200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.l rd, rs1 (d)
-    Single(0xD2207053),        RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xD2207053),        RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.lu" = [
     // fcvt.d.lu rd, rs1, rm (d)
-    Single(0xD2300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xD2300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.lu rd, rs1 (d)
-    Single(0xD2307053),        RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xD2307053),        RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.s" = [
     // fcvt.d.s rd, rs1, rm (d)
@@ -612,27 +606,27 @@ Ops!(
 ],
 "fcvt.d.w" = [
     // fcvt.d.w rd, rs1, rm (d)
-    Single(0xD2000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xD2000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.w rd, rs1 (d)
-    Single(0xD2007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xD2007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.wu" = [
     // fcvt.d.wu rd, rs1, rm (d)
-    Single(0xD2100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xD2100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.wu rd, rs1 (d)
-    Single(0xD2107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xD2107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.l.d" = [
     // fcvt.l.d rd, rs1, rm (d)
-    Single(0xC2200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.l.d rd, rs1 (d)
-    Single(0xC2207053),        RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2207053),        RV64, [X, F] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.lu.d" = [
     // fcvt.lu.d rd, rs1, rm (d)
-    Single(0xC2300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.lu.d rd, rs1 (d)
-    Single(0xC2307053),        RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2307053),        RV64, [X, F] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.s.d" = [
     // fcvt.s.d rd, rs1, rm (d)
@@ -642,15 +636,15 @@ Ops!(
 ],
 "fcvt.w.d" = [
     // fcvt.w.d rd, rs1, rm (d)
-    Single(0xC2000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.w.d rd, rs1 (d)
-    Single(0xC2007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.wu.d" = [
     // fcvt.wu.d rd, rs1, rm (d)
-    Single(0xC2100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.wu.d rd, rs1 (d)
-    Single(0xC2107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D];
 ],
 "fdiv.d" = [
     // fdiv.d rd, rs1, rs2, rm (d)
@@ -660,19 +654,19 @@ Ops!(
 ],
 "feq.d" = [
     // feq.d rd, rs1, rs2 (d)
-    Single(0xA2002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0xA2002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D];
 ],
 "fld" = [
     // fld rd, rs1, imm12 (d)
-    Single(0x00003007), RV32 | RV64, [F, F, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_D];
+    Single(0x00003007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_D];
 ],
 "fle.d" = [
     // fle.d rd, rs1, rs2 (d)
-    Single(0xA2000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0xA2000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D];
 ],
 "flt.d" = [
     // flt.d rd, rs1, rs2 (d)
-    Single(0xA2001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0xA2001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D];
 ],
 "fmadd.d" = [
     // fmadd.d rd, rs1, rs2, rs3, rm (d)
@@ -706,11 +700,11 @@ Ops!(
 ],
 "fmv.d.x" = [
     // fmv.d.x rd, rs1 (d)
-    Single(0xF2000053),        RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xF2000053),        RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fmv.x.d" = [
     // fmv.x.d rd, rs1 (d)
-    Single(0xE2000053),        RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0xE2000053),        RV64, [X, F] => [R(7), R(15)], [Ex_D];
 ],
 "fneg.d" = [
     // fneg.d rd, rs1, rs2=rs1 (subformat of rv_d::fsgnjn.d) (d)
@@ -730,7 +724,7 @@ Ops!(
 ],
 "fsd" = [
     // fsd imm12hi, rs1, rs2, imm12lo (d)
-    Single(0x00003027), RV32 | RV64, [F, F, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_D];
+    Single(0x00003027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_D];
 ],
 "fsgnj.d" = [
     // fsgnj.d rd, rs1, rs2 (d)
@@ -761,19 +755,19 @@ Ops!(
 
 "fcvtmod.w.d" = [
     // fcvtmod.w.d rd, rs1 (d_zfa)
-    Single(0xC2801053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfa];
+    Single(0xC2801053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D | Ex_Zfa];
 ],
 "fleq.d" = [
     // fleq.d rd, rs1, rs2 (d_zfa)
-    Single(0xA2004053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D | Ex_Zfa];
+    Single(0xA2004053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D | Ex_Zfa];
 ],
 "fli.d" = [
     // fli.d rd, rs1 (d_zfa)
-    Single(0xF2100053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfa];
+    Single(0xF2100053), RV32 | RV64, [F, Imm] => [R(7), FloatingPointImmediate(15)], [Ex_D | Ex_Zfa];
 ],
 "fltq.d" = [
     // fltq.d rd, rs1, rs2 (d_zfa)
-    Single(0xA2005053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D | Ex_Zfa];
+    Single(0xA2005053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D | Ex_Zfa];
 ],
 "fmaxm.d" = [
     // fmaxm.d rd, rs1, rs2 (d_zfa)
@@ -785,11 +779,11 @@ Ops!(
 ],
 "fmvh.x.d" = [
     // fmvh.x.d rd, rs1 (d_zfa)
-    Single(0xE2100053), RV32       , [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfa];
+    Single(0xE2100053), RV32       , [X, F] => [R(7), R(15)], [Ex_D | Ex_Zfa];
 ],
 "fmvp.d.x" = [
     // fmvp.d.x rd, rs1, rs2 (d_zfa)
-    Single(0xB2000053), RV32       , [F, F, F] => [R(7), R(15), R(20)], [Ex_D | Ex_Zfa];
+    Single(0xB2000053), RV32       , [F, X, X] => [R(7), R(15), R(20)], [Ex_D | Ex_Zfa];
 ],
 "fround.d" = [
     // fround.d rd, rs1, rm (d_zfa)
@@ -833,55 +827,55 @@ Ops!(
 ],
 "fclass.s" = [
     // fclass.s rd, rs1 (f)
-    Single(0xE0001053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xE0001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.l.s" = [
     // fcvt.l.s rd, rs1, rm (f)
-    Single(0xC0200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.l.s rd, rs1 (f)
-    Single(0xC0207053),        RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0207053),        RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.lu.s" = [
     // fcvt.lu.s rd, rs1, rm (f)
-    Single(0xC0300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.lu.s rd, rs1 (f)
-    Single(0xC0307053),        RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0307053),        RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.s.l" = [
     // fcvt.s.l rd, rs1, rm (f)
-    Single(0xD0200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.s.l rd, rs1 (f)
-    Single(0xD0207053),        RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xD0207053),        RV64, [F, X] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.s.lu" = [
     // fcvt.s.lu rd, rs1, rm (f)
-    Single(0xD0300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.s.lu rd, rs1 (f)
-    Single(0xD0307053),        RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xD0307053),        RV64, [F, X] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.s.w" = [
     // fcvt.s.w rd, rs1, rm (f)
-    Single(0xD0000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.s.w rd, rs1 (f)
-    Single(0xD0007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xD0007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.s.wu" = [
     // fcvt.s.wu rd, rs1, rm (f)
-    Single(0xD0100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.s.wu rd, rs1 (f)
-    Single(0xD0107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xD0107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.w.s" = [
     // fcvt.w.s rd, rs1, rm (f)
-    Single(0xC0000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.w.s rd, rs1 (f)
-    Single(0xC0007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fcvt.wu.s" = [
     // fcvt.wu.s rd, rs1, rm (f)
-    Single(0xC0100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
     // fcvt.wu.s rd, rs1 (f)
-    Single(0xC0107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fdiv.s" = [
     // fdiv.s rd, rs1, rs2, rm (f)
@@ -891,19 +885,19 @@ Ops!(
 ],
 "feq.s" = [
     // feq.s rd, rs1, rs2 (f)
-    Single(0xA0002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0xA0002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F];
 ],
 "fle.s" = [
     // fle.s rd, rs1, rs2 (f)
-    Single(0xA0000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0xA0000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F];
 ],
 "flt.s" = [
     // flt.s rd, rs1, rs2 (f)
-    Single(0xA0001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0xA0001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F];
 ],
 "flw" = [
     // flw rd, rs1, imm12 (f)
-    Single(0x00002007), RV32 | RV64, [F, F, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_F];
+    Single(0x00002007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_F];
 ],
 "fmadd.s" = [
     // fmadd.s rd, rs1, rs2, rs3, rm (f)
@@ -937,19 +931,19 @@ Ops!(
 ],
 "fmv.s.x" = [
     // fmv.s.x rd, rs1 (subformat of rv_f::fmv.w.x) (f)
-    Single(0xF0000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xF0000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_F];
 ],
 "fmv.w.x" = [
     // fmv.w.x rd, rs1 (f)
-    Single(0xF0000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xF0000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_F];
 ],
 "fmv.x.s" = [
     // fmv.x.s rd, rs1 (subformat of rv_f::fmv.x.w) (f)
-    Single(0xE0000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xE0000053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fmv.x.w" = [
     // fmv.x.w rd, rs1 (f)
-    Single(0xE0000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0xE0000053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
 ],
 "fneg.s" = [
     // fneg.s rd, rs1, rs2=rs1 (subformat of rv_f::fsgnjn.s) (f)
@@ -1025,22 +1019,22 @@ Ops!(
 ],
 "fsw" = [
     // fsw imm12hi, rs1, rs2, imm12lo (f)
-    Single(0x00002027), RV32 | RV64, [F, F, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_F];
+    Single(0x00002027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_F];
 ],
 
 // Extension(s) f_zfa
 
 "fleq.s" = [
     // fleq.s rd, rs1, rs2 (f_zfa)
-    Single(0xA0004053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F | Ex_Zfa];
+    Single(0xA0004053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F | Ex_Zfa];
 ],
 "fli.s" = [
     // fli.s rd, rs1 (f_zfa)
-    Single(0xF0100053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F | Ex_Zfa];
+    Single(0xF0100053), RV32 | RV64, [F, Imm] => [R(7), FloatingPointImmediate(15)], [Ex_F | Ex_Zfa];
 ],
 "fltq.s" = [
     // fltq.s rd, rs1, rs2 (f_zfa)
-    Single(0xA0005053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F | Ex_Zfa];
+    Single(0xA0005053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F | Ex_Zfa];
 ],
 "fmaxm.s" = [
     // fmaxm.s rd, rs1, rs2 (f_zfa)
@@ -1091,7 +1085,7 @@ Ops!(
 ],
 "auipc" = [
     // auipc rd, imm20 (i)
-    Single(0x00000017), RV32 | RV64, [X, Imm] => [R(7), SImm(20, 0), BitRange(12, 20, 0), Next], [Ex_I];
+    Single(0x00000017), RV32 | RV64, [X, Offset] => [R(7), Offset(AUIPC)], [Ex_I];
 ],
 "beq" = [
     // beq bimm12hi, rs1, rs2, bimm12lo (i)
@@ -1167,11 +1161,11 @@ Ops!(
 ],
 "fence" = [
     // fence fm, pred, succ, rs1, rd (i)
-    Single(0x0000000F), RV32 | RV64, [Ident, Ident, F, F] => [FenceSpec(24), FenceSpec(20), R(15), R(7)], [Ex_I];
+    Single(0x0000000F), RV32 | RV64, [Ident, Ident, X, X] => [FenceSpec(24), FenceSpec(20), R(15), R(7)], [Ex_I];
 ],
 "fence.tso" = [
     // fence.tso rs1, rd (subformat of rv_i::fence) (i)
-    Single(0x8330000F), RV32 | RV64, [F, F] => [R(15), R(7)], [Ex_I];
+    Single(0x8330000F), RV32 | RV64, [X, X] => [R(15), R(7)], [Ex_I];
 ],
 "j" = [
     // j jimm20 (subformat of rv_i::jal) (i)
@@ -1185,7 +1179,7 @@ Ops!(
 ],
 "jalr" = [
     // jalr rd, rs1, imm12 (i)
-    Single(0x00000067), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00000067), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Offset(JALR)], [Ex_I];
     // jalr rs1 (subformat of rv_i::jalr) (i)
     Single(0x000000E7), RV32 | RV64, [X] => [R(15)], [Ex_I];
 ],
@@ -1195,23 +1189,23 @@ Ops!(
 ],
 "lb" = [
     // lb rd, rs1, imm12 (i)
-    Single(0x00000003), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00000003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "lbu" = [
     // lbu rd, rs1, imm12 (i)
-    Single(0x00004003), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00004003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "ld" = [
     // ld rd, rs1, imm12 (i)
-    Single(0x00003003),        RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00003003),        RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "lh" = [
     // lh rd, rs1, imm12 (i)
-    Single(0x00001003), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00001003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "lhu" = [
     // lhu rd, rs1, imm12 (i)
-    Single(0x00005003), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00005003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "lui" = [
     // lui rd, imm20 (i)
@@ -1219,11 +1213,11 @@ Ops!(
 ],
 "lw" = [
     // lw rd, rs1, imm12 (i)
-    Single(0x00002003), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00002003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "lwu" = [
     // lwu rd, rs1, imm12 (i)
-    Single(0x00006003),        RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00006003),        RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
 ],
 "mv" = [
     // mv rd, rs1 (subformat of rv_i::addi) (i)
@@ -1255,7 +1249,7 @@ Ops!(
 ],
 "sb" = [
     // sb imm12hi, rs1, rs2, imm12lo (i)
-    Single(0x00000023), RV32 | RV64, [X, X, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    Single(0x00000023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
 ],
 "sbreak" = [
     // sbreak  (subformat of rv_i::ebreak) (i)
@@ -1267,7 +1261,7 @@ Ops!(
 ],
 "sd" = [
     // sd imm12hi, rs1, rs2, imm12lo (i)
-    Single(0x00003023),        RV64, [X, X, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    Single(0x00003023),        RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
 ],
 "seqz" = [
     // seqz rd, rs1 (subformat of rv_i::sltiu) (i)
@@ -1283,15 +1277,13 @@ Ops!(
 ],
 "sh" = [
     // sh imm12hi, rs1, rs2, imm12lo (i)
-    Single(0x00001023), RV32 | RV64, [X, X, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    Single(0x00001023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
 ],
 "sll" = [
     // sll rd, rs1, rs2 (i)
     Single(0x00001033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_I];
 ],
 "slli" = [
-    // slli rd, rs1, shamtw (subformat of rv64_i::slli) (i)
-    Single(0x00001013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_I];
     // slli rd, rs1, shamtw (subformat of rv64_i::slli) (i)
     Single(0x00001013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_I];
     // slli rd, rs1, shamtd (i)
@@ -1336,8 +1328,6 @@ Ops!(
 "srai" = [
     // srai rd, rs1, shamtw (subformat of rv64_i::srai) (i)
     Single(0x40005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_I];
-    // srai rd, rs1, shamtw (subformat of rv64_i::srai) (i)
-    Single(0x40005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_I];
     // srai rd, rs1, shamtd (i)
     Single(0x40005013),        RV64, [X, X, Imm] => [R(7), R(15), UImm(6, 0), BitRange(20, 6, 0), Next], [Ex_I];
 ],
@@ -1354,8 +1344,6 @@ Ops!(
     Single(0x00005033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_I];
 ],
 "srli" = [
-    // srli rd, rs1, shamtw (subformat of rv64_i::srli) (i)
-    Single(0x00005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_I];
     // srli rd, rs1, shamtw (subformat of rv64_i::srli) (i)
     Single(0x00005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_I];
     // srli rd, rs1, shamtd (i)
@@ -1379,7 +1367,7 @@ Ops!(
 ],
 "sw" = [
     // sw imm12hi, rs1, rs2, imm12lo (i)
-    Single(0x00002023), RV32 | RV64, [X, X, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    Single(0x00002023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
 ],
 "xor" = [
     // xor rd, rs1, rs2 (i)
@@ -1463,7 +1451,7 @@ Ops!(
 ],
 "fclass.q" = [
     // fclass.q rd, rs1 (q)
-    Single(0xE6001053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xE6001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.d.q" = [
     // fcvt.d.q rd, rs1, rm (q)
@@ -1473,15 +1461,15 @@ Ops!(
 ],
 "fcvt.l.q" = [
     // fcvt.l.q rd, rs1, rm (q)
-    Single(0xC6200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xC6200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.l.q rd, rs1 (q)
-    Single(0xC6207053),        RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xC6207053),        RV64, [X, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.lu.q" = [
     // fcvt.lu.q rd, rs1, rm (q)
-    Single(0xC6300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xC6300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.lu.q rd, rs1 (q)
-    Single(0xC6307053),        RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xC6307053),        RV64, [X, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.d" = [
     // fcvt.q.d rd, rs1, rm (q)
@@ -1491,15 +1479,15 @@ Ops!(
 ],
 "fcvt.q.l" = [
     // fcvt.q.l rd, rs1, rm (q)
-    Single(0xD6200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xD6200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.l rd, rs1 (q)
-    Single(0xD6207053),        RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6207053),        RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.lu" = [
     // fcvt.q.lu rd, rs1, rm (q)
-    Single(0xD6300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xD6300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.lu rd, rs1 (q)
-    Single(0xD6307053),        RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6307053),        RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.s" = [
     // fcvt.q.s rd, rs1, rm (q)
@@ -1509,15 +1497,15 @@ Ops!(
 ],
 "fcvt.q.w" = [
     // fcvt.q.w rd, rs1, rm (q)
-    Single(0xD6000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xD6000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.w rd, rs1 (q)
-    Single(0xD6007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.wu" = [
     // fcvt.q.wu rd, rs1, rm (q)
-    Single(0xD6100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xD6100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.wu rd, rs1 (q)
-    Single(0xD6107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.s.q" = [
     // fcvt.s.q rd, rs1, rm (q)
@@ -1527,15 +1515,15 @@ Ops!(
 ],
 "fcvt.w.q" = [
     // fcvt.w.q rd, rs1, rm (q)
-    Single(0xC6000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xC6000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.w.q rd, rs1 (q)
-    Single(0xC6007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xC6007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.wu.q" = [
     // fcvt.wu.q rd, rs1, rm (q)
-    Single(0xC6100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
+    Single(0xC6100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.wu.q rd, rs1 (q)
-    Single(0xC6107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0xC6107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fdiv.q" = [
     // fdiv.q rd, rs1, rs2, rm (q)
@@ -1545,19 +1533,19 @@ Ops!(
 ],
 "feq.q" = [
     // feq.q rd, rs1, rs2 (q)
-    Single(0xA6002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Q];
+    Single(0xA6002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Q];
 ],
 "fle.q" = [
     // fle.q rd, rs1, rs2 (q)
-    Single(0xA6000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Q];
+    Single(0xA6000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Q];
 ],
 "flq" = [
     // flq rd, rs1, imm12 (q)
-    Single(0x00004007), RV32 | RV64, [F, F, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Q];
+    Single(0x00004007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Q];
 ],
 "flt.q" = [
     // flt.q rd, rs1, rs2 (q)
-    Single(0xA6001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Q];
+    Single(0xA6001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Q];
 ],
 "fmadd.q" = [
     // fmadd.q rd, rs1, rs2, rs3, rm (q)
@@ -1619,7 +1607,7 @@ Ops!(
 ],
 "fsq" = [
     // fsq imm12hi, rs1, rs2, imm12lo (q)
-    Single(0x00004027), RV32 | RV64, [F, F, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Q];
+    Single(0x00004027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Q];
 ],
 "fsqrt.q" = [
     // fsqrt.q rd, rs1, rm (q)
@@ -1638,15 +1626,15 @@ Ops!(
 
 "fleq.q" = [
     // fleq.q rd, rs1, rs2 (q_zfa)
-    Single(0xA6004053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Q | Ex_Zfa];
+    Single(0xA6004053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Q | Ex_Zfa];
 ],
 "fli.q" = [
     // fli.q rd, rs1 (q_zfa)
-    Single(0xF6100053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfa];
+    Single(0xF6100053), RV32 | RV64, [F, Imm] => [R(7), FloatingPointImmediate(15)], [Ex_Q | Ex_Zfa];
 ],
 "fltq.q" = [
     // fltq.q rd, rs1, rs2 (q_zfa)
-    Single(0xA6005053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Q | Ex_Zfa];
+    Single(0xA6005053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Q | Ex_Zfa];
 ],
 "fmaxm.q" = [
     // fmaxm.q rd, rs1, rs2 (q_zfa)
@@ -1658,11 +1646,11 @@ Ops!(
 ],
 "fmvh.x.q" = [
     // fmvh.x.q rd, rs1 (q_zfa)
-    Single(0xE6100053),        RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfa];
+    Single(0xE6100053),        RV64, [X, F] => [R(7), R(15)], [Ex_Q | Ex_Zfa];
 ],
 "fmvp.q.x" = [
     // fmvp.q.x rd, rs1, rs2 (q_zfa)
-    Single(0xB6000053),        RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Q | Ex_Zfa];
+    Single(0xB6000053),        RV64, [F, X, X] => [R(7), R(15), R(20)], [Ex_Q | Ex_Zfa];
 ],
 "fround.q" = [
     // fround.q rd, rs1, rm (q_zfa)
@@ -1696,374 +1684,382 @@ Ops!(
 
 "amoadd.b" = [
     // amoadd.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.b.aq" = [
     // amoadd.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.b.aqrl" = [
     // amoadd.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.b.rl" = [
     // amoadd.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.h" = [
     // amoadd.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.h.aq" = [
     // amoadd.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.h.aqrl" = [
     // amoadd.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoadd.h.rl" = [
     // amoadd.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.b" = [
     // amoand.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.b.aq" = [
     // amoand.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.b.aqrl" = [
     // amoand.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.b.rl" = [
     // amoand.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.h" = [
     // amoand.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.h.aq" = [
     // amoand.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.h.aqrl" = [
     // amoand.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoand.h.rl" = [
     // amoand.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x6200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x6200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.b" = [
     // amocas.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2800002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2800002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.b.aq" = [
     // amocas.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2C00002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2C00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.b.aqrl" = [
     // amocas.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2E00002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2E00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.b.rl" = [
     // amocas.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2A00002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2A00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.h" = [
     // amocas.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2800102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2800102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.h.aq" = [
     // amocas.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2C00102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2C00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.h.aqrl" = [
     // amocas.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2E00102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2E00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amocas.h.rl" = [
     // amocas.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2A00102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2A00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.b" = [
     // amomax.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.b.aq" = [
     // amomax.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.b.aqrl" = [
     // amomax.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.b.rl" = [
     // amomax.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.h" = [
     // amomax.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.h.aq" = [
     // amomax.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.h.aqrl" = [
     // amomax.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.h.rl" = [
     // amomax.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xA200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xA200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.b" = [
     // amomaxu.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.b.aq" = [
     // amomaxu.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.b.aqrl" = [
     // amomaxu.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.b.rl" = [
     // amomaxu.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.h" = [
     // amomaxu.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.h.aq" = [
     // amomaxu.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.h.aqrl" = [
     // amomaxu.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomaxu.h.rl" = [
     // amomaxu.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xE200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xE200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.b" = [
     // amomin.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.b.aq" = [
     // amomin.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.b.aqrl" = [
     // amomin.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.b.rl" = [
     // amomin.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.h" = [
     // amomin.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.h.aq" = [
     // amomin.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.h.aqrl" = [
     // amomin.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomin.h.rl" = [
     // amomin.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x8200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x8200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.b" = [
     // amominu.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.b.aq" = [
     // amominu.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.b.aqrl" = [
     // amominu.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.b.rl" = [
     // amominu.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.h" = [
     // amominu.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.h.aq" = [
     // amominu.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.h.aqrl" = [
     // amominu.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amominu.h.rl" = [
     // amominu.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0xC200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0xC200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.b" = [
     // amoor.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.b.aq" = [
     // amoor.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.b.aqrl" = [
     // amoor.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.b.rl" = [
     // amoor.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.h" = [
     // amoor.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.h.aq" = [
     // amoor.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.h.aqrl" = [
     // amoor.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoor.h.rl" = [
     // amoor.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x4200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x4200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.b" = [
     // amoswap.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0800002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0800002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.b.aq" = [
     // amoswap.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0C00002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0C00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.b.aqrl" = [
     // amoswap.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0E00002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0E00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.b.rl" = [
     // amoswap.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0A00002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0A00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.h" = [
     // amoswap.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0800102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0800102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.h.aq" = [
     // amoswap.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0C00102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0C00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.h.aqrl" = [
     // amoswap.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0E00102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0E00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoswap.h.rl" = [
     // amoswap.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x0A00102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x0A00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.b" = [
     // amoxor.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2000002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2000002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.b.aq" = [
     // amoxor.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2400002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2400002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.b.aqrl" = [
     // amoxor.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2600002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2600002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.b.rl" = [
     // amoxor.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2200002F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2200002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.h" = [
     // amoxor.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2000102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2000102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.h.aq" = [
     // amoxor.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2400102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2400102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.h.aqrl" = [
     // amoxor.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2600102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2600102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amoxor.h.rl" = [
     // amoxor.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2200102F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zabha];
+    Single(0x2200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 
 // Extension(s) zacas
 
 "amocas.d" = [
     // amocas.d rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2800302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2800302F), RV32       , [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
+    // amocas.d rd, rs1, rs2, aq, rl (zacas)
+    Single(0x2800302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.d.aq" = [
     // amocas.d.aq rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2C00302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2C00302F), RV32       , [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
+    // amocas.d.aq rd, rs1, rs2, aq, rl (zacas)
+    Single(0x2C00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.d.aqrl" = [
     // amocas.d.aqrl rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2E00302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2E00302F), RV32       , [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
+    // amocas.d.aqrl rd, rs1, rs2, aq, rl (zacas)
+    Single(0x2E00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.d.rl" = [
     // amocas.d.rl rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2A00302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2A00302F), RV32       , [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
+    // amocas.d.rl rd, rs1, rs2, aq, rl (zacas)
+    Single(0x2A00302F),        RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.q" = [
     // amocas.q rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2800402F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2800402F),        RV64, [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
 ],
 "amocas.q.aq" = [
     // amocas.q.aq rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2C00402F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2C00402F),        RV64, [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
 ],
 "amocas.q.aqrl" = [
     // amocas.q.aqrl rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2E00402F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2E00402F),        RV64, [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
 ],
 "amocas.q.rl" = [
     // amocas.q.rl rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2A00402F),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2A00402F),        RV64, [X, X, Ref] => [Reven(7), Reven(20), R(15)], [Ex_Zacas];
 ],
 "amocas.w" = [
     // amocas.w rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2800202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2800202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.w.aq" = [
     // amocas.w.aq rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2C00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2C00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.w.aqrl" = [
     // amocas.w.aqrl rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2E00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2E00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 "amocas.w.rl" = [
     // amocas.w.rl rd, rs1, rs2, aq, rl (zacas)
-    Single(0x2A00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zacas];
+    Single(0x2A00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zacas];
 ],
 
 // Extension(s) zawrs
@@ -2162,42 +2158,6 @@ Ops!(
     // orc.b rd, rs1 (subformat of rv64_zbp::gorci) (zbb)
     Single(0x28705013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zbb];
 ],
-"rev8" = [
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbb)
-    Single(0x69805013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbb];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbkb)
-    Single(0x69805013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbkb];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zk)
-    Single(0x69805013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zk];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zkn)
-    Single(0x69805013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zkn];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zks)
-    Single(0x69805013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zks];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbb)
-    Single(0x6B805013),        RV64, [X, X] => [R(7), R(15)], [Ex_Zbb];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbkb)
-    Single(0x6B805013),        RV64, [X, X] => [R(7), R(15)], [Ex_Zbkb];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zk)
-    Single(0x6B805013),        RV64, [X, X] => [R(7), R(15)], [Ex_Zk];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zkn)
-    Single(0x6B805013),        RV64, [X, X] => [R(7), R(15)], [Ex_Zkn];
-    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zks)
-    Single(0x6B805013),        RV64, [X, X] => [R(7), R(15)], [Ex_Zks];
-],
-"rori" = [
-    // rori rd, rs1, shamtw (subformat of rv64_zbb::rori) (zbb)
-    Single(0x60005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_Zbb];
-    // rori rd, rs1, shamtw (subformat of rv64_zbb::rori) (zbkb)
-    Single(0x60005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_Zbkb];
-    // rori rd, rs1, shamtw (subformat of rv64_zbb::rori) (zk)
-    Single(0x60005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_Zk];
-    // rori rd, rs1, shamtw (subformat of rv64_zbb::rori) (zkn)
-    Single(0x60005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_Zkn];
-    // rori rd, rs1, shamtw (subformat of rv64_zbb::rori) (zks)
-    Single(0x60005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_Zks];
-    // rori rd, rs1, shamtd (zbb, zbkb, zk, zkn, zks)
-    Single(0x60005013),        RV64, [X, X, Imm] => [R(7), R(15), UImm(6, 0), BitRange(20, 6, 0), Next], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
-],
 "sext.b" = [
     // sext.b rd, rs1 (zbb)
     Single(0x60401013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zbb];
@@ -2223,6 +2183,12 @@ Ops!(
     // orn rd, rs1, rs2 (zbb, zbkb, zk, zkn, zks)
     Single(0x40006033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
 ],
+"rev8" = [
+    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbb, zbkb, zk, zkn, zks)
+    Single(0x69805013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+    // rev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbb, zbkb, zk, zkn, zks)
+    Single(0x6B805013),        RV64, [X, X] => [R(7), R(15)], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+],
 "rol" = [
     // rol rd, rs1, rs2 (zbb, zbkb, zk, zkn, zks)
     Single(0x60001033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
@@ -2234,6 +2200,12 @@ Ops!(
 "ror" = [
     // ror rd, rs1, rs2 (zbb, zbkb, zk, zkn, zks)
     Single(0x60005033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+],
+"rori" = [
+    // rori rd, rs1, shamtw (subformat of rv64_zbb::rori) (zbb, zbkb, zk, zkn, zks)
+    Single(0x60005013), RV32       , [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 5, 0), Next], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+    // rori rd, rs1, shamtd (zbb, zbkb, zk, zkn, zks)
+    Single(0x60005013),        RV64, [X, X, Imm] => [R(7), R(15), UImm(6, 0), BitRange(20, 6, 0), Next], [Ex_Zbb, Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
 ],
 "roriw" = [
     // roriw rd, rs1, shamtw (zbb, zbkb, zk, zkn, zks)
@@ -2266,41 +2238,12 @@ Ops!(
     Single(0x0A003033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zbc, Ex_Zbkc, Ex_Zk, Ex_Zkn, Ex_Zks];
 ],
 
-// Extension(s) zbkb
-
-"brev8" = [
-    // brev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbkb)
-    Single(0x68705013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zbkb];
-    // brev8 rd, rs1 (subformat of rv64_zbp::grevi) (zk)
-    Single(0x68705013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zk];
-    // brev8 rd, rs1 (subformat of rv64_zbp::grevi) (zkn)
-    Single(0x68705013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zkn];
-    // brev8 rd, rs1 (subformat of rv64_zbp::grevi) (zks)
-    Single(0x68705013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zks];
-],
-"unzip" = [
-    // unzip rd, rs1 (subformat of rv64_zbp::unshfli) (zbkb)
-    Single(0x08F05013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbkb];
-    // unzip rd, rs1 (subformat of rv64_zbp::unshfli) (zk)
-    Single(0x08F05013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zk];
-    // unzip rd, rs1 (subformat of rv64_zbp::unshfli) (zkn)
-    Single(0x08F05013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zkn];
-    // unzip rd, rs1 (subformat of rv64_zbp::unshfli) (zks)
-    Single(0x08F05013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zks];
-],
-"zip" = [
-    // zip rd, rs1 (subformat of rv64_zbp::shfli) (zbkb)
-    Single(0x08F01013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbkb];
-    // zip rd, rs1 (subformat of rv64_zbp::shfli) (zk)
-    Single(0x08F01013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zk];
-    // zip rd, rs1 (subformat of rv64_zbp::shfli) (zkn)
-    Single(0x08F01013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zkn];
-    // zip rd, rs1 (subformat of rv64_zbp::shfli) (zks)
-    Single(0x08F01013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zks];
-],
-
 // Extension(s) zbkb, zk, zkn, zks
 
+"brev8" = [
+    // brev8 rd, rs1 (subformat of rv64_zbp::grevi) (zbkb, zk, zkn, zks)
+    Single(0x68705013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+],
 "pack" = [
     // pack rd, rs1, rs2 (zbkb, zk, zkn, zks)
     Single(0x08004033), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
@@ -2312,6 +2255,14 @@ Ops!(
 "packw" = [
     // packw rd, rs1, rs2 (zbkb, zk, zkn, zks)
     Single(0x0800403B),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+],
+"unzip" = [
+    // unzip rd, rs1 (subformat of rv64_zbp::unshfli) (zbkb, zk, zkn, zks)
+    Single(0x08F05013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
+],
+"zip" = [
+    // zip rd, rs1 (subformat of rv64_zbp::shfli) (zbkb, zk, zkn, zks)
+    Single(0x08F01013), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbkb, Ex_Zk, Ex_Zkn, Ex_Zks];
 ],
 
 // Extension(s) zbkx, zk, zkn, zks
@@ -2372,15 +2323,15 @@ Ops!(
 
 "c.lbu" = [
     // c.lbu rd_p, rs1_p, c_uimm2 (zcb)
-    Compressed(0x8000), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(2, 0), Bits(5, &[0, 1]), Next], [Ex_Zcb];
+    Compressed(0x8000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), Bits(5, &[0, 1]), Next], [Ex_Zcb];
 ],
 "c.lh" = [
     // c.lh rd_p, rs1_p, c_uimm1 (zcb)
-    Compressed(0x8440), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(1, 0), BitRange(5, 1, 0), Next], [Ex_Zcb];
+    Compressed(0x8440), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 1), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
 "c.lhu" = [
     // c.lhu rd_p, rs1_p, c_uimm1 (zcb)
-    Compressed(0x8400), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(1, 0), BitRange(5, 1, 0), Next], [Ex_Zcb];
+    Compressed(0x8400), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 1), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
 "c.mul" = [
     // c.mul rd_rs1_p, rs2_p (zcb)
@@ -2392,7 +2343,7 @@ Ops!(
 ],
 "c.sb" = [
     // c.sb rs2_p, rs1_p, c_uimm2 (zcb)
-    Compressed(0x8800), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(2, 0), Bits(5, &[0, 1]), Next], [Ex_Zcb];
+    Compressed(0x8800), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), Bits(5, &[0, 1]), Next], [Ex_Zcb];
 ],
 "c.sext.b" = [
     // c.sext.b rd_rs1_p (zcb)
@@ -2408,7 +2359,7 @@ Ops!(
 ],
 "c.sh" = [
     // c.sh rs2_p, rs1_p, c_uimm1 (zcb)
-    Compressed(0x8C00), RV32 | RV64, [X, X, Imm] => [Rpop(2), Rpop(7), UImm(1, 0), BitRange(5, 1, 0), Next], [Ex_Zcb];
+    Compressed(0x8C00), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 1), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
 "c.zext.b" = [
     // c.zext.b rd_rs1_p (zcb)
@@ -2459,7 +2410,7 @@ Ops!(
 ],
 "c.mop.N" = [
     // c.mop.N c_mop_t (zcmop)
-    Compressed(0x6081), RV32 | RV64, [Imm] => [UImmOdd(3, 1), BitRange(8, 2, 1), Next], [Ex_Zcmop];
+    Compressed(0x6081), RV32 | RV64, [Imm] => [UImmOdd(3, 1), BitRange(8, 3, 0), Next], [Ex_Zcmop];
 ],
 
 // Extension(s) zcmp
@@ -2486,29 +2437,33 @@ Ops!(
 ],
 "cm.push" = [
     // cm.push c_rlist, c_spimm (zcmp)
-    Compressed(0xB802), RV32 | RV64, [Xlist, Imm] => [Rlist(4), UImm(6, 4), BitRange(2, 2, 4), Next], [Ex_Zcmp];
+    Compressed(0xB802), RV32 | RV64, [Xlist, Imm] => [Rlist(4), NImm(6, 4), NBitRange(2, 2, 4), Next], [Ex_Zcmp];
 ],
 
 // Extension(s) zcmt
 
 "cm.jalt" = [
     // cm.jalt c_index (zcmt)
-    Compressed(0xA002), RV32 | RV64, [Imm] => [UImmRange(0xFF, 0xFF), BitRange(2, 8, 0), Next], [Ex_Zcmt];
+    Compressed(0xA002), RV32 | RV64, [Imm] => [UImmRange(32, 255), BitRange(2, 8, 0), Next], [Ex_Zcmt];
+],
+"cm.jt" = [
+    // cm.jalt c_index (zcmt)
+    Compressed(0xA002), RV32 | RV64, [Imm] => [UImmRange(0, 31), BitRange(2, 8, 0), Next], [Ex_Zcmt];
 ],
 
 // Extension(s) zfa_zfh
 
 "fleq.h" = [
     // fleq.h rd, rs1, rs2 (zfa_zfh)
-    Single(0xA4004053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfa | Ex_Zfh];
+    Single(0xA4004053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfa | Ex_Zfh];
 ],
 "fli.h" = [
     // fli.h rd, rs1 (zfa_zfh)
-    Single(0xF4100053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfa | Ex_Zfh];
+    Single(0xF4100053), RV32 | RV64, [F, Imm] => [R(7), FloatingPointImmediate(15)], [Ex_Zfa | Ex_Zfh];
 ],
 "fltq.h" = [
     // fltq.h rd, rs1, rs2 (zfa_zfh)
-    Single(0xA4005053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfa | Ex_Zfh];
+    Single(0xA4005053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfa | Ex_Zfh];
 ],
 "fmaxm.h" = [
     // fmaxm.h rd, rs1, rs2 (zfa_zfh)
@@ -2560,19 +2515,19 @@ Ops!(
 ],
 "fclass.h" = [
     // fclass.h rd, rs1 (zfh)
-    Single(0xE4001053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xE4001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.h.l" = [
     // fcvt.h.l rd, rs1, rm (zfh)
-    Single(0xD4200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.h.l rd, rs1 (zfh)
-    Single(0xD4207053),        RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4207053),        RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.h.lu" = [
     // fcvt.h.lu rd, rs1, rm (zfh)
-    Single(0xD4300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.h.lu rd, rs1 (zfh)
-    Single(0xD4307053),        RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4307053),        RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.h.s" = [
     // fcvt.h.s rd, rs1, rm (zfh)
@@ -2582,27 +2537,27 @@ Ops!(
 ],
 "fcvt.h.w" = [
     // fcvt.h.w rd, rs1, rm (zfh)
-    Single(0xD4000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.h.w rd, rs1 (zfh)
-    Single(0xD4007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.h.wu" = [
     // fcvt.h.wu rd, rs1, rm (zfh)
-    Single(0xD4100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.h.wu rd, rs1 (zfh)
-    Single(0xD4107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.l.h" = [
     // fcvt.l.h rd, rs1, rm (zfh)
-    Single(0xC4200053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.l.h rd, rs1 (zfh)
-    Single(0xC4207053),        RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4207053),        RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.lu.h" = [
     // fcvt.lu.h rd, rs1, rm (zfh)
-    Single(0xC4300053),        RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.lu.h rd, rs1 (zfh)
-    Single(0xC4307053),        RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4307053),        RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.s.h" = [
     // fcvt.s.h rd, rs1, rm (zfh)
@@ -2612,15 +2567,15 @@ Ops!(
 ],
 "fcvt.w.h" = [
     // fcvt.w.h rd, rs1, rm (zfh)
-    Single(0xC4000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.w.h rd, rs1 (zfh)
-    Single(0xC4007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.wu.h" = [
     // fcvt.wu.h rd, rs1, rm (zfh)
-    Single(0xC4100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.wu.h rd, rs1 (zfh)
-    Single(0xC4107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fdiv.h" = [
     // fdiv.h rd, rs1, rs2, rm (zfh)
@@ -2630,19 +2585,19 @@ Ops!(
 ],
 "feq.h" = [
     // feq.h rd, rs1, rs2 (zfh)
-    Single(0xA4002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0xA4002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
 ],
 "fle.h" = [
     // fle.h rd, rs1, rs2 (zfh)
-    Single(0xA4000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0xA4000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
 ],
 "flh" = [
     // flh rd, rs1, imm12 (zfh)
-    Single(0x00001007), RV32 | RV64, [F, F, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Zfh];
+    Single(0x00001007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Zfh];
 ],
 "flt.h" = [
     // flt.h rd, rs1, rs2 (zfh)
-    Single(0xA4001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0xA4001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
 ],
 "fmadd.h" = [
     // fmadd.h rd, rs1, rs2, rs3, rm (zfh)
@@ -2676,11 +2631,11 @@ Ops!(
 ],
 "fmv.h.x" = [
     // fmv.h.x rd, rs1 (zfh)
-    Single(0xF4000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xF4000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fmv.x.h" = [
     // fmv.x.h rd, rs1 (zfh)
-    Single(0xE4000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xE4000053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fneg.h" = [
     // fneg.h rd, rs1, rs2=rs1 (subformat of rv_zfh::fsgnjn.h) (zfh)
@@ -2712,7 +2667,7 @@ Ops!(
 ],
 "fsh" = [
     // fsh imm12hi, rs1, rs2, imm12lo (zfh)
-    Single(0x00001027), RV32 | RV64, [F, F, Imm] => [R(15), R(20), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Zfh];
+    Single(0x00001027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Zfh];
 ],
 "fsqrt.h" = [
     // fsqrt.h rd, rs1, rm (zfh)
@@ -2769,35 +2724,35 @@ Ops!(
 
 "ssamoswap.d" = [
     // ssamoswap.d rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4800302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4800302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.d.aq" = [
     // ssamoswap.d.aq rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4C00302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4C00302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.d.aqrl" = [
     // ssamoswap.d.aqrl rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4E00302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4E00302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.d.rl" = [
     // ssamoswap.d.rl rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4A00302F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4A00302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.w" = [
     // ssamoswap.w rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4800202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4800202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.w.aq" = [
     // ssamoswap.w.aq rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4C00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4C00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.w.aqrl" = [
     // ssamoswap.w.aqrl rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4E00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4E00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.w.rl" = [
     // ssamoswap.w.rl rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4A00202F), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zicfiss];
+    Single(0x4A00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "sspopchk.x1" = [
     // sspopchk.x1  (subformat of rv_zimop::mop.r.N) (zicfiss)
@@ -2916,8 +2871,8 @@ Ops!(
 // Extension(s) zifencei
 
 "fence.i" = [
-    // fence.i imm12, rs1, rd (zifencei)
-    Single(0x0000100F), RV32 | RV64, [F, F, Imm] => [SImm(12, 0), BitRange(20, 12, 0), Next, R(15), R(7)], [Ex_Zifencei];
+    // fence.i (zifencei)
+    Single(0x0000100F), RV32 | RV64, [] => [], [Ex_Zifencei];
 ],
 
 // Extension(s) zihintntl

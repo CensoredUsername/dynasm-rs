@@ -258,7 +258,7 @@ class Encoder:
         if self.stored == {"c_uimm7lo", "c_uimm7hi"}:
             lo, _ = lut.get_arg_bounds("c_uimm7lo")
             hi, _ = lut.get_arg_bounds("c_uimm7hi")
-            self.fields.append(f"UImm(7, 2), BitRange({lo}, 3, 5), BitRange({hi}, 2, 3), Next")
+            self.fields.append(f"UImm(7, 2), BitRange({lo}, 2, 6), BitRange({hi}, 3, 3), Next")
             return
 
         # unsigned, 2-bit scaled 8-bit immediate. this isn't always correct

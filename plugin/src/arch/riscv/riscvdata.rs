@@ -143,13 +143,16 @@ pub enum Matcher {
     /// A vector register
     // V,
 
-    // An indirect reference with offset
-    Indirect,
+    /// An indirect reference to a register
+    Ref,
+
+    /// An indirect reference with offset. expands args to X, Imm
+    RefOffset,
 
     /// An immediate
     Imm,
 
-    /// A jump offset, expands to X, Imm
+    /// A jump offset
     Offset,
 
     /// a random ident
@@ -178,6 +181,9 @@ pub enum Command {
     /// A normal 5-bit register encoding. Argument specifies
     R(u8),
 
+    /// A normal 5-bit register encoding, but the register must be even
+    Reven(u8),
+
     /// A 5-bit register encoding that cannot be x0
     Rno0(u8),
 
@@ -204,6 +210,9 @@ pub enum Command {
 
     /// 12-bit field encoding CSRs. Used to provide support for encoding actual names
     Csr(u8),
+
+    /// weird floating point immediate instruction
+    FloatingPointImmediate(u8),
 
 
     // immediate handling, validation fields
@@ -233,10 +242,17 @@ pub enum Command {
     /// lower .1 bits are 1
     UImmOdd(u8, u8),
 
+    /// validate that the current arg is a negative value, which, if negated, fits in .0 bits, and
+    /// that the lower .1 bits of its negated representation are 0.
+    NImm(u8, u8),
+
     // immediate handling, encoding fields.
 
     /// Encode a slice of bits from a value .0 = offset, .1 = amount of bits, .2 = offset in value
     BitRange(u8, u8, u8),
+
+    /// Same as Bitrange, but negate the value before encoding
+    NBitRange(u8, u8, u8),
 
     /// Encode at offset .0, bits from the argument specified by .1. so if it is [3, 5, 4]
     /// then at .0 we encode arg.bits[3], at .0+1 arg.bits[5], at .0+2 arg.bits[4]
@@ -254,6 +270,18 @@ pub enum Relocation {
     // j, jal
     // 20 bits, 2-bit scaled
     J = 1,
+    // c.beqz, c.bnez
+    // 9 bits, 2-bit scaled
+    BC = 2,
+    // c.j, c.jal
+    // 12 bits, 2-bit scaled
+    JC = 3,
+    // auipc
+    // 32-bits, 12-bit scaled
+    AUIPC = 4,
+    // jalr
+    // 12-bits, no scaling
+    JALR = 5,
 }
 
 impl Relocation {
