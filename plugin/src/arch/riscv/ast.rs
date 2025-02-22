@@ -6,6 +6,7 @@
 //! * vector registers, denoted as v0-v31
 use proc_macro2::Span;
 use crate::common::Jump;
+use super::riscvdata::Opdata;
 
 
 /// A generic register reference. Can be either a static RegId or a dynamic register from a family
@@ -19,14 +20,14 @@ pub enum Register {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RegId {
     // regular registers
-    X0 = 0x00, X1 = 0x01, X2 = 0x02, X3 = 0x03,
-    X4 = 0x04, X5 = 0x05, X6 = 0x06, X7 = 0x07,
-    X8 = 0x08, X9 = 0x09, X10= 0x0A, X11= 0x0B,
-    X12= 0x0C, X13= 0x0D, X14= 0x0E, X15= 0x0F,
-    X16= 0x10, X17= 0x11, X18= 0x12, X19= 0x13,
-    X20= 0x14, X21= 0x15, X22= 0x16, X23= 0x17,
-    X24= 0x18, X25= 0x19, X26= 0x1A, X27= 0x1B,
-    X28= 0x1C, X29= 0x1D, X30= 0x1E, X31= 0x1F,
+    X0 = 0x00, X1 = 0x01, X2 = 0x02, X3 = 0x03, // zero, ra, sp, gp
+    X4 = 0x04, X5 = 0x05, X6 = 0x06, X7 = 0x07, // tp, t0, t1, t2
+    X8 = 0x08, X9 = 0x09, X10= 0x0A, X11= 0x0B, // s0, s1, a0, a1
+    X12= 0x0C, X13= 0x0D, X14= 0x0E, X15= 0x0F, // a2, a3, a4, a5
+    X16= 0x10, X17= 0x11, X18= 0x12, X19= 0x13, // a6, a7, s2, s3
+    X20= 0x14, X21= 0x15, X22= 0x16, X23= 0x17, // s4, s5, s6, s7
+    X24= 0x18, X25= 0x19, X26= 0x1A, X27= 0x1B, // s8, s9, s10,s11
+    X28= 0x1C, X29= 0x1D, X30= 0x1E, X31= 0x1F, // t3, t4, t5, t6
 
     // floating point registers
     F0 = 0x20, F1 = 0x21, F2 = 0x22, F3 = 0x23,
@@ -98,6 +99,23 @@ impl Register {
             Register::Dynamic(_, _) => true
         }
     }
+
+    /// Returns Some(RegId) if this Register is static
+    pub fn as_id(&self) -> Option<RegId> {
+        match self {
+            Register::Static(id) => Some(*id),
+            Register::Dynamic(_, _) => None
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub enum RegListCount {
+    Static(u8),
+    Dynamic(syn::Expr),
+    Single(Register),
+    Double(Register, Register)
 }
 
 
@@ -107,13 +125,13 @@ impl Register {
 /// * an immediate (arbitrary expression)
 /// * a label (in normal dynasm-rs style)
 /// * a register (one of the above)
-/// * a memory reference `expr ( intreg ) `
+/// * a memory reference `expr? ( intreg ) `
+/// * a register list {ra [, s0 [- s_n]]}
 /// this last one is somewhat problematic, as just parsing the expr will normally swallow
 /// the register reference as a call expression.
-
 #[derive(Debug)]
-pub enum ParsedArg {
-    // An immediate
+pub enum RawArg {
+    // An immediate, or potentially an identifier
     Immediate {
         value: syn::Expr
     },
@@ -129,16 +147,53 @@ pub enum ParsedArg {
     // A memory reference
     Reference {
         span: Span,
-        offset: syn::Expr,
+        offset: Option<syn::Expr>,
         base: Register,
-    }
+    },
+    // A register list. These only happen with a single family of instructions in the Zcmp extension
+    RegisterList {
+        span: Span,
+        first: Register, // this should always be ra
+        count: RegListCount
+    },
 }
 
-
-/// A full parsed instruction
+/// The result of parsing a single instruction
 #[derive(Debug)]
 pub struct ParsedInstruction {
-    pub span: Span,
     pub name: String,
-    pub args: Vec<ParsedArg>
+    pub span: Span,
+    pub args: Vec<RawArg>
+}
+
+#[derive(Debug)]
+pub enum RegListFlat {
+    Static(u8),
+    Dynamic(syn::Expr)
+}
+
+#[derive(Debug)]
+pub enum FlatArg {
+    Immediate {
+        value: syn::Expr
+    },
+    JumpTarget {
+        jump: Jump
+    },
+    Register {
+        span: Span,
+        reg: Register
+    },
+    RegisterList {
+        span: Span,
+        count: RegListFlat
+    },
+    Default
+}
+
+/// The result of finding a match for an instruction
+#[derive(Debug)]
+pub struct MatchData {
+    pub data: &'static Opdata,
+    pub args: Vec<FlatArg>
 }

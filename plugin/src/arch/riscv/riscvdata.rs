@@ -2,7 +2,7 @@
 use bitflags::bitflags;
 use lazy_static::lazy_static;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map};
 
 /// A template contains the information for the static parts of an instruction encoding, as well
 /// as its bitsize and length
@@ -354,6 +354,15 @@ macro_rules! Ops {
             )
         ),* ]
     }
+}
+
+pub fn get_mnemonic_data(name: &str) -> Option<&'static [Opdata]> {
+    OPMAP.get(&name).cloned()
+}
+
+#[allow(dead_code)]
+pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> {
+    OPMAP.keys()
 }
 
 

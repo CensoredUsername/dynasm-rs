@@ -9,7 +9,7 @@ use super::debug::format_opdata_list;
 use crate::common::{Size, JumpKind};
 use crate::parse_helpers::{as_ident, as_unsigned_number, as_float};
 
-/// Try finding an appropriate definition that matches the given instruction / arguments.
+/// Try finding an appropriate instruction definition that matches the given instruction / arguments.
 pub(super) fn match_instruction(_ctx: &mut Context, instruction: &Instruction, args: Vec<RawArg>) -> Result<MatchData, Option<String>> {
     // sanitize our arg list to remove any structures that cannot be matched on
     let args = sanitize_args(args)?;

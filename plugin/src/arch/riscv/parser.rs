@@ -10,6 +10,8 @@ use crate::parse_helpers::{parse_ident_or_rust_keyword, ParseOptExt};
 
 use super::{Context, ast};
 
+// TODO: implement register lists, and References without offset
+
 // syntax for a single op: ident ("." ident)* (arg ("," arg)*)? ";"
 pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast::ParsedInstruction> {
     let span = input.cursor().span();
@@ -47,12 +49,12 @@ pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) ->
 
 
 /// tries to parse a full arg definition
-fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast::ParsedArg> {
+fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast::RawArg> {
     let start = input.cursor().span(); // FIXME can't join spans yet
 
     // a label
     if let Some(jump) = input.parse_opt()? {
-        return Ok(ast::ParsedArg::JumpTarget {
+        return Ok(ast::RawArg::JumpTarget {
             jump
         });
     }
@@ -60,7 +62,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
     // register. we could also parse this from an expression, but this
     // would lead to worse error messages.
     if let Some(reg) = parse_reg(ctx, input)? {
-        return Ok(ast::ParsedArg::Register {
+        return Ok(ast::RawArg::Register {
             reg,
             span: start
         })
@@ -76,10 +78,10 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
         syn::Expr::Call(exprcall) => {
             if exprcall.args.len() == 1 {
                 if let Some(reg) = parse_reg_from_expression(ctx, &exprcall.args[0])? {
-                    return Ok(ast::ParsedArg::Reference {
+                    return Ok(ast::RawArg::Reference {
                         span: exprcall.span(),
                         base: reg,
-                        offset: *exprcall.func.clone()
+                        offset: Some(*exprcall.func.clone())
                     })
                 }
             }
@@ -87,7 +89,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
         _ => ()
     }
 
-    Ok(ast::ParsedArg::Immediate { value: expr })
+    Ok(ast::RawArg::Immediate { value: expr })
 }
 
 /// Checks if the given expression could be a valid RISC-V register reference

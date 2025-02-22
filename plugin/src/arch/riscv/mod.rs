@@ -4,14 +4,16 @@
 #![allow(unreachable_code)]
 
 use syn::parse;
+use proc_macro_error2::emit_error;
 
 use crate::State;
 use crate::arch::{Stmt, Jump, Size};
 use crate::arch::Arch;
 
+pub mod riscvdata;
 pub mod ast;
 pub mod parser;
-pub mod riscvdata;
+pub mod matching;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RiscVTarget {
@@ -78,6 +80,8 @@ impl Arch for ArchRiscV64I {
             features: self.features
         };
 
+        compile_instruction_inner(&mut ctx, input)?;
+
         let instruction = parser::parse_instruction(&mut ctx, input)?;
 
         unimplemented!();
@@ -113,8 +117,6 @@ impl Arch for ArchRiscV64E {
         };
 
         let instruction = parser::parse_instruction(&mut ctx, input)?;
-
-        validate_embedded_registers(&instruction)?;
 
         unimplemented!();
 
@@ -184,30 +186,24 @@ impl Arch for ArchRiscV32E {
 
         let instruction = parser::parse_instruction(&mut ctx, input)?;
 
-        validate_embedded_registers(&instruction)?;
-
         unimplemented!();
 
         Ok(())
     }
 }
 
-/// Returns an error if any static register above 15 is used as those are not supported
-/// on embedded RISC-V target
-fn validate_embedded_registers(instruction: &ast::ParsedInstruction) -> parse::Result<()> {
-    for arg in instruction.args.iter() {
-        let (register, span) = match arg {
-            ast::ParsedArg::Register { reg, span } => (reg, span),
-            ast::ParsedArg::Reference { base, span, .. } => (base, span),
-            _ => continue
-        };
+fn compile_instruction_inner(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<()> {
+    let instruction = parser::parse_instruction(ctx, input)?;
+    let span = instruction.span;
 
-        if let Some(code) = register.code() {
-            if code >= 16 {
-                return Err(parse::Error::new(*span, "Registers above x15 are not supported on embedded RISC-V"));
-            }
+    let match_data = match matching::match_instruction(ctx, instruction) {
+        Err(None) => return Ok(()),
+        Err(Some(e)) => {
+            emit_error!(span, e);
+            return Ok(())
         }
-    }
+        Ok(m) => m
+    };
 
     Ok(())
 }
