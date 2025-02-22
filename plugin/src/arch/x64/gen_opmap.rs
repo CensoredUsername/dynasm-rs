@@ -2296,6 +2296,9 @@ Ops!(
 "rdpmc" = [
     b""           , [0x0F, 0x33        ], X;
 ]
+"rdpru" = [
+    b""           , [0x0F, 0x01, 0xFD  ], X, AMD;
+]
 "rdrand" = [
     b"rq"         , [0x0F, 0xC7        ], 6, WITH_REXW;
 ]
