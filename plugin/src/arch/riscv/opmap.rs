@@ -369,11 +369,11 @@ Ops!(
 ],
 "c.addi16sp" = [
     // c.addi16sp c_nzimm10hi, c_nzimm10lo (c)
-    Compressed(0x6101), RV32 | RV64, [Imm] => [SImmNo0(10, 4), Bits(2, &[4, 6, 8, 7, 5]), BitRange(12, 1, 9), Next], [Ex_C];
+    Compressed(0x6101), RV32 | RV64, [Imm] => [SImmNo0(10, 4), BitRange(6, 1, 4), BitRange(5, 1, 6), BitRange(3, 2, 7), BitRange(2, 1, 5), BitRange(12, 1, 9), Next], [Ex_C];
 ],
 "c.addi4spn" = [
     // c.addi4spn rd_p, c_nzuimm10 (c)
-    Compressed(0x0000), RV32 | RV64, [X, Imm] => [Rpop(2), UImmNo0(10, 2), Bits(5, &[5, 4, 9, 8, 7, 6, 2, 3]), Next], [Ex_C];
+    Compressed(0x0000), RV32 | RV64, [X, Imm] => [Rpop(2), UImmNo0(10, 2), BitRange(11, 2, 4), BitRange(7, 4, 6), BitRange(6, 1, 2), BitRange(5, 1, 3), Next], [Ex_C];
 ],
 "c.addiw" = [
     // c.addiw rd_rs1_n0, c_imm6lo, c_imm6hi (c)
@@ -425,7 +425,7 @@ Ops!(
 ],
 "c.ldsp" = [
     // c.ldsp rd_n0, c_uimm9sphi, c_uimm9splo (c)
-    Compressed(0x6002),        RV64, [X, Imm] => [Rno0(7), UImm(9, 3), Bits(2, &[4, 3, 8, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C];
+    Compressed(0x6002),        RV64, [X, Imm] => [Rno0(7), UImm(9, 3), BitRange(5, 2, 3), BitRange(2, 3, 6), BitRange(12, 1, 5), Next], [Ex_C];
 ],
 "c.li" = [
     // c.li rd_n0, c_imm6lo, c_imm6hi (c)
@@ -437,11 +437,11 @@ Ops!(
 ],
 "c.lw" = [
     // c.lw rd_p, rs1_p, c_uimm7lo, c_uimm7hi (c)
-    Compressed(0x4000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C];
+    Compressed(0x4000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), BitRange(6, 1, 2), BitRange(5, 1, 6), BitRange(10, 3, 3), Next], [Ex_C];
 ],
 "c.lwsp" = [
     // c.lwsp rd_n0, c_uimm8sphi, c_uimm8splo (c)
-    Compressed(0x4002), RV32 | RV64, [X, Imm] => [Rno0(7), UImm(8, 2), Bits(2, &[4, 3, 2, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C];
+    Compressed(0x4002), RV32 | RV64, [X, Imm] => [Rno0(7), UImm(8, 2), BitRange(4, 3, 2), BitRange(2, 2, 6), BitRange(12, 1, 5), Next], [Ex_C];
 ],
 "c.mv" = [
     // c.mv rd_n0, c_rs2_n0 (c)
@@ -461,7 +461,7 @@ Ops!(
 ],
 "c.sdsp" = [
     // c.sdsp c_rs2, c_uimm9sp_s (c)
-    Compressed(0xE002),        RV64, [X, Imm] => [R(2), UImm(9, 3), Bits(7, &[5, 4, 3, 8, 7, 6]), Next], [Ex_C];
+    Compressed(0xE002),        RV64, [X, Imm] => [R(2), UImm(9, 3), BitRange(10, 3, 3), BitRange(7, 3, 6), Next], [Ex_C];
 ],
 "c.slli" = [
     // c.slli rd_rs1_n0, c_nzuimm6lo (subformat of rv64_c::c.slli) (c)
@@ -491,11 +491,11 @@ Ops!(
 ],
 "c.sw" = [
     // c.sw rs1_p, rs2_p, c_uimm7lo, c_uimm7hi (c)
-    Compressed(0xC000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C];
+    Compressed(0xC000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), BitRange(6, 1, 2), BitRange(5, 1, 6), BitRange(10, 3, 3), Next], [Ex_C];
 ],
 "c.swsp" = [
     // c.swsp c_rs2, c_uimm8sp_s (c)
-    Compressed(0xC002), RV32 | RV64, [X, Imm] => [R(2), UImm(8, 2), Bits(7, &[5, 4, 3, 2, 7, 6]), Next], [Ex_C];
+    Compressed(0xC002), RV32 | RV64, [X, Imm] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C];
 ],
 "c.xor" = [
     // c.xor rd_rs1_p, rs2_p (c)
@@ -510,7 +510,7 @@ Ops!(
 ],
 "c.fldsp" = [
     // c.fldsp rd, c_uimm9sphi, c_uimm9splo (c_d)
-    Compressed(0x2002), RV32 | RV64, [F, Imm] => [R(7), UImm(9, 3), Bits(2, &[4, 3, 8, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C | Ex_D];
+    Compressed(0x2002), RV32 | RV64, [F, Imm] => [R(7), UImm(9, 3), BitRange(5, 2, 3), BitRange(2, 3, 6), BitRange(12, 1, 5), Next], [Ex_C | Ex_D];
 ],
 "c.fsd" = [
     // c.fsd rs1_p, rs2_p, c_uimm8lo, c_uimm8hi (c_d)
@@ -518,26 +518,26 @@ Ops!(
 ],
 "c.fsdsp" = [
     // c.fsdsp c_rs2, c_uimm9sp_s (c_d)
-    Compressed(0xA002), RV32 | RV64, [F, Imm] => [R(2), UImm(9, 3), Bits(7, &[5, 4, 3, 8, 7, 6]), Next], [Ex_C | Ex_D];
+    Compressed(0xA002), RV32 | RV64, [F, Imm] => [R(2), UImm(9, 3), BitRange(10, 3, 3), BitRange(7, 3, 6), Next], [Ex_C | Ex_D];
 ],
 
 // Extension(s) c_f
 
 "c.flw" = [
     // c.flw rd_p, rs1_p, c_uimm7lo, c_uimm7hi (c_f)
-    Compressed(0x6000), RV32       , [F, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C | Ex_F];
+    Compressed(0x6000), RV32       , [F, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), BitRange(6, 1, 2), BitRange(5, 1, 6), BitRange(10, 3, 3), Next], [Ex_C | Ex_F];
 ],
 "c.flwsp" = [
     // c.flwsp rd, c_uimm8sphi, c_uimm8splo (c_f)
-    Compressed(0x6002), RV32       , [F, Imm] => [R(7), UImm(8, 2), Bits(2, &[4, 3, 2, 7, 6]), BitRange(12, 1, 5), Next], [Ex_C | Ex_F];
+    Compressed(0x6002), RV32       , [F, Imm] => [R(7), UImm(8, 2), BitRange(4, 3, 2), BitRange(2, 2, 6), BitRange(12, 1, 5), Next], [Ex_C | Ex_F];
 ],
 "c.fsw" = [
     // c.fsw rs1_p, rs2_p, c_uimm7lo, c_uimm7hi (c_f)
-    Compressed(0xE000), RV32       , [F, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), Bits(5, &[2, 6]), BitRange(10, 3, 3), Next], [Ex_C | Ex_F];
+    Compressed(0xE000), RV32       , [F, RefOffset] => [Rpop(2), Rpop(7), UImm(7, 2), BitRange(6, 1, 2), BitRange(5, 1, 6), BitRange(10, 3, 3), Next], [Ex_C | Ex_F];
 ],
 "c.fswsp" = [
     // c.fswsp c_rs2, c_uimm8sp_s (c_f)
-    Compressed(0xE002), RV32       , [F, Imm] => [R(2), UImm(8, 2), Bits(7, &[5, 4, 3, 2, 7, 6]), Next], [Ex_C | Ex_F];
+    Compressed(0xE002), RV32       , [F, Imm] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C | Ex_F];
 ],
 
 // Extension(s) c_zicfiss
@@ -2323,7 +2323,7 @@ Ops!(
 
 "c.lbu" = [
     // c.lbu rd_p, rs1_p, c_uimm2 (zcb)
-    Compressed(0x8000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), Bits(5, &[0, 1]), Next], [Ex_Zcb];
+    Compressed(0x8000), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), BitRange(6, 1, 0), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
 "c.lh" = [
     // c.lh rd_p, rs1_p, c_uimm1 (zcb)
@@ -2343,7 +2343,7 @@ Ops!(
 ],
 "c.sb" = [
     // c.sb rs2_p, rs1_p, c_uimm2 (zcb)
-    Compressed(0x8800), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), Bits(5, &[0, 1]), Next], [Ex_Zcb];
+    Compressed(0x8800), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), BitRange(6, 1, 0), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
 "c.sext.b" = [
     // c.sext.b rd_rs1_p (zcb)

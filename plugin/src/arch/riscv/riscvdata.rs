@@ -214,7 +214,6 @@ pub enum Command {
     /// weird floating point immediate instruction
     FloatingPointImmediate(u8),
 
-
     // immediate handling, validation fields
 
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
@@ -225,26 +224,24 @@ pub enum Command {
     /// lower .1 bits are 0
     SImm(u8, u8),
 
+    /// validate that the current arg is a negative value, which, if negated, fits in .0 bits, and
+    /// that the lower .1 bits of its negated representation are 0.
+    NImm(u8, u8),
+
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
-    /// lower .1 bits are 0. The value can also not be 0.
+    /// lower .1 bits are 0. Also check that the immediate is not 0
     UImmNo0(u8, u8),
 
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
-    /// lower .1 bits are 0. The value can also not be 0.
+    /// lower .1 bits are 0. Also check that the immediate is not 0
     SImmNo0(u8, u8),
-
-    // weird ones
-
-    /// Validate that the given argument conforms to .0 >= arg >= .1 
-    UImmRange(u32, u32),
 
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
     /// lower .1 bits are 1
     UImmOdd(u8, u8),
 
-    /// validate that the current arg is a negative value, which, if negated, fits in .0 bits, and
-    /// that the lower .1 bits of its negated representation are 0.
-    NImm(u8, u8),
+    /// Validate that the given argument conforms to .0 >= arg >= .1 
+    UImmRange(u32, u32),
 
     // immediate handling, encoding fields.
 
@@ -253,10 +250,6 @@ pub enum Command {
 
     /// Same as Bitrange, but negate the value before encoding
     NBitRange(u8, u8, u8),
-
-    /// Encode at offset .0, bits from the argument specified by .1. so if it is [3, 5, 4]
-    /// then at .0 we encode arg.bits[3], at .0+1 arg.bits[5], at .0+2 arg.bits[4]
-    Bits(u8, &'static [u8]),
 
     /// some kind of offset for a jump.
     Offset(Relocation),
@@ -456,4 +449,382 @@ lazy_static!{
 
         map
     };
+
+    pub static ref CSR_MAP: HashMap<&'static str, u16> = {
+        let mut map = HashMap::new();
+
+        map.insert("fflags", 0x001);
+        map.insert("frm", 0x002);
+        map.insert("fcsr", 0x003);
+        map.insert("vstart", 0x008);
+        map.insert("vxsat", 0x009);
+        map.insert("vxrm", 0x00A);
+        map.insert("vcsr", 0x00F);
+        map.insert("ssp", 0x011);
+        map.insert("seed", 0x015);
+        map.insert("jvt", 0x017);
+        map.insert("cycle", 0xC00);
+        map.insert("time", 0xC01);
+        map.insert("instret", 0xC02);
+        map.insert("hpmcounter3", 0xC03);
+        map.insert("hpmcounter4", 0xC04);
+        map.insert("hpmcounter5", 0xC05);
+        map.insert("hpmcounter6", 0xC06);
+        map.insert("hpmcounter7", 0xC07);
+        map.insert("hpmcounter8", 0xC08);
+        map.insert("hpmcounter9", 0xC09);
+        map.insert("hpmcounter10", 0xC0A);
+        map.insert("hpmcounter11", 0xC0B);
+        map.insert("hpmcounter12", 0xC0C);
+        map.insert("hpmcounter13", 0xC0D);
+        map.insert("hpmcounter14", 0xC0E);
+        map.insert("hpmcounter15", 0xC0F);
+        map.insert("hpmcounter16", 0xC10);
+        map.insert("hpmcounter17", 0xC11);
+        map.insert("hpmcounter18", 0xC12);
+        map.insert("hpmcounter19", 0xC13);
+        map.insert("hpmcounter20", 0xC14);
+        map.insert("hpmcounter21", 0xC15);
+        map.insert("hpmcounter22", 0xC16);
+        map.insert("hpmcounter23", 0xC17);
+        map.insert("hpmcounter24", 0xC18);
+        map.insert("hpmcounter25", 0xC19);
+        map.insert("hpmcounter26", 0xC1A);
+        map.insert("hpmcounter27", 0xC1B);
+        map.insert("hpmcounter28", 0xC1C);
+        map.insert("hpmcounter29", 0xC1D);
+        map.insert("hpmcounter30", 0xC1E);
+        map.insert("hpmcounter31", 0xC1F);
+        map.insert("vl", 0xC20);
+        map.insert("vtype", 0xC21);
+        map.insert("vlenb", 0xC22);
+        map.insert("sstatus", 0x100);
+        map.insert("sedeleg", 0x102);
+        map.insert("sideleg", 0x103);
+        map.insert("sie", 0x104);
+        map.insert("stvec", 0x105);
+        map.insert("scounteren", 0x106);
+        map.insert("senvcfg", 0x10A);
+        map.insert("sstateen0", 0x10C);
+        map.insert("sstateen1", 0x10D);
+        map.insert("sstateen2", 0x10E);
+        map.insert("sstateen3", 0x10F);
+        map.insert("scountinhibit", 0x120);
+        map.insert("sscratch", 0x140);
+        map.insert("sepc", 0x141);
+        map.insert("scause", 0x142);
+        map.insert("stval", 0x143);
+        map.insert("sip", 0x144);
+        map.insert("stimecmp", 0x14D);
+        map.insert("sctrctl", 0x14E);
+        map.insert("sctrstatus", 0x14F);
+        map.insert("siselect", 0x150);
+        map.insert("sireg", 0x151);
+        map.insert("sireg2", 0x152);
+        map.insert("sireg3", 0x153);
+        map.insert("sireg4", 0x155);
+        map.insert("sireg5", 0x156);
+        map.insert("sireg6", 0x157);
+        map.insert("stopei", 0x15C);
+        map.insert("sctrdepth", 0x15F);
+        map.insert("satp", 0x180);
+        map.insert("srmcfg", 0x181);
+        map.insert("scontext", 0x5A8);
+        map.insert("vsstatus", 0x200);
+        map.insert("vsie", 0x204);
+        map.insert("vstvec", 0x205);
+        map.insert("vsscratch", 0x240);
+        map.insert("vsepc", 0x241);
+        map.insert("vscause", 0x242);
+        map.insert("vstval", 0x243);
+        map.insert("vsip", 0x244);
+        map.insert("vstimecmp", 0x24D);
+        map.insert("vsctrctl", 0x24E);
+        map.insert("vsiselect", 0x250);
+        map.insert("vsireg", 0x251);
+        map.insert("vsireg2", 0x252);
+        map.insert("vsireg3", 0x253);
+        map.insert("vsireg4", 0x255);
+        map.insert("vsireg5", 0x256);
+        map.insert("vsireg6", 0x257);
+        map.insert("vstopei", 0x25C);
+        map.insert("vsatp", 0x280);
+        map.insert("hstatus", 0x600);
+        map.insert("hedeleg", 0x602);
+        map.insert("hideleg", 0x603);
+        map.insert("hie", 0x604);
+        map.insert("htimedelta", 0x605);
+        map.insert("hcounteren", 0x606);
+        map.insert("hgeie", 0x607);
+        map.insert("hvien", 0x608);
+        map.insert("hvictl", 0x609);
+        map.insert("henvcfg", 0x60A);
+        map.insert("hstateen0", 0x60C);
+        map.insert("hstateen1", 0x60D);
+        map.insert("hstateen2", 0x60E);
+        map.insert("hstateen3", 0x60F);
+        map.insert("htval", 0x643);
+        map.insert("hip", 0x644);
+        map.insert("hvip", 0x645);
+        map.insert("hviprio1", 0x646);
+        map.insert("hviprio2", 0x647);
+        map.insert("htinst", 0x64A);
+        map.insert("hgatp", 0x680);
+        map.insert("hcontext", 0x6A8);
+        map.insert("hgeip", 0xE12);
+        map.insert("vstopi", 0xEB0);
+        map.insert("scountovf", 0xDA0);
+        map.insert("stopi", 0xDB0);
+        map.insert("utvt", 0x007);
+        map.insert("unxti", 0x045);
+        map.insert("uintstatus", 0x046);
+        map.insert("uscratchcsw", 0x048);
+        map.insert("uscratchcswl", 0x049);
+        map.insert("stvt", 0x107);
+        map.insert("snxti", 0x145);
+        map.insert("sintstatus", 0x146);
+        map.insert("sscratchcsw", 0x148);
+        map.insert("sscratchcswl", 0x149);
+        map.insert("mtvt", 0x307);
+        map.insert("mnxti", 0x345);
+        map.insert("mintstatus", 0x346);
+        map.insert("mscratchcsw", 0x348);
+        map.insert("mscratchcswl", 0x349);
+        map.insert("mstatus", 0x300);
+        map.insert("misa", 0x301);
+        map.insert("medeleg", 0x302);
+        map.insert("mideleg", 0x303);
+        map.insert("mie", 0x304);
+        map.insert("mtvec", 0x305);
+        map.insert("mcounteren", 0x306);
+        map.insert("mvien", 0x308);
+        map.insert("mvip", 0x309);
+        map.insert("menvcfg", 0x30a);
+        map.insert("mstateen0", 0x30C);
+        map.insert("mstateen1", 0x30D);
+        map.insert("mstateen2", 0x30E);
+        map.insert("mstateen3", 0x30F);
+        map.insert("mcountinhibit", 0x320);
+        map.insert("mscratch", 0x340);
+        map.insert("mepc", 0x341);
+        map.insert("mcause", 0x342);
+        map.insert("mtval", 0x343);
+        map.insert("mip", 0x344);
+        map.insert("mtinst", 0x34a);
+        map.insert("mtval2", 0x34b);
+        map.insert("mctrctl", 0x34E);
+        map.insert("miselect", 0x350);
+        map.insert("mireg", 0x351);
+        map.insert("mireg2", 0x352);
+        map.insert("mireg3", 0x353);
+        map.insert("mireg4", 0x355);
+        map.insert("mireg5", 0x356);
+        map.insert("mireg6", 0x357);
+        map.insert("mtopei", 0x35c);
+        map.insert("pmpcfg0", 0x3a0);
+        map.insert("pmpcfg1", 0x3a1);
+        map.insert("pmpcfg2", 0x3a2);
+        map.insert("pmpcfg3", 0x3a3);
+        map.insert("pmpcfg4", 0x3a4);
+        map.insert("pmpcfg5", 0x3a5);
+        map.insert("pmpcfg6", 0x3a6);
+        map.insert("pmpcfg7", 0x3a7);
+        map.insert("pmpcfg8", 0x3a8);
+        map.insert("pmpcfg9", 0x3a9);
+        map.insert("pmpcfg10", 0x3aa);
+        map.insert("pmpcfg11", 0x3ab);
+        map.insert("pmpcfg12", 0x3ac);
+        map.insert("pmpcfg13", 0x3ad);
+        map.insert("pmpcfg14", 0x3ae);
+        map.insert("pmpcfg15", 0x3af);
+        map.insert("pmpaddr0", 0x3b0);
+        map.insert("pmpaddr1", 0x3b1);
+        map.insert("pmpaddr2", 0x3b2);
+        map.insert("pmpaddr3", 0x3b3);
+        map.insert("pmpaddr4", 0x3b4);
+        map.insert("pmpaddr5", 0x3b5);
+        map.insert("pmpaddr6", 0x3b6);
+        map.insert("pmpaddr7", 0x3b7);
+        map.insert("pmpaddr8", 0x3b8);
+        map.insert("pmpaddr9", 0x3b9);
+        map.insert("pmpaddr10", 0x3ba);
+        map.insert("pmpaddr11", 0x3bb);
+        map.insert("pmpaddr12", 0x3bc);
+        map.insert("pmpaddr13", 0x3bd);
+        map.insert("pmpaddr14", 0x3be);
+        map.insert("pmpaddr15", 0x3bf);
+        map.insert("pmpaddr16", 0x3c0);
+        map.insert("pmpaddr17", 0x3c1);
+        map.insert("pmpaddr18", 0x3c2);
+        map.insert("pmpaddr19", 0x3c3);
+        map.insert("pmpaddr20", 0x3c4);
+        map.insert("pmpaddr21", 0x3c5);
+        map.insert("pmpaddr22", 0x3c6);
+        map.insert("pmpaddr23", 0x3c7);
+        map.insert("pmpaddr24", 0x3c8);
+        map.insert("pmpaddr25", 0x3c9);
+        map.insert("pmpaddr26", 0x3ca);
+        map.insert("pmpaddr27", 0x3cb);
+        map.insert("pmpaddr28", 0x3cc);
+        map.insert("pmpaddr29", 0x3cd);
+        map.insert("pmpaddr30", 0x3ce);
+        map.insert("pmpaddr31", 0x3cf);
+        map.insert("pmpaddr32", 0x3d0);
+        map.insert("pmpaddr33", 0x3d1);
+        map.insert("pmpaddr34", 0x3d2);
+        map.insert("pmpaddr35", 0x3d3);
+        map.insert("pmpaddr36", 0x3d4);
+        map.insert("pmpaddr37", 0x3d5);
+        map.insert("pmpaddr38", 0x3d6);
+        map.insert("pmpaddr39", 0x3d7);
+        map.insert("pmpaddr40", 0x3d8);
+        map.insert("pmpaddr41", 0x3d9);
+        map.insert("pmpaddr42", 0x3da);
+        map.insert("pmpaddr43", 0x3db);
+        map.insert("pmpaddr44", 0x3dc);
+        map.insert("pmpaddr45", 0x3dd);
+        map.insert("pmpaddr46", 0x3de);
+        map.insert("pmpaddr47", 0x3df);
+        map.insert("pmpaddr48", 0x3e0);
+        map.insert("pmpaddr49", 0x3e1);
+        map.insert("pmpaddr50", 0x3e2);
+        map.insert("pmpaddr51", 0x3e3);
+        map.insert("pmpaddr52", 0x3e4);
+        map.insert("pmpaddr53", 0x3e5);
+        map.insert("pmpaddr54", 0x3e6);
+        map.insert("pmpaddr55", 0x3e7);
+        map.insert("pmpaddr56", 0x3e8);
+        map.insert("pmpaddr57", 0x3e9);
+        map.insert("pmpaddr58", 0x3ea);
+        map.insert("pmpaddr59", 0x3eb);
+        map.insert("pmpaddr60", 0x3ec);
+        map.insert("pmpaddr61", 0x3ed);
+        map.insert("pmpaddr62", 0x3ee);
+        map.insert("pmpaddr63", 0x3ef);
+        map.insert("mseccfg", 0x747);
+        map.insert("tselect", 0x7a0);
+        map.insert("tdata1", 0x7a1);
+        map.insert("tdata2", 0x7a2);
+        map.insert("tdata3", 0x7a3);
+        map.insert("tinfo", 0x7a4);
+        map.insert("tcontrol", 0x7a5);
+        map.insert("mcontext", 0x7a8);
+        map.insert("mscontext", 0x7aa);
+        map.insert("dcsr", 0x7b0);
+        map.insert("dpc", 0x7b1);
+        map.insert("dscratch0", 0x7b2);
+        map.insert("dscratch1", 0x7b3);
+        map.insert("mcycle", 0xB00);
+        map.insert("minstret", 0xB02);
+        map.insert("mhpmcounter3", 0xB03);
+        map.insert("mhpmcounter4", 0xB04);
+        map.insert("mhpmcounter5", 0xB05);
+        map.insert("mhpmcounter6", 0xB06);
+        map.insert("mhpmcounter7", 0xB07);
+        map.insert("mhpmcounter8", 0xB08);
+        map.insert("mhpmcounter9", 0xB09);
+        map.insert("mhpmcounter10", 0xB0A);
+        map.insert("mhpmcounter11", 0xB0B);
+        map.insert("mhpmcounter12", 0xB0C);
+        map.insert("mhpmcounter13", 0xB0D);
+        map.insert("mhpmcounter14", 0xB0E);
+        map.insert("mhpmcounter15", 0xB0F);
+        map.insert("mhpmcounter16", 0xB10);
+        map.insert("mhpmcounter17", 0xB11);
+        map.insert("mhpmcounter18", 0xB12);
+        map.insert("mhpmcounter19", 0xB13);
+        map.insert("mhpmcounter20", 0xB14);
+        map.insert("mhpmcounter21", 0xB15);
+        map.insert("mhpmcounter22", 0xB16);
+        map.insert("mhpmcounter23", 0xB17);
+        map.insert("mhpmcounter24", 0xB18);
+        map.insert("mhpmcounter25", 0xB19);
+        map.insert("mhpmcounter26", 0xB1A);
+        map.insert("mhpmcounter27", 0xB1B);
+        map.insert("mhpmcounter28", 0xB1C);
+        map.insert("mhpmcounter29", 0xB1D);
+        map.insert("mhpmcounter30", 0xB1E);
+        map.insert("mhpmcounter31", 0xB1F);
+        map.insert("mcyclecfg", 0x321);
+        map.insert("minstretcfg", 0x322);
+        map.insert("mhpmevent3", 0x323);
+        map.insert("mhpmevent4", 0x324);
+        map.insert("mhpmevent5", 0x325);
+        map.insert("mhpmevent6", 0x326);
+        map.insert("mhpmevent7", 0x327);
+        map.insert("mhpmevent8", 0x328);
+        map.insert("mhpmevent9", 0x329);
+        map.insert("mhpmevent10", 0x32A);
+        map.insert("mhpmevent11", 0x32B);
+        map.insert("mhpmevent12", 0x32C);
+        map.insert("mhpmevent13", 0x32D);
+        map.insert("mhpmevent14", 0x32E);
+        map.insert("mhpmevent15", 0x32F);
+        map.insert("mhpmevent16", 0x330);
+        map.insert("mhpmevent17", 0x331);
+        map.insert("mhpmevent18", 0x332);
+        map.insert("mhpmevent19", 0x333);
+        map.insert("mhpmevent20", 0x334);
+        map.insert("mhpmevent21", 0x335);
+        map.insert("mhpmevent22", 0x336);
+        map.insert("mhpmevent23", 0x337);
+        map.insert("mhpmevent24", 0x338);
+        map.insert("mhpmevent25", 0x339);
+        map.insert("mhpmevent26", 0x33A);
+        map.insert("mhpmevent27", 0x33B);
+        map.insert("mhpmevent28", 0x33C);
+        map.insert("mhpmevent29", 0x33D);
+        map.insert("mhpmevent30", 0x33E);
+        map.insert("mhpmevent31", 0x33F);
+        map.insert("mvendorid", 0xF11);
+        map.insert("marchid", 0xF12);
+        map.insert("mimpid", 0xF13);
+        map.insert("mhartid", 0xF14);
+        map.insert("mconfigptr", 0xF15);
+        map.insert("mtopi", 0xFB0);
+
+        map
+    };
+
+    pub static ref FP_IMM_IDENT_MAP: HashMap<&'static str, u8> = {
+        let mut map = HashMap::new();
+
+        map.insert("min", 1);
+        map.insert("inf", 30);
+        map.insert("nan", 31);
+
+        map
+    };
+
+    pub static ref FP_IMM_VALUE_MAP: &'static [(f32, u8)] = &[
+        (-1.0, 0),
+        (1.52587890625e-05, 2),
+        (3.0517578125e-05, 3),
+        (3.90625e-03, 4),
+        (7.8125e-03, 5),
+        (0.0625, 6),
+        (0.125, 7),
+        (0.25, 8),
+        (0.3125, 9),
+        (0.375, 10),
+        (0.4375, 11),
+        (0.5, 12),
+        (0.625, 13),
+        (0.75, 14),
+        (0.875, 15),
+        (1.0, 16),
+        (1.25, 17),
+        (1.5, 18),
+        (1.75, 19),
+        (2.0, 20),
+        (2.5, 21),
+        (3.0, 22),
+        (4.0, 23),
+        (8.0, 24),
+        (16.0, 25),
+        (128.0, 26),
+        (256.0, 27),
+        (32768.0, 28),
+        (65536.0, 29),
+    ];
 }

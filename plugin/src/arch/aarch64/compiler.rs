@@ -894,10 +894,10 @@ fn static_range_check(expr: &syn::Expr, bias: i32, range: u32, scale: u8) -> Res
 
     let biased = scaled - i64::from(bias);
     if biased < 0 {
-        emit_error!(expr, "Immediate too small");
+        emit_error!(expr, "Immediate too low");
         Err(None)
     } else if biased > i64::from(range) {
-        emit_error!(expr, "Immediate too large");
+        emit_error!(expr, "Immediate too high");
         Err(None)
     } else {
         // this cast is always safe

@@ -14,6 +14,8 @@ pub mod riscvdata;
 pub mod ast;
 pub mod parser;
 pub mod matching;
+pub mod compiler;
+pub mod debug;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RiscVTarget {
@@ -80,13 +82,7 @@ impl Arch for ArchRiscV64I {
             features: self.features
         };
 
-        compile_instruction_inner(&mut ctx, input)?;
-
-        let instruction = parser::parse_instruction(&mut ctx, input)?;
-
-        unimplemented!();
-
-        Ok(())
+        compile_instruction_inner(&mut ctx, input)
     }
 }
 
@@ -116,11 +112,7 @@ impl Arch for ArchRiscV64E {
             features: self.features
         };
 
-        let instruction = parser::parse_instruction(&mut ctx, input)?;
-
-        unimplemented!();
-
-        Ok(())
+        compile_instruction_inner(&mut ctx, input)
     }
 }
 
@@ -150,11 +142,7 @@ impl Arch for ArchRiscV32I {
             features: self.features
         };
 
-        let instruction = parser::parse_instruction(&mut ctx, input)?;
-
-        unimplemented!();
-
-        Ok(())
+        compile_instruction_inner(&mut ctx, input)
     }
 }
 
@@ -184,11 +172,7 @@ impl Arch for ArchRiscV32E {
             features: self.features
         };
 
-        let instruction = parser::parse_instruction(&mut ctx, input)?;
-
-        unimplemented!();
-
-        Ok(())
+        compile_instruction_inner(&mut ctx, input)
     }
 }
 
@@ -204,6 +188,15 @@ fn compile_instruction_inner(ctx: &mut Context, input: parse::ParseStream) -> pa
         }
         Ok(m) => m
     };
+
+    match compiler::compile_instruction(ctx, match_data) {
+        Err(None) => return Ok(()),
+        Err(Some(e)) => {
+            emit_error!(span, e);
+            return Ok(())
+        }
+        Ok(()) => ()
+    }
 
     Ok(())
 }
