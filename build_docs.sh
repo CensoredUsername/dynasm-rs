@@ -16,7 +16,7 @@ mkdir ./build_docs
 mkdir ./build_docs/language
 
 echo "create instruction reference markdown file"
-(cd doc/insref && cargo update && cargo run -- x64 > ../instructionref_x64.md && cargo run -- aarch64 > ../instructionref_aarch64.md)
+(cd doc/insref && cargo update && cargo run -- x64 > ../instructionref_x64.md && cargo run -- aarch64 > ../instructionref_aarch64.md && cargo run -- riscv > ../instructionref_riscv.md)
 
 echo "build plugin docs"
 for f in ./doc/*.md; do

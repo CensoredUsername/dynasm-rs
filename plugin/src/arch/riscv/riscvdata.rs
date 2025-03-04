@@ -354,7 +354,7 @@ pub fn get_mnemonic_data(name: &str) -> Option<&'static [Opdata]> {
 }
 
 #[allow(dead_code)]
-pub fn mnemnonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> {
+pub fn mnemonics() -> hash_map::Keys<'static, &'static str, &'static [Opdata]> {
     OPMAP.keys()
 }
 

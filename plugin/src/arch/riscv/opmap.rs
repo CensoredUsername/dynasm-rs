@@ -1089,67 +1089,67 @@ Ops!(
 ],
 "beq" = [
     // beq bimm12hi, rs1, rs2, bimm12lo (i)
-    Single(0x00000063), RV32 | RV64, [X, X, Imm] => [R(15), R(20), Offset(B)], [Ex_I];
+    Single(0x00000063), RV32 | RV64, [X, X, Offset] => [R(15), R(20), Offset(B)], [Ex_I];
 ],
 "beqz" = [
     // beqz bimm12hi, rs1, bimm12lo (subformat of rv_i::beq) (i)
-    Single(0x00000063), RV32 | RV64, [X, Imm] => [R(15), Offset(B)], [Ex_I];
+    Single(0x00000063), RV32 | RV64, [X, Offset] => [R(15), Offset(B)], [Ex_I];
 ],
 "bge" = [
     // bge bimm12hi, rs1, rs2, bimm12lo (i)
-    Single(0x00005063), RV32 | RV64, [X, X, Imm] => [R(15), R(20), Offset(B)], [Ex_I];
+    Single(0x00005063), RV32 | RV64, [X, X, Offset] => [R(15), R(20), Offset(B)], [Ex_I];
 ],
 "bgeu" = [
     // bgeu bimm12hi, rs1, rs2, bimm12lo (i)
-    Single(0x00007063), RV32 | RV64, [X, X, Imm] => [R(15), R(20), Offset(B)], [Ex_I];
+    Single(0x00007063), RV32 | RV64, [X, X, Offset] => [R(15), R(20), Offset(B)], [Ex_I];
 ],
 "bgez" = [
     // bgez bimm12hi, rs1, bimm12lo (subformat of rv_i::bge) (i)
-    Single(0x00005063), RV32 | RV64, [X, Imm] => [R(15), Offset(B)], [Ex_I];
+    Single(0x00005063), RV32 | RV64, [X, Offset] => [R(15), Offset(B)], [Ex_I];
 ],
 "bgt" = [
     // bgt bimm12hi, rs2, rs1, bimm12lo (subformat of rv_i::blt) (i)
-    Single(0x00004063), RV32 | RV64, [X, X, Imm] => [R(20), R(15), Offset(B)], [Ex_I];
+    Single(0x00004063), RV32 | RV64, [X, X, Offset] => [R(20), R(15), Offset(B)], [Ex_I];
 ],
 "bgtu" = [
     // bgtu bimm12hi, rs2, rs1, bimm12lo (subformat of rv_i::bltu) (i)
-    Single(0x00006063), RV32 | RV64, [X, X, Imm] => [R(20), R(15), Offset(B)], [Ex_I];
+    Single(0x00006063), RV32 | RV64, [X, X, Offset] => [R(20), R(15), Offset(B)], [Ex_I];
 ],
 "bgtz" = [
     // bgtz bimm12hi, rs2, bimm12lo (subformat of rv_i::blt) (i)
-    Single(0x00004063), RV32 | RV64, [X, Imm] => [R(20), Offset(B)], [Ex_I];
+    Single(0x00004063), RV32 | RV64, [X, Offset] => [R(20), Offset(B)], [Ex_I];
 ],
 "ble" = [
     // ble bimm12hi, rs2, rs1, bimm12lo (subformat of rv_i::bge) (i)
-    Single(0x00005063), RV32 | RV64, [X, X, Imm] => [R(20), R(15), Offset(B)], [Ex_I];
+    Single(0x00005063), RV32 | RV64, [X, X, Offset] => [R(20), R(15), Offset(B)], [Ex_I];
 ],
 "bleu" = [
     // bleu bimm12hi, rs2, rs1, bimm12lo (subformat of rv_i::bgeu) (i)
-    Single(0x00007063), RV32 | RV64, [X, X, Imm] => [R(20), R(15), Offset(B)], [Ex_I];
+    Single(0x00007063), RV32 | RV64, [X, X, Offset] => [R(20), R(15), Offset(B)], [Ex_I];
 ],
 "blez" = [
     // blez bimm12hi, rs2, bimm12lo (subformat of rv_i::bge) (i)
-    Single(0x00005063), RV32 | RV64, [X, Imm] => [R(20), Offset(B)], [Ex_I];
+    Single(0x00005063), RV32 | RV64, [X, Offset] => [R(20), Offset(B)], [Ex_I];
 ],
 "blt" = [
     // blt bimm12hi, rs1, rs2, bimm12lo (i)
-    Single(0x00004063), RV32 | RV64, [X, X, Imm] => [R(15), R(20), Offset(B)], [Ex_I];
+    Single(0x00004063), RV32 | RV64, [X, X, Offset] => [R(15), R(20), Offset(B)], [Ex_I];
 ],
 "bltu" = [
     // bltu bimm12hi, rs1, rs2, bimm12lo (i)
-    Single(0x00006063), RV32 | RV64, [X, X, Imm] => [R(15), R(20), Offset(B)], [Ex_I];
+    Single(0x00006063), RV32 | RV64, [X, X, Offset] => [R(15), R(20), Offset(B)], [Ex_I];
 ],
 "bltz" = [
     // bltz bimm12hi, rs1, bimm12lo (subformat of rv_i::blt) (i)
-    Single(0x00004063), RV32 | RV64, [X, Imm] => [R(15), Offset(B)], [Ex_I];
+    Single(0x00004063), RV32 | RV64, [X, Offset] => [R(15), Offset(B)], [Ex_I];
 ],
 "bne" = [
     // bne bimm12hi, rs1, rs2, bimm12lo (i)
-    Single(0x00001063), RV32 | RV64, [X, X, Imm] => [R(15), R(20), Offset(B)], [Ex_I];
+    Single(0x00001063), RV32 | RV64, [X, X, Offset] => [R(15), R(20), Offset(B)], [Ex_I];
 ],
 "bnez" = [
     // bnez bimm12hi, rs1, bimm12lo (subformat of rv_i::bne) (i)
-    Single(0x00001063), RV32 | RV64, [X, Imm] => [R(15), Offset(B)], [Ex_I];
+    Single(0x00001063), RV32 | RV64, [X, Offset] => [R(15), Offset(B)], [Ex_I];
 ],
 "ebreak" = [
     // ebreak  (i)
@@ -1169,17 +1169,17 @@ Ops!(
 ],
 "j" = [
     // j jimm20 (subformat of rv_i::jal) (i)
-    Single(0x0000006F), RV32 | RV64, [Imm] => [Offset(J)], [Ex_I];
+    Single(0x0000006F), RV32 | RV64, [Offset] => [Offset(J)], [Ex_I];
 ],
 "jal" = [
     // jal rd, jimm20 (i)
-    Single(0x0000006F), RV32 | RV64, [X, Imm] => [R(7), Offset(J)], [Ex_I];
+    Single(0x0000006F), RV32 | RV64, [X, Offset] => [R(7), Offset(J)], [Ex_I];
     // jal jimm20 (subformat of rv_i::jal) (i)
-    Single(0x000000EF), RV32 | RV64, [Imm] => [Offset(J)], [Ex_I];
+    Single(0x000000EF), RV32 | RV64, [Offset] => [Offset(J)], [Ex_I];
 ],
 "jalr" = [
     // jalr rd, rs1, imm12 (i)
-    Single(0x00000067), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Offset(JALR)], [Ex_I];
+    Single(0x00000067), RV32 | RV64, [X, X, Offset] => [R(7), R(15), Offset(JALR)], [Ex_I];
     // jalr rs1 (subformat of rv_i::jalr) (i)
     Single(0x000000E7), RV32 | RV64, [X] => [R(15)], [Ex_I];
 ],

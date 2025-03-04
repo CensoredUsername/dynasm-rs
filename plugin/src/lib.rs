@@ -189,6 +189,7 @@ pub fn dynasm_opmap(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream 
     s.push_str(&match opmap.arch.as_str() {
         "x64" | "x86" => arch::x64::create_opmap(),
         "aarch64" => arch::aarch64::create_opmap(),
+        "riscv" => arch::riscv::create_opmap(),
         x => panic!("Unknown architecture {}", x)
     });
 
@@ -210,6 +211,7 @@ pub fn dynasm_extract(tokens: proc_macro::TokenStream) -> proc_macro::TokenStrea
     let s = match opmap.arch.as_str() {
         "x64" | "x86" => "UNIMPLEMENTED".into(),
         "aarch64" => arch::aarch64::extract_opmap(),
+        "riscv" => arch::riscv::extract_opmap(),
         x => panic!("Unknown architecture {}", x)
     };
 

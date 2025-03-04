@@ -7,19 +7,18 @@ use std::fmt::Write;
 pub fn create_opmap() -> String {
     let mut s = String::new();
 
-    let mut mnemonics: Vec<_> = riscvdata::mnemonics().cloned().collect();
+    let mut mnemonics: Vec<_> = super::riscvdata::mnemonics().cloned().collect();
     mnemonics.sort();
-    for mnemnonic in mnemonics {
-        // get the data for this mnemnonic
-        let data = riscvdata::get_mnemonic_data(mnemonic).unwrap();
+    for mnemonic in mnemonics {
+        // get the data for this mnemonic
+        let data = super::riscvdata::get_mnemonic_data(mnemonic).unwrap();
         let formats = data.into_iter()
-            .map(|x| format_opdata(mnemnonic, x))
-            .flat_map(|x| x)
+            .map(|x| format!("{} {}", format_opdata(mnemonic, x), format_features(x)))
             .map(|x| x.replace(">>> ", ""))
             .collect::<Vec<_>>();
 
-        // push mnemnonic name as title
-        write!(s, "### {}\n```insref\n{}\n```\n", mnemnonic, formats.join("\n")).unwrap();
+        // push mnemonic name as title
+        write!(s, "### {}\n```insref\n{}\n```\n", mnemonic, formats.join("\n")).unwrap();
     }
     s
 }
@@ -29,17 +28,16 @@ pub fn create_opmap() -> String {
 pub fn extract_opmap() -> String {
     let mut buf = Vec::new();
 
-    let mut mnemnonics: Vec<_> = super::aarch64data::mnemnonics().cloned().collect();
-    mnemnonics.sort();
+    let mut mnemonics: Vec<_> = super::riscvdata::mnemonics().cloned().collect();
+    mnemonics.sort();
 
-    for mnemnonic in mnemnonics {
-        // get the data for this mnemnonic
-        let data = super::aarch64data::get_mnemonic_data(mnemnonic).unwrap();
+    for mnemonic in mnemonics {
+        // get the data for this mnemonic
+        let data = super::riscvdata::get_mnemonic_data(mnemonic).unwrap();
 
         buf.extend(
             data.into_iter()
-            .map(|x| extract_opdata(mnemnonic, x))
-            .flat_map(|x| x)
+            .map(|x| extract_opdata(mnemonic, x))
         );
     }
 
@@ -108,6 +106,12 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
             len += 1;
         }
         buf.push_str(&c);
+    } else {
+        let mut len = buf.len();
+        while len < 100 {
+            buf.push(' ');
+            len += 1;
+        }
     }
 
     buf
@@ -389,6 +393,44 @@ fn emit_constraints(name: &str, commands: &[Command], buf: &mut String) {
         write!(buf, ", ").unwrap();
         break;
     }
+}
+
+
+#[cfg(feature = "dynasm_opmap")]
+pub fn format_features(data: &Opdata) -> String {
+    let start = if data.isa_flags.contains(ISAFlags::RV32) && !data.isa_flags.contains(ISAFlags::RV64) {
+        "RV32"
+    } else if data.isa_flags.contains(ISAFlags::RV64) && !data.isa_flags.contains(ISAFlags::RV32) {
+        "RV64"
+    } else {
+        "RV32/64"
+    };
+
+    let mut items = Vec::new();
+
+    for ext_flags in data.ext_flags.iter() {
+        let mut item = start.to_string();
+        let mut encountered_z = false;
+
+        // assemble extension sets. only use underscores between Z flags
+        for (flag, bits) in ext_flags.iter_names() {
+            let flag = &flag[3..];
+
+            if encountered_z {
+                item.push_str("_");
+            }
+
+            item.push_str(flag);
+
+            if flag.starts_with("Z") {
+                encountered_z = true;
+            }
+        }
+
+        items.push(item)
+    }
+
+    return format!("({})", items.join(" or "))
 }
 
 

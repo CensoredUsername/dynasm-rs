@@ -6,16 +6,21 @@
 use syn::parse;
 use proc_macro_error2::emit_error;
 
-use crate::State;
-use crate::arch::{Stmt, Jump, Size};
-use crate::arch::Arch;
-
 pub mod riscvdata;
 pub mod ast;
 pub mod parser;
 pub mod matching;
 pub mod compiler;
 pub mod debug;
+
+use crate::State;
+use crate::arch::{Stmt, Jump, Size};
+use crate::arch::Arch;
+
+#[cfg(feature = "dynasm_opmap")]
+pub use debug::create_opmap;
+#[cfg(feature = "dynasm_extract")]
+pub use debug::extract_opmap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RiscVTarget {
