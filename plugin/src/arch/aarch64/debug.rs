@@ -617,8 +617,8 @@ fn emit_constraints(name: &str, prevname: &str, commands: &[Command], buf: &mut 
             Command::Offset(Relocation::ADR) => write!(buf, "offset is 21 bit"),
             Command::Offset(Relocation::ADRP) => write!(buf, "offset is 21 bit, 4K-page aligned"),
             Command::Offset(Relocation::TBZ) => write!(buf, "offset is 14 bit, 4-byte aligned"),
-            Command::Offset(Relocation::LITERAL32) => write!(buf, "offset is 32 bit>"),
-            Command::Offset(Relocation::LITERAL64) => write!(buf, "offset is 64 bit>"),
+            Command::Offset(Relocation::LITERAL32) => write!(buf, "offset is 32 bits"),
+            Command::Offset(Relocation::LITERAL64) => write!(buf, "offset is 64 bits"),
             _ => continue
         }.unwrap();
 

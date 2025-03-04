@@ -4,6 +4,7 @@ use proc_macro2::Span;
 use super::{Context, RiscVTarget};
 use super::ast::{ParsedInstruction, RawArg, RegListCount, MatchData, FlatArg, RegListFlat, Register, RegId, RegFamily};
 use super::riscvdata::{Opdata, Matcher, ISAFlags, get_mnemonic_data};
+use super::debug::format_opdata_list;
 
 use crate::common::JumpKind;
 use crate::parse_helpers::{as_ident, as_signed_number};
@@ -35,9 +36,8 @@ pub(super) fn match_instruction(ctx: &mut Context, mut instruction: ParsedInstru
         }
     }
 
-    // TODO: implement proper debug suggestions
     Err(Some(
-        format!("'{}': instruction format mismatch, expected one of the following forms:\nTODO", instruction.name)
+        format!("'{}': instruction format mismatch, expected one of the following forms:\n{}", &instruction.name, format_opdata_list(&instruction.name, opdata, ctx.target))
     ))
 }
 
