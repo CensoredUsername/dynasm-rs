@@ -85,7 +85,6 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
 
         let (arg_names, rest) = names.split_at(match matcher {
             Matcher::RefOffset => 2,
-            Matcher::Xlist => 0,
             _ => 1
         });
         names = rest;
@@ -93,9 +92,9 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
         match matcher {
             Matcher::X => write!(buf, "r{}", arg_names[0]).unwrap(),
             Matcher::F => write!(buf, "f{}", arg_names[0]).unwrap(),
-            Matcher::Xlist => write!(buf, "{{ra, [s0-s11]}}").unwrap(),
-            Matcher::Ref => write!(buf, "(x{})", arg_names[0]).unwrap(),
-            Matcher::RefOffset => write!(buf, "{}(x{})", arg_names[1], arg_names[0]).unwrap(),
+            Matcher::Xlist => write!(buf, "{{reg_list}}").unwrap(),
+            Matcher::Ref => write!(buf, "[r{}]", arg_names[0]).unwrap(),
+            Matcher::RefOffset => write!(buf, "[r{}, {}]", arg_names[0], arg_names[1]).unwrap(),
             Matcher::Offset => buf.push_str(&arg_names[0]),
             Matcher::Imm => buf.push_str(&arg_names[0]),
             Matcher::Ident => buf.push_str(&arg_names[0]),
@@ -150,7 +149,7 @@ fn group_opdata(opdata: &Opdata) -> Result<Vec<ArgWithCommands>, &'static str> {
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum FlatArgTy {
-    Direct,
+    Direct(bool), // boolean paramter is set to true if this one resulted from a memory reference
     Immediate,
     JumpTarget,
     Reglist,
@@ -170,11 +169,11 @@ fn flatten_matchers(matchers: &[Matcher]) -> Vec<FlatArgTy> {
         match matcher {
             Matcher::X
             | Matcher::F
-            | Matcher::Ref => args.push(FlatArgTy::Direct),
+            | Matcher::Ref => args.push(FlatArgTy::Direct(false)),
             Matcher::Ident
             | Matcher::Imm => args.push(FlatArgTy::Immediate),
             Matcher::RefOffset => {
-                args.push(FlatArgTy::Direct);
+                args.push(FlatArgTy::Direct(true));
                 args.push(FlatArgTy::Immediate);
             },
             Matcher::Offset => args.push(FlatArgTy::JumpTarget),
@@ -237,7 +236,7 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::Rno0(_)
                 | Command::Rno02(_)
                 | Command::Rpop(_)
-                | Command::Rpops(_) => arg.arg == FlatArgTy::Direct,
+                | Command::Rpops(_) => arg.arg == FlatArgTy::Direct(false) || arg.arg == FlatArgTy::Direct(true),
                 Command::Rlist(_) => arg.arg == FlatArgTy::Reglist,
                 Command::RoundingMode(_)
                 | Command::FenceSpec(_)
@@ -269,20 +268,30 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
 /// assign names to the args being used
 fn name_args(args: &mut [ArgWithCommands]) {
     // iirc no op uses more than 4 unconstrained literals / immediates
-    let reg_name_list = ["d", "s1", "s2", "s3"];
+    let reg_name_list;
     let mut reg_name_idx = 0;
     let imm_name_list = ["", "1", "2", "3"];
     let mut imm_name_idx = 0;
 
+    // if this is a memory instruction
+    if args.iter().any(|arg| arg.arg == FlatArgTy::Direct(true)) &&
+       args.iter().filter(|arg| arg.arg == FlatArgTy::Direct(false)).count() == 1 {
+        reg_name_list = ["v", "v", "v", "v"];
+    } else {
+        reg_name_list = ["d", "s1", "s2", "s3"];
+    }
+
     for arg in args {
         match arg.arg {
-            FlatArgTy::Direct => match &arg.commands[0] {
+            FlatArgTy::Direct(is_offset) => match &arg.commands[0] {
                 Command::R(_)
                 | Command::Reven(_)
                 | Command::Rno0(_)
                 | Command::Rno02(_)
                 | Command::Rpop(_)
-                | Command::Rpops(_) => {
+                | Command::Rpops(_) => if is_offset {
+                    arg.name = Some("b".to_string())
+                } else {
                     arg.name = Some(reg_name_list[reg_name_idx].to_string());
                     reg_name_idx += 1;
                 },
@@ -404,8 +413,8 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> String {
         match matcher {
             Matcher::X => write!(buf, "<X,{}>", arg_idx).unwrap(),
             Matcher::F => write!(buf, "<F,{}>", arg_idx).unwrap(),
-            Matcher::Ref => write!(buf, "<Imm,{}>(<XSP,{}>)", arg_idx + 1, arg_idx).unwrap(),
-            Matcher::RefOffset => write!(buf, "(<XSP,{}>)", arg_idx).unwrap(),
+            Matcher::Ref => write!(buf, "[<XSP,{}>]", arg_idx).unwrap(),
+            Matcher::RefOffset => write!(buf, "[<XSP,{}>, <Imm,{}>]", arg_idx, arg_idx + 1).unwrap(),
             Matcher::Imm => write!(buf, "<Imm,{}>", arg_idx).unwrap(),
             Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
             Matcher::Ident => write!(buf, "<Ident,{}>", arg_idx).unwrap(),

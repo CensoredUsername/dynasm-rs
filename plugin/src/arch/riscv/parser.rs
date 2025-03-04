@@ -52,15 +52,84 @@ pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) ->
 fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast::RawArg> {
     let start = input.cursor().span(); // FIXME can't join spans yet
 
-    // a label
+    // a label, identified by a leading < / > / -> / =>
     if let Some(jump) = input.parse_opt()? {
         return Ok(ast::RawArg::JumpTarget {
             jump
         });
     }
 
-    // register. we could also parse this from an expression, but this
-    // would lead to worse error messages.
+    // a register list. 
+    //    '{' reg [ ',' reg [ '-' reg ]] '}' 
+    // or '{' reg ';' amount '}'
+    if input.peek(syn::token::Brace) {
+        let span = input.cursor().span();
+        let inner;
+        let _ = syn::braced!(inner in input);
+        let inner = &inner;
+
+        let first = parse_reg(ctx, inner)?.ok_or_else(|| inner.error("Expected register"))?;
+
+        let count = if inner.peek(Token![,]) {
+            let _: Token![,] = inner.parse()?;
+
+            let second = parse_reg(ctx, inner)?.ok_or_else(|| inner.error("Expected register"))?;
+
+            if inner.peek(Token![-]) {
+                let _: Token![-] = inner.parse()?;
+
+                let third = parse_reg(ctx, inner)?.ok_or_else(|| inner.error("Expected register"))?;
+
+                ast::RegListCount::Double(second, third)
+            } else {
+                ast::RegListCount::Single(second)
+            }
+        } else if inner.peek(Token![;]) {
+            let _: Token![;] = inner.parse()?;
+
+            let expr: syn::Expr = inner.parse()?;
+
+            ast::RegListCount::Dynamic(expr)
+        } else {
+            ast::RegListCount::Static(4)
+        };
+
+        return Ok(ast::RawArg::RegisterList {
+            span,
+            first,
+            count
+        });
+    }
+
+    // a memory reference. we use '[' base [ ',' offset ] ']' syntax instead of the natural AT&T
+    // inspired syntax, as this would require large amounts of lookahead in the parser due to the
+    // possible syntactic ambiguities
+    if input.peek(syn::token::Bracket) {
+        let span = input.cursor().span();
+        let inner;
+        let _ = syn::bracketed!(inner in input);
+        let inner = &inner;
+
+        let base = parse_reg(ctx, inner)?.ok_or_else(|| inner.error("Expected register"))?;
+
+        let offset = if inner.peek(Token![,]) {
+            let _: Token![,] = inner.parse()?;
+
+            let expr: syn::Expr = inner.parse()?;
+
+            Some(expr)
+        } else {
+            None
+        };
+
+        return Ok(ast::RawArg::Reference {
+            span,
+            base,
+            offset
+        });
+    }
+
+    // a register
     if let Some(reg) = parse_reg(ctx, input)? {
         return Ok(ast::RawArg::Register {
             reg,
@@ -68,26 +137,8 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
         })
     }
 
-    // expression
+    // immediate
     let expr: syn::Expr = input.parse()?;
-
-    // the hard part: a RISC-V style memory reference will get parsed as a normal function call by
-    // rustc. but we need to allow the offset to also be an arbitrary expression. so we need to
-    // check if the topmost ast node is a call expression with a single argument that is a register.
-    match &expr {
-        syn::Expr::Call(exprcall) => {
-            if exprcall.args.len() == 1 {
-                if let Some(reg) = parse_reg_from_expression(ctx, &exprcall.args[0])? {
-                    return Ok(ast::RawArg::Reference {
-                        span: exprcall.span(),
-                        base: reg,
-                        offset: Some(*exprcall.func.clone())
-                    })
-                }
-            }
-        },
-        _ => ()
-    }
 
     Ok(ast::RawArg::Immediate { value: expr })
 }

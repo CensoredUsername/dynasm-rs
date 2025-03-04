@@ -433,7 +433,7 @@ Ops!(
 ],
 "c.lui" = [
     // c.lui rd_n2, c_nzimm18hi, c_nzimm18lo (c)
-    Compressed(0x6001), RV32 | RV64, [X, Imm] => [Rno02(7), SImmNo0(18, 12), BitRange(2, 5, 12), BitRange(12, 17, 1), Next], [Ex_C];
+    Compressed(0x6001), RV32 | RV64, [X, Imm] => [Rno02(7), SImmNo0(18, 12), BitRange(2, 5, 12), BitRange(12, 1, 17), Next], [Ex_C];
 ],
 "c.lw" = [
     // c.lw rd_p, rs1_p, c_uimm7lo, c_uimm7hi (c)
@@ -2817,55 +2817,55 @@ Ops!(
 
 "csrc" = [
     // csrc rs1, csr (subformat of rv_zicsr::csrrc) (zicsr)
-    Single(0x00003073), RV32 | RV64, [X, Ident] => [R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00003073), RV32 | RV64, [X, Imm] => [R(15), Csr(20)], [Ex_Zicsr];
 ],
 "csrci" = [
     // csrci csr, zimm (subformat of rv_zicsr::csrrci) (zicsr)
-    Single(0x00007073), RV32 | RV64, [Ident, Imm] => [Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
+    Single(0x00007073), RV32 | RV64, [Imm, Imm] => [Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
 ],
 "csrr" = [
     // csrr rd, csr (subformat of rv_zicsr::csrrs) (zicsr)
-    Single(0x00002073), RV32 | RV64, [X, Ident] => [R(7), Csr(20)], [Ex_Zicsr];
+    Single(0x00002073), RV32 | RV64, [X, Imm] => [R(7), Csr(20)], [Ex_Zicsr];
 ],
 "csrrc" = [
     // csrrc rd, rs1, csr (zicsr)
-    Single(0x00003073), RV32 | RV64, [X, X, Ident] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00003073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
 ],
 "csrrci" = [
     // csrrci rd, csr, zimm (zicsr)
-    Single(0x00007073), RV32 | RV64, [X, Ident, Imm] => [R(7), Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
+    Single(0x00007073), RV32 | RV64, [X, Imm, Imm] => [R(7), Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
 ],
 "csrrs" = [
     // csrrs rd, rs1, csr (zicsr)
-    Single(0x00002073), RV32 | RV64, [X, X, Ident] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00002073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
 ],
 "csrrsi" = [
     // csrrsi rd, csr, zimm (zicsr)
-    Single(0x00006073), RV32 | RV64, [X, Ident, Imm] => [R(7), Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
+    Single(0x00006073), RV32 | RV64, [X, Imm, Imm] => [R(7), Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
 ],
 "csrrw" = [
     // csrrw rd, rs1, csr (zicsr)
-    Single(0x00001073), RV32 | RV64, [X, X, Ident] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00001073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
 ],
 "csrrwi" = [
     // csrrwi rd, csr, zimm (zicsr)
-    Single(0x00005073), RV32 | RV64, [X, Ident, Imm] => [R(7), Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
+    Single(0x00005073), RV32 | RV64, [X, Imm, Imm] => [R(7), Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
 ],
 "csrs" = [
     // csrs rs1, csr (subformat of rv_zicsr::csrrs) (zicsr)
-    Single(0x00002073), RV32 | RV64, [X, Ident] => [R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00002073), RV32 | RV64, [X, Imm] => [R(15), Csr(20)], [Ex_Zicsr];
 ],
 "csrsi" = [
     // csrsi csr, zimm (subformat of rv_zicsr::csrrsi) (zicsr)
-    Single(0x00006073), RV32 | RV64, [Ident, Imm] => [Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
+    Single(0x00006073), RV32 | RV64, [Imm, Imm] => [Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
 ],
 "csrw" = [
     // csrw rs1, csr (subformat of rv_zicsr::csrrw) (zicsr)
-    Single(0x00001073), RV32 | RV64, [X, Ident] => [R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00001073), RV32 | RV64, [X, Imm] => [R(15), Csr(20)], [Ex_Zicsr];
 ],
 "csrwi" = [
     // csrwi csr, zimm (subformat of rv_zicsr::csrrwi) (zicsr)
-    Single(0x00005073), RV32 | RV64, [Ident, Imm] => [Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
+    Single(0x00005073), RV32 | RV64, [Imm, Imm] => [Csr(20), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_Zicsr];
 ],
 
 // Extension(s) zifencei

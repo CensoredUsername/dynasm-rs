@@ -103,7 +103,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg = #expr;
                             if _dyn_reg & 0x1 != 0x0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
                             _dyn_reg & 0x1E
                         }
@@ -111,12 +111,24 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rno0(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
-                        (#expr & 0x1F)
+                        {
+                            let _dyn_reg = #expr;
+                            if _dyn_reg == 0x0 {
+                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                            }
+                            _dyn_reg & 0x1F
+                        }
                     }));
                 },
                 Command::Rno02(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
-                        (#expr & 0x1F)
+                        {
+                            let _dyn_reg = #expr;
+                            if _dyn_reg == 0x0 || _dyn_reg == 0x2 {
+                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                            }
+                            _dyn_reg & 0x1F
+                        }
                     }));
                 },
                 Command::Rpop(offset) => {
@@ -124,7 +136,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg = #expr;
                             if _dyn_reg & 0x18 != 0x8 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
                             _dyn_reg & 0x7
                         }
@@ -135,7 +147,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg = #expr;
                             if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
                             _dyn_reg & 0x7
                         }
@@ -150,17 +162,33 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         statics.push((offset, u32::from(*c)));
                     },
                     RegListFlat::Dynamic(expr) => {
-                        // okay, so we're given an expression here, with legal input values
-                        // being 0-10 and 12, which should be mapped to 4-14 and 15
-                        dynamics.push((offset, quote_spanned!{ span=>
-                            {
-                                let _dyn_reg = #expr;
-                                if _dyn_reg == 11 || _dyn_reg > 12 {
-                                    ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                                }
-                                (_dyn_reg + if (_dyn_reg == 12) { 3 } else { 4 }) & 0xF
+                        if let Some(static_value) = as_signed_number(expr) {
+                            if static_value < 0 || (static_value > 10 && static_value != 12) {
+                                emit_error!(expr, "Impossible register list");
+                                return Err(None);
                             }
-                        }));
+
+                            let c = if static_value == 12 {
+                                15
+                            } else {
+                                (static_value + 4) as u32
+                            };
+
+                            statics.push((offset, c));
+
+                        } else {
+                            // okay, so we're given an expression here, with legal input values
+                            // being 0-10 and 12, which should be mapped to 4-14 and 15
+                            dynamics.push((offset, quote_spanned!{ span=>
+                                {
+                                    let _dyn_reg = #expr;
+                                    if _dyn_reg == 11 || _dyn_reg > 12 {
+                                        ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                    }
+                                    (_dyn_reg + if (_dyn_reg == 12) { 3 } else { 4 }) & 0xF
+                                }
+                            }));
+                        }
                     }
                 },
                 _ => panic!("Invalid argument processor")
@@ -169,9 +197,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             FlatArg::Default => match *command {
                 // Default is only emitted for a RefOffset where no offset was provided, i.e. it is 0
                 // This practically means we just don't have to encode anything.
-                Command::UImm(_, _) |
-                Command::SImm(_, _) |
-                Command::BitRange(_, _, _) => (),
+                Command::UImm(_, _)
+                | Command::SImm(_, _)
+                | Command::BitRange(_, _, _) 
+                | Command::Next => (),
                 _ => panic!("Invalid argument processor")
             },
 
@@ -489,14 +518,14 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         return Err(None);
                     }
                 },
-                Command::Csr(offset) => {
+                Command::Csr(offset) => 'csr: {
                     // Csr is a bit special as it allows both immediates and names
                     // because we cannot differentiate from those earlier, we handle that here.
                     if let Some(name) = as_ident(value) {
                         let name = name.to_string();
                         if let Some(&bits) = CSR_MAP.get(&&*name) {
                             statics.push((offset, u32::from(bits)));
-                            break;
+                            break 'csr;
                         }
                     }
 
@@ -522,7 +551,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         dynamics.push((0, dynamic));
                     }
                 },
-                Command::FloatingPointImmediate(offset) => {
+                Command::FloatingPointImmediate(offset) => 'fpimm: {
                     // this one has several special cases, and is very hard to do at runtime
                     // firstly, min, inf and nan are not actually values, but idents
                     // (min depends on what kind of floating point register the instruction targets)
@@ -531,7 +560,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         let name = name.to_string();
                         if let Some(&bits) = FP_IMM_IDENT_MAP.get(&&*name) {
                             statics.push((offset, u32::from(bits)));
-                            break;
+                            break 'fpimm;
                         }
                     }
 
@@ -540,7 +569,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                         if let Some(&(_, bits)) = FP_IMM_VALUE_MAP.iter().find(|(val, bits)| val == &value) {
                             statics.push((offset, u32::from(bits)));
-                            break;
+                            break 'fpimm;
                         }
                     }
 
@@ -579,6 +608,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
     }
 
     // sanity
+    dbg!(cursor);
     if cursor != data.args.len() {
         panic!("Not enough command processors");
     }
@@ -721,14 +751,15 @@ impl ImmediateEncoder {
 
         let mut encodes = match iter.next() {
             Some((offset, check)) => quote_spanned!{ span=>
-                (#check << #offset)
+                #check << #offset
             },
             None => quote_spanned!{ span=> 0 }
         };
 
         for (offset, check) in iter {
+            let parenthesized = delimited(encodes);
             encodes = quote_spanned!{ span=>
-                #encodes | (#check << #offset)
+                #parenthesized | (#check << #offset)
             };
         }
 
@@ -741,7 +772,7 @@ impl ImmediateEncoder {
                     let _dyn_imm = i32::from(#dynamic_value);
 
                     if #check {
-                        ::dynasmrt::aarch64::immediate_out_of_range_signed_32(_dyn_imm);
+                        ::dynasmrt::riscv64::immediate_out_of_range_signed_32(_dyn_imm);
                     }
 
                     #encodes
@@ -753,7 +784,7 @@ impl ImmediateEncoder {
                     let _dyn_imm = u32::from(#dynamic_value);
 
                     if #check {
-                        ::dynasmrt::aarch64::immediate_out_of_range_unsigned_32(_dyn_imm);
+                        ::dynasmrt::riscv64::immediate_out_of_range_unsigned_32(_dyn_imm);
                     }
 
                     #encodes
