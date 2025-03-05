@@ -29,6 +29,8 @@ bitflags! {
 
 
     /// Flags specifying what ISA extensions are required for an instruction
+    // debug.rs opmap generation relies on the Ex_ prefixes being fixed,
+    // so change that if editing this.
     #[derive(Debug, Clone, Copy)]
     pub struct ExtensionFlags: u64 {
         /// A: atomics
@@ -79,40 +81,44 @@ bitflags! {
         const Ex_Zfbfmin = 0x0000_0000_0040_0000;
         /// Zfh: half-width fp support
         const Ex_Zfh = 0x0000_0000_0080_0000;
-        /// Zicbo: cache block operations
-        const Ex_Zicbo = 0x0000_0000_0100_0000;
+        /// Zicbo: cache block management operations
+        const Ex_Zicbom = 0x0000_0000_0100_0000;
+        /// Zicbo: cache block prefetch operations
+        const Ex_Zicbop = 0x0000_0000_0200_0000;
+        /// Zicbo: cache block zero operations
+        const Ex_Zicboz = 0x0000_0000_0400_0000;
         /// Zicfilp: control flow integrity landing pad
-        const Ex_Zicfilp = 0x0000_0000_0200_0000;
+        const Ex_Zicfilp = 0x0000_0000_0800_0000;
         /// Zicfiss: Shadow stack
-        const Ex_Zicfiss = 0x0000_0000_0400_0000;
+        const Ex_Zicfiss = 0x0000_0000_1000_0000;
         /// Zicntr: base counters and timers
-        const Ex_Zicntr = 0x0000_0000_0800_0000;
+        const Ex_Zicntr = 0x0000_0000_2000_0000;
         /// Zicond: conditional operations
-        const Ex_Zicond = 0x0000_0000_1000_0000;
+        const Ex_Zicond = 0x0000_0000_4000_0000;
         /// Zicsr: control and status registers
-        const Ex_Zicsr = 0x0000_0000_2000_0000;
+        const Ex_Zicsr = 0x0000_0000_8000_0000;
         /// Zifencei: instruction-fetch fence
-        const Ex_Zifencei = 0x0000_0000_4000_0000;
+        const Ex_Zifencei = 0x0000_0001_0000_0000;
         /// Zihintntl: non-temporal hints
-        const Ex_Zihintntl = 0x0000_0000_8000_0000;
+        const Ex_Zihintntl = 0x0000_0002_0000_0000;
         /// Zimop: may-be-operations
-        const Ex_Zimop = 0x0000_0001_0000_0000;
+        const Ex_Zimop = 0x0000_0004_0000_0000;
         /// Zk: scalar cryptography
-        const Ex_Zk = 0x0000_0002_0000_0000;
+        const Ex_Zk = 0x0000_0008_0000_0000;
         /// Zkn: NIST algorithm suite
-        const Ex_Zkn = 0x0000_0004_0000_0000;
+        const Ex_Zkn = 0x0000_0010_0000_0000;
         /// Zknd: NIST suite: AES decyrption
-        const Ex_Zknd = 0x0000_0008_0000_0000;
+        const Ex_Zknd = 0x0000_0020_0000_0000;
         /// Zkne: NIST suite: AES encryption
-        const Ex_Zkne = 0x0000_0010_0000_0000;
+        const Ex_Zkne = 0x0000_0040_0000_0000;
         /// Zknh: NIST suite: Hash functions
-        const Ex_Zknh = 0x0000_0020_0000_0000;
+        const Ex_Zknh = 0x0000_0080_0000_0000;
         /// Zks: ShangMi algorithm suite
-        const Ex_Zks = 0x0000_0040_0000_0000;
+        const Ex_Zks = 0x0000_0100_0000_0000;
         /// Zksed: ShangMi suite: SM4 block cipher
-        const Ex_Zksed = 0x0000_0080_0000_0000;
+        const Ex_Zksed = 0x0000_0200_0000_0000;
         /// Zksh: ShangMi suite: SM3 hash functions
-        const Ex_Zksh = 0x0000_0100_0000_0000;
+        const Ex_Zksh = 0x0000_0400_0000_0000;
     }
 }
 
@@ -392,7 +398,9 @@ lazy_static!{
         const Ex_Zfa: u64 = ExtensionFlags::Ex_Zfa.bits();
         const Ex_Zfbfmin: u64 = ExtensionFlags::Ex_Zfbfmin.bits();
         const Ex_Zfh: u64 = ExtensionFlags::Ex_Zfh.bits();
-        const Ex_Zicbo: u64 = ExtensionFlags::Ex_Zicbo.bits();
+        const Ex_Zicbom: u64 = ExtensionFlags::Ex_Zicbom.bits();
+        const Ex_Zicbop: u64 = ExtensionFlags::Ex_Zicbop.bits();
+        const Ex_Zicboz: u64 = ExtensionFlags::Ex_Zicboz.bits();
         const Ex_Zicfilp: u64 = ExtensionFlags::Ex_Zicfilp.bits();
         const Ex_Zicfiss: u64 = ExtensionFlags::Ex_Zicfiss.bits();
         const Ex_Zicntr: u64 = ExtensionFlags::Ex_Zicntr.bits();

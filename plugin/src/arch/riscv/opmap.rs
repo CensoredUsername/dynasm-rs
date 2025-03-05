@@ -2682,35 +2682,41 @@ Ops!(
     Single(0x0C007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
 ],
 
-// Extension(s) zicbo
+// Extension(s) zicbom
 
 "cbo.clean" = [
     // cbo.clean rs1 (zicbo)
-    Single(0x0010200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbo];
+    Single(0x0010200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
 ],
 "cbo.flush" = [
     // cbo.flush rs1 (zicbo)
-    Single(0x0020200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbo];
+    Single(0x0020200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
 ],
 "cbo.inval" = [
     // cbo.inval rs1 (zicbo)
-    Single(0x0000200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbo];
+    Single(0x0000200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
 ],
-"cbo.zero" = [
-    // cbo.zero rs1 (zicbo)
-    Single(0x0040200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbo];
-],
+
+// Extension(s) zicbop
+
 "prefetch.i" = [
     // prefetch.i rs1, imm12hi (subformat of rv_i::ori) (zicbo)
-    Single(0x00006013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbo];
+    Single(0x00006013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
 ],
 "prefetch.r" = [
     // prefetch.r rs1, imm12hi (subformat of rv_i::ori) (zicbo)
-    Single(0x00106013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbo];
+    Single(0x00106013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
 ],
 "prefetch.w" = [
     // prefetch.w rs1, imm12hi (subformat of rv_i::ori) (zicbo)
-    Single(0x00306013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbo];
+    Single(0x00306013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
+],
+
+// Extension(s) zicbop
+
+"cbo.zero" = [
+    // cbo.zero rs1 (zicbo)
+    Single(0x0040200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
 ],
 
 // Extension(s) zicfilp
