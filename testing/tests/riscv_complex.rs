@@ -44,8 +44,8 @@ fn complex() {
         ; amocas.d x2, x4, [x6]
         ; cm.mva01s s1, s7
         // register list
-        ; cm.push {ra, s0 - s6}, 0
-        ; cm.push {ra; 7}, 0
+        ; cm.push {ra, s0 - s6}, -80
+        ; cm.push {ra; 7}, -80
         // memory references
         ; ld x6, [x7]
         ; ld x6, [x7, 0]
@@ -53,15 +53,15 @@ fn complex() {
         ; amocas.d x2, x4, [x6]
         ; amocas.d x2, x4, [x6, 0]
         // ident arguments
-        ; fence iorw, iorw, x1, x2
-        ; fence.tso x0, x0
+        ; fence iorw, iorw
+        ; fence.tso
         ; fadd.q f1, f2, f3, rdn
         ; fli.q f1, min
         ; fli.q f2, inf
         ; fli.q f3, nan
         ; fli.q f4, 1.0
-        ; csrrc x1, x2, fflags
-        ; csrrc x1, x2, 1
+        ; csrrc x1, fflags, x2
+        ; csrrc x1, 1, x2
 
     );
 
