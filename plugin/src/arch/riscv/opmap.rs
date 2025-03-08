@@ -1154,6 +1154,8 @@ Ops!(
 "fence" = [
     // fence fm, pred, succ, rs1, rd (i)
     Single(0x0000000F), RV32 | RV64, [Ident, Ident] => [FenceSpec(24), FenceSpec(20)], [Ex_I];
+    // pseudo-instruction, fence on all memory and i/o
+    Single(0x0FF0000F), RV32 | RV64, [] => [], [Ex_I];
 ],
 "fence.tso" = [
     // fence.tso rs1, rd (subformat of rv_i::fence) (i)
@@ -1219,9 +1221,17 @@ Ops!(
     // neg rd, rs1 (subformat of rv_i::sub) (i)
     Single(0x40000033), RV32 | RV64, [X, X] => [R(7), R(20)], [Ex_I];
 ],
+"negw" = [
+    // negw rd, rs1 (subformat of rv_i::subw) (i)
+    Single(0x4000003B),        RV64, [X, X] => [R(7), R(20)], [Ex_I];
+],
 "nop" = [
     // nop  (subformat of rv_i::addi) (i)
     Single(0x00000013), RV32 | RV64, [] => [], [Ex_I];
+],
+"not" = [
+    // nop  (subformat of rv_i::xori) (i)
+    Single(0xFFF04013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_I];
 ],
 "or" = [
     // or rd, rs1, rs2 (i)
