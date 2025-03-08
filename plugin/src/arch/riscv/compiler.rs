@@ -86,6 +86,35 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         code &= 7;
                         offset
                     },
+                    Command::Rpops2(offset) => {
+                        match data.args.get(cursor - 1) {
+                            Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
+                                if *id2 == id {
+                                    emit_error!(span, "This register cannot be identical to the previous argument");
+                                    return Err(None);
+                                }
+                            },
+                            Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr), .. }) => {
+                                dynamics.push((0, quote_spanned!{ span=>
+                                    {
+                                        let _dyn_reg: u8 = #expr;
+                                        if _dyn_reg == #code {
+                                            ::dynasmrt::riscv64::invalid_register(#code);
+                                        }
+                                        0u32
+                                    }
+                                }));
+                            },
+                            _ => panic!("Invalid encoding data, expected a register before")
+                        }
+
+                        if ((1 << code) & 0x00_FC_03_00) == 0 {
+                            emit_error!(span, "This register must be one of s0-s7 (x8, x9, x18-x23");
+                            return Err(None);
+                        }
+                        code &= 7;
+                        offset
+                    },
                     _ => panic!("Invalid argument processor")
                 };
 
@@ -95,63 +124,90 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             FlatArg::Register { span, reg: Register::Dynamic(_, ref expr) } => match *command {
                 Command::R(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
-                        (#expr & 0x1F)
+                        ((#expr & 0x1F) as u32)
                     }));
                 },
                 Command::Reven(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg = #expr;
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg & 0x1 != 0x0 {
                                 ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
-                            _dyn_reg & 0x1E
+                            (_dyn_reg & 0x1E) as u32
                         }
                     }));
                 },
                 Command::Rno0(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg = #expr;
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg == 0x0 {
                                 ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
-                            _dyn_reg & 0x1F
+                            (_dyn_reg & 0x1F) as u32
                         }
                     }));
                 },
                 Command::Rno02(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg = #expr;
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg == 0x0 || _dyn_reg == 0x2 {
                                 ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
-                            _dyn_reg & 0x1F
+                            (_dyn_reg & 0x1F) as u32
                         }
                     }));
                 },
                 Command::Rpop(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg = #expr;
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg & 0x18 != 0x8 {
                                 ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
-                            _dyn_reg & 0x7
+                            (_dyn_reg & 0x7) as u32
                         }
                     }));
                 },
                 Command::Rpops(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg = #expr;
+                            let _dyn_reg: u8 = #expr;
                             if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 {
                                 ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                             }
-                            _dyn_reg & 0x7
+                            (_dyn_reg & 0x7) as u32
                         }
                     }));
+                },
+                Command::Rpops2(offset) => match data.args.get(cursor - 1) {
+                    Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
+                        let code = id2.code() as u8;
+                        dynamics.push((offset, quote_spanned!{ span=>
+                            {
+                                let _dyn_reg: u8 = #expr;
+                                if (_dyn_reg == #code) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) {
+                                    ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                }
+                                (_dyn_reg & 0x7) as u32
+                            }
+                        }));
+                    },
+                    Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr2), .. }) => {
+                        dynamics.push((offset, quote_spanned!{ span=>
+                            {
+                                let _dyn_reg: u8 = #expr;
+                                let _dyn_reg_prev: u8 = #expr2;
+                                if (_dyn_reg == _dyn_reg_prev) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) {
+                                    ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                }
+                                (_dyn_reg & 0x7) as u32
+                            }
+                        }));
+                    },
+                    _ => panic!("Invalid encoding data, expected a register before")
                 },
                 _ => panic!("Invalid argument processor")
             },
@@ -181,7 +237,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             // being 0-10 and 12, which should be mapped to 4-14 and 15
                             dynamics.push((offset, quote_spanned!{ span=>
                                 {
-                                    let _dyn_reg = #expr;
+                                    let _dyn_reg: u32 = #expr;
                                     if _dyn_reg == 11 || _dyn_reg > 12 {
                                         ::dynasmrt::riscv64::invalid_register(_dyn_reg);
                                     }
@@ -246,28 +302,6 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 let zeromask = bitmask(scaling) as i32;
                                 imm_encoder.set_check(quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32
-                                });
-                            }
-                        }
-                    }
-                },
-                Command::NImm(bits, scaling) => {
-                    let span = value.span();
-                    let range = bitmask(bits);
-
-                    match imm_encoder.init(value, true) {
-                        Some(static_value) => {
-                            static_range_check(-static_value, 0, range, scaling, span)?;
-                        },
-                        None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
-                                    (-_dyn_imm) as u32 > #range
-                                });
-                            } else {
-                                let zeromask = bitmask(scaling) as i32;
-                                imm_encoder.set_check(quote_spanned!{ span =>
-                                    (-_dyn_imm) as u32 > #range || (-_dyn_imm) & #zeromask != 0i32
                                 });
                             }
                         }
@@ -391,22 +425,6 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         }
                     }
                 },
-                Command::NBitRange(offset, bits, scaling) => {
-                    match imm_encoder.static_value {
-                        Some(static_value) => {
-                            let mask = bitmask(bits);
-                            let slice = (((-static_value) as u32) >> scaling) & mask;
-                            statics.push((offset, slice));
-                        },
-                        None => {
-                            let span = value.span();
-                            let mask = bitmask(bits);
-                            imm_encoder.add_field(offset, quote_spanned!{ span => 
-                                ((((-_dyn_imm) as u32) >> #scaling) & #mask)
-                            });
-                        }
-                    }
-                },
 
                 // finish up encoding the current integer
                 Command::Next => {
@@ -444,19 +462,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         Relocation::JC => {
                             bits = 12;
                             scaling = 1;
-                            ranges = &[(12, 1, 11), (11, 1, 4), (9, 2, 8), (7, 1, 10), (6, 1, 6), (5, 1, 7), (3, 3, 1), (2, 1, 5)]; // why
+                            ranges = &[(12, 1, 11), (11, 1, 4), (9, 2, 8), (8, 1, 10), (7, 1, 6), (6, 1, 7), (3, 3, 1), (2, 1, 5)]; // why
                         },
                         // 32 bits, 12-bit scaled
                         Relocation::AUIPC => {
                             bits = 32;
                             scaling = 11;
                             ranges = &[(12, 20, 12)];
-                        },
-                        // 12 bits, no scaling
-                        Relocation::JALR => {
-                            bits = 12;
-                            scaling = 1;
-                            ranges = &[(20, 12, 0)];
                         },
                     }
 
@@ -486,7 +498,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }
 
                             for &(offset, count, scaling) in ranges.iter() {
-                                let mask = bitmask(bits);
+                                let mask = bitmask(count);
                                 imm_encoder.add_field(offset, quote_spanned!{ span => 
                                     (((_dyn_imm as u32) >> #scaling) & #mask)
                                 });
@@ -576,6 +588,91 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     emit_error!(value, "Invalid floating point immediate.");
                     return Err(None);
                 },
+                Command::SPImm(offset, negated) => 'spimm: {
+                    // the value we need to encode here depends on the count of registers in the
+                    // register list, and depends on the target architecture as well.
+                    let count = match data.args.get(cursor - 1) {
+                        Some(FlatArg::RegisterList { count, .. }) => count,
+                        _ => panic!("Invalid encoding data, expected a register list before")
+                    };
+
+                    let span = value.span();
+
+                    // either statically encode it, or return an expression for the register list bias
+                    let bias_expr = match count {
+                        RegListFlat::Static(code) => {
+                            let code = if *code == 15 {16} else {*code};
+
+                            let bias = if ctx.target.is_32_bit() {
+                                i32::from(code / 4 * 16)
+                            } else {
+                                i32::from(code / 2 * 16 - 16)
+                            };
+
+                            if let Some(mut static_value) = as_signed_number(value) {
+                                // statically encode everything
+                                if negated {
+                                    static_value = static_value.saturating_neg();
+                                }
+
+                                let bits = static_range_check(static_value, bias as i32, 48, 4, span)? >> 4;
+                                statics.push((offset, u32::from(bits)));
+
+                                break 'spimm;
+
+                            } else {
+                                quote_spanned!{ span=>
+                                    let _reglist_bias: i32 = #bias;
+                                }
+                            }
+                        },
+                        RegListFlat::Dynamic(expr) => {
+                            if let Some(mut static_value) = as_signed_number(value) {
+                                // just some sanity checks at compile time
+                                if negated {
+                                    static_value = static_value.saturating_neg();
+                                }
+                                if ctx.target.is_32_bit() {
+                                    static_range_check(static_value, 16, 96, 4, span)?;
+                                } else {
+                                    static_range_check(static_value, 16, 144, 4, span)?;
+                                }
+                            }
+                            if ctx.target.is_32_bit() {
+                                quote_spanned!{ span=>
+                                    let _reglist_expr: u8 = #expr;
+                                    let _reglist_bias: i32 = (_reglist_expr as i32) / 4 * 16 + 16;
+                                }
+                            } else {
+                                quote_spanned!{ span=>
+                                    let _reglist_expr: u8 = #expr;
+                                    let _reglist_bias: i32 = (_reglist_expr as i32) / 2 * 16 + 16;
+                                }
+                            }
+                        }
+                    };
+
+                    let imm_expr = if negated {
+                        quote_spanned!{ span=>
+                            let _dyn_imm: i32 = -#value;
+                        }
+                    } else {
+                        quote_spanned!{ span=>
+                            let _dyn_imm: i32 = #value;
+                        }
+                    };
+
+                    dynamics.push((offset, quote_spanned!{ span=>
+                        {
+                            #imm_expr
+                            #bias_expr
+                            if (_dyn_imm < _reglist_bias) || ((_dyn_imm - _reglist_bias) > 48) || ((_dyn_imm & 15) != 0) {
+                                ::dynasmrt::riscv64::immediate_out_of_range_signed_32(_dyn_imm);
+                            }
+                            (_dyn_imm - _reglist_bias) as u32 >> 4
+                        }
+                    }));
+                },
                 _ => panic!("Invalid argument processor")
             },
 
@@ -586,7 +683,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let stmt = jump.clone().encode(4, 4, &[relocation.to_id()]);
 
                     relocations.push(stmt);
-                    unimplemented!();
+                    todo!();
                 },
                 _ => panic!("Invalid argument processor")
             }
@@ -596,19 +693,16 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
         match *command {
             Command::UImm(_, _)
             | Command::SImm(_, _)
-            | Command::NImm(_, _)
             | Command::UImmNo0(_, _)
             | Command::SImmNo0(_, _)
             | Command::UImmOdd(_, _)
             | Command::UImmRange(_, _)
-            | Command::BitRange(_, _, _)
-            | Command::NBitRange(_, _, _) => (),
+            | Command::BitRange(_, _, _) => (),
             _ => cursor += 1
         }
     }
 
     // sanity
-    dbg!(cursor);
     if cursor != data.args.len() {
         panic!("Not enough command processors");
     }
@@ -736,16 +830,6 @@ impl ImmediateEncoder {
 
         let span = dynamic_value.span();
 
-        let load_expr = if signed {
-            quote_spanned!{ span=>
-                u32::from(#dynamic_value);
-            }
-        } else {
-            quote_spanned!{ span=>
-                i32::from(#dynamic_value);
-            }
-        };
-
         // assemble encoding chunks
         let mut iter = self.encodes.drain(..);
 
@@ -769,7 +853,7 @@ impl ImmediateEncoder {
         if signed {
             Some(quote_spanned!{ span=>
                 {
-                    let _dyn_imm = i32::from(#dynamic_value);
+                    let _dyn_imm: i32 = #dynamic_value;
 
                     if #check {
                         ::dynasmrt::riscv64::immediate_out_of_range_signed_32(_dyn_imm);
@@ -781,7 +865,7 @@ impl ImmediateEncoder {
         } else {
             Some(quote_spanned!{ span=>
                 {
-                    let _dyn_imm = u32::from(#dynamic_value);
+                    let _dyn_imm: u32 = #dynamic_value;
 
                     if #check {
                         ::dynasmrt::riscv64::immediate_out_of_range_unsigned_32(_dyn_imm);

@@ -369,11 +369,11 @@ Ops!(
 ],
 "c.addi16sp" = [
     // c.addi16sp c_nzimm10hi, c_nzimm10lo (c)
-    Compressed(0x6101), RV32 | RV64, [Imm] => [SImmNo0(10, 4), BitRange(6, 1, 4), BitRange(5, 1, 6), BitRange(3, 2, 7), BitRange(2, 1, 5), BitRange(12, 1, 9), Next], [Ex_C];
+    Compressed(0x6101), RV32 | RV64, [Reg(RegId::X2), Imm] => [SImmNo0(10, 4), BitRange(6, 1, 4), BitRange(5, 1, 6), BitRange(3, 2, 7), BitRange(2, 1, 5), BitRange(12, 1, 9), Next], [Ex_C];
 ],
 "c.addi4spn" = [
     // c.addi4spn rd_p, c_nzuimm10 (c)
-    Compressed(0x0000), RV32 | RV64, [X, Imm] => [Rpop(2), UImmNo0(10, 2), BitRange(11, 2, 4), BitRange(7, 4, 6), BitRange(6, 1, 2), BitRange(5, 1, 3), Next], [Ex_C];
+    Compressed(0x0000), RV32 | RV64, [X, Reg(RegId::X2), Imm] => [Rpop(2), UImmNo0(10, 2), BitRange(11, 2, 4), BitRange(7, 4, 6), BitRange(6, 1, 2), BitRange(5, 1, 3), Next], [Ex_C];
 ],
 "c.addiw" = [
     // c.addiw rd_rs1_n0, c_imm6lo, c_imm6hi (c)
@@ -425,7 +425,7 @@ Ops!(
 ],
 "c.ldsp" = [
     // c.ldsp rd_n0, c_uimm9sphi, c_uimm9splo (c)
-    Compressed(0x6002),        RV64, [X, Imm] => [Rno0(7), UImm(9, 3), BitRange(5, 2, 3), BitRange(2, 3, 6), BitRange(12, 1, 5), Next], [Ex_C];
+    Compressed(0x6002),        RV64, [X, RefSp] => [Rno0(7), UImm(9, 3), BitRange(5, 2, 3), BitRange(2, 3, 6), BitRange(12, 1, 5), Next], [Ex_C];
 ],
 "c.li" = [
     // c.li rd_n0, c_imm6lo, c_imm6hi (c)
@@ -441,7 +441,7 @@ Ops!(
 ],
 "c.lwsp" = [
     // c.lwsp rd_n0, c_uimm8sphi, c_uimm8splo (c)
-    Compressed(0x4002), RV32 | RV64, [X, Imm] => [Rno0(7), UImm(8, 2), BitRange(4, 3, 2), BitRange(2, 2, 6), BitRange(12, 1, 5), Next], [Ex_C];
+    Compressed(0x4002), RV32 | RV64, [X, RefSp] => [Rno0(7), UImm(8, 2), BitRange(4, 3, 2), BitRange(2, 2, 6), BitRange(12, 1, 5), Next], [Ex_C];
 ],
 "c.mv" = [
     // c.mv rd_n0, c_rs2_n0 (c)
@@ -461,7 +461,7 @@ Ops!(
 ],
 "c.sdsp" = [
     // c.sdsp c_rs2, c_uimm9sp_s (c)
-    Compressed(0xE002),        RV64, [X, Imm] => [R(2), UImm(9, 3), BitRange(10, 3, 3), BitRange(7, 3, 6), Next], [Ex_C];
+    Compressed(0xE002),        RV64, [X, RefSp] => [R(2), UImm(9, 3), BitRange(10, 3, 3), BitRange(7, 3, 6), Next], [Ex_C];
 ],
 "c.slli" = [
     // c.slli rd_rs1_n0, c_nzuimm6lo (subformat of rv64_c::c.slli) (c)
@@ -495,7 +495,7 @@ Ops!(
 ],
 "c.swsp" = [
     // c.swsp c_rs2, c_uimm8sp_s (c)
-    Compressed(0xC002), RV32 | RV64, [X, Imm] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C];
+    Compressed(0xC002), RV32 | RV64, [X, RefSp] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C];
 ],
 "c.xor" = [
     // c.xor rd_rs1_p, rs2_p (c)
@@ -510,7 +510,7 @@ Ops!(
 ],
 "c.fldsp" = [
     // c.fldsp rd, c_uimm9sphi, c_uimm9splo (c_d)
-    Compressed(0x2002), RV32 | RV64, [F, Imm] => [R(7), UImm(9, 3), BitRange(5, 2, 3), BitRange(2, 3, 6), BitRange(12, 1, 5), Next], [Ex_C | Ex_D];
+    Compressed(0x2002), RV32 | RV64, [F, RefSp] => [R(7), UImm(9, 3), BitRange(5, 2, 3), BitRange(2, 3, 6), BitRange(12, 1, 5), Next], [Ex_C | Ex_D];
 ],
 "c.fsd" = [
     // c.fsd rs1_p, rs2_p, c_uimm8lo, c_uimm8hi (c_d)
@@ -518,7 +518,7 @@ Ops!(
 ],
 "c.fsdsp" = [
     // c.fsdsp c_rs2, c_uimm9sp_s (c_d)
-    Compressed(0xA002), RV32 | RV64, [F, Imm] => [R(2), UImm(9, 3), BitRange(10, 3, 3), BitRange(7, 3, 6), Next], [Ex_C | Ex_D];
+    Compressed(0xA002), RV32 | RV64, [F, RefSp] => [R(2), UImm(9, 3), BitRange(10, 3, 3), BitRange(7, 3, 6), Next], [Ex_C | Ex_D];
 ],
 
 // Extension(s) c_f
@@ -529,7 +529,7 @@ Ops!(
 ],
 "c.flwsp" = [
     // c.flwsp rd, c_uimm8sphi, c_uimm8splo (c_f)
-    Compressed(0x6002), RV32       , [F, Imm] => [R(7), UImm(8, 2), BitRange(4, 3, 2), BitRange(2, 2, 6), BitRange(12, 1, 5), Next], [Ex_C | Ex_F];
+    Compressed(0x6002), RV32       , [F, RefSp] => [R(7), UImm(8, 2), BitRange(4, 3, 2), BitRange(2, 2, 6), BitRange(12, 1, 5), Next], [Ex_C | Ex_F];
 ],
 "c.fsw" = [
     // c.fsw rs1_p, rs2_p, c_uimm7lo, c_uimm7hi (c_f)
@@ -537,18 +537,18 @@ Ops!(
 ],
 "c.fswsp" = [
     // c.fswsp c_rs2, c_uimm8sp_s (c_f)
-    Compressed(0xE002), RV32       , [F, Imm] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C | Ex_F];
+    Compressed(0xE002), RV32       , [F, RefSp] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C | Ex_F];
 ],
 
-// Extension(s) c_zicfiss
+// Extension(s) zcmop_zicfiss
 
-"c.sspopchk.x5" = [
+"c.sspopchk" = [
     // c.sspopchk.x5  (subformat of rv_zcmop::c.mop.N) (c_zicfiss)
-    Compressed(0x6281), RV32 | RV64, [] => [], [Ex_C | Ex_Zicfiss];
+    Compressed(0x6281), RV32 | RV64, [Reg(RegId::X5)] => [], [Ex_Zcmop | Ex_Zicfiss];
 ],
-"c.sspush.x1" = [
+"c.sspush" = [
     // c.sspush.x1  (subformat of rv_zcmop::c.mop.N) (c_zicfiss)
-    Compressed(0x6081), RV32 | RV64, [] => [], [Ex_C | Ex_Zicfiss];
+    Compressed(0x6081), RV32 | RV64, [Reg(RegId::X1)] => [], [Ex_Zcmop | Ex_Zicfiss];
 ],
 
 // Extension(s) c_zihintntl
@@ -599,22 +599,16 @@ Ops!(
     Single(0xD2307053),        RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.s" = [
-    // fcvt.d.s rd, rs1, rm (d)
-    Single(0x42000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.s rd, rs1 (d)
-    Single(0x42007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0x42000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.w" = [
-    // fcvt.d.w rd, rs1, rm (d)
-    Single(0xD2000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.w rd, rs1 (d)
-    Single(0xD2007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
+    Single(0xD2000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.d.wu" = [
-    // fcvt.d.wu rd, rs1, rm (d)
-    Single(0xD2100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
     // fcvt.d.wu rd, rs1 (d)
-    Single(0xD2107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
+    Single(0xD2100053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
 ],
 "fcvt.l.d" = [
     // fcvt.l.d rd, rs1, rm (d)
@@ -755,7 +749,7 @@ Ops!(
 
 "fcvtmod.w.d" = [
     // fcvtmod.w.d rd, rs1 (d_zfa)
-    Single(0xC2801053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D | Ex_Zfa];
+    Single(0xC2801053), RV32 | RV64, [X, F, Lit(Literal::RTZ)] => [R(7), R(15)], [Ex_D | Ex_Zfa];
 ],
 "fleq.d" = [
     // fleq.d rd, rs1, rs2 (d_zfa)
@@ -801,10 +795,8 @@ Ops!(
 // Extension(s) d_zfh
 
 "fcvt.d.h" = [
-    // fcvt.d.h rd, rs1, rm (d_zfh)
-    Single(0x42200053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D | Ex_Zfh];
     // fcvt.d.h rd, rs1 (d_zfh)
-    Single(0x42207053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfh];
+    Single(0x42200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfh];
 ],
 "fcvt.h.d" = [
     // fcvt.h.d rd, rs1, rm (d_zfh)
@@ -963,27 +955,27 @@ Ops!(
 ],
 "frcsr" = [
     // frcsr rd (subformat of rv_zicsr::csrrs) (f)
-    Single(0x00302073), RV32 | RV64, [F] => [R(7)], [Ex_F];
+    Single(0x00302073), RV32 | RV64, [X] => [R(7)], [Ex_F];
 ],
 "frflags" = [
     // frflags rd (subformat of rv_zicsr::csrrs) (f)
-    Single(0x00102073), RV32 | RV64, [F] => [R(7)], [Ex_F];
+    Single(0x00102073), RV32 | RV64, [X] => [R(7)], [Ex_F];
 ],
 "frrm" = [
     // frrm rd (subformat of rv_zicsr::csrrs) (f)
-    Single(0x00202073), RV32 | RV64, [F] => [R(7)], [Ex_F];
+    Single(0x00202073), RV32 | RV64, [X] => [R(7)], [Ex_F];
 ],
 "fscsr" = [
     // fscsr rd, rs1 (subformat of rv_zicsr::csrrw) (f)
-    Single(0x00301073), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0x00301073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F];
 ],
 "fsflags" = [
     // fsflags rd, rs1 (subformat of rv_zicsr::csrrw) (f)
-    Single(0x00101073), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0x00101073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F];
 ],
 "fsflagsi" = [
     // fsflagsi rd, zimm (subformat of rv_zicsr::csrrwi) (f)
-    Single(0x00105073), RV32 | RV64, [F, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F];
+    Single(0x00105073), RV32 | RV64, [X, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F];
 ],
 "fsgnj.s" = [
     // fsgnj.s rd, rs1, rs2 (f)
@@ -1005,11 +997,11 @@ Ops!(
 ],
 "fsrm" = [
     // fsrm rd, rs1 (subformat of rv_zicsr::csrrw) (f)
-    Single(0x00201073), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0x00201073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F];
 ],
 "fsrmi" = [
     // fsrmi rd, zimm (subformat of rv_zicsr::csrrwi) (f)
-    Single(0x00205073), RV32 | RV64, [F, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F];
+    Single(0x00205073), RV32 | RV64, [X, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F];
 ],
 "fsub.s" = [
     // fsub.s rd, rs1, rs2, rm (f)
@@ -1161,11 +1153,11 @@ Ops!(
 ],
 "fence" = [
     // fence fm, pred, succ, rs1, rd (i)
-    Single(0x0000000F), RV32 | RV64, [Ident, Ident, X, X] => [FenceSpec(24), FenceSpec(20), R(15), R(7)], [Ex_I];
+    Single(0x0000000F), RV32 | RV64, [Ident, Ident] => [FenceSpec(24), FenceSpec(20)], [Ex_I];
 ],
 "fence.tso" = [
     // fence.tso rs1, rd (subformat of rv_i::fence) (i)
-    Single(0x8330000F), RV32 | RV64, [X, X] => [R(15), R(7)], [Ex_I];
+    Single(0x8330000F), RV32 | RV64, [] => [], [Ex_I];
 ],
 "j" = [
     // j jimm20 (subformat of rv_i::jal) (i)
@@ -1179,7 +1171,7 @@ Ops!(
 ],
 "jalr" = [
     // jalr rd, rs1, imm12 (i)
-    Single(0x00000067), RV32 | RV64, [X, X, Offset] => [R(7), R(15), Offset(JALR)], [Ex_I];
+    Single(0x00000067), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // jalr rs1 (subformat of rv_i::jalr) (i)
     Single(0x000000E7), RV32 | RV64, [X] => [R(15)], [Ex_I];
 ],
@@ -1209,7 +1201,7 @@ Ops!(
 ],
 "lui" = [
     // lui rd, imm20 (i)
-    Single(0x00000037), RV32 | RV64, [X, Imm] => [R(7), SImm(20, 0), BitRange(12, 20, 0), Next], [Ex_I];
+    Single(0x00000037), RV32 | RV64, [X, Imm] => [R(7), UImm(20, 12), BitRange(12, 20, 12), Next], [Ex_I];
 ],
 "lw" = [
     // lw rd, rs1, imm12 (i)
@@ -1225,7 +1217,7 @@ Ops!(
 ],
 "neg" = [
     // neg rd, rs1 (subformat of rv_i::sub) (i)
-    Single(0x40000033), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_I];
+    Single(0x40000033), RV32 | RV64, [X, X] => [R(7), R(20)], [Ex_I];
 ],
 "nop" = [
     // nop  (subformat of rv_i::addi) (i)
@@ -1241,7 +1233,7 @@ Ops!(
 ],
 "pause" = [
     // pause  (subformat of rv_i::fence) (i)
-    Single(0x0100000F), RV32 | RV64, [] => [], [Ex_I];
+    Single(0x0100000F), RV32 | RV64, [] => [], [Ex_Zihintpause];
 ],
 "ret" = [
     // ret  (subformat of rv_i::jalr) (i)
@@ -1379,7 +1371,7 @@ Ops!(
 ],
 "zext.b" = [
     // zext.b rd, rs1 (subformat of rv_i::andi) (i)
-    Single(0x00007013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_I];
+    Single(0x0FF07013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_I];
 ],
 
 // Extension(s) m
@@ -1472,40 +1464,28 @@ Ops!(
     Single(0xC6307053),        RV64, [X, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.d" = [
-    // fcvt.q.d rd, rs1, rm (q)
-    Single(0x46100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.d rd, rs1 (q)
-    Single(0x46107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0x46100053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.l" = [
-    // fcvt.q.l rd, rs1, rm (q)
-    Single(0xD6200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.l rd, rs1 (q)
-    Single(0xD6207053),        RV64, [F, X] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6200053),        RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.lu" = [
-    // fcvt.q.lu rd, rs1, rm (q)
-    Single(0xD6300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.lu rd, rs1 (q)
-    Single(0xD6307053),        RV64, [F, X] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6300053),        RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.s" = [
-    // fcvt.q.s rd, rs1, rm (q)
-    Single(0x46000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.s rd, rs1 (q)
-    Single(0x46007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
+    Single(0x46000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.w" = [
-    // fcvt.q.w rd, rs1, rm (q)
-    Single(0xD6000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.w rd, rs1 (q)
-    Single(0xD6007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.q.wu" = [
-    // fcvt.q.wu rd, rs1, rm (q)
-    Single(0xD6100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q];
     // fcvt.q.wu rd, rs1 (q)
-    Single(0xD6107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Q];
+    Single(0xD6100053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Q];
 ],
 "fcvt.s.q" = [
     // fcvt.s.q rd, rs1, rm (q)
@@ -1674,10 +1654,8 @@ Ops!(
     Single(0x44307053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh];
 ],
 "fcvt.q.h" = [
-    // fcvt.q.h rd, rs1, rm (q_zfh)
-    Single(0x46200053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q | Ex_Zfh];
     // fcvt.q.h rd, rs1 (q_zfh)
-    Single(0x46207053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh];
+    Single(0x46200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh];
 ],
 
 // Extension(s) zabha
@@ -1745,38 +1723,6 @@ Ops!(
 "amoand.h.rl" = [
     // amoand.h.rl rd, rs1, rs2, aq, rl (zabha)
     Single(0x6200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.b" = [
-    // amocas.b rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2800002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.b.aq" = [
-    // amocas.b.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2C00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.b.aqrl" = [
-    // amocas.b.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2E00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.b.rl" = [
-    // amocas.b.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2A00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.h" = [
-    // amocas.h rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2800102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.h.aq" = [
-    // amocas.h.aq rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2C00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.h.aqrl" = [
-    // amocas.h.aqrl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2E00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
-],
-"amocas.h.rl" = [
-    // amocas.h.rl rd, rs1, rs2, aq, rl (zabha)
-    Single(0x2A00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
 ],
 "amomax.b" = [
     // amomax.b rd, rs1, rs2, aq, rl (zabha)
@@ -2001,6 +1947,41 @@ Ops!(
 "amoxor.h.rl" = [
     // amoxor.h.rl rd, rs1, rs2, aq, rl (zabha)
     Single(0x2200102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha];
+],
+
+// Extension(s) zabha_zacas
+
+"amocas.b" = [
+    // amocas.b rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2800002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.b.aq" = [
+    // amocas.b.aq rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2C00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.b.aqrl" = [
+    // amocas.b.aqrl rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2E00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.b.rl" = [
+    // amocas.b.rl rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2A00002F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.h" = [
+    // amocas.h rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2800102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.h.rl" = [
+    // amocas.h.rl rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2A00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.h.aq" = [
+    // amocas.h.aq rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2C00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
+],
+"amocas.h.aqrl" = [
+    // amocas.h.aqrl rd, rs1, rs2, aq, rl (zabha)
+    Single(0x2E00102F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zabha | Ex_Zacas];
 ],
 
 // Extension(s) zacas
@@ -2333,10 +2314,6 @@ Ops!(
     // c.lhu rd_p, rs1_p, c_uimm1 (zcb)
     Compressed(0x8400), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 1), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
-"c.mul" = [
-    // c.mul rd_rs1_p, rs2_p (zcb)
-    Compressed(0x9C41), RV32 | RV64, [X, X] => [Rpop(7), Rpop(2)], [Ex_Zcb];
-],
 "c.not" = [
     // c.not rd_rs1_p (zcb)
     Compressed(0x9C75), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zcb];
@@ -2345,33 +2322,45 @@ Ops!(
     // c.sb rs2_p, rs1_p, c_uimm2 (zcb)
     Compressed(0x8800), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 0), BitRange(6, 1, 0), BitRange(5, 1, 1), Next], [Ex_Zcb];
 ],
-"c.sext.b" = [
-    // c.sext.b rd_rs1_p (zcb)
-    Compressed(0x9C65), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zcb];
-],
-"c.sext.h" = [
-    // c.sext.h rd_rs1_p (zcb)
-    Compressed(0x9C6D), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zcb];
-],
-"c.sext.w" = [
-    // c.sext.w rd_rs1_n0 (subformat of rv64_c::c.addiw) (zcb)
-    Compressed(0x2001),        RV64, [X] => [Rno0(7)], [Ex_Zcb];
-],
 "c.sh" = [
     // c.sh rs2_p, rs1_p, c_uimm1 (zcb)
-    Compressed(0x8C00), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 1), BitRange(5, 1, 1), Next], [Ex_Zcb];
+    Compressed(0x8C00), RV32 | RV64, [X, RefOffset] => [Rpop(2), Rpop(7), UImm(2, 1), BitRange(5, 1, 1), Next], [Ex_Zbb | Ex_Zcb];
 ],
 "c.zext.b" = [
     // c.zext.b rd_rs1_p (zcb)
     Compressed(0x9C61), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zcb];
 ],
+
+// Extension(s) zbb_zcb
+
+"c.sext.b" = [
+    // c.sext.b rd_rs1_p (zcb)
+    Compressed(0x9C65), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zbb | Ex_Zcb];
+],
+"c.sext.h" = [
+    // c.sext.h rd_rs1_p (zcb)
+    Compressed(0x9C6D), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zbb | Ex_Zcb];
+],
+"c.sext.w" = [
+    // c.sext.w rd_rs1_n0 (subformat of rv64_c::c.addiw) (zcb)
+    Compressed(0x2001),        RV64, [X] => [Rno0(7)], [Ex_Zbb | Ex_Zcb];
+],
 "c.zext.h" = [
     // c.zext.h rd_rs1_p (zcb)
-    Compressed(0x9C69), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zcb];
+    Compressed(0x9C69), RV32 | RV64, [X] => [Rpop(7)], [Ex_Zbb | Ex_Zcb];
 ],
+
+// Extension(s) zba_zcb
+
 "c.zext.w" = [
     // c.zext.w rd_rs1_p (zcb)
-    Compressed(0x9C71),        RV64, [X] => [Rpop(7)], [Ex_Zcb];
+    Compressed(0x9C71),        RV64, [X] => [Rpop(7)], [Ex_Zba | Ex_Zcb];
+],
+
+// Extension(s) m_zcb
+"c.mul" = [
+    // c.mul rd_rs1_p, rs2_p (zcb)
+    Compressed(0x9C41), RV32 | RV64, [X, X] => [Rpop(7), Rpop(2)], [Ex_Zcb | Ex_M];
 ],
 
 // Extension(s) zcmop
@@ -2410,7 +2399,7 @@ Ops!(
 ],
 "c.mop.N" = [
     // c.mop.N c_mop_t (zcmop)
-    Compressed(0x6081), RV32 | RV64, [Imm] => [UImmOdd(3, 1), BitRange(8, 3, 0), Next], [Ex_Zcmop];
+    Compressed(0x6081), RV32 | RV64, [Imm] => [UImmOdd(4, 1), BitRange(8, 3, 1), Next], [Ex_Zcmop];
 ],
 
 // Extension(s) zcmp
@@ -2421,23 +2410,23 @@ Ops!(
 ],
 "cm.mvsa01" = [
     // cm.mvsa01 c_sreg1, c_sreg2 (zcmp)
-    Compressed(0xAC22), RV32 | RV64, [X, X] => [Rpops(7), Rpops(2)], [Ex_Zcmp];
+    Compressed(0xAC22), RV32 | RV64, [X, X] => [Rpops(7), Rpops2(2)], [Ex_Zcmp];
 ],
 "cm.pop" = [
     // cm.pop c_rlist, c_spimm (zcmp)
-    Compressed(0xBA02), RV32 | RV64, [Xlist, Imm] => [Rlist(4), UImm(6, 4), BitRange(2, 2, 4), Next], [Ex_Zcmp];
+    Compressed(0xBA02), RV32 | RV64, [Xlist, Imm] => [Rlist(4), SPImm(2, false)], [Ex_Zcmp];
 ],
 "cm.popret" = [
     // cm.popret c_rlist, c_spimm (zcmp)
-    Compressed(0xBE02), RV32 | RV64, [Xlist, Imm] => [Rlist(4), UImm(6, 4), BitRange(2, 2, 4), Next], [Ex_Zcmp];
+    Compressed(0xBE02), RV32 | RV64, [Xlist, Imm] => [Rlist(4), SPImm(2, false)], [Ex_Zcmp];
 ],
 "cm.popretz" = [
     // cm.popretz c_rlist, c_spimm (zcmp)
-    Compressed(0xBC02), RV32 | RV64, [Xlist, Imm] => [Rlist(4), UImm(6, 4), BitRange(2, 2, 4), Next], [Ex_Zcmp];
+    Compressed(0xBC02), RV32 | RV64, [Xlist, Imm] => [Rlist(4), SPImm(2, false)], [Ex_Zcmp];
 ],
 "cm.push" = [
     // cm.push c_rlist, c_spimm (zcmp)
-    Compressed(0xB802), RV32 | RV64, [Xlist, Imm] => [Rlist(4), NImm(6, 4), NBitRange(2, 2, 4), Next], [Ex_Zcmp];
+    Compressed(0xB802), RV32 | RV64, [Xlist, Imm] => [Rlist(4), SPImm(2, true)], [Ex_Zcmp];
 ],
 
 // Extension(s) zcmt
@@ -2495,10 +2484,8 @@ Ops!(
     Single(0x44807053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfbfmin];
 ],
 "fcvt.s.bf16" = [
-    // fcvt.s.bf16 rd, rs1, rm (zfbfmin)
-    Single(0x40600053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfbfmin];
     // fcvt.s.bf16 rd, rs1 (zfbfmin)
-    Single(0x40607053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfbfmin];
+    Single(0x40600053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfbfmin];
 ],
 
 // Extension(s) zfh
@@ -2560,10 +2547,8 @@ Ops!(
     Single(0xC4307053),        RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.s.h" = [
-    // fcvt.s.h rd, rs1, rm (zfh)
-    Single(0x40200053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
     // fcvt.s.h rd, rs1 (zfh)
-    Single(0x40207053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0x40200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
 ],
 "fcvt.w.h" = [
     // fcvt.w.h rd, rs1, rm (zfh)
@@ -2686,63 +2671,63 @@ Ops!(
 
 "cbo.clean" = [
     // cbo.clean rs1 (zicbo)
-    Single(0x0010200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
+    Single(0x0010200F), RV32 | RV64, [Ref] => [R(15)], [Ex_Zicbom];
 ],
 "cbo.flush" = [
     // cbo.flush rs1 (zicbo)
-    Single(0x0020200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
+    Single(0x0020200F), RV32 | RV64, [Ref] => [R(15)], [Ex_Zicbom];
 ],
 "cbo.inval" = [
     // cbo.inval rs1 (zicbo)
-    Single(0x0000200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
+    Single(0x0000200F), RV32 | RV64, [Ref] => [R(15)], [Ex_Zicbom];
 ],
 
 // Extension(s) zicbop
 
 "prefetch.i" = [
     // prefetch.i rs1, imm12hi (subformat of rv_i::ori) (zicbo)
-    Single(0x00006013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
+    Single(0x00006013), RV32 | RV64, [RefOffset] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
 ],
 "prefetch.r" = [
     // prefetch.r rs1, imm12hi (subformat of rv_i::ori) (zicbo)
-    Single(0x00106013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
+    Single(0x00106013), RV32 | RV64, [RefOffset] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
 ],
 "prefetch.w" = [
     // prefetch.w rs1, imm12hi (subformat of rv_i::ori) (zicbo)
-    Single(0x00306013), RV32 | RV64, [X, Imm] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
+    Single(0x00306013), RV32 | RV64, [RefOffset] => [R(15), SImm(12, 5), BitRange(25, 7, 5), Next], [Ex_Zicbop];
 ],
 
-// Extension(s) zicbop
+// Extension(s) zicboz
 
 "cbo.zero" = [
     // cbo.zero rs1 (zicbo)
-    Single(0x0040200F), RV32 | RV64, [X] => [R(15)], [Ex_Zicbom];
+    Single(0x0040200F), RV32 | RV64, [Ref] => [R(15)], [Ex_Zicboz];
 ],
 
 // Extension(s) zicfilp
 
 "lpad" = [
     // lpad imm20 (subformat of rv_i::auipc) (zicfilp)
-    Single(0x00000017), RV32 | RV64, [Imm] => [SImm(20, 0), BitRange(12, 20, 0), Next], [Ex_Zicfilp];
+    Single(0x00000017), RV32 | RV64, [Imm] => [UImm(20, 0), BitRange(12, 20, 0), Next], [Ex_Zicfilp];
 ],
 
 // Extension(s) zicfiss
 
 "ssamoswap.d" = [
     // ssamoswap.d rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4800302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
+    Single(0x4800302F), RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.d.aq" = [
     // ssamoswap.d.aq rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4C00302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
+    Single(0x4C00302F), RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.d.aqrl" = [
     // ssamoswap.d.aqrl rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4E00302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
+    Single(0x4E00302F), RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.d.rl" = [
     // ssamoswap.d.rl rd, rs1, rs2, aq, rl (zicfiss)
-    Single(0x4A00302F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
+    Single(0x4A00302F), RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
 "ssamoswap.w" = [
     // ssamoswap.w rd, rs1, rs2, aq, rl (zicfiss)
@@ -2760,21 +2745,18 @@ Ops!(
     // ssamoswap.w.rl rd, rs1, rs2, aq, rl (zicfiss)
     Single(0x4A00202F), RV32 | RV64, [X, X, Ref] => [R(7), R(20), R(15)], [Ex_Zicfiss];
 ],
-"sspopchk.x1" = [
+"sspopchk" = [
     // sspopchk.x1  (subformat of rv_zimop::mop.r.N) (zicfiss)
-    Single(0xCDC0C073), RV32 | RV64, [] => [], [Ex_Zicfiss];
-],
-"sspopchk.x5" = [
+    Single(0xCDC0C073), RV32 | RV64, [Reg(RegId::X1)] => [], [Ex_Zicfiss];
     // sspopchk.x5  (subformat of rv_zimop::mop.r.N) (zicfiss)
-    Single(0xCDC2C073), RV32 | RV64, [] => [], [Ex_Zicfiss];
+    Single(0xCDC2C073), RV32 | RV64, [Reg(RegId::X5)] => [], [Ex_Zicfiss];
 ],
-"sspush.x1" = [
+
+"sspush" = [
     // sspush.x1  (subformat of rv_zimop::mop.rr.N) (zicfiss)
-    Single(0xCE104073), RV32 | RV64, [] => [], [Ex_Zicfiss];
-],
-"sspush.x5" = [
+    Single(0xCE104073), RV32 | RV64, [Reg(RegId::X1)] => [], [Ex_Zicfiss];
     // sspush.x5  (subformat of rv_zimop::mop.rr.N) (zicfiss)
-    Single(0xCE504073), RV32 | RV64, [] => [], [Ex_Zicfiss];
+    Single(0xCE504073), RV32 | RV64, [Reg(RegId::X5)] => [], [Ex_Zicfiss];
 ],
 "ssrdp" = [
     // ssrdp rd_n0 (subformat of rv_zimop::mop.r.N) (zicfiss)
@@ -2823,7 +2805,7 @@ Ops!(
 
 "csrc" = [
     // csrc rs1, csr (subformat of rv_zicsr::csrrc) (zicsr)
-    Single(0x00003073), RV32 | RV64, [X, Imm] => [R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00003073), RV32 | RV64, [Imm, X] => [Csr(20), R(15)], [Ex_Zicsr];
 ],
 "csrci" = [
     // csrci csr, zimm (subformat of rv_zicsr::csrrci) (zicsr)
@@ -2835,7 +2817,7 @@ Ops!(
 ],
 "csrrc" = [
     // csrrc rd, rs1, csr (zicsr)
-    Single(0x00003073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00003073), RV32 | RV64, [X, Imm, X] => [R(7), Csr(20), R(15)], [Ex_Zicsr];
 ],
 "csrrci" = [
     // csrrci rd, csr, zimm (zicsr)
@@ -2843,7 +2825,7 @@ Ops!(
 ],
 "csrrs" = [
     // csrrs rd, rs1, csr (zicsr)
-    Single(0x00002073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00002073), RV32 | RV64, [X, Imm, X] => [R(7), Csr(20), R(15)], [Ex_Zicsr];
 ],
 "csrrsi" = [
     // csrrsi rd, csr, zimm (zicsr)
@@ -2851,7 +2833,7 @@ Ops!(
 ],
 "csrrw" = [
     // csrrw rd, rs1, csr (zicsr)
-    Single(0x00001073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00001073), RV32 | RV64, [X, Imm, X] => [R(7), Csr(20), R(15)], [Ex_Zicsr];
 ],
 "csrrwi" = [
     // csrrwi rd, csr, zimm (zicsr)
@@ -2859,7 +2841,7 @@ Ops!(
 ],
 "csrs" = [
     // csrs rs1, csr (subformat of rv_zicsr::csrrs) (zicsr)
-    Single(0x00002073), RV32 | RV64, [X, Imm] => [R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00002073), RV32 | RV64, [Imm, X] => [Csr(20), R(15)], [Ex_Zicsr];
 ],
 "csrsi" = [
     // csrsi csr, zimm (subformat of rv_zicsr::csrrsi) (zicsr)
@@ -2867,7 +2849,7 @@ Ops!(
 ],
 "csrw" = [
     // csrw rs1, csr (subformat of rv_zicsr::csrrw) (zicsr)
-    Single(0x00001073), RV32 | RV64, [X, Imm] => [R(15), Csr(20)], [Ex_Zicsr];
+    Single(0x00001073), RV32 | RV64, [Imm, X] => [Csr(20), R(15)], [Ex_Zicsr];
 ],
 "csrwi" = [
     // csrwi csr, zimm (subformat of rv_zicsr::csrrwi) (zicsr)
@@ -3032,7 +3014,7 @@ Ops!(
 ],
 "mop.r.N" = [
     // mop.r.N mop_r_t_30, mop_r_t_27_26, mop_r_t_21_20, rd, rs1 (zimop)
-    Single(0x81C04073), RV32 | RV64, [X, X, Imm] => [R(7), R(15), UImm(5, 0), BitRange(20, 2, 0), BitRange(26, 2, 2), BitRange(30, 1, 4), Next], [Ex_Zimop];
+    Single(0x81C04073), RV32 | RV64, [Imm, X, X] => [UImm(5, 0), BitRange(20, 2, 0), BitRange(26, 2, 2), BitRange(30, 1, 4), Next, R(7), R(15)], [Ex_Zimop];
 ],
 "mop.rr.0" = [
     // mop.rr.0 rd, rs1, rs2 (subformat of rv_zimop::mop.rr.N) (zimop)
@@ -3068,7 +3050,7 @@ Ops!(
 ],
 "mop.rr.N" = [
     // mop.rr.N mop_rr_t_30, mop_rr_t_27_26, rd, rs1, rs2 (zimop)
-    Single(0x82004073), RV32 | RV64, [X, X, X, Imm] => [R(7), R(15), R(20), UImm(3, 0), BitRange(26, 2, 0), BitRange(30, 1, 2), Next], [Ex_Zimop];
+    Single(0x82004073), RV32 | RV64, [Imm, X, X, X] => [UImm(3, 0), BitRange(26, 2, 0), BitRange(30, 1, 2), Next, R(7), R(15), R(20)], [Ex_Zimop];
 ],
 
 // Extension(s) zk, zkn, zknd

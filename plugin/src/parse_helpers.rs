@@ -1,6 +1,7 @@
 //! This file contains parsing helpers used by multiple parsing backends
 use syn::parse;
 use std::convert::TryInto;
+use syn::ext::IdentExt;
 
 /**
  * Jump types
@@ -36,12 +37,7 @@ pub fn eat_pseudo_keyword(input: parse::ParseStream, kw: &str) -> bool {
 
 /// parses an ident, but instead of syn's Parse impl it does also parse keywords as idents
 pub fn parse_ident_or_rust_keyword(input: parse::ParseStream) -> parse::Result<syn::Ident> {
-    input.step(|cursor| {
-        if let Some((ident, rest)) = cursor.ident() {
-            return Ok((ident, rest));
-        }
-        Err(cursor.error("expected identifier"))
-    })
+    syn::Ident::parse_any(input)
 }
 
 /// checks if an expression is simply an ident, and if so, returns a clone of it.
@@ -51,16 +47,7 @@ pub fn as_ident(expr: &syn::Expr) -> Option<&syn::Ident> {
         _ => return None
     };
 
-    if path.leading_colon.is_some() || path.segments.len() != 1 {
-        return None;
-    }
-
-    let segment = &path.segments[0];
-    if segment.arguments != syn::PathArguments::None {
-        return None;
-    }
-
-    Some(&segment.ident)
+    path.get_ident()
 }
 
 /// checks if an expression is a simple literal, allowing us to perform compile-time analysis of an expression

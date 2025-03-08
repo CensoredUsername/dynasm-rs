@@ -6,7 +6,7 @@ use syn::spanned::Spanned;
 
 use lazy_static::lazy_static;
 
-use crate::parse_helpers::{parse_ident_or_rust_keyword, ParseOptExt};
+use crate::parse_helpers::{parse_ident_or_rust_keyword, ParseOptExt, eat_pseudo_keyword};
 
 use super::{Context, ast};
 
@@ -22,7 +22,13 @@ pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) ->
     while input.peek(Token![.]) {
         let _: Token![.] = input.parse()?;
         name.push('.');
-        name.push_str(&parse_ident_or_rust_keyword(input)?.to_string());
+
+        if input.peek(syn::LitInt) {
+            let number: syn::LitInt = input.parse()?;
+            name.push_str(number.base10_digits());
+        } else {
+            name.push_str(&parse_ident_or_rust_keyword(input)?.to_string());
+        }
     }
 
     let mut args = Vec::new();
@@ -138,7 +144,14 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
     }
 
     // immediate
-    let expr: syn::Expr = input.parse()?;
+    // guard against "dyn" used for rounding modes
+    let span = input.span();
+    let expr: syn::Expr = if eat_pseudo_keyword(input, "dyn") {
+        let path: syn::Path = syn::Ident::new("dyn", span).into();
+        syn::ExprPath { attrs: Vec::new(), qself: None, path}.into()
+    } else {
+        input.parse()?
+    };
 
     Ok(ast::RawArg::Immediate { value: expr })
 }

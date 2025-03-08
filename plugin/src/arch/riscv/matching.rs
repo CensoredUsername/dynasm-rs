@@ -155,17 +155,20 @@ impl Matcher {
                 Matcher::Imm => true,
                 Matcher::Offset => true,
                 Matcher::Ident => as_ident(value).is_some(),
+                Matcher::Lit(literal) => as_ident(value).map_or(false, |v| &v.to_string() == literal.as_str()),
                 _ => false
             },
             RawArg::JumpTarget { jump } => *self == Matcher::Offset,
             RawArg::Register { reg, .. }=> match self {
                 Matcher::X => reg.family() == RegFamily::INTEGER,
                 Matcher::F => reg.family() == RegFamily::FP,
+                Matcher::Reg(regid) => reg.as_id() == Some(*regid),
                 _ => false,
             },
             RawArg::Reference { offset, base, .. } => match self {
                 Matcher::Ref => offset.is_none(),
                 Matcher::RefOffset => true,
+                Matcher::RefSp => base.as_id() == Some(RegId::X2),
                 _ => false,
             },
             RawArg::RegisterList { first, count, .. } => *self == Matcher::Xlist,
@@ -202,24 +205,38 @@ pub fn match_args(args: &[RawArg], data: &'static Opdata) -> Option<MatchData> {
 fn flatten_args(args: Vec<RawArg>, data: &mut MatchData) {
     for (arg, matcher) in args.into_iter().zip(data.data.matchers.iter()) {
         match arg {
-            RawArg::Immediate { value } => {
-                data.args.push(FlatArg::Immediate { value });
+            RawArg::Immediate { value } => match matcher {
+                Matcher::Lit(_) => (),
+                _ => data.args.push(FlatArg::Immediate { value }),
             },
             RawArg::JumpTarget { jump } => {
                 data.args.push(FlatArg::JumpTarget { jump });
             },
-            RawArg::Register { span, reg } => {
-                data.args.push(FlatArg::Register { span, reg });
+            RawArg::Register { span, reg } => match matcher {
+                Matcher::Reg(_) => (),
+                _ => data.args.push(FlatArg::Register { span, reg })
             },
-            RawArg::Reference { span, offset, base } => {
-                data.args.push(FlatArg::Register { span, reg: base });
-                if let Matcher::RefOffset = matcher {
+            RawArg::Reference { span, offset, base } => match matcher {
+                Matcher::RefOffset => {
+                    data.args.push(FlatArg::Register { span, reg: base });
                     if let Some(offset) = offset {
                         data.args.push(FlatArg::Immediate { value: offset });
                     } else {
                         data.args.push(FlatArg::Default);
                     }
-                }
+                },
+                Matcher::Ref => {
+                    data.args.push(FlatArg::Register { span, reg: base });
+
+                },
+                Matcher::RefSp => {
+                    if let Some(offset) = offset {
+                        data.args.push(FlatArg::Immediate { value: offset });
+                    } else {
+                        data.args.push(FlatArg::Default);
+                    }
+                },
+                _ => unreachable!("Expected reference")
             },
             RawArg::RegisterList {span, first, count } => {
                 let count = match count {

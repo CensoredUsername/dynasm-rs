@@ -73,6 +73,15 @@ impl RegId {
             _ => unreachable!(),
         }
     }
+
+    /// Returns this register as a string
+    pub fn to_string(self) -> String {
+        match self.family() {
+            RegFamily::INTEGER => format!("x{}", self.code()),
+            RegFamily::FP => format!("f{}", self.code()),
+            RegFamily::VECTOR => format!("v{}", self.code()),
+        }
+    }
 }
 
 impl Register {

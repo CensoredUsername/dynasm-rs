@@ -3,6 +3,7 @@ use bitflags::bitflags;
 use lazy_static::lazy_static;
 
 use std::collections::{HashMap, hash_map};
+use super::ast::RegId;
 
 /// A template contains the information for the static parts of an instruction encoding, as well
 /// as its bitsize and length
@@ -66,7 +67,7 @@ bitflags! {
         /// Zbkx: crossbar permutations
         const Ex_Zbkx = 0x0000_0000_0000_8000;
         /// Zbs: single-bit instructions
-        const Ex_Zbs = 0x0000_0000_0001_000;
+        const Ex_Zbs = 0x0000_0000_0001_0000;
         /// Zcb: simple code-size saving instructions
         const Ex_Zcb = 0x0000_0000_0002_0000;
         /// Zcmop: compressed may-be-operations
@@ -101,24 +102,26 @@ bitflags! {
         const Ex_Zifencei = 0x0000_0001_0000_0000;
         /// Zihintntl: non-temporal hints
         const Ex_Zihintntl = 0x0000_0002_0000_0000;
+        /// Zihintpause: pause hint
+        const Ex_Zihintpause = 0x0000_0004_0000_0000;
         /// Zimop: may-be-operations
-        const Ex_Zimop = 0x0000_0004_0000_0000;
+        const Ex_Zimop = 0x0000_0008_0000_0000;
         /// Zk: scalar cryptography
-        const Ex_Zk = 0x0000_0008_0000_0000;
+        const Ex_Zk = 0x0000_0010_0000_0000;
         /// Zkn: NIST algorithm suite
-        const Ex_Zkn = 0x0000_0010_0000_0000;
+        const Ex_Zkn = 0x0000_0020_0000_0000;
         /// Zknd: NIST suite: AES decyrption
-        const Ex_Zknd = 0x0000_0020_0000_0000;
+        const Ex_Zknd = 0x0000_0040_0000_0000;
         /// Zkne: NIST suite: AES encryption
-        const Ex_Zkne = 0x0000_0040_0000_0000;
+        const Ex_Zkne = 0x0000_0080_0000_0000;
         /// Zknh: NIST suite: Hash functions
-        const Ex_Zknh = 0x0000_0080_0000_0000;
+        const Ex_Zknh = 0x0000_0100_0000_0000;
         /// Zks: ShangMi algorithm suite
-        const Ex_Zks = 0x0000_0100_0000_0000;
+        const Ex_Zks = 0x0000_0200_0000_0000;
         /// Zksed: ShangMi suite: SM4 block cipher
-        const Ex_Zksed = 0x0000_0200_0000_0000;
+        const Ex_Zksed = 0x0000_0400_0000_0000;
         /// Zksh: ShangMi suite: SM3 hash functions
-        const Ex_Zksh = 0x0000_0400_0000_0000;
+        const Ex_Zksh = 0x0000_0800_0000_0000;
     }
 }
 
@@ -134,6 +137,29 @@ impl ExtensionFlags {
     const fn make(bits: u64) -> ExtensionFlags {
         ExtensionFlags::from_bits_truncate(bits)
     }
+
+    /// formats the extension list into the standard RISC-V architecture specification format
+    pub fn to_string(&self) -> String {
+        let mut item = String::new();
+        let mut encountered_z = false;
+
+        // assemble extension sets. only use underscores between Z flags
+        for (flag, bits) in self.iter_names() {
+            let flag = &flag[3..];
+
+            if encountered_z {
+                item.push_str("_");
+            }
+
+            item.push_str(flag);
+
+            if flag.starts_with("Z") {
+                encountered_z = true;
+            }
+        }
+
+        item
+    }
 }
 
 
@@ -146,6 +172,9 @@ pub enum Matcher {
     /// A floating point register
     F,
 
+    /// A specific register
+    Reg(RegId),
+
     /// A vector register
     // V,
 
@@ -154,6 +183,9 @@ pub enum Matcher {
 
     /// An indirect reference with offset. expands args to X, Imm
     RefOffset,
+
+    /// An indirect reference with offset, with the base always being SP
+    RefSp,
 
     /// An immediate
     Imm,
@@ -165,7 +197,23 @@ pub enum Matcher {
     Ident,
 
     /// a register list
-    Xlist
+    Xlist,
+
+    /// a literal
+    Lit(Literal)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Literal {
+    RTZ
+}
+
+impl Literal {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Literal::RTZ => "rtz"
+        }
+    }
 }
 
 
@@ -202,6 +250,10 @@ pub enum Command {
     /// A 3-bit encoding that allows specifying any of s0-s7 (x5-x7, x18-22), as used in cm.mva01s
     Rpops(u8),
 
+    /// A 3-bit encoding that allows specifying any of s0-s7 (x5-x7, x18-22), as used in cm.mva01s
+    /// It also enforces that this is a different register from the previous one
+    Rpops2(u8),
+
     /// A register list, as used in cm.pop. values 3-15 encode ra, s0-s11
     Rlist(u8),
 
@@ -220,6 +272,10 @@ pub enum Command {
     /// weird floating point immediate instruction
     FloatingPointImmediate(u8),
 
+    /// Technically an immediate, but the way we encode this depends on the amount of items
+    /// in the previous register list. The boolean indicates if the value should be negated.
+    SPImm(u8, bool),
+
     // immediate handling, validation fields
 
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
@@ -229,10 +285,6 @@ pub enum Command {
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
     /// lower .1 bits are 0
     SImm(u8, u8),
-
-    /// validate that the current arg is a negative value, which, if negated, fits in .0 bits, and
-    /// that the lower .1 bits of its negated representation are 0.
-    NImm(u8, u8),
 
     /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
     /// lower .1 bits are 0. Also check that the immediate is not 0
@@ -253,10 +305,6 @@ pub enum Command {
 
     /// Encode a slice of bits from a value .0 = offset, .1 = amount of bits, .2 = offset in value
     BitRange(u8, u8, u8),
-
-    /// Same as Bitrange, but negate the value before encoding
-    NBitRange(u8, u8, u8),
-
     /// some kind of offset for a jump.
     Offset(Relocation),
 }
@@ -278,9 +326,6 @@ pub enum Relocation {
     // auipc
     // 32-bits, 12-bit scaled
     AUIPC = 4,
-    // jalr
-    // 12-bits, no scaling
-    JALR = 5,
 }
 
 impl Relocation {
@@ -408,6 +453,7 @@ lazy_static!{
         const Ex_Zicsr: u64 = ExtensionFlags::Ex_Zicsr.bits();
         const Ex_Zifencei: u64 = ExtensionFlags::Ex_Zifencei.bits();
         const Ex_Zihintntl: u64 = ExtensionFlags::Ex_Zihintntl.bits();
+        const Ex_Zihintpause: u64 = ExtensionFlags::Ex_Zihintpause.bits();
         const Ex_Zimop: u64 = ExtensionFlags::Ex_Zimop.bits();
         const Ex_Zk: u64 = ExtensionFlags::Ex_Zk.bits();
         const Ex_Zkn: u64 = ExtensionFlags::Ex_Zkn.bits();
@@ -791,8 +837,141 @@ lazy_static!{
         map.insert("mconfigptr", 0xF15);
         map.insert("mtopi", 0xFB0);
 
+        // 32-bit only csr's
+        map.insert("sieh", 0x114);
+        map.insert("siph", 0x154);
+        map.insert("stimecmph", 0x15D);
+        map.insert("vsieh", 0x214);
+        map.insert("vsiph", 0x254);
+        map.insert("vstimecmph", 0x25D);
+        map.insert("hedelegh", 0x612);
+        map.insert("htimedeltah", 0x615);
+        map.insert("hidelegh", 0x613);
+        map.insert("hvienh", 0x618);
+        map.insert("henvcfgh", 0x61A);
+        map.insert("hviph", 0x655);
+        map.insert("hviprio1h", 0x656);
+        map.insert("hviprio2h", 0x657);
+        map.insert("hstateen0h", 0x61C);
+        map.insert("hstateen1h", 0x61D);
+        map.insert("hstateen2h", 0x61E);
+        map.insert("hstateen3h", 0x61F);
+        map.insert("cycleh", 0xC80);
+        map.insert("timeh", 0xC81);
+        map.insert("instreth", 0xC82);
+        map.insert("hpmcounter3h", 0xC83);
+        map.insert("hpmcounter4h", 0xC84);
+        map.insert("hpmcounter5h", 0xC85);
+        map.insert("hpmcounter6h", 0xC86);
+        map.insert("hpmcounter7h", 0xC87);
+        map.insert("hpmcounter8h", 0xC88);
+        map.insert("hpmcounter9h", 0xC89);
+        map.insert("hpmcounter10h", 0xC8A);
+        map.insert("hpmcounter11h", 0xC8B);
+        map.insert("hpmcounter12h", 0xC8C);
+        map.insert("hpmcounter13h", 0xC8D);
+        map.insert("hpmcounter14h", 0xC8E);
+        map.insert("hpmcounter15h", 0xC8F);
+        map.insert("hpmcounter16h", 0xC90);
+        map.insert("hpmcounter17h", 0xC91);
+        map.insert("hpmcounter18h", 0xC92);
+        map.insert("hpmcounter19h", 0xC93);
+        map.insert("hpmcounter20h", 0xC94);
+        map.insert("hpmcounter21h", 0xC95);
+        map.insert("hpmcounter22h", 0xC96);
+        map.insert("hpmcounter23h", 0xC97);
+        map.insert("hpmcounter24h", 0xC98);
+        map.insert("hpmcounter25h", 0xC99);
+        map.insert("hpmcounter26h", 0xC9A);
+        map.insert("hpmcounter27h", 0xC9B);
+        map.insert("hpmcounter28h", 0xC9C);
+        map.insert("hpmcounter29h", 0xC9D);
+        map.insert("hpmcounter30h", 0xC9E);
+        map.insert("hpmcounter31h", 0xC9F);
+        map.insert("mstatush", 0x310);
+        map.insert("midelegh", 0x313);
+        map.insert("mieh", 0x314);
+        map.insert("mvienh", 0x318);
+        map.insert("mviph", 0x319);
+        map.insert("menvcfgh", 0x31A);
+        map.insert("mstateen0h", 0x31C);
+        map.insert("mstateen1h", 0x31D);
+        map.insert("mstateen2h", 0x31E);
+        map.insert("mstateen3h", 0x31F);
+        map.insert("miph", 0x354);
+        map.insert("mcyclecfgh", 0x721);
+        map.insert("minstretcfgh", 0x722);
+        map.insert("mhpmevent3h", 0x723);
+        map.insert("mhpmevent4h", 0x724);
+        map.insert("mhpmevent5h", 0x725);
+        map.insert("mhpmevent6h", 0x726);
+        map.insert("mhpmevent7h", 0x727);
+        map.insert("mhpmevent8h", 0x728);
+        map.insert("mhpmevent9h", 0x729);
+        map.insert("mhpmevent10h", 0x72A);
+        map.insert("mhpmevent11h", 0x72B);
+        map.insert("mhpmevent12h", 0x72C);
+        map.insert("mhpmevent13h", 0x72D);
+        map.insert("mhpmevent14h", 0x72E);
+        map.insert("mhpmevent15h", 0x72F);
+        map.insert("mhpmevent16h", 0x730);
+        map.insert("mhpmevent17h", 0x731);
+        map.insert("mhpmevent18h", 0x732);
+        map.insert("mhpmevent19h", 0x733);
+        map.insert("mhpmevent20h", 0x734);
+        map.insert("mhpmevent21h", 0x735);
+        map.insert("mhpmevent22h", 0x736);
+        map.insert("mhpmevent23h", 0x737);
+        map.insert("mhpmevent24h", 0x738);
+        map.insert("mhpmevent25h", 0x739);
+        map.insert("mhpmevent26h", 0x73A);
+        map.insert("mhpmevent27h", 0x73B);
+        map.insert("mhpmevent28h", 0x73C);
+        map.insert("mhpmevent29h", 0x73D);
+        map.insert("mhpmevent30h", 0x73E);
+        map.insert("mhpmevent31h", 0x73F);
+        map.insert("mnscratch", 0x740);
+        map.insert("mnepc", 0x741);
+        map.insert("mncause", 0x742);
+        map.insert("mnstatus", 0x744);
+        map.insert("mseccfgh", 0x757);
+        map.insert("mcycleh", 0xB80);
+        map.insert("minstreth", 0xB82);
+        map.insert("mhpmcounter3h", 0xB83);
+        map.insert("mhpmcounter4h", 0xB84);
+        map.insert("mhpmcounter5h", 0xB85);
+        map.insert("mhpmcounter6h", 0xB86);
+        map.insert("mhpmcounter7h", 0xB87);
+        map.insert("mhpmcounter8h", 0xB88);
+        map.insert("mhpmcounter9h", 0xB89);
+        map.insert("mhpmcounter10h", 0xB8A);
+        map.insert("mhpmcounter11h", 0xB8B);
+        map.insert("mhpmcounter12h", 0xB8C);
+        map.insert("mhpmcounter13h", 0xB8D);
+        map.insert("mhpmcounter14h", 0xB8E);
+        map.insert("mhpmcounter15h", 0xB8F);
+        map.insert("mhpmcounter16h", 0xB90);
+        map.insert("mhpmcounter17h", 0xB91);
+        map.insert("mhpmcounter18h", 0xB92);
+        map.insert("mhpmcounter19h", 0xB93);
+        map.insert("mhpmcounter20h", 0xB94);
+        map.insert("mhpmcounter21h", 0xB95);
+        map.insert("mhpmcounter22h", 0xB96);
+        map.insert("mhpmcounter23h", 0xB97);
+        map.insert("mhpmcounter24h", 0xB98);
+        map.insert("mhpmcounter25h", 0xB99);
+        map.insert("mhpmcounter26h", 0xB9A);
+        map.insert("mhpmcounter27h", 0xB9B);
+        map.insert("mhpmcounter28h", 0xB9C);
+        map.insert("mhpmcounter29h", 0xB9D);
+        map.insert("mhpmcounter30h", 0xB9E);
+        map.insert("mhpmcounter31h", 0xB9F);
+
         map
     };
+
+
+
 
     pub static ref FP_IMM_IDENT_MAP: HashMap<&'static str, u8> = {
         let mut map = HashMap::new();

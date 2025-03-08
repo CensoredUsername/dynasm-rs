@@ -69,11 +69,11 @@ pub struct ArchRiscV64I {
 
 impl Arch for ArchRiscV64I {
     fn set_features(&mut self, features: &[syn::Ident]) {
-        unimplemented!()
+        
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
-        unimplemented!()
+        todo!()
     }
 
     fn default_align(&self) -> u8 {
@@ -99,11 +99,11 @@ pub struct ArchRiscV64E {
 
 impl Arch for ArchRiscV64E {
     fn set_features(&mut self, features: &[syn::Ident]) {
-        unimplemented!()
+
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
-        unimplemented!()
+        todo!()
     }
 
     fn default_align(&self) -> u8 {
@@ -129,11 +129,11 @@ pub struct ArchRiscV32I {
 
 impl Arch for ArchRiscV32I {
     fn set_features(&mut self, features: &[syn::Ident]) {
-        unimplemented!()
+
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
-        unimplemented!()
+        todo!()
     }
 
     fn default_align(&self) -> u8 {
@@ -159,11 +159,11 @@ pub struct ArchRiscV32E {
 
 impl Arch for ArchRiscV32E {
     fn set_features(&mut self, features: &[syn::Ident]) {
-        unimplemented!()
+
     }
 
     fn handle_static_reloc(&self, stmts: &mut Vec<Stmt>, reloc: Jump, size: Size) {
-        unimplemented!()
+        todo!()
     }
 
     fn default_align(&self) -> u8 {
