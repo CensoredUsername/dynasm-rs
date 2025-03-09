@@ -11,6 +11,7 @@ macro_rules! my_dynasm {
     ($ops:ident $($t:tt)*) => {
         dynasm!($ops
             ; .arch riscv64
+            ; .feature GCQZcmt_Zcmp_Zacas_Zfa
             $($t)*
         )
     }
