@@ -465,11 +465,17 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             ranges = &[(12, 1, 11), (11, 1, 4), (9, 2, 8), (8, 1, 10), (7, 1, 6), (6, 1, 7), (3, 3, 1), (2, 1, 5)]; // why
                         },
                         // 32 bits, 12-bit scaled
-                        Relocation::AUIPC => {
+                        Relocation::HI20 => {
                             bits = 32;
-                            scaling = 11;
+                            scaling = 12;
                             ranges = &[(12, 20, 12)];
                         },
+                        // 12 bits, no scaling
+                        Relocation::LO12 => {
+                            bits = 12;
+                            scaling = 0;
+                            ranges = &[(20, 12, 0)];
+                        }
                     }
 
                     let span = value.span();

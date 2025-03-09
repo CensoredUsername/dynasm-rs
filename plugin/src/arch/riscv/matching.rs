@@ -59,15 +59,32 @@ fn sanitize_args(args: &mut [RawArg], target: &RiscVTarget) -> Result<(), Option
             RawArg::Register { reg, span } => sanitize_register(reg, *span, target)?,
             RawArg::Reference { base, span, offset } => {
                 sanitize_register(base, *span, target)?;
+                if base.family() != RegFamily::INTEGER {
+                    emit_error!(span, "Base register needs to be a regular (integer) register");
+                    return Err(None);
+                }
+
                 if let Some(o) = offset.as_ref() {
                     if as_signed_number(o) == Some(0) {
                         *offset = None
                     }
                 }
             },
+            RawArg::LabelReference { span, base, jump } => {
+                sanitize_register(base, *span, target)?;
+                if base.family() != RegFamily::INTEGER {
+                    emit_error!(span, "Base register needs to be a regular (integer) register");
+                    return Err(None);
+                }
+
+                if let JumpKind::Bare(_) = jump.kind {
+                    emit_error!(jump.span(), "Extern relocations are not allowed in riscv64");
+                    return Err(None);
+                }
+            },
             RawArg::JumpTarget { jump } => {
                 if let JumpKind::Bare(_) = jump.kind {
-                    emit_error!(jump.span(), "Extern relocations are not allowed in aarch64");
+                    emit_error!(jump.span(), "Extern relocations are not allowed in riscv64");
                     return Err(None);
                 }
             },
@@ -178,6 +195,10 @@ impl Matcher {
                 Matcher::RefSp => base.as_id() == Some(RegId::X2),
                 _ => false,
             },
+            RawArg::LabelReference { .. } => match self {
+                Matcher::LabelOffset => true,
+                _ => false,
+            },
             RawArg::RegisterList { first, count, .. } => *self == Matcher::Xlist,
         }
     }
@@ -234,7 +255,6 @@ fn flatten_args(args: Vec<RawArg>, data: &mut MatchData) {
                 },
                 Matcher::Ref => {
                     data.args.push(FlatArg::Register { span, reg: base });
-
                 },
                 Matcher::RefSp => {
                     if let Some(offset) = offset {
@@ -244,6 +264,10 @@ fn flatten_args(args: Vec<RawArg>, data: &mut MatchData) {
                     }
                 },
                 _ => unreachable!("Expected reference")
+            },
+            RawArg::LabelReference { span, jump, base } => {
+                data.args.push(FlatArg::Register {span, reg: base });
+                data.args.push(FlatArg::JumpTarget { jump });
             },
             RawArg::RegisterList {span, first, count } => {
                 let count = match count {

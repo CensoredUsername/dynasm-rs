@@ -657,6 +657,8 @@ Ops!(
 "fld" = [
     // fld rd, rs1, imm12 (d)
     Single(0x00003007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_D];
+    // as part of a pc-relative load
+    Single(0x00003007), RV32 | RV64, [F, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_D];
 ],
 "fle.d" = [
     // fle.d rd, rs1, rs2 (d)
@@ -723,6 +725,8 @@ Ops!(
 "fsd" = [
     // fsd imm12hi, rs1, rs2, imm12lo (d)
     Single(0x00003027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_D];
+    // as part of a pc-relative store
+    Single(0x00003027), RV32 | RV64, [F, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_D];
 ],
 "fsgnj.d" = [
     // fsgnj.d rd, rs1, rs2 (d)
@@ -894,6 +898,8 @@ Ops!(
 "flw" = [
     // flw rd, rs1, imm12 (f)
     Single(0x00002007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_F];
+    // as part of a pc-relative load
+    Single(0x00002007), RV32 | RV64, [F, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_F];
 ],
 "fmadd.s" = [
     // fmadd.s rd, rs1, rs2, rs3, rm (f)
@@ -1016,6 +1022,8 @@ Ops!(
 "fsw" = [
     // fsw imm12hi, rs1, rs2, imm12lo (f)
     Single(0x00002027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_F];
+    // as part of a pc-relative store
+    Single(0x00002027), RV32 | RV64, [F, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_F];
 ],
 
 // Extension(s) f_zfa
@@ -1062,6 +1070,8 @@ Ops!(
 "addi" = [
     // addi rd, rs1, imm12 (i)
     Single(0x00000013), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // addi as part of address building
+    Single(0x00000013), RV32 | RV64, [X, X, Offset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "addiw" = [
     // addiw rd, rs1, imm12 (i)
@@ -1081,7 +1091,7 @@ Ops!(
 ],
 "auipc" = [
     // auipc rd, imm20 (i)
-    Single(0x00000017), RV32 | RV64, [X, Offset] => [R(7), Offset(AUIPC)], [Ex_I];
+    Single(0x00000017), RV32 | RV64, [X, Offset] => [R(7), Offset(HI20)], [Ex_I];
 ],
 "beq" = [
     // beq bimm12hi, rs1, rs2, bimm12lo (i)
@@ -1188,22 +1198,32 @@ Ops!(
 "lb" = [
     // lb rd, rs1, imm12 (i)
     Single(0x00000003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00000003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "lbu" = [
     // lbu rd, rs1, imm12 (i)
     Single(0x00004003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00004003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "ld" = [
     // ld rd, rs1, imm12 (i)
     Single(0x00003003),        RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00003003),        RV64, [F, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "lh" = [
     // lh rd, rs1, imm12 (i)
     Single(0x00001003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00001003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "lhu" = [
     // lhu rd, rs1, imm12 (i)
     Single(0x00005003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00005003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "lui" = [
     // lui rd, imm20 (i)
@@ -1212,10 +1232,14 @@ Ops!(
 "lw" = [
     // lw rd, rs1, imm12 (i)
     Single(0x00002003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00002003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "lwu" = [
     // lwu rd, rs1, imm12 (i)
     Single(0x00006003),        RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // as part of a pc-relative load
+    Single(0x00006003),        RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "mv" = [
     // mv rd, rs1 (subformat of rv_i::addi) (i)
@@ -1256,6 +1280,8 @@ Ops!(
 "sb" = [
     // sb imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00000023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    // as part of a pc-relative store
+    Single(0x00000023), RV32 | RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
 ],
 "sbreak" = [
     // sbreak  (subformat of rv_i::ebreak) (i)
@@ -1268,6 +1294,8 @@ Ops!(
 "sd" = [
     // sd imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00003023),        RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    // as part of a pc-relative store
+    Single(0x00003023),        RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
 ],
 "seqz" = [
     // seqz rd, rs1 (subformat of rv_i::sltiu) (i)
@@ -1284,6 +1312,8 @@ Ops!(
 "sh" = [
     // sh imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00001023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    // as part of a pc-relative store
+    Single(0x00001023), RV32 | RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
 ],
 "sll" = [
     // sll rd, rs1, rs2 (i)
@@ -1374,6 +1404,8 @@ Ops!(
 "sw" = [
     // sw imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00002023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+    // as part of a pc-relative store
+    Single(0x00002023), RV32 | RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
 ],
 "unimp" = [
     // guaranteed to not be a valid instruction (it is a write to a read-only CSR)

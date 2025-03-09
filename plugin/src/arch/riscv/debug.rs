@@ -82,7 +82,8 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
         }
 
         let (arg_names, rest) = names.split_at(match matcher {
-            Matcher::RefOffset => 2,
+            Matcher::RefOffset
+            | Matcher::LabelOffset => 2,
             Matcher::Lit(_)
             | Matcher::Reg(_) => 0,
             _ => 1
@@ -97,6 +98,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
             Matcher::Ref => write!(buf, "[r{}]", arg_names[0]).unwrap(),
             Matcher::RefOffset => write!(buf, "[r{}, {}]", arg_names[0], arg_names[1]).unwrap(),
             Matcher::RefSp => write!(buf, "[sp, {}]", arg_names[0]).unwrap(),
+            Matcher::LabelOffset => write!(buf, "[r{}, {}]", arg_names[0], arg_names[1]).unwrap(),
             Matcher::Offset => buf.push_str(&arg_names[0]),
             Matcher::Imm => buf.push_str(&arg_names[0]),
             Matcher::Ident => buf.push_str(&arg_names[0]),
@@ -185,6 +187,10 @@ fn flatten_matchers(matchers: &[Matcher]) -> Vec<FlatArgTy> {
             Matcher::RefOffset => {
                 args.push(FlatArgTy::Direct(true));
                 args.push(FlatArgTy::Immediate);
+            },
+            Matcher::LabelOffset => {
+                args.push(FlatArgTy::Direct(true));
+                args.push(FlatArgTy::JumpTarget);
             },
             Matcher::Offset => args.push(FlatArgTy::JumpTarget),
             Matcher::Xlist => args.push(FlatArgTy::Reglist),
@@ -398,7 +404,8 @@ fn emit_constraints(name: &str, prev_name: &str, commands: &[Command], buf: &mut
             Command::Offset(Relocation::J) => write!(buf, "offset is 19 bits, 2-byte aligned"),
             Command::Offset(Relocation::BC) => write!(buf, "offset is 8 bits, 2-byte aligned"),
             Command::Offset(Relocation::JC) => write!(buf, "offset is 11 bits, 2-byte aligned"),
-            Command::Offset(Relocation::AUIPC) => write!(buf, "offset is 20 bits, 4K-page aligned"),
+            Command::Offset(Relocation::HI20) => write!(buf, "offset is the 20 highest bits of a 32-bit offset"),
+            Command::Offset(Relocation::LO12) => write!(buf, "offset is the 20 lowest bits of a 32-bit offset"),
 
             _ => continue
         }.unwrap();
@@ -456,6 +463,7 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> String {
             Matcher::Ref => write!(buf, "[<X,{}>]", arg_idx).unwrap(),
             Matcher::RefOffset => write!(buf, "[<X,{}>, <Imm,{}>]", arg_idx, arg_idx + 1).unwrap(),
             Matcher::RefSp => write!(buf, "[sp, <Imm,{}>]", arg_idx).unwrap(),
+            Matcher::RefOffset => write!(buf, "[<X,{}>, <Off,{}>]", arg_idx, arg_idx + 1).unwrap(),
             Matcher::Imm => write!(buf, "<Imm,{}>", arg_idx).unwrap(),
             Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
             Matcher::Ident => write!(buf, "<Ident,{}>", arg_idx).unwrap(),
@@ -464,7 +472,8 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> String {
         }
 
         arg_idx += match matcher {
-            Matcher::RefOffset => 2,
+            Matcher::RefOffset
+            | Matcher::LabelOffset => 2,
             Matcher::Lit(_)
             | Matcher::Reg(_) => 0,
             _ => 1
@@ -536,7 +545,8 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::Offset(Relocation::J) => format!("Range(-{}, {}, {})", 1u32 << 19, 1u32 << 19, 2),
                 Command::Offset(Relocation::BC) => format!("Range(-{}, {}, {})", 1u32 << 8, 1u32 << 8, 2),
                 Command::Offset(Relocation::JC) => format!("Range(-{}, {}, {})", 1u32 << 11, 1u32 << 11, 2),
-                Command::Offset(Relocation::AUIPC) => format!("Range(-{}, {}, {})", 1u32 << 31, 1u32 << 31, 1 << 12),
+                Command::Offset(Relocation::HI20) => format!("Range(-{}, {}, {})", 1u32 << 31, 1u32 << 31, 1 << 12),
+                Command::Offset(Relocation::LO12) => format!("Range(-{}, {}, 1)", 1u32 << 11, 1u32 << 11),
 
                 _ => continue
             };

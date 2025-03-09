@@ -118,21 +118,34 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
 
         let base = parse_reg(ctx, inner)?.ok_or_else(|| inner.error("Expected register"))?;
 
-        let offset = if inner.peek(Token![,]) {
+        if inner.peek(Token![,]) {
             let _: Token![,] = inner.parse()?;
 
-            let expr: syn::Expr = inner.parse()?;
+            if let Some(jump) = inner.parse_opt()? {
+                return Ok(ast::RawArg::LabelReference {
+                    span,
+                    base,
+                    jump
+                });
 
-            Some(expr)
+            } else {
+
+                let expr: syn::Expr = inner.parse()?;
+
+                return Ok(ast::RawArg::Reference {
+                    span,
+                    base,
+                    offset: Some(expr)
+                });
+            }
+
         } else {
-            None
+            return Ok(ast::RawArg::Reference {
+                span,
+                base,
+                offset: None
+            });
         };
-
-        return Ok(ast::RawArg::Reference {
-            span,
-            base,
-            offset
-        });
     }
 
     // a register

@@ -159,6 +159,12 @@ pub enum RawArg {
         offset: Option<syn::Expr>,
         base: Register,
     },
+    // A pc-relative reference
+    LabelReference {
+        span: Span,
+        jump: Jump,
+        base: Register
+    },
     // A register list. These only happen with a single family of instructions in the Zcmp extension
     RegisterList {
         span: Span,
