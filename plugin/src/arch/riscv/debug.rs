@@ -55,7 +55,7 @@ pub fn format_opdata_list(name: &str, data: &[Opdata], target: RiscVTarget) -> S
             continue
         }
 
-        forms.push(format_opdata(name, data));
+        forms.push(format!("{} {}", format_opdata(name, data), format_features(data)));
     }
 
     forms.join("\n")
@@ -409,7 +409,6 @@ fn emit_constraints(name: &str, prev_name: &str, commands: &[Command], buf: &mut
 }
 
 
-#[cfg(feature = "dynasm_opmap")]
 pub fn format_features(data: &Opdata) -> String {
     let start = if data.isa_flags.contains(ISAFlags::RV32) && !data.isa_flags.contains(ISAFlags::RV64) {
         "RV32"

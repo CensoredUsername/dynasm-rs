@@ -16,6 +16,8 @@ pub(super) fn match_instruction(ctx: &mut Context, mut instruction: ParsedInstru
 
     let opdata = get_mnemonic_data(&instruction.name).ok_or_else(|| Some(format!("Unknown instruction mnemonic '{}'", instruction.name)))?;
 
+    let mut rejected_because_features = false;
+
     // iterate through the supported instruction formats. If one matches, lower the args to
     // FlatArgs and return the combined Matchdata
     for data in opdata {
@@ -26,8 +28,10 @@ pub(super) fn match_instruction(ctx: &mut Context, mut instruction: ParsedInstru
         if ctx.target.is_64_bit() && !data.isa_flags.contains(ISAFlags::RV64) {
             continue;
         }
-
-        // TODO: give errors for missing features here
+        if !data.ext_flags.iter().any(|f| ctx.features.contains(*f)) {
+            rejected_because_features = true;
+            continue;
+        }
 
         if let Some(mut match_data) = match_args(&instruction.args, data) {
             flatten_args(instruction.args, &mut match_data);
@@ -36,9 +40,12 @@ pub(super) fn match_instruction(ctx: &mut Context, mut instruction: ParsedInstru
         }
     }
 
-    Err(Some(
-        format!("'{}': instruction format mismatch, expected one of the following forms:\n{}", &instruction.name, format_opdata_list(&instruction.name, opdata, ctx.target))
-    ))
+    let mut error = format!("'{}': instruction format mismatch, expected one of the following forms:\n{}", &instruction.name, format_opdata_list(&instruction.name, opdata, ctx.target));
+    if rejected_because_features {
+        error.push_str(&format!("\nNote: some instruction formats were rejected because of inactive ISA extension sets."));
+    }
+
+    Err(Some(error))
 }
 
 /// Sanitizes arguments, ensuring that

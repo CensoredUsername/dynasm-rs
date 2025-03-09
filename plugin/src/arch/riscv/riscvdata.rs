@@ -162,6 +162,12 @@ impl ExtensionFlags {
     }
 }
 
+impl Default for ExtensionFlags {
+    fn default() -> ExtensionFlags {
+        ExtensionFlags::Ex_I
+    }
+}
+
 
 /// Matchers. These validate the types of arguments passed to an instruction.
 #[derive(Debug, Clone, Copy, PartialEq)]

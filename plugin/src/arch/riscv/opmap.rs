@@ -497,6 +497,10 @@ Ops!(
     // c.swsp c_rs2, c_uimm8sp_s (c)
     Compressed(0xC002), RV32 | RV64, [X, RefSp] => [R(2), UImm(8, 2), BitRange(9, 4, 2), BitRange(7, 2, 6), Next], [Ex_C];
 ],
+"c.unimp" = [
+    // guaranteed to not be a valid instruction
+    Compressed(0x0000), RV32 | RV64, [] => [], [Ex_C];
+],
 "c.xor" = [
     // c.xor rd_rs1_p, rs2_p (c)
     Compressed(0x8C21), RV32 | RV64, [X, X] => [Rpop(7), Rpop(2)], [Ex_C];
@@ -1370,6 +1374,10 @@ Ops!(
 "sw" = [
     // sw imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00002023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
+],
+"unimp" = [
+    // guaranteed to not be a valid instruction (it is a write to a read-only CSR)
+    Single(0xC0001073), RV32 | RV64, [] => [], [Ex_I];
 ],
 "xor" = [
     // xor rd, rs1, rs2 (i)
