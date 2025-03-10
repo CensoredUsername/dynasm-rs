@@ -1205,6 +1205,10 @@ Ops!(
     // jalr rs1 (subformat of rv_i::jalr) (i)
     Single(0x000000E7), RV32 | RV64, [X] => [R(15)], [Ex_I];
 ],
+"jump" = [
+    // pseudo instruction for auipc xt, imm.roundshift(20); jalr x0, xt, imm & 0xFFF
+    Double(0x00000017, 0x00000067), RV32 | RV64, [Offset, X] => [Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_I];
+],
 "jr" = [
     // jr rs1 (subformat of rv_i::jalr) (i)
     Single(0x00000067), RV32 | RV64, [X] => [R(15)], [Ex_I];
