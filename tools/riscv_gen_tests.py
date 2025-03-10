@@ -14,6 +14,7 @@ RV32_BLACKLIST = {
     "lui",
     "c.lui",
     "auipc",
+    "li",
 }
 
 RV64_BLACKLIST = {
@@ -30,6 +31,11 @@ RV64_BLACKLIST = {
     "lui",
     "c.lui",
     "auipc",
+    # the sequences gas generates for "li" are unpredictable.
+    "li",
+    "li.44",
+    "li.56",
+    "li.64"
 }
 
 def main():
@@ -48,6 +54,17 @@ def main():
     riscv64_tests = []
 
     for template in templates:
+        # filter out additionally
+        # addi with offset
+        # anything with offset in label
+        # as we will have different semantics for those
+        if template.template.startswith("addi") and "Off" in template.template:
+            print(f"skipping {template.template} because it is exempted")
+            continue
+        if "[" in template.template and "Off" in template.template:
+            print(f"skipping {template.template} because it is exempted")
+            continue
+
         for _ in range(args.test_multiplier):
             if "rv32" in template.architectures:
                 if template.template.split()[0] not in RV32_BLACKLIST:
@@ -72,7 +89,8 @@ def main():
         for dynasm, gas, extensions in riscv64_tests:
             f.write(f"{dynasm}\t{gas}\t{extensions}\n")
 
-FIX_GAS_MEMREF = re.compile(r"\[ *([0-9a-zA-Z-_]+) *(?:, *([0-9a-zA-Z-_]+) *)?\]")
+FIX_GAS_MEMREF = re.compile(r"\[ *([0-9a-zA-Z-_]+) *(?:, *([0-9a-zA-Z-+_.]+) *)?\]")
+FIX_LI_MEMREF = re.compile(r"(li\.44|li\.56|li\.64)")
 FIX_GAS_MOP = re.compile(r"(c\.mop\.|mop\.r\.|mop\.rr\.)[nN] +([0-9]+),?")
 class OpTemplate:
     def __init__(self, template, constraints, architectures, extensions):
@@ -102,6 +120,7 @@ class OpTemplate:
 
         # rewrite gas memory references to AT&T style
         gas_string = FIX_GAS_MEMREF.sub(lambda m: f"{m.group(2) or ''}({m.group(1)})", gas_string)
+        gas_string = FIX_LI_MEMREF.sub(lambda m: "li", gas_string)
 
         # other gas fixups
         # gas doesn't have the mop.?.n variants so rewrite those
@@ -348,7 +367,10 @@ class Immediate(Arg):
 
 class Offset(Immediate):
     def emit_gas(self, value):
-        return ".+" + super().emit_gas(value)
+        if value >= 0:
+            return ".+" + super().emit_gas(value)
+        else:
+            return "." + super().emit_gas(value)
 
 class Ident(Immediate):
     pass

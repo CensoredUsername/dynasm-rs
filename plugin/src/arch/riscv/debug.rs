@@ -83,7 +83,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
 
         let (arg_names, rest) = names.split_at(match matcher {
             Matcher::RefOffset
-            | Matcher::LabelOffset => 2,
+            | Matcher::RefLabel => 2,
             Matcher::Lit(_)
             | Matcher::Reg(_) => 0,
             _ => 1
@@ -98,7 +98,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
             Matcher::Ref => write!(buf, "[r{}]", arg_names[0]).unwrap(),
             Matcher::RefOffset => write!(buf, "[r{}, {}]", arg_names[0], arg_names[1]).unwrap(),
             Matcher::RefSp => write!(buf, "[sp, {}]", arg_names[0]).unwrap(),
-            Matcher::LabelOffset => write!(buf, "[r{}, {}]", arg_names[0], arg_names[1]).unwrap(),
+            Matcher::RefLabel => write!(buf, "[r{}, {}]", arg_names[0], arg_names[1]).unwrap(),
             Matcher::Offset => buf.push_str(&arg_names[0]),
             Matcher::Imm => buf.push_str(&arg_names[0]),
             Matcher::Ident => buf.push_str(&arg_names[0]),
@@ -188,7 +188,7 @@ fn flatten_matchers(matchers: &[Matcher]) -> Vec<FlatArgTy> {
                 args.push(FlatArgTy::Direct(true));
                 args.push(FlatArgTy::Immediate);
             },
-            Matcher::LabelOffset => {
+            Matcher::RefLabel => {
                 args.push(FlatArgTy::Direct(true));
                 args.push(FlatArgTy::JumpTarget);
             },
@@ -266,11 +266,13 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
                 | Command::SPImm(_, _)
                 | Command::UImm(_, _)
                 | Command::SImm(_, _)
+                | Command::BigImm(_)
                 | Command::UImmNo0(_, _)
                 | Command::SImmNo0(_, _)
                 | Command::UImmOdd(_, _)
                 | Command::UImmRange(_, _)
-                | Command::BitRange(_, _, _) => arg.arg == FlatArgTy::Immediate,
+                | Command::BitRange(_, _, _)
+                | Command::RBitRange(_, _, _) => arg.arg == FlatArgTy::Immediate,
                 Command::Offset(_) => arg.arg == FlatArgTy::JumpTarget,
                 Command::Repeat
                 | Command::Next => unreachable!()
@@ -344,6 +346,7 @@ fn name_args(args: &mut [ArgWithCommands]) {
                     imm_name_idx += 1;
                 },
                 Command::SImm(_, _)
+                | Command::BigImm(_)
                 | Command::SImmNo0(_, _) => {
                     arg.name = Some(format!("simm{}", imm_name_list[imm_name_idx]));
                     imm_name_idx += 1;
@@ -390,6 +393,7 @@ fn emit_constraints(name: &str, prev_name: &str, commands: &[Command], buf: &mut
             Command::UImm(bits, 0) => write!(buf, "{} <= {}", name, (1u32 << bits) - 1),
             Command::UImm(bits, scale) => write!(buf, "{} <= {}, {} = {} * N", name, (1u32 << bits) - (1u32 << scale), name, 1u32 << scale),
             Command::SImm(bits, 0) => write!(buf, "-{} <= {} <= {}", (1u32 << (bits - 1)), name, (1u32 << (bits - 1)) - 1),
+            Command::BigImm(bits) => write!(buf, "-{} <= {} <= {}", (1u64 << (bits - 1)), name, (1u64 << (bits - 1)) - 1),
             Command::SImm(bits, scale) => write!(buf, "-{} <= {} <= {}, {} = {} * N", 1u32 << (bits - 1), name, (1u32 << (bits - 1)) - (1u32 << scale), name, 1u32 << scale),
 
             Command::UImmNo0(bits, 0) => write!(buf, "1 <= {} <= {}", name, (1u32 << bits) - 1),
@@ -405,7 +409,10 @@ fn emit_constraints(name: &str, prev_name: &str, commands: &[Command], buf: &mut
             Command::Offset(Relocation::BC) => write!(buf, "offset is 8 bits, 2-byte aligned"),
             Command::Offset(Relocation::JC) => write!(buf, "offset is 11 bits, 2-byte aligned"),
             Command::Offset(Relocation::HI20) => write!(buf, "offset is the 20 highest bits of a 32-bit offset"),
-            Command::Offset(Relocation::LO12) => write!(buf, "offset is the 20 lowest bits of a 32-bit offset"),
+            Command::Offset(Relocation::LO12)
+            | Command::Offset(Relocation::LO12S) => write!(buf, "offset is the 20 lowest bits of a 32-bit offset"),
+            Command::Offset(Relocation::SPLIT32)
+            | Command::Offset(Relocation::SPLIT32S) => write!(buf, "offset is 32 bits"),
 
             _ => continue
         }.unwrap();
@@ -463,7 +470,7 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> String {
             Matcher::Ref => write!(buf, "[<X,{}>]", arg_idx).unwrap(),
             Matcher::RefOffset => write!(buf, "[<X,{}>, <Imm,{}>]", arg_idx, arg_idx + 1).unwrap(),
             Matcher::RefSp => write!(buf, "[sp, <Imm,{}>]", arg_idx).unwrap(),
-            Matcher::RefOffset => write!(buf, "[<X,{}>, <Off,{}>]", arg_idx, arg_idx + 1).unwrap(),
+            Matcher::RefLabel => write!(buf, "[<X,{}>, <Off,{}>]", arg_idx, arg_idx + 1).unwrap(),
             Matcher::Imm => write!(buf, "<Imm,{}>", arg_idx).unwrap(),
             Matcher::Offset => write!(buf, "<Off,{}>", arg_idx).unwrap(),
             Matcher::Ident => write!(buf, "<Ident,{}>", arg_idx).unwrap(),
@@ -473,7 +480,7 @@ pub fn extract_opdata(name: &str, data: &Opdata) -> String {
 
         arg_idx += match matcher {
             Matcher::RefOffset
-            | Matcher::LabelOffset => 2,
+            | Matcher::RefLabel => 2,
             Matcher::Lit(_)
             | Matcher::Reg(_) => 0,
             _ => 1
@@ -536,6 +543,7 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
 
                 Command::UImm(bits, scale) => format!("Range(0, {}, {})", 1u32 << bits, 1u32 << scale),
                 Command::SImm(bits, scale) => format!("Range(-{}, {}, {})", 1u32 << (bits - 1), 1u32 << (bits - 1), 1u32 << scale),
+                Command::BigImm(bits) => format!("Range(-{}, {}, 1)", 1u64 << (bits - 1), 1u64 << (bits - 1)),
                 Command::UImmNo0(bits, scale) => format!("RangeNon0(0, {}, {})", 1u32 << bits, 1u32 << scale),
                 Command::SImmNo0(bits, scale) => format!("RangeNon0(-{}, {}, {})", 1u32 << (bits - 1), 1u32 << (bits - 1), 1u32 << scale),
                 Command::UImmOdd(bits, scale) => format!("Range({}, {}, {})", (1u32 << scale) - 1, 1u32 << bits, 1u32 << scale),
@@ -546,7 +554,10 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::Offset(Relocation::BC) => format!("Range(-{}, {}, {})", 1u32 << 8, 1u32 << 8, 2),
                 Command::Offset(Relocation::JC) => format!("Range(-{}, {}, {})", 1u32 << 11, 1u32 << 11, 2),
                 Command::Offset(Relocation::HI20) => format!("Range(-{}, {}, {})", 1u32 << 31, 1u32 << 31, 1 << 12),
-                Command::Offset(Relocation::LO12) => format!("Range(-{}, {}, 1)", 1u32 << 11, 1u32 << 11),
+                Command::Offset(Relocation::LO12)
+                | Command::Offset(Relocation::LO12S) => format!("Range(-{}, {}, 1)", 1u32 << 11, 1u32 << 11),
+                Command::Offset(Relocation::SPLIT32)
+                | Command::Offset(Relocation::SPLIT32S) => format!("Range(-{}, {}, 1)", 1u32 << 31, 1u32 << 31),
 
                 _ => continue
             };

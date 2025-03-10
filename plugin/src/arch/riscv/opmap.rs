@@ -658,7 +658,9 @@ Ops!(
     // fld rd, rs1, imm12 (d)
     Single(0x00003007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_D];
     // as part of a pc-relative load
-    Single(0x00003007), RV32 | RV64, [F, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_D];
+    Single(0x00003007), RV32 | RV64, [F, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_D];
+    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00003007), RV32 | RV64, [F, Offset, X] => [R(7+32), Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_D];
 ],
 "fle.d" = [
     // fle.d rd, rs1, rs2 (d)
@@ -726,7 +728,9 @@ Ops!(
     // fsd imm12hi, rs1, rs2, imm12lo (d)
     Single(0x00003027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_D];
     // as part of a pc-relative store
-    Single(0x00003027), RV32 | RV64, [F, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_D];
+    Single(0x00003027), RV32 | RV64, [F, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_D];
+    // Pseudo instruction for auipc rt, hi20(symbol); fsd, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00003027), RV32 | RV64, [F, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_D];
 ],
 "fsgnj.d" = [
     // fsgnj.d rd, rs1, rs2 (d)
@@ -899,7 +903,9 @@ Ops!(
     // flw rd, rs1, imm12 (f)
     Single(0x00002007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_F];
     // as part of a pc-relative load
-    Single(0x00002007), RV32 | RV64, [F, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_F];
+    Single(0x00002007), RV32 | RV64, [F, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_F];
+    // Pseudo instruction for auipc rt, hi20(symbol); flw, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00002007), RV32 | RV64, [F, Offset, X] => [R(7+32), Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_F];
 ],
 "fmadd.s" = [
     // fmadd.s rd, rs1, rs2, rs3, rm (f)
@@ -1023,7 +1029,9 @@ Ops!(
     // fsw imm12hi, rs1, rs2, imm12lo (f)
     Single(0x00002027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_F];
     // as part of a pc-relative store
-    Single(0x00002027), RV32 | RV64, [F, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_F];
+    Single(0x00002027), RV32 | RV64, [F, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_F];
+    // Pseudo instruction for auipc rt, hi20(symbol); fsw, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00002027), RV32 | RV64, [F, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_F];
 ],
 
 // Extension(s) f_zfa
@@ -1195,35 +1203,131 @@ Ops!(
     // jr rs1 (subformat of rv_i::jalr) (i)
     Single(0x00000067), RV32 | RV64, [X] => [R(15)], [Ex_I];
 ],
+"la" = [
+    // Pseudo instruction for auipc rd, hi20(symbol); addi, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00000013), RV32 | RV64, [X, Offset] => [R(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
+],
 "lb" = [
     // lb rd, rs1, imm12 (i)
     Single(0x00000003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00000003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00000003), RV32 | RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); lb, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00000003), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "lbu" = [
     // lbu rd, rs1, imm12 (i)
     Single(0x00004003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00004003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00004003), RV32 | RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); lbu, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00004003), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "ld" = [
     // ld rd, rs1, imm12 (i)
     Single(0x00003003),        RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00003003),        RV64, [F, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00003003),        RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); ld, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00003003),        RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "lh" = [
     // lh rd, rs1, imm12 (i)
     Single(0x00001003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00001003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00001003), RV32 | RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); lh, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00001003), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "lhu" = [
     // lhu rd, rs1, imm12 (i)
     Single(0x00005003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00005003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00005003), RV32 | RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); lhu, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00005003), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
+],
+"li" = [
+    // alias for
+    // lui rd, imm.roundrightshift(12)
+    // addi rd, rd, imm & 0xFFF
+    Double(0x00000037, 0x00000013), RV32 | RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        SImm(32, 0),
+        RBitRange(12, 20, 12),
+        BitRange(20+32, 12, 0),
+        Next
+    ], [Ex_I];
+],
+"li.44" = [
+    // alias for
+    // lui rd, imm.roundrightshift(24)
+    // addiW rd, rd, imm.roundrightshift(12) & 0xFFF
+    // slli rd, rd, 12
+    // addi rd, rd, imm & 0xFFF
+    Many(&[0x00000037, 0x00000013, 0x00C01013, 0x00000013]),        RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        Repeat, R(7+64), Repeat, R(15+64),
+        Repeat, R(7+96), Repeat, R(15+96),
+        BigImm(44),
+        RBitRange(12, 20, 24),
+        RBitRange(20+32, 12, 12),
+        BitRange(20+96, 12, 0),
+        Next
+    ], [Ex_I];
+],
+"li.56" = [
+    // alias for
+    // lui rd, imm.roundrightshift(36) & 0xFFF
+    // addi rd, rd, imm.roundrightshift(24) & 0xFFF
+    // slli rd, rd, 12
+    // addi rd, rd, imm.roundrightshift(12) & 0xFFF
+    // slli rd, rd, 12
+    // addi rd, rd, imm & 0xFFF
+    Many(&[0x00000037, 0x00000013, 0x00C01013, 0x00000013, 0x00C01013, 0x00000013]),        RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        Repeat, R(7+64), Repeat, R(15+64),
+        Repeat, R(7+96), Repeat, R(15+96),
+        Repeat, R(7+128), Repeat, R(15+128),
+        Repeat, R(7+160), Repeat, R(15+160),
+        BigImm(56),
+        RBitRange(12, 20, 36),
+        RBitRange(20+32, 12, 24),
+        RBitRange(20+96, 12, 12),
+        BitRange(20+160, 12, 0),
+        Next
+    ], [Ex_I];
+],
+"li.64" = [
+    // alias for
+    // lui rd, imm.roundrightshift(48)
+    // addi rd, rd, imm.roundrightshift(36) & 0xFFF
+    // slli rd, rd, 12
+    // addi rd, rd, imm.roundrightshift(24) & 0xFFF
+    // slli rd, rd, 12
+    // addi rd, rd, imm.roundrightshift(12) & 0xFFF
+    // slli rd, rd, 12
+    // addi rd, rd, imm & 0xFFF
+    Many(&[0x00000037, 0x00000013, 0x00C01013, 0x00000013, 0x00C01013, 0x00000013, 0x00C01013, 0x00000013]),        RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        Repeat, R(7+64), Repeat, R(15+64),
+        Repeat, R(7+96), Repeat, R(15+96),
+        Repeat, R(7+128), Repeat, R(15+128),
+        Repeat, R(7+160), Repeat, R(15+160),
+        Repeat, R(7+192), Repeat, R(15+192),
+        Repeat, R(7+224), Repeat, R(15+224),
+        BigImm(64),
+        RBitRange(12, 16, 48),
+        RBitRange(20+32, 12, 36),
+        RBitRange(20+96, 12, 24),
+        RBitRange(20+160, 12, 12),
+        BitRange(20+224, 12, 0),
+        Next
+    ], [Ex_I];
 ],
 "lui" = [
     // lui rd, imm20 (i)
@@ -1233,13 +1337,17 @@ Ops!(
     // lw rd, rs1, imm12 (i)
     Single(0x00002003), RV32 | RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00002003), RV32 | RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00002003), RV32 | RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); lw, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00002003), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "lwu" = [
     // lwu rd, rs1, imm12 (i)
     Single(0x00006003),        RV64, [X, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
     // as part of a pc-relative load
-    Single(0x00006003),        RV64, [X, LabelOffset] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00006003),        RV64, [X, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_I];
+    // Pseudo instruction for auipc rd, hi20(symbol); lwu, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00006003),        RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "mv" = [
     // mv rd, rs1 (subformat of rv_i::addi) (i)
@@ -1281,7 +1389,9 @@ Ops!(
     // sb imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00000023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
     // as part of a pc-relative store
-    Single(0x00000023), RV32 | RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00000023), RV32 | RV64, [X, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_I];
+    // Pseudo instruction for auipc rt, hi20(symbol); sb, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00000023), RV32 | RV64, [X, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_I];
 ],
 "sbreak" = [
     // sbreak  (subformat of rv_i::ebreak) (i)
@@ -1295,7 +1405,9 @@ Ops!(
     // sd imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00003023),        RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
     // as part of a pc-relative store
-    Single(0x00003023),        RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00003023),        RV64, [X, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_I];
+    // Pseudo instruction for auipc rt, hi20(symbol); sd, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00003023),        RV64, [X, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_I];
 ],
 "seqz" = [
     // seqz rd, rs1 (subformat of rv_i::sltiu) (i)
@@ -1313,7 +1425,9 @@ Ops!(
     // sh imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00001023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
     // as part of a pc-relative store
-    Single(0x00001023), RV32 | RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00001023), RV32 | RV64, [X, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_I];
+    // Pseudo instruction for auipc rt, hi20(symbol); sh, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00001023), RV32 | RV64, [X, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_I];
 ],
 "sll" = [
     // sll rd, rs1, rs2 (i)
@@ -1405,7 +1519,9 @@ Ops!(
     // sw imm12hi, rs1, rs2, imm12lo (i)
     Single(0x00002023), RV32 | RV64, [X, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_I];
     // as part of a pc-relative store
-    Single(0x00002023), RV32 | RV64, [X, LabelOffset] => [R(20), R(15), Offset(LO12)], [Ex_I];
+    Single(0x00002023), RV32 | RV64, [X, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_I];
+    // Pseudo instruction for auipc rt, hi20(symbol); sw, rd, rt, lo12(symbol)
+    Double(0x00000017, 0x00002023), RV32 | RV64, [X, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_I];
 ],
 "unimp" = [
     // guaranteed to not be a valid instruction (it is a write to a read-only CSR)

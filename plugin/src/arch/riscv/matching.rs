@@ -196,7 +196,7 @@ impl Matcher {
                 _ => false,
             },
             RawArg::LabelReference { .. } => match self {
-                Matcher::LabelOffset => true,
+                Matcher::RefLabel => true,
                 _ => false,
             },
             RawArg::RegisterList { first, count, .. } => *self == Matcher::Xlist,

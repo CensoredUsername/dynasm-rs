@@ -8,7 +8,7 @@ use proc_macro2::{TokenStream, Span};
 use proc_macro_error2::emit_error;
 
 use crate::parse_helpers::{as_signed_number, as_ident, as_float};
-use crate::common::{Stmt, Size, delimited, bitmask};
+use crate::common::{Stmt, Size, delimited, bitmask, bitmask64};
 
 /// Compile a single instruction. Input is taken from `data`, containing both the arguments
 /// and the encoding template and commands.
@@ -26,16 +26,16 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
     // Any relocation will be encoded in this list
     let mut relocations = Vec::new();
 
-    // Because of the sheer amount of split immediates we handle these specially
-    // this generates significantly less terrible code
-    let mut imm_encoder = ImmediateEncoder::new();
-
-    for command in data.data.commands.iter() {
+    for (i, command) in data.data.commands.iter().enumerate() {
         // meta commands
         match *command {
 
             Command::Repeat => {
                 cursor -= 1;
+                continue;
+            },
+            Command::Next => {
+                cursor += 1;
                 continue;
             },
             _ => ()
@@ -266,21 +266,25 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let span = value.span();
                     let range: u32 = bitmask(bits);
 
-                    match imm_encoder.init(value, false) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             static_range_check(static_value, 0, range, scaling, span)?;
                         },
                         None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = if scaling == 0 {
+                                quote_spanned!{ span =>
                                     _dyn_imm > #range
-                                });
+                                }
                             } else {
                                 let zeromask: u32 = bitmask(scaling);
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                                quote_spanned!{ span =>
                                     _dyn_imm > #range || _dyn_imm & #zeromask != 0u32
-                                });
-                            }
+                                }
+                            };
+                            imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         }
                     }
                 },
@@ -289,21 +293,52 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
                     let min: i32 = (-1) << (bits - 1);
 
-                    match imm_encoder.init(value, true) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             static_range_check(static_value, min, range, scaling, span)?;
                         },
                         None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = if scaling == 0 {
+                                quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range
-                                });
+                                }
                             } else {
                                 let zeromask = bitmask(scaling) as i32;
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                                quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32
-                                });
+                                }
+                            };
+                            imm_encoder.emit_dynamic(true, false, check, &mut dynamics);
+                        }
+                    }
+                },
+                Command::BigImm(bits) => {
+                    let span = value.span();
+                    let range = bitmask64(bits);
+                    let min: i64 = (-1) << (bits - 1);
+
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
+                        Some(static_value) => {
+                            if static_value < min {
+                                emit_error!(span, "Immediate too low");
+                                return Err(None);
                             }
+                            if static_value.wrapping_sub(min) as u64 > range {
+                                emit_error!(span, "Immediate too high");
+                                return Err(None);
+                            }
+                        },
+                        None => {
+                            let check = quote_spanned!{ span =>
+                                _dyn_imm.wrapping_sub(#min) as u64 > #range
+                            };
+                            imm_encoder.emit_dynamic(true, true, check, &mut dynamics);
                         }
                     }
                 },
@@ -311,7 +346,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let span = value.span();
                     let range = bitmask(bits);
 
-                    match imm_encoder.init(value, false) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             static_range_check(static_value, 0, range, scaling, span)?;
                             if static_value == 0 {
@@ -320,16 +358,17 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }
                         },
                         None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = if scaling == 0 {
+                                quote_spanned!{ span =>
                                     _dyn_imm > #range || _dyn_imm == 0u32
-                                });
+                                }
                             } else {
                                 let zeromask: u32 = bitmask(scaling);
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                                quote_spanned!{ span =>
                                     _dyn_imm > #range || _dyn_imm & #zeromask != 0u32 || _dyn_imm == 0u32
-                                });
-                            }
+                                }
+                            };
+                            imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         },
                     }
                 },
@@ -338,7 +377,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
                     let min: i32 = (-1) << (bits - 1);
 
-                    match imm_encoder.init(value, true) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             static_range_check(static_value, min, range, scaling, span)?;
                             if static_value == 0 {
@@ -347,25 +389,29 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }
                         },
                         None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = if scaling == 0 {
+                                quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm == 0i32
-                                });
+                                }
                             } else {
                                 let zeromask = bitmask(scaling) as i32;
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                                quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32 || _dyn_imm == 0i32
-                                });
-                            }
+                                }
+                            };
+                            imm_encoder.emit_dynamic(true, false, check, &mut dynamics);
                         }
                     }
                 },
                 Command::UImmOdd(bits, scaling) => {
                     let span = value.span();
                     let range = bitmask(bits);
-                                let zeromask: u32 = bitmask(scaling);
+                    let zeromask: u32 = bitmask(scaling);
 
-                    match imm_encoder.init(value, false) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             let biased = static_range_check(static_value, 0, range, 0, span)?;
                             if biased & zeromask != zeromask {
@@ -374,22 +420,26 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }
                         },
                         None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = if scaling == 0 {
+                                quote_spanned!{ span =>
                                     _dyn_imm > #range
-                                });
+                                }
                             } else {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                                quote_spanned!{ span =>
                                     _dyn_imm > #range || _dyn_imm & #zeromask != #zeromask
-                                });
-                            }
+                                }
+                            };
+                            imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         }
                     }
                 },
                 Command::UImmRange(min, max) => {
                     let span = value.span();
 
-                    match imm_encoder.init(value, false) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             if static_value < i64::from(min) {
                                 emit_error!(span, "Immediate too low");
@@ -401,80 +451,127 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }
                         },
                         None => {
-                            imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = quote_spanned!{ span=>
                                 _dyn_imm < #min || _dyn_imm > #max
-                            });
+                            };
+                            imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         }
                     }
                 },
 
                 // integer encoding commands
-                Command::BitRange(offset, bits, scaling) => {
-                    match imm_encoder.static_value {
-                        Some(static_value) => {
-                            let mask = bitmask(bits);
-                            let slice = ((static_value as u32) >> scaling) & mask;
-                            statics.push((offset, slice));
-                        },
-                        None => {
-                            let span = value.span();
-                            let mask = bitmask(bits);
-                            imm_encoder.add_field(offset, quote_spanned!{ span => 
-                                (((_dyn_imm as u32) >> #scaling) & #mask)
-                            });
-                        }
-                    }
-                },
-
-                // finish up encoding the current integer
-                Command::Next => {
-                    if let Some(dynamic) = imm_encoder.finalize(value) {
-                        dynamics.push((0, dynamic));
-                    }
-                }
+                Command::BitRange(offset, bits, scaling) => (),
+                Command::RBitRange(offset, bits, scaling) => (),
 
                 // offsets can accept immediates too
                 Command::Offset(relocation_type) => {
                     let bits;
                     let scaling;
-                    let ranges: &'static [(u8, u8, u8)];
+                    let commands: &'static [Command];
+
+                    // equivalent bitrange encodings for offsets
                     match relocation_type {
                         // 12 bits, 2-bit scaled. Equivalent to
-                        // BitRange(31, 1, 12), BitRange(25, 6, 5), BitRange(8, 4, 1), BitRange(7, 1, 11)
                         Relocation::B => {
                             bits = 12;
                             scaling = 1;
-                            ranges = &[(31, 1, 12), (25, 6, 5), (8, 4, 1), (7, 1, 11)];
+                            commands = &[
+                                Command::BitRange(31, 1, 12),
+                                Command::BitRange(25, 6, 5),
+                                Command::BitRange(8, 4, 1),
+                                Command::BitRange(7, 1, 11),
+                                Command::Next
+                            ];
                         },
                         // 20 bits, 2-bit scaled
                         Relocation::J => {
                             bits = 20;
                             scaling = 1;
-                            ranges = &[(31, 1, 20), (21, 10, 1), (20, 1, 11), (12, 8, 12)];
+                            commands = &[
+                                Command::BitRange(31, 1, 20),
+                                Command::BitRange(21, 10, 1),
+                                Command::BitRange(20, 1, 11),
+                                Command::BitRange(12, 8, 12),
+                                Command::Next
+                            ];
                         },
                         // 9 bits, 2-bit scaled
                         Relocation::BC => {
                             bits = 9;
                             scaling = 1;
-                            ranges = &[(12, 1, 8), (10, 2, 3), (5, 2, 6), (3, 2, 1), (2, 1, 5)];
+                            commands = &[
+                                Command::BitRange(12, 1, 8),
+                                Command::BitRange(10, 2, 3),
+                                Command::BitRange(5, 2, 6),
+                                Command::BitRange(3, 2, 1),
+                                Command::BitRange(2, 1, 5),
+                                Command::Next
+                            ];
                         },
                         // 12 bits, 2-bit scaled
                         Relocation::JC => {
                             bits = 12;
                             scaling = 1;
-                            ranges = &[(12, 1, 11), (11, 1, 4), (9, 2, 8), (8, 1, 10), (7, 1, 6), (6, 1, 7), (3, 3, 1), (2, 1, 5)]; // why
+                            commands = &[
+                                Command::BitRange(12, 1, 11),
+                                Command::BitRange(11, 1, 4),
+                                Command::BitRange(9, 2, 8),
+                                Command::BitRange(8, 1, 10),
+                                Command::BitRange(7, 1, 6),
+                                Command::BitRange(6, 1, 7),
+                                Command::BitRange(3, 3, 1), 
+                                Command::BitRange(2, 1, 5),
+                                Command::Next
+                            ]; // why
                         },
                         // 32 bits, 12-bit scaled
                         Relocation::HI20 => {
                             bits = 32;
                             scaling = 12;
-                            ranges = &[(12, 20, 12)];
+                            commands = &[
+                                Command::BitRange(12, 20, 12),
+                                Command::Next
+                            ];
                         },
                         // 12 bits, no scaling
                         Relocation::LO12 => {
                             bits = 12;
                             scaling = 0;
-                            ranges = &[(20, 12, 0)];
+                            commands = &[
+                                Command::BitRange(20, 12, 0),
+                                Command::Next
+                            ];
+                        },
+                        // 12 bits, no scaling
+                        Relocation::LO12S => {
+                            bits = 12;
+                            scaling = 0;
+                            commands = &[
+                                Command::BitRange(7, 5, 0),
+                                Command::BitRange(25, 7, 5),
+                                Command::Next
+                            ];
+                        },
+                        // 32 bits, no scaling
+                        Relocation::SPLIT32 => {
+                            bits = 32;
+                            scaling = 0;
+                            commands = &[
+                                Command::RBitRange(12, 20, 12),
+                                Command::BitRange(20+32, 12, 0),
+                                Command::Next
+                            ]
+                        },
+                        // 32 bits, no scaling
+                        Relocation::SPLIT32S => {
+                            bits = 32;
+                            scaling = 0;
+                            commands = &[
+                                Command::RBitRange(12, 20, 12),
+                                Command::BitRange(7+32, 5, 0),
+                                Command::BitRange(25+32, 7, 5),
+                                Command::Next
+                            ]
                         }
                     }
 
@@ -482,38 +579,27 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
                     let min: i32 = (-1) << (bits - 1);
 
-                    match imm_encoder.init(value, true) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(commands, 0, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             static_range_check(static_value, min, range, scaling, span)?;
-
-                            for &(offset, count, scaling) in ranges.iter() {
-                                let slice = ((static_value as u32) >> scaling) & bitmask(count);
-                                statics.push((offset, slice))
-                            }
                         },
                         None => {
-                            if scaling == 0 {
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = if scaling == 0 {
+                                quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range
-                                });
+                                }
                             } else {
                                 let zeromask = bitmask(scaling) as i32;
-                                imm_encoder.set_check(quote_spanned!{ span =>
+                                quote_spanned!{ span =>
                                     _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32
-                                });
-                            }
+                                }
+                            };
 
-                            for &(offset, count, scaling) in ranges.iter() {
-                                let mask = bitmask(count);
-                                imm_encoder.add_field(offset, quote_spanned!{ span => 
-                                    (((_dyn_imm as u32) >> #scaling) & #mask)
-                                });
-                            }
+                            imm_encoder.emit_dynamic(true, false, check, &mut dynamics);
                         }
-                    }
-
-                    if let Some(dynamic) = imm_encoder.finalize(value) {
-                        dynamics.push((0, dynamic));
                     }
                 },
 
@@ -549,24 +635,24 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                     let span = value.span();
                     let range = 0xFFF;
+                    let commands = &[
+                        Command::BitRange(offset, 12, 0),
+                        Command::Next
+                    ];
 
-                    match imm_encoder.init(value, false) {
+                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    imm_encoder.gather_fields(commands, 0, &mut statics);
+
+                    match imm_encoder.static_value {
                         Some(static_value) => {
                             static_range_check(static_value, 0, range, 0, span)?;
-                            statics.push((offset, static_value as u32));
                         },
                         None => {
-                            imm_encoder.set_check(quote_spanned!{ span =>
+                            let check = quote_spanned!{ span =>
                                 _dyn_imm > #range
-                            });
-                            imm_encoder.add_field(offset, quote_spanned!{ span => 
-                                (_dyn_imm & 0xFFFu32)
-                            });
+                            };
+                            imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         }
-                    }
-
-                    if let Some(dynamic) = imm_encoder.finalize(value) {
-                        dynamics.push((0, dynamic));
                     }
                 },
                 Command::FloatingPointImmediate(offset) => 'fpimm: {
@@ -699,11 +785,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
         match *command {
             Command::UImm(_, _)
             | Command::SImm(_, _)
+            | Command::BigImm(_)
             | Command::UImmNo0(_, _)
             | Command::SImmNo0(_, _)
             | Command::UImmOdd(_, _)
             | Command::UImmRange(_, _)
-            | Command::BitRange(_, _, _) => (),
+            | Command::BitRange(_, _, _)
+            | Command::RBitRange(_, _, _) => (),
             _ => cursor += 1
         }
     }
@@ -713,50 +801,79 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
         panic!("Not enough command processors");
     }
 
+    let mut templates = [0u32; 8];
+    let mut exprs = [None, None, None, None, None, None, None, None];
+
     // for convenience sake we operate in 32 bits width, even for compressed instructions
-    let mut bits = match data.data.template {
-        Template::Compressed(val) => u32::from(val),
-        Template::Single(val) => val
+    match data.data.template {
+        Template::Compressed(val) => templates[0] = u32::from(val),
+        Template::Single(val) => templates[0] = val,
+        Template::Double(val1, val2) => {
+            templates[0] = val1;
+            templates[1] = val2;
+        },
+        Template::Many(values) => {
+            templates[ .. values.len()].copy_from_slice(&values);
+        }
     };
 
-    // apply all statics to template
+    // apply all statics to templates
     for (offset, value) in statics {
-        bits |= value << offset;
+        templates[(offset >> 5) as usize] |= value << (offset & 0x1F);
     }
 
-    // generate dynamic code
-    if !dynamics.is_empty() {
-        let mut res = quote!{
-            #bits
-        };
-        for (offset, expr) in dynamics {
-            if offset == 0 {
-                res = quote!{
-                    #res | #expr
-                };
-            } else {
-                res = quote!{
-                    #res | (#expr << #offset)
-                };
-            }
-        }
+    // and process all dynamics
+    for (offset, expr) in dynamics {
+        let index = usize::from(offset >> 5);
+        let offset = offset & 0x1F;
 
-        match data.data.template {
-            Template::Compressed(_) => {
-                res = quote!{ (#res) as u16 };
-                ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::B_2));
+        exprs[index] = match exprs[index].take() {
+            Some(prev_expr) => {
+                Some(if offset == 0 {
+                    quote!{ #prev_expr | #expr }
+                } else {
+                    quote!{ #prev_expr | (#expr << #offset) }
+                })
             },
-            Template::Single(_) => {
-                ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::B_4));
+            None => {
+                let bits = templates[index];
+                Some(if offset == 0 {
+                    quote!{ #bits | #expr }
+                } else {
+                    quote!{ #bits | (#expr << #offset) }
+                })
             }
         }
-    } else {
-        match data.data.template {
-            Template::Compressed(_) => {
-                ctx.state.stmts.push(Stmt::Const(u64::from(bits & 0xFFFF), Size::B_2));
-            },
-            Template::Single(_) => {
-                ctx.state.stmts.push(Stmt::Const(u64::from(bits), Size::B_4));
+    }
+
+    match data.data.template {
+        Template::Compressed(_) => if let Some(d) = exprs[0].take() {
+            let res = quote!{ (#d) as u16 };
+            ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::B_2));
+        } else {
+            ctx.state.stmts.push(Stmt::Const(u64::from(templates[0] & 0xFFFF), Size::B_2));
+        },
+        Template::Single(_) => if let Some(d) = exprs[0].take() {
+            ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(d), Size::B_4));
+        } else {
+            ctx.state.stmts.push(Stmt::Const(u64::from(templates[0]), Size::B_4));
+        },
+        Template::Double(_, _) => {
+            for i in 0 .. 2 {
+                if let Some(d) = exprs[i].take() {
+                    ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(d), Size::B_4));
+                } else {
+                    ctx.state.stmts.push(Stmt::Const(u64::from(templates[i]), Size::B_4));
+                }
+            }
+        },
+        Template::Many(c) => {
+            for i in 0 .. c.len() {
+                if let Some(d) = exprs[i].take() {
+                    ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(d), Size::B_4));
+                } else {
+                    ctx.state.stmts.push(Stmt::Const(u64::from(templates[i]), Size::B_4));
+                }
             }
         }
     }
@@ -767,119 +884,159 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 }
 
 
-// how to do integer encoding properly so we don't redo the same work n times
-// so work is split between pure validation commands that don't anything
-// and encoding commands that don't do any validation
-
-// general workflow should be like this
-// a new integer arg is encountered
-// step 1: determine if it is statically evaluatable
-// step 2: if static: check value. if dynamic: encode rangechecks
-// step 3: if static: add bits to static template. if dynamic: add bits to encoding expression
-// step 4: if we're done with this arg, emit these from the builder
-struct ImmediateEncoder {
-    // if this is None, we haven't initialized
-    pub is_signed: Option<bool>,
+/// Handles the encoding of immediates in a somewhat efficient fashion.
+struct ImmediateEncoder<'a> {
+    pub dynamic_value: &'a syn::Expr,
     pub static_value: Option<i64>,
     pub encodes: Vec<(u8, TokenStream)>, // encoding_offset, expression
-    pub check: Option<TokenStream>
+    pub span: Span
 }
 
-impl ImmediateEncoder {
-    pub fn new() -> ImmediateEncoder {
-        ImmediateEncoder {
-            is_signed: None,
-            static_value: None,
-            check: None,
-            encodes: Vec::new()
-        }
-    }
-
-    pub fn init(&mut self, dynamic_value: &syn::Expr, is_signed: bool) -> Option<i64> {
+impl<'a> ImmediateEncoder<'a> {
+    pub fn new(dynamic_value: &syn::Expr) -> ImmediateEncoder {
         #![allow(unexpected_cfgs)]
-
-        if self.is_signed.is_none() {
-            self.is_signed = Some(is_signed);
-            self.static_value = as_signed_number(dynamic_value);
-        }
+        let static_value;
 
         // this allows turning off static checks for testing purposes
+        #[cfg(not(disable_static_checks="1"))]
+        {
+            static_value = as_signed_number(dynamic_value);
+        }
         #[cfg(disable_static_checks="1")]
         {
-            self.static_value = None;
-        }
-
-        self.static_value
-    }
-
-    pub fn add_field(&mut self, encoding_offset: u8, expr: TokenStream) {
-        self.encodes.push((encoding_offset, expr));
-    }
-
-    pub fn set_check(&mut self, check: TokenStream) {
-        self.check = Some(check);
-    }
-
-    pub fn finalize(&mut self, dynamic_value: &syn::Expr) -> Option<TokenStream> {
-        // this should only be called if we have been initialized
-        let signed = self.is_signed.expect("bad encoding data");
-
-        // if the value was statically known, there is no need to encode something dynamically
-        if self.static_value.is_some() {
-            self.is_signed = None;
-            self.static_value = None;
-            self.check = None;
-            self.encodes.clear();
-
-            return None;
+            static_value = None;
         }
 
         let span = dynamic_value.span();
 
+        ImmediateEncoder {
+            dynamic_value,
+            static_value,
+            encodes: Vec::new(),
+            span
+        }
+    }
+
+    pub fn gather_fields(&mut self, commands: &[Command], mut index: usize, statics: &mut Vec<(u8, u32)>) {
+        loop {
+            match commands.get(index) {
+                Some(&Command::BitRange(offset, bits, scaling)) => {
+                    let mask = bitmask(bits);
+
+                    if let Some(v) = self.static_value {
+                        let slice = (v >> scaling) as u32 & mask;
+                        statics.push((offset, slice));
+
+                    } else {
+                        self.encodes.push((offset, quote_spanned!{ self.span=>
+                            ((_dyn_imm >> #scaling) as u32 & #mask)
+                        }));
+                    }
+                },
+                Some(&Command::RBitRange(offset, bits, scaling)) => {
+                    let mask = bitmask(bits);
+                    let round_offset: i64 = if scaling != 0 { 1 << (scaling - 1) } else { 0 };
+
+                    if let Some(v) = self.static_value {
+                        let slice = (v.wrapping_add(round_offset) >> scaling) as u32 & mask;
+                        statics.push((offset, slice));
+
+                    } else {
+                        self.encodes.push((offset, quote_spanned!{ self.span=>
+                            ((_dyn_imm.wrapping_add(#round_offset) >> #scaling) as u32 & #mask)
+                        }));
+                    }
+                },
+                Some(Command::Next) => break,
+                Some(_)
+                | None => panic!("Bad encoding data, integer field sequence is not terminated"),
+            }
+            index += 1;
+        }
+    }
+
+    pub fn emit_dynamic(mut self, is_signed: bool, is_64bit: bool, check: TokenStream, dynamics: &mut Vec<(u8, TokenStream)>) {
         // assemble encoding chunks
-        let mut iter = self.encodes.drain(..);
+        let mut exprs = [None, None, None, None, None, None, None, None];
+        let dynamic_value = self.dynamic_value;
+        let span = self.span;
 
-        let mut encodes = match iter.next() {
-            Some((offset, check)) => quote_spanned!{ span=>
-                #check << #offset
-            },
-            None => quote_spanned!{ span=> 0 }
-        };
+        for (offset, expr) in self.encodes.drain(..) {
+            let index = usize::from(offset >> 5);
+            let offset = offset & 0x1F;
 
-        for (offset, check) in iter {
-            let parenthesized = delimited(encodes);
-            encodes = quote_spanned!{ span=>
-                #parenthesized | (#check << #offset)
-            };
+            exprs[index] = match exprs[index].take() {
+                Some(prev_expr) => {
+                    let parenthesized = delimited(prev_expr);
+
+                    Some(if offset == 0 {
+                        let expr = delimited(expr);
+                        quote!{ #parenthesized | #expr }
+                    } else {
+                        quote!{ #parenthesized | (#expr << #offset) }
+                    })
+                },
+                None => {
+                    Some(if offset == 0 {
+                        quote!{ #expr }
+                    } else {
+                        quote!{ #expr << #offset }
+                    })
+                }
+            }
         }
 
+        let imm_ty = match (is_signed, is_64bit) {
+            (false, false) => quote_spanned!{ span=> u32 },
+            (false, true)  => quote_spanned!{ span=> i32 },
+            (true, false)  => quote_spanned!{ span=> u64 },
+            (true, true)   => quote_spanned!{ span=> i64 }
+        };
 
-        let check = self.check.take().expect("Integer range check was not configured for dynamic value");
+        let mut first = true;
+        for (i, expr) in exprs.into_iter().enumerate() {
+            let encodes = if let Some(encodes) = expr { encodes } else {
+                continue
+            };
+            let offset = (i * 32) as u8;
 
-        if signed {
-            Some(quote_spanned!{ span=>
-                {
-                    let _dyn_imm: i32 = #dynamic_value;
-
-                    if #check {
-                        ::dynasmrt::riscv64::immediate_out_of_range_signed_32(_dyn_imm);
+            if first {
+                first = false;
+                let error_expr = match (is_signed, is_64bit) {
+                    (false, false) => quote_spanned!{ span=>
+                        ::dynasmrt::riscv64::immediate_out_of_range_unsigned_32
+                    },
+                    (false, true)  => quote_spanned!{ span=>
+                        ::dynasmrt::riscv64::immediate_out_of_range_signed_32
+                    },
+                    (true, false)  => quote_spanned!{ span=>
+                        ::dynasmrt::riscv64::immediate_out_of_range_unsigned_64
+                    },
+                    (true, true)   => quote_spanned!{ span=>
+                        ::dynasmrt::riscv64::immediate_out_of_range_signed_64
                     }
+                };
 
-                    #encodes
-                }
-            })
-        } else {
-            Some(quote_spanned!{ span=>
-                {
-                    let _dyn_imm: u32 = #dynamic_value;
+                dynamics.push((offset, quote_spanned!{ span=>
+                    {
+                        let _dyn_imm: #imm_ty = #dynamic_value;
 
-                    if #check {
-                        ::dynasmrt::riscv64::immediate_out_of_range_unsigned_32(_dyn_imm);
+                        if #check {
+                            #error_expr(_dyn_imm);
+                        }
+
+                        #encodes
                     }
+                }));
 
-                    #encodes
-                }
-            })
+            } else {
+                dynamics.push((offset, quote_spanned!{ span=>
+                    {
+                        let _dyn_imm: #imm_ty = #dynamic_value;
+                        #encodes
+                    }
+                }));
+            }
         }
     }
 }
