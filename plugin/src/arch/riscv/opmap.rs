@@ -1201,7 +1201,7 @@ Ops!(
 ],
 "jalr" = [
     // jalr rd, rs1, imm12 (i)
-    Single(0x00000067), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    Single(0x00000067), RV32 | RV64, [X, X, Offset] => [R(7), R(15), Offset(LO12)], [Ex_I];
     // jalr rs1 (subformat of rv_i::jalr) (i)
     Single(0x000000E7), RV32 | RV64, [X] => [R(15)], [Ex_I];
 ],
@@ -1261,7 +1261,7 @@ Ops!(
     // alias for
     // lui rd, imm.roundrightshift(12)
     // addi rd, rd, imm & 0xFFF
-    Double(0x00000037, 0x00000013), RV32 | RV64, [X, Imm] => [
+    Double(0x00000037, 0x00000013), RV32       , [X, Imm] => [
         R(7),
         Repeat, R(7+32), Repeat, R(15+32),
         SImm(32, 0),
@@ -1269,59 +1269,16 @@ Ops!(
         BitRange(20+32, 12, 0),
         Next
     ], [Ex_I];
-],
-"li.44" = [
     // alias for
-    // lui rd, imm.roundrightshift(24)
-    // addiW rd, rd, imm.roundrightshift(12) & 0xFFF
-    // slli rd, rd, 12
-    // addi rd, rd, imm & 0xFFF
-    Many(&[0x00000037, 0x00000013, 0x00C01013, 0x00000013]),        RV64, [X, Imm] => [
-        R(7),
-        Repeat, R(7+32), Repeat, R(15+32),
-        Repeat, R(7+64), Repeat, R(15+64),
-        Repeat, R(7+96), Repeat, R(15+96),
-        BigImm(44),
-        RBitRange(12, 20, 24),
-        RBitRange(20+32, 12, 12),
-        BitRange(20+96, 12, 0),
-        Next
-    ], [Ex_I];
-],
-"li.56" = [
-    // alias for
-    // lui rd, imm.roundrightshift(36) & 0xFFF
-    // addi rd, rd, imm.roundrightshift(24) & 0xFFF
-    // slli rd, rd, 12
-    // addi rd, rd, imm.roundrightshift(12) & 0xFFF
-    // slli rd, rd, 12
-    // addi rd, rd, imm & 0xFFF
-    Many(&[0x00000037, 0x00000013, 0x00C01013, 0x00000013, 0x00C01013, 0x00000013]),        RV64, [X, Imm] => [
-        R(7),
-        Repeat, R(7+32), Repeat, R(15+32),
-        Repeat, R(7+64), Repeat, R(15+64),
-        Repeat, R(7+96), Repeat, R(15+96),
-        Repeat, R(7+128), Repeat, R(15+128),
-        Repeat, R(7+160), Repeat, R(15+160),
-        BigImm(56),
-        RBitRange(12, 20, 36),
-        RBitRange(20+32, 12, 24),
-        RBitRange(20+96, 12, 12),
-        BitRange(20+160, 12, 0),
-        Next
-    ], [Ex_I];
-],
-"li.64" = [
-    // alias for
-    // lui rd, imm.roundrightshift(48)
-    // addi rd, rd, imm.roundrightshift(36) & 0xFFF
-    // slli rd, rd, 12
-    // addi rd, rd, imm.roundrightshift(24) & 0xFFF
-    // slli rd, rd, 12
-    // addi rd, rd, imm.roundrightshift(12) & 0xFFF
-    // slli rd, rd, 12
-    // addi rd, rd, imm & 0xFFF
-    Many(&[0x00000037, 0x00000013, 0x00C01013, 0x00000013, 0x00C01013, 0x00000013, 0x00C01013, 0x00000013]),        RV64, [X, Imm] => [
+    // lui rd, imm.roundrightshift(45)
+    // addiw rd, rd, imm >> 33 & 0xFFF
+    // slli rd, rd, 11
+    // addi rd, rd, imm >> 22 & 0x7FF
+    // slli rd, rd, 11
+    // addi rd, rd, imm >> 11 & 0x7FF
+    // slli rd, rd, 11
+    // addi rd, rd, imm & 0x7FF
+    Many(&[0x00000037, 0x0000001B, 0x00B01013, 0x00000013, 0x00B01013, 0x00000013, 0x00B01013, 0x00000013]),        RV64, [X, Imm] => [
         R(7),
         Repeat, R(7+32), Repeat, R(15+32),
         Repeat, R(7+64), Repeat, R(15+64),
@@ -1331,11 +1288,65 @@ Ops!(
         Repeat, R(7+192), Repeat, R(15+192),
         Repeat, R(7+224), Repeat, R(15+224),
         BigImm(64),
-        RBitRange(12, 16, 48),
-        RBitRange(20+32, 12, 36),
-        RBitRange(20+96, 12, 24),
-        RBitRange(20+160, 12, 12),
-        BitRange(20+224, 12, 0),
+        RBitRange(12, 19, 45),
+        BitRange(20+32, 12, 33),
+        BitRange(20+96, 11, 22),
+        BitRange(20+160, 11, 11),
+        BitRange(20+224, 11, 0),
+        Next
+    ], [Ex_I];
+],
+"li.w" = [
+    // alias for
+    // lui rd, imm.roundrightshift(12)
+    // addiw rd, rd, imm & 0xFFF
+    Double(0x00000037, 0x0000001B),        RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        SImm(32, 0),
+        RBitRange(12, 20, 12),
+        BitRange(20+32, 12, 0),
+        Next
+    ], [Ex_I];
+],
+"li.43" = [
+    // alias for
+    // lui rd, imm.roundrightshift(23)
+    // addiw rd, rd, imm >> 11 & 0xFFF
+    // slli rd, rd, 11
+    // addi rd, rd, imm & 0x7FF
+    Many(&[0x00000037, 0x0000001B, 0x00B01013, 0x00000013]),        RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        Repeat, R(7+64), Repeat, R(15+64),
+        Repeat, R(7+96), Repeat, R(15+96),
+        BigImm(43),
+        RBitRange(12, 20, 23),
+        BitRange(20+32, 12, 11),
+        BitRange(20+96, 11, 0),
+        Next
+    ], [Ex_I];
+],
+"li.54" = [
+    // alias for
+    // lui rd, imm.roundrightshift(34) & 0xFFF
+    // addiw rd, rd, imm >> 22 & 0xFFF
+    // slli rd, rd, 11
+    // addi rd, rd, imm >> 11 & 0x7FF
+    // slli rd, rd, 11
+    // addi rd, rd, imm & 0x7FF
+    Many(&[0x00000037, 0x0000001B, 0x00B01013, 0x00000013, 0x00B01013, 0x00000013]),        RV64, [X, Imm] => [
+        R(7),
+        Repeat, R(7+32), Repeat, R(15+32),
+        Repeat, R(7+64), Repeat, R(15+64),
+        Repeat, R(7+96), Repeat, R(15+96),
+        Repeat, R(7+128), Repeat, R(15+128),
+        Repeat, R(7+160), Repeat, R(15+160),
+        BigImm(54),
+        RBitRange(12, 20, 34),
+        BitRange(20+32, 12, 22),
+        BitRange(20+96, 11, 11),
+        BitRange(20+160, 11, 0),
         Next
     ], [Ex_I];
 ],
