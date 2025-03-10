@@ -1165,6 +1165,12 @@ Ops!(
     // bnez bimm12hi, rs1, bimm12lo (subformat of rv_i::bne) (i)
     Single(0x00001063), RV32 | RV64, [X, Offset] => [R(15), Offset(B)], [Ex_I];
 ],
+"call" = [
+    // pseudo instruction for auipc x1, imm.roundshift(20); jalr x1, x1, imm & 0xFFF
+    Double(0x00000097, 0x000080E7), RV32 | RV64, [Offset] => [Offset(SPLIT32)], [Ex_I];
+    // pseudo instruction for auipc rd, imm.roundshift(20); jalr rd, rd, imm & 0xFFF
+    Double(0x00000017, 0x00000067), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
+],
 "ebreak" = [
     // ebreak  (i)
     Single(0x00100073), RV32 | RV64, [] => [], [Ex_I];
@@ -1522,6 +1528,12 @@ Ops!(
     Single(0x00002023), RV32 | RV64, [X, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_I];
     // Pseudo instruction for auipc rt, hi20(symbol); sw, rd, rt, lo12(symbol)
     Double(0x00000017, 0x00002023), RV32 | RV64, [X, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_I];
+],
+"tail" = [
+    // pseudo instruction for auipc x7, imm.roundshift(20); jalr x0, x7, imm & 0xFFF
+    Double(0x00000397, 0x00038067), RV32 | RV64, [Offset] => [Offset(SPLIT32)], [Ex_Zicfilp];
+    // pseudo instruction for auipc x6, imm.roundshift(20); jalr x0, x6, imm & 0xFFF
+    Double(0x00000317, 0x00030067), RV32 | RV64, [Offset] => [Offset(SPLIT32)], [Ex_I];
 ],
 "unimp" = [
     // guaranteed to not be a valid instruction (it is a write to a read-only CSR)

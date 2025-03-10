@@ -21,18 +21,23 @@ def read_test_strings(f):
 
 def compile_with_as(asmstring, extensions, is_64bit=True, is_32bit=False):
     with open("test.s", "w", encoding="utf-8") as f:
+        f.write(".global _start\n")
+        f.write("_start:\n")
         f.write(asmstring)
         f.write("\n")
 
     if is_64bit:
         arch = "rv64i" + extensions
+        ldemulation = "elf64lriscv"
     elif is_32bit:
         arch = "rv32i" + extensions
+        ldemulation = "elf32lriscv"
     else:
         raise ValueError("Unknown architecture")
 
     subprocess.run(["as", f"-march={arch}", "-mlittle-endian", "-mno-relax", "test.s", "-o", "test.o"], check=True, capture_output=True)
-    subprocess.run(["objcopy", "-O", "binary", "test.o", "test.bin"], check=True)
+    subprocess.run(["ld", "-m", ldemulation, "test.o", "-o", "test.elf"], check=True)
+    subprocess.run(["objcopy", "-O", "binary", "test.elf", "test.bin"], check=True)
 
     with open("test.bin", "rb") as f:
         data = f.read()
