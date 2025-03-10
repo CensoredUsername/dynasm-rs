@@ -29,7 +29,7 @@ macro_rules! reg_impls {
 pub mod x64;
 pub mod x86;
 pub mod aarch64;
-pub mod riscv64;
+pub mod riscv;
 
 pub use crate::mmap::ExecutableBuffer;
 pub use dynasm::{dynasm, dynasm_backwards};

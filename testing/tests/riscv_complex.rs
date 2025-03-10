@@ -19,12 +19,13 @@ macro_rules! my_dynasm {
 
 #[test]
 fn complex() {
-    let mut ops = dynasmrt::SimpleAssembler::new();
+    let mut ops = dynasmrt::riscv::Assembler::new().unwrap();
     // let d = 3i32;
     let c = 4u32;
 
     // interesting testcases
     my_dynasm!(ops
+        ; test:
         // no args
         ; nop
         // short
@@ -63,10 +64,29 @@ fn complex() {
         ; fli.q f4, 1.0
         ; csrrc x1, fflags, x2
         ; csrrc x1, 1, x2
-
+        // all the branches
+        ; beqz x31, <test
+        ; j <test
+        ; c.beqz x8, <test
+        ; c.j <test
+        ; auipc x1, <test
+        ; jalr ra, x1, <test + 4
+        ; lw x2, [x1, <test + 8]
+        ; sw x2, [x1, <test + 12]
+        ; lw x1, <test
+        ; sw x1, <test, x2
+        ; la x1, <test
+        ; call <test
+        ; jump <test, x2
+        ; tail <test
+        // load immediates
+        ; li.w x4, 0x7FFFF_FFF
+        ; li.43 x4, 0x3FFF_FFFF_FFF
+        ; li.54 x4, 0x1FFF_FFFF_FFFF_FF
+        ; li x4, 0x7FFF_FFFF_FFFF_FFFF
     );
 
-    let buf = ops.finalize();
+    let buf = ops.finalize().unwrap();
 
     println!("Generated assembly:");
     for i in buf.iter() {

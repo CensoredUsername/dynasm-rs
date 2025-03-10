@@ -99,7 +99,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                     {
                                         let _dyn_reg: u8 = #expr;
                                         if _dyn_reg == #code {
-                                            ::dynasmrt::riscv64::invalid_register(#code);
+                                            ::dynasmrt::riscv::invalid_register(#code);
                                         }
                                         0u32
                                     }
@@ -132,7 +132,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg: u8 = #expr;
                             if _dyn_reg & 0x1 != 0x0 {
-                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x1E) as u32
                         }
@@ -143,7 +143,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg: u8 = #expr;
                             if _dyn_reg == 0x0 {
-                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x1F) as u32
                         }
@@ -154,7 +154,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg: u8 = #expr;
                             if _dyn_reg == 0x0 || _dyn_reg == 0x2 {
-                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x1F) as u32
                         }
@@ -165,7 +165,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg: u8 = #expr;
                             if _dyn_reg & 0x18 != 0x8 {
-                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x7) as u32
                         }
@@ -176,7 +176,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         {
                             let _dyn_reg: u8 = #expr;
                             if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 {
-                                ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x7) as u32
                         }
@@ -189,7 +189,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             {
                                 let _dyn_reg: u8 = #expr;
                                 if (_dyn_reg == #code) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) {
-                                    ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                    ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                 }
                                 (_dyn_reg & 0x7) as u32
                             }
@@ -201,7 +201,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 let _dyn_reg: u8 = #expr;
                                 let _dyn_reg_prev: u8 = #expr2;
                                 if (_dyn_reg == _dyn_reg_prev) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) {
-                                    ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                    ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                 }
                                 (_dyn_reg & 0x7) as u32
                             }
@@ -239,7 +239,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 {
                                     let _dyn_reg: u32 = #expr;
                                     if _dyn_reg == 11 || _dyn_reg > 12 {
-                                        ::dynasmrt::riscv64::invalid_register(_dyn_reg);
+                                        ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                     }
                                     (_dyn_reg + if (_dyn_reg == 12) { 3 } else { 4 }) & 0xF
                                 }
@@ -519,7 +519,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 Command::BitRange(8, 1, 10),
                                 Command::BitRange(7, 1, 6),
                                 Command::BitRange(6, 1, 7),
-                                Command::BitRange(3, 3, 1), 
+                                Command::BitRange(3, 3, 1),
                                 Command::BitRange(2, 1, 5),
                                 Command::Next
                             ]; // why
@@ -763,7 +763,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             #imm_expr
                             #bias_expr
                             if (_dyn_imm < _reglist_bias) || ((_dyn_imm - _reglist_bias) > 48) || ((_dyn_imm & 15) != 0) {
-                                ::dynasmrt::riscv64::immediate_out_of_range_signed_32(_dyn_imm);
+                                ::dynasmrt::riscv::immediate_out_of_range_signed_32(_dyn_imm);
                             }
                             (_dyn_imm - _reglist_bias) as u32 >> 4
                         }
@@ -1009,16 +1009,16 @@ impl<'a> ImmediateEncoder<'a> {
                 first = false;
                 let error_expr = match (is_64bit, is_signed) {
                     (false, false) => quote_spanned!{ span=>
-                        ::dynasmrt::riscv64::immediate_out_of_range_unsigned_32
+                        ::dynasmrt::riscv::immediate_out_of_range_unsigned_32
                     },
                     (false, true)  => quote_spanned!{ span=>
-                        ::dynasmrt::riscv64::immediate_out_of_range_signed_32
+                        ::dynasmrt::riscv::immediate_out_of_range_signed_32
                     },
                     (true, false)  => quote_spanned!{ span=>
-                        ::dynasmrt::riscv64::immediate_out_of_range_unsigned_64
+                        ::dynasmrt::riscv::immediate_out_of_range_unsigned_64
                     },
                     (true, true)   => quote_spanned!{ span=>
-                        ::dynasmrt::riscv64::immediate_out_of_range_signed_64
+                        ::dynasmrt::riscv::immediate_out_of_range_signed_64
                     }
                 };
 
