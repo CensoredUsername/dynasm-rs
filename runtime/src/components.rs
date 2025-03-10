@@ -359,11 +359,10 @@ impl<R: Relocation> PatchLoc<R> {
     /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
     /// `adjustment` is `new_buf_addr - old_buf_addr`.
     pub fn adjust(&self, buffer: &mut [u8], adjustment: isize) -> Result<(), ImpossibleRelocation> {
-        let value = self.relocation.read_value(buffer);
         let value = match self.relocation.kind() {
-            RelocationKind::Relative => value,
-            RelocationKind::RelToAbs => value.wrapping_sub(adjustment),
-            RelocationKind::AbsToRel => value.wrapping_add(adjustment),
+            RelocationKind::Relative => return Ok(()),
+            RelocationKind::RelToAbs => self.relocation.read_value(buffer).wrapping_sub(adjustment),
+            RelocationKind::AbsToRel => self.relocation.read_value(buffer).wrapping_add(adjustment),
         };
         self.relocation.write_value(buffer, value)
     }

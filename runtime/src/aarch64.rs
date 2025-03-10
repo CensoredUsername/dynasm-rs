@@ -12,7 +12,7 @@
 //!
 //! ## Enums
 //!
-//! There are enumerator of every logically distinct register family usable in aarch64. 
+//! There are enumerations of every logically distinct register family usable in aarch64.
 //! These enums implement the [`Register`] trait and their discriminant values match their numeric encoding in dynamic register literals.
 //!
 //! *Note: The presence of some registers listed here is purely what is encodable. Check the relevant architecture documentation to find what is architecturally valid.*
@@ -175,7 +175,7 @@ impl Relocation for Aarch64Relocation {
             Self::Plain(_) => unreachable!()
         };
         let offset = 1u64 << (bits - 1);
-        let value: u64 = (unpacked ^ offset) - offset;
+        let value: u64 = (unpacked ^ offset).wrapping_sub(offset);
 
         value as i64 as isize
     }
