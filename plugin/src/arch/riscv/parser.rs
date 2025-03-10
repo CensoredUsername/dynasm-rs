@@ -10,8 +10,6 @@ use crate::parse_helpers::{parse_ident_or_rust_keyword, ParseOptExt, eat_pseudo_
 
 use super::{Context, ast};
 
-// TODO: implement register lists, and References without offset
-
 // syntax for a single op: ident ("." ident)* (arg ("," arg)*)? ";"
 pub(super) fn parse_instruction(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast::ParsedInstruction> {
     let span = input.cursor().span();

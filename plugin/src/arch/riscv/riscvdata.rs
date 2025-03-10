@@ -356,11 +356,37 @@ pub enum Relocation {
     // pc-relative store pseudo instructions
     // 32 bits, no scaling
     SPLIT32S = 8,
+    // 8-bit literal
+    LITERAL8 = 9,
+    // 16-bit literal
+    LITERAL16 = 10,
+    // 32-bit literal
+    LITERAL32 = 12,
+    // 64-bit literal
+    LITERAL64 = 16,
 }
 
 impl Relocation {
     pub fn to_id(self) -> u8 {
         self as u8
+    }
+
+    pub fn size(self) -> u8 {
+        match self {
+            Relocation::LITERAL8 => 1,
+            Relocation::BC
+            | Relocation::JC
+            | Relocation::LITERAL16 => 2,
+            Relocation::B
+            | Relocation::J
+            | Relocation::HI20
+            | Relocation::LO12
+            | Relocation::LO12S
+            | Relocation::LITERAL32 => 4,
+            Relocation::SPLIT32
+            | Relocation::SPLIT32S
+            | Relocation::LITERAL64 => 8
+        }
     }
 }
 

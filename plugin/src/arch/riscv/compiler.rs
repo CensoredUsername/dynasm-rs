@@ -572,7 +572,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 Command::BitRange(25+32, 7, 5),
                                 Command::Next
                             ]
-                        }
+                        },
+                        Relocation::LITERAL8
+                        | Relocation::LITERAL16
+                        | Relocation::LITERAL32
+                        | Relocation::LITERAL64 => panic!("Literal relocation in instruction"),
                     }
 
                     let span = value.span();
@@ -770,12 +774,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
             FlatArg::JumpTarget { ref jump } => match *command {
                 Command::Offset( relocation ) => {
-                    // encode the complete relocation. Always starts at the begin of the instruction, and also relative to that
-                    // TODO: handle variable instruction width
-                    let stmt = jump.clone().encode(4, 4, &[relocation.to_id()]);
+                    // encode the complete relocation. Always starts at the begin of the instruction(s), and also relative to that
+                    let stmt = jump.clone().encode(relocation.size(), relocation.size(), &[relocation.to_id()]);
 
                     relocations.push(stmt);
-                    todo!();
                 },
                 _ => panic!("Invalid argument processor")
             }
