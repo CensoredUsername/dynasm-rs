@@ -1084,6 +1084,8 @@ Ops!(
 "addiw" = [
     // addiw rd, rs1, imm12 (i)
     Single(0x0000001B),        RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // addiw as part of address building
+    Single(0x0000001B),        RV64, [X, X, Offset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "addw" = [
     // addw rd, rs1, rs2 (i)
