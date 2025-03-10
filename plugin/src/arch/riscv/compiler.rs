@@ -4,7 +4,7 @@ use super::ast::{MatchData, FlatArg, RegListFlat, Register};
 
 use syn::spanned::Spanned;
 use quote::{quote, quote_spanned};
-use proc_macro2::{TokenStream, Span};
+use proc_macro2::{TokenStream, Span, Literal};
 use proc_macro_error2::emit_error;
 
 use crate::parse_helpers::{as_signed_number, as_ident, as_float};
@@ -944,6 +944,9 @@ impl<'a> ImmediateEncoder<'a> {
                         statics.push((offset, slice));
 
                     } else {
+                        // ensure we emit an unsuffixed literal for this so it works with all
+                        // types of number
+                        let round_offset = Literal::i64_unsuffixed(round_offset);
                         self.encodes.push((offset, quote_spanned!{ self.span=>
                             ((_dyn_imm.wrapping_add(#round_offset) >> #scaling) as u32 & #mask)
                         }));
@@ -988,7 +991,7 @@ impl<'a> ImmediateEncoder<'a> {
             }
         }
 
-        let imm_ty = match (is_signed, is_64bit) {
+        let imm_ty = match (is_64bit, is_signed) {
             (false, false) => quote_spanned!{ span=> u32 },
             (false, true)  => quote_spanned!{ span=> i32 },
             (true, false)  => quote_spanned!{ span=> u64 },
@@ -1004,7 +1007,7 @@ impl<'a> ImmediateEncoder<'a> {
 
             if first {
                 first = false;
-                let error_expr = match (is_signed, is_64bit) {
+                let error_expr = match (is_64bit, is_signed) {
                     (false, false) => quote_spanned!{ span=>
                         ::dynasmrt::riscv64::immediate_out_of_range_unsigned_32
                     },
