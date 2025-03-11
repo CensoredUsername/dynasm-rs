@@ -10,23 +10,23 @@ extern crate dynasmrt;
 use dynasmrt::dynasm;
 use dynasmrt::{DynasmApi, DynasmLabelApi};
 
-#[cfg(target_arch="aarch64")]
+#[cfg(target_arch="riscv64")]
 #[test]
 fn test_cache_coherency_same_core() {
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::riscv::Assembler::new().unwrap();
     let reader = ops.reader();
 
     // write some code
     let start = ops.offset();
     dynasm!(ops
-        ; .arch aarch64
-        ; mov w0, 0xABCD
+        ; .arch riscv64
+        ; li a0, 0xABCD
         ; ret
     );
     let end = ops.offset();
 
     ops.commit().unwrap();
-    
+
     // execute it once
     {
         let buf = reader.lock();
@@ -42,8 +42,8 @@ fn test_cache_coherency_same_core() {
             modifier.goto(start);
 
             dynasm!(modifier
-                ; .arch aarch64
-                ; mov w0, 0xCDEF
+                ; .arch riscv64
+                ; li a0, 0xCDEF
                 ; ret
             );
             modifier.check_exact(end).unwrap();
@@ -63,8 +63,8 @@ fn test_cache_coherency_same_core() {
             modifier.goto(start);
 
             dynasm!(modifier
-                ; .arch aarch64
-                ; mov w0, 0xABCD
+                ; .arch riscv64
+                ; li a0, 0xABCD
                 ; ret
             );
             modifier.check_exact(end).unwrap();
@@ -81,7 +81,7 @@ fn test_cache_coherency_same_core() {
     }
 }
 
-#[cfg(target_arch="aarch64")]
+#[cfg(target_arch="riscv64")]
 #[test]
 fn test_cache_coherency_other_cores() {
     // spawn a bunch of threads, and have them all racing to execute some assembly
@@ -99,11 +99,11 @@ fn test_cache_coherency_other_cores() {
     let second_value = AtomicU32::new(0xDEADC0DE);
     let rejoin_threads = AtomicBool::new(false);
 
-    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+    let mut ops = dynasmrt::riscv::Assembler::new().unwrap();
 
     // write some code;
     dynasm!(ops
-        ; .arch aarch64
+        ; .arch riscv64
         ; .align 8
         ; -> first_addr:
         ; .u64 first_value.as_ptr() as *mut u8 as _
@@ -112,15 +112,15 @@ fn test_cache_coherency_other_cores() {
     );
     let start = ops.offset();
     dynasm!(ops
-        ; .arch aarch64
-        ; adr x1, ->first_addr
-        ; adr x2, ->second_addr
+        ; .arch riscv64
+        ; la t0, ->first_addr
+        ; la t1, ->second_addr
     );
     let edit = ops.offset();
     dynasm!(ops
-        ; .arch aarch64
-        ; ldr x0, [x1]
-        ; ldr w0, [x0]
+        ; .arch riscv64
+        ; ld t2, [t0]
+        ; lwu a0, [t2]
         ; ret
     );
     let end = ops.offset();
@@ -147,6 +147,7 @@ fn test_cache_coherency_other_cores() {
 
                     let value = callable();
                     if value != 0x12345678 {
+                        assert_eq!(value, 0xDEADC0DE, "something worse is broken");
                         bad_results += 1;
                     }
                 }
@@ -164,16 +165,16 @@ fn test_cache_coherency_other_cores() {
                 modifier.goto(edit);
 
                 dynasm!(modifier
-                    ; .arch aarch64
-                    ; ldr x0, [x2]
-                    ; ldr w0, [x0]
+                    ; .arch riscv64
+                    ; ld t2, [t1]
+                    ; lwu a0, [t2]
                     ; ret
                 );
                 modifier.check_exact(end).unwrap();
 
                 // also change the values. ordering is relaxed as the lock of the assembler
                 // guarantees that these values will be visible.
-                first_value.store(0xDEADBEEF, Ordering::Relaxed);
+                first_value.store(0xDEADC0DE, Ordering::Relaxed);
                 second_value.store(0x12345678, Ordering::Relaxed);
 
             }).unwrap();
@@ -186,9 +187,9 @@ fn test_cache_coherency_other_cores() {
                 modifier.goto(edit);
 
                 dynasm!(modifier
-                    ; .arch aarch64
-                    ; ldr x0, [x1]
-                    ; ldr w0, [x0]
+                    ; .arch riscv64
+                    ; ld t2, [t0]
+                    ; lwu a0, [t2]
                     ; ret
                 );
                 modifier.check_exact(end).unwrap();
@@ -196,10 +197,10 @@ fn test_cache_coherency_other_cores() {
                 // also change the values. ordering is relaxed as the lock of the assembler
                 // guarantees that these values will be visible.
                 first_value.store(0x12345678, Ordering::Relaxed);
-                second_value.store(0xDEADBEEF, Ordering::Relaxed);
+                second_value.store(0xDEADC0DE, Ordering::Relaxed);
 
             }).unwrap();
-            
+
             // wait a bit more
             std::thread::sleep(std::time::Duration::from_millis(1));
         }

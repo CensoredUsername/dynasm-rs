@@ -7,12 +7,16 @@
 /// This function should be called before any jit-compiled code is executed, on the thread that will
 /// execute this code.
 #[inline(always)]
-pub fn prepare_for_execution() {
+pub fn prepare_for_execution(slice: &[u8]) {
+    #![allow(unused_variables)]
     #[cfg(target_arch="aarch64")]
     {
         aarch64::prepare_for_execution()
     }
-
+    #[cfg(any(target_arch="riscv64", target_arch="riscv32"))]
+    {
+        riscv::enforce_ordering_dcache_icache(slice, true);
+    }
 }
 
 /// This function should be called after modification of any data that could've been loaded into the
@@ -146,5 +150,47 @@ mod aarch64 {
 
         // wait for that to complete as well
         wait_for_cache_ops_complete();
+    }
+}
+
+#[cfg(any(target_arch="riscv64", target_arch="riscv32"))]
+mod riscv {
+    // On risc-v, the story about how we synchronize caches is confused.
+    // The data sheet states that we ought to do the following.
+    // 1: on the assembling hart, perform a data fence to ensure that
+    //    any stores will be visible to other harts
+    // 2: on the executing hart, perform a fence.i instruction fence to
+    //    ensure that all the observed stores are visible to our instruction
+    //    fetches
+    //
+    // however, this doesn't solve all problems. Namely, the OS might just move our process
+    // from the current hart to another hart after the fence.i instruction. So it basically
+    // offers no guarantees. for this reason, linux has removed FENCE.I from the user ABI, and
+    // instead offered a syscall for managing this.
+    // this is `riscv_flush_icache()`, which has options to apply to a single thread, or all threads
+    // and over a range of addresses.
+    // as there are no other operating systems targetting risc-v right now, this is the only choice
+    // we have.
+    use std::ffi::{c_void, c_long, c_int};
+
+    #[cfg(unix)]
+    extern "C" {
+        #[link_name="__riscv_flush_icache"]
+        fn riscv_flush_icache(start: *const c_void, end: *const c_void, flags: c_long) -> c_int;
+    }
+
+    pub fn enforce_ordering_dcache_icache(slice: &[u8], local: bool) {
+        let range = slice.as_ptr_range();
+        let start = range.start as *const c_void;
+        let end = range.end as *const c_void;
+        let mut flags: c_long = 0;
+        if local {
+            flags |= 1;
+        }
+        let rv;
+        unsafe {
+            rv = riscv_flush_icache(start, end, flags);
+        }
+        assert!(rv == 0, "riscv_flush_icache failed, returned {rv}");
     }
 }

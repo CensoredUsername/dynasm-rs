@@ -93,7 +93,7 @@ impl Executor {
     #[inline]
     pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
         let guard = self.execbuffer.read().unwrap();
-        cache_control::prepare_for_execution();
+        cache_control::prepare_for_execution(&*guard);
         guard
     }
 }
@@ -669,7 +669,7 @@ impl<R: Relocation> Assembler<R> {
         self.commit().expect("Errors were encountered when committing before finalization");
         match self.memory.finalize() {
             Ok(execbuffer) => {
-                cache_control::prepare_for_execution();
+                cache_control::prepare_for_execution(&execbuffer);
                 Ok(execbuffer)
             },
             Err(memory) => Err(Self {
