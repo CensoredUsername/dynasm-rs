@@ -292,7 +292,7 @@ pub enum Command {
     /// lower .1 bits are 0
     UImm(u8, u8),
 
-    /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
+    /// validate that the current arg is a signed value that fits in .0 bits, and that the
     /// lower .1 bits are 0
     SImm(u8, u8),
 
@@ -303,7 +303,7 @@ pub enum Command {
     /// lower .1 bits are 0. Also check that the immediate is not 0
     UImmNo0(u8, u8),
 
-    /// validate that the current arg is an unsigned value that fits in .0 bits, and that the
+    /// validate that the current arg is a signed value that fits in .0 bits, and that the
     /// lower .1 bits are 0. Also check that the immediate is not 0
     SImmNo0(u8, u8),
 
@@ -312,7 +312,7 @@ pub enum Command {
     UImmOdd(u8, u8),
 
     /// Validate that the given argument conforms to .0 >= arg >= .1 
-    UImmRange(u32, u32),
+    UImmRange(u16, u16),
 
     // immediate handling, encoding fields.
 
@@ -320,7 +320,7 @@ pub enum Command {
     BitRange(u8, u8, u8),
 
     /// Encode a slice of bits from a value .0 = offset, .1 = amount of bits, .2 = offset in value,
-    /// but add 1 << (offset - 1) to value before encoding to round it
+    /// but add 1 << (.2 - 1) to value before encoding to round it
     RBitRange(u8, u8, u8),
 
     /// some kind of offset for a jump.

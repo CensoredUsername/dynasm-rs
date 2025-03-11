@@ -1203,6 +1203,8 @@ Ops!(
 ],
 "jalr" = [
     // jalr rd, rs1, imm12 (i)
+    Single(0x00000067), RV32 | RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+    // jalr rd, rs1, imm12 (i)
     Single(0x00000067), RV32 | RV64, [X, X, Offset] => [R(7), R(15), Offset(LO12)], [Ex_I];
     // jalr rs1 (subformat of rv_i::jalr) (i)
     Single(0x000000E7), RV32 | RV64, [X] => [R(15)], [Ex_I];
@@ -1280,7 +1282,7 @@ Ops!(
     // addi rd, rd, imm >> 11 & 0x7FF
     // slli rd, rd, 11
     // addi rd, rd, imm & 0x7FF
-    Many(&[0x00000037, 0x0000001B, 0x00B01013, 0x00000013, 0x00B01013, 0x00000013, 0x00B01013, 0x00000013]),        RV64, [X, Imm] => [
+    Many(&[0x00000037, 0x0000001B, 0x00B01013, 0x00000013, 0x00B01013, 0x00000013, 0x00A01013, 0x00000013]),        RV64, [X, Imm] => [
         R(7),
         Repeat, R(7+32), Repeat, R(15+32),
         Repeat, R(7+64), Repeat, R(15+64),
@@ -1290,11 +1292,11 @@ Ops!(
         Repeat, R(7+192), Repeat, R(15+192),
         Repeat, R(7+224), Repeat, R(15+224),
         BigImm(64),
-        RBitRange(12, 19, 45),
-        BitRange(20+32, 12, 33),
-        BitRange(20+96, 11, 22),
-        BitRange(20+160, 11, 11),
-        BitRange(20+224, 11, 0),
+        RBitRange(12, 20, 44),
+        BitRange(20+32, 12, 32),
+        BitRange(20+96, 11, 21),
+        BitRange(20+160, 11, 10),
+        BitRange(20+224, 10, 0),
         Next
     ], [Ex_I];
 ],
@@ -1354,7 +1356,7 @@ Ops!(
 ],
 "lui" = [
     // lui rd, imm20 (i)
-    Single(0x00000037), RV32 | RV64, [X, Imm] => [R(7), UImm(20, 12), BitRange(12, 20, 12), Next], [Ex_I];
+    Single(0x00000037), RV32 | RV64, [X, Imm] => [R(7), SImm(32, 12), BitRange(12, 20, 12), Next], [Ex_I];
 ],
 "lw" = [
     // lw rd, rs1, imm12 (i)
@@ -1717,6 +1719,10 @@ Ops!(
 "flq" = [
     // flq rd, rs1, imm12 (q)
     Single(0x00004007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Q];
+    // as part of a pc-relative load
+    Single(0x00004007), RV32 | RV64, [F, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_Q];
+    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00004007), RV32 | RV64, [F, Offset, X] => [R(7+32), Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_Q];
 ],
 "flt.q" = [
     // flt.q rd, rs1, rs2 (q)
@@ -1783,6 +1789,10 @@ Ops!(
 "fsq" = [
     // fsq imm12hi, rs1, rs2, imm12lo (q)
     Single(0x00004027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Q];
+    // as part of a pc-relative load
+    Single(0x00004027), RV32 | RV64, [F, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_Q];
+    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00004027), RV32 | RV64, [F, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_Q];
 ],
 "fsqrt.q" = [
     // fsqrt.q rd, rs1, rm (q)
@@ -2774,6 +2784,10 @@ Ops!(
 "flh" = [
     // flh rd, rs1, imm12 (zfh)
     Single(0x00001007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Zfh];
+    // as part of a pc-relative load
+    Single(0x00001007), RV32 | RV64, [F, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_Zfh];
+    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00001007), RV32 | RV64, [F, Offset, X] => [R(7+32), Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_Zfh];
 ],
 "flt.h" = [
     // flt.h rd, rs1, rs2 (zfh)
@@ -2848,6 +2862,10 @@ Ops!(
 "fsh" = [
     // fsh imm12hi, rs1, rs2, imm12lo (zfh)
     Single(0x00001027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Zfh];
+    // as part of a pc-relative load
+    Single(0x00001027), RV32 | RV64, [F, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_Zfh];
+    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00001027), RV32 | RV64, [F, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_Zfh];
 ],
 "fsqrt.h" = [
     // fsqrt.h rd, rs1, rm (zfh)

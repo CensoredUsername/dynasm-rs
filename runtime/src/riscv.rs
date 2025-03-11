@@ -122,8 +122,29 @@ impl Relocation for RiscvRelocation {
 
         let (bits, scaling) = self.bitsize();
         let mask = (1i64 << scaling) - 1;
-        if !fits_signed_bitfield(value, bits) || (value & mask) != 0 {
-            return Err(ImpossibleRelocation { } );
+        // special case: the 32-bit AUIPC-based offsets don't actually
+        // range from -0x8000_0000 to 0x7FFF_FFFF on RV64 due to how
+        // sign extension interacts between them, they range from
+        // -0x8000_0800 to 0x7FFF_F7FF. But on RV32 they do span
+        // from -0x8000_0000 to 0x7FFF_FFFF.
+        // neither of these limits will ever occur in practical code,
+        // so for sanity's sake we just clamp to between -0x8000_0000 and
+        // 0x7FFF_F7FF
+        match self {
+            Self::HI20
+            | Self::LO12
+            | Self::LO12S
+            | Self::SPLIT32
+            | Self::SPLIT32S => {
+                if value < -0x8000_0800 || value > 0x7FFF_F7FF {
+                    return Err(ImpossibleRelocation { } );  
+                }
+            },
+            _ => {
+                if !fits_signed_bitfield(value, bits) || (value & mask) != 0 {
+                    return Err(ImpossibleRelocation { } );
+                }
+            }
         }
 
         // we never encode any bit above the 31st so cast now

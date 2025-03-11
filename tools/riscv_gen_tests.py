@@ -33,9 +33,9 @@ RV64_BLACKLIST = {
     "auipc",
     # the sequences gas generates for "li" are unpredictable.
     "li",
-    "li.44",
-    "li.56",
-    "li.64"
+    "li.43",
+    "li.54",
+    "li.w"
 }
 
 def main():
@@ -59,13 +59,13 @@ def main():
         # anything with offset in label
         # call reg, offset
         # as we will have different semantics for those
-        if template.template.startswith("addi") and "Off" in template.template:
+        if template.template.startswith(("addi ", "addiw ", "jalr ")) and "Off" in template.template:
             print(f"skipping {template.template} because it is exempted")
             continue
         if "[" in template.template and "Off" in template.template:
             print(f"skipping {template.template} because it is exempted")
             continue
-        if template.template.startswith("call") and ("x" in template.template or "X" in template.template):
+        if template.template.startswith("call ") and ("x" in template.template or "X" in template.template):
             print(f"skipping {template.template} because it is exempted")
             continue
 

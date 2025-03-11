@@ -235,11 +235,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         } else {
                             // okay, so we're given an expression here, with legal input values
                             // being 0-10 and 12, which should be mapped to 4-14 and 15
+                            // note: this isn't quite the right register error
                             dynamics.push((offset, quote_spanned!{ span=>
                                 {
                                     let _dyn_reg: u32 = #expr;
                                     if _dyn_reg == 11 || _dyn_reg > 12 {
-                                        ::dynasmrt::riscv::invalid_register(_dyn_reg);
+                                        ::dynasmrt::riscv::invalid_register(_dyn_reg as u8);
                                     }
                                     (_dyn_reg + if (_dyn_reg == 12) { 3 } else { 4 }) & 0xF
                                 }
@@ -435,6 +436,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::UImmRange(min, max) => {
                     let span = value.span();
+                    let min = u32::from(min);
+                    let max = u32::from(max);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
                     imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
@@ -524,12 +527,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 Command::Next
                             ]; // why
                         },
-                        // 32 bits, 12-bit scaled
+                        // 32 bits, 12-bit scaled, offset by 0x800
                         Relocation::HI20 => {
                             bits = 32;
-                            scaling = 12;
+                            scaling = 0;
                             commands = &[
-                                Command::BitRange(12, 20, 12),
+                                Command::RBitRange(12, 20, 12),
                                 Command::Next
                             ];
                         },
@@ -552,7 +555,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 Command::Next
                             ];
                         },
-                        // 32 bits, no scaling
+                        // 32 bits, no scaling, offset by 0x800
                         Relocation::SPLIT32 => {
                             bits = 32;
                             scaling = 0;
@@ -560,9 +563,9 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 Command::RBitRange(12, 20, 12),
                                 Command::BitRange(20+32, 12, 0),
                                 Command::Next
-                            ]
+                            ];
                         },
-                        // 32 bits, no scaling
+                        // 32 bits, no scaling, offset by 0x800
                         Relocation::SPLIT32S => {
                             bits = 32;
                             scaling = 0;
@@ -571,7 +574,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 Command::BitRange(7+32, 5, 0),
                                 Command::BitRange(25+32, 7, 5),
                                 Command::Next
-                            ]
+                            ];
                         },
                         Relocation::LITERAL8
                         | Relocation::LITERAL16
@@ -580,8 +583,20 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }
 
                     let span = value.span();
-                    let range = bitmask(bits);
+                    let mut range = bitmask(bits);
                     let min: i32 = (-1) << (bits - 1);
+
+                    // special case: the 32-bit AUIPC-based offsets don't actually
+                    // range from -0x8000_0000 to 0x7FFF_FFFF on RV64 due to how
+                    // sign extension interacts between them, they range from
+                    // -0x8000_0800 to 0x7FFF_F7FF. But on RV32 they do span
+                    // from -0x8000_0000 to 0x7FFF_FFFF.
+                    // neither of these limits will ever occur in practical code,
+                    // so for sanity's sake we just clamp to between -0x8000_0000 and
+                    // 0x7FFF_F7FF
+                    if bits == 32 {
+                        range = 0xFFFF_F7FF;
+                    }
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
                     imm_encoder.gather_fields(commands, 0, &mut statics);
@@ -937,7 +952,7 @@ impl<'a> ImmediateEncoder<'a> {
                 },
                 Some(&Command::RBitRange(offset, bits, scaling)) => {
                     let mask = bitmask(bits);
-                    let round_offset: i64 = if scaling != 0 { 1 << (scaling - 1) } else { 0 };
+                    let round_offset: i64 =  1 << (scaling - 1);
 
                     if let Some(v) = self.static_value {
                         let slice = (v.wrapping_add(round_offset) >> scaling) as u32 & mask;

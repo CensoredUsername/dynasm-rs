@@ -410,7 +410,7 @@ fn emit_constraints(name: &str, prev_name: &str, commands: &[Command], buf: &mut
             Command::Offset(Relocation::JC) => write!(buf, "offset is 11 bits, 2-byte aligned"),
             Command::Offset(Relocation::HI20) => write!(buf, "offset is the 20 highest bits of a 32-bit offset"),
             Command::Offset(Relocation::LO12)
-            | Command::Offset(Relocation::LO12S) => write!(buf, "offset is the 20 lowest bits of a 32-bit offset"),
+            | Command::Offset(Relocation::LO12S) => write!(buf, "offset is the 12 lowest bits of a 32-bit offset"),
             Command::Offset(Relocation::SPLIT32)
             | Command::Offset(Relocation::SPLIT32S) => write!(buf, "offset is 32 bits"),
 
@@ -553,11 +553,11 @@ fn extract_constraints(args: &[ArgWithCommands]) -> Vec<String> {
                 Command::Offset(Relocation::J) => format!("Range(-{}, {}, {})", 1u32 << 19, 1u32 << 19, 2),
                 Command::Offset(Relocation::BC) => format!("Range(-{}, {}, {})", 1u32 << 8, 1u32 << 8, 2),
                 Command::Offset(Relocation::JC) => format!("Range(-{}, {}, {})", 1u32 << 11, 1u32 << 11, 2),
-                Command::Offset(Relocation::HI20) => format!("Range(-{}, {}, {})", 1u32 << 31, 1u32 << 31, 1 << 12),
+                Command::Offset(Relocation::HI20) => format!("Range(-{}, {}, {})", 1u32 << 31, (1u32 << 31) - 0x800, 1 << 12),
                 Command::Offset(Relocation::LO12)
                 | Command::Offset(Relocation::LO12S) => format!("Range(-{}, {}, 1)", 1u32 << 11, 1u32 << 11),
                 Command::Offset(Relocation::SPLIT32)
-                | Command::Offset(Relocation::SPLIT32S) => format!("Range(-{}, {}, 1)", 1u32 << 31, 1u32 << 31),
+                | Command::Offset(Relocation::SPLIT32S) => format!("Range(-{}, {}, 1)", 1u32 << 31, (1u32 << 31) - 0x800),
 
                 _ => continue
             };
