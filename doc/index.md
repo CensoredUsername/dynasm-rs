@@ -11,7 +11,7 @@ translation of assembly templates into rust code, the second part is a
 [small runtime](../runtime/dynasmrt/index.html) that handles the generation of the wanted
 machine code.
 
-Dynasm-rs supports the x86, x64 and aarch64 instruction set architectures.
+Dynasm-rs supports the x86, x64, aarch64, riscv32 and riscv64 instruction set architectures.
 
 Dynasm-rs is inspired by the LuaJIT DynASM project for C and C++.
 
@@ -51,4 +51,8 @@ in dynasm-rs it is `reg => Type.attr`.
 
 ### aarch64
 
-- Unknown.
+- Unknown due to lack of documentation on LuaJIT's dynasm.
+
+### aarch64
+
+- Unknown due to lack of documentation on LuaJIT's dynasm.
