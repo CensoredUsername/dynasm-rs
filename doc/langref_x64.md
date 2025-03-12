@@ -1,8 +1,8 @@
-% Language Reference
+% x64/x86 assembly language reference
 
 # Lexical structure definition
 
-Instructions for the `x86` and `x64` assembling backend use the following lexical structure
+Instructions for the `x86` and `x64` assembling backends use the following lexical structure:
 
 ## Base units
 

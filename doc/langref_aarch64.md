@@ -1,8 +1,8 @@
-% Language Reference
+% aarch64 assembly language reference
 
 # Lexical structure definition
 
-Instructions for the `aarch64` assembling backend use the following lexical structure
+Instructions for the `aarch64` assembling backend use the following lexical structure:
 
 ## Base units
 
@@ -37,7 +37,7 @@ The following base syntax units are recognized by the parser.
 
 `element_specifier : "[" expr "]" ;`
 
-`reference : "[" refitem ("," refitem)* "]" !"? ;`
+`reference : "[" refitem ("," refitem)* "]" "!"? ;`
 
 `refitem : register | modifier_expr | immediate ;`
 
@@ -140,12 +140,12 @@ Table 3: dynasm-rs memory reference formats
 
 Syntax   | Explanation
 :--------|:-----------
-<code>[Xn&#124;SP]</code> | A `WSP` family register is used as the address to be resolved.
-<code>[Xn&#124;SP {, #imm } ]</code> | A `WSP` family register is used as base with an optional integer offset as the address to be resolved.
-<code>[Xn&#124;SP, #imm ]!</code> | A `WSP` family register is used as base with an integer offset as the address to be resolved. The final address is written back to the base register.
-<code>[Xn&#124;SP], #imm</code> | A `WSP` family register is used as the base address to be resolved. Then the immediate is added to the base register and written back.
-<code>[Xn&#124;SP, Wm&#124;Xm {, MOD { #imm } } ]</code> | A `WSP` family register is used as base with an (optionally shifted) index register to compute the final address to be resolved.
-<code>[Xn&#124;SP], Xm </code> | A `WSP` family register is used as the base address to be resolved. Then the second register is added to the base register and written back.
+<code>[Xn&#124;SP]</code> | A `XSP` family register is used as the address to be resolved.
+<code>[Xn&#124;SP {, #imm } ]</code> | A `XSP` family register is used as base with an optional integer offset as the address to be resolved.
+<code>[Xn&#124;SP, #imm ]!</code> | A `XSP` family register is used as base with an integer offset as the address to be resolved. The final address is written back to the base register.
+<code>[Xn&#124;SP], #imm</code> | A `XSP` family register is used as the base address to be resolved. Then the immediate is added to the base register and written back.
+<code>[Xn&#124;SP, Wm&#124;Xm {, MOD { #imm } } ]</code> | A `XSP` family register is used as base with an (optionally shifted) index register to compute the final address to be resolved.
+<code>[Xn&#124;SP], Xm </code> | A `XSP` family register is used as the base address to be resolved. Then the second register is added to the base register and written back.
 
 #### Modifiers
 
