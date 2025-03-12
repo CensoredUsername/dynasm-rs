@@ -1313,6 +1313,10 @@ Ops!(
         Next
     ], [Ex_I];
 ],
+"li.12" = [
+    // alias for addi rd, x0, imm
+    Single(0x00000013), RV32 | RV64, [X, Imm] => [R(7), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
+],
 "li.43" = [
     // alias for
     // lui rd, imm.roundrightshift(23)

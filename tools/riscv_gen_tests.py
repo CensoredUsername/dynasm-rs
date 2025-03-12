@@ -15,6 +15,7 @@ RV32_BLACKLIST = {
     "c.lui",
     "auipc",
     "li",
+    "li.12",
 }
 
 RV64_BLACKLIST = {
@@ -33,6 +34,7 @@ RV64_BLACKLIST = {
     "auipc",
     # the sequences gas generates for "li" are unpredictable.
     "li",
+    "li.12",
     "li.43",
     "li.54",
     "li.w"
