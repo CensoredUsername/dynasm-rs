@@ -1,11 +1,11 @@
 @import url('${RUSTDOC}');
 @import url('${LIGHT}');
 
-code.language-diffnew {
+pre.language-diffnew code {
     background-color: rgb(203, 255, 203);
 }
 
-code.language-diffold {
+pre.language-diffold code {
     background-color: rgb(255, 203, 203);
 }
 
