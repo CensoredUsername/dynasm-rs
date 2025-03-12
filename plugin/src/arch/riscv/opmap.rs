@@ -1084,8 +1084,6 @@ Ops!(
 "addiw" = [
     // addiw rd, rs1, imm12 (i)
     Single(0x0000001B),        RV64, [X, X, Imm] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_I];
-    // addiw as part of address building
-    Single(0x0000001B),        RV64, [X, X, Offset] => [R(7), R(15), Offset(LO12)], [Ex_I];
 ],
 "addw" = [
     // addw rd, rs1, rs2 (i)
@@ -1300,7 +1298,7 @@ Ops!(
         Next
     ], [Ex_I];
 ],
-"li.w" = [
+"li.32" = [
     // alias for
     // lui rd, imm.roundrightshift(12)
     // addiw rd, rd, imm & 0xFFF
@@ -2300,6 +2298,8 @@ Ops!(
 "zext.w" = [
     // zext.w rd, rs1 (subformat of rv64_zba::add.uw) (zba)
     Single(0x0800003B),        RV64, [X, X] => [R(7), R(15)], [Ex_Zba];
+    // alias for slli rd, rs, 32; srli rd, rd, 32
+    Double(0x02001013, 0x02005013),       RV64, [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
 ],
 
 // Extension(s) zbb
@@ -2351,16 +2351,28 @@ Ops!(
 "sext.b" = [
     // sext.b rd, rs1 (zbb)
     Single(0x60401013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zbb];
+    // alias for slli rd, rs, 24; srai rd, rd, 24
+    Double(0x01801013, 0x41805013), RV32      , [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
+    // alias for slli rd, rs, 56; srai rd, rd, 56
+    Double(0x03801013, 0x43805013),       RV64, [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
 ],
 "sext.h" = [
     // sext.h rd, rs1 (zbb)
     Single(0x60501013), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zbb];
+    // alias for slli rd, rs, 16; srai rd, rd, 16
+    Double(0x01001013, 0x41005013), RV32      , [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
+    // alias for slli rd, rs, 48; srai rd, rd, 48
+    Double(0x03001013, 0x43005013),       RV64, [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
 ],
 "zext.h" = [
     // zext.h rd, rs1 (subformat of rv_zbkb::pack) (zbb)
     Single(0x08004033), RV32       , [X, X] => [R(7), R(15)], [Ex_Zbb];
     // zext.h rd, rs1 (subformat of rv64_zbkb::packw) (zbb)
     Single(0x0800403B),        RV64, [X, X] => [R(7), R(15)], [Ex_Zbb];
+    // alias for slli rd, rs, 16; srli rd, rd, 16
+    Double(0x01001013, 0x01005013), RV32      , [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
+    // alias for slli rd, rs, 48; srli rd, rd, 48
+    Double(0x03001013, 0x03005013),       RV64, [X, X] => [R(7), Repeat, R(7+32), Repeat, R(15+32), R(15)], [Ex_I];
 ],
 
 // Extension(s) zbb, zbkb, zk, zkn, zks

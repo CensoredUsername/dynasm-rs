@@ -121,10 +121,10 @@ fn li_64() {
     dynasm!(ops
         ; .arch riscv64
         ; .feature i
-        ; li.w x1, 0x1234_5678
-        ; li.w x2, 0x7FFF_FFFF
-        ; li.w x3, -0x1234_5678
-        ; li.w x4, -0x8000_0000
+        ; li.32 x1, 0x1234_5678
+        ; li.32 x2, 0x7FFF_FFFF
+        ; li.32 x3, -0x1234_5678
+        ; li.32 x4, -0x8000_0000
         ; li.43 x5, 0x345_6789_ABCD
         ; li.43 x6, 0x3FF_FFFF_FFFF
         ; li.43 x7, -0x345_6789_ABCD
@@ -201,7 +201,7 @@ fn pc_rel_address_building_64() {
 
         ; auipc x1, >testlabel
         ; addi x1, x1, >testlabel + 4
-        ; addiw x1, x1, >testlabel + 8
+        ; addi x1, x1, >testlabel + 8
 
         ; la x2, <startlabel
         ; la x3, 0x1234_5678
@@ -214,7 +214,7 @@ fn pc_rel_address_building_64() {
     let buf = ops.finalize().unwrap();
     let hex: Vec<String> = buf.iter().map(|x| format!("{:02X}", *x)).collect();
     let hex = hex.join("");
-    assert_eq!(hex, "97000000938040039B80400317010000130141FF975134129381816717F2FF7F1302F27F97B2CBED938282981703008013030300", "pc relative address building");
+    assert_eq!(hex, "97000000938040039380400317010000130141FF975134129381816717F2FF7F1302F27F97B2CBED938282981703008013030300", "pc relative address building");
 }
 
 #[test]

@@ -35,9 +35,9 @@ RV64_BLACKLIST = {
     # the sequences gas generates for "li" are unpredictable.
     "li",
     "li.12",
+    "li.32",
     "li.43",
     "li.54",
-    "li.w"
 }
 
 def main():

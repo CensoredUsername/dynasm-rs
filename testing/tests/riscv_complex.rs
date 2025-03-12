@@ -80,7 +80,7 @@ fn complex() {
         ; jump <test, x2
         ; tail <test
         // load immediates
-        ; li.w x4, 0x7FFFF_FFF
+        ; li.32 x4, 0x7FFFF_FFF
         ; li.43 x4, 0x3FFF_FFFF_FFF
         ; li.54 x4, 0x1FFF_FFFF_FFFF_FF
         ; li x4, 0x7FFF_FFFF_FFFF_FFFF
