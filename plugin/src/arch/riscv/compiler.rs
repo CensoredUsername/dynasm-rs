@@ -128,10 +128,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::Reven(offset) => {
+                    let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr;
-                            if _dyn_reg & 0x1 != 0x0 {
+                            if _dyn_reg & 0x1 != 0x0 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x1E) as u32
@@ -139,10 +140,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::Rno0(offset) => {
+                    let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr;
-                            if _dyn_reg == 0x0 {
+                            if _dyn_reg == 0x0 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x1F) as u32
@@ -150,10 +152,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::Rno02(offset) => {
+                    let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr;
-                            if _dyn_reg == 0x0 || _dyn_reg == 0x2 {
+                            if _dyn_reg == 0x0 || _dyn_reg == 0x2 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x1F) as u32
@@ -161,10 +164,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::Rpop(offset) => {
+                    let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr;
-                            if _dyn_reg & 0x18 != 0x8 {
+                            if _dyn_reg & 0x18 != 0x8 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x7) as u32
@@ -172,10 +176,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::Rpops(offset) => {
+                    let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr;
-                            if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 {
+                            if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
                             (_dyn_reg & 0x7) as u32
@@ -185,10 +190,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::Rpops2(offset) => match data.args.get(cursor - 1) {
                     Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
                         let code = id2.code() as u8;
+                        let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
                                 let _dyn_reg: u8 = #expr;
-                                if (_dyn_reg == #code) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) {
+                                if (_dyn_reg == #code) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) || (_dyn_reg & #invalid_reg_mask) != 0 {
                                     ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                 }
                                 (_dyn_reg & 0x7) as u32
@@ -196,11 +202,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         }));
                     },
                     Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr2), .. }) => {
+                        let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
                                 let _dyn_reg: u8 = #expr;
                                 let _dyn_reg_prev: u8 = #expr2;
-                                if (_dyn_reg == _dyn_reg_prev) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) {
+                                if (_dyn_reg == _dyn_reg_prev) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) || (_dyn_reg & #invalid_reg_mask) != 0 {
                                     ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                 }
                                 (_dyn_reg & 0x7) as u32
