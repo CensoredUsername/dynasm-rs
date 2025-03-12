@@ -61,6 +61,13 @@ do
         echo -n -e "\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n}\n" >> \
              "./testing/tests/${TARGET}_aarch64.rs"
     fi
+    if [ -f "./doc/examples/${EX}/src/riscv64.rs" ]; then
+        echo -n -e "#[cfg(target_arch=\"riscv64\")]\nmod test {\n" > \
+             "./testing/tests/${TARGET}_riscv64.rs"
+        cat "./doc/examples/${EX}/src/riscv64.rs" >> "./testing/tests/${TARGET}_riscv64.rs"
+        echo -n -e "\n#[test]\nfn ex_${TARGET}()\n{\n    main();\n}\n}\n" >> \
+             "./testing/tests/${TARGET}_riscv64.rs"
+    fi
 done
 
 if [ "$1" == "commit" ]; then
