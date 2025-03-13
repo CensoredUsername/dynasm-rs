@@ -322,9 +322,14 @@ Dynasm-rs currently supports the following ratified RISC-V instruction set exten
 - `Zcmop`: compressed may-be-operations
 - `Zcmp`: microcoded push/pop operations
 - `Zcmt`: table jumps
+- `Zdinx`: double floating point integer registers.
 - `Zfa`: additional floating point instructions
 - `Zfbfmin`: scalar convert to/from BF16
 - `Zfh`: half floating point support
+- `Zfhmin`: half floating point support: conversion only
+- `Zfinx`: floating point in integer registers
+- `Zhinx`: half floating point in integer registers
+- `Zhinxmin`: half floating point in integer registers: conversion only
 - `Zicbom`: cache block operations: management
 - `Zicbop`: cache block operations: prefetching
 - `Zicboz`: cache block operations: zero
@@ -334,7 +339,7 @@ Dynasm-rs currently supports the following ratified RISC-V instruction set exten
 - `Zicond`: integer conditional operations
 - `Zicsr`: control and status registers
 - `Zifencei`: data to instruction cache fence
-- `Zihintntl`: non temporal load hints
+- `Zihintntl`: non temporal locality hints
 - `Zihintpause`: pause hint
 - `Zimop`: may-be-operations
 - `Zk`: Scalar cryptography

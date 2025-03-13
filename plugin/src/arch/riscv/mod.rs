@@ -270,6 +270,16 @@ fn parse_features(features: &[syn::Ident]) -> riscvdata::ExtensionFlags {
             split.insert("zifencei");
         }
 
+        // expand b to Zba_Zbb_Zbs
+        if split.remove(&"b") {
+            split.insert("zba");
+            split.insert("zbb");
+            split.insert("zbs");
+        }
+
+        // remove Ztso as it doesn't add instructions
+        split.remove(&"ztso");
+
         // many extensions
         for s in split.into_iter() {
             let flag = match s {
@@ -294,9 +304,14 @@ fn parse_features(features: &[syn::Ident]) -> riscvdata::ExtensionFlags {
                 "zcmop" => riscvdata::ExtensionFlags::Ex_Zcmop,
                 "zcmp" => riscvdata::ExtensionFlags::Ex_Zcmp,
                 "zcmt" => riscvdata::ExtensionFlags::Ex_Zcmt,
+                "zdinx" => riscvdata::ExtensionFlags::Ex_Zdinx,
                 "zfa" => riscvdata::ExtensionFlags::Ex_Zfa,
                 "zfbfmin" => riscvdata::ExtensionFlags::Ex_Zfbfmin,
                 "zfh" => riscvdata::ExtensionFlags::Ex_Zfh,
+                "zfhmin" => riscvdata::ExtensionFlags::Ex_Zfhmin,
+                "zfinx" => riscvdata::ExtensionFlags::Ex_Zfinx,
+                "zhinx" => riscvdata::ExtensionFlags::Ex_Zhinx,
+                "zhinxmin" => riscvdata::ExtensionFlags::Ex_Zhinxmin,
                 "zicbom" => riscvdata::ExtensionFlags::Ex_Zicbom,
                 "zicbop" => riscvdata::ExtensionFlags::Ex_Zicbop,
                 "zicboz" => riscvdata::ExtensionFlags::Ex_Zicboz,

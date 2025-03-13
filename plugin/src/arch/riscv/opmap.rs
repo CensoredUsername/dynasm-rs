@@ -579,80 +579,120 @@ Ops!(
 "fabs.d" = [
     // fabs.d rd, rs1, rs2=rs1 (subformat of rv_d::fsgnjx.d) (d)
     Single(0x22002053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_D];
+    Single(0x22002053), RV32       , [X, X] => [Reven(7), Reven(15), Repeat, R(20)], [Ex_Zdinx];
+    Single(0x22002053),        RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zdinx];
 ],
 "fadd.d" = [
     // fadd.d rd, rs1, rs2, rm (d)
     Single(0x02000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_D];
+    Single(0x02000053), RV32       , [X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x02000053),        RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zdinx];
     // fadd.d rd, rs1, rs2 (d)
     Single(0x02007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x02007053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x02007053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fclass.d" = [
     // fclass.d rd, rs1 (d)
     Single(0xE2001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D];
+    Single(0xE2001053), RV32       , [X, X] => [R(7), Reven(15)], [Ex_Zdinx];
+    Single(0xE2001053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.d.l" = [
     // fcvt.d.l rd, rs1, rm (d)
     Single(0xD2200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xD2200053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.d.l rd, rs1 (d)
     Single(0xD2207053),        RV64, [F, X] => [R(7), R(15)], [Ex_D];
+    Single(0xD2207053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.d.lu" = [
     // fcvt.d.lu rd, rs1, rm (d)
     Single(0xD2300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xD2300053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.d.lu rd, rs1 (d)
     Single(0xD2307053),        RV64, [F, X] => [R(7), R(15)], [Ex_D];
+    Single(0xD2307053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.d.s" = [
     // fcvt.d.s rd, rs1 (d)
     Single(0x42000053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0x42000053), RV32       , [X, X] => [Reven(7), Reven(15)], [Ex_Zdinx];
+    Single(0x42000053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.d.w" = [
     // fcvt.d.w rd, rs1 (d)
     Single(0xD2000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
+    Single(0xD2000053), RV32       , [X, X] => [Reven(7), R(15)], [Ex_Zdinx];
+    Single(0xD2000053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.d.wu" = [
     // fcvt.d.wu rd, rs1 (d)
     Single(0xD2100053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_D];
+    Single(0xD2100053), RV32       , [X, X] => [Reven(7), R(15)], [Ex_Zdinx];
+    Single(0xD2100053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.l.d" = [
     // fcvt.l.d rd, rs1, rm (d)
     Single(0xC2200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2200053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.l.d rd, rs1 (d)
     Single(0xC2207053),        RV64, [X, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2207053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.lu.d" = [
     // fcvt.lu.d rd, rs1, rm (d)
     Single(0xC2300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2300053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.lu.d rd, rs1 (d)
     Single(0xC2307053),        RV64, [X, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2307053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.s.d" = [
     // fcvt.s.d rd, rs1, rm (d)
     Single(0x40100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0x40100053), RV32       , [X, X, Ident] => [Reven(7), Reven(15), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x40100053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.s.d rd, rs1 (d)
     Single(0x40107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0x40107053), RV32       , [X, X] => [Reven(7), Reven(15)], [Ex_Zdinx];
+    Single(0x40107053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.w.d" = [
     // fcvt.w.d rd, rs1, rm (d)
     Single(0xC2000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2000053), RV32       , [X, X, Ident] => [R(7), Reven(15), RoundingMode(12)], [Ex_Zdinx];
+    Single(0xC2000053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.w.d rd, rs1 (d)
     Single(0xC2007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2007053), RV32       , [X, X] => [R(7), Reven(15)], [Ex_Zdinx];
+    Single(0xC2007053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fcvt.wu.d" = [
     // fcvt.wu.d rd, rs1, rm (d)
     Single(0xC2100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0xC2100053), RV32       , [X, X, Ident] => [R(7), Reven(15), RoundingMode(12)], [Ex_Zdinx];
+    Single(0xC2100053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fcvt.wu.d rd, rs1 (d)
     Single(0xC2107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_D];
+    Single(0xC2107053), RV32       , [X, X] => [R(7), Reven(15)], [Ex_Zdinx];
+    Single(0xC2107053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fdiv.d" = [
     // fdiv.d rd, rs1, rs2, rm (d)
     Single(0x1A000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_D];
+    Single(0x1A000053), RV32       , [X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x1A000053),        RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zdinx];
     // fdiv.d rd, rs1, rs2 (d)
     Single(0x1A007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x1A007053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x1A007053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "feq.d" = [
     // feq.d rd, rs1, rs2 (d)
     Single(0xA2002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0xA2002053), RV32       , [X, X, X] => [R(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0xA2002053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fld" = [
     // fld rd, rs1, imm12 (d)
@@ -665,40 +705,62 @@ Ops!(
 "fle.d" = [
     // fle.d rd, rs1, rs2 (d)
     Single(0xA2000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0xA2000053), RV32       , [X, X, X] => [R(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0xA2000053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "flt.d" = [
     // flt.d rd, rs1, rs2 (d)
     Single(0xA2001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0xA2001053), RV32       , [X, X, X] => [R(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0xA2001053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fmadd.d" = [
     // fmadd.d rd, rs1, rs2, rs3, rm (d)
     Single(0x02000043), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_D];
+    Single(0x02000043), RV32       , [X, X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), Reven(27), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x02000043),        RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zdinx];
     // fmadd.d rd, rs1, rs2, rs3 (d)
     Single(0x02007043), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_D];
+    Single(0x02007043), RV32       , [X, X, X, X] => [Reven(7), Reven(15), Reven(20), Reven(27)], [Ex_Zdinx];
+    Single(0x02007043),        RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zdinx];
 ],
 "fmax.d" = [
     // fmax.d rd, rs1, rs2 (d)
     Single(0x2A001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x2A001053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x2A001053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fmin.d" = [
     // fmin.d rd, rs1, rs2 (d)
     Single(0x2A000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x2A000053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x2A000053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fmsub.d" = [
     // fmsub.d rd, rs1, rs2, rs3, rm (d)
     Single(0x02000047), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_D];
+    Single(0x02000047), RV32       , [X, X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), Reven(27), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x02000047),        RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zdinx];
     // fmsub.d rd, rs1, rs2, rs3 (d)
     Single(0x02007047), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_D];
+    Single(0x02007047), RV32       , [X, X, X, X] => [Reven(7), Reven(15), Reven(20), Reven(27)], [Ex_Zdinx];
+    Single(0x02007047),        RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zdinx];
 ],
 "fmul.d" = [
     // fmul.d rd, rs1, rs2, rm (d)
     Single(0x12000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_D];
+    Single(0x12000053), RV32       , [X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x12000053),        RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zdinx];
     // fmul.d rd, rs1, rs2 (d)
     Single(0x12007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x12007053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x12007053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fmv.d" = [
     // fmv.d rd, rs1, rs2=rs1 (subformat of rv_d::fsgnj.d) (d)
     Single(0x22000053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_D];
+    Single(0x22000053), RV32       , [X, X] => [Reven(7), Reven(15), Repeat, R(20)], [Ex_Zdinx];
+    Single(0x22000053),        RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zdinx];
 ],
 "fmv.d.x" = [
     // fmv.d.x rd, rs1 (d)
@@ -711,18 +773,28 @@ Ops!(
 "fneg.d" = [
     // fneg.d rd, rs1, rs2=rs1 (subformat of rv_d::fsgnjn.d) (d)
     Single(0x22001053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_D];
+    Single(0x22001053), RV32       , [X, X] => [Reven(7), Reven(15), Repeat, R(20)], [Ex_Zdinx];
+    Single(0x22001053),        RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zdinx];
 ],
 "fnmadd.d" = [
     // fnmadd.d rd, rs1, rs2, rs3, rm (d)
     Single(0x0200004F), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_D];
+    Single(0x0200004F), RV32       , [X, X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), Reven(27), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x0200004F),        RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zdinx];
     // fnmadd.d rd, rs1, rs2, rs3 (d)
     Single(0x0200704F), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_D];
+    Single(0x0200704F), RV32       , [X, X, X, X] => [Reven(7), Reven(15), Reven(20), Reven(27)], [Ex_Zdinx];
+    Single(0x0200704F),        RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zdinx];
 ],
 "fnmsub.d" = [
     // fnmsub.d rd, rs1, rs2, rs3, rm (d)
     Single(0x0200004B), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_D];
+    Single(0x0200004B), RV32       , [X, X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), Reven(27), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x0200004B),        RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zdinx];
     // fnmsub.d rd, rs1, rs2, rs3 (d)
     Single(0x0200704B), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_D];
+    Single(0x0200704B), RV32       , [X, X, X, X] => [Reven(7), Reven(15), Reven(20), Reven(27)], [Ex_Zdinx];
+    Single(0x0200704B),        RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zdinx];
 ],
 "fsd" = [
     // fsd imm12hi, rs1, rs2, imm12lo (d)
@@ -735,26 +807,40 @@ Ops!(
 "fsgnj.d" = [
     // fsgnj.d rd, rs1, rs2 (d)
     Single(0x22000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x22000053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x22000053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fsgnjn.d" = [
     // fsgnjn.d rd, rs1, rs2 (d)
     Single(0x22001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x22001053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x22001053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fsgnjx.d" = [
     // fsgnjx.d rd, rs1, rs2 (d)
     Single(0x22002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x22002053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x22002053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 "fsqrt.d" = [
     // fsqrt.d rd, rs1, rm (d)
     Single(0x5A000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D];
+    Single(0x5A000053), RV32       , [X, X, Ident] => [Reven(7), Reven(15), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x5A000053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx];
     // fsqrt.d rd, rs1 (d)
     Single(0x5A007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D];
+    Single(0x5A007053), RV32       , [X, X] => [Reven(7), Reven(15)], [Ex_Zdinx];
+    Single(0x5A007053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx];
 ],
 "fsub.d" = [
     // fsub.d rd, rs1, rs2, rm (d)
     Single(0x0A000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_D];
+    Single(0x0A000053), RV32       , [X, X, X, Ident] => [Reven(7), Reven(15), Reven(20), RoundingMode(12)], [Ex_Zdinx];
+    Single(0x0A000053),        RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zdinx];
     // fsub.d rd, rs1, rs2 (d)
     Single(0x0A007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_D];
+    Single(0x0A007053), RV32       , [X, X, X] => [Reven(7), Reven(15), Reven(20)], [Ex_Zdinx];
+    Single(0x0A007053),        RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zdinx];
 ],
 
 // Extension(s) d_zfa
@@ -808,13 +894,19 @@ Ops!(
 
 "fcvt.d.h" = [
     // fcvt.d.h rd, rs1 (d_zfh)
-    Single(0x42200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfh];
+    Single(0x42200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfh, Ex_D | Ex_Zfhmin];
+    Single(0x42200053), RV32       , [X, X] => [Reven(7), R(15)], [Ex_Zdinx | Ex_Zhinx, Ex_Zdinx | Ex_Zhinxmin];
+    Single(0x42200053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx | Ex_Zhinx, Ex_Zdinx | Ex_Zhinxmin];
 ],
 "fcvt.h.d" = [
     // fcvt.h.d rd, rs1, rm (d_zfh)
-    Single(0x44100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D | Ex_Zfh];
+    Single(0x44100053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_D | Ex_Zfh, Ex_D | Ex_Zfhmin];
+    Single(0x44100053), RV32       , [X, X, Ident] => [R(7), Reven(15), RoundingMode(12)], [Ex_Zdinx | Ex_Zhinx, Ex_Zdinx | Ex_Zhinxmin];
+    Single(0x44100053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zdinx | Ex_Zhinx, Ex_Zdinx | Ex_Zhinxmin];
     // fcvt.h.d rd, rs1 (d_zfh)
-    Single(0x44107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfh];
+    Single(0x44107053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_D | Ex_Zfh, Ex_D | Ex_Zfhmin];
+    Single(0x44107053), RV32       , [X, X] => [R(7), Reven(15)], [Ex_Zdinx | Ex_Zhinx, Ex_Zdinx | Ex_Zhinxmin];
+    Single(0x44107053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zdinx | Ex_Zhinx, Ex_Zdinx | Ex_Zhinxmin];
 ],
 
 // Extension(s) f
@@ -822,82 +914,107 @@ Ops!(
 "fabs.s" = [
     // fabs.s rd, rs1, rs2=rs1 (subformat of rv_f::fsgnjx.s) (f)
     Single(0x20002053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_F];
+    Single(0x20002053), RV32 | RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zfinx];
 ],
 "fadd.s" = [
     // fadd.s rd, rs1, rs2, rm (f)
     Single(0x00000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_F];
+    Single(0x00000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfinx];
     // fadd.s rd, rs1, rs2 (f)
     Single(0x00007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x00007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fclass.s" = [
     // fclass.s rd, rs1 (f)
     Single(0xE0001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
+    Single(0xE0001053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.l.s" = [
     // fcvt.l.s rd, rs1, rm (f)
     Single(0xC0200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0200053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.l.s rd, rs1 (f)
     Single(0xC0207053),        RV64, [X, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0207053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.lu.s" = [
     // fcvt.lu.s rd, rs1, rm (f)
     Single(0xC0300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0300053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.lu.s rd, rs1 (f)
     Single(0xC0307053),        RV64, [X, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0307053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.s.l" = [
     // fcvt.s.l rd, rs1, rm (f)
     Single(0xD0200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0200053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.s.l rd, rs1 (f)
     Single(0xD0207053),        RV64, [F, X] => [R(7), R(15)], [Ex_F];
+    Single(0xD0207053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.s.lu" = [
     // fcvt.s.lu rd, rs1, rm (f)
     Single(0xD0300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0300053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.s.lu rd, rs1 (f)
     Single(0xD0307053),        RV64, [F, X] => [R(7), R(15)], [Ex_F];
+    Single(0xD0307053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.s.w" = [
     // fcvt.s.w rd, rs1, rm (f)
     Single(0xD0000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.s.w rd, rs1 (f)
     Single(0xD0007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_F];
+    Single(0xD0007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.s.wu" = [
     // fcvt.s.wu rd, rs1, rm (f)
     Single(0xD0100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xD0100053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.s.wu rd, rs1 (f)
     Single(0xD0107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_F];
+    Single(0xD0107053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.w.s" = [
     // fcvt.w.s rd, rs1, rm (f)
     Single(0xC0000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.w.s rd, rs1 (f)
     Single(0xC0007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fcvt.wu.s" = [
     // fcvt.wu.s rd, rs1, rm (f)
     Single(0xC0100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0xC0100053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fcvt.wu.s rd, rs1 (f)
     Single(0xC0107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_F];
+    Single(0xC0107053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fdiv.s" = [
     // fdiv.s rd, rs1, rs2, rm (f)
     Single(0x18000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_F];
+    Single(0x18000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfinx];
     // fdiv.s rd, rs1, rs2 (f)
     Single(0x18007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x18007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "feq.s" = [
     // feq.s rd, rs1, rs2 (f)
     Single(0xA0002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0xA0002053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fle.s" = [
     // fle.s rd, rs1, rs2 (f)
     Single(0xA0000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0xA0000053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "flt.s" = [
     // flt.s rd, rs1, rs2 (f)
     Single(0xA0001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0xA0001053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "flw" = [
     // flw rd, rs1, imm12 (f)
@@ -910,32 +1027,41 @@ Ops!(
 "fmadd.s" = [
     // fmadd.s rd, rs1, rs2, rs3, rm (f)
     Single(0x00000043), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_F];
+    Single(0x00000043), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfinx];
     // fmadd.s rd, rs1, rs2, rs3 (f)
     Single(0x00007043), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_F];
+    Single(0x00007043), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zfinx];
 ],
 "fmax.s" = [
     // fmax.s rd, rs1, rs2 (f)
     Single(0x28001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x28001053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fmin.s" = [
     // fmin.s rd, rs1, rs2 (f)
     Single(0x28000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x28000053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fmsub.s" = [
     // fmsub.s rd, rs1, rs2, rs3, rm (f)
     Single(0x00000047), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_F];
+    Single(0x00000047), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfinx];
     // fmsub.s rd, rs1, rs2, rs3 (f)
     Single(0x00007047), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_F];
+    Single(0x00007047), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zfinx];
 ],
 "fmul.s" = [
     // fmul.s rd, rs1, rs2, rm (f)
     Single(0x10000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_F];
+    Single(0x10000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfinx];
     // fmul.s rd, rs1, rs2 (f)
     Single(0x10007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x10007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fmv.s" = [
     // fmv.s rd, rs1, rs2=rs1 (subformat of rv_f::fsgnj.s) (f)
     Single(0x20000053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_F];
+    Single(0x20000053), RV32 | RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zfinx];
 ],
 "fmv.s.x" = [
     // fmv.s.x rd, rs1 (subformat of rv_f::fmv.w.x) (f)
@@ -956,74 +1082,86 @@ Ops!(
 "fneg.s" = [
     // fneg.s rd, rs1, rs2=rs1 (subformat of rv_f::fsgnjn.s) (f)
     Single(0x20001053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_F];
+    Single(0x20001053), RV32 | RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zfinx];
 ],
 "fnmadd.s" = [
     // fnmadd.s rd, rs1, rs2, rs3, rm (f)
     Single(0x0000004F), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_F];
+    Single(0x0000004F), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfinx];
     // fnmadd.s rd, rs1, rs2, rs3 (f)
     Single(0x0000704F), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_F];
+    Single(0x0000704F), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zfinx];
 ],
 "fnmsub.s" = [
     // fnmsub.s rd, rs1, rs2, rs3, rm (f)
     Single(0x0000004B), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_F];
+    Single(0x0000004B), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfinx];
     // fnmsub.s rd, rs1, rs2, rs3 (f)
     Single(0x0000704B), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_F];
+    Single(0x0000704B), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zfinx];
 ],
 "frcsr" = [
     // frcsr rd (subformat of rv_zicsr::csrrs) (f)
-    Single(0x00302073), RV32 | RV64, [X] => [R(7)], [Ex_F];
+    Single(0x00302073), RV32 | RV64, [X] => [R(7)], [Ex_F, Ex_Zfinx];
 ],
 "frflags" = [
     // frflags rd (subformat of rv_zicsr::csrrs) (f)
-    Single(0x00102073), RV32 | RV64, [X] => [R(7)], [Ex_F];
+    Single(0x00102073), RV32 | RV64, [X] => [R(7)], [Ex_F, Ex_Zfinx];
 ],
 "frrm" = [
     // frrm rd (subformat of rv_zicsr::csrrs) (f)
-    Single(0x00202073), RV32 | RV64, [X] => [R(7)], [Ex_F];
+    Single(0x00202073), RV32 | RV64, [X] => [R(7)], [Ex_F, Ex_Zfinx];
 ],
 "fscsr" = [
     // fscsr rd, rs1 (subformat of rv_zicsr::csrrw) (f)
-    Single(0x00301073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F];
+    Single(0x00301073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F, Ex_Zfinx];
 ],
 "fsflags" = [
     // fsflags rd, rs1 (subformat of rv_zicsr::csrrw) (f)
-    Single(0x00101073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F];
+    Single(0x00101073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F, Ex_Zfinx];
 ],
 "fsflagsi" = [
     // fsflagsi rd, zimm (subformat of rv_zicsr::csrrwi) (f)
-    Single(0x00105073), RV32 | RV64, [X, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F];
+    Single(0x00105073), RV32 | RV64, [X, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F, Ex_Zfinx];
 ],
 "fsgnj.s" = [
     // fsgnj.s rd, rs1, rs2 (f)
     Single(0x20000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x20000053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fsgnjn.s" = [
     // fsgnjn.s rd, rs1, rs2 (f)
     Single(0x20001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x20001053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fsgnjx.s" = [
     // fsgnjx.s rd, rs1, rs2 (f)
     Single(0x20002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x20002053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fsqrt.s" = [
     // fsqrt.s rd, rs1, rm (f)
     Single(0x58000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_F];
+    Single(0x58000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfinx];
     // fsqrt.s rd, rs1 (f)
     Single(0x58007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_F];
+    Single(0x58007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zfinx];
 ],
 "fsrm" = [
     // fsrm rd, rs1 (subformat of rv_zicsr::csrrw) (f)
-    Single(0x00201073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F];
+    Single(0x00201073), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_F, Ex_Zfinx];
 ],
 "fsrmi" = [
     // fsrmi rd, zimm (subformat of rv_zicsr::csrrwi) (f)
-    Single(0x00205073), RV32 | RV64, [X, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F];
+    Single(0x00205073), RV32 | RV64, [X, Imm] => [R(7), UImm(5, 0), BitRange(15, 5, 0), Next], [Ex_F, Ex_Zfinx];
 ],
 "fsub.s" = [
     // fsub.s rd, rs1, rs2, rm (f)
     Single(0x08000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_F];
+    Single(0x08000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfinx];
     // fsub.s rd, rs1, rs2 (f)
     Single(0x08007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_F];
+    Single(0x08007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zfinx];
 ],
 "fsw" = [
     // fsw imm12hi, rs1, rs2, imm12lo (f)
@@ -1217,7 +1355,7 @@ Ops!(
 ],
 "la" = [
     // Pseudo instruction for auipc rd, hi20(symbol); addi, rd, rd, lo12(symbol)
-    Double(0x00000017, 0x00000013), RV32 | RV64, [X, Offset] => [R(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
+    Double(0x00000017, 0x00000013), RV32 | RV64, [X, Offset] => [Rno0(7), Repeat, R(7+32), Repeat, R(15+32), Offset(SPLIT32)], [Ex_I];
 ],
 "lb" = [
     // lb rd, rs1, imm12 (i)
@@ -1856,13 +1994,13 @@ Ops!(
 
 "fcvt.h.q" = [
     // fcvt.h.q rd, rs1, rm (q_zfh)
-    Single(0x44300053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q | Ex_Zfh];
+    Single(0x44300053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Q | Ex_Zfh, Ex_Q | Ex_Zfhmin];
     // fcvt.h.q rd, rs1 (q_zfh)
-    Single(0x44307053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh];
+    Single(0x44307053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh, Ex_Q | Ex_Zfhmin];
 ],
 "fcvt.q.h" = [
     // fcvt.q.h rd, rs1 (q_zfh)
-    Single(0x46200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh];
+    Single(0x46200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Q | Ex_Zfh, Ex_Q | Ex_Zfhmin];
 ],
 
 // Extension(s) zabha
@@ -2714,186 +2852,235 @@ Ops!(
 "fabs.h" = [
     // fabs.h rd, rs1, rs2=rs1 (subformat of rv_zfh::fsgnjx.h) (zfh)
     Single(0x24002053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_Zfh];
+    Single(0x24002053), RV32 | RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zhinx];
 ],
 "fadd.h" = [
     // fadd.h rd, rs1, rs2, rm (zfh)
     Single(0x04000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfh];
+    Single(0x04000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zhinx];
     // fadd.h rd, rs1, rs2 (zfh)
     Single(0x04007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x04007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fclass.h" = [
     // fclass.h rd, rs1 (zfh)
     Single(0xE4001053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xE4001053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.h.l" = [
     // fcvt.h.l rd, rs1, rm (zfh)
     Single(0xD4200053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4200053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.h.l rd, rs1 (zfh)
     Single(0xD4207053),        RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4207053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.h.lu" = [
     // fcvt.h.lu rd, rs1, rm (zfh)
     Single(0xD4300053),        RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4300053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.h.lu rd, rs1 (zfh)
     Single(0xD4307053),        RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4307053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.h.s" = [
     // fcvt.h.s rd, rs1, rm (zfh)
-    Single(0x44000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0x44000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh, Ex_Zfhmin];
+    Single(0x44000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx, Ex_Zhinxmin];
     // fcvt.h.s rd, rs1 (zfh)
-    Single(0x44007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0x44007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh, Ex_Zfhmin];
+    Single(0x44007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx, Ex_Zhinxmin];
 ],
 "fcvt.h.w" = [
     // fcvt.h.w rd, rs1, rm (zfh)
     Single(0xD4000053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.h.w rd, rs1 (zfh)
     Single(0xD4007053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.h.wu" = [
     // fcvt.h.wu rd, rs1, rm (zfh)
     Single(0xD4100053), RV32 | RV64, [F, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xD4100053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.h.wu rd, rs1 (zfh)
     Single(0xD4107053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xD4107053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.l.h" = [
     // fcvt.l.h rd, rs1, rm (zfh)
     Single(0xC4200053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4200053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.l.h rd, rs1 (zfh)
     Single(0xC4207053),        RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4207053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.lu.h" = [
     // fcvt.lu.h rd, rs1, rm (zfh)
     Single(0xC4300053),        RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4300053),        RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.lu.h rd, rs1 (zfh)
     Single(0xC4307053),        RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4307053),        RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.s.h" = [
     // fcvt.s.h rd, rs1 (zfh)
-    Single(0x40200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0x40200053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh, Ex_Zfhmin];
+    Single(0x40200053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx, Ex_Zhinxmin];
 ],
 "fcvt.w.h" = [
     // fcvt.w.h rd, rs1, rm (zfh)
     Single(0xC4000053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.w.h rd, rs1 (zfh)
     Single(0xC4007053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fcvt.wu.h" = [
     // fcvt.wu.h rd, rs1, rm (zfh)
     Single(0xC4100053), RV32 | RV64, [X, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0xC4100053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fcvt.wu.h rd, rs1 (zfh)
     Single(0xC4107053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xC4107053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fdiv.h" = [
     // fdiv.h rd, rs1, rs2, rm (zfh)
     Single(0x1C000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfh];
+    Single(0x1C000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zhinx];
     // fdiv.h rd, rs1, rs2 (zfh)
     Single(0x1C007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x1C007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "feq.h" = [
     // feq.h rd, rs1, rs2 (zfh)
     Single(0xA4002053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0xA4002053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fle.h" = [
     // fle.h rd, rs1, rs2 (zfh)
     Single(0xA4000053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0xA4000053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "flh" = [
     // flh rd, rs1, imm12 (zfh)
-    Single(0x00001007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Zfh];
+    Single(0x00001007), RV32 | RV64, [F, RefOffset] => [R(7), R(15), SImm(12, 0), BitRange(20, 12, 0), Next], [Ex_Zfh, Ex_Zfhmin];
     // as part of a pc-relative load
-    Single(0x00001007), RV32 | RV64, [F, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_Zfh];
-    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
-    Double(0x00000017, 0x00001007), RV32 | RV64, [F, Offset, X] => [R(7+32), Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_Zfh];
+    Single(0x00001007), RV32 | RV64, [F, RefLabel] => [R(7), R(15), Offset(LO12)], [Ex_Zfh, Ex_Zfhmin];
+    // Pseudo instruction for auipc rd, hi20(symbol); flh, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00001007), RV32 | RV64, [F, Offset, X] => [R(7+32), Offset(SPLIT32), Rno0(7), Repeat, R(15+32)], [Ex_Zfh, Ex_Zfhmin];
 ],
 "flt.h" = [
     // flt.h rd, rs1, rs2 (zfh)
     Single(0xA4001053), RV32 | RV64, [X, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0xA4001053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fmadd.h" = [
     // fmadd.h rd, rs1, rs2, rs3, rm (zfh)
     Single(0x04000043), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfh];
+    Single(0x04000043), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zhinx];
     // fmadd.h rd, rs1, rs2, rs3 (zfh)
     Single(0x04007043), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_Zfh];
+    Single(0x04007043), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zhinx];
 ],
 "fmax.h" = [
     // fmax.h rd, rs1, rs2 (zfh)
     Single(0x2C001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x2C001053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fmin.h" = [
     // fmin.h rd, rs1, rs2 (zfh)
     Single(0x2C000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x2C000053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fmsub.h" = [
     // fmsub.h rd, rs1, rs2, rs3, rm (zfh)
     Single(0x04000047), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfh];
+    Single(0x04000047), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zhinx];
     // fmsub.h rd, rs1, rs2, rs3 (zfh)
     Single(0x04007047), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_Zfh];
+    Single(0x04007047), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zhinx];
 ],
 "fmul.h" = [
     // fmul.h rd, rs1, rs2, rm (zfh)
     Single(0x14000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfh];
+    Single(0x14000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zhinx];
     // fmul.h rd, rs1, rs2 (zfh)
     Single(0x14007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x14007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fmv.h" = [
     // fmv.h rd, rs1, rs2=rs1 (subformat of rv_zfh::fsgnj.h) (zfh)
     Single(0x24000053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_Zfh];
+    Single(0x24000053), RV32 | RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zhinx];
 ],
 "fmv.h.x" = [
     // fmv.h.x rd, rs1 (zfh)
-    Single(0xF4000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xF4000053), RV32 | RV64, [F, X] => [R(7), R(15)], [Ex_Zfh, Ex_Zfhmin];
 ],
 "fmv.x.h" = [
     // fmv.x.h rd, rs1 (zfh)
-    Single(0xE4000053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0xE4000053), RV32 | RV64, [X, F] => [R(7), R(15)], [Ex_Zfh, Ex_Zfhmin];
 ],
 "fneg.h" = [
     // fneg.h rd, rs1, rs2=rs1 (subformat of rv_zfh::fsgnjn.h) (zfh)
     Single(0x24001053), RV32 | RV64, [F, F] => [R(7), R(15), Repeat, R(20)], [Ex_Zfh];
+    Single(0x24001053), RV32 | RV64, [X, X] => [R(7), R(15), Repeat, R(20)], [Ex_Zhinx];
 ],
 "fnmadd.h" = [
     // fnmadd.h rd, rs1, rs2, rs3, rm (zfh)
     Single(0x0400004F), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfh];
+    Single(0x0400004F), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zhinx];
     // fnmadd.h rd, rs1, rs2, rs3 (zfh)
     Single(0x0400704F), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_Zfh];
+    Single(0x0400704F), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zhinx];
 ],
 "fnmsub.h" = [
     // fnmsub.h rd, rs1, rs2, rs3, rm (zfh)
     Single(0x0400004B), RV32 | RV64, [F, F, F, F, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zfh];
+    Single(0x0400004B), RV32 | RV64, [X, X, X, X, Ident] => [R(7), R(15), R(20), R(27), RoundingMode(12)], [Ex_Zhinx];
     // fnmsub.h rd, rs1, rs2, rs3 (zfh)
     Single(0x0400704B), RV32 | RV64, [F, F, F, F] => [R(7), R(15), R(20), R(27)], [Ex_Zfh];
+    Single(0x0400704B), RV32 | RV64, [X, X, X, X] => [R(7), R(15), R(20), R(27)], [Ex_Zhinx];
 ],
 "fsgnj.h" = [
     // fsgnj.h rd, rs1, rs2 (zfh)
     Single(0x24000053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x24000053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fsgnjn.h" = [
     // fsgnjn.h rd, rs1, rs2 (zfh)
     Single(0x24001053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x24001053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fsgnjx.h" = [
     // fsgnjx.h rd, rs1, rs2 (zfh)
     Single(0x24002053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x24002053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 "fsh" = [
     // fsh imm12hi, rs1, rs2, imm12lo (zfh)
-    Single(0x00001027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Zfh];
+    Single(0x00001027), RV32 | RV64, [F, RefOffset] => [R(20), R(15), SImm(12, 0), BitRange(7, 5, 0), BitRange(25, 7, 5), Next], [Ex_Zfh, Ex_Zfhmin];
     // as part of a pc-relative load
-    Single(0x00001027), RV32 | RV64, [F, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_Zfh];
-    // Pseudo instruction for auipc rd, hi20(symbol); fld, rd, rd, lo12(symbol)
-    Double(0x00000017, 0x00001027), RV32 | RV64, [F, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_Zfh];
+    Single(0x00001027), RV32 | RV64, [F, RefLabel] => [R(20), R(15), Offset(LO12S)], [Ex_Zfh, Ex_Zfhmin];
+    // Pseudo instruction for auipc rd, hi20(symbol); fsh, rd, rd, lo12(symbol)
+    Double(0x00000017, 0x00001027), RV32 | RV64, [F, Offset, X] => [R(20+32), Offset(SPLIT32S), Rno0(7), Repeat, R(15+32)], [Ex_Zfh, Ex_Zfhmin];
 ],
 "fsqrt.h" = [
     // fsqrt.h rd, rs1, rm (zfh)
     Single(0x5C000053), RV32 | RV64, [F, F, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zfh];
+    Single(0x5C000053), RV32 | RV64, [X, X, Ident] => [R(7), R(15), RoundingMode(12)], [Ex_Zhinx];
     // fsqrt.h rd, rs1 (zfh)
     Single(0x5C007053), RV32 | RV64, [F, F] => [R(7), R(15)], [Ex_Zfh];
+    Single(0x5C007053), RV32 | RV64, [X, X] => [R(7), R(15)], [Ex_Zhinx];
 ],
 "fsub.h" = [
     // fsub.h rd, rs1, rs2, rm (zfh)
     Single(0x0C000053), RV32 | RV64, [F, F, F, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zfh];
+    Single(0x0C000053), RV32 | RV64, [X, X, X, Ident] => [R(7), R(15), R(20), RoundingMode(12)], [Ex_Zhinx];
     // fsub.h rd, rs1, rs2 (zfh)
     Single(0x0C007053), RV32 | RV64, [F, F, F] => [R(7), R(15), R(20)], [Ex_Zfh];
+    Single(0x0C007053), RV32 | RV64, [X, X, X] => [R(7), R(15), R(20)], [Ex_Zhinx];
 ],
 
 // Extension(s) zicbom

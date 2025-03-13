@@ -78,52 +78,62 @@ bitflags! {
         const Ex_Zcmp = 0x0000_0000_0008_0000;
         /// Zcmt: compressed table jump instructions
         const Ex_Zcmt = 0x0000_0000_0010_0000;
+        /// Zdinx: double floating point in X registers
+        const Ex_Zdinx = 0x0000_0000_0020_0000;
         /// Zfa: additional floating point instructions
-        const Ex_Zfa = 0x0000_0000_0020_0000;
+        const Ex_Zfa = 0x0000_0000_0040_0000;
         /// Zfbfmin: Scalar convert to/from BF16
-        const Ex_Zfbfmin = 0x0000_0000_0040_0000;
+        const Ex_Zfbfmin = 0x0000_0000_0080_0000;
         /// Zfh: half-width fp support
-        const Ex_Zfh = 0x0000_0000_0080_0000;
+        const Ex_Zfh = 0x0000_0000_0100_0000;
+        /// Zfhmin: half-width fp support, conversion only
+        const Ex_Zfhmin = 0x0000_0000_0200_0000;
+        /// Zfinx: floating point in X registers
+        const Ex_Zfinx = 0x0000_0000_0400_0000;
+        /// Zhinx: half floating point in X registers
+        const Ex_Zhinx = 0x0000_0000_0800_0000;
+        /// Zhinxmin: half floating point in X registers, conversion only
+        const Ex_Zhinxmin = 0x0000_0000_1000_0000;
         /// Zicbo: cache block management operations
-        const Ex_Zicbom = 0x0000_0000_0100_0000;
+        const Ex_Zicbom = 0x0000_0000_2000_0000;
         /// Zicbo: cache block prefetch operations
-        const Ex_Zicbop = 0x0000_0000_0200_0000;
+        const Ex_Zicbop = 0x0000_0000_4000_0000;
         /// Zicbo: cache block zero operations
-        const Ex_Zicboz = 0x0000_0000_0400_0000;
+        const Ex_Zicboz = 0x0000_0000_8000_0000;
         /// Zicfilp: control flow integrity landing pad
-        const Ex_Zicfilp = 0x0000_0000_0800_0000;
+        const Ex_Zicfilp = 0x0000_0001_0000_0000;
         /// Zicfiss: Shadow stack
-        const Ex_Zicfiss = 0x0000_0000_1000_0000;
+        const Ex_Zicfiss = 0x0000_0002_0000_0000;
         /// Zicntr: base counters and timers
-        const Ex_Zicntr = 0x0000_0000_2000_0000;
+        const Ex_Zicntr = 0x0000_0004_0000_0000;
         /// Zicond: conditional operations
-        const Ex_Zicond = 0x0000_0000_4000_0000;
+        const Ex_Zicond = 0x0000_0008_0000_0000;
         /// Zicsr: control and status registers
-        const Ex_Zicsr = 0x0000_0000_8000_0000;
+        const Ex_Zicsr = 0x0000_0010_0000_0000;
         /// Zifencei: instruction-fetch fence
-        const Ex_Zifencei = 0x0000_0001_0000_0000;
+        const Ex_Zifencei = 0x0000_0020_0000_0000;
         /// Zihintntl: non-temporal hints
-        const Ex_Zihintntl = 0x0000_0002_0000_0000;
+        const Ex_Zihintntl = 0x0000_0040_0000_0000;
         /// Zihintpause: pause hint
-        const Ex_Zihintpause = 0x0000_0004_0000_0000;
+        const Ex_Zihintpause = 0x0000_0080_0000_0000;
         /// Zimop: may-be-operations
-        const Ex_Zimop = 0x0000_0008_0000_0000;
+        const Ex_Zimop = 0x0000_0100_0000_0000;
         /// Zk: scalar cryptography
-        const Ex_Zk = 0x0000_0010_0000_0000;
+        const Ex_Zk = 0x0000_0200_0000_0000;
         /// Zkn: NIST algorithm suite
-        const Ex_Zkn = 0x0000_0020_0000_0000;
+        const Ex_Zkn = 0x0000_0400_0000_0000;
         /// Zknd: NIST suite: AES decyrption
-        const Ex_Zknd = 0x0000_0040_0000_0000;
+        const Ex_Zknd = 0x0000_0800_0000_0000;
         /// Zkne: NIST suite: AES encryption
-        const Ex_Zkne = 0x0000_0080_0000_0000;
+        const Ex_Zkne = 0x0000_1000_0000_0000;
         /// Zknh: NIST suite: Hash functions
-        const Ex_Zknh = 0x0000_0100_0000_0000;
+        const Ex_Zknh = 0x0000_2000_0000_0000;
         /// Zks: ShangMi algorithm suite
-        const Ex_Zks = 0x0000_0200_0000_0000;
+        const Ex_Zks = 0x0000_4000_0000_0000;
         /// Zksed: ShangMi suite: SM4 block cipher
-        const Ex_Zksed = 0x0000_0400_0000_0000;
+        const Ex_Zksed = 0x0000_8000_0000_0000;
         /// Zksh: ShangMi suite: SM3 hash functions
-        const Ex_Zksh = 0x0000_0800_0000_0000;
+        const Ex_Zksh = 0x0001_0000_0000_0000;
     }
 }
 
@@ -497,9 +507,14 @@ lazy_static!{
         const Ex_Zcmop: u64 = ExtensionFlags::Ex_Zcmop.bits();
         const Ex_Zcmp: u64 = ExtensionFlags::Ex_Zcmp.bits();
         const Ex_Zcmt: u64 = ExtensionFlags::Ex_Zcmt.bits();
+        const Ex_Zdinx: u64 = ExtensionFlags::Ex_Zdinx.bits();
         const Ex_Zfa: u64 = ExtensionFlags::Ex_Zfa.bits();
         const Ex_Zfbfmin: u64 = ExtensionFlags::Ex_Zfbfmin.bits();
         const Ex_Zfh: u64 = ExtensionFlags::Ex_Zfh.bits();
+        const Ex_Zfhmin: u64 = ExtensionFlags::Ex_Zfhmin.bits();
+        const Ex_Zfinx: u64 = ExtensionFlags::Ex_Zfinx.bits();
+        const Ex_Zhinx: u64 = ExtensionFlags::Ex_Zhinx.bits();
+        const Ex_Zhinxmin: u64 = ExtensionFlags::Ex_Zhinxmin.bits();
         const Ex_Zicbom: u64 = ExtensionFlags::Ex_Zicbom.bits();
         const Ex_Zicbop: u64 = ExtensionFlags::Ex_Zicbop.bits();
         const Ex_Zicboz: u64 = ExtensionFlags::Ex_Zicboz.bits();
