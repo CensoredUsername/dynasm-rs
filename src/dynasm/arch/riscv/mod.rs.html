@@ -334,7 +334,22 @@
 <a href="#333" id="333">333</a>
 <a href="#334" id="334">334</a>
 <a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a></pre></div><pre class="rust"><code><span class="comment">// FIXME remove this
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a></pre></div><pre class="rust"><code><span class="comment">// FIXME remove this
 </span><span class="attr">#![allow(dead_code)]
 #![allow(unused_variables)]
 #![allow(unreachable_code)]
@@ -606,6 +621,16 @@
             split.insert(<span class="string">"zifencei"</span>);
         }
 
+        <span class="comment">// expand b to Zba_Zbb_Zbs
+        </span><span class="kw">if </span>split.remove(<span class="kw-2">&amp;</span><span class="string">"b"</span>) {
+            split.insert(<span class="string">"zba"</span>);
+            split.insert(<span class="string">"zbb"</span>);
+            split.insert(<span class="string">"zbs"</span>);
+        }
+
+        <span class="comment">// remove Ztso as it doesn't add instructions
+        </span>split.remove(<span class="kw-2">&amp;</span><span class="string">"ztso"</span>);
+
         <span class="comment">// many extensions
         </span><span class="kw">for </span>s <span class="kw">in </span>split.into_iter() {
             <span class="kw">let </span>flag = <span class="kw">match </span>s {
@@ -630,9 +655,14 @@
                 <span class="string">"zcmop" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zcmop,
                 <span class="string">"zcmp" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zcmp,
                 <span class="string">"zcmt" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zcmt,
+                <span class="string">"zdinx" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zdinx,
                 <span class="string">"zfa" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zfa,
                 <span class="string">"zfbfmin" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zfbfmin,
                 <span class="string">"zfh" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zfh,
+                <span class="string">"zfhmin" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zfhmin,
+                <span class="string">"zfinx" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zfinx,
+                <span class="string">"zhinx" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zhinx,
+                <span class="string">"zhinxmin" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zhinxmin,
                 <span class="string">"zicbom" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zicbom,
                 <span class="string">"zicbop" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zicbop,
                 <span class="string">"zicboz" </span>=&gt; riscvdata::ExtensionFlags::Ex_Zicboz,

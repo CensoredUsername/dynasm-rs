@@ -327,9 +327,14 @@ lw x9, [x8, -&gt;our_target_label + <span class="number">16</span>] <span class=
 <li><code>Zcmop</code>: compressed may-be-operations</li>
 <li><code>Zcmp</code>: microcoded push/pop operations</li>
 <li><code>Zcmt</code>: table jumps</li>
+<li><code>Zdinx</code>: double floating point integer registers.</li>
 <li><code>Zfa</code>: additional floating point instructions</li>
 <li><code>Zfbfmin</code>: scalar convert to/from BF16</li>
 <li><code>Zfh</code>: half floating point support</li>
+<li><code>Zfhmin</code>: half floating point support: conversion only</li>
+<li><code>Zfinx</code>: floating point in integer registers</li>
+<li><code>Zhinx</code>: half floating point in integer registers</li>
+<li><code>Zhinxmin</code>: half floating point in integer registers: conversion only</li>
 <li><code>Zicbom</code>: cache block operations: management</li>
 <li><code>Zicbop</code>: cache block operations: prefetching</li>
 <li><code>Zicboz</code>: cache block operations: zero</li>
@@ -339,7 +344,7 @@ lw x9, [x8, -&gt;our_target_label + <span class="number">16</span>] <span class=
 <li><code>Zicond</code>: integer conditional operations</li>
 <li><code>Zicsr</code>: control and status registers</li>
 <li><code>Zifencei</code>: data to instruction cache fence</li>
-<li><code>Zihintntl</code>: non temporal load hints</li>
+<li><code>Zihintntl</code>: non temporal locality hints</li>
 <li><code>Zihintpause</code>: pause hint</li>
 <li><code>Zimop</code>: may-be-operations</li>
 <li><code>Zk</code>: Scalar cryptography</li>

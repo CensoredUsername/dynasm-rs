@@ -1072,7 +1072,22 @@
 <a href="#1071" id="1071">1071</a>
 <a href="#1072" id="1072">1072</a>
 <a href="#1073" id="1073">1073</a>
-<a href="#1074" id="1074">1074</a></pre></div><pre class="rust"><code><span class="doccomment">//! this file contains the datastructure specification for the RISC-V encoding data
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a></pre></div><pre class="rust"><code><span class="doccomment">//! this file contains the datastructure specification for the RISC-V encoding data
 </span><span class="kw">use </span>bitflags::bitflags;
 <span class="kw">use </span>lazy_static::lazy_static;
 
@@ -1152,52 +1167,62 @@
         </span><span class="kw">const </span>Ex_Zcmp = <span class="number">0x0000_0000_0008_0000</span>;
         <span class="doccomment">/// Zcmt: compressed table jump instructions
         </span><span class="kw">const </span>Ex_Zcmt = <span class="number">0x0000_0000_0010_0000</span>;
+        <span class="doccomment">/// Zdinx: double floating point in X registers
+        </span><span class="kw">const </span>Ex_Zdinx = <span class="number">0x0000_0000_0020_0000</span>;
         <span class="doccomment">/// Zfa: additional floating point instructions
-        </span><span class="kw">const </span>Ex_Zfa = <span class="number">0x0000_0000_0020_0000</span>;
+        </span><span class="kw">const </span>Ex_Zfa = <span class="number">0x0000_0000_0040_0000</span>;
         <span class="doccomment">/// Zfbfmin: Scalar convert to/from BF16
-        </span><span class="kw">const </span>Ex_Zfbfmin = <span class="number">0x0000_0000_0040_0000</span>;
+        </span><span class="kw">const </span>Ex_Zfbfmin = <span class="number">0x0000_0000_0080_0000</span>;
         <span class="doccomment">/// Zfh: half-width fp support
-        </span><span class="kw">const </span>Ex_Zfh = <span class="number">0x0000_0000_0080_0000</span>;
+        </span><span class="kw">const </span>Ex_Zfh = <span class="number">0x0000_0000_0100_0000</span>;
+        <span class="doccomment">/// Zfhmin: half-width fp support, conversion only
+        </span><span class="kw">const </span>Ex_Zfhmin = <span class="number">0x0000_0000_0200_0000</span>;
+        <span class="doccomment">/// Zfinx: floating point in X registers
+        </span><span class="kw">const </span>Ex_Zfinx = <span class="number">0x0000_0000_0400_0000</span>;
+        <span class="doccomment">/// Zhinx: half floating point in X registers
+        </span><span class="kw">const </span>Ex_Zhinx = <span class="number">0x0000_0000_0800_0000</span>;
+        <span class="doccomment">/// Zhinxmin: half floating point in X registers, conversion only
+        </span><span class="kw">const </span>Ex_Zhinxmin = <span class="number">0x0000_0000_1000_0000</span>;
         <span class="doccomment">/// Zicbo: cache block management operations
-        </span><span class="kw">const </span>Ex_Zicbom = <span class="number">0x0000_0000_0100_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicbom = <span class="number">0x0000_0000_2000_0000</span>;
         <span class="doccomment">/// Zicbo: cache block prefetch operations
-        </span><span class="kw">const </span>Ex_Zicbop = <span class="number">0x0000_0000_0200_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicbop = <span class="number">0x0000_0000_4000_0000</span>;
         <span class="doccomment">/// Zicbo: cache block zero operations
-        </span><span class="kw">const </span>Ex_Zicboz = <span class="number">0x0000_0000_0400_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicboz = <span class="number">0x0000_0000_8000_0000</span>;
         <span class="doccomment">/// Zicfilp: control flow integrity landing pad
-        </span><span class="kw">const </span>Ex_Zicfilp = <span class="number">0x0000_0000_0800_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicfilp = <span class="number">0x0000_0001_0000_0000</span>;
         <span class="doccomment">/// Zicfiss: Shadow stack
-        </span><span class="kw">const </span>Ex_Zicfiss = <span class="number">0x0000_0000_1000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicfiss = <span class="number">0x0000_0002_0000_0000</span>;
         <span class="doccomment">/// Zicntr: base counters and timers
-        </span><span class="kw">const </span>Ex_Zicntr = <span class="number">0x0000_0000_2000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicntr = <span class="number">0x0000_0004_0000_0000</span>;
         <span class="doccomment">/// Zicond: conditional operations
-        </span><span class="kw">const </span>Ex_Zicond = <span class="number">0x0000_0000_4000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicond = <span class="number">0x0000_0008_0000_0000</span>;
         <span class="doccomment">/// Zicsr: control and status registers
-        </span><span class="kw">const </span>Ex_Zicsr = <span class="number">0x0000_0000_8000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zicsr = <span class="number">0x0000_0010_0000_0000</span>;
         <span class="doccomment">/// Zifencei: instruction-fetch fence
-        </span><span class="kw">const </span>Ex_Zifencei = <span class="number">0x0000_0001_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zifencei = <span class="number">0x0000_0020_0000_0000</span>;
         <span class="doccomment">/// Zihintntl: non-temporal hints
-        </span><span class="kw">const </span>Ex_Zihintntl = <span class="number">0x0000_0002_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zihintntl = <span class="number">0x0000_0040_0000_0000</span>;
         <span class="doccomment">/// Zihintpause: pause hint
-        </span><span class="kw">const </span>Ex_Zihintpause = <span class="number">0x0000_0004_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zihintpause = <span class="number">0x0000_0080_0000_0000</span>;
         <span class="doccomment">/// Zimop: may-be-operations
-        </span><span class="kw">const </span>Ex_Zimop = <span class="number">0x0000_0008_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zimop = <span class="number">0x0000_0100_0000_0000</span>;
         <span class="doccomment">/// Zk: scalar cryptography
-        </span><span class="kw">const </span>Ex_Zk = <span class="number">0x0000_0010_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zk = <span class="number">0x0000_0200_0000_0000</span>;
         <span class="doccomment">/// Zkn: NIST algorithm suite
-        </span><span class="kw">const </span>Ex_Zkn = <span class="number">0x0000_0020_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zkn = <span class="number">0x0000_0400_0000_0000</span>;
         <span class="doccomment">/// Zknd: NIST suite: AES decyrption
-        </span><span class="kw">const </span>Ex_Zknd = <span class="number">0x0000_0040_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zknd = <span class="number">0x0000_0800_0000_0000</span>;
         <span class="doccomment">/// Zkne: NIST suite: AES encryption
-        </span><span class="kw">const </span>Ex_Zkne = <span class="number">0x0000_0080_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zkne = <span class="number">0x0000_1000_0000_0000</span>;
         <span class="doccomment">/// Zknh: NIST suite: Hash functions
-        </span><span class="kw">const </span>Ex_Zknh = <span class="number">0x0000_0100_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zknh = <span class="number">0x0000_2000_0000_0000</span>;
         <span class="doccomment">/// Zks: ShangMi algorithm suite
-        </span><span class="kw">const </span>Ex_Zks = <span class="number">0x0000_0200_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zks = <span class="number">0x0000_4000_0000_0000</span>;
         <span class="doccomment">/// Zksed: ShangMi suite: SM4 block cipher
-        </span><span class="kw">const </span>Ex_Zksed = <span class="number">0x0000_0400_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zksed = <span class="number">0x0000_8000_0000_0000</span>;
         <span class="doccomment">/// Zksh: ShangMi suite: SM3 hash functions
-        </span><span class="kw">const </span>Ex_Zksh = <span class="number">0x0000_0800_0000_0000</span>;
+        </span><span class="kw">const </span>Ex_Zksh = <span class="number">0x0001_0000_0000_0000</span>;
     }
 }
 
@@ -1571,9 +1596,14 @@
         <span class="kw">const </span>Ex_Zcmop: u64 = ExtensionFlags::Ex_Zcmop.bits();
         <span class="kw">const </span>Ex_Zcmp: u64 = ExtensionFlags::Ex_Zcmp.bits();
         <span class="kw">const </span>Ex_Zcmt: u64 = ExtensionFlags::Ex_Zcmt.bits();
+        <span class="kw">const </span>Ex_Zdinx: u64 = ExtensionFlags::Ex_Zdinx.bits();
         <span class="kw">const </span>Ex_Zfa: u64 = ExtensionFlags::Ex_Zfa.bits();
         <span class="kw">const </span>Ex_Zfbfmin: u64 = ExtensionFlags::Ex_Zfbfmin.bits();
         <span class="kw">const </span>Ex_Zfh: u64 = ExtensionFlags::Ex_Zfh.bits();
+        <span class="kw">const </span>Ex_Zfhmin: u64 = ExtensionFlags::Ex_Zfhmin.bits();
+        <span class="kw">const </span>Ex_Zfinx: u64 = ExtensionFlags::Ex_Zfinx.bits();
+        <span class="kw">const </span>Ex_Zhinx: u64 = ExtensionFlags::Ex_Zhinx.bits();
+        <span class="kw">const </span>Ex_Zhinxmin: u64 = ExtensionFlags::Ex_Zhinxmin.bits();
         <span class="kw">const </span>Ex_Zicbom: u64 = ExtensionFlags::Ex_Zicbom.bits();
         <span class="kw">const </span>Ex_Zicbop: u64 = ExtensionFlags::Ex_Zicbop.bits();
         <span class="kw">const </span>Ex_Zicboz: u64 = ExtensionFlags::Ex_Zicboz.bits();

@@ -83,6 +83,14 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
+<h1 id="version-320"><a class="doc-anchor" href="#version-320">§</a>Version 3.2.0</h1><h2 id="architecture-support"><a class="doc-anchor" href="#architecture-support">§</a>Architecture support</h2>
+<ul>
+<li>RISC-V targets got support for the <code>Zfinx</code>, <code>Zhinx</code>, <code>Zdinx</code>, <code>Zhinxmin</code> and <code>Zfhmin</code> instruction
+set extensions.</li>
+<li>RISC-V targets now automatically expand the <code>B</code> collection of ISA EXTENSIONS</li>
+<li>RISC-V targets now ignore the <code>Ztso</code> extension instead of it causing an error
+(as it doesn’t actually add any new instructions).</li>
+</ul>
 <h1 id="version-310"><a class="doc-anchor" href="#version-310">§</a>Version 3.1.0</h1><h2 id="summary"><a class="doc-anchor" href="#summary">§</a>Summary</h2>
 <p>This release adds support for several architectures from the RISC-V family of instruction sets.
 These are <code>riscv64i</code>, <code>riscv64e</code>, <code>riscv32i</code> and <code>riscv32e</code>. There’s also support for a large set
@@ -95,10 +103,10 @@ and cache management support out of the box.</p>
 <li>dependencies have been updated</li>
 <li>handled many clippy warnings (Thanks to waywardmonkeys!)</li>
 </ul>
-<h2 id="architecture-support"><a class="doc-anchor" href="#architecture-support">§</a>Architecture support</h2>
+<h2 id="architecture-support-1"><a class="doc-anchor" href="#architecture-support-1">§</a>Architecture support</h2>
 <ul>
 <li>added <code>riscv32i</code>, <code>riscv32e</code>, <code>riscv64i</code> and <code>riscv64e</code> architecture targets.</li>
-<li><code>x64</code> gained support for the <code>RDPRU</code> instruction (Thanks to eigenform!)</li>
+<li><code>x64</code> gained support for the <code>RDPRU</code> instruction (Thanks to eigenform!).</li>
 </ul>
 <h1 id="version-301"><a class="doc-anchor" href="#version-301">§</a>Version 3.0.1</h1><h2 id="bugfix"><a class="doc-anchor" href="#bugfix">§</a>Bugfix</h2>
 <ul>
@@ -122,7 +130,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Several documentation improvements have been made.</li>
 <li>More tests have been introduced.</li>
 </ul>
-<h2 id="architecture-support-1"><a class="doc-anchor" href="#architecture-support-1">§</a>Architecture support</h2>
+<h2 id="architecture-support-2"><a class="doc-anchor" href="#architecture-support-2">§</a>Architecture support</h2>
 <ul>
 <li><code>x64</code> gained support for the <code>MOVDIRI</code> instruction</li>
 <li><code>x64</code> gained support for the <code>ZWORD</code> operand size (needed for AVX512 support in the future)</li>
@@ -234,7 +242,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Impossible relocations no longer panic. Instead they cause an error to be emitted from <code>Assembler::commit()</code>.</li>
 <li>Significant refactoring.</li>
 </ul>
-<h1 id="version-040"><a class="doc-anchor" href="#version-040">§</a>Version 0.4.0</h1><h2 id="architecture-support-2"><a class="doc-anchor" href="#architecture-support-2">§</a>Architecture support</h2>
+<h1 id="version-040"><a class="doc-anchor" href="#version-040">§</a>Version 0.4.0</h1><h2 id="architecture-support-3"><a class="doc-anchor" href="#architecture-support-3">§</a>Architecture support</h2>
 <ul>
 <li>Added Aarch64 support, thanks to sponsoring from <a href="https://wasmer.io">Wasmer</a>.</li>
 </ul>
@@ -261,7 +269,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Added an API for returning the offset of a dynamic label directly.</li>
 </ul>
-<h1 id="version-030"><a class="doc-anchor" href="#version-030">§</a>Version 0.3.0</h1><h2 id="architecture-support-3"><a class="doc-anchor" href="#architecture-support-3">§</a>Architecture support</h2>
+<h1 id="version-030"><a class="doc-anchor" href="#version-030">§</a>Version 0.3.0</h1><h2 id="architecture-support-4"><a class="doc-anchor" href="#architecture-support-4">§</a>Architecture support</h2>
 <ul>
 <li>Fixed SETB and SETNB not being present in x64/x86</li>
 </ul>
@@ -278,7 +286,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Updates so it stays compatible with rustc as the plugin API changes.</li>
 </ul>
-<h1 id="version-020"><a class="doc-anchor" href="#version-020">§</a>Version 0.2.0</h1><h2 id="architecture-support-4"><a class="doc-anchor" href="#architecture-support-4">§</a>Architecture support</h2>
+<h1 id="version-020"><a class="doc-anchor" href="#version-020">§</a>Version 0.2.0</h1><h2 id="architecture-support-5"><a class="doc-anchor" href="#architecture-support-5">§</a>Architecture support</h2>
 <ul>
 <li>Added support for x86</li>
 <li>Enabled relocation support in x64 when additional immediate fields are present.</li>
