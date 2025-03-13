@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\cache_control.rs`."><title>cache_control.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\cache_control.rs`."><title>cache_control.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasmrt/</div>cache_control.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -148,7 +149,52 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! This module contains several utility functions to manage the state of the caches
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a></pre></div><pre class="rust"><code><span class="doccomment">//! This module contains several utility functions to manage the state of the caches
 //! of the executing processor. On von Neumann architectures (like x86/AMD64), these are no-ops,
 //! as these processors ensure synchronization of the instruction and data caches internally.
 //! On modified Harvard architectures like ARMv8, these functions are needed to ensure that
@@ -157,12 +203,16 @@
 /// This function should be called before any jit-compiled code is executed, on the thread that will
 /// execute this code.
 </span><span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>prepare_for_execution() {
-    <span class="attr">#[cfg(target_arch=<span class="string">"aarch64"</span>)]
+</span><span class="kw">pub fn </span>prepare_for_execution(slice: <span class="kw-2">&amp;</span>[u8]) {
+    <span class="attr">#![allow(unused_variables)]
+    #[cfg(target_arch=<span class="string">"aarch64"</span>)]
     </span>{
         aarch64::prepare_for_execution()
     }
-
+    <span class="attr">#[cfg(any(target_arch=<span class="string">"riscv64"</span>, target_arch=<span class="string">"riscv32"</span>))]
+    </span>{
+        riscv::enforce_ordering_dcache_icache(slice, <span class="bool-val">true</span>);
+    }
 }
 
 <span class="doccomment">/// This function should be called after modification of any data that could've been loaded into the
@@ -296,6 +346,48 @@
 
         <span class="comment">// wait for that to complete as well
         </span>wait_for_cache_ops_complete();
+    }
+}
+
+<span class="attr">#[cfg(any(target_arch=<span class="string">"riscv64"</span>, target_arch=<span class="string">"riscv32"</span>))]
+</span><span class="kw">mod </span>riscv {
+    <span class="comment">// On risc-v, the story about how we synchronize caches is confused.
+    // The data sheet states that we ought to do the following.
+    // 1: on the assembling hart, perform a data fence to ensure that
+    //    any stores will be visible to other harts
+    // 2: on the executing hart, perform a fence.i instruction fence to
+    //    ensure that all the observed stores are visible to our instruction
+    //    fetches
+    //
+    // however, this doesn't solve all problems. Namely, the OS might just move our process
+    // from the current hart to another hart after the fence.i instruction. So it basically
+    // offers no guarantees. for this reason, linux has removed FENCE.I from the user ABI, and
+    // instead offered a syscall for managing this.
+    // this is `riscv_flush_icache()`, which has options to apply to a single thread, or all threads
+    // and over a range of addresses.
+    // as there are no other operating systems targetting risc-v right now, this is the only choice
+    // we have.
+    </span><span class="kw">use </span>std::ffi::{c_void, c_long, c_int};
+
+    <span class="attr">#[cfg(unix)]
+    </span><span class="kw">extern </span><span class="string">"C" </span>{
+        <span class="attr">#[link_name=<span class="string">"__riscv_flush_icache"</span>]
+        </span><span class="kw">fn </span>riscv_flush_icache(start: <span class="kw-2">*const </span>c_void, end: <span class="kw-2">*const </span>c_void, flags: c_long) -&gt; c_int;
+    }
+
+    <span class="kw">pub fn </span>enforce_ordering_dcache_icache(slice: <span class="kw-2">&amp;</span>[u8], local: bool) {
+        <span class="kw">let </span>range = slice.as_ptr_range();
+        <span class="kw">let </span>start = range.start <span class="kw">as </span><span class="kw-2">*const </span>c_void;
+        <span class="kw">let </span>end = range.end <span class="kw">as </span><span class="kw-2">*const </span>c_void;
+        <span class="kw">let </span><span class="kw-2">mut </span>flags: c_long = <span class="number">0</span>;
+        <span class="kw">if </span>local {
+            flags |= <span class="number">1</span>;
+        }
+        <span class="kw">let </span>rv;
+        <span class="kw">unsafe </span>{
+            rv = riscv_flush_icache(start, end, flags);
+        }
+        <span class="macro">assert!</span>(rv == <span class="number">0</span>, <span class="string">"riscv_flush_icache failed, returned {rv}"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

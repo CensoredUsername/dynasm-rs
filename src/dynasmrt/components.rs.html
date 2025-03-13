@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\components.rs`."><title>components.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\components.rs`."><title>components.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasmrt/</div>components.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -692,9 +693,7 @@
 <a href="#692" id="692">692</a>
 <a href="#693" id="693">693</a>
 <a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! This module provides several reusable compoments for implementing assemblers
+<a href="#695" id="695">695</a></pre></div><pre class="rust"><code><span class="doccomment">//! This module provides several reusable compoments for implementing assemblers
 
 </span><span class="kw">use </span>std::io;
 <span class="kw">use </span>std::collections::hash_map::Entry;
@@ -834,7 +833,7 @@
 
             <span class="comment">// copy over the data
             </span>new_buffer[.. old_asmoffset].copy_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.execbuffer.read().unwrap());
-            new_buffer[old_asmoffset..].copy_from_slice(<span class="kw-2">&amp;</span>new);
+            new_buffer[old_asmoffset..].copy_from_slice(new);
             <span class="kw">let </span>new_buffer_addr = new_buffer.as_ptr() <span class="kw">as </span>usize;
 
             <span class="comment">// allow modifications to be made
@@ -856,7 +855,7 @@
 
             <span class="comment">// update buffer and length
             </span>buffer.set_len(new_asmoffset);
-            buffer[old_asmoffset..].copy_from_slice(<span class="kw-2">&amp;</span>new);
+            buffer[old_asmoffset..].copy_from_slice(new);
 
             <span class="comment">// ensure that no old data remains in the icache of what we just updated
             </span>cache_control::synchronize_icache(<span class="kw-2">&amp;</span>buffer[old_asmoffset .. ]);
@@ -983,7 +982,7 @@
 
     <span class="doccomment">/// Returns the offset at which the dynamic label `id` was defined, if one was defined.
     </span><span class="kw">pub fn </span>resolve_dynamic(<span class="kw-2">&amp;</span><span class="self">self</span>, id: DynamicLabel) -&gt; <span class="prelude-ty">Result</span>&lt;AssemblyOffset, DynasmError&gt; {
-        <span class="self">self</span>.dynamic_labels.get(id.<span class="number">0</span>).and_then(|<span class="kw-2">&amp;</span>e| e).ok_or_else(|| DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
+        <span class="self">self</span>.dynamic_labels.get(id.<span class="number">0</span>).and_then(|<span class="kw-2">&amp;</span>e| e).ok_or(DynasmError::UnknownLabel(LabelKind::Dynamic(id)))
     }
 
     <span class="doccomment">/// Returns the offset at which the global label `label` was defined, if one was defined.
@@ -1055,11 +1054,10 @@
     /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
     /// `adjustment` is `new_buf_addr - old_buf_addr`.
     </span><span class="kw">pub fn </span>adjust(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], adjustment: isize) -&gt; <span class="prelude-ty">Result</span>&lt;(), ImpossibleRelocation&gt; {
-        <span class="kw">let </span>value = <span class="self">self</span>.relocation.read_value(buffer);
         <span class="kw">let </span>value = <span class="kw">match </span><span class="self">self</span>.relocation.kind() {
-            RelocationKind::Relative =&gt; value,
-            RelocationKind::RelToAbs =&gt; value.wrapping_sub(adjustment),
-            RelocationKind::AbsToRel =&gt; value.wrapping_add(adjustment),
+            RelocationKind::Relative =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
+            RelocationKind::RelToAbs =&gt; <span class="self">self</span>.relocation.read_value(buffer).wrapping_sub(adjustment),
+            RelocationKind::AbsToRel =&gt; <span class="self">self</span>.relocation.read_value(buffer).wrapping_add(adjustment),
         };
         <span class="self">self</span>.relocation.write_value(buffer, value)
     }
@@ -1212,13 +1210,13 @@
 
     <span class="doccomment">/// Add extra alignment for the next value in the literal pool
     </span><span class="kw">pub fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: usize, with: u8) {
-        <span class="kw">let </span>misalign = <span class="self">self</span>.offset % (size <span class="kw">as </span>usize);
+        <span class="kw">let </span>misalign = <span class="self">self</span>.offset % size;
         <span class="kw">if </span>misalign == <span class="number">0 </span>{
             <span class="kw">return</span>;
         }
 
         <span class="self">self</span>.entries.push(LitPoolEntry::Align(with, size));
-        <span class="self">self</span>.offset += size <span class="kw">as </span>usize - misalign;
+        <span class="self">self</span>.offset += size - misalign;
     }
 
     <span class="doccomment">/// Encode `value` into the literal pool.

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\compiler.rs`."><title>compiler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../..\../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../..\../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\x64\compiler.rs`."><title>compiler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../..\../static.files/storage-59e33391.js"></script><script defer src="../../..\../static.files/src-script-56102188.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm\arch\x64/</div>compiler.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1676,8 +1677,7 @@
 <a href="#1676" id="1676">1676</a>
 <a href="#1677" id="1677">1677</a>
 <a href="#1678" id="1678">1678</a>
-<a href="#1679" id="1679">1679</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>syn::spanned::Spanned;
+<a href="#1679" id="1679">1679</a></pre></div><pre class="rust"><code><span class="kw">use </span>syn::spanned::Spanned;
 <span class="kw">use </span>proc_macro2::{Span, TokenTree, Literal};
 <span class="kw">use </span>quote::{quote_spanned};
 <span class="kw">use </span>proc_macro_error2::emit_error;
@@ -1777,7 +1777,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>args = args.into_iter().map(clean_memoryref).collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;CleanArg&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
     <span class="comment">// sanitize memory references, determine address size, and size immediates/displacements if possible
-    </span><span class="kw">let </span>addr_size = sanitize_indirects_and_sizes(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>args)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>addr_size = sanitize_indirects_and_sizes(ctx, <span class="kw-2">&amp;mut </span>args)<span class="question-mark">?</span>;
     <span class="kw">let </span>addr_size = addr_size.unwrap_or(<span class="kw">match </span>ctx.mode {
         X86Mode::Long =&gt; Size::B_8,
         X86Mode::Protected =&gt; Size::B_4
@@ -1820,7 +1820,7 @@
 
         <span class="kw">match </span>ctx.mode {
             X86Mode::Protected =&gt; <span class="kw">if </span>op_size == Size::B_8 {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 64 bit operands in 32-bit mode"</span>, op.to_string())));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 64 bit operands in 32-bit mode"</span>, op)));
             },
             X86Mode::Long =&gt; ()
         }
@@ -1830,14 +1830,14 @@
                 (Size::B_2, <span class="kw">_</span>) =&gt; pref_size = <span class="bool-val">true</span>,
                 (Size::B_8, X86Mode::Long) =&gt; (),
                 (Size::B_4, X86Mode::Protected) =&gt; (),
-                (Size::B_4, X86Mode::Long) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 32 bit operands in 64-bit mode"</span>, op.to_string()))),
+                (Size::B_4, X86Mode::Long) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 32 bit operands in 64-bit mode"</span>, op))),
                 (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">"bad formatting data"</span>),
             }
         } <span class="kw">else if </span>data.flags.contains(Flags::AUTO_REXW) {
             <span class="kw">if </span>op_size == Size::B_8 {
                 rex_w = <span class="bool-val">true</span>;
             } <span class="kw">else if </span>op_size != Size::B_4 {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 16-bit operands"</span>, op.to_string())));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 16-bit operands"</span>, op)));
             }
         } <span class="kw">else if </span>data.flags.contains(Flags::AUTO_VEXL) {
             <span class="kw">if </span>op_size == Size::B_32 {
@@ -1920,7 +1920,7 @@
             <span class="comment">// Certain SSE/AVX legacy encoded operations are not available in 32-bit mode
             // as they require a REX.W prefix to be encoded, which is impossible. We catch those cases here
             </span><span class="kw">if </span>ctx.mode == X86Mode::Protected {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 64 bit operand size in 32-bit mode"</span>, op.to_string())))
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"'{}': Does not support 64 bit operand size in 32-bit mode"</span>, op)))
             }
             compile_rex(buffer, rex_w, <span class="kw-2">&amp;</span>reg, <span class="kw-2">&amp;</span>rm);
         }
@@ -1967,7 +1967,7 @@
         };
 
         <span class="comment">// check addressing mode special cases
-        </span><span class="kw">let </span>mode_vsib = index.as_ref().map_or(<span class="bool-val">false</span>, |<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>i, <span class="kw">_</span>, <span class="kw">_</span>)| i.kind.family() == RegFamily::XMM);
+        </span><span class="kw">let </span>mode_vsib = index.as_ref().map_or(<span class="bool-val">false</span>, |(i, <span class="kw">_</span>, <span class="kw">_</span>)| i.kind.family() == RegFamily::XMM);
         <span class="kw">let </span>mode_16bit = addr_size == Size::B_2;
         <span class="kw">let </span>mode_rip_relative = base.as_ref().map_or(<span class="bool-val">false</span>, |b| b.kind.family() == RegFamily::RIP);
         <span class="kw">let </span>mode_rbp_base = base.as_ref().map_or(<span class="bool-val">false</span>, |b| b == <span class="kw-2">&amp;</span>RegId::RBP || b == <span class="kw-2">&amp;</span>RegId::R13 || b.kind.is_dynamic());
@@ -2228,7 +2228,7 @@
             </span><span class="kw">let </span><span class="kw-2">mut </span>base_reg_index = <span class="prelude-val">None</span>;
             <span class="kw">for </span>(i, reg) <span class="kw">in </span>regs.iter().enumerate() {
                 <span class="kw">if </span>!(regs.iter().enumerate().any(|(j, other)| i != j &amp;&amp; reg == other) ||
-                     scaled.iter().any(|<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>other, <span class="kw">_</span>)| reg == other)) {
+                     scaled.iter().any(|(other, <span class="kw">_</span>)| reg == other)) {
                     base_reg_index = <span class="prelude-val">Some</span>(i);
                     <span class="kw">break</span>;
                 }
@@ -2240,7 +2240,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>joined_regs = Vec::new();
             <span class="kw">for </span>(reg, s) <span class="kw">in </span>scaled {
                 <span class="comment">// does this register already have a spot?
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(i) = joined_regs.iter().position(|<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>other, <span class="kw">_</span>)| <span class="kw-2">&amp;</span>reg == other) {
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(i) = joined_regs.iter().position(|(other, <span class="kw">_</span>)| <span class="kw-2">&amp;</span>reg == other) {
                     joined_regs[i].<span class="number">1 </span>+= s;
                 } <span class="kw">else </span>{
                     joined_regs.push((reg, s));
@@ -2305,7 +2305,7 @@
             </span><span class="kw">let </span><span class="kw-2">mut </span>joined_regs = Vec::new();
             <span class="kw">for </span>(reg, s) <span class="kw">in </span>scaled {
                 <span class="comment">// does this register already have a spot?
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(i) = joined_regs.iter().position(|<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>other, <span class="kw">_</span>)| <span class="kw-2">&amp;</span>reg == other) {
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(i) = joined_regs.iter().position(|(other, <span class="kw">_</span>)| <span class="kw-2">&amp;</span>reg == other) {
                     joined_regs[i].<span class="number">1 </span>+= s;
                 } <span class="kw">else </span>{
                     joined_regs.push((reg, s));
@@ -2740,47 +2740,47 @@
             (<span class="string">b'o'</span>, <span class="kw-2">&amp;</span>CleanArg::JumpTarget{size, ..}) =&gt; size,
 
             <span class="comment">// specific legacy regs
-            </span>(x @ <span class="string">b'A' </span>..= <span class="string">b'P'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(x @ <span class="string">b'A' </span>..= <span class="string">b'P'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::LEGACY &amp;&amp;
                 reg.kind.code() == <span class="prelude-val">Some</span>(x - <span class="string">b'A'</span>) =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// specific segment regs
-            </span>(x @ <span class="string">b'Q' </span>..= <span class="string">b'V'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(x @ <span class="string">b'Q' </span>..= <span class="string">b'V'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::SEGMENT &amp;&amp;
                 reg.kind.code() == <span class="prelude-val">Some</span>(x - <span class="string">b'Q'</span>) =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// CR8 can be specially referenced
-            </span>(<span class="string">b'W'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'W'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind == RegId::CR8 =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// top of the fp stack is also often used
-            </span>(<span class="string">b'X'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'X'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind == RegId::ST0 =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// generic legacy regs
-            </span>(<span class="string">b'r'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
-            (<span class="string">b'v'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'r'</span>, CleanArg::Direct{reg, ..}) |
+            (<span class="string">b'v'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::LEGACY ||
                 reg.kind.family() == RegFamily::HIGHBYTE =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// other reg types often mixed with memory refs
-            </span>(<span class="string">b'x'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
-            (<span class="string">b'u'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'x'</span>, CleanArg::Direct{reg, ..}) |
+            (<span class="string">b'u'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::MMX =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b'y'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) |
-            (<span class="string">b'w'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'y'</span>, CleanArg::Direct{reg, ..}) |
+            (<span class="string">b'w'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::XMM =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// other reg types
-            </span>(<span class="string">b'f'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            </span>(<span class="string">b'f'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::FP =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b's'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b's'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::SEGMENT =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b'c'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'c'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::CONTROL =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b'd'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'd'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::DEBUG =&gt; <span class="prelude-val">Some</span>(reg.size()),
-            (<span class="string">b'b'</span>, <span class="kw-2">&amp;</span>CleanArg::Direct{<span class="kw-2">ref </span>reg, ..}) <span class="kw">if
+            (<span class="string">b'b'</span>, CleanArg::Direct{reg, ..}) <span class="kw">if
                 </span>reg.kind.family() == RegFamily::BOUND =&gt; <span class="prelude-val">Some</span>(reg.size()),
 
             <span class="comment">// memory offsets
@@ -2857,7 +2857,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>im_size = <span class="prelude-val">None</span>;
 
     <span class="comment">// operand size determination loop
-    </span><span class="kw">for </span>(arg, (<span class="kw">_</span>, fsize)) <span class="kw">in </span>args.iter().zip(FormatStringIterator::new(<span class="kw-2">&amp;</span>fmt.args)) {
+    </span><span class="kw">for </span>(arg, (<span class="kw">_</span>, fsize)) <span class="kw">in </span>args.iter().zip(FormatStringIterator::new(fmt.args)) {
         <span class="kw">if </span>fsize != <span class="string">b'*' </span>{
             <span class="kw">continue</span>;
         }
@@ -2920,7 +2920,7 @@
 
     <span class="comment">// fill-in loop. default should never be used.
     </span><span class="kw">let </span><span class="kw-2">mut </span>new_args = Vec::new();
-    <span class="kw">for </span>(arg, (code, fsize)) <span class="kw">in </span>args.into_iter().zip(FormatStringIterator::new(<span class="kw-2">&amp;</span>fmt.args)) {
+    <span class="kw">for </span>(arg, (code, fsize)) <span class="kw">in </span>args.into_iter().zip(FormatStringIterator::new(fmt.args)) {
 
         <span class="comment">//get the specified operand size from the format string
         </span><span class="kw">let </span>size = <span class="kw">match </span>(fsize, code) {

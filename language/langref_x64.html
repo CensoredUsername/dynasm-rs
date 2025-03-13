@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <title>Language Reference</title>
+    <title>x64/x86 assembly language reference</title>
 
     <link rel="stylesheet" href="./formatting.css">
     
@@ -68,13 +68,22 @@
         <a href="./instructionref_aarch64.html">Instruction reference</a>
       </li>
     </ul>
+    <h4>riscv32/riscv64</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_riscv.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_riscv.html">Instruction reference</a>
+      </li>
+    </ul>
   </div>
 </nav>
 <section id="main" class="content mod docblock">
 
-    <h1 class="title">Language Reference</h1>
+    <h1 class="title">x64/x86 assembly language reference</h1>
     <h1 id="lexical-structure-definition"><a class="doc-anchor" href="#lexical-structure-definition">§</a>Lexical structure definition</h1>
-<p>Instructions for the <code>x86</code> and <code>x64</code> assembling backend use the following lexical structure</p>
+<p>Instructions for the <code>x86</code> and <code>x64</code> assembling backends use the following lexical structure:</p>
 <h2 id="base-units"><a class="doc-anchor" href="#base-units">§</a>Base units</h2>
 <p>The following base syntax units are recognized by the parser.</p>
 <ul>

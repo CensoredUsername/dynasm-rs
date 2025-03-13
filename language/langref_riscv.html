@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>riscv assembly language reference</title>
+
+    <link rel="stylesheet" href="./formatting.css">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <nav class="sidebar">
+  <h2 class="location">
+    <a href="#">Dynasm-rs reference</a>
+  </h2>
+  <div class="sidebar-elems">
+    <h3>Components</h3>
+    <ul class="block crate">
+      <li>
+        <a href="../language/index.html">Syntax</a>
+      </li>
+      <li>
+        <a href="../dynasm/index.html">Plugin (dynasm)</a>
+      </li>
+      <li>
+        <a href="../dynasmrt/index.html">Runtime (dynasmrt)</a>
+      </li>
+    </ul>
+    <h3>Syntax</h3>
+    <ul class="block crate">
+      <li>
+        <a href="./index.html">Home</a>
+      </li>
+      <li>
+        <a href="./tutorial.html">Tutorial</a>
+      </li>
+      <li>
+        <a href="./langref_common.html">Language</a>
+      </li>
+      <li>
+        <a href="./releasenotes.html">Release Notes</a>
+      </li>
+    </ul>
+    <h3>Architectures</h3>
+    <h4>x64/x86</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_x64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_x64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>aarch64</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_aarch64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_aarch64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>riscv32/riscv64</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_riscv.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_riscv.html">Instruction reference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section id="main" class="content mod docblock">
+
+    <h1 class="title">riscv assembly language reference</h1>
+    <h1 id="lexical-structure-definition"><a class="doc-anchor" href="#lexical-structure-definition">§</a>Lexical structure definition</h1>
+<p>Instructions for the <code>riscv</code> assembling backends use the following lexical structure:</p>
+<h2 id="base-units"><a class="doc-anchor" href="#base-units">§</a>Base units</h2>
+<p>The following base syntax units are recognized by the parser.</p>
+<ul>
+<li><code>static_reg_name</code> matches any valid register name as seen in table 2, or any previously defined alias</li>
+<li><code>dynamic_reg_family</code> matches any valid register family from table 2</li>
+</ul>
+<h2 id="instruction"><a class="doc-anchor" href="#instruction">§</a>Instruction</h2>
+<p><code>instruction : ident ("." ident)* (arg ("," arg)* )? ;</code></p>
+<h2 id="arguments"><a class="doc-anchor" href="#arguments">§</a>Arguments</h2>
+<p><code>arg : register | registerlist | labelref | reference | expr ;</code></p>
+<p><code>register : static_reg_name | dynamic_reg_family "(" expr ")" ;</code></p>
+<p><code>register_list : "{ comma_list | amount_list "}";</code></p>
+<p><code>comma_list : register ("," register ("-" register)? )?  ;</code></p>
+<p><code>amount_list : register ";" expr ;</code></p>
+<p><code>reference : "[" register ("," expr | labelref)? "]"  ;</code></p>
+<h1 id="reference"><a class="doc-anchor" href="#reference">§</a>Reference</h1><h2 id="targets"><a class="doc-anchor" href="#targets">§</a>Targets</h2>
+<p>The RISC-V instruction set family comprises several different architectures. At the time of writing, dynasm-rs supports the following targets, which can be selected using the <code>.arch</code> directive:</p>
+<p>Table 1: dynasm-rs RISC-V architecture support</p>
+<div><table><thead><tr><th style="text-align: right">Instruction set</th><th style="text-align: left">Directive</th><th style="text-align: left">Integer register width</th><th style="text-align: left">Integer register count</th></tr></thead><tbody>
+<tr><td style="text-align: right"><code>RV32I</code></td><td style="text-align: left"><code>.arch riscv32i</code></td><td style="text-align: left"><code>32</code></td><td style="text-align: left"><code>32</code></td></tr>
+<tr><td style="text-align: right"><code>RV32E</code></td><td style="text-align: left"><code>.arch riscv32e</code></td><td style="text-align: left"><code>32</code></td><td style="text-align: left"><code>16</code></td></tr>
+<tr><td style="text-align: right"><code>RV64I</code></td><td style="text-align: left"><code>.arch riscv64i</code></td><td style="text-align: left"><code>64</code></td><td style="text-align: left"><code>32</code></td></tr>
+<tr><td style="text-align: right"><code>RV64E</code></td><td style="text-align: left"><code>.arch riscv64e</code></td><td style="text-align: left"><code>64</code></td><td style="text-align: left"><code>16</code></td></tr>
+</tbody></table>
+</div><h3 id="instruction-set-extensions"><a class="doc-anchor" href="#instruction-set-extensions">§</a>Instruction Set Extensions</h3>
+<p>The RISC-V instruction set family has a small base instruction set, and defines a large set of extensions. These extensions are either identified by a single letter like <code>A</code>, or a longer name starting with a <code>Z</code> like <code>Zifencei</code>. The full set of extensions for a RISC-V instruction set is identified by concatenating these instruction set identifiers, wherein underscores are added after longer names, combining into identifiers like <code>IMAFDZicsr_Zifencei</code>.</p>
+<p>Selecting the active set of instruction set extensions in dynasm-rs is done using the <code>.feature</code> directive. It is possible to pass in a full instruction set identifier into this directive, or a comma-separated list of instruction set extension identifiers. Instruction set identifiers are case-insensitive. The following examples have identical behaviour:</p>
+<ul>
+<li><code>.feature IMAFDZicsr_Zifencei</code></li>
+<li><code>.feature I, M, A, F, D, Zicsr, Zifencei</code></li>
+<li><code>.feature IMAFD, Zicsr, Zifencei</code></li>
+<li><code>.feature imafdzicsr_zifencei</code></li>
+</ul>
+<h2 id="instructions"><a class="doc-anchor" href="#instructions">§</a>Instructions</h2>
+<p>At the time of writing, the official RISC-V Assembly Programmer’s manual is still in development state at version <code>0.0.1</code>. It currently doesn’t cover a significant part of the syntax that is used in much of the RISC-V documentation. The assembly language used by dynasm-rs in riscv mode is therefore inspired by the assembly dialect used by the GNU assembler. Several additions have been made to support dynamic registers, and to ensure the Rust parser can parse it.</p>
+<p>A significant difference exists in the syntax used for memory references. The GNU assembler uses <code>offset(base_register)</code> syntax for these. Use of this syntax in dynasm-rs would cause parsing ambiguities as it is unclear if the given expression should be parsed as an immediate that contains a function call, or a memory reference. Therefore, the dynasm-rs RISC-V assembly language uses arm-style <code>[base, offset]</code> memory references.</p>
+<h3 id="operands"><a class="doc-anchor" href="#operands">§</a>Operands</h3><h4 id="register"><a class="doc-anchor" href="#register">§</a>Register</h4>
+<p>There are two ways to reference registers in dynasm-rs, either via their static name, or via dynamic register references. Dynamic register references allow the exact register choice to be made at runtime. Please note that the expression inside a dynamic register reference may be evaluated multiple times during assembly of the instruction.</p>
+<p>The following table lists all available static registers, their dynamic family name and their encoding when they are used dynamically. Note that when the architecture is set to <code>riscv32e</code> or <code>riscv64e</code>, only the first 16 integer registers can be used.</p>
+<p>Table 2: dynasm-rs registers (RISC-V)</p>
+<div><table><thead><tr><th style="text-align: right">Family</th><th style="text-align: left">integer</th><th style="text-align: left">floating point</th><th style="text-align: left">vector</th></tr></thead><tbody>
+<tr><td style="text-align: right">Dynamic Encoding</td><td style="text-align: left"><code>X</code></td><td style="text-align: left"><code>W</code></td><td style="text-align: left"><code>V</code></td></tr>
+<tr><td style="text-align: right"><code>0</code></td><td style="text-align: left"><code>x0/zero</code></td><td style="text-align: left"><code>f0/ft</code></td><td style="text-align: left"><code>v0</code></td></tr>
+<tr><td style="text-align: right"><code>1</code></td><td style="text-align: left"><code>x1/ra</code></td><td style="text-align: left"><code>f1/ft</code></td><td style="text-align: left"><code>v1</code></td></tr>
+<tr><td style="text-align: right"><code>2</code></td><td style="text-align: left"><code>x2/sp</code></td><td style="text-align: left"><code>f2/ft</code></td><td style="text-align: left"><code>v2</code></td></tr>
+<tr><td style="text-align: right"><code>3</code></td><td style="text-align: left"><code>x3/gp</code></td><td style="text-align: left"><code>f3/ft</code></td><td style="text-align: left"><code>v3</code></td></tr>
+<tr><td style="text-align: right"><code>4</code></td><td style="text-align: left"><code>x4/tp</code></td><td style="text-align: left"><code>f4/ft</code></td><td style="text-align: left"><code>v4</code></td></tr>
+<tr><td style="text-align: right"><code>5</code></td><td style="text-align: left"><code>x5/t0</code></td><td style="text-align: left"><code>f5/ft</code></td><td style="text-align: left"><code>v5</code></td></tr>
+<tr><td style="text-align: right"><code>6</code></td><td style="text-align: left"><code>x6/t1</code></td><td style="text-align: left"><code>f6/ft</code></td><td style="text-align: left"><code>v6</code></td></tr>
+<tr><td style="text-align: right"><code>7</code></td><td style="text-align: left"><code>x7/t2</code></td><td style="text-align: left"><code>f7/ft</code></td><td style="text-align: left"><code>v7</code></td></tr>
+<tr><td style="text-align: right"><code>8</code></td><td style="text-align: left"><code>x8/s0/fp</code></td><td style="text-align: left"><code>f8/fs</code></td><td style="text-align: left"><code>v8</code></td></tr>
+<tr><td style="text-align: right"><code>9</code></td><td style="text-align: left"><code>x9/s1</code></td><td style="text-align: left"><code>f9/fs</code></td><td style="text-align: left"><code>v9</code></td></tr>
+<tr><td style="text-align: right"><code>10</code></td><td style="text-align: left"><code>x10/a0</code></td><td style="text-align: left"><code>f10/fa</code></td><td style="text-align: left"><code>v10</code></td></tr>
+<tr><td style="text-align: right"><code>11</code></td><td style="text-align: left"><code>x11/a1</code></td><td style="text-align: left"><code>f11/fa</code></td><td style="text-align: left"><code>v11</code></td></tr>
+<tr><td style="text-align: right"><code>12</code></td><td style="text-align: left"><code>x12/a2</code></td><td style="text-align: left"><code>f12/fa</code></td><td style="text-align: left"><code>v12</code></td></tr>
+<tr><td style="text-align: right"><code>13</code></td><td style="text-align: left"><code>x13/a3</code></td><td style="text-align: left"><code>f13/fa</code></td><td style="text-align: left"><code>v13</code></td></tr>
+<tr><td style="text-align: right"><code>14</code></td><td style="text-align: left"><code>x14/a4</code></td><td style="text-align: left"><code>f14/fa</code></td><td style="text-align: left"><code>v14</code></td></tr>
+<tr><td style="text-align: right"><code>15</code></td><td style="text-align: left"><code>x15/a5</code></td><td style="text-align: left"><code>f15/fa</code></td><td style="text-align: left"><code>v15</code></td></tr>
+<tr><td style="text-align: right"><code>16</code></td><td style="text-align: left"><code>x16/a6</code></td><td style="text-align: left"><code>f16/fa</code></td><td style="text-align: left"><code>v16</code></td></tr>
+<tr><td style="text-align: right"><code>17</code></td><td style="text-align: left"><code>x17/a7</code></td><td style="text-align: left"><code>f17/fa</code></td><td style="text-align: left"><code>v17</code></td></tr>
+<tr><td style="text-align: right"><code>18</code></td><td style="text-align: left"><code>x18/s2</code></td><td style="text-align: left"><code>f18/fs</code></td><td style="text-align: left"><code>v18</code></td></tr>
+<tr><td style="text-align: right"><code>19</code></td><td style="text-align: left"><code>x19/s3</code></td><td style="text-align: left"><code>f19/fs</code></td><td style="text-align: left"><code>v19</code></td></tr>
+<tr><td style="text-align: right"><code>20</code></td><td style="text-align: left"><code>x20/s4</code></td><td style="text-align: left"><code>f20/fs</code></td><td style="text-align: left"><code>v20</code></td></tr>
+<tr><td style="text-align: right"><code>21</code></td><td style="text-align: left"><code>x21/s5</code></td><td style="text-align: left"><code>f21/fs</code></td><td style="text-align: left"><code>v21</code></td></tr>
+<tr><td style="text-align: right"><code>22</code></td><td style="text-align: left"><code>x22/s6</code></td><td style="text-align: left"><code>f22/fs</code></td><td style="text-align: left"><code>v22</code></td></tr>
+<tr><td style="text-align: right"><code>23</code></td><td style="text-align: left"><code>x23/s7</code></td><td style="text-align: left"><code>f23/fs</code></td><td style="text-align: left"><code>v23</code></td></tr>
+<tr><td style="text-align: right"><code>24</code></td><td style="text-align: left"><code>x24/s8</code></td><td style="text-align: left"><code>f24/fs</code></td><td style="text-align: left"><code>v24</code></td></tr>
+<tr><td style="text-align: right"><code>25</code></td><td style="text-align: left"><code>x25/s9</code></td><td style="text-align: left"><code>f25/fs</code></td><td style="text-align: left"><code>v25</code></td></tr>
+<tr><td style="text-align: right"><code>26</code></td><td style="text-align: left"><code>x26/s10</code></td><td style="text-align: left"><code>f26/fs</code></td><td style="text-align: left"><code>v26</code></td></tr>
+<tr><td style="text-align: right"><code>27</code></td><td style="text-align: left"><code>x27/s11</code></td><td style="text-align: left"><code>f27/fs</code></td><td style="text-align: left"><code>v27</code></td></tr>
+<tr><td style="text-align: right"><code>28</code></td><td style="text-align: left"><code>x28/t3</code></td><td style="text-align: left"><code>f28/ft</code></td><td style="text-align: left"><code>v28</code></td></tr>
+<tr><td style="text-align: right"><code>29</code></td><td style="text-align: left"><code>x29/t4</code></td><td style="text-align: left"><code>f29/ft</code></td><td style="text-align: left"><code>v29</code></td></tr>
+<tr><td style="text-align: right"><code>30</code></td><td style="text-align: left"><code>x30/t5</code></td><td style="text-align: left"><code>f30/ft</code></td><td style="text-align: left"><code>v30</code></td></tr>
+<tr><td style="text-align: right"><code>31</code></td><td style="text-align: left"><code>x31/t6</code></td><td style="text-align: left"><code>f31/ft</code></td><td style="text-align: left"><code>v31</code></td></tr>
+</tbody></table>
+</div>
+<p>When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: <code>X(reg_number)</code>, where <code>reg_number</code> is one of the given dynamic encodings listed in the table.</p>
+<p>Note that not all RISC-V instructions accept all registers. In particular, many instructions in the <code>C</code> instruction set extension don’t support the <code>zero</code> register, or only support registers <code>x8-x15</code>. Attempting to use those will result in an error at compile time, or a panic at runtime.</p>
+<h4 id="register-lists"><a class="doc-anchor" href="#register-lists">§</a>Register lists</h4>
+<p>Several instructions in the <code>Zcmp</code> instruction set extension take a list of registers as argument. These register lists conform to a fixed format of the <code>ra</code> register, and 0 to 12 registers from the set <code>s0-s11</code>. Alternatively, the amount of saved registers can be passed dynamically using the <code>{ra; expr}</code> syntax, where <code>expr</code> should be an expression that evaluates to the amount of saved registers in the register list. This can be any number from 0 to 10, or 12. It is impossible to encode 11 saved registers. Note that on <code>RV32E</code> and <code>RV64E</code> only 0 to 2 saved registers can be encoded.</p>
+<p>The following instructions are examples of the allowed formats:</p>
+<ul>
+<li><code>{ra}</code>: Only the return address</li>
+<li><code>{ra, s0}</code>: The return address and s0</li>
+<li><code>{ra, s0 - s4}</code>: <code>ra</code> and five saved registers</li>
+<li><code>{ra, s0 - s11}</code>: The full set of <code>ra</code> and twelve saved registers</li>
+<li><code>{ra; 0}</code>: Only the return address</li>
+<li><code>{ra; 1}</code>: The return address and s0</li>
+<li><code>{ra; 5}</code>: <code>ra</code> and five saved registers</li>
+<li><code>{ra; 12}</code>: The full set of <code>ra</code> and twelve saved registers</li>
+</ul>
+<h4 id="jump-targets"><a class="doc-anchor" href="#jump-targets">§</a>Jump targets</h4>
+<p>All flow control instructions and instructions featuring PC-relative addressing have a jump target as argument. This jump target will feature a label reference as described in the common language reference. Note that this reference must be encoded in a limited amount of bits in the relevant instructions, so check the instruction reference to see what the maximum offset range is.</p>
+<h4 id="memory-references"><a class="doc-anchor" href="#memory-references">§</a>Memory references</h4>
+<p>As a load-store architecture, the RISC-V instruction sets only has a limited amount of instructions capable of addressing memory. These memory references can have several different format, which are listed in the table below. The valid formats for each instruction can be found in the instruction reference.</p>
+<p>Table 3: dynasm-rs RISC-V memory reference formats</p>
+<div><table><thead><tr><th style="text-align: left">Syntax</th><th style="text-align: left">Explanation</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>[xn]</code></td><td style="text-align: left">An <code>X</code> family register is used as the address to be resolved.</td></tr>
+<tr><td style="text-align: left"><code>[xn {, imm } ]</code></td><td style="text-align: left">An <code>X</code> family register is used as base with an optional integer offset as the address to be resolved.</td></tr>
+<tr><td style="text-align: left"><code>[sp {, imm } ]</code></td><td style="text-align: left">The <code>sp</code> register is used as base with an optional integer offset as the address to be resolved.</td></tr>
+<tr><td style="text-align: left"><code>[xn {, labelref } ]</code></td><td style="text-align: left">The lower 12 bits of a relocation are added to an address in the <code>X</code> family register. See the section on pc-relative instructions for further details.</td></tr>
+</tbody></table>
+</div><h4 id="immediates"><a class="doc-anchor" href="#immediates">§</a>Immediates</h4>
+<p>The RISC-V instruction set features both signed and unsigned immediate operands. The size of these immediates is often not a clean amount of bytes and thus a larger than the maximum value integer type is needed to pass these arguments. Dynasm-rs expects the type of any dynamic RISC-V immediates to be passed to be <code>u32</code> for unsigned immediates and <code>i32</code> for signed immediates, with the exception of the &gt;32bits <code>li</code> pseudo-instructions which use <code>i64</code>. These immediates are where possible validated at compile time. If an impossible immediate is provided at runtime, this will result in a panic.</p>
+<p>Several instructions have additional requirements on any passed immediates. Consult the instruction reference for the exact requirements of each instruction.</p>
+<h3 id="compressed-instructions"><a class="doc-anchor" href="#compressed-instructions">§</a>Compressed instructions</h3>
+<p>The <code>C</code> extension set for RISC-V defines several compressed instructions that implement a subset of functionality of base RISC-V instructions. These compressed extensions are only 2 bytes long, compared to the 4 bytes length of regular RISC-V instructions. As RISC-V assumes a minimum instruction alignment of only 2 bytes, these instructions can be freely intermixed in the instruction stream.</p>
+<h3 id="pseudo-instructions"><a class="doc-anchor" href="#pseudo-instructions">§</a>Pseudo-Instructions</h3>
+<p>The RISC-V ISA specifies several pseudo-instructions next to its regular instructions. These are either aliases for another instruction with some preconfigured arguments (like <code>sext.w rd, rs1 = addiw rd, rs1, 0</code>), or they expand to sequences of several instructions. Alias instructions can be treated just like regular instructions and thus require no special handling, but those that expand to sequences of instructions are of special interest, as dynasm-rs provides guarantees that the length of a sequence of instructions doesn’t change depending on the value of arguments, only the chosen instruction format. The following table lists all multi-instruction non-<code>li</code> pseudo instructions, as well as what they expand to.</p>
+<p>Table 4: RISC-V pseudo-instructions</p>
+<div><table><thead><tr><th style="text-align: left">Instruction</th><th style="text-align: left">Architecture</th><th style="text-align: left">Equivalent dynasm-rs instructions</th><th style="text-align: left">Function</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>la rd, label</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rd, label</code> <br><code>addi rd, rd, label + 4</code></td><td style="text-align: left">PC-relative load address</td></tr>
+<tr><td style="text-align: left"><code>lb rd, label</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rb, label</code> <br><code>lb rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load signed byte</td></tr>
+<tr><td style="text-align: left"><code>lbu rd, label</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rbu, label</code><br><code>lbu rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load unsigned byte</td></tr>
+<tr><td style="text-align: left"><code>lh rd, label</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rh, label</code> <br><code>lh rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load signed halfword</td></tr>
+<tr><td style="text-align: left"><code>lhu rd, label</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rhu, label</code><br><code>lhu rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load unsigned halfword</td></tr>
+<tr><td style="text-align: left"><code>lw rd, label</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rw, label</code> <br><code>lw rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load signed word</td></tr>
+<tr><td style="text-align: left"><code>lwu rd, label</code></td><td style="text-align: left">RV64</td><td style="text-align: left"><code>auipc rwu, label</code><br><code>lwu rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load unsigned word</td></tr>
+<tr><td style="text-align: left"><code>ld rd, label</code></td><td style="text-align: left">RV64</td><td style="text-align: left"><code>auipc rd, label</code> <br><code>ld rd, [rd, label + 4]</code></td><td style="text-align: left">PC-relative load doubleword</td></tr>
+<tr><td style="text-align: left"><code>flh rd, label, rt</code></td><td style="text-align: left">RV32/64Zfh</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>flh rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative load half float</td></tr>
+<tr><td style="text-align: left"><code>flw rd, label, rt</code></td><td style="text-align: left">RV32/64F</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>flw rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative load float</td></tr>
+<tr><td style="text-align: left"><code>fld rd, label, rt</code></td><td style="text-align: left">RV32/64D</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>fld rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative load double float</td></tr>
+<tr><td style="text-align: left"><code>flq rd, label, rt</code></td><td style="text-align: left">RV32/64Q</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>flq rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative load quad float</td></tr>
+<tr><td style="text-align: left"><code>sb rd, label, rt</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>sb rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store byte</td></tr>
+<tr><td style="text-align: left"><code>sh rd, label, rt</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>sh rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store halfword</td></tr>
+<tr><td style="text-align: left"><code>sw rd, label, rt</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>sw rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store word</td></tr>
+<tr><td style="text-align: left"><code>sd rd, label, rt</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>sd rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store doubleword</td></tr>
+<tr><td style="text-align: left"><code>fsh rd, label, rt</code></td><td style="text-align: left">RV32/64Zfh</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>fsh rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store half float</td></tr>
+<tr><td style="text-align: left"><code>fsw rd, label, rt</code></td><td style="text-align: left">RV32/64F</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>fsw rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store float</td></tr>
+<tr><td style="text-align: left"><code>fsd rd, label, rt</code></td><td style="text-align: left">RV32/64D</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>fsd rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store double float</td></tr>
+<tr><td style="text-align: left"><code>fsq rd, label, rt</code></td><td style="text-align: left">RV32/64Q</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>fsq rd, [rt, label + 4]</code></td><td style="text-align: left">PC-relative store quad float</td></tr>
+<tr><td style="text-align: left"><code>sext.b rd, rs</code></td><td style="text-align: left">RV32</td><td style="text-align: left"><code>slli rd, rs, 24</code> <br><code>srai rd, rd, 24</code></td><td style="text-align: left">Sign extend byte, when <code>Zbb</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>sext.b rd, rs</code></td><td style="text-align: left">RV64</td><td style="text-align: left"><code>slli rd, rs, 56</code> <br><code>srai rd, rd, 56</code></td><td style="text-align: left">Sign extend byte, when <code>Zbb</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>sext.h rd, rs</code></td><td style="text-align: left">RV32</td><td style="text-align: left"><code>slli rd, rs, 16</code> <br><code>srai rd, rd, 16</code></td><td style="text-align: left">Sign extend halfword, when <code>Zbb</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>sext.h rd, rs</code></td><td style="text-align: left">RV64</td><td style="text-align: left"><code>slli rd, rs, 48</code> <br><code>srai rd, rd, 48</code></td><td style="text-align: left">Sign extend halfword, when <code>Zbb</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>zext.h rd, rs</code></td><td style="text-align: left">RV32</td><td style="text-align: left"><code>slli rd, rs, 16</code> <br><code>srli rd, rd, 16</code></td><td style="text-align: left">Zero extend halfword, when <code>Zbb</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>zext.h rd, rs</code></td><td style="text-align: left">RV64</td><td style="text-align: left"><code>slli rd, rs, 48</code> <br><code>srli rd, rd, 48</code></td><td style="text-align: left">Zero extend halfword, when <code>Zbb</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>zext.w rd, rs</code></td><td style="text-align: left">RV64</td><td style="text-align: left"><code>slli rd, rs, 32</code> <br><code>srli rd, rd, 32</code></td><td style="text-align: left">Zero extend word, when <code>Zba</code> is unavailable</td></tr>
+<tr><td style="text-align: left"><code>jump offset, rt</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rt, label</code> <br><code>jalr zero, rt, label</code></td><td style="text-align: left">32-bit relative jump</td></tr>
+<tr><td style="text-align: left"><code>call offset</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc ra, label</code> <br><code>jalr ra, ra, label</code></td><td style="text-align: left">32-bit relative call</td></tr>
+<tr><td style="text-align: left"><code>call rd, offset</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc rd, label</code> <br><code>jalr rd, rd, label</code></td><td style="text-align: left">32-bit relative call, writing the return address to <code>rd</code></td></tr>
+<tr><td style="text-align: left"><code>tail offset</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left"><code>auipc t1, label</code> <br><code>jalr zero, t1, label</code></td><td style="text-align: left">32-bit relative tail call. Uses <code>t1</code> as temp, or <code>t2</code> when the <code>Zicfilp</code> extension is available</td></tr>
+</tbody></table>
+</div>
+<p>Note: <code>rt</code> in these instructions is a temporary register to use during address generation. Its value is not important to the instruction.</p>
+<h4 id="load-immediate"><a class="doc-anchor" href="#load-immediate">§</a>Load immediate</h4>
+<p>Another important pseudo-instruction is <code>li</code> or load immediate. In the GNU assembler, this instruction expands to a variable amount of instructions, designed to load the wanted immediate in an as small amount of instructions as possible. This means that the instruction sequence generated is dependent on the value of the immediate, and thus this approach does not work for dynasm-rs.</p>
+<p>Instead, dynasm-rs provides the user with several <code>li.bitsize</code> instructions that can load a signed immediate of at most <code>bitsize</code> bits into a register. Depending on the target architecture, the following pseudo-instructions are available:</p>
+<p>Table 5: Load immediate formats</p>
+<div><table><thead><tr><th style="text-align: left">Instruction</th><th style="text-align: left">Architecture</th><th style="text-align: left">Sequence length</th><th style="text-align: left">Value range</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>li.12 rd, imm</code></td><td style="text-align: left">RV32/64</td><td style="text-align: left">4 bytes</td><td style="text-align: left"><code>-0x800 &lt;= imm &lt;= 0x7FF</code></td></tr>
+<tr><td style="text-align: left"><code>li rd, imm</code></td><td style="text-align: left">RV32</td><td style="text-align: left">8 bytes</td><td style="text-align: left"><code>-0x8000_0000 &lt;= imm &lt;= 0x7FFF_FFFF</code></td></tr>
+<tr><td style="text-align: left"><code>li.32 rd, imm</code></td><td style="text-align: left">RV64</td><td style="text-align: left">8 bytes</td><td style="text-align: left"><code>-0x8000_0000 &lt;= imm &lt;= 0x7FFF_FFFF</code></td></tr>
+<tr><td style="text-align: left"><code>li.43 rd, imm</code></td><td style="text-align: left">RV64</td><td style="text-align: left">16 bytes</td><td style="text-align: left"><code>-0x400_0000_0000 &lt;= imm &lt;= 0x3FF_FFFF_FFFF</code></td></tr>
+<tr><td style="text-align: left"><code>li.54 rd, imm</code></td><td style="text-align: left">RV64</td><td style="text-align: left">24 bytes</td><td style="text-align: left"><code>-0x20_0000_0000_0000 &lt;= imm &lt;= 0x1F_FFFF_FFFF_FFFF</code></td></tr>
+<tr><td style="text-align: left"><code>li rd, imm</code></td><td style="text-align: left">RV64</td><td style="text-align: left">32 bytes</td><td style="text-align: left"><code>-0x8000_0000_0000_0000 &lt;= imm &lt;= 0x7FFF_FFFF_FFFF_FFFF</code></td></tr>
+</tbody></table>
+</div><h3 id="upper-immediate-instructions"><a class="doc-anchor" href="#upper-immediate-instructions">§</a>Upper immediate instructions</h3>
+<p>The behaviour of the load upper immediate instructions (<code>lui</code>, <code>c.lui</code>, and <code>auipc</code>) in dynasm-rs differs slightly from their behaviour in the GNU assembler. Where the GNU assembler expects the argument to be the result value shifted right 12 bits, dynasm-rs expects the argument to be the expected result value of the instruction. This is both done out of consistency (every other immediate in the instruction set is encoded this way) and to be logical with the way label references are handled. The following table shows the difference:</p>
+<p>Table 6: Upper immediate syntax</p>
+<div><table><thead><tr><th style="text-align: left">GNU style</th><th style="text-align: left">Dynasm-rs style</th><th style="text-align: left">Result</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>lui rd, 0x12345</code></td><td style="text-align: left"><code>lui rd, 0x12345000</code></td><td style="text-align: left"><code>rd == 0x12345000</code></td></tr>
+<tr><td style="text-align: left"><code>c.lui rd, 0x12</code></td><td style="text-align: left"><code>lui rd, 0x12000</code></td><td style="text-align: left"><code>rd == 0x12000</code></td></tr>
+<tr><td style="text-align: left"><code>auipc rd, 0x12345</code></td><td style="text-align: left"><code>auipc rd, 0x12345000</code></td><td style="text-align: left"><code>rd == pc + 0x12345000</code></td></tr>
+</tbody></table>
+</div><h3 id="pc-relative-instructions"><a class="doc-anchor" href="#pc-relative-instructions">§</a>PC-relative instructions</h3>
+<p>Due to its use of multi-instruction sequences for many PC-relative operations, RISC-V requires extra attention regarding jumps and pc-relative loads/stores. This section lays out the different classes of instructions, and their rules.</p>
+<h4 id="normal-branch-and-jump-instructions"><a class="doc-anchor" href="#normal-branch-and-jump-instructions">§</a>Normal branch and jump instructions</h4>
+<p>The basic jump to label instructions <code>j</code>, <code>jal</code>, and their compressed variants (<code>c.j</code>, <code>c.jal</code>), work without issues with dynasm-rs’s relocation system. The same applies to all conditional branches (<code>c.bnez</code>, <code>c.beqz</code>, and all <code>b[ge|le|eq|gt|lt|ne][uz ]</code> instructions). Note that many of these have very limited ranges, as shown in the table below:</p>
+<p>Table 7: Regular jump and branch range</p>
+<div><table><thead><tr><th style="text-align: left">Instructions</th><th style="text-align: left">jump offset size</th><th style="text-align: left">range</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>j</code>, <code>jal</code></td><td style="text-align: left">20 bits</td><td style="text-align: left"><code>pc-0x8_0000</code> to <code>pc+0x7_FFFE</code></td></tr>
+<tr><td style="text-align: left"><code>beq</code>, <code>beqz</code>,<br><code>bne</code>, <code>bnez</code>,<br><code>blt</code>, <code>bltu</code>, <code>bltz</code>,<br><code>bgt</code>, <code>bgtu</code>, <code>bgtz</code>,<br><code>ble</code>, <code>bleu</code>, <code>blez</code>,<br><code>bge</code>, <code>bgeu</code>, <code>bgez</code></td><td style="text-align: left">12 bits</td><td style="text-align: left"><code>pc-0x800</code> to <code>pc+0x7FF</code></td></tr>
+<tr><td style="text-align: left"><code>c.j</code>, <code>c.jal</code></td><td style="text-align: left">12 bits</td><td style="text-align: left"><code>pc-0x800</code> to <code>pc+0x7FF</code></td></tr>
+<tr><td style="text-align: left"><code>c.beqz</code>, <code>c.bnez</code></td><td style="text-align: left">9  bits</td><td style="text-align: left"><code>pc-0x100</code> to <code>pc+0xFF</code></td></tr>
+</tbody></table>
+</div><h4 id="auipc"><a class="doc-anchor" href="#auipc">§</a>AUIPC</h4>
+<p><code>auipc rd, imm</code> is the special instruction that allows for 32-bit PC-relative jumps and address generation in RISC-V. It functions by loading the current program counter, adding an immediate to it, and storing it to the destination register. However, this immediate only contains the upper 20 bits of a signed 32-bit value. The lower 12 bits of this address are then intended to be provided by instructions like <code>addi</code> and <code>addiw</code>, the offset in <code>jalr</code>, or the memory reference offset in load/store instructions.</p>
+<p>This does raise a problem in that these offsets are signed. Therefore, one cannot simply mask the higher bits of an offset and pass that to <code>auipc</code>, and then pass the lower bits to any of these instructions. The immediate passed to <code>auipc</code> must be biased by 0x800 before masking it. To ensure that such a sequence works correctly, dynasm-rs performs the needed adjustment for the user, provided the full immediate (or label) is passed to <code>auipc</code>.</p>
+<p>This results in the following behaviour for <code>auipc</code>:</p>
+<ul>
+<li><code>auipc rb, 0x12345000</code>: <code>rb = pc + 0x12345000</code></li>
+<li><code>auipc rb, 0x123457FF</code>: <code>rb = pc + 0x12345000</code></li>
+<li><code>auipc rb, 0x12345800</code>: <code>rb = pc + 0x12346000</code></li>
+<li><code>auipc rb, 0x12346000</code>: <code>rb = pc + 0x12346000</code></li>
+</ul>
+<h4 id="lower-immediate-instructions"><a class="doc-anchor" href="#lower-immediate-instructions">§</a>Lower immediate instructions</h4>
+<p>After use of <code>auipc rb, offset32</code> to load the offset program counter value, the following instructions can be used to fill in the lowest bits of the offset.</p>
+<p>Table 8: Lower immediate instruction formats for pc-relative operations</p>
+<div><table><thead><tr><th style="text-align: left">Instruction formats</th><th style="text-align: left">Function</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>addi rb, rb, offset32 &amp; 0xFFF</code></td><td style="text-align: left">load <code>pc + offset32</code> into <code>rb</code></td></tr>
+<tr><td style="text-align: left"><code>jalr ra, rb, offset32 &amp; 0xFFF</code></td><td style="text-align: left">Jump (possibly with link) to <code>pc + offset32</code></td></tr>
+<tr><td style="text-align: left"><code>lb  rb, [rb, offset32 &amp; 0xFFF]</code><br>and <code>lh</code>/<code>lw</code>/<code>ld</code>/<code>lbu</code>/<code>lhu</code>/<code>lwu</code></td><td style="text-align: left">loads a value from <code>[pc + offset32]</code> into <code>rb</code></td></tr>
+<tr><td style="text-align: left"><code>sb  rd, [rb, offset32 &amp; 0xFFF]</code><br>and <code>sh</code>/<code>sw</code>/<code>sd</code></td><td style="text-align: left">stores <code>rd</code> to <code>[pc + offset32]</code></td></tr>
+<tr><td style="text-align: left"><code>flh rd, [rb, offset32 &amp; 0xFFF]</code><br>and <code>flw</code>/<code>fld</code>/<code>flq</code></td><td style="text-align: left">loads a floating point value from <code>[pc + offset32]</code> into <code>rd</code></td></tr>
+<tr><td style="text-align: left"><code>slh rd, [rb, offset32 &amp; 0xFFF]</code><br>and <code>slw</code>/<code>sld</code>/<code>slq</code></td><td style="text-align: left">stores a floating point value <code>rd</code> to <code>[pc + offset32]</code></td></tr>
+</tbody></table>
+</div>
+<p>These instructions can also be used with dynamic offsets, in which case, dynasm-rs takes care of the masking automatically. It should be noted, that the program counter referenced in the description of these instructions is the address of the <code>auipc</code> instruction. In the case of static offsets, this is not a problem. But when dynasm-rs labels are used as the offset, the offset will evaluate to different values in the <code>auipc</code> instruction and the subsequent load/store/<code>addi</code>/<code>jalr</code>. To remedy this, an offset equal to the spacing between these instructions needs to be added to the relocation in the subsequent instruction:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code>-&gt;our_target_label:
+.u32 <span class="number">0xAABBCCDD
+</span>&lt;some code&gt;
+auipc x8, -&gt;our_target_label
+lw x9, [x8, -&gt;our_target_label + <span class="number">4</span>] <span class="comment">// loads 0xAABBCCDD
+</span>lw x9, [x8, -&gt;our_target_label + <span class="number">8</span>] <span class="comment">// also loads 0xAABBCCDD
+</span>nop
+lw x9, [x8, -&gt;our_target_label + <span class="number">16</span>] <span class="comment">// also loads 0xAABBCCDD</span></code></pre></div>
+<p>Using these offsets, it is also possible to load additional values around the label without additional <code>auipc</code> instructions, provided the net difference between the address of the <code>auipc</code> instruction and the address of the loaded value stays within the same <code>diff_hi - 0x800</code> to <code>diff_hi + 0x7FF</code> range.</p>
+<h4 id="pseudo-instructions-1"><a class="doc-anchor" href="#pseudo-instructions-1">§</a>Pseudo instructions</h4>
+<p>As the above combination of <code>auipc</code> and another instruction with these extra requirements, RISC-V provides several pseudo-instructions that expand into these sequences. These instructions are listed amongst other pseudo instructions in table 4, but to summarize them:</p>
+<ul>
+<li><code>la rd, offset/label</code> will load an address from the given label or 32-bit pc-relative offset.</li>
+<li>Integer load instructions have an additional format: <code>lb rd, offset/label</code>, which will perform a pc-relative load from the given label/32-bit offset</li>
+<li>Integer store instructions, as well as floating point load/store instructions have an additional format: <code>lb rd, offset/label, rt</code>, which will perform a pc-relative load from the given label/32-bit offset, using <code>rt</code> as a temporary.</li>
+<li><code>call offset/label</code>, <code>jump offset/label</code> and <code>tail offset/label</code> perform 32-bit calls/jumps/tail calls to the given label/32-bit offset.</li>
+</ul>
+<h4 id="range-limitations"><a class="doc-anchor" href="#range-limitations">§</a>Range limitations</h4>
+<p>Due to the mechanism used for performing 32-bit pc-relative operations on RISC-V (loading an upper immediate and then adding a signed lower immediate), the range of these 32-bit offsets is a bit odd. On RV64, They allow for creating addresses from <code>pc-0x8000_0800</code> to <code>pc+0x7FFF_F7FF</code>, or 32 bits of signed integer range biased around <code>-0x800</code>. This range would mean that provided values could be outside the range of an <code>i32</code>, and thus dynasm-rs restricts this further, limiting offsets to being between <code>-0x8000_0000</code> and <code>0x7FFF_F7FF</code>. This does reduce the available range slightly, but as the range was asymmetric to begin with, this extra range on backwards jumps was never useful.</p>
+<h1 id="supported-extensions"><a class="doc-anchor" href="#supported-extensions">§</a>Supported extensions</h1>
+<p>Dynasm-rs currently supports the following ratified RISC-V instruction set extensions:</p>
+<ul>
+<li><code>A</code>: atomic instructions</li>
+<li><code>C</code>: compressed instructions</li>
+<li><code>D</code>: double floating point support</li>
+<li><code>F</code>: floating point support</li>
+<li><code>I</code>: Base instruction set</li>
+<li><code>M</code>: multiplication and division</li>
+<li><code>Q</code>quad floating point support</li>
+<li><code>Zabha</code>: byte and halfword atomics</li>
+<li><code>Zacas</code>: atomic compare and swap</li>
+<li><code>Zawrs</code>: atomic wait-on-reservation-set</li>
+<li><code>Zba</code>: bit manipulation for address generation</li>
+<li><code>Zbb</code>: basic bit-manipulation</li>
+<li><code>Zbc</code>: carry-less multiplication</li>
+<li><code>Zbkb</code>: bit-manipulation for cryptography</li>
+<li><code>Zbkc</code>: carry-less bit-manipulation for cryptography</li>
+<li><code>Zbkx</code>: crossbar permutations</li>
+<li><code>Zbs</code>: single-bit instructions</li>
+<li><code>Zcb</code>: simple code-size savings</li>
+<li><code>Zcmop</code>: compressed may-be-operations</li>
+<li><code>Zcmp</code>: microcoded push/pop operations</li>
+<li><code>Zcmt</code>: table jumps</li>
+<li><code>Zfa</code>: additional floating point instructions</li>
+<li><code>Zfbfmin</code>: scalar convert to/from BF16</li>
+<li><code>Zfh</code>: half floating point support</li>
+<li><code>Zicbom</code>: cache block operations: management</li>
+<li><code>Zicbop</code>: cache block operations: prefetching</li>
+<li><code>Zicboz</code>: cache block operations: zero</li>
+<li><code>Zicfilp</code>: control flow integrity: landing pads</li>
+<li><code>Zicfiss</code>: control flow integrity: shadow stack</li>
+<li><code>Zicntr</code>: counters</li>
+<li><code>Zicond</code>: integer conditional operations</li>
+<li><code>Zicsr</code>: control and status registers</li>
+<li><code>Zifencei</code>: data to instruction cache fence</li>
+<li><code>Zihintntl</code>: non temporal load hints</li>
+<li><code>Zihintpause</code>: pause hint</li>
+<li><code>Zimop</code>: may-be-operations</li>
+<li><code>Zk</code>: Scalar cryptography</li>
+<li><code>Zkn</code>: NIST algorithm suite</li>
+<li><code>Zknd</code>: NIST suite: AES decryption</li>
+<li><code>Zkne</code>: NIST suite: AES decryption</li>
+<li><code>Zknh</code>: NIST suite: Hash function instruction</li>
+<li><code>Zks</code>: ShangMi algorithm suite</li>
+<li><code>Zksed</code>: ShangMi suite: SM4 block cipher</li>
+<li><code>Zksh</code>: ShangMi suite: SM3 hash function</li>
+</ul>
+
+    </section>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    var old = document.querySelectorAll("code.language-diffold");
+    var old_pre = [];
+    for (var i = 0; i < old.length; i++) {
+        var old_pre = old[i].parentNode;
+        var new_pre = old_pre.nextElementSibling;
+        if (new_pre && new_pre.childNodes.length > 0 && new_pre.childNodes[0].className == "language-diffnew") {
+            old_pre.className = "collapse-old";
+            new_pre.className = "collapse-new";
+        }
+    }
+
+});
+</script>
+
+</body>
+</html>

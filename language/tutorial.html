@@ -68,6 +68,15 @@
         <a href="./instructionref_aarch64.html">Instruction reference</a>
       </li>
     </ul>
+    <h4>riscv32/riscv64</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_riscv.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_riscv.html">Instruction reference</a>
+      </li>
+    </ul>
   </div>
 </nav>
 <section id="main" class="content mod docblock">
@@ -357,8 +366,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 }</code></pre></div>
 <h2 id="basics"><a class="doc-anchor" href="#basics">§</a>Basics</h2>
 <p>To kickstart this process, we’ll <code>use</code> the <code>dynasm!</code> macro as well as the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits:</p>
-<div class="example-wrap"><pre class="language-diffnew"><code>+ use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};
-</code></pre></div>
+<div class="example-wrap"><pre class="language-diffnew"><code>+ use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};</code></pre></div>
 <p>Next, we’ll define our own custom dynasm macro which first defines the current architecture as well as several aliases we’d like to use when writing the rest of the code.</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ macro_rules! my_dynasm {
 +     ($ops:ident $($t:tt)*) =&gt; {
@@ -372,8 +380,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +             $($t)*
 +         )
 +     }
-+ }
-</code></pre></div>
++ }</code></pre></div>
 <p>We can now define several utility macros to handle common operations in the code.</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ macro_rules! prologue {
 +     ($ops:ident) =&gt; {{
@@ -406,8 +413,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +         ; mov r8,  [rsp + 0x40]
 +         ; mov r9,  [rsp + 0x48]
 +     );};
-+ }
-</code></pre></div><h2 id="state"><a class="doc-anchor" href="#state">§</a>State</h2>
++ }</code></pre></div><h2 id="state"><a class="doc-anchor" href="#state">§</a>State</h2>
 <p>Looking at the state of the interpreter, it contains a lot of fields that the jit compiler doesn’t need. We therefore reduce the state and we define a second struct which will hold the compiled machine code:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- struct Interpreter&lt;&#39;a&gt; {
 -     pub input: Box&lt;BufRead + &#39;a&gt;,
@@ -416,8 +422,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 -     pub tape: [u8; TAPE_SIZE],
 -     pub tape_index: usize,
 -     pub pos: usize
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ struct State&lt;&#39;a&gt; {
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ struct State&lt;&#39;a&gt; {
 +     pub input: Box&lt;BufRead + &#39;a&gt;,
 +     pub output: Box&lt;Write + &#39;a&gt;,
 +     tape: [u8; TAPE_SIZE]
@@ -426,8 +431,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 + struct Program {
 +     code: dynasmrt::ExecutableBuffer,
 +     start: dynasmrt::AssemblyOffset,
-+ }
-</code></pre></div><h2 id="compiler"><a class="doc-anchor" href="#compiler">§</a>Compiler</h2>
++ }</code></pre></div><h2 id="compiler"><a class="doc-anchor" href="#compiler">§</a>Compiler</h2>
 <p>With the state defined, we can now start adapting the <code>Interpreter::run</code> method into <code>Program::compile</code>, starting with initalization code. We initialize an assembler and a <code>Vec</code> to hold the loops stack. As we will only parse through the code once, replace the slice indexing by an iterator that allows us to look ahead, courtesy of the <code>itertools</code> crate. We get the starting offset and emit the function prologue and finally we start iterating through the program:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- impl&lt;&#39;a&gt; Interpreter&lt;&#39;a&gt; {
 -     fn new(input: Box&lt;BufRead + &#39;a&gt;, output: Box&lt;Write + &#39;a&gt;) -&gt; Interpreter&lt;&#39;a&gt; {
@@ -443,8 +447,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 - 
 -     fn run(&amp;mut self, program: &amp;[u8]) -&gt; Result&lt;(), &amp;&#39;static str&gt; {
 -         while let Some(&amp;c) = program.get(self.pos) {
--             self.pos += 1;
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ impl Program {
+-             self.pos += 1;</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ impl Program {
 +     fn compile(program: &amp;[u8]) -&gt; Result&lt;Program, &amp;&#39;static str&gt; {
 +         let mut ops = dynasmrt::x64::Assembler::new().unwrap();
 +         let mut loops = Vec::new();
@@ -452,8 +455,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 + 
 +         let start = prologue!(ops);
 + 
-+         while let Some(c) = code.next() {
-</code></pre></div><h3 id="tape-movement"><a class="doc-anchor" href="#tape-movement">§</a>Tape movement</h3>
++         while let Some(c) = code.next() {</code></pre></div><h3 id="tape-movement"><a class="doc-anchor" href="#tape-movement">§</a>Tape movement</h3>
 <p>We can now replace the the tape movement by an optimized assembly version. Note the local label used to implement tape wraparound:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;&lt;&#39;);
 - self.pos += amount;
@@ -461,30 +463,26 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 - self.tape_index = self.tape_index.wrapping_sub(amount + 1);
 - while self.tape_index &gt;= TAPE_SIZE {
 -     self.tape_index = self.tape_index.wrapping_add(TAPE_SIZE);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;&lt;&#39;).count() + 1;
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;&lt;&#39;).count() + 1;
 + my_dynasm!(ops
 +     ; sub a_current, (amount % TAPE_SIZE) as _
 +     ; cmp a_current, a_begin
 +     ; jae &gt;wrap
 +     ; add a_current, TAPE_SIZE as _
 +     ;wrap:
-+ );
-</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;&gt;&#39;);
++ );</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;&gt;&#39;);
 - self.pos += amount;
 - self.tape_index += amount + 1;
 - while self.tape_index &gt;= TAPE_SIZE {
 -     self.tape_index -= TAPE_SIZE;
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;&gt;&#39;).count() + 1;
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;&gt;&#39;).count() + 1;
 + my_dynasm!(ops
 +     ; add a_current, (amount % TAPE_SIZE) as _
 +     ; cmp a_current, a_end
 +     ; jb &gt;wrap
 +     ; sub a_current, TAPE_SIZE as _
 +     ;wrap:
-+ );
-</code></pre></div><h3 id="arithmetric"><a class="doc-anchor" href="#arithmetric">§</a>Arithmetric</h3>
++ );</code></pre></div><h3 id="arithmetric"><a class="doc-anchor" href="#arithmetric">§</a>Arithmetric</h3>
 <p>The <code>+</code> and <code>-</code> instructions have by far the most simple implementations. Note that when an overflow occurs at runtime, we jump to the <code>-&gt;overflow:</code> global label (Note: overflow is somewhat ill-defined in brainfsck, but in the spirit of Rust I decided that everything that can be checked should be checked):</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;+&#39;);
 - self.pos += amount;
@@ -492,31 +490,27 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 -     self.tape[self.tape_index] = a;
 - } else {
 -     return Err(&quot;An overflow occurred&quot;);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;+&#39;).count() + 1;
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;+&#39;).count() + 1;
 + if amount &gt; u8::MAX as usize {
 +     return Err(&quot;An overflow occurred&quot;);
 + }
 + my_dynasm!(ops
 +     ; add BYTE [a_current], amount as _
 +     ; jo -&gt;overflow
-+ );
-</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;-&#39;);
++ );</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- let amount = count_leading_chars(&amp;program[self.pos..], b&#39;-&#39;);
 - self.pos += amount;
 - if let Some(a) = self.tape[self.tape_index].checked_sub(amount as u8 + 1) {
 -     self.tape[self.tape_index] = a;
 - } else {
 -     return Err(&quot;An overflow occurred&quot;);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;-&#39;).count() + 1;
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let amount = code.take_while_ref(|x| *x == b&#39;-&#39;).count() + 1;
 + if amount &gt; u8::MAX as usize {
 +     return Err(&quot;An overflow occurred&quot;);
 + }
 + my_dynasm!(ops
 +     ; sub BYTE [a_current], amount as _
 +     ; jo -&gt;overflow
-+ );
-</code></pre></div><h3 id="io"><a class="doc-anchor" href="#io">§</a>I/O</h3>
++ );</code></pre></div><h3 id="io"><a class="doc-anchor" href="#io">§</a>I/O</h3>
 <p>As the input and output fields of state are implemented as trait objects, we need to handle the virtual call to them in Rust code. Therefore, we first define the following wrapper methods on <code>State</code>:</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>impl&lt;&#39;a&gt; State&lt;&#39;a&gt; {
     unsafe extern &quot;win64&quot; fn getchar(state: *mut State, cell: *mut u8) -&gt; u8 {
@@ -528,27 +522,22 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     unsafe extern &quot;win64&quot; fn putchar(state: *mut State, cell: *mut u8) -&gt; u8 {
         let state = &amp;mut *state;
         state.output.write_all(slice::from_raw_parts(cell, 1)).is_err() as u8
-    }
-</code></pre></div>
+    }</code></pre></div>
 <p>We can then simply call these methods directly from the compiled code. If the I/O functions failed, we jump to the <code>-&gt;io_failure</code> global label:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- let err = self.output.flush().is_err();
 - if self.input.read_exact(&amp;mut self.tape[self.tape_index..self.tape_index + 1]).is_err() || err {
 -     return Err(&quot;IO error&quot;);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ my_dynasm!(ops
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ my_dynasm!(ops
 +     ;; call_extern!(ops, State::getchar)
 +     ; cmp al, 0
 +     ; jnz -&gt;io_failure
-+ );
-</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- if self.output.write_all(&amp;self.tape[self.tape_index..self.tape_index + 1]).is_err() {
++ );</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- if self.output.write_all(&amp;self.tape[self.tape_index..self.tape_index + 1]).is_err() {
 -     return Err(&quot;IO error&quot;);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ my_dynasm!(ops
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ my_dynasm!(ops
 +     ;; call_extern!(ops, State::putchar)
 +     ; cmp al, 0
 +     ; jnz -&gt;io_failure
-+ );
-</code></pre></div><h3 id="loops"><a class="doc-anchor" href="#loops">§</a>Loops</h3>
++ );</code></pre></div><h3 id="loops"><a class="doc-anchor" href="#loops">§</a>Loops</h3>
 <p>The <code>[</code> and <code>]</code> commands have the most complex implementation. When a <code>[</code> is encountered, we need to declare two dynamic labels. One to jump to after the <code>]</code> when the current tape value is 0 and another to jump from the <code>]</code> to just after the <code>[</code> when the current tape value is not 0. Additionally, we special case the sequence <code>[-]</code> which is often used to set the current tape value to 0 and emit optimized machine code for it.</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- if self.tape[self.tape_index] == 0 {
 -     let mut nesting = 1;
@@ -563,8 +552,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 -     self.pos += amount;
 - } else {
 -     self.loops.push(self.pos);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let first = code.peek() == Some(&amp;b&#39;-&#39;);
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let first = code.peek() == Some(&amp;b&#39;-&#39;);
 + if first &amp;&amp; code.peek() == Some(&amp;b&#39;]&#39;) {
 +     code.next();
 +     code.next();
@@ -580,15 +568,13 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +         ; jz =&gt;forward_label
 +         ;=&gt;backward_label
 +     );
-+ }
-</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- if self.tape[self.tape_index] == 0 {
++ }</code></pre></div><div class="example-wrap"><pre class="language-diffold"><code>- if self.tape[self.tape_index] == 0 {
 -     self.loops.pop();
 - } else if let Some(&amp;loc) = self.loops.last() {
 -     self.pos = loc;
 - } else {
 -     return Err(&quot;] without matching [&quot;);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ if let Some((backward_label, forward_label)) = loops.pop() {
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ if let Some((backward_label, forward_label)) = loops.pop() {
 +     my_dynasm!(ops
 +         ; cmp BYTE [a_current], 0
 +         ; jnz =&gt;backward_label
@@ -596,8 +582,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     );
 + } else {
 +     return Err(&quot;] without matching [&quot;);
-+ },
-</code></pre></div><h3 id="epilogue"><a class="doc-anchor" href="#epilogue">§</a>Epilogue</h3>
++ },</code></pre></div><h3 id="epilogue"><a class="doc-anchor" href="#epilogue">§</a>Epilogue</h3>
 <p>With the end of the parsing reached, we must now handle the return and possible error conditions. This is done by returning 0 if the execution was successful, or an error code when an error happened at runtime.</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ my_dynasm!(ops
 +     ;; epilogue!(ops, 0)
@@ -605,16 +590,13 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     ;; epilogue!(ops, 1)
 +     ;-&gt;io_failure:
 +     ;; epilogue!(ops, 2)
-+ );
-</code></pre></div>
++ );</code></pre></div>
 <p>Now we can finalize the assembler and construct a Program from the resulting buffer:</p>
-<div class="example-wrap"><pre class="language-diffold"><code>- Ok(())
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let code = ops.finalize().unwrap();
+<div class="example-wrap"><pre class="language-diffold"><code>- Ok(())</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let code = ops.finalize().unwrap();
 + Ok(Program {
 +     code: code,
 +     start: start
-+ })
-</code></pre></div><h2 id="calling-the-compiled-code"><a class="doc-anchor" href="#calling-the-compiled-code">§</a>Calling the compiled code</h2>
++ })</code></pre></div><h2 id="calling-the-compiled-code"><a class="doc-anchor" href="#calling-the-compiled-code">§</a>Calling the compiled code</h2>
 <p>First, we add an initializer method to <code>State</code>:</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ fn new(input: Box&lt;BufRead + &#39;a&gt;, output: Box&lt;Write + &#39;a&gt;) -&gt; State&lt;&#39;a&gt; {
 +     State {
@@ -622,8 +604,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +         output: output,
 +         tape: [0; TAPE_SIZE]
 +     }
-+ }
-</code></pre></div>
++ }</code></pre></div>
 <p>Then, we add a <code>run</code> method on <code>Program</code>. This method does the following:</p>
 <ul>
 <li>Transmute a pointer to the start of our compiled data to a function. This is the one <code>unsafe</code> block always needed when using Dynasm-rs, but it is probably the most dangerous one you’ll ever find.</li>
@@ -647,8 +628,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 +     } else {
 +         panic!(&quot;Unknown error code&quot;);
 +     }
-+ }
-</code></pre></div>
++ }</code></pre></div>
 <p>And finally, we can edit the <code>main</code> function to use the JIT:</p>
 <div class="example-wrap"><pre class="language-diffold"><code>- let mut interp = Interpreter::new(
 -     Box::new(BufReader::new(stdin())), 
@@ -656,8 +636,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 - );
 - if let Err(e) = interp.run(&amp;buf) {
 -     println!(&quot;{}&quot;, e);
-- }
-</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let mut state = State::new(
+- }</code></pre></div><div class="example-wrap"><pre class="language-diffnew"><code>+ let mut state = State::new(
 +     Box::new(BufReader::new(stdin())), 
 +     Box::new(BufWriter::new(stdout()))
 + );
@@ -671,8 +650,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 + if let Err(e) = program.run(&amp;mut state) {
 +     println!(&quot;{}&quot;, e);
 +     return;
-+ }
-</code></pre></div><h2 id="result"><a class="doc-anchor" href="#result">§</a>Result</h2>
++ }</code></pre></div><h2 id="result"><a class="doc-anchor" href="#result">§</a>Result</h2>
 <p>With these changes, adding the necessary <code>use</code> statements and removing unused functions, you should end up with the following code (you can also find this example <a href="https://github.com/CensoredUsername/dynasm-rs/tree/master/doc/examples/bf-jit">here</a>):</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};

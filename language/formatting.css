@@ -1,11 +1,11 @@
-@import url('../static.files/rustdoc-c5d6553a23f1e5a6.css');
+@import url('../static.files/rustdoc-46132b98.css');
 @import url('../static.files/light*.css');
 
-code.language-diffnew {
+pre.language-diffnew code {
     background-color: rgb(203, 255, 203);
 }
 
-code.language-diffold {
+pre.language-diffold code {
     background-color: rgb(255, 203, 203);
 }
 
