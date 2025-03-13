@@ -5,6 +5,8 @@ use lazy_static::lazy_static;
 use std::collections::{HashMap, hash_map};
 use super::ast::RegId;
 
+use std::fmt;
+
 /// A template contains the information for the static parts of an instruction encoding, as well
 /// as its bitsize and length
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -137,10 +139,10 @@ impl ExtensionFlags {
     const fn make(bits: u64) -> ExtensionFlags {
         ExtensionFlags::from_bits_truncate(bits)
     }
+}
 
-    /// formats the extension list into the standard RISC-V architecture specification format
-    pub fn to_string(&self) -> String {
-        let mut item = String::new();
+impl fmt::Display for ExtensionFlags {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut encountered_z = false;
 
         // assemble extension sets. only use underscores between Z flags
@@ -148,17 +150,16 @@ impl ExtensionFlags {
             let flag = &flag[3..];
 
             if encountered_z {
-                item.push_str("_");
+                write!(f, "_")?;
             }
 
-            item.push_str(flag);
+            write!(f, "{}", flag)?;
 
             if flag.starts_with("Z") {
                 encountered_z = true;
             }
         }
-
-        item
+        Ok(())
     }
 }
 

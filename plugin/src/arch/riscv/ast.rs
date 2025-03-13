@@ -8,6 +8,8 @@ use proc_macro2::Span;
 use crate::common::Jump;
 use super::riscvdata::Opdata;
 
+use std::fmt;
+
 
 /// A generic register reference. Can be either a static RegId or a dynamic register from a family
 #[derive(Debug, Clone)]
@@ -73,13 +75,14 @@ impl RegId {
             _ => unreachable!(),
         }
     }
+}
 
-    /// Returns this register as a string
-    pub fn to_string(self) -> String {
+impl fmt::Display for RegId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.family() {
-            RegFamily::INTEGER => format!("x{}", self.code()),
-            RegFamily::FP => format!("f{}", self.code()),
-            RegFamily::VECTOR => format!("v{}", self.code()),
+            RegFamily::INTEGER => write!(f, "x{}", self.code()),
+            RegFamily::FP => write!(f, "f{}", self.code()),
+            RegFamily::VECTOR => write!(f, "v{}", self.code()),
         }
     }
 }
@@ -136,6 +139,7 @@ pub enum RegListCount {
 /// * a register (one of the above)
 /// * a memory reference `expr? ( intreg ) `
 /// * a register list {ra [, s0 [- s_n]]}
+///
 /// this last one is somewhat problematic, as just parsing the expr will normally swallow
 /// the register reference as a call expression.
 #[derive(Debug)]

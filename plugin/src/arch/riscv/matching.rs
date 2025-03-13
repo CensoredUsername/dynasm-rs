@@ -42,7 +42,7 @@ pub(super) fn match_instruction(ctx: &mut Context, mut instruction: ParsedInstru
 
     let mut error = format!("'{}': instruction format mismatch, expected one of the following forms:\n{}", &instruction.name, format_opdata_list(&instruction.name, opdata, ctx.target));
     if rejected_because_features {
-        error.push_str(&format!("\nNote: some instruction formats were rejected because of inactive ISA extension sets."));
+        error.push_str("\nNote: some instruction formats were rejected because of inactive ISA extension sets.");
     }
 
     Err(Some(error))
@@ -179,7 +179,7 @@ impl Matcher {
                 Matcher::Imm => true,
                 Matcher::Offset => true,
                 Matcher::Ident => as_ident(value).is_some(),
-                Matcher::Lit(literal) => as_ident(value).map_or(false, |v| &v.to_string() == literal.as_str()),
+                Matcher::Lit(literal) => as_ident(value).map_or(false, |v| v == literal.as_str()),
                 _ => false
             },
             RawArg::JumpTarget { jump } => *self == Matcher::Offset,
@@ -195,11 +195,8 @@ impl Matcher {
                 Matcher::RefSp => base.as_id() == Some(RegId::X2),
                 _ => false,
             },
-            RawArg::LabelReference { .. } => match self {
-                Matcher::RefLabel => true,
-                _ => false,
-            },
-            RawArg::RegisterList { first, count, .. } => *self == Matcher::Xlist,
+            RawArg::LabelReference { .. } => matches!(self, Matcher::RefLabel),
+            RawArg::RegisterList { first, count, .. } => matches!(self, Matcher::Xlist),
         }
     }
 }

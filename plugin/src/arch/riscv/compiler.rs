@@ -189,7 +189,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rpops2(offset) => match data.args.get(cursor - 1) {
                     Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
-                        let code = id2.code() as u8;
+                        let code: u8 = id2.code();
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
@@ -275,7 +275,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range: u32 = bitmask(bits);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -302,7 +302,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let min: i32 = (-1) << (bits - 1);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -329,7 +329,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let min: i64 = (-1) << (bits - 1);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -355,7 +355,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -386,7 +386,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let min: i32 = (-1) << (bits - 1);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -417,7 +417,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let zeromask: u32 = bitmask(scaling);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -447,7 +447,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let max = u32::from(max);
 
                     let mut imm_encoder = ImmediateEncoder::new(value);
-                    imm_encoder.gather_fields(&data.data.commands, i + 1, &mut statics);
+                    imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
                         Some(static_value) => {
@@ -733,8 +733,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                     static_value = static_value.saturating_neg();
                                 }
 
-                                let bits = static_range_check(static_value, bias as i32, 48, 4, span)? >> 4;
-                                statics.push((offset, u32::from(bits)));
+                                let bits = static_range_check(static_value, bias, 48, 4, span)? >> 4;
+                                statics.push((offset, bits));
 
                                 break 'spimm;
 
@@ -837,7 +837,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             templates[1] = val2;
         },
         Template::Many(values) => {
-            templates[ .. values.len()].copy_from_slice(&values);
+            templates[ .. values.len()].copy_from_slice(values);
         }
     };
 
@@ -1088,11 +1088,9 @@ fn static_range_check(value: i64, min: i32, range: u32, scale: u8, span: Span) -
 
     let biased = biased as u32;
 
-    if scale != 0 {
-        if biased & bitmask(scale) != 0 {
-            emit_error!(span, "Unrepresentable immediate");
-            return Err(None);
-        }
+    if scale != 0 && (biased & bitmask(scale)) != 0 {
+        emit_error!(span, "Unrepresentable immediate");
+        return Err(None);
     }
 
     Ok(biased)

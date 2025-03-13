@@ -49,9 +49,8 @@ pub fn format_opdata_list(name: &str, data: &[Opdata], target: RiscVTarget) -> S
     let mut forms = Vec::new();
 
     for data in data {
-        if target.is_64_bit() && !data.isa_flags.contains(ISAFlags::RV64) {
-            continue
-        } else if target.is_32_bit() && !data.isa_flags.contains(ISAFlags::RV32) {
+        if (target.is_64_bit() && !data.isa_flags.contains(ISAFlags::RV64)) || 
+           (target.is_32_bit() && !data.isa_flags.contains(ISAFlags::RV32)) {
             continue
         }
 
@@ -93,7 +92,7 @@ pub fn format_opdata(name: &str, data: &Opdata) -> String {
         match matcher {
             Matcher::X => write!(buf, "x{}", arg_names[0]).unwrap(),
             Matcher::F => write!(buf, "f{}", arg_names[0]).unwrap(),
-            Matcher::Reg(regid) => write!(buf, "{}", regid.to_string()).unwrap(),
+            Matcher::Reg(regid) => write!(buf, "{}", regid).unwrap(),
             Matcher::Xlist => write!(buf, "{{reg_list}}").unwrap(),
             Matcher::Ref => write!(buf, "[x{}]", arg_names[0]).unwrap(),
             Matcher::RefOffset => write!(buf, "[x{}, {}]", arg_names[0], arg_names[1]).unwrap(),
@@ -290,18 +289,18 @@ fn check_command_sanity(args: &[ArgWithCommands]) -> Result<(), &'static str> {
 /// assign names to the args being used
 fn name_args(args: &mut [ArgWithCommands]) {
     // iirc no op uses more than 4 unconstrained literals / immediates
-    let reg_name_list;
+    
     let mut reg_name_idx = 0;
     let imm_name_list = ["", "1", "2", "3"];
     let mut imm_name_idx = 0;
 
     // if this is a memory instruction
-    if args.iter().any(|arg| arg.arg == FlatArgTy::Direct(true)) &&
+    let reg_name_list = if args.iter().any(|arg| arg.arg == FlatArgTy::Direct(true)) &&
        args.iter().filter(|arg| arg.arg == FlatArgTy::Direct(false)).count() == 1 {
-        reg_name_list = ["v", "v", "v", "v"];
+        ["v", "v", "v", "v"]
     } else {
-        reg_name_list = ["d", "s1", "s2", "s3"];
-    }
+        ["d", "s1", "s2", "s3"]
+    };
 
     for arg in args {
         match arg.arg {
@@ -446,7 +445,7 @@ pub fn format_features(data: &Opdata) -> String {
         items.push(item);
     }
 
-    return format!("({})", items.join(" or "))
+    format!("({})", items.join(" or "))
 }
 
 
