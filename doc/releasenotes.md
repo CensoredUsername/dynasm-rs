@@ -2,6 +2,18 @@
 
 The `dynasm-rs` project consists out of two crates: The procedural macro crate `dynasm` and the runtime support crate `dynasmrt`. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards `dynasmrt` depends on `dynasm` itself to simplify this relationship. Any version listings below therefore refers to both the `dynasm` and `dynasmrt` crate version.
 
+
+Version 3.2.0
+=============
+
+Architecture support
+--------------------
+- RISC-V targets got support for the `Zfinx`, `Zhinx`, `Zdinx`, `Zhinxmin` and `Zfhmin` instruction
+  set extensions.
+- RISC-V targets now automatically expand the `B` collection of ISA EXTENSIONS
+- RISC-V targets now ignore the `Ztso` extension instead of it causing an error
+  (as it doesn't actually add any new instructions).
+
 Version 3.1.0
 =============
 
@@ -24,7 +36,7 @@ General
 Architecture support
 --------------------
 - added `riscv32i`, `riscv32e`, `riscv64i` and `riscv64e` architecture targets.
-- `x64` gained support for the `RDPRU` instruction (Thanks to eigenform!)
+- `x64` gained support for the `RDPRU` instruction (Thanks to eigenform!).
 
 Version 3.0.1
 =============
