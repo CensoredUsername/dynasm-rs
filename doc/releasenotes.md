@@ -2,6 +2,20 @@
 
 The `dynasm-rs` project consists out of two crates: The procedural macro crate `dynasm` and the runtime support crate `dynasmrt`. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards `dynasmrt` depends on `dynasm` itself to simplify this relationship. Any version listings below therefore refers to both the `dynasm` and `dynasmrt` crate version.
 
+Version 3.1.0
+=============
+
+Architecture support
+--------------------
+
+This release adds support for several architectures from the RISC-V family of instruction sets.
+These are `riscv64i`, `riscv64e`, `riscv32i` and `riscv32e`. There's also support for a large set
+of instruction set extensions. This architecture support is introduced with the same standards as
+currently supported targets, meaning that they come with full runtime support, immediate checking
+and cache management support out of the box.
+
+This architecture support has been sponsored by [Wasmer](https://wasmer.io).
+
 Version 3.0.1
 =============
 
