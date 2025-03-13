@@ -53,6 +53,6 @@ in dynasm-rs it is `reg => Type.attr`.
 
 - Unknown due to lack of documentation on LuaJIT's dynasm.
 
-### aarch64
+### RISC-V
 
 - Unknown due to lack of documentation on LuaJIT's dynasm.
