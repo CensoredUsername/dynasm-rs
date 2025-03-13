@@ -33,7 +33,7 @@ The following base syntax units are recognized by the parser.
 
 ## Targets
 
-The RISC-V instruction set family comprises several different architectures. At the time of writing, dynasm-rs supports the following targets, which can be selected using the `.arch` directive.
+The RISC-V instruction set family comprises several different architectures. At the time of writing, dynasm-rs supports the following targets, which can be selected using the `.arch` directive:
 
 Table 1: dynasm-rs RISC-V architecture support
 
@@ -59,7 +59,7 @@ Selecting the active set of instruction set extensions in dynasm-rs is done usin
 
 At the time of writing, the official RISC-V Assembly Programmer's manual is still in development state at version `0.0.1`. It currently doesn't cover a significant part of the syntax that is used in much of the RISC-V documentation. The assembly language used by dynasm-rs in riscv mode is therefore inspired by the assembly dialect used by the GNU assembler. Several additions have been made to support dynamic registers, and to ensure the Rust parser can parse it.
 
-A significant difference exists in the syntax used for memory references. The GNU assembler uses `offset(base_register)` syntax for these. Use of this syntax in dynasm-rs would cause parsing ambiguities as it is unclear if the given expression should be parsed as an immediate that contains a function call, or a memory reference. Therefore, the dynasm-rs RISC-V backends uses arm-style `[base, offset]` memory references.
+A significant difference exists in the syntax used for memory references. The GNU assembler uses `offset(base_register)` syntax for these. Use of this syntax in dynasm-rs would cause parsing ambiguities as it is unclear if the given expression should be parsed as an immediate that contains a function call, or a memory reference. Therefore, the dynasm-rs RISC-V assembly language uses arm-style `[base, offset]` memory references.
 
 ### Operands
 
@@ -113,7 +113,7 @@ Note that not all RISC-V instructions accept all registers. In particular, many 
 
 #### Register lists
 
-Several instructions in the `Zcmp` instruction set extension take a list of registers as argument. These register lists confirm to a fixed format of the `ra` register, and 0 to 12 registers from the set `s0-s11`. Alternatively, the amount of saved registers can be passed dynamically using the `{ra; expr}` syntax, where `expr` should be an expression that evaluates to the amount of saved registers in the register list. This can be any number from 0 to 10, or 12. It is impossible to encode 11 saved registers. Note that on `RV32E` and `RV64E` only 0 to 2 saved registers can be encoded.
+Several instructions in the `Zcmp` instruction set extension take a list of registers as argument. These register lists conform to a fixed format of the `ra` register, and 0 to 12 registers from the set `s0-s11`. Alternatively, the amount of saved registers can be passed dynamically using the `{ra; expr}` syntax, where `expr` should be an expression that evaluates to the amount of saved registers in the register list. This can be any number from 0 to 10, or 12. It is impossible to encode 11 saved registers. Note that on `RV32E` and `RV64E` only 0 to 2 saved registers can be encoded.
 
 The following instructions are examples of the allowed formats:
 
@@ -132,7 +132,7 @@ All flow control instructions and instructions featuring PC-relative addressing 
 
 #### Memory references
 
-As a load-store architecture, the aarch64 instruction set only has a limited amount of instructions capable of addressing memory. These memory references can have several different format, which are listed in the table below. The valid formats for each instruction can be found in the instruction reference.
+As a load-store architecture, the RISC-V instruction sets only has a limited amount of instructions capable of addressing memory. These memory references can have several different format, which are listed in the table below. The valid formats for each instruction can be found in the instruction reference.
 
 Table 3: dynasm-rs RISC-V memory reference formats
 
@@ -141,11 +141,11 @@ Syntax                           | Explanation
 <code>[xn]</code>                | An `X` family register is used as the address to be resolved.
 <code>[xn {, imm } ]</code>      | An `X` family register is used as base with an optional integer offset as the address to be resolved.
 <code>[sp {, imm } ]</code>      | The `sp` register is used as base with an optional integer offset as the address to be resolved.
-<code>[xn {, labelref } ]</code> | The lower 12 bits of a relocation are added to an address in the `X` family register. See the section on pc-relative instruction for further details.
+<code>[xn {, labelref } ]</code> | The lower 12 bits of a relocation are added to an address in the `X` family register. See the section on pc-relative instructions for further details.
 
 #### Immediates
 
-The RISC-V instruction features both signed and unsigned immediate operands. The size of these immediates is often not a clean amount of bytes but instead measured in bits. Dynasm-rs expects the type of any dynamic RISC-V immediates to be passed to be `u32` for unsigned immediates and `i32` for signed immediates, with the exception of the >32bits `li` pseudo-instructions. These immediates are where possible validated at compile time. If an impossible immediate is requested at runtime, this will result in a panic.
+The RISC-V instruction set features both signed and unsigned immediate operands. The size of these immediates is often not a clean amount of bytes and thus a larger than the maximum value integer type is needed to pass these arguments. Dynasm-rs expects the type of any dynamic RISC-V immediates to be passed to be `u32` for unsigned immediates and `i32` for signed immediates, with the exception of the >32bits `li` pseudo-instructions which use `i64`. These immediates are where possible validated at compile time. If an impossible immediate is provided at runtime, this will result in a panic.
 
 Several instructions have additional requirements on any passed immediates. Consult the instruction reference for the exact requirements of each instruction.
 
@@ -155,7 +155,7 @@ The `C` extension set for RISC-V defines several compressed instructions that im
 
 ### Pseudo-Instructions
 
-The RISC-V ISA specifies several pseudo-instructions next to its regular instructions. These are either aliases for another instruction with some preconfigured arguments (like `sext.w rd, rs1 = addiw rd, rs1, 0`), or they expand to sequences of several instructions. Alias instructions can be treated just like regular instructions and thus require no special handling, but those that expand to sequences of instructions are of special interest, as dynasm-rs provides guarantees that the length of a sequence of instructions doesn't change depending on the value of arguments, only the chosen instruction format. Therefore, these instructions are listed in the following table, as well as what they expand to.
+The RISC-V ISA specifies several pseudo-instructions next to its regular instructions. These are either aliases for another instruction with some preconfigured arguments (like `sext.w rd, rs1 = addiw rd, rs1, 0`), or they expand to sequences of several instructions. Alias instructions can be treated just like regular instructions and thus require no special handling, but those that expand to sequences of instructions are of special interest, as dynasm-rs provides guarantees that the length of a sequence of instructions doesn't change depending on the value of arguments, only the chosen instruction format. The following table lists all multi-instruction non-`li` pseudo instructions, as well as what they expand to.
 
 Table 4: RISC-V pseudo-instructions
 
@@ -191,13 +191,13 @@ Instruction         |Architecture| Equivalent dynasm-rs instructions            
 `jump offset, rt`   | RV32/64    | `auipc rt, label` <br>`jalr zero, rt, label`    | 32-bit relative jump
 `call offset`       | RV32/64    | `auipc ra, label` <br>`jalr ra, ra, label`      | 32-bit relative call
 `call rd, offset`   | RV32/64    | `auipc rd, label` <br>`jalr rd, rd, label`      | 32-bit relative call, writing the return address to `rd`
-`tail offset`       | RV32/64    | `auipc t1, label` <br>`jalr zero, t1, label`    | 32-bit relative tail call. Uses `t1` as temp or `t2` when the `Zicfilp` extension is available
+`tail offset`       | RV32/64    | `auipc t1, label` <br>`jalr zero, t1, label`    | 32-bit relative tail call. Uses `t1` as temp, or `t2` when the `Zicfilp` extension is available
 
 Note: `rt` in these instructions is a temporary register to use during address generation. Its value is not important to the instruction.
 
 #### Load immediate
 
-Another important pseudo-instruction is `li` or load immediate. In regular RISC-V assembly, this instruction expands to a large possible number of sequences, designed to load the wanted immediate in an as small amount of instructions as possible. This means that the instruction sequence generated is dependent on the value of the immediate, and thus this approach does not work for dynasm-rs.
+Another important pseudo-instruction is `li` or load immediate. In the GNU assembler, this instruction expands to a variable amount of instructions, designed to load the wanted immediate in an as small amount of instructions as possible. This means that the instruction sequence generated is dependent on the value of the immediate, and thus this approach does not work for dynasm-rs.
 
 Instead, dynasm-rs provides the user with several `li.bitsize` instructions that can load a signed immediate of at most `bitsize` bits into a register. Depending on the target architecture, the following pseudo-instructions are available:
 
@@ -214,7 +214,7 @@ Instruction     |Architecture| Sequence length | Value range
 
 ### Upper immediate instructions
 
-The behaviour of the load upper immediate instructions (`lui`, `c.lui`, and `auipc`) in dynasm-rs differs slightly from their behaviour in the GNU assembler. Where the GNU assembler requires the value before it is shifted 12 bits left, dynasm-rs chooses to require the user to provide the value after the shift. This is both done out of consistency (every other immediate in the instruction set is encoded this way) and to be logical with the way label references are handled. The following table shows the difference:
+The behaviour of the load upper immediate instructions (`lui`, `c.lui`, and `auipc`) in dynasm-rs differs slightly from their behaviour in the GNU assembler. Where the GNU assembler expects the argument to be the result value shifted right 12 bits, dynasm-rs expects the argument to be the expected result value of the instruction. This is both done out of consistency (every other immediate in the instruction set is encoded this way) and to be logical with the way label references are handled. The following table shows the difference:
 
 Table 6: Upper immediate syntax
 
@@ -230,7 +230,7 @@ Due to its use of multi-instruction sequences for many PC-relative operations, R
 
 #### Normal branch and jump instructions
 
-The basic jump to label instructions `j`, `jal`, and their compressed variants (`c.j`, `c.jal`), work without issues with dynasm-rs's relocation system. The same applies to all conditional branches (`c.bnez`, `c.beqz`, and all `b[ge|le|eq|gt|lt|ne][uz ]` instructions). Do note that most of these have very limited ranges, as shown in the table below:
+The basic jump to label instructions `j`, `jal`, and their compressed variants (`c.j`, `c.jal`), work without issues with dynasm-rs's relocation system. The same applies to all conditional branches (`c.bnez`, `c.beqz`, and all `b[ge|le|eq|gt|lt|ne][uz ]` instructions). Note that many of these have very limited ranges, as shown in the table below:
 
 Table 7: Regular jump and branch range
 
@@ -245,9 +245,9 @@ Instructions       | jump offset size | range
 
 `auipc rd, imm` is the special instruction that allows for 32-bit PC-relative jumps and address generation in RISC-V. It functions by loading the current program counter, adding an immediate to it, and storing it to the destination register. However, this immediate only contains the upper 20 bits of a signed 32-bit value. The lower 12 bits of this address are then intended to be provided by instructions like `addi` and `addiw`, the offset in `jalr`, or the memory reference offset in load/store instructions.
 
-This does raise a problem in that these offsets are signed. Therefore, one cannot simply mask the higher bits of an offset and pass that to `auipc`, and then pass the lower bits too any of these instructions. To ensure that such a sequence works correctly, dynasm-rs performs the needed adjustment for the user, provided the full immediate (or label) is passed to `auipc`. 
+This does raise a problem in that these offsets are signed. Therefore, one cannot simply mask the higher bits of an offset and pass that to `auipc`, and then pass the lower bits to any of these instructions. The immediate passed to `auipc` must be biased by 0x800 before masking it. To ensure that such a sequence works correctly, dynasm-rs performs the needed adjustment for the user, provided the full immediate (or label) is passed to `auipc`. 
 
-This results in the following behaviour, where the immediate is rounded to the 12th bit before being masked:
+This results in the following behaviour for `auipc`:
 
 - `auipc rb, 0x12345000`: `rb = pc + 0x12345000`
 - `auipc rb, 0x123457FF`: `rb = pc + 0x12345000`
@@ -267,9 +267,9 @@ Instruction formats                                                            |
 `lb  rb, [rb, offset32 & 0xFFF]`<br>and `lh`/`lw`/`ld`/`lbu`/`lhu`/`lwu`       | loads a value from `[pc + offset32]` into `rb`
 `sb  rd, [rb, offset32 & 0xFFF]`<br>and `sh`/`sw`/`sd`                         | stores `rd` to `[pc + offset32]`
 `flh rd, [rb, offset32 & 0xFFF]`<br>and `flw`/`fld`/`flq`                      | loads a floating point value from `[pc + offset32]` into `rd`
-`slh rd, [rb, offset32 & 0xFFF]`<br>and `slw`/`sld`/`slq`                      | stores floating point value `rd` to `[pc + offset32]`
+`slh rd, [rb, offset32 & 0xFFF]`<br>and `slw`/`sld`/`slq`                      | stores a floating point value `rd` to `[pc + offset32]`
 
-These instructions can also be used with dynamic offsets, in which case, dynasm-rs takes care of the masking automatically. But it should be noted, that the program counter in these instructions is the address of the `auipc` instruction. In the case of static offsets, this is not a problem. But when dynasm-rs labels are used as the offset, this is a problem as the offset will evaluate to different values in the `auipc` instruction and the subsequent load/store/`addi`/`jalr`. To remedy this, an offset equal to the spacing between these instructions needs to be added to the relocation in the subsequent instruction:
+These instructions can also be used with dynamic offsets, in which case, dynasm-rs takes care of the masking automatically. It should be noted, that the program counter referenced in the description of these instructions is the address of the `auipc` instruction. In the case of static offsets, this is not a problem. But when dynasm-rs labels are used as the offset, the offset will evaluate to different values in the `auipc` instruction and the subsequent load/store/`addi`/`jalr`. To remedy this, an offset equal to the spacing between these instructions needs to be added to the relocation in the subsequent instruction:
 
 ```rust
 ->our_target_label:
@@ -282,20 +282,20 @@ nop
 lw x9, [x8, ->our_target_label + 16] // also loads 0xAABBCCDD
 ```
 
-Using these offsets, it is also possible to load additional values around the label without additional `auipc` instructions, provided the net difference between the address of the `auipc` instruction and the address of the loaded value stays within the same `-0x????_?7FF` to `0x????_?800` range.
+Using these offsets, it is also possible to load additional values around the label without additional `auipc` instructions, provided the net difference between the address of the `auipc` instruction and the address of the loaded value stays within the same `diff_hi - 0x800` to `diff_hi + 0x7FF` range.
 
 #### Pseudo instructions
 
 As the above combination of `auipc` and another instruction with these extra requirements, RISC-V provides several pseudo-instructions that expand into these sequences. These instructions are listed amongst other pseudo instructions in table 4, but to summarize them:
 
 - `la rd, offset/label` will load an address from the given label or 32-bit pc-relative offset.
-- Integer load instructions have an additional format like `lb rd, offset/label` which will perform a pc-relative load from the given label/32-bit offset 
-- Integer store instructions, as well as floating point load/store instructions have an additional format like `lb rd, offset/label, rt` which will perform a pc-relative load from the given label/32-bit offset, using `rt` as a temporary.
+- Integer load instructions have an additional format: `lb rd, offset/label`, which will perform a pc-relative load from the given label/32-bit offset 
+- Integer store instructions, as well as floating point load/store instructions have an additional format: `lb rd, offset/label, rt`, which will perform a pc-relative load from the given label/32-bit offset, using `rt` as a temporary.
 - `call offset/label`, `jump offset/label` and `tail offset/label` perform 32-bit calls/jumps/tail calls to the given label/32-bit offset.
 
 #### Range limitations
 
-Due to the mechanism used for performing 32-bit pc-relative operations on RISC-V (loading an upper immediate and then adding a signed lower immediate), the range of these 32-bit offsets is a bit odd. On RV64, They allow for creating addresses from `pc-0x8000_0800` to `pc+0x7FFF_F7FF`, or 32 bits of signed integer range biased around -0x800. This range would mean that provided values could be outside the range of an `i32`, and thus dynasm-rs restricts this further, limiting offsets to being between `-0x8000_0000` and `0x7FFF_F7FF`.
+Due to the mechanism used for performing 32-bit pc-relative operations on RISC-V (loading an upper immediate and then adding a signed lower immediate), the range of these 32-bit offsets is a bit odd. On RV64, They allow for creating addresses from `pc-0x8000_0800` to `pc+0x7FFF_F7FF`, or 32 bits of signed integer range biased around `-0x800`. This range would mean that provided values could be outside the range of an `i32`, and thus dynasm-rs restricts this further, limiting offsets to being between `-0x8000_0000` and `0x7FFF_F7FF`. This does reduce the available range slightly, but as the range was asymmetric to begin with, this extra range on backwards jumps was never useful.
 
 # Supported extensions
 

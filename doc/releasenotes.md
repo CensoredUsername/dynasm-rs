@@ -5,8 +5,8 @@ The `dynasm-rs` project consists out of two crates: The procedural macro crate `
 Version 3.1.0
 =============
 
-Architecture support
---------------------
+Summary
+-------
 
 This release adds support for several architectures from the RISC-V family of instruction sets.
 These are `riscv64i`, `riscv64e`, `riscv32i` and `riscv32e`. There's also support for a large set
@@ -15,6 +15,16 @@ currently supported targets, meaning that they come with full runtime support, i
 and cache management support out of the box.
 
 This architecture support has been sponsored by [Wasmer](https://wasmer.io).
+
+General
+-------
+- dependencies have been updated
+- handled many clippy warnings (Thanks to waywardmonkeys!)
+
+Architecture support
+--------------------
+- added `riscv32i`, `riscv32e`, `riscv64i` and `riscv64e` architecture targets.
+- `x64` gained support for the `RDPRU` instruction (Thanks to eigenform!)
 
 Version 3.0.1
 =============

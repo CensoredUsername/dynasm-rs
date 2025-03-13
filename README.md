@@ -25,6 +25,7 @@ It is compatible with stable `rustc` 1.77 and higher.
 
 - Supports the x64/x86 instruction sets in long and protected mode with every AMD/Intel/VIA extension except for AVX-512.
 - Supports the aarch64 instruction set up to ARMv8.4 except for SVE instructions. The development of this assembler backend has been generously sponsored by the awesome folks at [Wasmer](https://github.com/wasmerio/wasmer)!
+- Supports the riscv32 and riscv64 instruction sets, with many extensions. The development of these assembler backends was sponsored by [Wasmer](https://github.com/wasmerio/wasmer) as well!
 
 ## Example
 
