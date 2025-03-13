@@ -97,10 +97,10 @@ impl Program {
                 b'<' => {
                     let amount = code.take_while_ref(|x| *x == b'<').count() + 1;
                     my_dynasm!(ops
-                        ; li.w a4, (amount % TAPE_SIZE) as u32 as i32
+                        ; li.32 a4, (amount % TAPE_SIZE) as u32 as i32
                         ; c.sub a_current, a4
                         ; bgeu a_current, a_begin, >nowrap
-                        ;  li.w a4, TAPE_SIZE as u32 as i32
+                        ;  li.32 a4, TAPE_SIZE as u32 as i32
                         ;  c.add a_current, a4
                         ; nowrap:
                     );
@@ -108,10 +108,10 @@ impl Program {
                 b'>' => {
                     let amount = code.take_while_ref(|x| *x == b'>').count() + 1;
                     my_dynasm!(ops
-                        ; li.w a4, (amount % TAPE_SIZE) as u32 as i32
+                        ; li.32 a4, (amount % TAPE_SIZE) as u32 as i32
                         ; c.add a_current, a4
                         ; bltu a_current, a_end, >nowrap
-                        ;  li.w a4, TAPE_SIZE as u32 as i32
+                        ;  li.32 a4, TAPE_SIZE as u32 as i32
                         ;  c.sub a_current, a4
                         ; nowrap:
                     );
