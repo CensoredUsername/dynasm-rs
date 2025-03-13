@@ -255,6 +255,21 @@ fn enc_amd_mwaitx4153() {
 
 
 #[test]
+fn enc_amd_rdpru_manual() {
+     let mut ops = dynasmrt::SimpleAssembler::new();
+     dynasm!(ops
+             ; .arch x64
+             ; rdpru
+     );
+     let buf = ops.finalize();
+     let hex: Vec<String> = buf.iter().map(|x| format!("0x{:02X}", *x)).collect();
+     let hex: String = hex.join(", ");
+     assert_eq!(hex, "0x0F, 0x01, 0xFD", "sfence");
+}
+
+
+
+#[test]
 fn enc_amd_sfence4154() {
      let mut ops = dynasmrt::SimpleAssembler::new();
      dynasm!(ops
