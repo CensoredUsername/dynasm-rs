@@ -25,9 +25,21 @@ pub fn prepare_for_execution(slice: &[u8]) {
 #[inline(always)]
 #[allow(unused_variables)]
 pub fn synchronize_icache(slice: &[u8]) {
-    #[cfg(target_arch="aarch64")]
+    #[cfg(all(target_arch="aarch64", not(target_os="macos")))]
     {
         aarch64::synchronize_icache(slice);
+    }
+    #[cfg(all(target_arch="aarch64", target_os="macos"))]
+    {
+        extern "C" {
+            pub fn sys_icache_invalidate(
+                start: *const std::ffi::c_void,
+                size: usize,
+            );
+        }
+        unsafe {
+            sys_icache_invalidate(slice.as_ptr() as *const std::ffi::c_void, slice.len());
+        }
     }
 }
 
