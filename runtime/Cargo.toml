@@ -18,4 +18,4 @@ license.workspace = true
 memmap2 = "0.9.5"
 byteorder = "1.5.0"
 fnv = "1.0.7"
-dynasm = { version = "=3.2.0", path = "../plugin" }
+dynasm = { version = "=3.2.1", path = "../plugin" }
