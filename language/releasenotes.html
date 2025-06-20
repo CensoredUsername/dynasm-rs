@@ -83,6 +83,10 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
+<h1 id="version-321"><a class="doc-anchor" href="#version-321">§</a>Version 3.2.1</h1><h2 id="runtime"><a class="doc-anchor" href="#runtime">§</a>Runtime</h2>
+<ul>
+<li>Cache invalidation on aarch64 Apple hardware now does not crash with an illegal instruction exception.</li>
+</ul>
 <h1 id="version-320"><a class="doc-anchor" href="#version-320">§</a>Version 3.2.0</h1><h2 id="architecture-support"><a class="doc-anchor" href="#architecture-support">§</a>Architecture support</h2>
 <ul>
 <li>RISC-V targets got support for the <code>Zfinx</code>, <code>Zhinx</code>, <code>Zdinx</code>, <code>Zhinxmin</code> and <code>Zfhmin</code> instruction
@@ -152,7 +156,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Be stricter on X/W or XSP/WSP differentiation in x64.</li>
 </ul>
-<h2 id="runtime"><a class="doc-anchor" href="#runtime">§</a>Runtime</h2>
+<h2 id="runtime-1"><a class="doc-anchor" href="#runtime-1">§</a>Runtime</h2>
 <ul>
 <li>Significant performance optimization of label processing.</li>
 <li>Rework of various components.</li>
@@ -169,19 +173,19 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 </ul>
 <h1 id="version-122"><a class="doc-anchor" href="#version-122">§</a>Version 1.2.2</h1><h2 id="global"><a class="doc-anchor" href="#global">§</a>Global</h2>
 <p>Fixes travis integration displayed in crates.io</p>
-<h1 id="version-121"><a class="doc-anchor" href="#version-121">§</a>Version 1.2.1</h1><h2 id="runtime-1"><a class="doc-anchor" href="#runtime-1">§</a>Runtime</h2>
+<h1 id="version-121"><a class="doc-anchor" href="#version-121">§</a>Version 1.2.1</h1><h2 id="runtime-2"><a class="doc-anchor" href="#runtime-2">§</a>Runtime</h2>
 <ul>
 <li>Fix overflow in aarch64 logical immediate encoding at runtime.</li>
 </ul>
-<h1 id="version-120"><a class="doc-anchor" href="#version-120">§</a>Version 1.2.0</h1><h2 id="runtime-2"><a class="doc-anchor" href="#runtime-2">§</a>Runtime</h2>
+<h1 id="version-120"><a class="doc-anchor" href="#version-120">§</a>Version 1.2.0</h1><h2 id="runtime-3"><a class="doc-anchor" href="#runtime-3">§</a>Runtime</h2>
 <ul>
 <li>update memmap2 version.</li>
 </ul>
-<h1 id="version-110"><a class="doc-anchor" href="#version-110">§</a>Version 1.1.0</h1><h2 id="runtime-3"><a class="doc-anchor" href="#runtime-3">§</a>Runtime</h2>
+<h1 id="version-110"><a class="doc-anchor" href="#version-110">§</a>Version 1.1.0</h1><h2 id="runtime-4"><a class="doc-anchor" href="#runtime-4">§</a>Runtime</h2>
 <ul>
 <li>Added missing label management methods to <code>VecAssembler</code>.</li>
 </ul>
-<h1 id="version-101"><a class="doc-anchor" href="#version-101">§</a>Version 1.0.1</h1><h2 id="runtime-4"><a class="doc-anchor" href="#runtime-4">§</a>Runtime</h2>
+<h1 id="version-101"><a class="doc-anchor" href="#version-101">§</a>Version 1.0.1</h1><h2 id="runtime-5"><a class="doc-anchor" href="#runtime-5">§</a>Runtime</h2>
 <ul>
 <li>Switched from the unmaintained <code>memmap</code> crate to <code>memmap2</code>.</li>
 </ul>
@@ -193,7 +197,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Use new Span::mixed_site hygiene to replace call_site hygiene wherever relevant.</li>
 </ul>
-<h1 id="version-071"><a class="doc-anchor" href="#version-071">§</a>Version 0.7.1</h1><h2 id="runtime-5"><a class="doc-anchor" href="#runtime-5">§</a>Runtime</h2>
+<h1 id="version-071"><a class="doc-anchor" href="#version-071">§</a>Version 0.7.1</h1><h2 id="runtime-6"><a class="doc-anchor" href="#runtime-6">§</a>Runtime</h2>
 <ul>
 <li>Fixed an issue where calls to Modifier.extend would cause invalid code to be emitted.</li>
 </ul>
@@ -208,13 +212,13 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Now compiles and is usable on a stable 1.45 rust compiler.</li>
 <li>Added <code>dynasm_backwards!</code>, which emits templates in reverse order. This allows writing assemblers that compile code backwards.</li>
 </ul>
-<h2 id="runtime-6"><a class="doc-anchor" href="#runtime-6">§</a>Runtime</h2>
+<h2 id="runtime-7"><a class="doc-anchor" href="#runtime-7">§</a>Runtime</h2>
 <ul>
 <li><code>dynasmrt</code> now re-exports the <code>dynasm!</code> macro from <code>dynasm</code>, so projects only need the <code>dynasmrt</code> dependency.</li>
 <li>Refactoring PatchLoc and Relocation to generalize relocation handling between architectures.</li>
 <li>Added register family listings, to facilitate dynamic register usage. This feature was contributed by vext01.</li>
 </ul>
-<h1 id="version-060"><a class="doc-anchor" href="#version-060">§</a>Version 0.6.0</h1><h2 id="runtime-7"><a class="doc-anchor" href="#runtime-7">§</a>Runtime</h2>
+<h1 id="version-060"><a class="doc-anchor" href="#version-060">§</a>Version 0.6.0</h1><h2 id="runtime-8"><a class="doc-anchor" href="#runtime-8">§</a>Runtime</h2>
 <ul>
 <li>Significant internal refactoring: Architectural support is now abstracted through the Relocation trait, that all assemblers are generic over. Aliases for the previous architecture-specific assemblers are kept for backwards compatibility.</li>
 <li>Made assembler components public to facilitate writing custom assemblers.</li>
@@ -228,7 +232,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Remove a problematic semicolon that might cause errors in the future.</li>
 <li>README update.</li>
 </ul>
-<h1 id="version-051"><a class="doc-anchor" href="#version-051">§</a>Version 0.5.1</h1><h2 id="runtime-8"><a class="doc-anchor" href="#runtime-8">§</a>Runtime</h2>
+<h1 id="version-051"><a class="doc-anchor" href="#version-051">§</a>Version 0.5.1</h1><h2 id="runtime-9"><a class="doc-anchor" href="#runtime-9">§</a>Runtime</h2>
 <ul>
 <li>Fix a bug that caused emitted code corruption corruption in Aarch64’s B and ADRP relocation calculations.</li>
 </ul>
@@ -236,7 +240,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>We now support an arbitrary offset added to any jump. This feature allows direct addressing of literal pools or arrays of values without generating labels for every single item in them.</li>
 </ul>
-<h2 id="runtime-9"><a class="doc-anchor" href="#runtime-9">§</a>Runtime</h2>
+<h2 id="runtime-10"><a class="doc-anchor" href="#runtime-10">§</a>Runtime</h2>
 <ul>
 <li>Added LitPool, a tool to automatically build literal pools.</li>
 <li>Impossible relocations no longer panic. Instead they cause an error to be emitted from <code>Assembler::commit()</code>.</li>
@@ -265,7 +269,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Fixed an issue where dynamic registers caused wrong code generation.</li>
 </ul>
-<h2 id="runtime-10"><a class="doc-anchor" href="#runtime-10">§</a>Runtime</h2>
+<h2 id="runtime-11"><a class="doc-anchor" href="#runtime-11">§</a>Runtime</h2>
 <ul>
 <li>Added an API for returning the offset of a dynamic label directly.</li>
 </ul>
@@ -278,7 +282,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>The plugin has been updated to the new procedural macro system. This means it should no longer break when new compiler versions are released.</li>
 <li>Directives are now scoped file-local instead of crate-local.</li>
 </ul>
-<h2 id="runtime-11"><a class="doc-anchor" href="#runtime-11">§</a>Runtime</h2>
+<h2 id="runtime-12"><a class="doc-anchor" href="#runtime-12">§</a>Runtime</h2>
 <ul>
 <li>The alter API can now return values produced by the user-defined closure.</li>
 </ul>
@@ -296,7 +300,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Significant refactoring of the x64 backend to also handle x86</li>
 <li>Added x64 feature selection support.</li>
 </ul>
-<h2 id="runtime-12"><a class="doc-anchor" href="#runtime-12">§</a>Runtime</h2>
+<h2 id="runtime-13"><a class="doc-anchor" href="#runtime-13">§</a>Runtime</h2>
 <ul>
 <li>Added managed relocation support to handle non-relative relocations.</li>
 </ul>
