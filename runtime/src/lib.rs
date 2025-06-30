@@ -583,6 +583,19 @@ impl<R: Relocation> Assembler<R> {
         })
     }
 
+    /// Create a new assembler with a pre-allocated buffer of the specified capacity.
+    pub fn new_with_capacity(capacity: usize) -> io::Result<Self> {
+        // Scale the amount by 7 to account for the average encoding size, in bytes.
+        Ok(Self {
+            ops: Vec::with_capacity(capacity * 7),
+            memory: MemoryManager::new(capacity * 7)?,
+            labels: LabelRegistry::new(),
+            relocs: RelocRegistry::new(),
+            managed: ManagedRelocs::new(),
+            error: None
+        })
+    }
+
     /// Create a new dynamic label ID
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         self.labels.new_dynamic_label()
