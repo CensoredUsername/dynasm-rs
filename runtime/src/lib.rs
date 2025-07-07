@@ -583,6 +583,28 @@ impl<R: Relocation> Assembler<R> {
         })
     }
 
+    /// Create a new, empty assembler, with a pre-allocated buffer of the specified capacity in bytes,
+    /// and an initial allocation of `capacity.next_multiple_of(page_size)`.
+    pub fn new_with_capacity(capacity: usize) -> io::Result<Self> {
+        // Avoid panic or wraps on overflow.
+        let memory_size =
+            capacity
+                .checked_next_multiple_of(R::page_size())
+                .ok_or(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Capacity is too large",
+                ))?;
+
+        Ok(Self {
+            ops: Vec::with_capacity(capacity),
+            memory: MemoryManager::new(memory_size)?,
+            labels: LabelRegistry::new(),
+            relocs: RelocRegistry::new(),
+            managed: ManagedRelocs::new(),
+            error: None,
+        })
+    }
+
     /// Create a new dynamic label ID
     pub fn new_dynamic_label(&mut self) -> DynamicLabel {
         self.labels.new_dynamic_label()
