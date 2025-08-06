@@ -100,6 +100,7 @@ Dynamic Encoding  | `X`      | `W`      | `XSP`    | `WSP`    | `B`      | `H`  
              `31` | `xzr`    | `wzr`    | `sp`     | `wsp`    | `b31`    | `h31`    | `s31`    | `d31`    | `q31`    | `v31`    |
 
 When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: `X(reg_number)`, where reg_number is one of the given dynamic encodings listed in the table.
+Note the `reg_number` can be of an arbitrary type that implements `Into<u8>`.
 
 As aarch64 either uses scalar register 31 as the zero register `xzr` or the stack pointer register `sp`, two separate families of registers exist to encode this possible difference (as it can influence instruction variant choice).
 
