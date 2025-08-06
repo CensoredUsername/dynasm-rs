@@ -1,6 +1,8 @@
 use dynasmrt::dynasm;
 use dynasmrt::DynasmApi;
 
+use std::convert::Into;
+
 // confirms that static and dynamic encodings for immediates result in the same data
 // (regular tests confirmthis for registers)
 
@@ -176,4 +178,24 @@ fn offsets_range() {
     );
     let buf = ops.finalize();
     assert!(are_chunks_equal(&buf, 8), "offsets_range");
+}
+
+#[test]
+fn opaque_register_type() {
+    struct GPR {
+        register: u8
+    }
+
+    impl Into<u8> for GPR {
+        fn into(self) -> u8 {
+            self.register
+        }
+    }
+
+    let rs = GPR { register: 22 };
+    let mut ops = dynasmrt::SimpleAssembler::new();
+    dynasm!(ops
+        ; .arch riscv64
+        ; mv X(rs), X(12)
+    );
 }

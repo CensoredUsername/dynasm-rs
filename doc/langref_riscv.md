@@ -108,6 +108,7 @@ Dynamic Encoding  | `X`         | `W`            | `V`    |
              `31` | `x31/t6`    | `f31/ft`       | `v31`  |
 
 When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: `X(reg_number)`, where `reg_number` is one of the given dynamic encodings listed in the table.
+Note the `reg_number` can be of an arbitrary type that implements `Into<u8>`.
 
 Note that not all RISC-V instructions accept all registers. In particular, many instructions in the `C` instruction set extension don't support the `zero` register, or only support registers `x8-x15`. Attempting to use those will result in an error at compile time, or a panic at runtime.
 
