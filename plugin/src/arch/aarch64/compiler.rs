@@ -91,17 +91,26 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 Command::R(offset)
                 | Command::RNoZr(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
-                        #expr & 0x1F
+                        {
+                            let _dyn_reg: u8 = #expr.into();
+                            _dyn_reg & 0x1F
+                        }
                     }));
                 },
                 Command::REven(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
-                        #expr & 0x1E
+                        {
+                            let _dyn_reg: u8 = #expr.into();
+                            _dyn_reg & 0x1E
+                        }
                     }));
                 },
                 Command::R4(offset) => {
                     dynamics.push((offset, quote_spanned!{ span=>
-                        #expr & 0xF
+                        {
+                            let _dyn_reg: u8 = #expr.into();
+                            _dyn_reg & 0xF
+                        }
                     }));
                 },
                 Command::RNext => {
@@ -660,7 +669,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
         };
         for (offset, expr) in dynamics {
             res = quote!{
-                #res | ((#expr) << #offset)
+                #res | ((#expr as u32) << #offset)
             };
         }
         ctx.state.stmts.push(Stmt::ExprUnsigned(delimited(res), Size::B_4));

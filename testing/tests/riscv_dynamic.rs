@@ -182,17 +182,17 @@ fn offsets_range() {
 
 #[test]
 fn opaque_register_type() {
-    struct GPR {
+    struct Gpr {
         register: u8
     }
 
-    impl Into<u8> for GPR {
+    impl Into<u8> for Gpr {
         fn into(self) -> u8 {
             self.register
         }
     }
 
-    let rs = GPR { register: 22 };
+    let rs = Gpr { register: 22 };
     let mut ops = dynasmrt::SimpleAssembler::new();
     dynasm!(ops
         ; .arch riscv64
