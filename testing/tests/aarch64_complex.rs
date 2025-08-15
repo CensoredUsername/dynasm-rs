@@ -135,3 +135,22 @@ fn complex() {
     }
     println!("");
 }
+
+#[test]
+fn opaque_register_type() {
+    struct Gpr {
+        register: u8,
+    }
+
+    impl Into<u8> for Gpr {
+        fn into(self) -> u8 {
+            self.register
+        }
+    }
+
+    let rs = Gpr { register: 22 };
+    let mut ops = dynasmrt::SimpleAssembler::new();
+    my_dynasm!(ops
+        ; mov X(rs), X(12)
+    );
+}
