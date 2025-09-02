@@ -31,7 +31,7 @@ Plugin
 
 Runtime
 -------
-- Assembler has gained a `new_with-capacity` method.
+- Assembler has gained a `new_with_capacity` method.
 
 Version 3.2.1
 =============
