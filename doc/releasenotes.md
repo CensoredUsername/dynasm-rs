@@ -2,6 +2,37 @@
 
 The `dynasm-rs` project consists out of two crates: The procedural macro crate `dynasm` and the runtime support crate `dynasmrt`. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards `dynasmrt` depends on `dynasm` itself to simplify this relationship. Any version listings below therefore refers to both the `dynasm` and `dynasmrt` crate version.
 
+Version 4.0.0
+=============
+
+Summary
+-------
+
+This release adds ergonomics improvements to dynamic registers. Where it was previously required to explicitly convert the type for dynamic registers as follows:
+```rust
+let dyn_reg = dynasmrt::x64::Rq::RAX;
+
+dynasm!(ops
+    ; add Rq(dyn_reg.into()), 5
+);
+```
+This is no longer necessary. Instead, the conversion is now performed implicitly via `Into<u8>`.
+```rust
+let dyn_reg = dynasmrt::x64::Rq::RAX;
+
+dynasm!(ops
+    ; add Rq(dyn_reg), 5
+);
+```
+
+Plugin
+------
+- Dynamic registers now accept any value that is convertible via `Into<u8>`. This significantly improves the ergonomics of using dynamic register values with custom wrapper types. Unfortunately, this might break code which already does this conversion explicitly, leading to an unknown type error. To remedy this, simply remove the explicit conversion.
+
+Runtime
+-------
+- Assembler has gained a `new_with-capacity` method.
+
 Version 3.2.1
 =============
 

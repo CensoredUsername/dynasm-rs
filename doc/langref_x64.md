@@ -63,14 +63,17 @@ Dynamic Encoding    | `Rb`        | `Rh`       | `Rw`       | `Rd`        | `Rq`
                 `5` | `bpl`/`r5b` | `ch`       | `bp`/`r5w` | `ebp`/`r5d` | `rbp`/`r5`        | `eip/rip` | `st5`          | `mmx5` | `xmm5`    | `ymm5`    | `gs`    | `cr5`   | `dr5` |
                 `6` | `sil`/`r6b` | `dh`       | `si`/`r6w` | `esi`/`r6d` | `rsi`/`r6`        |           | `st6`          | `mmx6` | `xmm6`    | `ymm6`    |         | `cr6`   | `dr6` |
                 `7` | `dil`/`r7b` | `bh`       | `di`/`r7w` | `edi`/`r7d` | `rdi`/`r7`        |           | `st7`          | `mmx7` | `xmm7`    | `ymm7`    |         | `cr7`   | `dr7` |
-    (x64)  `8` | `r8b`       |            | `r8w`      | `r8d`       | `r8`              |           |                |        | `xmm8`    | `ymm8`    |         | `cr8`   | `dr8` |
-    (x64)  `9` | `r9b`       |            | `r9w`      | `r9d`       | `r9`              |           |                |        | `xmm9`    | `ymm9`    |         | `cr9`   | `dr9` |
-    (x64) `10` | `r10b`      |            | `r10w`     | `r10d`      | `r10`             |           |                |        | `xmm10`   | `ymm10`   |         | `cr10`  | `dr10`|
-    (x64) `11` | `r11b`      |            | `r11w`     | `r11d`      | `r11`             |           |                |        | `xmm11`   | `ymm11`   |         | `cr11`  | `dr11`|
-    (x64) `12` | `r12b`      |            | `r12w`     | `r12d`      | `r12`             |           |                |        | `xmm12`   | `ymm12`   |         | `cr12`  | `dr12`|
-    (x64) `13` | `r13b`      |            | `r13w`     | `r13d`      | `r13`             |           |                |        | `xmm13`   | `ymm13`   |         | `cr13`  | `dr13`|
-    (x64) `14` | `r14b`      |            | `r14w`     | `r14d`      | `r14`             |           |                |        | `xmm14`   | `ymm14`   |         | `cr14`  | `dr14`|
-    (x64) `15` | `r15b`      |            | `r15w`     | `r15d`      | `r15`             |           |                |        | `xmm15`   | `ymm15`   |         | `cr15`  | `dr15`|
+         (x64)  `8` | `r8b`       |            | `r8w`      | `r8d`       | `r8`              |           |                |        | `xmm8`    | `ymm8`    |         | `cr8`   | `dr8` |
+         (x64)  `9` | `r9b`       |            | `r9w`      | `r9d`       | `r9`              |           |                |        | `xmm9`    | `ymm9`    |         | `cr9`   | `dr9` |
+         (x64) `10` | `r10b`      |            | `r10w`     | `r10d`      | `r10`             |           |                |        | `xmm10`   | `ymm10`   |         | `cr10`  | `dr10`|
+         (x64) `11` | `r11b`      |            | `r11w`     | `r11d`      | `r11`             |           |                |        | `xmm11`   | `ymm11`   |         | `cr11`  | `dr11`|
+         (x64) `12` | `r12b`      |            | `r12w`     | `r12d`      | `r12`             |           |                |        | `xmm12`   | `ymm12`   |         | `cr12`  | `dr12`|
+         (x64) `13` | `r13b`      |            | `r13w`     | `r13d`      | `r13`             |           |                |        | `xmm13`   | `ymm13`   |         | `cr13`  | `dr13`|
+         (x64) `14` | `r14b`      |            | `r14w`     | `r14d`      | `r14`             |           |                |        | `xmm14`   | `ymm14`   |         | `cr14`  | `dr14`|
+         (x64) `15` | `r15b`      |            | `r15w`     | `r15d`      | `r15`             |           |                |        | `xmm15`   | `ymm15`   |         | `cr15`  | `dr15`|
+
+When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: `Rq(reg_number)`, where reg_number is one of the given dynamic encodings listed in the table.
+Note the `reg_number` can be of an arbitrary type that implements `Into<u8>`.
 
 #### Jump targets
 
