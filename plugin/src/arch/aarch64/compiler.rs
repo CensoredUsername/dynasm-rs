@@ -90,6 +90,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             FlatArg::Direct { span, reg: RegKind::Dynamic(_, ref expr) } => match *command {
                 Command::R(offset)
                 | Command::RNoZr(offset) => {
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -98,6 +99,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::REven(offset) => {
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -106,6 +108,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     }));
                 },
                 Command::R4(offset) => {
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();

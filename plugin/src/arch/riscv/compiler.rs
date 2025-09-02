@@ -95,6 +95,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 }
                             },
                             Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr), .. }) => {
+                                let expr = delimited(expr);
                                 dynamics.push((0, quote_spanned!{ span=>
                                     {
                                         let _dyn_reg: u8 = #expr.into();
@@ -123,6 +124,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
             FlatArg::Register { span, reg: Register::Dynamic(_, ref expr) } => match *command {
                 Command::R(offset) => {
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -132,6 +134,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Reven(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -144,6 +147,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rno0(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -156,6 +160,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rno02(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -168,6 +173,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rpop(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -180,6 +186,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rpops(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                    let expr = delimited(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
                             let _dyn_reg: u8 = #expr.into();
@@ -194,6 +201,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
                         let code: u8 = id2.code();
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                        let expr = delimited(expr);
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
                                 let _dyn_reg: u8 = #expr.into();
@@ -206,6 +214,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     },
                     Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr2), .. }) => {
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
+                        let expr = delimited(expr);
+                        let expr2 = delimited(expr2);
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
                                 let _dyn_reg: u8 = #expr.into();

@@ -118,3 +118,43 @@ fn bugreport_6() {
     let hex: String = hex.join(", ");
     assert_eq!(hex, "0x48, 0x8D, 0x43, 0x01, 0x48, 0x8D, 0x83, 0x80, 0x00, 0x00, 0x00, 0x48, 0x8D, 0x43, 0xFF, 0x48, 0x8D, 0x43, 0xFF, 0x48, 0x8D, 0x83, 0x7F, 0xFF, 0xFF, 0xFF", "bugreport_6");
 }
+
+
+#[test]
+fn rustc_does_not_properly_respect_macro_expr_grouping_for_precedence() {
+    // the issue here is that code for emitting dynamic registers ends up emitting code like this
+    // let _dyn_reg: u8 = #expr.into();
+    // now unfortunately rustc doesn't properly handle delimitation of macro operands when reassembling tokenstreams
+    // so in this test case, this could accidentally get emitted as
+    // let _dyn_reg: u8 = Test(1) + Test(2).into(); which is a compilation error over the intended
+    // let _dyn_reg: u8 = (Test(1) + Test(2)).into();
+    // we ought to guard against this properly, so that's what this test is for.
+    let mut ops = dynasmrt::SimpleAssembler::new();
+
+    #[derive(Clone, Copy)]
+    struct Test(u8);
+
+    impl std::convert::From<Test> for u8 {
+        fn from(value: Test) -> u8 {
+            value.0
+        }
+    }
+
+    impl std::ops::Add<Test> for Test {
+        type Output = Test;
+        fn add(self, rhs: Test) -> Test {
+            Test(self.0 + rhs.0)
+        }
+    }
+
+    dynasm!(ops
+        ; .arch x64
+        ; add Rq(Test(1) + Test(2)), rax
+        ; .arch aarch64
+        ; add x5, X(Test(1) + Test(2)), x4
+        ; .arch riscv64
+        ; add x27, X(Test(1) + Test(2)), x13
+    );
+
+
+}
