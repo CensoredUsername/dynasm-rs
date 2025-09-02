@@ -1,6 +1,6 @@
 use syn::spanned::Spanned;
-use proc_macro2::{Span, TokenTree, Literal};
-use quote::{quote_spanned};
+use proc_macro2::{Span, Literal};
+use quote::{quote_spanned, quote};
 use proc_macro_error2::emit_error;
 
 use crate::common::{Stmt, Size, Jump, JumpKind, delimited};
@@ -259,12 +259,19 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
             panic!("bad formatting data")
         };
 
-        if let RegKind::Dynamic(_, expr) = rm_k {
-            let last: TokenTree = Literal::u8_suffixed(*last).into();
-            buffer.push(Stmt::ExprUnsigned(serialize::expr_mask_shift_or(&last, &delimited(expr), 7, 0), Size::BYTE));
-        } else {
-            buffer.push(Stmt::u8(last + (rm_k.encode() & 7)));
-        }
+        buffer.push(match rm_k {
+            RegKind::Dynamic(_, expr) => {
+                Stmt::ExprUnsigned(delimited(quote_spanned!{ expr.span()=>
+                    {
+                        let _dyn_reg: u8 = #expr.into();
+                        (_dyn_reg & 7) + #last
+                    }
+                }), Size::BYTE)
+            },
+            RegKind::Static(regid) => {
+                Stmt::u8(last + (regid.code() & 7))
+            }
+        });
     // just push the opcode
     } else {
         buffer.push(Stmt::Extend(Vec::from(ops)));
@@ -453,22 +460,48 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
     // register in immediate argument
     if let Some(SizedArg::Direct {reg: ireg, ..}) = ireg {
         let ireg = ireg.kind;
-        let byte = ireg.encode() << 4;
-
-        let mut byte: TokenTree = Literal::u8_suffixed(byte).into();
-        if let RegKind::Dynamic(_, expr) = ireg {
-            byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 0xF, 4);
-        }
-        // if immediates are present, the register argument will be merged into the
-        // first immediate byte.
-        if !args.is_empty() {
+        
+        let immediate = if !args.is_empty() {
             if let SizedArg::Immediate {value, size: Size::BYTE} = args.remove(0) {
-                byte = serialize::expr_mask_shift_or(&byte, &delimited(value), 0xF, 0);
+                Some(delimited(value))
             } else {
                 panic!("bad formatting data")
             }
-        }
-        buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
+        } else {
+            None
+        };
+
+        let expr = match (ireg, immediate) {
+            (RegKind::Dynamic(_, expr), None) => {
+                delimited(quote_spanned!{ expr.span()=> 
+                    {
+                        let _dyn_reg: u8 = #expr.into();
+                        ((_dyn_reg & 0xF) << 4)
+                    }
+                })
+            },
+            (RegKind::Dynamic(_, expr), Some(imm)) => {
+                delimited(quote_spanned!{ expr.span()=> 
+                    {
+                        let _dyn_reg: u8 = #expr.into();
+                        ((_dyn_reg & 0xF) << 4) | (#imm & 0xF)
+                    }
+                })
+            },
+            (RegKind::Static(regid), None) => {
+                Literal::u8_suffixed(regid.code() << 4).into()
+            },
+            (RegKind::Static(regid), Some(imm)) => {
+                let reg = Literal::u8_suffixed(regid.code() << 4);
+                delimited(quote_spanned!{ imm.span()=>
+                    {
+                        #reg | (#imm & 0xF)
+                    }
+                })
+            }
+        };
+
+        buffer.push(Stmt::ExprUnsigned(expr, Size::BYTE));
 
         // bump relocations
         relocations.iter_mut().for_each(|r| r.1 += 1);
@@ -1515,18 +1548,44 @@ fn compile_rex(buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<SizedArg>, rm: 
         return;
     }
 
-    let mut rex: TokenTree = Literal::u8_suffixed(rex).into();
+    let mut dyn_regs = Vec::new();
+    let mut dyn_items = Vec::new();
 
     if let RegKind::Dynamic(_, expr) = reg_k {
-        rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -1);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_reg: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            ((_dyn_reg & 8) >> 1)
+        });
     }
     if let RegKind::Dynamic(_, expr) = index_k {
-        rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -2);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_index: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            ((_dyn_index & 8) >> 2)
+        });
     }
     if let RegKind::Dynamic(_, expr) = base_k {
-        rex = serialize::expr_mask_shift_or(&rex, &delimited(expr), 8, -3);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_base: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            ((_dyn_base & 8) >> 3)
+        });
     }
-    buffer.push(Stmt::ExprUnsigned(rex, Size::BYTE));
+
+    let rex = Literal::u8_suffixed(rex);
+    buffer.push(Stmt::ExprUnsigned(delimited(quote! {
+        {
+            #( #dyn_regs )*
+            #rex #( | #dyn_items )*
+        }
+    }), Size::BYTE));
 }
 
 fn compile_vex_xop(mode: X86Mode, buffer: &mut Vec<Stmt>, data: &'static Opdata, reg: &Option<SizedArg>,
@@ -1583,43 +1642,92 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
             return;
         }
 
-        let mut byte1: TokenTree = Literal::u8_suffixed(byte1).into();
+        let mut dyn_regs = Vec::new();
+        let mut dyn_items = Vec::new();
+
         if let RegKind::Dynamic(_, expr) = reg_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 4)
+            let expr = delimited(expr);
+            dyn_regs.push(quote_spanned! { expr.span()=>
+                let _dyn_reg: u8 = #expr.into();
+            });
+            dyn_items.push(quote_spanned! { expr.span()=>
+                !((_dyn_reg & 8) << 4)
+            });
         }
         if let RegKind::Dynamic(_, expr) = vvvv_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 0xF, 3)
+            let expr = delimited(expr);
+            dyn_regs.push(quote_spanned! { expr.span()=>
+                let _dyn_vvvv: u8 = #expr.into();
+            });
+            dyn_items.push(quote_spanned! { expr.span()=>
+                !((_dyn_vvvv & 0xF) << 3)
+            });
         }
-        buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
+
+        let byte1 = Literal::u8_suffixed(byte1);
+        buffer.push(Stmt::ExprUnsigned(delimited(quote! {
+            {
+                #( #dyn_regs )*
+                #byte1 #( & #dyn_items )*
+            }
+        }), Size::BYTE));
         return;
     }
 
     buffer.push(Stmt::u8(if data.flags.contains(Flags::VEX_OP) {0xC4} else {0x8F}));
 
     if mode == X86Mode::Long && (reg_k.is_dynamic() || index_k.is_dynamic() || base_k.is_dynamic()) {
-        let mut byte1: TokenTree = Literal::u8_suffixed(byte1).into();
+        let mut dyn_regs = Vec::new();
+        let mut dyn_items = Vec::new();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 4);
+            let expr = delimited(expr);
+            dyn_regs.push(quote_spanned! { expr.span()=>
+                let _dyn_reg: u8 = #expr.into();
+            });
+            dyn_items.push(quote_spanned! { expr.span()=>
+                !((_dyn_reg & 8) << 4)
+            });
         }
         if let RegKind::Dynamic(_, expr) = index_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 3);
+            let expr = delimited(expr);
+            dyn_regs.push(quote_spanned! { expr.span()=>
+                let _dyn_index: u8 = #expr.into();
+            });
+            dyn_items.push(quote_spanned! { expr.span()=>
+                !((_dyn_index & 8) << 3)
+            });
         }
         if let RegKind::Dynamic(_, expr) = base_k {
-            byte1 = serialize::expr_mask_shift_inverted_and(&byte1, &delimited(expr), 8, 2);
+            let expr = delimited(expr);
+            dyn_regs.push(quote_spanned! { expr.span()=>
+                let _dyn_base: u8 = #expr.into();
+            });
+            dyn_items.push(quote_spanned! { expr.span()=>
+                !((_dyn_base & 8) << 2)
+            });
         }
-        buffer.push(Stmt::ExprUnsigned(byte1, Size::BYTE));
+
+        let byte1 = Literal::u8_suffixed(byte1);
+        buffer.push(Stmt::ExprUnsigned(delimited(quote! {
+            {
+                #( #dyn_regs )*
+                #byte1 #( & #dyn_items )*
+            }
+        }), Size::BYTE));
     } else {
         buffer.push(Stmt::u8(byte1));
     }
 
-    if vvvv_k.is_dynamic() {
-        let mut byte2: TokenTree = Literal::u8_suffixed(byte2).into();
-
-        if let RegKind::Dynamic(_, expr) = vvvv_k {
-            byte2 = serialize::expr_mask_shift_inverted_and(&byte2, &delimited(expr), 0xF, 3)
-        }
-        buffer.push(Stmt::ExprUnsigned(byte2, Size::BYTE));
+    if let RegKind::Dynamic(_, expr) = vvvv_k {
+        let byte2 = Literal::u8_suffixed(byte2);
+        let expr = delimited(expr);
+        buffer.push(Stmt::ExprUnsigned(delimited(quote! {
+            {
+                let _dyn_vvvv: u8 = #expr.into();
+                #byte2 & !((_dyn_vvvv & 0xF) << 3)
+            }
+        }), Size::BYTE));
     } else {
         buffer.push(Stmt::u8(byte2));
     }
@@ -1635,45 +1743,83 @@ fn compile_modrm_sib(buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegK
         return;
     }
 
-    let mut byte: TokenTree = Literal::u8_suffixed(byte).into();
+    let mut dyn_regs = Vec::new();
+    let mut dyn_items = Vec::new();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 3);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_reg1: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            ((_dyn_reg1 & 7) << 3)
+        });
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 0);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_reg2: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            (_dyn_reg2 & 7)
+        });
     }
-    buffer.push(Stmt::ExprUnsigned(byte, Size::BYTE));
+
+    let byte = Literal::u8_suffixed(byte);
+    buffer.push(Stmt::ExprUnsigned(delimited(quote! {
+        {
+            #( #dyn_regs )*
+            #byte #( | #dyn_items )*
+        }
+    }), Size::BYTE));
 }
 
 fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr, reg1: RegKind, reg2: RegKind) {
     let byte = (reg1.encode()  & 7) << 3 |
                (reg2.encode()  & 7)      ;
 
-    let mut byte: TokenTree = Literal::u8_suffixed(byte).into();
-    let scale: TokenTree = Literal::u8_unsuffixed(scale).into();
+    let mut dyn_regs = Vec::new();
+    let mut dyn_items = Vec::new();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 3);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_reg1: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            ((_dyn_reg1 & 7) << 3)
+        });
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        byte = serialize::expr_mask_shift_or(&byte, &delimited(expr), 7, 0);
+        let expr = delimited(expr);
+        dyn_regs.push(quote_spanned! { expr.span()=>
+            let _dyn_reg2: u8 = #expr.into();
+        });
+        dyn_items.push(quote_spanned! { expr.span()=>
+            (_dyn_reg2 & 7)
+        });
     }
 
-    let span = scale_expr.span();
     let scale_expr = delimited(scale_expr);
-
-    let expr = delimited(quote_spanned!{ span=>
-        ((
-            match #scale_expr * #scale {
-                8 => 3,
-                4 => 2,
-                2 => 1,
-                1 => 0,
-                _ => panic!("Type size not representable as scale")
-            }
-        & 3) << 6) | #byte
+    let scale = Literal::u8_unsuffixed(scale);
+    dyn_regs.push(quote_spanned!{ scale_expr.span()=> 
+        let _dyn_scale = match #scale_expr * #scale {
+            8 => 3,
+            4 => 2,
+            2 => 1,
+            1 => 0,
+            _ => panic!("Type size not representable as scale")
+        };
+    });
+    dyn_items.push(quote_spanned! {scale_expr.span()=>
+        ((_dyn_scale & 3) << 6)
     });
 
-    buffer.push(Stmt::ExprUnsigned(expr, Size::BYTE));
+    let byte = Literal::u8_suffixed(byte);
+    buffer.push(Stmt::ExprUnsigned(delimited(quote! {
+        {
+            #( #dyn_regs )*
+            #byte #( | #dyn_items )*
+        }
+    }), Size::BYTE));
 }
