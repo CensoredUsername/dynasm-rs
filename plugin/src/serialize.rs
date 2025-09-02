@@ -255,45 +255,6 @@ pub fn expr_size_of_scale(ty: &syn::Path, value: &TokenTree, size: Size) -> Toke
     })
 }
 
-/// returns orig | ((expr & mask) << shift)
-pub fn expr_mask_shift_or(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: i8) -> TokenTree {
-    let span = expr.span();
-
-    let mask: TokenTree = proc_macro2::Literal::u64_unsuffixed(mask).into();
-
-    delimited(if shift >= 0 {
-        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(shift).into();
-        quote_spanned! { span=>
-            #orig | ((#expr & #mask) << #shift)
-        }
-    } else {
-        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(-shift).into();
-        quote_spanned! { span=>
-            #orig | ((#expr & #mask) >> #shift)
-        }
-    })
-}
-
-
-/// returns orig & !((expr & mask) << shift)
-pub fn expr_mask_shift_inverted_and(orig: &TokenTree, expr: &TokenTree, mask: u64, shift: i8) -> TokenTree {
-    let span = expr.span();
-
-    let mask: TokenTree = proc_macro2::Literal::u64_unsuffixed(mask).into();
-
-    delimited(if shift >= 0 {
-        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(shift).into();
-        quote_spanned! { span=>
-            #orig & !((#expr & #mask) << #shift)
-        }
-    } else {
-        let shift: TokenTree = proc_macro2::Literal::i8_unsuffixed(-shift).into();
-        quote_spanned! { span=>
-            #orig & !((#expr & #mask) >> #shift)
-        }
-    })
-}
-
 /// returns (offset_of!(path, attr) as size)
 pub fn expr_offset_of(path: &syn::Path, attr: &syn::Ident, size: Size) -> TokenTree {
     // generate a P<Expr> that resolves into the offset of an attribute to a type.
