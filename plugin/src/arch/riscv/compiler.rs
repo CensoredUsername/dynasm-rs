@@ -771,6 +771,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     };
 
                     let imm_expr = if negated {
+                        let value = delimited(value);
                         quote_spanned!{ span=>
                             let _dyn_imm: i32 = -#value;
                         }
