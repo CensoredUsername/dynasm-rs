@@ -151,7 +151,8 @@
 <tr><td style="text-align: right"><code>31</code></td><td style="text-align: left"><code>xzr</code></td><td style="text-align: left"><code>wzr</code></td><td style="text-align: left"><code>sp</code></td><td style="text-align: left"><code>wsp</code></td><td style="text-align: left"><code>b31</code></td><td style="text-align: left"><code>h31</code></td><td style="text-align: left"><code>s31</code></td><td style="text-align: left"><code>d31</code></td><td style="text-align: left"><code>q31</code></td><td style="text-align: left"><code>v31</code></td></tr>
 </tbody></table>
 </div>
-<p>When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: <code>X(reg_number)</code>, where reg_number is one of the given dynamic encodings listed in the table.</p>
+<p>When used statically, the notation simply matchers the given name in the table. When used dynamically, the syntax is similar to a function call: <code>X(reg_number)</code>, where reg_number is one of the given dynamic encodings listed in the table.
+Note the <code>reg_number</code> can be of an arbitrary type that implements <code>Into&lt;u8&gt;</code>.</p>
 <p>As aarch64 either uses scalar register 31 as the zero register <code>xzr</code> or the stack pointer register <code>sp</code>, two separate families of registers exist to encode this possible difference (as it can influence instruction variant choice).</p>
 <p>A special case are the vector registers. These are never used as bare registers, but need to have the element size they are being accessed with postfixed to the register. This element size can be:</p>
 <ul>
