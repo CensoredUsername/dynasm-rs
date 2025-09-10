@@ -7,7 +7,6 @@ Version 4.0.0
 
 Summary
 -------
-
 This release adds ergonomics improvements to dynamic registers. Where it was previously required to explicitly convert the type for dynamic registers as follows:
 ```rust
 let dyn_reg = dynasmrt::x64::Rq::RAX;
@@ -24,6 +23,10 @@ dynasm!(ops
     ; add Rq(dyn_reg), 5
 );
 ```
+
+General
+-------
+- dependencies have been updated
 
 Plugin
 ------
