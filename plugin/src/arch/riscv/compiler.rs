@@ -931,7 +931,7 @@ struct ImmediateEncoder<'a> {
 }
 
 impl<'a> ImmediateEncoder<'a> {
-    pub fn new(dynamic_value: &syn::Expr) -> ImmediateEncoder {
+    pub fn new(dynamic_value: &'a syn::Expr) -> ImmediateEncoder<'a> {
         #![allow(unexpected_cfgs)]
         let static_value;
 

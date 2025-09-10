@@ -175,7 +175,7 @@ impl MemoryManager {
     }
 
     /// Borrow the internal memory buffer mutably
-    pub fn write(&self) -> RwLockWriteGuard<ExecutableBuffer> {
+    pub fn write(&self) -> RwLockWriteGuard<'_, ExecutableBuffer> {
         self.execbuffer.write().unwrap()
     }
 

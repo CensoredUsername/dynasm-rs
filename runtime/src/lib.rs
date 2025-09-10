@@ -91,7 +91,7 @@ impl Executor {
     /// Any pointers created to the `ExecutableBuffer` should no longer be used when
     /// the guard is dropped.
     #[inline]
-    pub fn lock(&self) -> RwLockReadGuard<ExecutableBuffer> {
+    pub fn lock(&self) -> RwLockReadGuard<'_, ExecutableBuffer> {
         let guard = self.execbuffer.read().unwrap();
         cache_control::prepare_for_execution(&*guard);
         guard
@@ -303,7 +303,7 @@ impl SimpleAssembler {
     }
 
     /// Use an `UncommittedModifier` to alter uncommitted code.
-    pub fn alter(&mut self) -> UncommittedModifier {
+    pub fn alter(&mut self) -> UncommittedModifier<'_> {
         UncommittedModifier::new(&mut self.ops, AssemblyOffset(0))
     }
 
@@ -434,7 +434,7 @@ impl<R: Relocation> VecAssembler<R> {
 
     /// Use an `UncommittedModifier` to alter uncommitted code.
     /// This does not allow the user to change labels/relocations.
-    pub fn alter(&mut self) -> UncommittedModifier {
+    pub fn alter(&mut self) -> UncommittedModifier<'_> {
         UncommittedModifier::new(&mut self.ops, AssemblyOffset(0))
     }
 
@@ -612,7 +612,7 @@ impl<R: Relocation> Assembler<R> {
 
     /// Use an `UncommittedModifier` to alter uncommitted code.
     /// This does not allow the user to change labels/relocations.
-    pub fn alter_uncommitted(&mut self) -> UncommittedModifier {
+    pub fn alter_uncommitted(&mut self) -> UncommittedModifier<'_> {
         let offset = self.memory.committed();
         UncommittedModifier::new(&mut self.ops, AssemblyOffset(offset))
     }
@@ -1075,7 +1075,7 @@ pub struct UncommittedModifier<'a> {
 
 impl<'a> UncommittedModifier<'a> {
     /// create a new uncommittedmodifier
-    pub fn new(buffer: &mut Vec<u8>, base_offset: AssemblyOffset) -> UncommittedModifier {
+    pub fn new(buffer: &mut Vec<u8>, base_offset: AssemblyOffset) -> UncommittedModifier<'_> {
         UncommittedModifier {
             buffer,
             base_offset: base_offset.0,
