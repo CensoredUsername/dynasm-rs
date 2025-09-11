@@ -13,7 +13,7 @@ pub fn prepare_for_execution(slice: &[u8]) {
     {
         aarch64::prepare_for_execution()
     }
-    #[cfg(any(target_arch="riscv64", target_arch="riscv32"))]
+    #[cfg(all(unix, any(target_arch="riscv64", target_arch="riscv32")))]
     {
         riscv::enforce_ordering_dcache_icache(slice, true);
     }
@@ -165,7 +165,7 @@ mod aarch64 {
     }
 }
 
-#[cfg(any(target_arch="riscv64", target_arch="riscv32"))]
+#[cfg(all(unix, any(target_arch="riscv64", target_arch="riscv32")))]
 mod riscv {
     // On risc-v, the story about how we synchronize caches is confused.
     // The data sheet states that we ought to do the following.
@@ -185,7 +185,6 @@ mod riscv {
     // we have.
     use std::ffi::{c_void, c_long, c_int};
 
-    #[cfg(unix)]
     extern "C" {
         #[link_name="__riscv_flush_icache"]
         fn riscv_flush_icache(start: *const c_void, end: *const c_void, flags: c_long) -> c_int;
