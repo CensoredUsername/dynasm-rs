@@ -83,6 +83,8 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
+<h1 id="version-401"><a class="doc-anchor" href="#version-401">§</a>Version 4.0.1</h1><h2 id="bugfix"><a class="doc-anchor" href="#bugfix">§</a>Bugfix</h2>
+<p>This bugfix release fixes a failure to compile the <code>dynasmrt</code> crate on non-unix RISC-V.</p>
 <h1 id="version-400"><a class="doc-anchor" href="#version-400">§</a>Version 4.0.0</h1><h2 id="summary"><a class="doc-anchor" href="#summary">§</a>Summary</h2>
 <p>This release adds ergonomics improvements to dynamic registers. Where it was previously required to explicitly convert the type for dynamic registers as follows:</p>
 
@@ -139,7 +141,7 @@ and cache management support out of the box.</p>
 <li>added <code>riscv32i</code>, <code>riscv32e</code>, <code>riscv64i</code> and <code>riscv64e</code> architecture targets.</li>
 <li><code>x64</code> gained support for the <code>RDPRU</code> instruction (Thanks to eigenform!).</li>
 </ul>
-<h1 id="version-301"><a class="doc-anchor" href="#version-301">§</a>Version 3.0.1</h1><h2 id="bugfix"><a class="doc-anchor" href="#bugfix">§</a>Bugfix</h2>
+<h1 id="version-301"><a class="doc-anchor" href="#version-301">§</a>Version 3.0.1</h1><h2 id="bugfix-1"><a class="doc-anchor" href="#bugfix-1">§</a>Bugfix</h2>
 <ul>
 <li><code>x64</code> immediate const evaluation now handles negative displacements properly again, generating
 8-bit displacements where possible.</li>
