@@ -13,7 +13,7 @@ members = [
 
 [workspace.package]
 authors = ["Alexander Stocko <as@coder.gg>", "CensoredUsername <cens.username@gmail.com>"]
-version = "4.0.0"
+version = "4.0.1"
 edition = "2021"
 
 documentation = "https://censoredusername.github.io/dynasm-rs/language/index.html"

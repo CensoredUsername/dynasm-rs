@@ -2,6 +2,14 @@
 
 The `dynasm-rs` project consists out of two crates: The procedural macro crate `dynasm` and the runtime support crate `dynasmrt`. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards `dynasmrt` depends on `dynasm` itself to simplify this relationship. Any version listings below therefore refers to both the `dynasm` and `dynasmrt` crate version.
 
+Version 4.0.1
+=============
+
+Bugfix
+------
+This bugfix release fixes a failure to compile the `dynasmrt` crate on non-unix RISC-V.
+
+
 Version 4.0.0
 =============
 
