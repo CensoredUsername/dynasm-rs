@@ -5547,7 +5547,7 @@ Ops!(
 
 "out"   = [
     b"ibAb"       , [0xE6            ], X;
-    b"ibAw"       , [0xE7            ], X;
+    b"ibAw"       , [0xE7            ], X, WORD_SIZE;
     b"ibAd"       , [0xE7            ], X;
     b"CwAb"       , [0xEE            ], X;
     b"CwAw"       , [0xEF            ], X, WORD_SIZE;
