@@ -535,7 +535,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         let mask = bitmask(bits);
                         let half = -1i32 << (bits - 1);
                         if let Some((_, scaled)) = static_range_check(value, half, mask, 12)? {
-                            statics.push((5, scaled & 0x7FFFF));
+                            statics.push((5, (scaled >> 2u8) & 0x7FFFFu32));
                             statics.push((29, scaled & 3));
 
                         } else {
