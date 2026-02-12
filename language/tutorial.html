@@ -43,6 +43,9 @@
         <a href="./tutorial.html">Tutorial</a>
       </li>
       <li>
+        <a href="./dynamic_assembly.html">Dynamic Assembly Basics</a>
+      </li>
+      <li>
         <a href="./langref_common.html">Language</a>
       </li>
       <li>
@@ -106,7 +109,7 @@
         ; lea rcx, [-&gt;hello]
         ; xor edx, edx
         ; mov dl, BYTE string.len() <span class="kw">as _
-        </span>; mov rax, QWORD print <span class="kw">as _
+        </span>; mov rax, QWORD print <span class="kw-2">*const </span>() <span class="kw">as _
         </span>; sub rsp, BYTE <span class="number">0x28
         </span>; call rax
         ; add rsp, BYTE <span class="number">0x28
@@ -150,7 +153,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     ; lea rcx, [-&gt;hello]
     ; xor edx, edx
     ; mov dl, BYTE string.len() <span class="kw">as _
-    </span>; mov rax, QWORD print <span class="kw">as _
+    </span>; mov rax, QWORD print <span class="kw-2">*const </span>() <span class="kw">as _
     </span>; sub rsp, BYTE <span class="number">0x28
     </span>; call rax
     ; add rsp, BYTE <span class="number">0x28
@@ -302,10 +305,10 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
                         <span class="kw">let </span><span class="kw-2">mut </span>nesting = <span class="number">1</span>;
                         <span class="kw">let </span>amount = program[<span class="self">self</span>.pos..].iter().take_while(|x| <span class="kw">match </span><span class="kw-2">**</span>x {
                             <span class="string">b'[' </span>=&gt; {nesting += <span class="number">1</span>; <span class="bool-val">true</span>},
-                            <span class="string">b']' </span>=&gt; {nesting -= <span class="number">1</span>; nesting != <span class="number">0</span>},
+                            <span class="string">b']' </span>=&gt; {nesting -= <span class="number">1</span>; <span class="macro">nesting !</span>= <span class="number">0</span>},
                             <span class="kw">_ </span>=&gt; <span class="bool-val">true
                         </span>}).count() + <span class="number">1</span>;
-                        <span class="kw">if </span>nesting != <span class="number">0 </span>{
+                        <span class="kw">if </span><span class="macro">nesting !</span>= <span class="number">0 </span>{
                             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"[ without matching ]"</span>);
                         }
                         <span class="self">self</span>.pos += amount;
@@ -363,8 +366,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
     <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = interp.run(<span class="kw-2">&amp;</span>buf) {
         <span class="macro">println!</span>(<span class="string">"{}"</span>, e);
     }
-}</code></pre></div>
-<h2 id="basics"><a class="doc-anchor" href="#basics">§</a>Basics</h2>
+}</code></pre></div><h2 id="basics"><a class="doc-anchor" href="#basics">§</a>Basics</h2>
 <p>To kickstart this process, we’ll <code>use</code> the <code>dynasm!</code> macro as well as the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits:</p>
 <div class="example-wrap"><pre class="language-diffnew"><code>+ use dynasmrt::{dynasm, DynasmApi, DynasmLabelApi};</code></pre></div>
 <p>Next, we’ll define our own custom dynasm macro which first defines the current architecture as well as several aliases we’d like to use when writing the rest of the code.</p>
@@ -406,7 +408,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 + macro_rules! call_extern {
 +     ($ops:ident, $addr:expr) =&gt; {my_dynasm!($ops
 +         ; mov [rsp + 0x38], rdx
-+         ; mov rax, QWORD $addr as _
++         ; mov rax, QWORD $addr *const () as _
 +         ; call rax
 +         ; mov rcx, [rsp + 0x30]
 +         ; mov rdx, [rsp + 0x38]
@@ -705,7 +707,7 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
 <span class="macro">macro_rules!</span> call_extern {
     (<span class="macro-nonterminal">$ops</span>:ident, <span class="macro-nonterminal">$addr</span>:expr) =&gt; {<span class="macro">my_dynasm!</span>(<span class="macro-nonterminal">$ops
         </span>; mov [rsp + <span class="number">0x38</span>], rdx
-        ; mov rax, QWORD <span class="macro-nonterminal">$addr </span><span class="kw">as _
+        ; mov rax, QWORD <span class="macro-nonterminal">$addr </span><span class="kw-2">*const </span>() <span class="kw">as _
         </span>; call rax
         ; mov rcx, [rsp + <span class="number">0x30</span>]
         ; mov rdx, [rsp + <span class="number">0x38</span>]
@@ -917,7 +919,6 @@ Furthermore, the <code>DynasmApi</code> and <code>DynasmLabelApi</code> traits a
         <span class="kw">return</span>;
     }
 }</code></pre></div>
-
     </section>
 <script type="text/javascript">
 // make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs

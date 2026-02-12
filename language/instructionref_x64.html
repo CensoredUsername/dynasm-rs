@@ -43,6 +43,9 @@
         <a href="./tutorial.html">Tutorial</a>
       </li>
       <li>
+        <a href="./dynamic_assembly.html">Dynamic Assembly Basics</a>
+      </li>
+      <li>
         <a href="./langref_common.html">Language</a>
       </li>
       <li>
@@ -646,6 +649,7 @@ mov reg32, dreg
 mov reg32, imm32
 mov reg32, reg/mem32
 mov reg32, segreg
+mov reg64, abs64addr
 mov reg64, cr8
 mov reg64, creg
 mov reg64, dreg
@@ -655,14 +659,14 @@ mov reg64, segreg
 mov reg8, imm8
 mov reg8, reg/mem8
 mov segreg, mem16
-mov segreg, reg16</code></pre></div><h3 id="movabs"><a class="doc-anchor" href="#movabs">§</a>movabs</h3><div class="example-wrap"><pre class="language-insref"><code>movabs al, imm64
-movabs ax, imm64
-movabs eax, imm64
-movabs imm64, al
-movabs imm64, ax
-movabs imm64, eax
-movabs imm64, rax
-movabs rax, imm64</code></pre></div><h3 id="movapd"><a class="doc-anchor" href="#movapd">§</a>movapd</h3><div class="example-wrap"><pre class="language-insref"><code>movapd mem128, xmm                        (sse2)
+mov segreg, reg16</code></pre></div><h3 id="movabs"><a class="doc-anchor" href="#movabs">§</a>movabs</h3><div class="example-wrap"><pre class="language-insref"><code>movabs abs64addr, al
+movabs abs64addr, ax
+movabs abs64addr, eax
+movabs abs64addr, rax
+movabs al, abs64addr
+movabs ax, abs64addr
+movabs eax, abs64addr
+movabs rax, abs64addr</code></pre></div><h3 id="movapd"><a class="doc-anchor" href="#movapd">§</a>movapd</h3><div class="example-wrap"><pre class="language-insref"><code>movapd mem128, xmm                        (sse2)
 movapd xmm, mem128                        (sse2)
 movapd xmm, xmm                           (sse2)
 movapd xmm, xmm                           (sse2)</code></pre></div><h3 id="movaps"><a class="doc-anchor" href="#movaps">§</a>movaps</h3><div class="example-wrap"><pre class="language-insref"><code>movaps xmm, xmm/mem128                    (sse)

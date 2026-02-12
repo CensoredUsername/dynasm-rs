@@ -43,6 +43,9 @@
         <a href="./tutorial.html">Tutorial</a>
       </li>
       <li>
+        <a href="./dynamic_assembly.html">Dynamic Assembly Basics</a>
+      </li>
+      <li>
         <a href="./langref_common.html">Language</a>
       </li>
       <li>
@@ -125,10 +128,20 @@ Check the documentation for the specific architecture.</p>
 <tr><td><code>.i64</code></td><td>One or more expressions of the type <code>i64</code></td><td>Pushes the values into the assembling buffer.</td></tr>
 <tr><td><code>.f32</code></td><td>One or more expressions of the type <code>f32</code></td><td>Pushes the values into the assembling buffer.</td></tr>
 <tr><td><code>.f64</code></td><td>One or more expressions of the type <code>f64</code></td><td>Pushes the values into the assembling buffer.</td></tr>
+<tr><td><code>.rel8</code></td><td>One label</td><td>Pushes the offset of the specified label target to this directive into the assembling buffer, encoded as an <code>i8</code>.</td></tr>
+<tr><td><code>.rel16</code></td><td>One label</td><td>Pushes the offset of the specified label target to this directive into the assembling buffer, encoded as an <code>i16</code>.</td></tr>
+<tr><td><code>.rel32</code></td><td>One label</td><td>Pushes the offset of the specified label target to this directive into the assembling buffer, encoded as an <code>i32</code>.</td></tr>
+<tr><td><code>.rel64</code></td><td>One label</td><td>Pushes the offset of the specified label target to this directive into the assembling buffer, encoded as an <code>i64</code>.</td></tr>
+<tr><td><code>.abs32</code></td><td>One label</td><td>Pushes the absolute address of this label into the assembling buffer, encoded as an <code>i32</code>.</td></tr>
+<tr><td><code>.abs64</code></td><td>One label</td><td>Pushes the absolute address of this label into the assembling buffer, encoded as an <code>i64</code>.</td></tr>
 <tr><td><code>.bytes</code></td><td>An expression of that implements <code>IntoIterator&lt;Item=u8&gt;</code> or <code>IntoIterator&lt;Item=&amp;u8&gt;</code></td><td>Extends the assembling buffer with the iterator.</td></tr>
 </tbody></table>
 </div>
 <p>Directives are normally local to the current <code>dynasm!</code> invocation. However, if the <code>filelocal</code> feature is used they will be processed in lexical order over the whole file. This feature only works on a nightly compiler and might be removed in the future.</p>
+<h3 id="a-note-on-label-directives"><a class="doc-anchor" href="#a-note-on-label-directives">§</a>A note on label directives</h3>
+<p>Label directives allow labels to be encoded directly in the instruction stream. They are resolved similarly to labels as instruction arguments, but can allow larger absolute addresses and relative offsets to be specified than an instruction set supports in its instructions. As long as dynasm-rs controls the relevant buffers, their offsets will be updated as the buffer grows and moves around in memory. Both relative and absolute offsets are provided to allow for the creation of position-independent code on architectures that support this.</p>
+<p>When using label sizes that do not match the bitwidth of <code>usize</code>, dynasm-rs assumes sign-extension of the value. For instance, the <code>.abs32</code> directive allows addresses from <code>0</code> to <code>0x0000_0000_7FFF_FFFF</code> and <code>0xFFFF_FFFF_8000_0000</code> to <code>0xFFFF_FFFF_FFFF_FFFF</code> to be encoded on 64-bit systems. Similarly, the <code>.abs64</code> directive will sign extend the encoded values on 32-bit systems.</p>
+<p>Label offset calculation uses wrapping arithmetic, so a relative label the same size as <code>usize</code> can access the entire memory space.</p>
 <h2 id="aliases"><a class="doc-anchor" href="#aliases">§</a>Aliases</h2>
 <p>Dynasm-rs allows the user to define aliases for registers using the <code>.alias name, register</code> directive. These aliases can then be used at places where registers are allowed to be used. Note that aliases are defined in lexical parsing order.</p>
 <h2 id="macros"><a class="doc-anchor" href="#macros">§</a>Macros</h2>
@@ -140,9 +153,8 @@ Check the documentation for the specific architecture.</p>
         </span>; imul <span class="macro-nonterminal">$arg1</span>, <span class="macro-nonterminal">$arg2
         </span>; add <span class="macro-nonterminal">$accumulator</span>, <span class="macro-nonterminal">$arg1
     </span>)};
-}</code></pre></div>
-<h2 id="statements"><a class="doc-anchor" href="#statements">§</a>Statements</h2>
-<p>To make code that uses a lot of macros less verbose, dynasm-rs allows bare Rust statements to be inserted inside <code>dynasm!</code> invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:</p>
+}</code></pre></div><h2 id="statements"><a class="doc-anchor" href="#statements">§</a>Statements</h2>
+<p>To make code that uses many macros less verbose, dynasm-rs allows bare Rust statements to be inserted inside <code>dynasm!</code> invocations. This can be done by using a double semicolon instead of a single semicolon at the start of the line as displayed in the following equivalent examples:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">dynasm!</span>(ops
     ; mov rcx, rax
@@ -156,16 +168,15 @@ Check the documentation for the specific architecture.</p>
     ; mov rcx, rax
     ;; <span class="macro">call_extern!</span>(ops, extern_func)
     ; mov rcx, rax
-);</code></pre></div>
-<h2 id="labels-1"><a class="doc-anchor" href="#labels-1">§</a>Labels</h2>
-<p>In order to describe flow control effectively, dynasm-rs supports labels. However, since the assembly templates can be combined in a variety of ways at the mercy of the program using dynasm-rs, the semantics of these labels are somewhat different from how labels work in a static assembler.</p>
+);</code></pre></div><h2 id="labels-1"><a class="doc-anchor" href="#labels-1">§</a>Labels</h2>
+<p>To describe flow control effectively, dynasm-rs supports labels. Since the assembly templates can be combined in a variety of ways at the mercy of the program using dynasm-rs, the semantics of these labels are somewhat different from how labels work in a static assembler.</p>
 <p>Dynasm-rs distinguishes between four different types of labels: global, local, dynamic and extern. Their syntax is as follows:</p>
 <p>Table 2: dynasm-rs label types</p>
 <div><table><thead><tr><th>Type</th><th>Kind</th><th>Definition</th><th>Reference</th></tr></thead><tbody>
 <tr><td>Local</td><td>static</td><td><code>label:</code></td><td><code>&gt;label</code> or <code>&lt;label</code></td></tr>
 <tr><td>GLobal</td><td>static</td><td><code>-&gt;label:</code></td><td><code>-&gt;label</code></td></tr>
 <tr><td>Dynamic</td><td>dynamic</td><td><code>=&gt;expr</code></td><td><code>=&gt;expr</code></td></tr>
-<tr><td>Extern</td><td>extern</td><td><code>-</code></td><td><code>extern expr</code></td></tr>
+<tr><td>Extern</td><td>extern</td><td>none</td><td><code>extern expr</code></td></tr>
 </tbody></table>
 </div>
 <p>All labels have their addresses resolved at <code>Assembler::commit()</code> time.</p>
@@ -177,7 +188,7 @@ Check the documentation for the specific architecture.</p>
 <h3 id="dynamic-labels"><a class="doc-anchor" href="#dynamic-labels">§</a>Dynamic labels</h3>
 <p>Dynamic labels are similar to global labels in that they can be defined only once (per-assembler), but instead of a name, they are identified by an expression. New dynamic labels can be created at runtime by the assembler. This expression is evaluated at the point where the label is defined or referenced, and the labels will be resolved at only at commit time.</p>
 <h3 id="extern-labels"><a class="doc-anchor" href="#extern-labels">§</a>Extern labels</h3>
-<p>Extern labels allow emitted machine code to directly reference fixed addresses as branch targets. This is only supported on architectures featuring absolute branch targets, like <code>x86</code>.</p>
+<p>Extern labels allow emitted machine code to directly reference fixed addresses as branch targets.</p>
 
     </section>
 <script type="text/javascript">

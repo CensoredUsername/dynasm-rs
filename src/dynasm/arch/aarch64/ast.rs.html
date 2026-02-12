@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\ast.rs`."><title>ast.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../..\../static.files/storage-4e99c027.js"></script><script defer src="../../..\../static.files/src-script-813739b1.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm\arch\aarch64/</div>ast.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>proc_macro2::Span;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\aarch64\ast.rs`."><title>ast.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../..\../static.files/storage-e2aeef58.js"></script><script defer src="../../..\../static.files/src-script-813739b1.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm\arch\aarch64/</div>ast.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>proc_macro2::Span;
 <a href=#2 id=2 data-nosnippet>2</a>
-<a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span><span class="kw">crate</span>::common::{Size, Jump};
+<a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span><span class="kw">crate</span>::common::{Size, JumpTarget};
 <a href=#4 id=4 data-nosnippet>4</a>
 <a href=#5 id=5 data-nosnippet>5</a>
 <a href=#6 id=6 data-nosnippet>6</a><span class="doccomment">/// A complete abstraction of an aarch64 register access.
@@ -326,7 +326,7 @@
 <a href=#326 id=326 data-nosnippet>326</a>    },
 <a href=#327 id=327 data-nosnippet>327</a>    <span class="comment">// jump target. Also used by PC-rel loads etc
 <a href=#328 id=328 data-nosnippet>328</a>    </span>JumpTarget {
-<a href=#329 id=329 data-nosnippet>329</a>        jump: Jump
+<a href=#329 id=329 data-nosnippet>329</a>        jump: JumpTarget
 <a href=#330 id=330 data-nosnippet>330</a>    },
 <a href=#331 id=331 data-nosnippet>331</a>    <span class="comment">// just an arbitrary expression
 <a href=#332 id=332 data-nosnippet>332</a>    </span>Immediate {
@@ -380,7 +380,7 @@
 <a href=#380 id=380 data-nosnippet>380</a>        reg: Register
 <a href=#381 id=381 data-nosnippet>381</a>    },
 <a href=#382 id=382 data-nosnippet>382</a>    JumpTarget {
-<a href=#383 id=383 data-nosnippet>383</a>        jump: Jump
+<a href=#383 id=383 data-nosnippet>383</a>        jump: JumpTarget
 <a href=#384 id=384 data-nosnippet>384</a>    },
 <a href=#385 id=385 data-nosnippet>385</a>    Immediate {
 <a href=#386 id=386 data-nosnippet>386</a>        prefixed: bool,
@@ -409,10 +409,11 @@
 <a href=#409 id=409 data-nosnippet>409</a>        modifier: Modifier,
 <a href=#410 id=410 data-nosnippet>410</a>    },
 <a href=#411 id=411 data-nosnippet>411</a>    JumpTarget {
-<a href=#412 id=412 data-nosnippet>412</a>        jump: Jump
+<a href=#412 id=412 data-nosnippet>412</a>        jump: JumpTarget
 <a href=#413 id=413 data-nosnippet>413</a>    },
 <a href=#414 id=414 data-nosnippet>414</a>    Lit {
 <a href=#415 id=415 data-nosnippet>415</a>        ident: syn::Ident
 <a href=#416 id=416 data-nosnippet>416</a>    },
 <a href=#417 id=417 data-nosnippet>417</a>    Default
-<a href=#418 id=418 data-nosnippet>418</a>}</code></pre></div></section></main></body></html>
+<a href=#418 id=418 data-nosnippet>418</a>}
+</code></pre></div></section></main></body></html>

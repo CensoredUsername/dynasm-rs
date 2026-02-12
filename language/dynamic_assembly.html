@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <title>Dynamic assembly basics</title>
+
+    <link rel="stylesheet" href="./formatting.css">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <nav class="sidebar">
+  <h2 class="location">
+    <a href="#">Dynasm-rs reference</a>
+  </h2>
+  <div class="sidebar-elems">
+    <h3>Components</h3>
+    <ul class="block crate">
+      <li>
+        <a href="../language/index.html">Syntax</a>
+      </li>
+      <li>
+        <a href="../dynasm/index.html">Plugin (dynasm)</a>
+      </li>
+      <li>
+        <a href="../dynasmrt/index.html">Runtime (dynasmrt)</a>
+      </li>
+    </ul>
+    <h3>Syntax</h3>
+    <ul class="block crate">
+      <li>
+        <a href="./index.html">Home</a>
+      </li>
+      <li>
+        <a href="./tutorial.html">Tutorial</a>
+      </li>
+      <li>
+        <a href="./dynamic_assembly.html">Dynamic Assembly Basics</a>
+      </li>
+      <li>
+        <a href="./langref_common.html">Language</a>
+      </li>
+      <li>
+        <a href="./releasenotes.html">Release Notes</a>
+      </li>
+    </ul>
+    <h3>Architectures</h3>
+    <h4>x64/x86</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_x64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_x64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>aarch64</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_aarch64.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_aarch64.html">Instruction reference</a>
+      </li>
+    </ul>
+    <h4>riscv32/riscv64</h4>
+    <ul class="block crate">
+      <li>
+        <a href="./langref_riscv.html">Language dialect</a>
+      </li>
+      <li>
+        <a href="./instructionref_riscv.html">Instruction reference</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<section id="main" class="content mod docblock">
+
+    <h1 class="title">Dynamic assembly basics</h1>
+    <p>Dynamic assembly, runtime assembly, or Just-in-time compilation is the technique of generating machine code at runtime. This is in contrast to the more standard ahead-of-time assembling, where all machine code for a program is generated ahead of its execution. This technique occupies a niche in between compiled code and interpreted code, where it is possible to compile code at runtime so that it executes several times faster than interpreted code, while having a much lower up-front cost than ahead-of-time compilation.</p>
+<p>This page discusses some of the details one should be aware of when using this technique through <code>dynasm-rs</code> as well as some of the required terminology.</p>
+<h1 id="differences-between-ahead-of-time-compilation-and-just-in-time-compilation"><a class="doc-anchor" href="#differences-between-ahead-of-time-compilation-and-just-in-time-compilation">§</a>Differences between ahead-of-time compilation and just-in-time compilation</h1>
+<p>The fundamental difference between these two techniques is that during ahead-of-time compilation, the entire code to be compiled is known. In just-in-time compilation it is instead normal for only parts of the program to be compiled at a time, often without full knowledge of the rest of the program. Furthermore, the target environment is already a running process, and thus it cannot freely choose at what address the compiled code will be located.</p>
+<p>Due to these limitations, handling of references to instructions in the emitted code is significantly different in dynamic assemblers like <code>dynasm-rs</code>. As the amount of emitted code grows, the <code>dynasm-rs</code> runtime must be prepared to move the emitted code around in memory, and adjust any references that might change during this process.</p>
+<h1 id="label-resolution"><a class="doc-anchor" href="#label-resolution">§</a>Label resolution</h1>
+<p>Just like in classical assemblers, references to locations in the emitted code are handled via labels (see the <a href="./langref_common.md">common language reference</a> for all the different label types). These labels can be defined at any point in the to be emitted instruction stream, and code (both emitted before and after the label declaration) can reference these labels in order to create jumps to them or reference data encoded in the instruction stream.</p>
+<p>Unlike classical assemblers, it is not possible to perform arbitrary math on these labels or manipulate them as values, as their exact values might not be known at the time these labels are encoded. The runtime does provide limited support for adding / subtracting arbitrary offsets from labels at the moment they are referenced.</p>
+<h1 id="relocations"><a class="doc-anchor" href="#relocations">§</a>Relocations</h1>
+<p>When emitted code references a label in a jump or address load, the <code>dynasm-rs</code> runtime does not immediately encode it. Instead, it records a so-called relocation. This relocation contains information on the address of the relevant instruction, what it is targetting, how the resulting value should be encoded, and how the value should be adjusted if the runtime has to move the emitted code in memory.</p>
+<p>When emitted code is committed, the runtime will resolve all currently outstanding relocations. At this point, all labels referenced in the code need to be defined, else this process will return an <code>Err(DynasmError)</code>.</p>
+<h2 id="managed-relocations"><a class="doc-anchor" href="#managed-relocations">§</a>Managed Relocations</h2>
+<p>If a relocation needs to be adjusted when the runtime moves emitted code around in memory, it is stored as a managed relocation during the commit process. These relocations will have to be remembered until the assembling process is finalized, and therefore they do come at a performance and memory cost. Luckily, on modern architectures these can be mostly avoided by using position-independent code techniques.</p>
+<h1 id="position-independent-code"><a class="doc-anchor" href="#position-independent-code">§</a>Position-independent code</h1>
+<p>Position independent code is code that will run identically, independent of where it is placed in its processes address space. As you can imagine, this is beneficial for preventing <code>dynasm-rs</code> from having to use managed relocations. Such code only uses relative offsets for performing jumps and loads/stores of static data. For a dynamic assembler such as <code>dynasm-rs</code>, the rules are even looser, as it is also possible to use absolute offsets to any objects that are already present in the address space of the containing process. These objects should then of course not be moved while the emitted code is used.</p>
+<p>The exact details of how to create position-independent code depend on the instruction set architecture that is being emitted. One should ensure that only PC-relative instructions are used for any label references into the emitted code, and only absolute instructions are used for any references to static items in the processes address space. Any absolute encodings of references to items in the run-time emitted code, or relative jumps to absolute addresses will result in managed relocations having to be emitted.</p>
+<h1 id="code-patching"><a class="doc-anchor" href="#code-patching">§</a>Code patching</h1>
+<p>If more complex mechanisms than relocations are needed for modifying previously emitted code, <code>dynasm-rs</code> supports the ability to modify previously emitted code directly, both before and after having committed it. Modifying uncommitted code is a cheap operation, while modifying committed code potentially requires changing memory permissions.</p>
+<p><code>dynasm-rs</code> guarantees that emitted instruction sizes and encodings are predictable at compile time. This ensures that it is possible to patch code in a consistent manner. During the patching process, any outstanding or managed relocations that touch modified code are automatically removed, and new ones can be recorded where necessary.</p>
+<h1 id="cache-management"><a class="doc-anchor" href="#cache-management">§</a>Cache management</h1>
+<p><code>dynasm-rs</code> supports a variety of use cases. One of these is progressive compilation, where execution of dynamically assembled code can happen before the full compilation process is finished. To handle these use cases, <code>dynasm-rs</code> provides an <code>Assembler</code> implementation that keeps track of what code is ready to be executed, and actual assembling happens to a different, internal buffer. When code is committed, execution has to be paused and the internal buffer is appended to the rest of the executable code. To enhance security, <code>dynasm-rs</code> ensures that memory is never writeable and executable at the same time.</p>
+<p>Some architectures require additional handling during this process, or during modification of emitted code, as they have incoherent instruction caches. This means that changes made to memory are not directly visible to already cached instruction data. <code>dynasm-rs</code> internally ensures that the required cache control operations are executed on these architectures to bring these caches to coherency before execution resumes. <code>dynasm-rs</code> also ensures multi-thread coherency here, to code to be assembled in parallel with the execution of previously emitted code.</p>
+
+    </section>
+<script type="text/javascript">
+// make diffs look better, I can't do this in css for some reason and I don't want to hack it into rustdocs
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    var old = document.querySelectorAll("code.language-diffold");
+    var old_pre = [];
+    for (var i = 0; i < old.length; i++) {
+        var old_pre = old[i].parentNode;
+        var new_pre = old_pre.nextElementSibling;
+        if (new_pre && new_pre.childNodes.length > 0 && new_pre.childNodes[0].className == "language-diffnew") {
+            old_pre.className = "collapse-old";
+            new_pre.className = "collapse-new";
+        }
+    }
+
+});
+</script>
+
+</body>
+</html>

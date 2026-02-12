@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\riscv\riscvdata.rs`."><title>riscvdata.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../..\../static.files/storage-4e99c027.js"></script><script defer src="../../..\../static.files/src-script-813739b1.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm\arch\riscv/</div>riscvdata.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! this file contains the datastructure specification for the RISC-V encoding data
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\arch\riscv\riscvdata.rs`."><title>riscvdata.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../..\../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../..\../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../..\../static.files/storage-e2aeef58.js"></script><script defer src="../../..\../static.files/src-script-813739b1.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm\arch\riscv/</div>riscvdata.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! this file contains the datastructure specification for the RISC-V encoding data
 <a href=#2 id=2 data-nosnippet>2</a></span><span class="kw">use </span>bitflags::bitflags;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>lazy_static::lazy_static;
 <a href=#4 id=4 data-nosnippet>4</a>
@@ -367,723 +367,712 @@
 <a href=#367 id=367 data-nosnippet>367</a>    <span class="comment">// pc-relative store pseudo instructions
 <a href=#368 id=368 data-nosnippet>368</a>    // 32 bits, no scaling
 <a href=#369 id=369 data-nosnippet>369</a>    </span>SPLIT32S = <span class="number">8</span>,
-<a href=#370 id=370 data-nosnippet>370</a>    <span class="comment">// 8-bit literal
-<a href=#371 id=371 data-nosnippet>371</a>    </span>LITERAL8 = <span class="number">9</span>,
-<a href=#372 id=372 data-nosnippet>372</a>    <span class="comment">// 16-bit literal
-<a href=#373 id=373 data-nosnippet>373</a>    </span>LITERAL16 = <span class="number">10</span>,
-<a href=#374 id=374 data-nosnippet>374</a>    <span class="comment">// 32-bit literal
-<a href=#375 id=375 data-nosnippet>375</a>    </span>LITERAL32 = <span class="number">12</span>,
-<a href=#376 id=376 data-nosnippet>376</a>    <span class="comment">// 64-bit literal
-<a href=#377 id=377 data-nosnippet>377</a>    </span>LITERAL64 = <span class="number">16</span>,
-<a href=#378 id=378 data-nosnippet>378</a>}
-<a href=#379 id=379 data-nosnippet>379</a>
-<a href=#380 id=380 data-nosnippet>380</a><span class="kw">impl </span>Relocation {
-<a href=#381 id=381 data-nosnippet>381</a>    <span class="kw">pub fn </span>to_id(<span class="self">self</span>) -&gt; u8 {
-<a href=#382 id=382 data-nosnippet>382</a>        <span class="self">self </span><span class="kw">as </span>u8
-<a href=#383 id=383 data-nosnippet>383</a>    }
-<a href=#384 id=384 data-nosnippet>384</a>
-<a href=#385 id=385 data-nosnippet>385</a>    <span class="kw">pub fn </span>size(<span class="self">self</span>) -&gt; u8 {
-<a href=#386 id=386 data-nosnippet>386</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#387 id=387 data-nosnippet>387</a>            Relocation::LITERAL8 =&gt; <span class="number">1</span>,
-<a href=#388 id=388 data-nosnippet>388</a>            Relocation::BC
-<a href=#389 id=389 data-nosnippet>389</a>            | Relocation::JC
-<a href=#390 id=390 data-nosnippet>390</a>            | Relocation::LITERAL16 =&gt; <span class="number">2</span>,
-<a href=#391 id=391 data-nosnippet>391</a>            Relocation::B
-<a href=#392 id=392 data-nosnippet>392</a>            | Relocation::J
-<a href=#393 id=393 data-nosnippet>393</a>            | Relocation::HI20
-<a href=#394 id=394 data-nosnippet>394</a>            | Relocation::LO12
-<a href=#395 id=395 data-nosnippet>395</a>            | Relocation::LO12S
-<a href=#396 id=396 data-nosnippet>396</a>            | Relocation::LITERAL32 =&gt; <span class="number">4</span>,
-<a href=#397 id=397 data-nosnippet>397</a>            Relocation::SPLIT32
-<a href=#398 id=398 data-nosnippet>398</a>            | Relocation::SPLIT32S
-<a href=#399 id=399 data-nosnippet>399</a>            | Relocation::LITERAL64 =&gt; <span class="number">8
-<a href=#400 id=400 data-nosnippet>400</a>        </span>}
-<a href=#401 id=401 data-nosnippet>401</a>    }
-<a href=#402 id=402 data-nosnippet>402</a>}
-<a href=#403 id=403 data-nosnippet>403</a>
-<a href=#404 id=404 data-nosnippet>404</a>
-<a href=#405 id=405 data-nosnippet>405</a><span class="attr">#[derive(Debug, Clone, Copy)]
-<a href=#406 id=406 data-nosnippet>406</a></span><span class="kw">pub struct </span>Opdata {
-<a href=#407 id=407 data-nosnippet>407</a>    <span class="doccomment">/// The base template for the encoding.
-<a href=#408 id=408 data-nosnippet>408</a>    </span><span class="kw">pub </span>template: Template,
-<a href=#409 id=409 data-nosnippet>409</a>    <span class="doccomment">/// What ISA targets this op is valid for
-<a href=#410 id=410 data-nosnippet>410</a>    </span><span class="kw">pub </span>isa_flags: ISAFlags,
-<a href=#411 id=411 data-nosnippet>411</a>    <span class="doccomment">/// What (combination) of extensions is required for this instruction
-<a href=#412 id=412 data-nosnippet>412</a>    </span><span class="kw">pub </span>ext_flags: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[ExtensionFlags],
-<a href=#413 id=413 data-nosnippet>413</a>    <span class="doccomment">/// A set of matchers capable of matching the instruction encoding that this instruction represents.
-<a href=#414 id=414 data-nosnippet>414</a>    </span><span class="kw">pub </span>matchers: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Matcher],
-<a href=#415 id=415 data-nosnippet>415</a>    <span class="doccomment">/// A sequence of encoder commands that check the matched instruction on validity and whose output gets orred together with the original template at runtime.
-<a href=#416 id=416 data-nosnippet>416</a>    </span><span class="kw">pub </span>commands: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Command],
-<a href=#417 id=417 data-nosnippet>417</a>}
-<a href=#418 id=418 data-nosnippet>418</a>
-<a href=#419 id=419 data-nosnippet>419</a><span class="macro">macro_rules!</span> SingleOp {
-<a href=#420 id=420 data-nosnippet>420</a>    ( <span class="macro-nonterminal">$template</span>:expr, <span class="macro-nonterminal">$isa</span>:expr, [ $( <span class="macro-nonterminal">$matcher</span>:expr ),* ], [ $( <span class="macro-nonterminal">$command</span>:expr ),* ], [ $( <span class="macro-nonterminal">$extension</span>:expr ),* ] ) =&gt; {
-<a href=#421 id=421 data-nosnippet>421</a>        {
-<a href=#422 id=422 data-nosnippet>422</a>            <span class="kw">const </span>MATCHERS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Matcher] = {
-<a href=#423 id=423 data-nosnippet>423</a>                <span class="attr">#[allow(unused_imports)]
-<a href=#424 id=424 data-nosnippet>424</a>                </span><span class="kw">use </span><span class="self">self</span>::Matcher::<span class="kw-2">*</span>;
-<a href=#425 id=425 data-nosnippet>425</a>                <span class="kw-2">&amp;</span>[ $(
-<a href=#426 id=426 data-nosnippet>426</a>                    <span class="macro-nonterminal">$matcher
-<a href=#427 id=427 data-nosnippet>427</a>                </span>),* ]
-<a href=#428 id=428 data-nosnippet>428</a>            };
-<a href=#429 id=429 data-nosnippet>429</a>            <span class="kw">const </span>COMMANDS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Command] = {
-<a href=#430 id=430 data-nosnippet>430</a>                <span class="attr">#[allow(unused_imports)]
-<a href=#431 id=431 data-nosnippet>431</a>                </span><span class="kw">use </span><span class="self">self</span>::Command::<span class="kw-2">*</span>;
-<a href=#432 id=432 data-nosnippet>432</a>                <span class="attr">#[allow(unused_imports)]
-<a href=#433 id=433 data-nosnippet>433</a>                </span><span class="kw">use </span><span class="self">self</span>::Relocation::<span class="kw-2">*</span>;
-<a href=#434 id=434 data-nosnippet>434</a>                <span class="kw-2">&amp;</span>[ $(
-<a href=#435 id=435 data-nosnippet>435</a>                    <span class="macro-nonterminal">$command
-<a href=#436 id=436 data-nosnippet>436</a>                </span>),* ]
-<a href=#437 id=437 data-nosnippet>437</a>            };
-<a href=#438 id=438 data-nosnippet>438</a>            <span class="kw">const </span>EXTENSIONS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[ExtensionFlags] = {
-<a href=#439 id=439 data-nosnippet>439</a>                <span class="attr">#[allow(unused_imports)]
-<a href=#440 id=440 data-nosnippet>440</a>                </span><span class="kw-2">&amp;</span>[ $(
-<a href=#441 id=441 data-nosnippet>441</a>                    ExtensionFlags::make(<span class="macro-nonterminal">$extension</span>)
-<a href=#442 id=442 data-nosnippet>442</a>                ),* ]
-<a href=#443 id=443 data-nosnippet>443</a>            };
+<a href=#370 id=370 data-nosnippet>370</a>}
+<a href=#371 id=371 data-nosnippet>371</a>
+<a href=#372 id=372 data-nosnippet>372</a><span class="kw">impl </span>Relocation {
+<a href=#373 id=373 data-nosnippet>373</a>    <span class="kw">pub fn </span>to_id(<span class="self">self</span>) -&gt; u8 {
+<a href=#374 id=374 data-nosnippet>374</a>        <span class="self">self </span><span class="kw">as </span>u8
+<a href=#375 id=375 data-nosnippet>375</a>    }
+<a href=#376 id=376 data-nosnippet>376</a>
+<a href=#377 id=377 data-nosnippet>377</a>    <span class="kw">pub fn </span>size(<span class="self">self</span>) -&gt; u8 {
+<a href=#378 id=378 data-nosnippet>378</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#379 id=379 data-nosnippet>379</a>            Relocation::BC
+<a href=#380 id=380 data-nosnippet>380</a>            | Relocation::JC =&gt; <span class="number">2</span>,
+<a href=#381 id=381 data-nosnippet>381</a>            Relocation::B
+<a href=#382 id=382 data-nosnippet>382</a>            | Relocation::J
+<a href=#383 id=383 data-nosnippet>383</a>            | Relocation::HI20
+<a href=#384 id=384 data-nosnippet>384</a>            | Relocation::LO12
+<a href=#385 id=385 data-nosnippet>385</a>            | Relocation::LO12S =&gt; <span class="number">4</span>,
+<a href=#386 id=386 data-nosnippet>386</a>            Relocation::SPLIT32
+<a href=#387 id=387 data-nosnippet>387</a>            | Relocation::SPLIT32S =&gt; <span class="number">8
+<a href=#388 id=388 data-nosnippet>388</a>        </span>}
+<a href=#389 id=389 data-nosnippet>389</a>    }
+<a href=#390 id=390 data-nosnippet>390</a>}
+<a href=#391 id=391 data-nosnippet>391</a>
+<a href=#392 id=392 data-nosnippet>392</a>
+<a href=#393 id=393 data-nosnippet>393</a><span class="attr">#[derive(Debug, Clone, Copy)]
+<a href=#394 id=394 data-nosnippet>394</a></span><span class="kw">pub struct </span>Opdata {
+<a href=#395 id=395 data-nosnippet>395</a>    <span class="doccomment">/// The base template for the encoding.
+<a href=#396 id=396 data-nosnippet>396</a>    </span><span class="kw">pub </span>template: Template,
+<a href=#397 id=397 data-nosnippet>397</a>    <span class="doccomment">/// What ISA targets this op is valid for
+<a href=#398 id=398 data-nosnippet>398</a>    </span><span class="kw">pub </span>isa_flags: ISAFlags,
+<a href=#399 id=399 data-nosnippet>399</a>    <span class="doccomment">/// What (combination) of extensions is required for this instruction
+<a href=#400 id=400 data-nosnippet>400</a>    </span><span class="kw">pub </span>ext_flags: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[ExtensionFlags],
+<a href=#401 id=401 data-nosnippet>401</a>    <span class="doccomment">/// A set of matchers capable of matching the instruction encoding that this instruction represents.
+<a href=#402 id=402 data-nosnippet>402</a>    </span><span class="kw">pub </span>matchers: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Matcher],
+<a href=#403 id=403 data-nosnippet>403</a>    <span class="doccomment">/// A sequence of encoder commands that check the matched instruction on validity and whose output gets orred together with the original template at runtime.
+<a href=#404 id=404 data-nosnippet>404</a>    </span><span class="kw">pub </span>commands: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Command],
+<a href=#405 id=405 data-nosnippet>405</a>}
+<a href=#406 id=406 data-nosnippet>406</a>
+<a href=#407 id=407 data-nosnippet>407</a><span class="macro">macro_rules!</span> SingleOp {
+<a href=#408 id=408 data-nosnippet>408</a>    ( <span class="macro-nonterminal">$template</span>:expr, <span class="macro-nonterminal">$isa</span>:expr, [ $( <span class="macro-nonterminal">$matcher</span>:expr ),* ], [ $( <span class="macro-nonterminal">$command</span>:expr ),* ], [ $( <span class="macro-nonterminal">$extension</span>:expr ),* ] ) =&gt; {
+<a href=#409 id=409 data-nosnippet>409</a>        {
+<a href=#410 id=410 data-nosnippet>410</a>            <span class="kw">const </span>MATCHERS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Matcher] = {
+<a href=#411 id=411 data-nosnippet>411</a>                <span class="attr">#[allow(unused_imports)]
+<a href=#412 id=412 data-nosnippet>412</a>                </span><span class="kw">use </span><span class="self">self</span>::Matcher::<span class="kw-2">*</span>;
+<a href=#413 id=413 data-nosnippet>413</a>                <span class="kw-2">&amp;</span>[ $(
+<a href=#414 id=414 data-nosnippet>414</a>                    <span class="macro-nonterminal">$matcher
+<a href=#415 id=415 data-nosnippet>415</a>                </span>),* ]
+<a href=#416 id=416 data-nosnippet>416</a>            };
+<a href=#417 id=417 data-nosnippet>417</a>            <span class="kw">const </span>COMMANDS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Command] = {
+<a href=#418 id=418 data-nosnippet>418</a>                <span class="attr">#[allow(unused_imports)]
+<a href=#419 id=419 data-nosnippet>419</a>                </span><span class="kw">use </span><span class="self">self</span>::Command::<span class="kw-2">*</span>;
+<a href=#420 id=420 data-nosnippet>420</a>                <span class="attr">#[allow(unused_imports)]
+<a href=#421 id=421 data-nosnippet>421</a>                </span><span class="kw">use </span><span class="self">self</span>::Relocation::<span class="kw-2">*</span>;
+<a href=#422 id=422 data-nosnippet>422</a>                <span class="kw-2">&amp;</span>[ $(
+<a href=#423 id=423 data-nosnippet>423</a>                    <span class="macro-nonterminal">$command
+<a href=#424 id=424 data-nosnippet>424</a>                </span>),* ]
+<a href=#425 id=425 data-nosnippet>425</a>            };
+<a href=#426 id=426 data-nosnippet>426</a>            <span class="kw">const </span>EXTENSIONS: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[ExtensionFlags] = {
+<a href=#427 id=427 data-nosnippet>427</a>                <span class="attr">#[allow(unused_imports)]
+<a href=#428 id=428 data-nosnippet>428</a>                </span><span class="kw-2">&amp;</span>[ $(
+<a href=#429 id=429 data-nosnippet>429</a>                    ExtensionFlags::make(<span class="macro-nonterminal">$extension</span>)
+<a href=#430 id=430 data-nosnippet>430</a>                ),* ]
+<a href=#431 id=431 data-nosnippet>431</a>            };
+<a href=#432 id=432 data-nosnippet>432</a>
+<a href=#433 id=433 data-nosnippet>433</a>            <span class="kw">use </span><span class="self">self</span>::Template::<span class="kw-2">*</span>;
+<a href=#434 id=434 data-nosnippet>434</a>            Opdata {
+<a href=#435 id=435 data-nosnippet>435</a>                template: <span class="macro-nonterminal">$template</span>,
+<a href=#436 id=436 data-nosnippet>436</a>                isa_flags: ISAFlags::make(<span class="macro-nonterminal">$isa</span>),
+<a href=#437 id=437 data-nosnippet>437</a>                ext_flags: EXTENSIONS,
+<a href=#438 id=438 data-nosnippet>438</a>                matchers: MATCHERS,
+<a href=#439 id=439 data-nosnippet>439</a>                commands: COMMANDS,
+<a href=#440 id=440 data-nosnippet>440</a>            }
+<a href=#441 id=441 data-nosnippet>441</a>        }
+<a href=#442 id=442 data-nosnippet>442</a>    }
+<a href=#443 id=443 data-nosnippet>443</a>}
 <a href=#444 id=444 data-nosnippet>444</a>
-<a href=#445 id=445 data-nosnippet>445</a>            <span class="kw">use </span><span class="self">self</span>::Template::<span class="kw-2">*</span>;
-<a href=#446 id=446 data-nosnippet>446</a>            Opdata {
-<a href=#447 id=447 data-nosnippet>447</a>                template: <span class="macro-nonterminal">$template</span>,
-<a href=#448 id=448 data-nosnippet>448</a>                isa_flags: ISAFlags::make(<span class="macro-nonterminal">$isa</span>),
-<a href=#449 id=449 data-nosnippet>449</a>                ext_flags: EXTENSIONS,
-<a href=#450 id=450 data-nosnippet>450</a>                matchers: MATCHERS,
-<a href=#451 id=451 data-nosnippet>451</a>                commands: COMMANDS,
-<a href=#452 id=452 data-nosnippet>452</a>            }
-<a href=#453 id=453 data-nosnippet>453</a>        }
-<a href=#454 id=454 data-nosnippet>454</a>    }
-<a href=#455 id=455 data-nosnippet>455</a>}
-<a href=#456 id=456 data-nosnippet>456</a>
-<a href=#457 id=457 data-nosnippet>457</a><span class="macro">macro_rules!</span> Ops {
-<a href=#458 id=458 data-nosnippet>458</a>    ( $( <span class="macro-nonterminal">$name</span>:tt = [ $( <span class="macro-nonterminal">$template</span>:expr , <span class="macro-nonterminal">$isa</span>:expr , [ $( <span class="macro-nonterminal">$matcher</span>:expr ),* ] =&gt; [ $( <span class="macro-nonterminal">$command</span>:expr ),* ] , [ $( <span class="macro-nonterminal">$extension</span>:expr ),* ] ; )+ ] , )* ) =&gt; {
-<a href=#459 id=459 data-nosnippet>459</a>        [ $(
-<a href=#460 id=460 data-nosnippet>460</a>            (
-<a href=#461 id=461 data-nosnippet>461</a>                <span class="macro-nonterminal">$name</span>,
-<a href=#462 id=462 data-nosnippet>462</a>                <span class="kw-2">&amp;</span>[ $(
-<a href=#463 id=463 data-nosnippet>463</a>                    <span class="macro">SingleOp!</span>( <span class="macro-nonterminal">$template</span>, <span class="macro-nonterminal">$isa</span>, [ $( <span class="macro-nonterminal">$matcher </span>),* ], [ $( <span class="macro-nonterminal">$command </span>),* ], [ $( <span class="macro-nonterminal">$extension </span>),* ] )
-<a href=#464 id=464 data-nosnippet>464</a>                ),+ ] <span class="kw">as </span><span class="kw-2">&amp;</span>[<span class="kw">_</span>]
-<a href=#465 id=465 data-nosnippet>465</a>            )
-<a href=#466 id=466 data-nosnippet>466</a>        ),* ]
-<a href=#467 id=467 data-nosnippet>467</a>    }
-<a href=#468 id=468 data-nosnippet>468</a>}
-<a href=#469 id=469 data-nosnippet>469</a>
-<a href=#470 id=470 data-nosnippet>470</a><span class="kw">pub fn </span>get_mnemonic_data(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; {
-<a href=#471 id=471 data-nosnippet>471</a>    OPMAP.get(<span class="kw-2">&amp;</span>name).cloned()
-<a href=#472 id=472 data-nosnippet>472</a>}
-<a href=#473 id=473 data-nosnippet>473</a>
-<a href=#474 id=474 data-nosnippet>474</a><span class="attr">#[allow(dead_code)]
-<a href=#475 id=475 data-nosnippet>475</a></span><span class="kw">pub fn </span>mnemonics() -&gt; hash_map::Keys&lt;<span class="lifetime">'static</span>, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; {
-<a href=#476 id=476 data-nosnippet>476</a>    OPMAP.keys()
-<a href=#477 id=477 data-nosnippet>477</a>}
-<a href=#478 id=478 data-nosnippet>478</a>
-<a href=#479 id=479 data-nosnippet>479</a>
-<a href=#480 id=480 data-nosnippet>480</a><span class="macro">lazy_static!</span>{
-<a href=#481 id=481 data-nosnippet>481</a>    <span class="kw">static </span><span class="kw-2">ref </span>OPMAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; = {
-<a href=#482 id=482 data-nosnippet>482</a>        <span class="attr">#![allow(non_upper_case_globals)]
-<a href=#483 id=483 data-nosnippet>483</a>
-<a href=#484 id=484 data-nosnippet>484</a>        </span><span class="comment">// we need to reimport these as we can't use bitflags in const
-<a href=#485 id=485 data-nosnippet>485</a>        </span><span class="kw">const </span>RV32: u8 = ISAFlags::RV32.bits();
-<a href=#486 id=486 data-nosnippet>486</a>        <span class="kw">const </span>RV64: u8 = ISAFlags::RV64.bits();
-<a href=#487 id=487 data-nosnippet>487</a>
-<a href=#488 id=488 data-nosnippet>488</a>        <span class="comment">// yes these too...
-<a href=#489 id=489 data-nosnippet>489</a>        </span><span class="kw">const </span>Ex_A: u64 = ExtensionFlags::Ex_A.bits();
-<a href=#490 id=490 data-nosnippet>490</a>        <span class="kw">const </span>Ex_C: u64 = ExtensionFlags::Ex_C.bits();
-<a href=#491 id=491 data-nosnippet>491</a>        <span class="kw">const </span>Ex_D: u64 = ExtensionFlags::Ex_D.bits();
-<a href=#492 id=492 data-nosnippet>492</a>        <span class="kw">const </span>Ex_F: u64 = ExtensionFlags::Ex_F.bits();
-<a href=#493 id=493 data-nosnippet>493</a>        <span class="kw">const </span>Ex_I: u64 = ExtensionFlags::Ex_I.bits();
-<a href=#494 id=494 data-nosnippet>494</a>        <span class="kw">const </span>Ex_M: u64 = ExtensionFlags::Ex_M.bits();
-<a href=#495 id=495 data-nosnippet>495</a>        <span class="kw">const </span>Ex_Q: u64 = ExtensionFlags::Ex_Q.bits();
-<a href=#496 id=496 data-nosnippet>496</a>        <span class="kw">const </span>Ex_Zabha: u64 = ExtensionFlags::Ex_Zabha.bits();
-<a href=#497 id=497 data-nosnippet>497</a>        <span class="kw">const </span>Ex_Zacas: u64 = ExtensionFlags::Ex_Zacas.bits();
-<a href=#498 id=498 data-nosnippet>498</a>        <span class="kw">const </span>Ex_Zawrs: u64 = ExtensionFlags::Ex_Zawrs.bits();
-<a href=#499 id=499 data-nosnippet>499</a>        <span class="kw">const </span>Ex_Zba: u64 = ExtensionFlags::Ex_Zba.bits();
-<a href=#500 id=500 data-nosnippet>500</a>        <span class="kw">const </span>Ex_Zbb: u64 = ExtensionFlags::Ex_Zbb.bits();
-<a href=#501 id=501 data-nosnippet>501</a>        <span class="kw">const </span>Ex_Zbc: u64 = ExtensionFlags::Ex_Zbc.bits();
-<a href=#502 id=502 data-nosnippet>502</a>        <span class="kw">const </span>Ex_Zbkb: u64 = ExtensionFlags::Ex_Zbkb.bits();
-<a href=#503 id=503 data-nosnippet>503</a>        <span class="kw">const </span>Ex_Zbkc: u64 = ExtensionFlags::Ex_Zbkc.bits();
-<a href=#504 id=504 data-nosnippet>504</a>        <span class="kw">const </span>Ex_Zbkx: u64 = ExtensionFlags::Ex_Zbkx.bits();
-<a href=#505 id=505 data-nosnippet>505</a>        <span class="kw">const </span>Ex_Zbs: u64 = ExtensionFlags::Ex_Zbs.bits();
-<a href=#506 id=506 data-nosnippet>506</a>        <span class="kw">const </span>Ex_Zcb: u64 = ExtensionFlags::Ex_Zcb.bits();
-<a href=#507 id=507 data-nosnippet>507</a>        <span class="kw">const </span>Ex_Zcmop: u64 = ExtensionFlags::Ex_Zcmop.bits();
-<a href=#508 id=508 data-nosnippet>508</a>        <span class="kw">const </span>Ex_Zcmp: u64 = ExtensionFlags::Ex_Zcmp.bits();
-<a href=#509 id=509 data-nosnippet>509</a>        <span class="kw">const </span>Ex_Zcmt: u64 = ExtensionFlags::Ex_Zcmt.bits();
-<a href=#510 id=510 data-nosnippet>510</a>        <span class="kw">const </span>Ex_Zdinx: u64 = ExtensionFlags::Ex_Zdinx.bits();
-<a href=#511 id=511 data-nosnippet>511</a>        <span class="kw">const </span>Ex_Zfa: u64 = ExtensionFlags::Ex_Zfa.bits();
-<a href=#512 id=512 data-nosnippet>512</a>        <span class="kw">const </span>Ex_Zfbfmin: u64 = ExtensionFlags::Ex_Zfbfmin.bits();
-<a href=#513 id=513 data-nosnippet>513</a>        <span class="kw">const </span>Ex_Zfh: u64 = ExtensionFlags::Ex_Zfh.bits();
-<a href=#514 id=514 data-nosnippet>514</a>        <span class="kw">const </span>Ex_Zfhmin: u64 = ExtensionFlags::Ex_Zfhmin.bits();
-<a href=#515 id=515 data-nosnippet>515</a>        <span class="kw">const </span>Ex_Zfinx: u64 = ExtensionFlags::Ex_Zfinx.bits();
-<a href=#516 id=516 data-nosnippet>516</a>        <span class="kw">const </span>Ex_Zhinx: u64 = ExtensionFlags::Ex_Zhinx.bits();
-<a href=#517 id=517 data-nosnippet>517</a>        <span class="kw">const </span>Ex_Zhinxmin: u64 = ExtensionFlags::Ex_Zhinxmin.bits();
-<a href=#518 id=518 data-nosnippet>518</a>        <span class="kw">const </span>Ex_Zicbom: u64 = ExtensionFlags::Ex_Zicbom.bits();
-<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">const </span>Ex_Zicbop: u64 = ExtensionFlags::Ex_Zicbop.bits();
-<a href=#520 id=520 data-nosnippet>520</a>        <span class="kw">const </span>Ex_Zicboz: u64 = ExtensionFlags::Ex_Zicboz.bits();
-<a href=#521 id=521 data-nosnippet>521</a>        <span class="kw">const </span>Ex_Zicfilp: u64 = ExtensionFlags::Ex_Zicfilp.bits();
-<a href=#522 id=522 data-nosnippet>522</a>        <span class="kw">const </span>Ex_Zicfiss: u64 = ExtensionFlags::Ex_Zicfiss.bits();
-<a href=#523 id=523 data-nosnippet>523</a>        <span class="kw">const </span>Ex_Zicntr: u64 = ExtensionFlags::Ex_Zicntr.bits();
-<a href=#524 id=524 data-nosnippet>524</a>        <span class="kw">const </span>Ex_Zicond: u64 = ExtensionFlags::Ex_Zicond.bits();
-<a href=#525 id=525 data-nosnippet>525</a>        <span class="kw">const </span>Ex_Zicsr: u64 = ExtensionFlags::Ex_Zicsr.bits();
-<a href=#526 id=526 data-nosnippet>526</a>        <span class="kw">const </span>Ex_Zifencei: u64 = ExtensionFlags::Ex_Zifencei.bits();
-<a href=#527 id=527 data-nosnippet>527</a>        <span class="kw">const </span>Ex_Zihintntl: u64 = ExtensionFlags::Ex_Zihintntl.bits();
-<a href=#528 id=528 data-nosnippet>528</a>        <span class="kw">const </span>Ex_Zihintpause: u64 = ExtensionFlags::Ex_Zihintpause.bits();
-<a href=#529 id=529 data-nosnippet>529</a>        <span class="kw">const </span>Ex_Zimop: u64 = ExtensionFlags::Ex_Zimop.bits();
-<a href=#530 id=530 data-nosnippet>530</a>        <span class="kw">const </span>Ex_Zk: u64 = ExtensionFlags::Ex_Zk.bits();
-<a href=#531 id=531 data-nosnippet>531</a>        <span class="kw">const </span>Ex_Zkn: u64 = ExtensionFlags::Ex_Zkn.bits();
-<a href=#532 id=532 data-nosnippet>532</a>        <span class="kw">const </span>Ex_Zknd: u64 = ExtensionFlags::Ex_Zknd.bits();
-<a href=#533 id=533 data-nosnippet>533</a>        <span class="kw">const </span>Ex_Zkne: u64 = ExtensionFlags::Ex_Zkne.bits();
-<a href=#534 id=534 data-nosnippet>534</a>        <span class="kw">const </span>Ex_Zknh: u64 = ExtensionFlags::Ex_Zknh.bits();
-<a href=#535 id=535 data-nosnippet>535</a>        <span class="kw">const </span>Ex_Zks: u64 = ExtensionFlags::Ex_Zks.bits();
-<a href=#536 id=536 data-nosnippet>536</a>        <span class="kw">const </span>Ex_Zksed: u64 = ExtensionFlags::Ex_Zksed.bits();
-<a href=#537 id=537 data-nosnippet>537</a>        <span class="kw">const </span>Ex_Zksh: u64 = ExtensionFlags::Ex_Zksh.bits();
-<a href=#538 id=538 data-nosnippet>538</a>
-<a href=#539 id=539 data-nosnippet>539</a>
-<a href=#540 id=540 data-nosnippet>540</a>        <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>[Opdata])] = <span class="kw-2">&amp;</span><span class="macro">include!</span>(<span class="string">"opmap.rs"</span>);
-<a href=#541 id=541 data-nosnippet>541</a>        MAP.iter().cloned().collect()
-<a href=#542 id=542 data-nosnippet>542</a>    };
-<a href=#543 id=543 data-nosnippet>543</a>
-<a href=#544 id=544 data-nosnippet>544</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>ROUNDMODE_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u8&gt; = {
-<a href=#545 id=545 data-nosnippet>545</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
-<a href=#546 id=546 data-nosnippet>546</a>
-<a href=#547 id=547 data-nosnippet>547</a>        map.insert(<span class="string">"rne"</span>, <span class="number">0</span>);
-<a href=#548 id=548 data-nosnippet>548</a>        map.insert(<span class="string">"rtz"</span>, <span class="number">1</span>);
-<a href=#549 id=549 data-nosnippet>549</a>        map.insert(<span class="string">"rdn"</span>, <span class="number">2</span>);
-<a href=#550 id=550 data-nosnippet>550</a>        map.insert(<span class="string">"rup"</span>, <span class="number">3</span>);
-<a href=#551 id=551 data-nosnippet>551</a>        map.insert(<span class="string">"rmm"</span>, <span class="number">4</span>);
-<a href=#552 id=552 data-nosnippet>552</a>        map.insert(<span class="string">"dyn"</span>, <span class="number">7</span>);
-<a href=#553 id=553 data-nosnippet>553</a>
-<a href=#554 id=554 data-nosnippet>554</a>        map
-<a href=#555 id=555 data-nosnippet>555</a>    };
-<a href=#556 id=556 data-nosnippet>556</a>
-<a href=#557 id=557 data-nosnippet>557</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>FENCESPEC_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u8&gt; = {
-<a href=#558 id=558 data-nosnippet>558</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
-<a href=#559 id=559 data-nosnippet>559</a>
-<a href=#560 id=560 data-nosnippet>560</a>        map.insert(<span class="string">"w"</span>, <span class="number">1</span>);
-<a href=#561 id=561 data-nosnippet>561</a>        map.insert(<span class="string">"r"</span>, <span class="number">2</span>);
-<a href=#562 id=562 data-nosnippet>562</a>        map.insert(<span class="string">"rw"</span>, <span class="number">3</span>);
-<a href=#563 id=563 data-nosnippet>563</a>        map.insert(<span class="string">"o"</span>, <span class="number">4</span>);
-<a href=#564 id=564 data-nosnippet>564</a>        map.insert(<span class="string">"ow"</span>, <span class="number">5</span>);
-<a href=#565 id=565 data-nosnippet>565</a>        map.insert(<span class="string">"or"</span>, <span class="number">6</span>);
-<a href=#566 id=566 data-nosnippet>566</a>        map.insert(<span class="string">"orw"</span>, <span class="number">7</span>);
-<a href=#567 id=567 data-nosnippet>567</a>        map.insert(<span class="string">"i"</span>, <span class="number">8</span>);
-<a href=#568 id=568 data-nosnippet>568</a>        map.insert(<span class="string">"iw"</span>, <span class="number">9</span>);
-<a href=#569 id=569 data-nosnippet>569</a>        map.insert(<span class="string">"ir"</span>, <span class="number">10</span>);
-<a href=#570 id=570 data-nosnippet>570</a>        map.insert(<span class="string">"irw"</span>, <span class="number">11</span>);
-<a href=#571 id=571 data-nosnippet>571</a>        map.insert(<span class="string">"io"</span>, <span class="number">12</span>);
-<a href=#572 id=572 data-nosnippet>572</a>        map.insert(<span class="string">"iow"</span>, <span class="number">13</span>);
-<a href=#573 id=573 data-nosnippet>573</a>        map.insert(<span class="string">"ior"</span>, <span class="number">14</span>);
-<a href=#574 id=574 data-nosnippet>574</a>        map.insert(<span class="string">"iorw"</span>, <span class="number">15</span>);
-<a href=#575 id=575 data-nosnippet>575</a>
-<a href=#576 id=576 data-nosnippet>576</a>        map
-<a href=#577 id=577 data-nosnippet>577</a>    };
-<a href=#578 id=578 data-nosnippet>578</a>
-<a href=#579 id=579 data-nosnippet>579</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>CSR_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u16&gt; = {
-<a href=#580 id=580 data-nosnippet>580</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
-<a href=#581 id=581 data-nosnippet>581</a>
-<a href=#582 id=582 data-nosnippet>582</a>        map.insert(<span class="string">"fflags"</span>, <span class="number">0x001</span>);
-<a href=#583 id=583 data-nosnippet>583</a>        map.insert(<span class="string">"frm"</span>, <span class="number">0x002</span>);
-<a href=#584 id=584 data-nosnippet>584</a>        map.insert(<span class="string">"fcsr"</span>, <span class="number">0x003</span>);
-<a href=#585 id=585 data-nosnippet>585</a>        map.insert(<span class="string">"vstart"</span>, <span class="number">0x008</span>);
-<a href=#586 id=586 data-nosnippet>586</a>        map.insert(<span class="string">"vxsat"</span>, <span class="number">0x009</span>);
-<a href=#587 id=587 data-nosnippet>587</a>        map.insert(<span class="string">"vxrm"</span>, <span class="number">0x00A</span>);
-<a href=#588 id=588 data-nosnippet>588</a>        map.insert(<span class="string">"vcsr"</span>, <span class="number">0x00F</span>);
-<a href=#589 id=589 data-nosnippet>589</a>        map.insert(<span class="string">"ssp"</span>, <span class="number">0x011</span>);
-<a href=#590 id=590 data-nosnippet>590</a>        map.insert(<span class="string">"seed"</span>, <span class="number">0x015</span>);
-<a href=#591 id=591 data-nosnippet>591</a>        map.insert(<span class="string">"jvt"</span>, <span class="number">0x017</span>);
-<a href=#592 id=592 data-nosnippet>592</a>        map.insert(<span class="string">"cycle"</span>, <span class="number">0xC00</span>);
-<a href=#593 id=593 data-nosnippet>593</a>        map.insert(<span class="string">"time"</span>, <span class="number">0xC01</span>);
-<a href=#594 id=594 data-nosnippet>594</a>        map.insert(<span class="string">"instret"</span>, <span class="number">0xC02</span>);
-<a href=#595 id=595 data-nosnippet>595</a>        map.insert(<span class="string">"hpmcounter3"</span>, <span class="number">0xC03</span>);
-<a href=#596 id=596 data-nosnippet>596</a>        map.insert(<span class="string">"hpmcounter4"</span>, <span class="number">0xC04</span>);
-<a href=#597 id=597 data-nosnippet>597</a>        map.insert(<span class="string">"hpmcounter5"</span>, <span class="number">0xC05</span>);
-<a href=#598 id=598 data-nosnippet>598</a>        map.insert(<span class="string">"hpmcounter6"</span>, <span class="number">0xC06</span>);
-<a href=#599 id=599 data-nosnippet>599</a>        map.insert(<span class="string">"hpmcounter7"</span>, <span class="number">0xC07</span>);
-<a href=#600 id=600 data-nosnippet>600</a>        map.insert(<span class="string">"hpmcounter8"</span>, <span class="number">0xC08</span>);
-<a href=#601 id=601 data-nosnippet>601</a>        map.insert(<span class="string">"hpmcounter9"</span>, <span class="number">0xC09</span>);
-<a href=#602 id=602 data-nosnippet>602</a>        map.insert(<span class="string">"hpmcounter10"</span>, <span class="number">0xC0A</span>);
-<a href=#603 id=603 data-nosnippet>603</a>        map.insert(<span class="string">"hpmcounter11"</span>, <span class="number">0xC0B</span>);
-<a href=#604 id=604 data-nosnippet>604</a>        map.insert(<span class="string">"hpmcounter12"</span>, <span class="number">0xC0C</span>);
-<a href=#605 id=605 data-nosnippet>605</a>        map.insert(<span class="string">"hpmcounter13"</span>, <span class="number">0xC0D</span>);
-<a href=#606 id=606 data-nosnippet>606</a>        map.insert(<span class="string">"hpmcounter14"</span>, <span class="number">0xC0E</span>);
-<a href=#607 id=607 data-nosnippet>607</a>        map.insert(<span class="string">"hpmcounter15"</span>, <span class="number">0xC0F</span>);
-<a href=#608 id=608 data-nosnippet>608</a>        map.insert(<span class="string">"hpmcounter16"</span>, <span class="number">0xC10</span>);
-<a href=#609 id=609 data-nosnippet>609</a>        map.insert(<span class="string">"hpmcounter17"</span>, <span class="number">0xC11</span>);
-<a href=#610 id=610 data-nosnippet>610</a>        map.insert(<span class="string">"hpmcounter18"</span>, <span class="number">0xC12</span>);
-<a href=#611 id=611 data-nosnippet>611</a>        map.insert(<span class="string">"hpmcounter19"</span>, <span class="number">0xC13</span>);
-<a href=#612 id=612 data-nosnippet>612</a>        map.insert(<span class="string">"hpmcounter20"</span>, <span class="number">0xC14</span>);
-<a href=#613 id=613 data-nosnippet>613</a>        map.insert(<span class="string">"hpmcounter21"</span>, <span class="number">0xC15</span>);
-<a href=#614 id=614 data-nosnippet>614</a>        map.insert(<span class="string">"hpmcounter22"</span>, <span class="number">0xC16</span>);
-<a href=#615 id=615 data-nosnippet>615</a>        map.insert(<span class="string">"hpmcounter23"</span>, <span class="number">0xC17</span>);
-<a href=#616 id=616 data-nosnippet>616</a>        map.insert(<span class="string">"hpmcounter24"</span>, <span class="number">0xC18</span>);
-<a href=#617 id=617 data-nosnippet>617</a>        map.insert(<span class="string">"hpmcounter25"</span>, <span class="number">0xC19</span>);
-<a href=#618 id=618 data-nosnippet>618</a>        map.insert(<span class="string">"hpmcounter26"</span>, <span class="number">0xC1A</span>);
-<a href=#619 id=619 data-nosnippet>619</a>        map.insert(<span class="string">"hpmcounter27"</span>, <span class="number">0xC1B</span>);
-<a href=#620 id=620 data-nosnippet>620</a>        map.insert(<span class="string">"hpmcounter28"</span>, <span class="number">0xC1C</span>);
-<a href=#621 id=621 data-nosnippet>621</a>        map.insert(<span class="string">"hpmcounter29"</span>, <span class="number">0xC1D</span>);
-<a href=#622 id=622 data-nosnippet>622</a>        map.insert(<span class="string">"hpmcounter30"</span>, <span class="number">0xC1E</span>);
-<a href=#623 id=623 data-nosnippet>623</a>        map.insert(<span class="string">"hpmcounter31"</span>, <span class="number">0xC1F</span>);
-<a href=#624 id=624 data-nosnippet>624</a>        map.insert(<span class="string">"vl"</span>, <span class="number">0xC20</span>);
-<a href=#625 id=625 data-nosnippet>625</a>        map.insert(<span class="string">"vtype"</span>, <span class="number">0xC21</span>);
-<a href=#626 id=626 data-nosnippet>626</a>        map.insert(<span class="string">"vlenb"</span>, <span class="number">0xC22</span>);
-<a href=#627 id=627 data-nosnippet>627</a>        map.insert(<span class="string">"sstatus"</span>, <span class="number">0x100</span>);
-<a href=#628 id=628 data-nosnippet>628</a>        map.insert(<span class="string">"sedeleg"</span>, <span class="number">0x102</span>);
-<a href=#629 id=629 data-nosnippet>629</a>        map.insert(<span class="string">"sideleg"</span>, <span class="number">0x103</span>);
-<a href=#630 id=630 data-nosnippet>630</a>        map.insert(<span class="string">"sie"</span>, <span class="number">0x104</span>);
-<a href=#631 id=631 data-nosnippet>631</a>        map.insert(<span class="string">"stvec"</span>, <span class="number">0x105</span>);
-<a href=#632 id=632 data-nosnippet>632</a>        map.insert(<span class="string">"scounteren"</span>, <span class="number">0x106</span>);
-<a href=#633 id=633 data-nosnippet>633</a>        map.insert(<span class="string">"senvcfg"</span>, <span class="number">0x10A</span>);
-<a href=#634 id=634 data-nosnippet>634</a>        map.insert(<span class="string">"sstateen0"</span>, <span class="number">0x10C</span>);
-<a href=#635 id=635 data-nosnippet>635</a>        map.insert(<span class="string">"sstateen1"</span>, <span class="number">0x10D</span>);
-<a href=#636 id=636 data-nosnippet>636</a>        map.insert(<span class="string">"sstateen2"</span>, <span class="number">0x10E</span>);
-<a href=#637 id=637 data-nosnippet>637</a>        map.insert(<span class="string">"sstateen3"</span>, <span class="number">0x10F</span>);
-<a href=#638 id=638 data-nosnippet>638</a>        map.insert(<span class="string">"scountinhibit"</span>, <span class="number">0x120</span>);
-<a href=#639 id=639 data-nosnippet>639</a>        map.insert(<span class="string">"sscratch"</span>, <span class="number">0x140</span>);
-<a href=#640 id=640 data-nosnippet>640</a>        map.insert(<span class="string">"sepc"</span>, <span class="number">0x141</span>);
-<a href=#641 id=641 data-nosnippet>641</a>        map.insert(<span class="string">"scause"</span>, <span class="number">0x142</span>);
-<a href=#642 id=642 data-nosnippet>642</a>        map.insert(<span class="string">"stval"</span>, <span class="number">0x143</span>);
-<a href=#643 id=643 data-nosnippet>643</a>        map.insert(<span class="string">"sip"</span>, <span class="number">0x144</span>);
-<a href=#644 id=644 data-nosnippet>644</a>        map.insert(<span class="string">"stimecmp"</span>, <span class="number">0x14D</span>);
-<a href=#645 id=645 data-nosnippet>645</a>        map.insert(<span class="string">"sctrctl"</span>, <span class="number">0x14E</span>);
-<a href=#646 id=646 data-nosnippet>646</a>        map.insert(<span class="string">"sctrstatus"</span>, <span class="number">0x14F</span>);
-<a href=#647 id=647 data-nosnippet>647</a>        map.insert(<span class="string">"siselect"</span>, <span class="number">0x150</span>);
-<a href=#648 id=648 data-nosnippet>648</a>        map.insert(<span class="string">"sireg"</span>, <span class="number">0x151</span>);
-<a href=#649 id=649 data-nosnippet>649</a>        map.insert(<span class="string">"sireg2"</span>, <span class="number">0x152</span>);
-<a href=#650 id=650 data-nosnippet>650</a>        map.insert(<span class="string">"sireg3"</span>, <span class="number">0x153</span>);
-<a href=#651 id=651 data-nosnippet>651</a>        map.insert(<span class="string">"sireg4"</span>, <span class="number">0x155</span>);
-<a href=#652 id=652 data-nosnippet>652</a>        map.insert(<span class="string">"sireg5"</span>, <span class="number">0x156</span>);
-<a href=#653 id=653 data-nosnippet>653</a>        map.insert(<span class="string">"sireg6"</span>, <span class="number">0x157</span>);
-<a href=#654 id=654 data-nosnippet>654</a>        map.insert(<span class="string">"stopei"</span>, <span class="number">0x15C</span>);
-<a href=#655 id=655 data-nosnippet>655</a>        map.insert(<span class="string">"sctrdepth"</span>, <span class="number">0x15F</span>);
-<a href=#656 id=656 data-nosnippet>656</a>        map.insert(<span class="string">"satp"</span>, <span class="number">0x180</span>);
-<a href=#657 id=657 data-nosnippet>657</a>        map.insert(<span class="string">"srmcfg"</span>, <span class="number">0x181</span>);
-<a href=#658 id=658 data-nosnippet>658</a>        map.insert(<span class="string">"scontext"</span>, <span class="number">0x5A8</span>);
-<a href=#659 id=659 data-nosnippet>659</a>        map.insert(<span class="string">"vsstatus"</span>, <span class="number">0x200</span>);
-<a href=#660 id=660 data-nosnippet>660</a>        map.insert(<span class="string">"vsie"</span>, <span class="number">0x204</span>);
-<a href=#661 id=661 data-nosnippet>661</a>        map.insert(<span class="string">"vstvec"</span>, <span class="number">0x205</span>);
-<a href=#662 id=662 data-nosnippet>662</a>        map.insert(<span class="string">"vsscratch"</span>, <span class="number">0x240</span>);
-<a href=#663 id=663 data-nosnippet>663</a>        map.insert(<span class="string">"vsepc"</span>, <span class="number">0x241</span>);
-<a href=#664 id=664 data-nosnippet>664</a>        map.insert(<span class="string">"vscause"</span>, <span class="number">0x242</span>);
-<a href=#665 id=665 data-nosnippet>665</a>        map.insert(<span class="string">"vstval"</span>, <span class="number">0x243</span>);
-<a href=#666 id=666 data-nosnippet>666</a>        map.insert(<span class="string">"vsip"</span>, <span class="number">0x244</span>);
-<a href=#667 id=667 data-nosnippet>667</a>        map.insert(<span class="string">"vstimecmp"</span>, <span class="number">0x24D</span>);
-<a href=#668 id=668 data-nosnippet>668</a>        map.insert(<span class="string">"vsctrctl"</span>, <span class="number">0x24E</span>);
-<a href=#669 id=669 data-nosnippet>669</a>        map.insert(<span class="string">"vsiselect"</span>, <span class="number">0x250</span>);
-<a href=#670 id=670 data-nosnippet>670</a>        map.insert(<span class="string">"vsireg"</span>, <span class="number">0x251</span>);
-<a href=#671 id=671 data-nosnippet>671</a>        map.insert(<span class="string">"vsireg2"</span>, <span class="number">0x252</span>);
-<a href=#672 id=672 data-nosnippet>672</a>        map.insert(<span class="string">"vsireg3"</span>, <span class="number">0x253</span>);
-<a href=#673 id=673 data-nosnippet>673</a>        map.insert(<span class="string">"vsireg4"</span>, <span class="number">0x255</span>);
-<a href=#674 id=674 data-nosnippet>674</a>        map.insert(<span class="string">"vsireg5"</span>, <span class="number">0x256</span>);
-<a href=#675 id=675 data-nosnippet>675</a>        map.insert(<span class="string">"vsireg6"</span>, <span class="number">0x257</span>);
-<a href=#676 id=676 data-nosnippet>676</a>        map.insert(<span class="string">"vstopei"</span>, <span class="number">0x25C</span>);
-<a href=#677 id=677 data-nosnippet>677</a>        map.insert(<span class="string">"vsatp"</span>, <span class="number">0x280</span>);
-<a href=#678 id=678 data-nosnippet>678</a>        map.insert(<span class="string">"hstatus"</span>, <span class="number">0x600</span>);
-<a href=#679 id=679 data-nosnippet>679</a>        map.insert(<span class="string">"hedeleg"</span>, <span class="number">0x602</span>);
-<a href=#680 id=680 data-nosnippet>680</a>        map.insert(<span class="string">"hideleg"</span>, <span class="number">0x603</span>);
-<a href=#681 id=681 data-nosnippet>681</a>        map.insert(<span class="string">"hie"</span>, <span class="number">0x604</span>);
-<a href=#682 id=682 data-nosnippet>682</a>        map.insert(<span class="string">"htimedelta"</span>, <span class="number">0x605</span>);
-<a href=#683 id=683 data-nosnippet>683</a>        map.insert(<span class="string">"hcounteren"</span>, <span class="number">0x606</span>);
-<a href=#684 id=684 data-nosnippet>684</a>        map.insert(<span class="string">"hgeie"</span>, <span class="number">0x607</span>);
-<a href=#685 id=685 data-nosnippet>685</a>        map.insert(<span class="string">"hvien"</span>, <span class="number">0x608</span>);
-<a href=#686 id=686 data-nosnippet>686</a>        map.insert(<span class="string">"hvictl"</span>, <span class="number">0x609</span>);
-<a href=#687 id=687 data-nosnippet>687</a>        map.insert(<span class="string">"henvcfg"</span>, <span class="number">0x60A</span>);
-<a href=#688 id=688 data-nosnippet>688</a>        map.insert(<span class="string">"hstateen0"</span>, <span class="number">0x60C</span>);
-<a href=#689 id=689 data-nosnippet>689</a>        map.insert(<span class="string">"hstateen1"</span>, <span class="number">0x60D</span>);
-<a href=#690 id=690 data-nosnippet>690</a>        map.insert(<span class="string">"hstateen2"</span>, <span class="number">0x60E</span>);
-<a href=#691 id=691 data-nosnippet>691</a>        map.insert(<span class="string">"hstateen3"</span>, <span class="number">0x60F</span>);
-<a href=#692 id=692 data-nosnippet>692</a>        map.insert(<span class="string">"htval"</span>, <span class="number">0x643</span>);
-<a href=#693 id=693 data-nosnippet>693</a>        map.insert(<span class="string">"hip"</span>, <span class="number">0x644</span>);
-<a href=#694 id=694 data-nosnippet>694</a>        map.insert(<span class="string">"hvip"</span>, <span class="number">0x645</span>);
-<a href=#695 id=695 data-nosnippet>695</a>        map.insert(<span class="string">"hviprio1"</span>, <span class="number">0x646</span>);
-<a href=#696 id=696 data-nosnippet>696</a>        map.insert(<span class="string">"hviprio2"</span>, <span class="number">0x647</span>);
-<a href=#697 id=697 data-nosnippet>697</a>        map.insert(<span class="string">"htinst"</span>, <span class="number">0x64A</span>);
-<a href=#698 id=698 data-nosnippet>698</a>        map.insert(<span class="string">"hgatp"</span>, <span class="number">0x680</span>);
-<a href=#699 id=699 data-nosnippet>699</a>        map.insert(<span class="string">"hcontext"</span>, <span class="number">0x6A8</span>);
-<a href=#700 id=700 data-nosnippet>700</a>        map.insert(<span class="string">"hgeip"</span>, <span class="number">0xE12</span>);
-<a href=#701 id=701 data-nosnippet>701</a>        map.insert(<span class="string">"vstopi"</span>, <span class="number">0xEB0</span>);
-<a href=#702 id=702 data-nosnippet>702</a>        map.insert(<span class="string">"scountovf"</span>, <span class="number">0xDA0</span>);
-<a href=#703 id=703 data-nosnippet>703</a>        map.insert(<span class="string">"stopi"</span>, <span class="number">0xDB0</span>);
-<a href=#704 id=704 data-nosnippet>704</a>        map.insert(<span class="string">"utvt"</span>, <span class="number">0x007</span>);
-<a href=#705 id=705 data-nosnippet>705</a>        map.insert(<span class="string">"unxti"</span>, <span class="number">0x045</span>);
-<a href=#706 id=706 data-nosnippet>706</a>        map.insert(<span class="string">"uintstatus"</span>, <span class="number">0x046</span>);
-<a href=#707 id=707 data-nosnippet>707</a>        map.insert(<span class="string">"uscratchcsw"</span>, <span class="number">0x048</span>);
-<a href=#708 id=708 data-nosnippet>708</a>        map.insert(<span class="string">"uscratchcswl"</span>, <span class="number">0x049</span>);
-<a href=#709 id=709 data-nosnippet>709</a>        map.insert(<span class="string">"stvt"</span>, <span class="number">0x107</span>);
-<a href=#710 id=710 data-nosnippet>710</a>        map.insert(<span class="string">"snxti"</span>, <span class="number">0x145</span>);
-<a href=#711 id=711 data-nosnippet>711</a>        map.insert(<span class="string">"sintstatus"</span>, <span class="number">0x146</span>);
-<a href=#712 id=712 data-nosnippet>712</a>        map.insert(<span class="string">"sscratchcsw"</span>, <span class="number">0x148</span>);
-<a href=#713 id=713 data-nosnippet>713</a>        map.insert(<span class="string">"sscratchcswl"</span>, <span class="number">0x149</span>);
-<a href=#714 id=714 data-nosnippet>714</a>        map.insert(<span class="string">"mtvt"</span>, <span class="number">0x307</span>);
-<a href=#715 id=715 data-nosnippet>715</a>        map.insert(<span class="string">"mnxti"</span>, <span class="number">0x345</span>);
-<a href=#716 id=716 data-nosnippet>716</a>        map.insert(<span class="string">"mintstatus"</span>, <span class="number">0x346</span>);
-<a href=#717 id=717 data-nosnippet>717</a>        map.insert(<span class="string">"mscratchcsw"</span>, <span class="number">0x348</span>);
-<a href=#718 id=718 data-nosnippet>718</a>        map.insert(<span class="string">"mscratchcswl"</span>, <span class="number">0x349</span>);
-<a href=#719 id=719 data-nosnippet>719</a>        map.insert(<span class="string">"mstatus"</span>, <span class="number">0x300</span>);
-<a href=#720 id=720 data-nosnippet>720</a>        map.insert(<span class="string">"misa"</span>, <span class="number">0x301</span>);
-<a href=#721 id=721 data-nosnippet>721</a>        map.insert(<span class="string">"medeleg"</span>, <span class="number">0x302</span>);
-<a href=#722 id=722 data-nosnippet>722</a>        map.insert(<span class="string">"mideleg"</span>, <span class="number">0x303</span>);
-<a href=#723 id=723 data-nosnippet>723</a>        map.insert(<span class="string">"mie"</span>, <span class="number">0x304</span>);
-<a href=#724 id=724 data-nosnippet>724</a>        map.insert(<span class="string">"mtvec"</span>, <span class="number">0x305</span>);
-<a href=#725 id=725 data-nosnippet>725</a>        map.insert(<span class="string">"mcounteren"</span>, <span class="number">0x306</span>);
-<a href=#726 id=726 data-nosnippet>726</a>        map.insert(<span class="string">"mvien"</span>, <span class="number">0x308</span>);
-<a href=#727 id=727 data-nosnippet>727</a>        map.insert(<span class="string">"mvip"</span>, <span class="number">0x309</span>);
-<a href=#728 id=728 data-nosnippet>728</a>        map.insert(<span class="string">"menvcfg"</span>, <span class="number">0x30a</span>);
-<a href=#729 id=729 data-nosnippet>729</a>        map.insert(<span class="string">"mstateen0"</span>, <span class="number">0x30C</span>);
-<a href=#730 id=730 data-nosnippet>730</a>        map.insert(<span class="string">"mstateen1"</span>, <span class="number">0x30D</span>);
-<a href=#731 id=731 data-nosnippet>731</a>        map.insert(<span class="string">"mstateen2"</span>, <span class="number">0x30E</span>);
-<a href=#732 id=732 data-nosnippet>732</a>        map.insert(<span class="string">"mstateen3"</span>, <span class="number">0x30F</span>);
-<a href=#733 id=733 data-nosnippet>733</a>        map.insert(<span class="string">"mcountinhibit"</span>, <span class="number">0x320</span>);
-<a href=#734 id=734 data-nosnippet>734</a>        map.insert(<span class="string">"mscratch"</span>, <span class="number">0x340</span>);
-<a href=#735 id=735 data-nosnippet>735</a>        map.insert(<span class="string">"mepc"</span>, <span class="number">0x341</span>);
-<a href=#736 id=736 data-nosnippet>736</a>        map.insert(<span class="string">"mcause"</span>, <span class="number">0x342</span>);
-<a href=#737 id=737 data-nosnippet>737</a>        map.insert(<span class="string">"mtval"</span>, <span class="number">0x343</span>);
-<a href=#738 id=738 data-nosnippet>738</a>        map.insert(<span class="string">"mip"</span>, <span class="number">0x344</span>);
-<a href=#739 id=739 data-nosnippet>739</a>        map.insert(<span class="string">"mtinst"</span>, <span class="number">0x34a</span>);
-<a href=#740 id=740 data-nosnippet>740</a>        map.insert(<span class="string">"mtval2"</span>, <span class="number">0x34b</span>);
-<a href=#741 id=741 data-nosnippet>741</a>        map.insert(<span class="string">"mctrctl"</span>, <span class="number">0x34E</span>);
-<a href=#742 id=742 data-nosnippet>742</a>        map.insert(<span class="string">"miselect"</span>, <span class="number">0x350</span>);
-<a href=#743 id=743 data-nosnippet>743</a>        map.insert(<span class="string">"mireg"</span>, <span class="number">0x351</span>);
-<a href=#744 id=744 data-nosnippet>744</a>        map.insert(<span class="string">"mireg2"</span>, <span class="number">0x352</span>);
-<a href=#745 id=745 data-nosnippet>745</a>        map.insert(<span class="string">"mireg3"</span>, <span class="number">0x353</span>);
-<a href=#746 id=746 data-nosnippet>746</a>        map.insert(<span class="string">"mireg4"</span>, <span class="number">0x355</span>);
-<a href=#747 id=747 data-nosnippet>747</a>        map.insert(<span class="string">"mireg5"</span>, <span class="number">0x356</span>);
-<a href=#748 id=748 data-nosnippet>748</a>        map.insert(<span class="string">"mireg6"</span>, <span class="number">0x357</span>);
-<a href=#749 id=749 data-nosnippet>749</a>        map.insert(<span class="string">"mtopei"</span>, <span class="number">0x35c</span>);
-<a href=#750 id=750 data-nosnippet>750</a>        map.insert(<span class="string">"pmpcfg0"</span>, <span class="number">0x3a0</span>);
-<a href=#751 id=751 data-nosnippet>751</a>        map.insert(<span class="string">"pmpcfg1"</span>, <span class="number">0x3a1</span>);
-<a href=#752 id=752 data-nosnippet>752</a>        map.insert(<span class="string">"pmpcfg2"</span>, <span class="number">0x3a2</span>);
-<a href=#753 id=753 data-nosnippet>753</a>        map.insert(<span class="string">"pmpcfg3"</span>, <span class="number">0x3a3</span>);
-<a href=#754 id=754 data-nosnippet>754</a>        map.insert(<span class="string">"pmpcfg4"</span>, <span class="number">0x3a4</span>);
-<a href=#755 id=755 data-nosnippet>755</a>        map.insert(<span class="string">"pmpcfg5"</span>, <span class="number">0x3a5</span>);
-<a href=#756 id=756 data-nosnippet>756</a>        map.insert(<span class="string">"pmpcfg6"</span>, <span class="number">0x3a6</span>);
-<a href=#757 id=757 data-nosnippet>757</a>        map.insert(<span class="string">"pmpcfg7"</span>, <span class="number">0x3a7</span>);
-<a href=#758 id=758 data-nosnippet>758</a>        map.insert(<span class="string">"pmpcfg8"</span>, <span class="number">0x3a8</span>);
-<a href=#759 id=759 data-nosnippet>759</a>        map.insert(<span class="string">"pmpcfg9"</span>, <span class="number">0x3a9</span>);
-<a href=#760 id=760 data-nosnippet>760</a>        map.insert(<span class="string">"pmpcfg10"</span>, <span class="number">0x3aa</span>);
-<a href=#761 id=761 data-nosnippet>761</a>        map.insert(<span class="string">"pmpcfg11"</span>, <span class="number">0x3ab</span>);
-<a href=#762 id=762 data-nosnippet>762</a>        map.insert(<span class="string">"pmpcfg12"</span>, <span class="number">0x3ac</span>);
-<a href=#763 id=763 data-nosnippet>763</a>        map.insert(<span class="string">"pmpcfg13"</span>, <span class="number">0x3ad</span>);
-<a href=#764 id=764 data-nosnippet>764</a>        map.insert(<span class="string">"pmpcfg14"</span>, <span class="number">0x3ae</span>);
-<a href=#765 id=765 data-nosnippet>765</a>        map.insert(<span class="string">"pmpcfg15"</span>, <span class="number">0x3af</span>);
-<a href=#766 id=766 data-nosnippet>766</a>        map.insert(<span class="string">"pmpaddr0"</span>, <span class="number">0x3b0</span>);
-<a href=#767 id=767 data-nosnippet>767</a>        map.insert(<span class="string">"pmpaddr1"</span>, <span class="number">0x3b1</span>);
-<a href=#768 id=768 data-nosnippet>768</a>        map.insert(<span class="string">"pmpaddr2"</span>, <span class="number">0x3b2</span>);
-<a href=#769 id=769 data-nosnippet>769</a>        map.insert(<span class="string">"pmpaddr3"</span>, <span class="number">0x3b3</span>);
-<a href=#770 id=770 data-nosnippet>770</a>        map.insert(<span class="string">"pmpaddr4"</span>, <span class="number">0x3b4</span>);
-<a href=#771 id=771 data-nosnippet>771</a>        map.insert(<span class="string">"pmpaddr5"</span>, <span class="number">0x3b5</span>);
-<a href=#772 id=772 data-nosnippet>772</a>        map.insert(<span class="string">"pmpaddr6"</span>, <span class="number">0x3b6</span>);
-<a href=#773 id=773 data-nosnippet>773</a>        map.insert(<span class="string">"pmpaddr7"</span>, <span class="number">0x3b7</span>);
-<a href=#774 id=774 data-nosnippet>774</a>        map.insert(<span class="string">"pmpaddr8"</span>, <span class="number">0x3b8</span>);
-<a href=#775 id=775 data-nosnippet>775</a>        map.insert(<span class="string">"pmpaddr9"</span>, <span class="number">0x3b9</span>);
-<a href=#776 id=776 data-nosnippet>776</a>        map.insert(<span class="string">"pmpaddr10"</span>, <span class="number">0x3ba</span>);
-<a href=#777 id=777 data-nosnippet>777</a>        map.insert(<span class="string">"pmpaddr11"</span>, <span class="number">0x3bb</span>);
-<a href=#778 id=778 data-nosnippet>778</a>        map.insert(<span class="string">"pmpaddr12"</span>, <span class="number">0x3bc</span>);
-<a href=#779 id=779 data-nosnippet>779</a>        map.insert(<span class="string">"pmpaddr13"</span>, <span class="number">0x3bd</span>);
-<a href=#780 id=780 data-nosnippet>780</a>        map.insert(<span class="string">"pmpaddr14"</span>, <span class="number">0x3be</span>);
-<a href=#781 id=781 data-nosnippet>781</a>        map.insert(<span class="string">"pmpaddr15"</span>, <span class="number">0x3bf</span>);
-<a href=#782 id=782 data-nosnippet>782</a>        map.insert(<span class="string">"pmpaddr16"</span>, <span class="number">0x3c0</span>);
-<a href=#783 id=783 data-nosnippet>783</a>        map.insert(<span class="string">"pmpaddr17"</span>, <span class="number">0x3c1</span>);
-<a href=#784 id=784 data-nosnippet>784</a>        map.insert(<span class="string">"pmpaddr18"</span>, <span class="number">0x3c2</span>);
-<a href=#785 id=785 data-nosnippet>785</a>        map.insert(<span class="string">"pmpaddr19"</span>, <span class="number">0x3c3</span>);
-<a href=#786 id=786 data-nosnippet>786</a>        map.insert(<span class="string">"pmpaddr20"</span>, <span class="number">0x3c4</span>);
-<a href=#787 id=787 data-nosnippet>787</a>        map.insert(<span class="string">"pmpaddr21"</span>, <span class="number">0x3c5</span>);
-<a href=#788 id=788 data-nosnippet>788</a>        map.insert(<span class="string">"pmpaddr22"</span>, <span class="number">0x3c6</span>);
-<a href=#789 id=789 data-nosnippet>789</a>        map.insert(<span class="string">"pmpaddr23"</span>, <span class="number">0x3c7</span>);
-<a href=#790 id=790 data-nosnippet>790</a>        map.insert(<span class="string">"pmpaddr24"</span>, <span class="number">0x3c8</span>);
-<a href=#791 id=791 data-nosnippet>791</a>        map.insert(<span class="string">"pmpaddr25"</span>, <span class="number">0x3c9</span>);
-<a href=#792 id=792 data-nosnippet>792</a>        map.insert(<span class="string">"pmpaddr26"</span>, <span class="number">0x3ca</span>);
-<a href=#793 id=793 data-nosnippet>793</a>        map.insert(<span class="string">"pmpaddr27"</span>, <span class="number">0x3cb</span>);
-<a href=#794 id=794 data-nosnippet>794</a>        map.insert(<span class="string">"pmpaddr28"</span>, <span class="number">0x3cc</span>);
-<a href=#795 id=795 data-nosnippet>795</a>        map.insert(<span class="string">"pmpaddr29"</span>, <span class="number">0x3cd</span>);
-<a href=#796 id=796 data-nosnippet>796</a>        map.insert(<span class="string">"pmpaddr30"</span>, <span class="number">0x3ce</span>);
-<a href=#797 id=797 data-nosnippet>797</a>        map.insert(<span class="string">"pmpaddr31"</span>, <span class="number">0x3cf</span>);
-<a href=#798 id=798 data-nosnippet>798</a>        map.insert(<span class="string">"pmpaddr32"</span>, <span class="number">0x3d0</span>);
-<a href=#799 id=799 data-nosnippet>799</a>        map.insert(<span class="string">"pmpaddr33"</span>, <span class="number">0x3d1</span>);
-<a href=#800 id=800 data-nosnippet>800</a>        map.insert(<span class="string">"pmpaddr34"</span>, <span class="number">0x3d2</span>);
-<a href=#801 id=801 data-nosnippet>801</a>        map.insert(<span class="string">"pmpaddr35"</span>, <span class="number">0x3d3</span>);
-<a href=#802 id=802 data-nosnippet>802</a>        map.insert(<span class="string">"pmpaddr36"</span>, <span class="number">0x3d4</span>);
-<a href=#803 id=803 data-nosnippet>803</a>        map.insert(<span class="string">"pmpaddr37"</span>, <span class="number">0x3d5</span>);
-<a href=#804 id=804 data-nosnippet>804</a>        map.insert(<span class="string">"pmpaddr38"</span>, <span class="number">0x3d6</span>);
-<a href=#805 id=805 data-nosnippet>805</a>        map.insert(<span class="string">"pmpaddr39"</span>, <span class="number">0x3d7</span>);
-<a href=#806 id=806 data-nosnippet>806</a>        map.insert(<span class="string">"pmpaddr40"</span>, <span class="number">0x3d8</span>);
-<a href=#807 id=807 data-nosnippet>807</a>        map.insert(<span class="string">"pmpaddr41"</span>, <span class="number">0x3d9</span>);
-<a href=#808 id=808 data-nosnippet>808</a>        map.insert(<span class="string">"pmpaddr42"</span>, <span class="number">0x3da</span>);
-<a href=#809 id=809 data-nosnippet>809</a>        map.insert(<span class="string">"pmpaddr43"</span>, <span class="number">0x3db</span>);
-<a href=#810 id=810 data-nosnippet>810</a>        map.insert(<span class="string">"pmpaddr44"</span>, <span class="number">0x3dc</span>);
-<a href=#811 id=811 data-nosnippet>811</a>        map.insert(<span class="string">"pmpaddr45"</span>, <span class="number">0x3dd</span>);
-<a href=#812 id=812 data-nosnippet>812</a>        map.insert(<span class="string">"pmpaddr46"</span>, <span class="number">0x3de</span>);
-<a href=#813 id=813 data-nosnippet>813</a>        map.insert(<span class="string">"pmpaddr47"</span>, <span class="number">0x3df</span>);
-<a href=#814 id=814 data-nosnippet>814</a>        map.insert(<span class="string">"pmpaddr48"</span>, <span class="number">0x3e0</span>);
-<a href=#815 id=815 data-nosnippet>815</a>        map.insert(<span class="string">"pmpaddr49"</span>, <span class="number">0x3e1</span>);
-<a href=#816 id=816 data-nosnippet>816</a>        map.insert(<span class="string">"pmpaddr50"</span>, <span class="number">0x3e2</span>);
-<a href=#817 id=817 data-nosnippet>817</a>        map.insert(<span class="string">"pmpaddr51"</span>, <span class="number">0x3e3</span>);
-<a href=#818 id=818 data-nosnippet>818</a>        map.insert(<span class="string">"pmpaddr52"</span>, <span class="number">0x3e4</span>);
-<a href=#819 id=819 data-nosnippet>819</a>        map.insert(<span class="string">"pmpaddr53"</span>, <span class="number">0x3e5</span>);
-<a href=#820 id=820 data-nosnippet>820</a>        map.insert(<span class="string">"pmpaddr54"</span>, <span class="number">0x3e6</span>);
-<a href=#821 id=821 data-nosnippet>821</a>        map.insert(<span class="string">"pmpaddr55"</span>, <span class="number">0x3e7</span>);
-<a href=#822 id=822 data-nosnippet>822</a>        map.insert(<span class="string">"pmpaddr56"</span>, <span class="number">0x3e8</span>);
-<a href=#823 id=823 data-nosnippet>823</a>        map.insert(<span class="string">"pmpaddr57"</span>, <span class="number">0x3e9</span>);
-<a href=#824 id=824 data-nosnippet>824</a>        map.insert(<span class="string">"pmpaddr58"</span>, <span class="number">0x3ea</span>);
-<a href=#825 id=825 data-nosnippet>825</a>        map.insert(<span class="string">"pmpaddr59"</span>, <span class="number">0x3eb</span>);
-<a href=#826 id=826 data-nosnippet>826</a>        map.insert(<span class="string">"pmpaddr60"</span>, <span class="number">0x3ec</span>);
-<a href=#827 id=827 data-nosnippet>827</a>        map.insert(<span class="string">"pmpaddr61"</span>, <span class="number">0x3ed</span>);
-<a href=#828 id=828 data-nosnippet>828</a>        map.insert(<span class="string">"pmpaddr62"</span>, <span class="number">0x3ee</span>);
-<a href=#829 id=829 data-nosnippet>829</a>        map.insert(<span class="string">"pmpaddr63"</span>, <span class="number">0x3ef</span>);
-<a href=#830 id=830 data-nosnippet>830</a>        map.insert(<span class="string">"mseccfg"</span>, <span class="number">0x747</span>);
-<a href=#831 id=831 data-nosnippet>831</a>        map.insert(<span class="string">"tselect"</span>, <span class="number">0x7a0</span>);
-<a href=#832 id=832 data-nosnippet>832</a>        map.insert(<span class="string">"tdata1"</span>, <span class="number">0x7a1</span>);
-<a href=#833 id=833 data-nosnippet>833</a>        map.insert(<span class="string">"tdata2"</span>, <span class="number">0x7a2</span>);
-<a href=#834 id=834 data-nosnippet>834</a>        map.insert(<span class="string">"tdata3"</span>, <span class="number">0x7a3</span>);
-<a href=#835 id=835 data-nosnippet>835</a>        map.insert(<span class="string">"tinfo"</span>, <span class="number">0x7a4</span>);
-<a href=#836 id=836 data-nosnippet>836</a>        map.insert(<span class="string">"tcontrol"</span>, <span class="number">0x7a5</span>);
-<a href=#837 id=837 data-nosnippet>837</a>        map.insert(<span class="string">"mcontext"</span>, <span class="number">0x7a8</span>);
-<a href=#838 id=838 data-nosnippet>838</a>        map.insert(<span class="string">"mscontext"</span>, <span class="number">0x7aa</span>);
-<a href=#839 id=839 data-nosnippet>839</a>        map.insert(<span class="string">"dcsr"</span>, <span class="number">0x7b0</span>);
-<a href=#840 id=840 data-nosnippet>840</a>        map.insert(<span class="string">"dpc"</span>, <span class="number">0x7b1</span>);
-<a href=#841 id=841 data-nosnippet>841</a>        map.insert(<span class="string">"dscratch0"</span>, <span class="number">0x7b2</span>);
-<a href=#842 id=842 data-nosnippet>842</a>        map.insert(<span class="string">"dscratch1"</span>, <span class="number">0x7b3</span>);
-<a href=#843 id=843 data-nosnippet>843</a>        map.insert(<span class="string">"mcycle"</span>, <span class="number">0xB00</span>);
-<a href=#844 id=844 data-nosnippet>844</a>        map.insert(<span class="string">"minstret"</span>, <span class="number">0xB02</span>);
-<a href=#845 id=845 data-nosnippet>845</a>        map.insert(<span class="string">"mhpmcounter3"</span>, <span class="number">0xB03</span>);
-<a href=#846 id=846 data-nosnippet>846</a>        map.insert(<span class="string">"mhpmcounter4"</span>, <span class="number">0xB04</span>);
-<a href=#847 id=847 data-nosnippet>847</a>        map.insert(<span class="string">"mhpmcounter5"</span>, <span class="number">0xB05</span>);
-<a href=#848 id=848 data-nosnippet>848</a>        map.insert(<span class="string">"mhpmcounter6"</span>, <span class="number">0xB06</span>);
-<a href=#849 id=849 data-nosnippet>849</a>        map.insert(<span class="string">"mhpmcounter7"</span>, <span class="number">0xB07</span>);
-<a href=#850 id=850 data-nosnippet>850</a>        map.insert(<span class="string">"mhpmcounter8"</span>, <span class="number">0xB08</span>);
-<a href=#851 id=851 data-nosnippet>851</a>        map.insert(<span class="string">"mhpmcounter9"</span>, <span class="number">0xB09</span>);
-<a href=#852 id=852 data-nosnippet>852</a>        map.insert(<span class="string">"mhpmcounter10"</span>, <span class="number">0xB0A</span>);
-<a href=#853 id=853 data-nosnippet>853</a>        map.insert(<span class="string">"mhpmcounter11"</span>, <span class="number">0xB0B</span>);
-<a href=#854 id=854 data-nosnippet>854</a>        map.insert(<span class="string">"mhpmcounter12"</span>, <span class="number">0xB0C</span>);
-<a href=#855 id=855 data-nosnippet>855</a>        map.insert(<span class="string">"mhpmcounter13"</span>, <span class="number">0xB0D</span>);
-<a href=#856 id=856 data-nosnippet>856</a>        map.insert(<span class="string">"mhpmcounter14"</span>, <span class="number">0xB0E</span>);
-<a href=#857 id=857 data-nosnippet>857</a>        map.insert(<span class="string">"mhpmcounter15"</span>, <span class="number">0xB0F</span>);
-<a href=#858 id=858 data-nosnippet>858</a>        map.insert(<span class="string">"mhpmcounter16"</span>, <span class="number">0xB10</span>);
-<a href=#859 id=859 data-nosnippet>859</a>        map.insert(<span class="string">"mhpmcounter17"</span>, <span class="number">0xB11</span>);
-<a href=#860 id=860 data-nosnippet>860</a>        map.insert(<span class="string">"mhpmcounter18"</span>, <span class="number">0xB12</span>);
-<a href=#861 id=861 data-nosnippet>861</a>        map.insert(<span class="string">"mhpmcounter19"</span>, <span class="number">0xB13</span>);
-<a href=#862 id=862 data-nosnippet>862</a>        map.insert(<span class="string">"mhpmcounter20"</span>, <span class="number">0xB14</span>);
-<a href=#863 id=863 data-nosnippet>863</a>        map.insert(<span class="string">"mhpmcounter21"</span>, <span class="number">0xB15</span>);
-<a href=#864 id=864 data-nosnippet>864</a>        map.insert(<span class="string">"mhpmcounter22"</span>, <span class="number">0xB16</span>);
-<a href=#865 id=865 data-nosnippet>865</a>        map.insert(<span class="string">"mhpmcounter23"</span>, <span class="number">0xB17</span>);
-<a href=#866 id=866 data-nosnippet>866</a>        map.insert(<span class="string">"mhpmcounter24"</span>, <span class="number">0xB18</span>);
-<a href=#867 id=867 data-nosnippet>867</a>        map.insert(<span class="string">"mhpmcounter25"</span>, <span class="number">0xB19</span>);
-<a href=#868 id=868 data-nosnippet>868</a>        map.insert(<span class="string">"mhpmcounter26"</span>, <span class="number">0xB1A</span>);
-<a href=#869 id=869 data-nosnippet>869</a>        map.insert(<span class="string">"mhpmcounter27"</span>, <span class="number">0xB1B</span>);
-<a href=#870 id=870 data-nosnippet>870</a>        map.insert(<span class="string">"mhpmcounter28"</span>, <span class="number">0xB1C</span>);
-<a href=#871 id=871 data-nosnippet>871</a>        map.insert(<span class="string">"mhpmcounter29"</span>, <span class="number">0xB1D</span>);
-<a href=#872 id=872 data-nosnippet>872</a>        map.insert(<span class="string">"mhpmcounter30"</span>, <span class="number">0xB1E</span>);
-<a href=#873 id=873 data-nosnippet>873</a>        map.insert(<span class="string">"mhpmcounter31"</span>, <span class="number">0xB1F</span>);
-<a href=#874 id=874 data-nosnippet>874</a>        map.insert(<span class="string">"mcyclecfg"</span>, <span class="number">0x321</span>);
-<a href=#875 id=875 data-nosnippet>875</a>        map.insert(<span class="string">"minstretcfg"</span>, <span class="number">0x322</span>);
-<a href=#876 id=876 data-nosnippet>876</a>        map.insert(<span class="string">"mhpmevent3"</span>, <span class="number">0x323</span>);
-<a href=#877 id=877 data-nosnippet>877</a>        map.insert(<span class="string">"mhpmevent4"</span>, <span class="number">0x324</span>);
-<a href=#878 id=878 data-nosnippet>878</a>        map.insert(<span class="string">"mhpmevent5"</span>, <span class="number">0x325</span>);
-<a href=#879 id=879 data-nosnippet>879</a>        map.insert(<span class="string">"mhpmevent6"</span>, <span class="number">0x326</span>);
-<a href=#880 id=880 data-nosnippet>880</a>        map.insert(<span class="string">"mhpmevent7"</span>, <span class="number">0x327</span>);
-<a href=#881 id=881 data-nosnippet>881</a>        map.insert(<span class="string">"mhpmevent8"</span>, <span class="number">0x328</span>);
-<a href=#882 id=882 data-nosnippet>882</a>        map.insert(<span class="string">"mhpmevent9"</span>, <span class="number">0x329</span>);
-<a href=#883 id=883 data-nosnippet>883</a>        map.insert(<span class="string">"mhpmevent10"</span>, <span class="number">0x32A</span>);
-<a href=#884 id=884 data-nosnippet>884</a>        map.insert(<span class="string">"mhpmevent11"</span>, <span class="number">0x32B</span>);
-<a href=#885 id=885 data-nosnippet>885</a>        map.insert(<span class="string">"mhpmevent12"</span>, <span class="number">0x32C</span>);
-<a href=#886 id=886 data-nosnippet>886</a>        map.insert(<span class="string">"mhpmevent13"</span>, <span class="number">0x32D</span>);
-<a href=#887 id=887 data-nosnippet>887</a>        map.insert(<span class="string">"mhpmevent14"</span>, <span class="number">0x32E</span>);
-<a href=#888 id=888 data-nosnippet>888</a>        map.insert(<span class="string">"mhpmevent15"</span>, <span class="number">0x32F</span>);
-<a href=#889 id=889 data-nosnippet>889</a>        map.insert(<span class="string">"mhpmevent16"</span>, <span class="number">0x330</span>);
-<a href=#890 id=890 data-nosnippet>890</a>        map.insert(<span class="string">"mhpmevent17"</span>, <span class="number">0x331</span>);
-<a href=#891 id=891 data-nosnippet>891</a>        map.insert(<span class="string">"mhpmevent18"</span>, <span class="number">0x332</span>);
-<a href=#892 id=892 data-nosnippet>892</a>        map.insert(<span class="string">"mhpmevent19"</span>, <span class="number">0x333</span>);
-<a href=#893 id=893 data-nosnippet>893</a>        map.insert(<span class="string">"mhpmevent20"</span>, <span class="number">0x334</span>);
-<a href=#894 id=894 data-nosnippet>894</a>        map.insert(<span class="string">"mhpmevent21"</span>, <span class="number">0x335</span>);
-<a href=#895 id=895 data-nosnippet>895</a>        map.insert(<span class="string">"mhpmevent22"</span>, <span class="number">0x336</span>);
-<a href=#896 id=896 data-nosnippet>896</a>        map.insert(<span class="string">"mhpmevent23"</span>, <span class="number">0x337</span>);
-<a href=#897 id=897 data-nosnippet>897</a>        map.insert(<span class="string">"mhpmevent24"</span>, <span class="number">0x338</span>);
-<a href=#898 id=898 data-nosnippet>898</a>        map.insert(<span class="string">"mhpmevent25"</span>, <span class="number">0x339</span>);
-<a href=#899 id=899 data-nosnippet>899</a>        map.insert(<span class="string">"mhpmevent26"</span>, <span class="number">0x33A</span>);
-<a href=#900 id=900 data-nosnippet>900</a>        map.insert(<span class="string">"mhpmevent27"</span>, <span class="number">0x33B</span>);
-<a href=#901 id=901 data-nosnippet>901</a>        map.insert(<span class="string">"mhpmevent28"</span>, <span class="number">0x33C</span>);
-<a href=#902 id=902 data-nosnippet>902</a>        map.insert(<span class="string">"mhpmevent29"</span>, <span class="number">0x33D</span>);
-<a href=#903 id=903 data-nosnippet>903</a>        map.insert(<span class="string">"mhpmevent30"</span>, <span class="number">0x33E</span>);
-<a href=#904 id=904 data-nosnippet>904</a>        map.insert(<span class="string">"mhpmevent31"</span>, <span class="number">0x33F</span>);
-<a href=#905 id=905 data-nosnippet>905</a>        map.insert(<span class="string">"mvendorid"</span>, <span class="number">0xF11</span>);
-<a href=#906 id=906 data-nosnippet>906</a>        map.insert(<span class="string">"marchid"</span>, <span class="number">0xF12</span>);
-<a href=#907 id=907 data-nosnippet>907</a>        map.insert(<span class="string">"mimpid"</span>, <span class="number">0xF13</span>);
-<a href=#908 id=908 data-nosnippet>908</a>        map.insert(<span class="string">"mhartid"</span>, <span class="number">0xF14</span>);
-<a href=#909 id=909 data-nosnippet>909</a>        map.insert(<span class="string">"mconfigptr"</span>, <span class="number">0xF15</span>);
-<a href=#910 id=910 data-nosnippet>910</a>        map.insert(<span class="string">"mtopi"</span>, <span class="number">0xFB0</span>);
-<a href=#911 id=911 data-nosnippet>911</a>
-<a href=#912 id=912 data-nosnippet>912</a>        <span class="comment">// 32-bit only csr's
-<a href=#913 id=913 data-nosnippet>913</a>        </span>map.insert(<span class="string">"sieh"</span>, <span class="number">0x114</span>);
-<a href=#914 id=914 data-nosnippet>914</a>        map.insert(<span class="string">"siph"</span>, <span class="number">0x154</span>);
-<a href=#915 id=915 data-nosnippet>915</a>        map.insert(<span class="string">"stimecmph"</span>, <span class="number">0x15D</span>);
-<a href=#916 id=916 data-nosnippet>916</a>        map.insert(<span class="string">"vsieh"</span>, <span class="number">0x214</span>);
-<a href=#917 id=917 data-nosnippet>917</a>        map.insert(<span class="string">"vsiph"</span>, <span class="number">0x254</span>);
-<a href=#918 id=918 data-nosnippet>918</a>        map.insert(<span class="string">"vstimecmph"</span>, <span class="number">0x25D</span>);
-<a href=#919 id=919 data-nosnippet>919</a>        map.insert(<span class="string">"hedelegh"</span>, <span class="number">0x612</span>);
-<a href=#920 id=920 data-nosnippet>920</a>        map.insert(<span class="string">"htimedeltah"</span>, <span class="number">0x615</span>);
-<a href=#921 id=921 data-nosnippet>921</a>        map.insert(<span class="string">"hidelegh"</span>, <span class="number">0x613</span>);
-<a href=#922 id=922 data-nosnippet>922</a>        map.insert(<span class="string">"hvienh"</span>, <span class="number">0x618</span>);
-<a href=#923 id=923 data-nosnippet>923</a>        map.insert(<span class="string">"henvcfgh"</span>, <span class="number">0x61A</span>);
-<a href=#924 id=924 data-nosnippet>924</a>        map.insert(<span class="string">"hviph"</span>, <span class="number">0x655</span>);
-<a href=#925 id=925 data-nosnippet>925</a>        map.insert(<span class="string">"hviprio1h"</span>, <span class="number">0x656</span>);
-<a href=#926 id=926 data-nosnippet>926</a>        map.insert(<span class="string">"hviprio2h"</span>, <span class="number">0x657</span>);
-<a href=#927 id=927 data-nosnippet>927</a>        map.insert(<span class="string">"hstateen0h"</span>, <span class="number">0x61C</span>);
-<a href=#928 id=928 data-nosnippet>928</a>        map.insert(<span class="string">"hstateen1h"</span>, <span class="number">0x61D</span>);
-<a href=#929 id=929 data-nosnippet>929</a>        map.insert(<span class="string">"hstateen2h"</span>, <span class="number">0x61E</span>);
-<a href=#930 id=930 data-nosnippet>930</a>        map.insert(<span class="string">"hstateen3h"</span>, <span class="number">0x61F</span>);
-<a href=#931 id=931 data-nosnippet>931</a>        map.insert(<span class="string">"cycleh"</span>, <span class="number">0xC80</span>);
-<a href=#932 id=932 data-nosnippet>932</a>        map.insert(<span class="string">"timeh"</span>, <span class="number">0xC81</span>);
-<a href=#933 id=933 data-nosnippet>933</a>        map.insert(<span class="string">"instreth"</span>, <span class="number">0xC82</span>);
-<a href=#934 id=934 data-nosnippet>934</a>        map.insert(<span class="string">"hpmcounter3h"</span>, <span class="number">0xC83</span>);
-<a href=#935 id=935 data-nosnippet>935</a>        map.insert(<span class="string">"hpmcounter4h"</span>, <span class="number">0xC84</span>);
-<a href=#936 id=936 data-nosnippet>936</a>        map.insert(<span class="string">"hpmcounter5h"</span>, <span class="number">0xC85</span>);
-<a href=#937 id=937 data-nosnippet>937</a>        map.insert(<span class="string">"hpmcounter6h"</span>, <span class="number">0xC86</span>);
-<a href=#938 id=938 data-nosnippet>938</a>        map.insert(<span class="string">"hpmcounter7h"</span>, <span class="number">0xC87</span>);
-<a href=#939 id=939 data-nosnippet>939</a>        map.insert(<span class="string">"hpmcounter8h"</span>, <span class="number">0xC88</span>);
-<a href=#940 id=940 data-nosnippet>940</a>        map.insert(<span class="string">"hpmcounter9h"</span>, <span class="number">0xC89</span>);
-<a href=#941 id=941 data-nosnippet>941</a>        map.insert(<span class="string">"hpmcounter10h"</span>, <span class="number">0xC8A</span>);
-<a href=#942 id=942 data-nosnippet>942</a>        map.insert(<span class="string">"hpmcounter11h"</span>, <span class="number">0xC8B</span>);
-<a href=#943 id=943 data-nosnippet>943</a>        map.insert(<span class="string">"hpmcounter12h"</span>, <span class="number">0xC8C</span>);
-<a href=#944 id=944 data-nosnippet>944</a>        map.insert(<span class="string">"hpmcounter13h"</span>, <span class="number">0xC8D</span>);
-<a href=#945 id=945 data-nosnippet>945</a>        map.insert(<span class="string">"hpmcounter14h"</span>, <span class="number">0xC8E</span>);
-<a href=#946 id=946 data-nosnippet>946</a>        map.insert(<span class="string">"hpmcounter15h"</span>, <span class="number">0xC8F</span>);
-<a href=#947 id=947 data-nosnippet>947</a>        map.insert(<span class="string">"hpmcounter16h"</span>, <span class="number">0xC90</span>);
-<a href=#948 id=948 data-nosnippet>948</a>        map.insert(<span class="string">"hpmcounter17h"</span>, <span class="number">0xC91</span>);
-<a href=#949 id=949 data-nosnippet>949</a>        map.insert(<span class="string">"hpmcounter18h"</span>, <span class="number">0xC92</span>);
-<a href=#950 id=950 data-nosnippet>950</a>        map.insert(<span class="string">"hpmcounter19h"</span>, <span class="number">0xC93</span>);
-<a href=#951 id=951 data-nosnippet>951</a>        map.insert(<span class="string">"hpmcounter20h"</span>, <span class="number">0xC94</span>);
-<a href=#952 id=952 data-nosnippet>952</a>        map.insert(<span class="string">"hpmcounter21h"</span>, <span class="number">0xC95</span>);
-<a href=#953 id=953 data-nosnippet>953</a>        map.insert(<span class="string">"hpmcounter22h"</span>, <span class="number">0xC96</span>);
-<a href=#954 id=954 data-nosnippet>954</a>        map.insert(<span class="string">"hpmcounter23h"</span>, <span class="number">0xC97</span>);
-<a href=#955 id=955 data-nosnippet>955</a>        map.insert(<span class="string">"hpmcounter24h"</span>, <span class="number">0xC98</span>);
-<a href=#956 id=956 data-nosnippet>956</a>        map.insert(<span class="string">"hpmcounter25h"</span>, <span class="number">0xC99</span>);
-<a href=#957 id=957 data-nosnippet>957</a>        map.insert(<span class="string">"hpmcounter26h"</span>, <span class="number">0xC9A</span>);
-<a href=#958 id=958 data-nosnippet>958</a>        map.insert(<span class="string">"hpmcounter27h"</span>, <span class="number">0xC9B</span>);
-<a href=#959 id=959 data-nosnippet>959</a>        map.insert(<span class="string">"hpmcounter28h"</span>, <span class="number">0xC9C</span>);
-<a href=#960 id=960 data-nosnippet>960</a>        map.insert(<span class="string">"hpmcounter29h"</span>, <span class="number">0xC9D</span>);
-<a href=#961 id=961 data-nosnippet>961</a>        map.insert(<span class="string">"hpmcounter30h"</span>, <span class="number">0xC9E</span>);
-<a href=#962 id=962 data-nosnippet>962</a>        map.insert(<span class="string">"hpmcounter31h"</span>, <span class="number">0xC9F</span>);
-<a href=#963 id=963 data-nosnippet>963</a>        map.insert(<span class="string">"mstatush"</span>, <span class="number">0x310</span>);
-<a href=#964 id=964 data-nosnippet>964</a>        map.insert(<span class="string">"midelegh"</span>, <span class="number">0x313</span>);
-<a href=#965 id=965 data-nosnippet>965</a>        map.insert(<span class="string">"mieh"</span>, <span class="number">0x314</span>);
-<a href=#966 id=966 data-nosnippet>966</a>        map.insert(<span class="string">"mvienh"</span>, <span class="number">0x318</span>);
-<a href=#967 id=967 data-nosnippet>967</a>        map.insert(<span class="string">"mviph"</span>, <span class="number">0x319</span>);
-<a href=#968 id=968 data-nosnippet>968</a>        map.insert(<span class="string">"menvcfgh"</span>, <span class="number">0x31A</span>);
-<a href=#969 id=969 data-nosnippet>969</a>        map.insert(<span class="string">"mstateen0h"</span>, <span class="number">0x31C</span>);
-<a href=#970 id=970 data-nosnippet>970</a>        map.insert(<span class="string">"mstateen1h"</span>, <span class="number">0x31D</span>);
-<a href=#971 id=971 data-nosnippet>971</a>        map.insert(<span class="string">"mstateen2h"</span>, <span class="number">0x31E</span>);
-<a href=#972 id=972 data-nosnippet>972</a>        map.insert(<span class="string">"mstateen3h"</span>, <span class="number">0x31F</span>);
-<a href=#973 id=973 data-nosnippet>973</a>        map.insert(<span class="string">"miph"</span>, <span class="number">0x354</span>);
-<a href=#974 id=974 data-nosnippet>974</a>        map.insert(<span class="string">"mcyclecfgh"</span>, <span class="number">0x721</span>);
-<a href=#975 id=975 data-nosnippet>975</a>        map.insert(<span class="string">"minstretcfgh"</span>, <span class="number">0x722</span>);
-<a href=#976 id=976 data-nosnippet>976</a>        map.insert(<span class="string">"mhpmevent3h"</span>, <span class="number">0x723</span>);
-<a href=#977 id=977 data-nosnippet>977</a>        map.insert(<span class="string">"mhpmevent4h"</span>, <span class="number">0x724</span>);
-<a href=#978 id=978 data-nosnippet>978</a>        map.insert(<span class="string">"mhpmevent5h"</span>, <span class="number">0x725</span>);
-<a href=#979 id=979 data-nosnippet>979</a>        map.insert(<span class="string">"mhpmevent6h"</span>, <span class="number">0x726</span>);
-<a href=#980 id=980 data-nosnippet>980</a>        map.insert(<span class="string">"mhpmevent7h"</span>, <span class="number">0x727</span>);
-<a href=#981 id=981 data-nosnippet>981</a>        map.insert(<span class="string">"mhpmevent8h"</span>, <span class="number">0x728</span>);
-<a href=#982 id=982 data-nosnippet>982</a>        map.insert(<span class="string">"mhpmevent9h"</span>, <span class="number">0x729</span>);
-<a href=#983 id=983 data-nosnippet>983</a>        map.insert(<span class="string">"mhpmevent10h"</span>, <span class="number">0x72A</span>);
-<a href=#984 id=984 data-nosnippet>984</a>        map.insert(<span class="string">"mhpmevent11h"</span>, <span class="number">0x72B</span>);
-<a href=#985 id=985 data-nosnippet>985</a>        map.insert(<span class="string">"mhpmevent12h"</span>, <span class="number">0x72C</span>);
-<a href=#986 id=986 data-nosnippet>986</a>        map.insert(<span class="string">"mhpmevent13h"</span>, <span class="number">0x72D</span>);
-<a href=#987 id=987 data-nosnippet>987</a>        map.insert(<span class="string">"mhpmevent14h"</span>, <span class="number">0x72E</span>);
-<a href=#988 id=988 data-nosnippet>988</a>        map.insert(<span class="string">"mhpmevent15h"</span>, <span class="number">0x72F</span>);
-<a href=#989 id=989 data-nosnippet>989</a>        map.insert(<span class="string">"mhpmevent16h"</span>, <span class="number">0x730</span>);
-<a href=#990 id=990 data-nosnippet>990</a>        map.insert(<span class="string">"mhpmevent17h"</span>, <span class="number">0x731</span>);
-<a href=#991 id=991 data-nosnippet>991</a>        map.insert(<span class="string">"mhpmevent18h"</span>, <span class="number">0x732</span>);
-<a href=#992 id=992 data-nosnippet>992</a>        map.insert(<span class="string">"mhpmevent19h"</span>, <span class="number">0x733</span>);
-<a href=#993 id=993 data-nosnippet>993</a>        map.insert(<span class="string">"mhpmevent20h"</span>, <span class="number">0x734</span>);
-<a href=#994 id=994 data-nosnippet>994</a>        map.insert(<span class="string">"mhpmevent21h"</span>, <span class="number">0x735</span>);
-<a href=#995 id=995 data-nosnippet>995</a>        map.insert(<span class="string">"mhpmevent22h"</span>, <span class="number">0x736</span>);
-<a href=#996 id=996 data-nosnippet>996</a>        map.insert(<span class="string">"mhpmevent23h"</span>, <span class="number">0x737</span>);
-<a href=#997 id=997 data-nosnippet>997</a>        map.insert(<span class="string">"mhpmevent24h"</span>, <span class="number">0x738</span>);
-<a href=#998 id=998 data-nosnippet>998</a>        map.insert(<span class="string">"mhpmevent25h"</span>, <span class="number">0x739</span>);
-<a href=#999 id=999 data-nosnippet>999</a>        map.insert(<span class="string">"mhpmevent26h"</span>, <span class="number">0x73A</span>);
-<a href=#1000 id=1000 data-nosnippet>1000</a>        map.insert(<span class="string">"mhpmevent27h"</span>, <span class="number">0x73B</span>);
-<a href=#1001 id=1001 data-nosnippet>1001</a>        map.insert(<span class="string">"mhpmevent28h"</span>, <span class="number">0x73C</span>);
-<a href=#1002 id=1002 data-nosnippet>1002</a>        map.insert(<span class="string">"mhpmevent29h"</span>, <span class="number">0x73D</span>);
-<a href=#1003 id=1003 data-nosnippet>1003</a>        map.insert(<span class="string">"mhpmevent30h"</span>, <span class="number">0x73E</span>);
-<a href=#1004 id=1004 data-nosnippet>1004</a>        map.insert(<span class="string">"mhpmevent31h"</span>, <span class="number">0x73F</span>);
-<a href=#1005 id=1005 data-nosnippet>1005</a>        map.insert(<span class="string">"mnscratch"</span>, <span class="number">0x740</span>);
-<a href=#1006 id=1006 data-nosnippet>1006</a>        map.insert(<span class="string">"mnepc"</span>, <span class="number">0x741</span>);
-<a href=#1007 id=1007 data-nosnippet>1007</a>        map.insert(<span class="string">"mncause"</span>, <span class="number">0x742</span>);
-<a href=#1008 id=1008 data-nosnippet>1008</a>        map.insert(<span class="string">"mnstatus"</span>, <span class="number">0x744</span>);
-<a href=#1009 id=1009 data-nosnippet>1009</a>        map.insert(<span class="string">"mseccfgh"</span>, <span class="number">0x757</span>);
-<a href=#1010 id=1010 data-nosnippet>1010</a>        map.insert(<span class="string">"mcycleh"</span>, <span class="number">0xB80</span>);
-<a href=#1011 id=1011 data-nosnippet>1011</a>        map.insert(<span class="string">"minstreth"</span>, <span class="number">0xB82</span>);
-<a href=#1012 id=1012 data-nosnippet>1012</a>        map.insert(<span class="string">"mhpmcounter3h"</span>, <span class="number">0xB83</span>);
-<a href=#1013 id=1013 data-nosnippet>1013</a>        map.insert(<span class="string">"mhpmcounter4h"</span>, <span class="number">0xB84</span>);
-<a href=#1014 id=1014 data-nosnippet>1014</a>        map.insert(<span class="string">"mhpmcounter5h"</span>, <span class="number">0xB85</span>);
-<a href=#1015 id=1015 data-nosnippet>1015</a>        map.insert(<span class="string">"mhpmcounter6h"</span>, <span class="number">0xB86</span>);
-<a href=#1016 id=1016 data-nosnippet>1016</a>        map.insert(<span class="string">"mhpmcounter7h"</span>, <span class="number">0xB87</span>);
-<a href=#1017 id=1017 data-nosnippet>1017</a>        map.insert(<span class="string">"mhpmcounter8h"</span>, <span class="number">0xB88</span>);
-<a href=#1018 id=1018 data-nosnippet>1018</a>        map.insert(<span class="string">"mhpmcounter9h"</span>, <span class="number">0xB89</span>);
-<a href=#1019 id=1019 data-nosnippet>1019</a>        map.insert(<span class="string">"mhpmcounter10h"</span>, <span class="number">0xB8A</span>);
-<a href=#1020 id=1020 data-nosnippet>1020</a>        map.insert(<span class="string">"mhpmcounter11h"</span>, <span class="number">0xB8B</span>);
-<a href=#1021 id=1021 data-nosnippet>1021</a>        map.insert(<span class="string">"mhpmcounter12h"</span>, <span class="number">0xB8C</span>);
-<a href=#1022 id=1022 data-nosnippet>1022</a>        map.insert(<span class="string">"mhpmcounter13h"</span>, <span class="number">0xB8D</span>);
-<a href=#1023 id=1023 data-nosnippet>1023</a>        map.insert(<span class="string">"mhpmcounter14h"</span>, <span class="number">0xB8E</span>);
-<a href=#1024 id=1024 data-nosnippet>1024</a>        map.insert(<span class="string">"mhpmcounter15h"</span>, <span class="number">0xB8F</span>);
-<a href=#1025 id=1025 data-nosnippet>1025</a>        map.insert(<span class="string">"mhpmcounter16h"</span>, <span class="number">0xB90</span>);
-<a href=#1026 id=1026 data-nosnippet>1026</a>        map.insert(<span class="string">"mhpmcounter17h"</span>, <span class="number">0xB91</span>);
-<a href=#1027 id=1027 data-nosnippet>1027</a>        map.insert(<span class="string">"mhpmcounter18h"</span>, <span class="number">0xB92</span>);
-<a href=#1028 id=1028 data-nosnippet>1028</a>        map.insert(<span class="string">"mhpmcounter19h"</span>, <span class="number">0xB93</span>);
-<a href=#1029 id=1029 data-nosnippet>1029</a>        map.insert(<span class="string">"mhpmcounter20h"</span>, <span class="number">0xB94</span>);
-<a href=#1030 id=1030 data-nosnippet>1030</a>        map.insert(<span class="string">"mhpmcounter21h"</span>, <span class="number">0xB95</span>);
-<a href=#1031 id=1031 data-nosnippet>1031</a>        map.insert(<span class="string">"mhpmcounter22h"</span>, <span class="number">0xB96</span>);
-<a href=#1032 id=1032 data-nosnippet>1032</a>        map.insert(<span class="string">"mhpmcounter23h"</span>, <span class="number">0xB97</span>);
-<a href=#1033 id=1033 data-nosnippet>1033</a>        map.insert(<span class="string">"mhpmcounter24h"</span>, <span class="number">0xB98</span>);
-<a href=#1034 id=1034 data-nosnippet>1034</a>        map.insert(<span class="string">"mhpmcounter25h"</span>, <span class="number">0xB99</span>);
-<a href=#1035 id=1035 data-nosnippet>1035</a>        map.insert(<span class="string">"mhpmcounter26h"</span>, <span class="number">0xB9A</span>);
-<a href=#1036 id=1036 data-nosnippet>1036</a>        map.insert(<span class="string">"mhpmcounter27h"</span>, <span class="number">0xB9B</span>);
-<a href=#1037 id=1037 data-nosnippet>1037</a>        map.insert(<span class="string">"mhpmcounter28h"</span>, <span class="number">0xB9C</span>);
-<a href=#1038 id=1038 data-nosnippet>1038</a>        map.insert(<span class="string">"mhpmcounter29h"</span>, <span class="number">0xB9D</span>);
-<a href=#1039 id=1039 data-nosnippet>1039</a>        map.insert(<span class="string">"mhpmcounter30h"</span>, <span class="number">0xB9E</span>);
-<a href=#1040 id=1040 data-nosnippet>1040</a>        map.insert(<span class="string">"mhpmcounter31h"</span>, <span class="number">0xB9F</span>);
-<a href=#1041 id=1041 data-nosnippet>1041</a>
-<a href=#1042 id=1042 data-nosnippet>1042</a>        map
-<a href=#1043 id=1043 data-nosnippet>1043</a>    };
-<a href=#1044 id=1044 data-nosnippet>1044</a>
+<a href=#445 id=445 data-nosnippet>445</a><span class="macro">macro_rules!</span> Ops {
+<a href=#446 id=446 data-nosnippet>446</a>    ( $( <span class="macro-nonterminal">$name</span>:tt = [ $( <span class="macro-nonterminal">$template</span>:expr , <span class="macro-nonterminal">$isa</span>:expr , [ $( <span class="macro-nonterminal">$matcher</span>:expr ),* ] =&gt; [ $( <span class="macro-nonterminal">$command</span>:expr ),* ] , [ $( <span class="macro-nonterminal">$extension</span>:expr ),* ] ; )+ ] , )* ) =&gt; {
+<a href=#447 id=447 data-nosnippet>447</a>        [ $(
+<a href=#448 id=448 data-nosnippet>448</a>            (
+<a href=#449 id=449 data-nosnippet>449</a>                <span class="macro-nonterminal">$name</span>,
+<a href=#450 id=450 data-nosnippet>450</a>                <span class="kw-2">&amp;</span>[ $(
+<a href=#451 id=451 data-nosnippet>451</a>                    <span class="macro">SingleOp!</span>( <span class="macro-nonterminal">$template</span>, <span class="macro-nonterminal">$isa</span>, [ $( <span class="macro-nonterminal">$matcher </span>),* ], [ $( <span class="macro-nonterminal">$command </span>),* ], [ $( <span class="macro-nonterminal">$extension </span>),* ] )
+<a href=#452 id=452 data-nosnippet>452</a>                ),+ ] <span class="kw">as </span><span class="kw-2">&amp;</span>[<span class="kw">_</span>]
+<a href=#453 id=453 data-nosnippet>453</a>            )
+<a href=#454 id=454 data-nosnippet>454</a>        ),* ]
+<a href=#455 id=455 data-nosnippet>455</a>    }
+<a href=#456 id=456 data-nosnippet>456</a>}
+<a href=#457 id=457 data-nosnippet>457</a>
+<a href=#458 id=458 data-nosnippet>458</a><span class="kw">pub fn </span>get_mnemonic_data(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; {
+<a href=#459 id=459 data-nosnippet>459</a>    OPMAP.get(<span class="kw-2">&amp;</span>name).cloned()
+<a href=#460 id=460 data-nosnippet>460</a>}
+<a href=#461 id=461 data-nosnippet>461</a>
+<a href=#462 id=462 data-nosnippet>462</a><span class="attr">#[allow(dead_code)]
+<a href=#463 id=463 data-nosnippet>463</a></span><span class="kw">pub fn </span>mnemonics() -&gt; hash_map::Keys&lt;<span class="lifetime">'static</span>, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; {
+<a href=#464 id=464 data-nosnippet>464</a>    OPMAP.keys()
+<a href=#465 id=465 data-nosnippet>465</a>}
+<a href=#466 id=466 data-nosnippet>466</a>
+<a href=#467 id=467 data-nosnippet>467</a>
+<a href=#468 id=468 data-nosnippet>468</a><span class="macro">lazy_static!</span>{
+<a href=#469 id=469 data-nosnippet>469</a>    <span class="kw">static </span><span class="kw-2">ref </span>OPMAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[Opdata]&gt; = {
+<a href=#470 id=470 data-nosnippet>470</a>        <span class="attr">#![allow(non_upper_case_globals)]
+<a href=#471 id=471 data-nosnippet>471</a>
+<a href=#472 id=472 data-nosnippet>472</a>        </span><span class="comment">// we need to reimport these as we can't use bitflags in const
+<a href=#473 id=473 data-nosnippet>473</a>        </span><span class="kw">const </span>RV32: u8 = ISAFlags::RV32.bits();
+<a href=#474 id=474 data-nosnippet>474</a>        <span class="kw">const </span>RV64: u8 = ISAFlags::RV64.bits();
+<a href=#475 id=475 data-nosnippet>475</a>
+<a href=#476 id=476 data-nosnippet>476</a>        <span class="comment">// yes these too...
+<a href=#477 id=477 data-nosnippet>477</a>        </span><span class="kw">const </span>Ex_A: u64 = ExtensionFlags::Ex_A.bits();
+<a href=#478 id=478 data-nosnippet>478</a>        <span class="kw">const </span>Ex_C: u64 = ExtensionFlags::Ex_C.bits();
+<a href=#479 id=479 data-nosnippet>479</a>        <span class="kw">const </span>Ex_D: u64 = ExtensionFlags::Ex_D.bits();
+<a href=#480 id=480 data-nosnippet>480</a>        <span class="kw">const </span>Ex_F: u64 = ExtensionFlags::Ex_F.bits();
+<a href=#481 id=481 data-nosnippet>481</a>        <span class="kw">const </span>Ex_I: u64 = ExtensionFlags::Ex_I.bits();
+<a href=#482 id=482 data-nosnippet>482</a>        <span class="kw">const </span>Ex_M: u64 = ExtensionFlags::Ex_M.bits();
+<a href=#483 id=483 data-nosnippet>483</a>        <span class="kw">const </span>Ex_Q: u64 = ExtensionFlags::Ex_Q.bits();
+<a href=#484 id=484 data-nosnippet>484</a>        <span class="kw">const </span>Ex_Zabha: u64 = ExtensionFlags::Ex_Zabha.bits();
+<a href=#485 id=485 data-nosnippet>485</a>        <span class="kw">const </span>Ex_Zacas: u64 = ExtensionFlags::Ex_Zacas.bits();
+<a href=#486 id=486 data-nosnippet>486</a>        <span class="kw">const </span>Ex_Zawrs: u64 = ExtensionFlags::Ex_Zawrs.bits();
+<a href=#487 id=487 data-nosnippet>487</a>        <span class="kw">const </span>Ex_Zba: u64 = ExtensionFlags::Ex_Zba.bits();
+<a href=#488 id=488 data-nosnippet>488</a>        <span class="kw">const </span>Ex_Zbb: u64 = ExtensionFlags::Ex_Zbb.bits();
+<a href=#489 id=489 data-nosnippet>489</a>        <span class="kw">const </span>Ex_Zbc: u64 = ExtensionFlags::Ex_Zbc.bits();
+<a href=#490 id=490 data-nosnippet>490</a>        <span class="kw">const </span>Ex_Zbkb: u64 = ExtensionFlags::Ex_Zbkb.bits();
+<a href=#491 id=491 data-nosnippet>491</a>        <span class="kw">const </span>Ex_Zbkc: u64 = ExtensionFlags::Ex_Zbkc.bits();
+<a href=#492 id=492 data-nosnippet>492</a>        <span class="kw">const </span>Ex_Zbkx: u64 = ExtensionFlags::Ex_Zbkx.bits();
+<a href=#493 id=493 data-nosnippet>493</a>        <span class="kw">const </span>Ex_Zbs: u64 = ExtensionFlags::Ex_Zbs.bits();
+<a href=#494 id=494 data-nosnippet>494</a>        <span class="kw">const </span>Ex_Zcb: u64 = ExtensionFlags::Ex_Zcb.bits();
+<a href=#495 id=495 data-nosnippet>495</a>        <span class="kw">const </span>Ex_Zcmop: u64 = ExtensionFlags::Ex_Zcmop.bits();
+<a href=#496 id=496 data-nosnippet>496</a>        <span class="kw">const </span>Ex_Zcmp: u64 = ExtensionFlags::Ex_Zcmp.bits();
+<a href=#497 id=497 data-nosnippet>497</a>        <span class="kw">const </span>Ex_Zcmt: u64 = ExtensionFlags::Ex_Zcmt.bits();
+<a href=#498 id=498 data-nosnippet>498</a>        <span class="kw">const </span>Ex_Zdinx: u64 = ExtensionFlags::Ex_Zdinx.bits();
+<a href=#499 id=499 data-nosnippet>499</a>        <span class="kw">const </span>Ex_Zfa: u64 = ExtensionFlags::Ex_Zfa.bits();
+<a href=#500 id=500 data-nosnippet>500</a>        <span class="kw">const </span>Ex_Zfbfmin: u64 = ExtensionFlags::Ex_Zfbfmin.bits();
+<a href=#501 id=501 data-nosnippet>501</a>        <span class="kw">const </span>Ex_Zfh: u64 = ExtensionFlags::Ex_Zfh.bits();
+<a href=#502 id=502 data-nosnippet>502</a>        <span class="kw">const </span>Ex_Zfhmin: u64 = ExtensionFlags::Ex_Zfhmin.bits();
+<a href=#503 id=503 data-nosnippet>503</a>        <span class="kw">const </span>Ex_Zfinx: u64 = ExtensionFlags::Ex_Zfinx.bits();
+<a href=#504 id=504 data-nosnippet>504</a>        <span class="kw">const </span>Ex_Zhinx: u64 = ExtensionFlags::Ex_Zhinx.bits();
+<a href=#505 id=505 data-nosnippet>505</a>        <span class="kw">const </span>Ex_Zhinxmin: u64 = ExtensionFlags::Ex_Zhinxmin.bits();
+<a href=#506 id=506 data-nosnippet>506</a>        <span class="kw">const </span>Ex_Zicbom: u64 = ExtensionFlags::Ex_Zicbom.bits();
+<a href=#507 id=507 data-nosnippet>507</a>        <span class="kw">const </span>Ex_Zicbop: u64 = ExtensionFlags::Ex_Zicbop.bits();
+<a href=#508 id=508 data-nosnippet>508</a>        <span class="kw">const </span>Ex_Zicboz: u64 = ExtensionFlags::Ex_Zicboz.bits();
+<a href=#509 id=509 data-nosnippet>509</a>        <span class="kw">const </span>Ex_Zicfilp: u64 = ExtensionFlags::Ex_Zicfilp.bits();
+<a href=#510 id=510 data-nosnippet>510</a>        <span class="kw">const </span>Ex_Zicfiss: u64 = ExtensionFlags::Ex_Zicfiss.bits();
+<a href=#511 id=511 data-nosnippet>511</a>        <span class="kw">const </span>Ex_Zicntr: u64 = ExtensionFlags::Ex_Zicntr.bits();
+<a href=#512 id=512 data-nosnippet>512</a>        <span class="kw">const </span>Ex_Zicond: u64 = ExtensionFlags::Ex_Zicond.bits();
+<a href=#513 id=513 data-nosnippet>513</a>        <span class="kw">const </span>Ex_Zicsr: u64 = ExtensionFlags::Ex_Zicsr.bits();
+<a href=#514 id=514 data-nosnippet>514</a>        <span class="kw">const </span>Ex_Zifencei: u64 = ExtensionFlags::Ex_Zifencei.bits();
+<a href=#515 id=515 data-nosnippet>515</a>        <span class="kw">const </span>Ex_Zihintntl: u64 = ExtensionFlags::Ex_Zihintntl.bits();
+<a href=#516 id=516 data-nosnippet>516</a>        <span class="kw">const </span>Ex_Zihintpause: u64 = ExtensionFlags::Ex_Zihintpause.bits();
+<a href=#517 id=517 data-nosnippet>517</a>        <span class="kw">const </span>Ex_Zimop: u64 = ExtensionFlags::Ex_Zimop.bits();
+<a href=#518 id=518 data-nosnippet>518</a>        <span class="kw">const </span>Ex_Zk: u64 = ExtensionFlags::Ex_Zk.bits();
+<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">const </span>Ex_Zkn: u64 = ExtensionFlags::Ex_Zkn.bits();
+<a href=#520 id=520 data-nosnippet>520</a>        <span class="kw">const </span>Ex_Zknd: u64 = ExtensionFlags::Ex_Zknd.bits();
+<a href=#521 id=521 data-nosnippet>521</a>        <span class="kw">const </span>Ex_Zkne: u64 = ExtensionFlags::Ex_Zkne.bits();
+<a href=#522 id=522 data-nosnippet>522</a>        <span class="kw">const </span>Ex_Zknh: u64 = ExtensionFlags::Ex_Zknh.bits();
+<a href=#523 id=523 data-nosnippet>523</a>        <span class="kw">const </span>Ex_Zks: u64 = ExtensionFlags::Ex_Zks.bits();
+<a href=#524 id=524 data-nosnippet>524</a>        <span class="kw">const </span>Ex_Zksed: u64 = ExtensionFlags::Ex_Zksed.bits();
+<a href=#525 id=525 data-nosnippet>525</a>        <span class="kw">const </span>Ex_Zksh: u64 = ExtensionFlags::Ex_Zksh.bits();
+<a href=#526 id=526 data-nosnippet>526</a>
+<a href=#527 id=527 data-nosnippet>527</a>
+<a href=#528 id=528 data-nosnippet>528</a>        <span class="kw">static </span>MAP: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>[Opdata])] = <span class="kw-2">&amp;</span><span class="macro">include!</span>(<span class="string">"opmap.rs"</span>);
+<a href=#529 id=529 data-nosnippet>529</a>        MAP.iter().cloned().collect()
+<a href=#530 id=530 data-nosnippet>530</a>    };
+<a href=#531 id=531 data-nosnippet>531</a>
+<a href=#532 id=532 data-nosnippet>532</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>ROUNDMODE_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u8&gt; = {
+<a href=#533 id=533 data-nosnippet>533</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
+<a href=#534 id=534 data-nosnippet>534</a>
+<a href=#535 id=535 data-nosnippet>535</a>        map.insert(<span class="string">"rne"</span>, <span class="number">0</span>);
+<a href=#536 id=536 data-nosnippet>536</a>        map.insert(<span class="string">"rtz"</span>, <span class="number">1</span>);
+<a href=#537 id=537 data-nosnippet>537</a>        map.insert(<span class="string">"rdn"</span>, <span class="number">2</span>);
+<a href=#538 id=538 data-nosnippet>538</a>        map.insert(<span class="string">"rup"</span>, <span class="number">3</span>);
+<a href=#539 id=539 data-nosnippet>539</a>        map.insert(<span class="string">"rmm"</span>, <span class="number">4</span>);
+<a href=#540 id=540 data-nosnippet>540</a>        map.insert(<span class="string">"dyn"</span>, <span class="number">7</span>);
+<a href=#541 id=541 data-nosnippet>541</a>
+<a href=#542 id=542 data-nosnippet>542</a>        map
+<a href=#543 id=543 data-nosnippet>543</a>    };
+<a href=#544 id=544 data-nosnippet>544</a>
+<a href=#545 id=545 data-nosnippet>545</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>FENCESPEC_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u8&gt; = {
+<a href=#546 id=546 data-nosnippet>546</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
+<a href=#547 id=547 data-nosnippet>547</a>
+<a href=#548 id=548 data-nosnippet>548</a>        map.insert(<span class="string">"w"</span>, <span class="number">1</span>);
+<a href=#549 id=549 data-nosnippet>549</a>        map.insert(<span class="string">"r"</span>, <span class="number">2</span>);
+<a href=#550 id=550 data-nosnippet>550</a>        map.insert(<span class="string">"rw"</span>, <span class="number">3</span>);
+<a href=#551 id=551 data-nosnippet>551</a>        map.insert(<span class="string">"o"</span>, <span class="number">4</span>);
+<a href=#552 id=552 data-nosnippet>552</a>        map.insert(<span class="string">"ow"</span>, <span class="number">5</span>);
+<a href=#553 id=553 data-nosnippet>553</a>        map.insert(<span class="string">"or"</span>, <span class="number">6</span>);
+<a href=#554 id=554 data-nosnippet>554</a>        map.insert(<span class="string">"orw"</span>, <span class="number">7</span>);
+<a href=#555 id=555 data-nosnippet>555</a>        map.insert(<span class="string">"i"</span>, <span class="number">8</span>);
+<a href=#556 id=556 data-nosnippet>556</a>        map.insert(<span class="string">"iw"</span>, <span class="number">9</span>);
+<a href=#557 id=557 data-nosnippet>557</a>        map.insert(<span class="string">"ir"</span>, <span class="number">10</span>);
+<a href=#558 id=558 data-nosnippet>558</a>        map.insert(<span class="string">"irw"</span>, <span class="number">11</span>);
+<a href=#559 id=559 data-nosnippet>559</a>        map.insert(<span class="string">"io"</span>, <span class="number">12</span>);
+<a href=#560 id=560 data-nosnippet>560</a>        map.insert(<span class="string">"iow"</span>, <span class="number">13</span>);
+<a href=#561 id=561 data-nosnippet>561</a>        map.insert(<span class="string">"ior"</span>, <span class="number">14</span>);
+<a href=#562 id=562 data-nosnippet>562</a>        map.insert(<span class="string">"iorw"</span>, <span class="number">15</span>);
+<a href=#563 id=563 data-nosnippet>563</a>
+<a href=#564 id=564 data-nosnippet>564</a>        map
+<a href=#565 id=565 data-nosnippet>565</a>    };
+<a href=#566 id=566 data-nosnippet>566</a>
+<a href=#567 id=567 data-nosnippet>567</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>CSR_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u16&gt; = {
+<a href=#568 id=568 data-nosnippet>568</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
+<a href=#569 id=569 data-nosnippet>569</a>
+<a href=#570 id=570 data-nosnippet>570</a>        map.insert(<span class="string">"fflags"</span>, <span class="number">0x001</span>);
+<a href=#571 id=571 data-nosnippet>571</a>        map.insert(<span class="string">"frm"</span>, <span class="number">0x002</span>);
+<a href=#572 id=572 data-nosnippet>572</a>        map.insert(<span class="string">"fcsr"</span>, <span class="number">0x003</span>);
+<a href=#573 id=573 data-nosnippet>573</a>        map.insert(<span class="string">"vstart"</span>, <span class="number">0x008</span>);
+<a href=#574 id=574 data-nosnippet>574</a>        map.insert(<span class="string">"vxsat"</span>, <span class="number">0x009</span>);
+<a href=#575 id=575 data-nosnippet>575</a>        map.insert(<span class="string">"vxrm"</span>, <span class="number">0x00A</span>);
+<a href=#576 id=576 data-nosnippet>576</a>        map.insert(<span class="string">"vcsr"</span>, <span class="number">0x00F</span>);
+<a href=#577 id=577 data-nosnippet>577</a>        map.insert(<span class="string">"ssp"</span>, <span class="number">0x011</span>);
+<a href=#578 id=578 data-nosnippet>578</a>        map.insert(<span class="string">"seed"</span>, <span class="number">0x015</span>);
+<a href=#579 id=579 data-nosnippet>579</a>        map.insert(<span class="string">"jvt"</span>, <span class="number">0x017</span>);
+<a href=#580 id=580 data-nosnippet>580</a>        map.insert(<span class="string">"cycle"</span>, <span class="number">0xC00</span>);
+<a href=#581 id=581 data-nosnippet>581</a>        map.insert(<span class="string">"time"</span>, <span class="number">0xC01</span>);
+<a href=#582 id=582 data-nosnippet>582</a>        map.insert(<span class="string">"instret"</span>, <span class="number">0xC02</span>);
+<a href=#583 id=583 data-nosnippet>583</a>        map.insert(<span class="string">"hpmcounter3"</span>, <span class="number">0xC03</span>);
+<a href=#584 id=584 data-nosnippet>584</a>        map.insert(<span class="string">"hpmcounter4"</span>, <span class="number">0xC04</span>);
+<a href=#585 id=585 data-nosnippet>585</a>        map.insert(<span class="string">"hpmcounter5"</span>, <span class="number">0xC05</span>);
+<a href=#586 id=586 data-nosnippet>586</a>        map.insert(<span class="string">"hpmcounter6"</span>, <span class="number">0xC06</span>);
+<a href=#587 id=587 data-nosnippet>587</a>        map.insert(<span class="string">"hpmcounter7"</span>, <span class="number">0xC07</span>);
+<a href=#588 id=588 data-nosnippet>588</a>        map.insert(<span class="string">"hpmcounter8"</span>, <span class="number">0xC08</span>);
+<a href=#589 id=589 data-nosnippet>589</a>        map.insert(<span class="string">"hpmcounter9"</span>, <span class="number">0xC09</span>);
+<a href=#590 id=590 data-nosnippet>590</a>        map.insert(<span class="string">"hpmcounter10"</span>, <span class="number">0xC0A</span>);
+<a href=#591 id=591 data-nosnippet>591</a>        map.insert(<span class="string">"hpmcounter11"</span>, <span class="number">0xC0B</span>);
+<a href=#592 id=592 data-nosnippet>592</a>        map.insert(<span class="string">"hpmcounter12"</span>, <span class="number">0xC0C</span>);
+<a href=#593 id=593 data-nosnippet>593</a>        map.insert(<span class="string">"hpmcounter13"</span>, <span class="number">0xC0D</span>);
+<a href=#594 id=594 data-nosnippet>594</a>        map.insert(<span class="string">"hpmcounter14"</span>, <span class="number">0xC0E</span>);
+<a href=#595 id=595 data-nosnippet>595</a>        map.insert(<span class="string">"hpmcounter15"</span>, <span class="number">0xC0F</span>);
+<a href=#596 id=596 data-nosnippet>596</a>        map.insert(<span class="string">"hpmcounter16"</span>, <span class="number">0xC10</span>);
+<a href=#597 id=597 data-nosnippet>597</a>        map.insert(<span class="string">"hpmcounter17"</span>, <span class="number">0xC11</span>);
+<a href=#598 id=598 data-nosnippet>598</a>        map.insert(<span class="string">"hpmcounter18"</span>, <span class="number">0xC12</span>);
+<a href=#599 id=599 data-nosnippet>599</a>        map.insert(<span class="string">"hpmcounter19"</span>, <span class="number">0xC13</span>);
+<a href=#600 id=600 data-nosnippet>600</a>        map.insert(<span class="string">"hpmcounter20"</span>, <span class="number">0xC14</span>);
+<a href=#601 id=601 data-nosnippet>601</a>        map.insert(<span class="string">"hpmcounter21"</span>, <span class="number">0xC15</span>);
+<a href=#602 id=602 data-nosnippet>602</a>        map.insert(<span class="string">"hpmcounter22"</span>, <span class="number">0xC16</span>);
+<a href=#603 id=603 data-nosnippet>603</a>        map.insert(<span class="string">"hpmcounter23"</span>, <span class="number">0xC17</span>);
+<a href=#604 id=604 data-nosnippet>604</a>        map.insert(<span class="string">"hpmcounter24"</span>, <span class="number">0xC18</span>);
+<a href=#605 id=605 data-nosnippet>605</a>        map.insert(<span class="string">"hpmcounter25"</span>, <span class="number">0xC19</span>);
+<a href=#606 id=606 data-nosnippet>606</a>        map.insert(<span class="string">"hpmcounter26"</span>, <span class="number">0xC1A</span>);
+<a href=#607 id=607 data-nosnippet>607</a>        map.insert(<span class="string">"hpmcounter27"</span>, <span class="number">0xC1B</span>);
+<a href=#608 id=608 data-nosnippet>608</a>        map.insert(<span class="string">"hpmcounter28"</span>, <span class="number">0xC1C</span>);
+<a href=#609 id=609 data-nosnippet>609</a>        map.insert(<span class="string">"hpmcounter29"</span>, <span class="number">0xC1D</span>);
+<a href=#610 id=610 data-nosnippet>610</a>        map.insert(<span class="string">"hpmcounter30"</span>, <span class="number">0xC1E</span>);
+<a href=#611 id=611 data-nosnippet>611</a>        map.insert(<span class="string">"hpmcounter31"</span>, <span class="number">0xC1F</span>);
+<a href=#612 id=612 data-nosnippet>612</a>        map.insert(<span class="string">"vl"</span>, <span class="number">0xC20</span>);
+<a href=#613 id=613 data-nosnippet>613</a>        map.insert(<span class="string">"vtype"</span>, <span class="number">0xC21</span>);
+<a href=#614 id=614 data-nosnippet>614</a>        map.insert(<span class="string">"vlenb"</span>, <span class="number">0xC22</span>);
+<a href=#615 id=615 data-nosnippet>615</a>        map.insert(<span class="string">"sstatus"</span>, <span class="number">0x100</span>);
+<a href=#616 id=616 data-nosnippet>616</a>        map.insert(<span class="string">"sedeleg"</span>, <span class="number">0x102</span>);
+<a href=#617 id=617 data-nosnippet>617</a>        map.insert(<span class="string">"sideleg"</span>, <span class="number">0x103</span>);
+<a href=#618 id=618 data-nosnippet>618</a>        map.insert(<span class="string">"sie"</span>, <span class="number">0x104</span>);
+<a href=#619 id=619 data-nosnippet>619</a>        map.insert(<span class="string">"stvec"</span>, <span class="number">0x105</span>);
+<a href=#620 id=620 data-nosnippet>620</a>        map.insert(<span class="string">"scounteren"</span>, <span class="number">0x106</span>);
+<a href=#621 id=621 data-nosnippet>621</a>        map.insert(<span class="string">"senvcfg"</span>, <span class="number">0x10A</span>);
+<a href=#622 id=622 data-nosnippet>622</a>        map.insert(<span class="string">"sstateen0"</span>, <span class="number">0x10C</span>);
+<a href=#623 id=623 data-nosnippet>623</a>        map.insert(<span class="string">"sstateen1"</span>, <span class="number">0x10D</span>);
+<a href=#624 id=624 data-nosnippet>624</a>        map.insert(<span class="string">"sstateen2"</span>, <span class="number">0x10E</span>);
+<a href=#625 id=625 data-nosnippet>625</a>        map.insert(<span class="string">"sstateen3"</span>, <span class="number">0x10F</span>);
+<a href=#626 id=626 data-nosnippet>626</a>        map.insert(<span class="string">"scountinhibit"</span>, <span class="number">0x120</span>);
+<a href=#627 id=627 data-nosnippet>627</a>        map.insert(<span class="string">"sscratch"</span>, <span class="number">0x140</span>);
+<a href=#628 id=628 data-nosnippet>628</a>        map.insert(<span class="string">"sepc"</span>, <span class="number">0x141</span>);
+<a href=#629 id=629 data-nosnippet>629</a>        map.insert(<span class="string">"scause"</span>, <span class="number">0x142</span>);
+<a href=#630 id=630 data-nosnippet>630</a>        map.insert(<span class="string">"stval"</span>, <span class="number">0x143</span>);
+<a href=#631 id=631 data-nosnippet>631</a>        map.insert(<span class="string">"sip"</span>, <span class="number">0x144</span>);
+<a href=#632 id=632 data-nosnippet>632</a>        map.insert(<span class="string">"stimecmp"</span>, <span class="number">0x14D</span>);
+<a href=#633 id=633 data-nosnippet>633</a>        map.insert(<span class="string">"sctrctl"</span>, <span class="number">0x14E</span>);
+<a href=#634 id=634 data-nosnippet>634</a>        map.insert(<span class="string">"sctrstatus"</span>, <span class="number">0x14F</span>);
+<a href=#635 id=635 data-nosnippet>635</a>        map.insert(<span class="string">"siselect"</span>, <span class="number">0x150</span>);
+<a href=#636 id=636 data-nosnippet>636</a>        map.insert(<span class="string">"sireg"</span>, <span class="number">0x151</span>);
+<a href=#637 id=637 data-nosnippet>637</a>        map.insert(<span class="string">"sireg2"</span>, <span class="number">0x152</span>);
+<a href=#638 id=638 data-nosnippet>638</a>        map.insert(<span class="string">"sireg3"</span>, <span class="number">0x153</span>);
+<a href=#639 id=639 data-nosnippet>639</a>        map.insert(<span class="string">"sireg4"</span>, <span class="number">0x155</span>);
+<a href=#640 id=640 data-nosnippet>640</a>        map.insert(<span class="string">"sireg5"</span>, <span class="number">0x156</span>);
+<a href=#641 id=641 data-nosnippet>641</a>        map.insert(<span class="string">"sireg6"</span>, <span class="number">0x157</span>);
+<a href=#642 id=642 data-nosnippet>642</a>        map.insert(<span class="string">"stopei"</span>, <span class="number">0x15C</span>);
+<a href=#643 id=643 data-nosnippet>643</a>        map.insert(<span class="string">"sctrdepth"</span>, <span class="number">0x15F</span>);
+<a href=#644 id=644 data-nosnippet>644</a>        map.insert(<span class="string">"satp"</span>, <span class="number">0x180</span>);
+<a href=#645 id=645 data-nosnippet>645</a>        map.insert(<span class="string">"srmcfg"</span>, <span class="number">0x181</span>);
+<a href=#646 id=646 data-nosnippet>646</a>        map.insert(<span class="string">"scontext"</span>, <span class="number">0x5A8</span>);
+<a href=#647 id=647 data-nosnippet>647</a>        map.insert(<span class="string">"vsstatus"</span>, <span class="number">0x200</span>);
+<a href=#648 id=648 data-nosnippet>648</a>        map.insert(<span class="string">"vsie"</span>, <span class="number">0x204</span>);
+<a href=#649 id=649 data-nosnippet>649</a>        map.insert(<span class="string">"vstvec"</span>, <span class="number">0x205</span>);
+<a href=#650 id=650 data-nosnippet>650</a>        map.insert(<span class="string">"vsscratch"</span>, <span class="number">0x240</span>);
+<a href=#651 id=651 data-nosnippet>651</a>        map.insert(<span class="string">"vsepc"</span>, <span class="number">0x241</span>);
+<a href=#652 id=652 data-nosnippet>652</a>        map.insert(<span class="string">"vscause"</span>, <span class="number">0x242</span>);
+<a href=#653 id=653 data-nosnippet>653</a>        map.insert(<span class="string">"vstval"</span>, <span class="number">0x243</span>);
+<a href=#654 id=654 data-nosnippet>654</a>        map.insert(<span class="string">"vsip"</span>, <span class="number">0x244</span>);
+<a href=#655 id=655 data-nosnippet>655</a>        map.insert(<span class="string">"vstimecmp"</span>, <span class="number">0x24D</span>);
+<a href=#656 id=656 data-nosnippet>656</a>        map.insert(<span class="string">"vsctrctl"</span>, <span class="number">0x24E</span>);
+<a href=#657 id=657 data-nosnippet>657</a>        map.insert(<span class="string">"vsiselect"</span>, <span class="number">0x250</span>);
+<a href=#658 id=658 data-nosnippet>658</a>        map.insert(<span class="string">"vsireg"</span>, <span class="number">0x251</span>);
+<a href=#659 id=659 data-nosnippet>659</a>        map.insert(<span class="string">"vsireg2"</span>, <span class="number">0x252</span>);
+<a href=#660 id=660 data-nosnippet>660</a>        map.insert(<span class="string">"vsireg3"</span>, <span class="number">0x253</span>);
+<a href=#661 id=661 data-nosnippet>661</a>        map.insert(<span class="string">"vsireg4"</span>, <span class="number">0x255</span>);
+<a href=#662 id=662 data-nosnippet>662</a>        map.insert(<span class="string">"vsireg5"</span>, <span class="number">0x256</span>);
+<a href=#663 id=663 data-nosnippet>663</a>        map.insert(<span class="string">"vsireg6"</span>, <span class="number">0x257</span>);
+<a href=#664 id=664 data-nosnippet>664</a>        map.insert(<span class="string">"vstopei"</span>, <span class="number">0x25C</span>);
+<a href=#665 id=665 data-nosnippet>665</a>        map.insert(<span class="string">"vsatp"</span>, <span class="number">0x280</span>);
+<a href=#666 id=666 data-nosnippet>666</a>        map.insert(<span class="string">"hstatus"</span>, <span class="number">0x600</span>);
+<a href=#667 id=667 data-nosnippet>667</a>        map.insert(<span class="string">"hedeleg"</span>, <span class="number">0x602</span>);
+<a href=#668 id=668 data-nosnippet>668</a>        map.insert(<span class="string">"hideleg"</span>, <span class="number">0x603</span>);
+<a href=#669 id=669 data-nosnippet>669</a>        map.insert(<span class="string">"hie"</span>, <span class="number">0x604</span>);
+<a href=#670 id=670 data-nosnippet>670</a>        map.insert(<span class="string">"htimedelta"</span>, <span class="number">0x605</span>);
+<a href=#671 id=671 data-nosnippet>671</a>        map.insert(<span class="string">"hcounteren"</span>, <span class="number">0x606</span>);
+<a href=#672 id=672 data-nosnippet>672</a>        map.insert(<span class="string">"hgeie"</span>, <span class="number">0x607</span>);
+<a href=#673 id=673 data-nosnippet>673</a>        map.insert(<span class="string">"hvien"</span>, <span class="number">0x608</span>);
+<a href=#674 id=674 data-nosnippet>674</a>        map.insert(<span class="string">"hvictl"</span>, <span class="number">0x609</span>);
+<a href=#675 id=675 data-nosnippet>675</a>        map.insert(<span class="string">"henvcfg"</span>, <span class="number">0x60A</span>);
+<a href=#676 id=676 data-nosnippet>676</a>        map.insert(<span class="string">"hstateen0"</span>, <span class="number">0x60C</span>);
+<a href=#677 id=677 data-nosnippet>677</a>        map.insert(<span class="string">"hstateen1"</span>, <span class="number">0x60D</span>);
+<a href=#678 id=678 data-nosnippet>678</a>        map.insert(<span class="string">"hstateen2"</span>, <span class="number">0x60E</span>);
+<a href=#679 id=679 data-nosnippet>679</a>        map.insert(<span class="string">"hstateen3"</span>, <span class="number">0x60F</span>);
+<a href=#680 id=680 data-nosnippet>680</a>        map.insert(<span class="string">"htval"</span>, <span class="number">0x643</span>);
+<a href=#681 id=681 data-nosnippet>681</a>        map.insert(<span class="string">"hip"</span>, <span class="number">0x644</span>);
+<a href=#682 id=682 data-nosnippet>682</a>        map.insert(<span class="string">"hvip"</span>, <span class="number">0x645</span>);
+<a href=#683 id=683 data-nosnippet>683</a>        map.insert(<span class="string">"hviprio1"</span>, <span class="number">0x646</span>);
+<a href=#684 id=684 data-nosnippet>684</a>        map.insert(<span class="string">"hviprio2"</span>, <span class="number">0x647</span>);
+<a href=#685 id=685 data-nosnippet>685</a>        map.insert(<span class="string">"htinst"</span>, <span class="number">0x64A</span>);
+<a href=#686 id=686 data-nosnippet>686</a>        map.insert(<span class="string">"hgatp"</span>, <span class="number">0x680</span>);
+<a href=#687 id=687 data-nosnippet>687</a>        map.insert(<span class="string">"hcontext"</span>, <span class="number">0x6A8</span>);
+<a href=#688 id=688 data-nosnippet>688</a>        map.insert(<span class="string">"hgeip"</span>, <span class="number">0xE12</span>);
+<a href=#689 id=689 data-nosnippet>689</a>        map.insert(<span class="string">"vstopi"</span>, <span class="number">0xEB0</span>);
+<a href=#690 id=690 data-nosnippet>690</a>        map.insert(<span class="string">"scountovf"</span>, <span class="number">0xDA0</span>);
+<a href=#691 id=691 data-nosnippet>691</a>        map.insert(<span class="string">"stopi"</span>, <span class="number">0xDB0</span>);
+<a href=#692 id=692 data-nosnippet>692</a>        map.insert(<span class="string">"utvt"</span>, <span class="number">0x007</span>);
+<a href=#693 id=693 data-nosnippet>693</a>        map.insert(<span class="string">"unxti"</span>, <span class="number">0x045</span>);
+<a href=#694 id=694 data-nosnippet>694</a>        map.insert(<span class="string">"uintstatus"</span>, <span class="number">0x046</span>);
+<a href=#695 id=695 data-nosnippet>695</a>        map.insert(<span class="string">"uscratchcsw"</span>, <span class="number">0x048</span>);
+<a href=#696 id=696 data-nosnippet>696</a>        map.insert(<span class="string">"uscratchcswl"</span>, <span class="number">0x049</span>);
+<a href=#697 id=697 data-nosnippet>697</a>        map.insert(<span class="string">"stvt"</span>, <span class="number">0x107</span>);
+<a href=#698 id=698 data-nosnippet>698</a>        map.insert(<span class="string">"snxti"</span>, <span class="number">0x145</span>);
+<a href=#699 id=699 data-nosnippet>699</a>        map.insert(<span class="string">"sintstatus"</span>, <span class="number">0x146</span>);
+<a href=#700 id=700 data-nosnippet>700</a>        map.insert(<span class="string">"sscratchcsw"</span>, <span class="number">0x148</span>);
+<a href=#701 id=701 data-nosnippet>701</a>        map.insert(<span class="string">"sscratchcswl"</span>, <span class="number">0x149</span>);
+<a href=#702 id=702 data-nosnippet>702</a>        map.insert(<span class="string">"mtvt"</span>, <span class="number">0x307</span>);
+<a href=#703 id=703 data-nosnippet>703</a>        map.insert(<span class="string">"mnxti"</span>, <span class="number">0x345</span>);
+<a href=#704 id=704 data-nosnippet>704</a>        map.insert(<span class="string">"mintstatus"</span>, <span class="number">0x346</span>);
+<a href=#705 id=705 data-nosnippet>705</a>        map.insert(<span class="string">"mscratchcsw"</span>, <span class="number">0x348</span>);
+<a href=#706 id=706 data-nosnippet>706</a>        map.insert(<span class="string">"mscratchcswl"</span>, <span class="number">0x349</span>);
+<a href=#707 id=707 data-nosnippet>707</a>        map.insert(<span class="string">"mstatus"</span>, <span class="number">0x300</span>);
+<a href=#708 id=708 data-nosnippet>708</a>        map.insert(<span class="string">"misa"</span>, <span class="number">0x301</span>);
+<a href=#709 id=709 data-nosnippet>709</a>        map.insert(<span class="string">"medeleg"</span>, <span class="number">0x302</span>);
+<a href=#710 id=710 data-nosnippet>710</a>        map.insert(<span class="string">"mideleg"</span>, <span class="number">0x303</span>);
+<a href=#711 id=711 data-nosnippet>711</a>        map.insert(<span class="string">"mie"</span>, <span class="number">0x304</span>);
+<a href=#712 id=712 data-nosnippet>712</a>        map.insert(<span class="string">"mtvec"</span>, <span class="number">0x305</span>);
+<a href=#713 id=713 data-nosnippet>713</a>        map.insert(<span class="string">"mcounteren"</span>, <span class="number">0x306</span>);
+<a href=#714 id=714 data-nosnippet>714</a>        map.insert(<span class="string">"mvien"</span>, <span class="number">0x308</span>);
+<a href=#715 id=715 data-nosnippet>715</a>        map.insert(<span class="string">"mvip"</span>, <span class="number">0x309</span>);
+<a href=#716 id=716 data-nosnippet>716</a>        map.insert(<span class="string">"menvcfg"</span>, <span class="number">0x30a</span>);
+<a href=#717 id=717 data-nosnippet>717</a>        map.insert(<span class="string">"mstateen0"</span>, <span class="number">0x30C</span>);
+<a href=#718 id=718 data-nosnippet>718</a>        map.insert(<span class="string">"mstateen1"</span>, <span class="number">0x30D</span>);
+<a href=#719 id=719 data-nosnippet>719</a>        map.insert(<span class="string">"mstateen2"</span>, <span class="number">0x30E</span>);
+<a href=#720 id=720 data-nosnippet>720</a>        map.insert(<span class="string">"mstateen3"</span>, <span class="number">0x30F</span>);
+<a href=#721 id=721 data-nosnippet>721</a>        map.insert(<span class="string">"mcountinhibit"</span>, <span class="number">0x320</span>);
+<a href=#722 id=722 data-nosnippet>722</a>        map.insert(<span class="string">"mscratch"</span>, <span class="number">0x340</span>);
+<a href=#723 id=723 data-nosnippet>723</a>        map.insert(<span class="string">"mepc"</span>, <span class="number">0x341</span>);
+<a href=#724 id=724 data-nosnippet>724</a>        map.insert(<span class="string">"mcause"</span>, <span class="number">0x342</span>);
+<a href=#725 id=725 data-nosnippet>725</a>        map.insert(<span class="string">"mtval"</span>, <span class="number">0x343</span>);
+<a href=#726 id=726 data-nosnippet>726</a>        map.insert(<span class="string">"mip"</span>, <span class="number">0x344</span>);
+<a href=#727 id=727 data-nosnippet>727</a>        map.insert(<span class="string">"mtinst"</span>, <span class="number">0x34a</span>);
+<a href=#728 id=728 data-nosnippet>728</a>        map.insert(<span class="string">"mtval2"</span>, <span class="number">0x34b</span>);
+<a href=#729 id=729 data-nosnippet>729</a>        map.insert(<span class="string">"mctrctl"</span>, <span class="number">0x34E</span>);
+<a href=#730 id=730 data-nosnippet>730</a>        map.insert(<span class="string">"miselect"</span>, <span class="number">0x350</span>);
+<a href=#731 id=731 data-nosnippet>731</a>        map.insert(<span class="string">"mireg"</span>, <span class="number">0x351</span>);
+<a href=#732 id=732 data-nosnippet>732</a>        map.insert(<span class="string">"mireg2"</span>, <span class="number">0x352</span>);
+<a href=#733 id=733 data-nosnippet>733</a>        map.insert(<span class="string">"mireg3"</span>, <span class="number">0x353</span>);
+<a href=#734 id=734 data-nosnippet>734</a>        map.insert(<span class="string">"mireg4"</span>, <span class="number">0x355</span>);
+<a href=#735 id=735 data-nosnippet>735</a>        map.insert(<span class="string">"mireg5"</span>, <span class="number">0x356</span>);
+<a href=#736 id=736 data-nosnippet>736</a>        map.insert(<span class="string">"mireg6"</span>, <span class="number">0x357</span>);
+<a href=#737 id=737 data-nosnippet>737</a>        map.insert(<span class="string">"mtopei"</span>, <span class="number">0x35c</span>);
+<a href=#738 id=738 data-nosnippet>738</a>        map.insert(<span class="string">"pmpcfg0"</span>, <span class="number">0x3a0</span>);
+<a href=#739 id=739 data-nosnippet>739</a>        map.insert(<span class="string">"pmpcfg1"</span>, <span class="number">0x3a1</span>);
+<a href=#740 id=740 data-nosnippet>740</a>        map.insert(<span class="string">"pmpcfg2"</span>, <span class="number">0x3a2</span>);
+<a href=#741 id=741 data-nosnippet>741</a>        map.insert(<span class="string">"pmpcfg3"</span>, <span class="number">0x3a3</span>);
+<a href=#742 id=742 data-nosnippet>742</a>        map.insert(<span class="string">"pmpcfg4"</span>, <span class="number">0x3a4</span>);
+<a href=#743 id=743 data-nosnippet>743</a>        map.insert(<span class="string">"pmpcfg5"</span>, <span class="number">0x3a5</span>);
+<a href=#744 id=744 data-nosnippet>744</a>        map.insert(<span class="string">"pmpcfg6"</span>, <span class="number">0x3a6</span>);
+<a href=#745 id=745 data-nosnippet>745</a>        map.insert(<span class="string">"pmpcfg7"</span>, <span class="number">0x3a7</span>);
+<a href=#746 id=746 data-nosnippet>746</a>        map.insert(<span class="string">"pmpcfg8"</span>, <span class="number">0x3a8</span>);
+<a href=#747 id=747 data-nosnippet>747</a>        map.insert(<span class="string">"pmpcfg9"</span>, <span class="number">0x3a9</span>);
+<a href=#748 id=748 data-nosnippet>748</a>        map.insert(<span class="string">"pmpcfg10"</span>, <span class="number">0x3aa</span>);
+<a href=#749 id=749 data-nosnippet>749</a>        map.insert(<span class="string">"pmpcfg11"</span>, <span class="number">0x3ab</span>);
+<a href=#750 id=750 data-nosnippet>750</a>        map.insert(<span class="string">"pmpcfg12"</span>, <span class="number">0x3ac</span>);
+<a href=#751 id=751 data-nosnippet>751</a>        map.insert(<span class="string">"pmpcfg13"</span>, <span class="number">0x3ad</span>);
+<a href=#752 id=752 data-nosnippet>752</a>        map.insert(<span class="string">"pmpcfg14"</span>, <span class="number">0x3ae</span>);
+<a href=#753 id=753 data-nosnippet>753</a>        map.insert(<span class="string">"pmpcfg15"</span>, <span class="number">0x3af</span>);
+<a href=#754 id=754 data-nosnippet>754</a>        map.insert(<span class="string">"pmpaddr0"</span>, <span class="number">0x3b0</span>);
+<a href=#755 id=755 data-nosnippet>755</a>        map.insert(<span class="string">"pmpaddr1"</span>, <span class="number">0x3b1</span>);
+<a href=#756 id=756 data-nosnippet>756</a>        map.insert(<span class="string">"pmpaddr2"</span>, <span class="number">0x3b2</span>);
+<a href=#757 id=757 data-nosnippet>757</a>        map.insert(<span class="string">"pmpaddr3"</span>, <span class="number">0x3b3</span>);
+<a href=#758 id=758 data-nosnippet>758</a>        map.insert(<span class="string">"pmpaddr4"</span>, <span class="number">0x3b4</span>);
+<a href=#759 id=759 data-nosnippet>759</a>        map.insert(<span class="string">"pmpaddr5"</span>, <span class="number">0x3b5</span>);
+<a href=#760 id=760 data-nosnippet>760</a>        map.insert(<span class="string">"pmpaddr6"</span>, <span class="number">0x3b6</span>);
+<a href=#761 id=761 data-nosnippet>761</a>        map.insert(<span class="string">"pmpaddr7"</span>, <span class="number">0x3b7</span>);
+<a href=#762 id=762 data-nosnippet>762</a>        map.insert(<span class="string">"pmpaddr8"</span>, <span class="number">0x3b8</span>);
+<a href=#763 id=763 data-nosnippet>763</a>        map.insert(<span class="string">"pmpaddr9"</span>, <span class="number">0x3b9</span>);
+<a href=#764 id=764 data-nosnippet>764</a>        map.insert(<span class="string">"pmpaddr10"</span>, <span class="number">0x3ba</span>);
+<a href=#765 id=765 data-nosnippet>765</a>        map.insert(<span class="string">"pmpaddr11"</span>, <span class="number">0x3bb</span>);
+<a href=#766 id=766 data-nosnippet>766</a>        map.insert(<span class="string">"pmpaddr12"</span>, <span class="number">0x3bc</span>);
+<a href=#767 id=767 data-nosnippet>767</a>        map.insert(<span class="string">"pmpaddr13"</span>, <span class="number">0x3bd</span>);
+<a href=#768 id=768 data-nosnippet>768</a>        map.insert(<span class="string">"pmpaddr14"</span>, <span class="number">0x3be</span>);
+<a href=#769 id=769 data-nosnippet>769</a>        map.insert(<span class="string">"pmpaddr15"</span>, <span class="number">0x3bf</span>);
+<a href=#770 id=770 data-nosnippet>770</a>        map.insert(<span class="string">"pmpaddr16"</span>, <span class="number">0x3c0</span>);
+<a href=#771 id=771 data-nosnippet>771</a>        map.insert(<span class="string">"pmpaddr17"</span>, <span class="number">0x3c1</span>);
+<a href=#772 id=772 data-nosnippet>772</a>        map.insert(<span class="string">"pmpaddr18"</span>, <span class="number">0x3c2</span>);
+<a href=#773 id=773 data-nosnippet>773</a>        map.insert(<span class="string">"pmpaddr19"</span>, <span class="number">0x3c3</span>);
+<a href=#774 id=774 data-nosnippet>774</a>        map.insert(<span class="string">"pmpaddr20"</span>, <span class="number">0x3c4</span>);
+<a href=#775 id=775 data-nosnippet>775</a>        map.insert(<span class="string">"pmpaddr21"</span>, <span class="number">0x3c5</span>);
+<a href=#776 id=776 data-nosnippet>776</a>        map.insert(<span class="string">"pmpaddr22"</span>, <span class="number">0x3c6</span>);
+<a href=#777 id=777 data-nosnippet>777</a>        map.insert(<span class="string">"pmpaddr23"</span>, <span class="number">0x3c7</span>);
+<a href=#778 id=778 data-nosnippet>778</a>        map.insert(<span class="string">"pmpaddr24"</span>, <span class="number">0x3c8</span>);
+<a href=#779 id=779 data-nosnippet>779</a>        map.insert(<span class="string">"pmpaddr25"</span>, <span class="number">0x3c9</span>);
+<a href=#780 id=780 data-nosnippet>780</a>        map.insert(<span class="string">"pmpaddr26"</span>, <span class="number">0x3ca</span>);
+<a href=#781 id=781 data-nosnippet>781</a>        map.insert(<span class="string">"pmpaddr27"</span>, <span class="number">0x3cb</span>);
+<a href=#782 id=782 data-nosnippet>782</a>        map.insert(<span class="string">"pmpaddr28"</span>, <span class="number">0x3cc</span>);
+<a href=#783 id=783 data-nosnippet>783</a>        map.insert(<span class="string">"pmpaddr29"</span>, <span class="number">0x3cd</span>);
+<a href=#784 id=784 data-nosnippet>784</a>        map.insert(<span class="string">"pmpaddr30"</span>, <span class="number">0x3ce</span>);
+<a href=#785 id=785 data-nosnippet>785</a>        map.insert(<span class="string">"pmpaddr31"</span>, <span class="number">0x3cf</span>);
+<a href=#786 id=786 data-nosnippet>786</a>        map.insert(<span class="string">"pmpaddr32"</span>, <span class="number">0x3d0</span>);
+<a href=#787 id=787 data-nosnippet>787</a>        map.insert(<span class="string">"pmpaddr33"</span>, <span class="number">0x3d1</span>);
+<a href=#788 id=788 data-nosnippet>788</a>        map.insert(<span class="string">"pmpaddr34"</span>, <span class="number">0x3d2</span>);
+<a href=#789 id=789 data-nosnippet>789</a>        map.insert(<span class="string">"pmpaddr35"</span>, <span class="number">0x3d3</span>);
+<a href=#790 id=790 data-nosnippet>790</a>        map.insert(<span class="string">"pmpaddr36"</span>, <span class="number">0x3d4</span>);
+<a href=#791 id=791 data-nosnippet>791</a>        map.insert(<span class="string">"pmpaddr37"</span>, <span class="number">0x3d5</span>);
+<a href=#792 id=792 data-nosnippet>792</a>        map.insert(<span class="string">"pmpaddr38"</span>, <span class="number">0x3d6</span>);
+<a href=#793 id=793 data-nosnippet>793</a>        map.insert(<span class="string">"pmpaddr39"</span>, <span class="number">0x3d7</span>);
+<a href=#794 id=794 data-nosnippet>794</a>        map.insert(<span class="string">"pmpaddr40"</span>, <span class="number">0x3d8</span>);
+<a href=#795 id=795 data-nosnippet>795</a>        map.insert(<span class="string">"pmpaddr41"</span>, <span class="number">0x3d9</span>);
+<a href=#796 id=796 data-nosnippet>796</a>        map.insert(<span class="string">"pmpaddr42"</span>, <span class="number">0x3da</span>);
+<a href=#797 id=797 data-nosnippet>797</a>        map.insert(<span class="string">"pmpaddr43"</span>, <span class="number">0x3db</span>);
+<a href=#798 id=798 data-nosnippet>798</a>        map.insert(<span class="string">"pmpaddr44"</span>, <span class="number">0x3dc</span>);
+<a href=#799 id=799 data-nosnippet>799</a>        map.insert(<span class="string">"pmpaddr45"</span>, <span class="number">0x3dd</span>);
+<a href=#800 id=800 data-nosnippet>800</a>        map.insert(<span class="string">"pmpaddr46"</span>, <span class="number">0x3de</span>);
+<a href=#801 id=801 data-nosnippet>801</a>        map.insert(<span class="string">"pmpaddr47"</span>, <span class="number">0x3df</span>);
+<a href=#802 id=802 data-nosnippet>802</a>        map.insert(<span class="string">"pmpaddr48"</span>, <span class="number">0x3e0</span>);
+<a href=#803 id=803 data-nosnippet>803</a>        map.insert(<span class="string">"pmpaddr49"</span>, <span class="number">0x3e1</span>);
+<a href=#804 id=804 data-nosnippet>804</a>        map.insert(<span class="string">"pmpaddr50"</span>, <span class="number">0x3e2</span>);
+<a href=#805 id=805 data-nosnippet>805</a>        map.insert(<span class="string">"pmpaddr51"</span>, <span class="number">0x3e3</span>);
+<a href=#806 id=806 data-nosnippet>806</a>        map.insert(<span class="string">"pmpaddr52"</span>, <span class="number">0x3e4</span>);
+<a href=#807 id=807 data-nosnippet>807</a>        map.insert(<span class="string">"pmpaddr53"</span>, <span class="number">0x3e5</span>);
+<a href=#808 id=808 data-nosnippet>808</a>        map.insert(<span class="string">"pmpaddr54"</span>, <span class="number">0x3e6</span>);
+<a href=#809 id=809 data-nosnippet>809</a>        map.insert(<span class="string">"pmpaddr55"</span>, <span class="number">0x3e7</span>);
+<a href=#810 id=810 data-nosnippet>810</a>        map.insert(<span class="string">"pmpaddr56"</span>, <span class="number">0x3e8</span>);
+<a href=#811 id=811 data-nosnippet>811</a>        map.insert(<span class="string">"pmpaddr57"</span>, <span class="number">0x3e9</span>);
+<a href=#812 id=812 data-nosnippet>812</a>        map.insert(<span class="string">"pmpaddr58"</span>, <span class="number">0x3ea</span>);
+<a href=#813 id=813 data-nosnippet>813</a>        map.insert(<span class="string">"pmpaddr59"</span>, <span class="number">0x3eb</span>);
+<a href=#814 id=814 data-nosnippet>814</a>        map.insert(<span class="string">"pmpaddr60"</span>, <span class="number">0x3ec</span>);
+<a href=#815 id=815 data-nosnippet>815</a>        map.insert(<span class="string">"pmpaddr61"</span>, <span class="number">0x3ed</span>);
+<a href=#816 id=816 data-nosnippet>816</a>        map.insert(<span class="string">"pmpaddr62"</span>, <span class="number">0x3ee</span>);
+<a href=#817 id=817 data-nosnippet>817</a>        map.insert(<span class="string">"pmpaddr63"</span>, <span class="number">0x3ef</span>);
+<a href=#818 id=818 data-nosnippet>818</a>        map.insert(<span class="string">"mseccfg"</span>, <span class="number">0x747</span>);
+<a href=#819 id=819 data-nosnippet>819</a>        map.insert(<span class="string">"tselect"</span>, <span class="number">0x7a0</span>);
+<a href=#820 id=820 data-nosnippet>820</a>        map.insert(<span class="string">"tdata1"</span>, <span class="number">0x7a1</span>);
+<a href=#821 id=821 data-nosnippet>821</a>        map.insert(<span class="string">"tdata2"</span>, <span class="number">0x7a2</span>);
+<a href=#822 id=822 data-nosnippet>822</a>        map.insert(<span class="string">"tdata3"</span>, <span class="number">0x7a3</span>);
+<a href=#823 id=823 data-nosnippet>823</a>        map.insert(<span class="string">"tinfo"</span>, <span class="number">0x7a4</span>);
+<a href=#824 id=824 data-nosnippet>824</a>        map.insert(<span class="string">"tcontrol"</span>, <span class="number">0x7a5</span>);
+<a href=#825 id=825 data-nosnippet>825</a>        map.insert(<span class="string">"mcontext"</span>, <span class="number">0x7a8</span>);
+<a href=#826 id=826 data-nosnippet>826</a>        map.insert(<span class="string">"mscontext"</span>, <span class="number">0x7aa</span>);
+<a href=#827 id=827 data-nosnippet>827</a>        map.insert(<span class="string">"dcsr"</span>, <span class="number">0x7b0</span>);
+<a href=#828 id=828 data-nosnippet>828</a>        map.insert(<span class="string">"dpc"</span>, <span class="number">0x7b1</span>);
+<a href=#829 id=829 data-nosnippet>829</a>        map.insert(<span class="string">"dscratch0"</span>, <span class="number">0x7b2</span>);
+<a href=#830 id=830 data-nosnippet>830</a>        map.insert(<span class="string">"dscratch1"</span>, <span class="number">0x7b3</span>);
+<a href=#831 id=831 data-nosnippet>831</a>        map.insert(<span class="string">"mcycle"</span>, <span class="number">0xB00</span>);
+<a href=#832 id=832 data-nosnippet>832</a>        map.insert(<span class="string">"minstret"</span>, <span class="number">0xB02</span>);
+<a href=#833 id=833 data-nosnippet>833</a>        map.insert(<span class="string">"mhpmcounter3"</span>, <span class="number">0xB03</span>);
+<a href=#834 id=834 data-nosnippet>834</a>        map.insert(<span class="string">"mhpmcounter4"</span>, <span class="number">0xB04</span>);
+<a href=#835 id=835 data-nosnippet>835</a>        map.insert(<span class="string">"mhpmcounter5"</span>, <span class="number">0xB05</span>);
+<a href=#836 id=836 data-nosnippet>836</a>        map.insert(<span class="string">"mhpmcounter6"</span>, <span class="number">0xB06</span>);
+<a href=#837 id=837 data-nosnippet>837</a>        map.insert(<span class="string">"mhpmcounter7"</span>, <span class="number">0xB07</span>);
+<a href=#838 id=838 data-nosnippet>838</a>        map.insert(<span class="string">"mhpmcounter8"</span>, <span class="number">0xB08</span>);
+<a href=#839 id=839 data-nosnippet>839</a>        map.insert(<span class="string">"mhpmcounter9"</span>, <span class="number">0xB09</span>);
+<a href=#840 id=840 data-nosnippet>840</a>        map.insert(<span class="string">"mhpmcounter10"</span>, <span class="number">0xB0A</span>);
+<a href=#841 id=841 data-nosnippet>841</a>        map.insert(<span class="string">"mhpmcounter11"</span>, <span class="number">0xB0B</span>);
+<a href=#842 id=842 data-nosnippet>842</a>        map.insert(<span class="string">"mhpmcounter12"</span>, <span class="number">0xB0C</span>);
+<a href=#843 id=843 data-nosnippet>843</a>        map.insert(<span class="string">"mhpmcounter13"</span>, <span class="number">0xB0D</span>);
+<a href=#844 id=844 data-nosnippet>844</a>        map.insert(<span class="string">"mhpmcounter14"</span>, <span class="number">0xB0E</span>);
+<a href=#845 id=845 data-nosnippet>845</a>        map.insert(<span class="string">"mhpmcounter15"</span>, <span class="number">0xB0F</span>);
+<a href=#846 id=846 data-nosnippet>846</a>        map.insert(<span class="string">"mhpmcounter16"</span>, <span class="number">0xB10</span>);
+<a href=#847 id=847 data-nosnippet>847</a>        map.insert(<span class="string">"mhpmcounter17"</span>, <span class="number">0xB11</span>);
+<a href=#848 id=848 data-nosnippet>848</a>        map.insert(<span class="string">"mhpmcounter18"</span>, <span class="number">0xB12</span>);
+<a href=#849 id=849 data-nosnippet>849</a>        map.insert(<span class="string">"mhpmcounter19"</span>, <span class="number">0xB13</span>);
+<a href=#850 id=850 data-nosnippet>850</a>        map.insert(<span class="string">"mhpmcounter20"</span>, <span class="number">0xB14</span>);
+<a href=#851 id=851 data-nosnippet>851</a>        map.insert(<span class="string">"mhpmcounter21"</span>, <span class="number">0xB15</span>);
+<a href=#852 id=852 data-nosnippet>852</a>        map.insert(<span class="string">"mhpmcounter22"</span>, <span class="number">0xB16</span>);
+<a href=#853 id=853 data-nosnippet>853</a>        map.insert(<span class="string">"mhpmcounter23"</span>, <span class="number">0xB17</span>);
+<a href=#854 id=854 data-nosnippet>854</a>        map.insert(<span class="string">"mhpmcounter24"</span>, <span class="number">0xB18</span>);
+<a href=#855 id=855 data-nosnippet>855</a>        map.insert(<span class="string">"mhpmcounter25"</span>, <span class="number">0xB19</span>);
+<a href=#856 id=856 data-nosnippet>856</a>        map.insert(<span class="string">"mhpmcounter26"</span>, <span class="number">0xB1A</span>);
+<a href=#857 id=857 data-nosnippet>857</a>        map.insert(<span class="string">"mhpmcounter27"</span>, <span class="number">0xB1B</span>);
+<a href=#858 id=858 data-nosnippet>858</a>        map.insert(<span class="string">"mhpmcounter28"</span>, <span class="number">0xB1C</span>);
+<a href=#859 id=859 data-nosnippet>859</a>        map.insert(<span class="string">"mhpmcounter29"</span>, <span class="number">0xB1D</span>);
+<a href=#860 id=860 data-nosnippet>860</a>        map.insert(<span class="string">"mhpmcounter30"</span>, <span class="number">0xB1E</span>);
+<a href=#861 id=861 data-nosnippet>861</a>        map.insert(<span class="string">"mhpmcounter31"</span>, <span class="number">0xB1F</span>);
+<a href=#862 id=862 data-nosnippet>862</a>        map.insert(<span class="string">"mcyclecfg"</span>, <span class="number">0x321</span>);
+<a href=#863 id=863 data-nosnippet>863</a>        map.insert(<span class="string">"minstretcfg"</span>, <span class="number">0x322</span>);
+<a href=#864 id=864 data-nosnippet>864</a>        map.insert(<span class="string">"mhpmevent3"</span>, <span class="number">0x323</span>);
+<a href=#865 id=865 data-nosnippet>865</a>        map.insert(<span class="string">"mhpmevent4"</span>, <span class="number">0x324</span>);
+<a href=#866 id=866 data-nosnippet>866</a>        map.insert(<span class="string">"mhpmevent5"</span>, <span class="number">0x325</span>);
+<a href=#867 id=867 data-nosnippet>867</a>        map.insert(<span class="string">"mhpmevent6"</span>, <span class="number">0x326</span>);
+<a href=#868 id=868 data-nosnippet>868</a>        map.insert(<span class="string">"mhpmevent7"</span>, <span class="number">0x327</span>);
+<a href=#869 id=869 data-nosnippet>869</a>        map.insert(<span class="string">"mhpmevent8"</span>, <span class="number">0x328</span>);
+<a href=#870 id=870 data-nosnippet>870</a>        map.insert(<span class="string">"mhpmevent9"</span>, <span class="number">0x329</span>);
+<a href=#871 id=871 data-nosnippet>871</a>        map.insert(<span class="string">"mhpmevent10"</span>, <span class="number">0x32A</span>);
+<a href=#872 id=872 data-nosnippet>872</a>        map.insert(<span class="string">"mhpmevent11"</span>, <span class="number">0x32B</span>);
+<a href=#873 id=873 data-nosnippet>873</a>        map.insert(<span class="string">"mhpmevent12"</span>, <span class="number">0x32C</span>);
+<a href=#874 id=874 data-nosnippet>874</a>        map.insert(<span class="string">"mhpmevent13"</span>, <span class="number">0x32D</span>);
+<a href=#875 id=875 data-nosnippet>875</a>        map.insert(<span class="string">"mhpmevent14"</span>, <span class="number">0x32E</span>);
+<a href=#876 id=876 data-nosnippet>876</a>        map.insert(<span class="string">"mhpmevent15"</span>, <span class="number">0x32F</span>);
+<a href=#877 id=877 data-nosnippet>877</a>        map.insert(<span class="string">"mhpmevent16"</span>, <span class="number">0x330</span>);
+<a href=#878 id=878 data-nosnippet>878</a>        map.insert(<span class="string">"mhpmevent17"</span>, <span class="number">0x331</span>);
+<a href=#879 id=879 data-nosnippet>879</a>        map.insert(<span class="string">"mhpmevent18"</span>, <span class="number">0x332</span>);
+<a href=#880 id=880 data-nosnippet>880</a>        map.insert(<span class="string">"mhpmevent19"</span>, <span class="number">0x333</span>);
+<a href=#881 id=881 data-nosnippet>881</a>        map.insert(<span class="string">"mhpmevent20"</span>, <span class="number">0x334</span>);
+<a href=#882 id=882 data-nosnippet>882</a>        map.insert(<span class="string">"mhpmevent21"</span>, <span class="number">0x335</span>);
+<a href=#883 id=883 data-nosnippet>883</a>        map.insert(<span class="string">"mhpmevent22"</span>, <span class="number">0x336</span>);
+<a href=#884 id=884 data-nosnippet>884</a>        map.insert(<span class="string">"mhpmevent23"</span>, <span class="number">0x337</span>);
+<a href=#885 id=885 data-nosnippet>885</a>        map.insert(<span class="string">"mhpmevent24"</span>, <span class="number">0x338</span>);
+<a href=#886 id=886 data-nosnippet>886</a>        map.insert(<span class="string">"mhpmevent25"</span>, <span class="number">0x339</span>);
+<a href=#887 id=887 data-nosnippet>887</a>        map.insert(<span class="string">"mhpmevent26"</span>, <span class="number">0x33A</span>);
+<a href=#888 id=888 data-nosnippet>888</a>        map.insert(<span class="string">"mhpmevent27"</span>, <span class="number">0x33B</span>);
+<a href=#889 id=889 data-nosnippet>889</a>        map.insert(<span class="string">"mhpmevent28"</span>, <span class="number">0x33C</span>);
+<a href=#890 id=890 data-nosnippet>890</a>        map.insert(<span class="string">"mhpmevent29"</span>, <span class="number">0x33D</span>);
+<a href=#891 id=891 data-nosnippet>891</a>        map.insert(<span class="string">"mhpmevent30"</span>, <span class="number">0x33E</span>);
+<a href=#892 id=892 data-nosnippet>892</a>        map.insert(<span class="string">"mhpmevent31"</span>, <span class="number">0x33F</span>);
+<a href=#893 id=893 data-nosnippet>893</a>        map.insert(<span class="string">"mvendorid"</span>, <span class="number">0xF11</span>);
+<a href=#894 id=894 data-nosnippet>894</a>        map.insert(<span class="string">"marchid"</span>, <span class="number">0xF12</span>);
+<a href=#895 id=895 data-nosnippet>895</a>        map.insert(<span class="string">"mimpid"</span>, <span class="number">0xF13</span>);
+<a href=#896 id=896 data-nosnippet>896</a>        map.insert(<span class="string">"mhartid"</span>, <span class="number">0xF14</span>);
+<a href=#897 id=897 data-nosnippet>897</a>        map.insert(<span class="string">"mconfigptr"</span>, <span class="number">0xF15</span>);
+<a href=#898 id=898 data-nosnippet>898</a>        map.insert(<span class="string">"mtopi"</span>, <span class="number">0xFB0</span>);
+<a href=#899 id=899 data-nosnippet>899</a>
+<a href=#900 id=900 data-nosnippet>900</a>        <span class="comment">// 32-bit only csr's
+<a href=#901 id=901 data-nosnippet>901</a>        </span>map.insert(<span class="string">"sieh"</span>, <span class="number">0x114</span>);
+<a href=#902 id=902 data-nosnippet>902</a>        map.insert(<span class="string">"siph"</span>, <span class="number">0x154</span>);
+<a href=#903 id=903 data-nosnippet>903</a>        map.insert(<span class="string">"stimecmph"</span>, <span class="number">0x15D</span>);
+<a href=#904 id=904 data-nosnippet>904</a>        map.insert(<span class="string">"vsieh"</span>, <span class="number">0x214</span>);
+<a href=#905 id=905 data-nosnippet>905</a>        map.insert(<span class="string">"vsiph"</span>, <span class="number">0x254</span>);
+<a href=#906 id=906 data-nosnippet>906</a>        map.insert(<span class="string">"vstimecmph"</span>, <span class="number">0x25D</span>);
+<a href=#907 id=907 data-nosnippet>907</a>        map.insert(<span class="string">"hedelegh"</span>, <span class="number">0x612</span>);
+<a href=#908 id=908 data-nosnippet>908</a>        map.insert(<span class="string">"htimedeltah"</span>, <span class="number">0x615</span>);
+<a href=#909 id=909 data-nosnippet>909</a>        map.insert(<span class="string">"hidelegh"</span>, <span class="number">0x613</span>);
+<a href=#910 id=910 data-nosnippet>910</a>        map.insert(<span class="string">"hvienh"</span>, <span class="number">0x618</span>);
+<a href=#911 id=911 data-nosnippet>911</a>        map.insert(<span class="string">"henvcfgh"</span>, <span class="number">0x61A</span>);
+<a href=#912 id=912 data-nosnippet>912</a>        map.insert(<span class="string">"hviph"</span>, <span class="number">0x655</span>);
+<a href=#913 id=913 data-nosnippet>913</a>        map.insert(<span class="string">"hviprio1h"</span>, <span class="number">0x656</span>);
+<a href=#914 id=914 data-nosnippet>914</a>        map.insert(<span class="string">"hviprio2h"</span>, <span class="number">0x657</span>);
+<a href=#915 id=915 data-nosnippet>915</a>        map.insert(<span class="string">"hstateen0h"</span>, <span class="number">0x61C</span>);
+<a href=#916 id=916 data-nosnippet>916</a>        map.insert(<span class="string">"hstateen1h"</span>, <span class="number">0x61D</span>);
+<a href=#917 id=917 data-nosnippet>917</a>        map.insert(<span class="string">"hstateen2h"</span>, <span class="number">0x61E</span>);
+<a href=#918 id=918 data-nosnippet>918</a>        map.insert(<span class="string">"hstateen3h"</span>, <span class="number">0x61F</span>);
+<a href=#919 id=919 data-nosnippet>919</a>        map.insert(<span class="string">"cycleh"</span>, <span class="number">0xC80</span>);
+<a href=#920 id=920 data-nosnippet>920</a>        map.insert(<span class="string">"timeh"</span>, <span class="number">0xC81</span>);
+<a href=#921 id=921 data-nosnippet>921</a>        map.insert(<span class="string">"instreth"</span>, <span class="number">0xC82</span>);
+<a href=#922 id=922 data-nosnippet>922</a>        map.insert(<span class="string">"hpmcounter3h"</span>, <span class="number">0xC83</span>);
+<a href=#923 id=923 data-nosnippet>923</a>        map.insert(<span class="string">"hpmcounter4h"</span>, <span class="number">0xC84</span>);
+<a href=#924 id=924 data-nosnippet>924</a>        map.insert(<span class="string">"hpmcounter5h"</span>, <span class="number">0xC85</span>);
+<a href=#925 id=925 data-nosnippet>925</a>        map.insert(<span class="string">"hpmcounter6h"</span>, <span class="number">0xC86</span>);
+<a href=#926 id=926 data-nosnippet>926</a>        map.insert(<span class="string">"hpmcounter7h"</span>, <span class="number">0xC87</span>);
+<a href=#927 id=927 data-nosnippet>927</a>        map.insert(<span class="string">"hpmcounter8h"</span>, <span class="number">0xC88</span>);
+<a href=#928 id=928 data-nosnippet>928</a>        map.insert(<span class="string">"hpmcounter9h"</span>, <span class="number">0xC89</span>);
+<a href=#929 id=929 data-nosnippet>929</a>        map.insert(<span class="string">"hpmcounter10h"</span>, <span class="number">0xC8A</span>);
+<a href=#930 id=930 data-nosnippet>930</a>        map.insert(<span class="string">"hpmcounter11h"</span>, <span class="number">0xC8B</span>);
+<a href=#931 id=931 data-nosnippet>931</a>        map.insert(<span class="string">"hpmcounter12h"</span>, <span class="number">0xC8C</span>);
+<a href=#932 id=932 data-nosnippet>932</a>        map.insert(<span class="string">"hpmcounter13h"</span>, <span class="number">0xC8D</span>);
+<a href=#933 id=933 data-nosnippet>933</a>        map.insert(<span class="string">"hpmcounter14h"</span>, <span class="number">0xC8E</span>);
+<a href=#934 id=934 data-nosnippet>934</a>        map.insert(<span class="string">"hpmcounter15h"</span>, <span class="number">0xC8F</span>);
+<a href=#935 id=935 data-nosnippet>935</a>        map.insert(<span class="string">"hpmcounter16h"</span>, <span class="number">0xC90</span>);
+<a href=#936 id=936 data-nosnippet>936</a>        map.insert(<span class="string">"hpmcounter17h"</span>, <span class="number">0xC91</span>);
+<a href=#937 id=937 data-nosnippet>937</a>        map.insert(<span class="string">"hpmcounter18h"</span>, <span class="number">0xC92</span>);
+<a href=#938 id=938 data-nosnippet>938</a>        map.insert(<span class="string">"hpmcounter19h"</span>, <span class="number">0xC93</span>);
+<a href=#939 id=939 data-nosnippet>939</a>        map.insert(<span class="string">"hpmcounter20h"</span>, <span class="number">0xC94</span>);
+<a href=#940 id=940 data-nosnippet>940</a>        map.insert(<span class="string">"hpmcounter21h"</span>, <span class="number">0xC95</span>);
+<a href=#941 id=941 data-nosnippet>941</a>        map.insert(<span class="string">"hpmcounter22h"</span>, <span class="number">0xC96</span>);
+<a href=#942 id=942 data-nosnippet>942</a>        map.insert(<span class="string">"hpmcounter23h"</span>, <span class="number">0xC97</span>);
+<a href=#943 id=943 data-nosnippet>943</a>        map.insert(<span class="string">"hpmcounter24h"</span>, <span class="number">0xC98</span>);
+<a href=#944 id=944 data-nosnippet>944</a>        map.insert(<span class="string">"hpmcounter25h"</span>, <span class="number">0xC99</span>);
+<a href=#945 id=945 data-nosnippet>945</a>        map.insert(<span class="string">"hpmcounter26h"</span>, <span class="number">0xC9A</span>);
+<a href=#946 id=946 data-nosnippet>946</a>        map.insert(<span class="string">"hpmcounter27h"</span>, <span class="number">0xC9B</span>);
+<a href=#947 id=947 data-nosnippet>947</a>        map.insert(<span class="string">"hpmcounter28h"</span>, <span class="number">0xC9C</span>);
+<a href=#948 id=948 data-nosnippet>948</a>        map.insert(<span class="string">"hpmcounter29h"</span>, <span class="number">0xC9D</span>);
+<a href=#949 id=949 data-nosnippet>949</a>        map.insert(<span class="string">"hpmcounter30h"</span>, <span class="number">0xC9E</span>);
+<a href=#950 id=950 data-nosnippet>950</a>        map.insert(<span class="string">"hpmcounter31h"</span>, <span class="number">0xC9F</span>);
+<a href=#951 id=951 data-nosnippet>951</a>        map.insert(<span class="string">"mstatush"</span>, <span class="number">0x310</span>);
+<a href=#952 id=952 data-nosnippet>952</a>        map.insert(<span class="string">"midelegh"</span>, <span class="number">0x313</span>);
+<a href=#953 id=953 data-nosnippet>953</a>        map.insert(<span class="string">"mieh"</span>, <span class="number">0x314</span>);
+<a href=#954 id=954 data-nosnippet>954</a>        map.insert(<span class="string">"mvienh"</span>, <span class="number">0x318</span>);
+<a href=#955 id=955 data-nosnippet>955</a>        map.insert(<span class="string">"mviph"</span>, <span class="number">0x319</span>);
+<a href=#956 id=956 data-nosnippet>956</a>        map.insert(<span class="string">"menvcfgh"</span>, <span class="number">0x31A</span>);
+<a href=#957 id=957 data-nosnippet>957</a>        map.insert(<span class="string">"mstateen0h"</span>, <span class="number">0x31C</span>);
+<a href=#958 id=958 data-nosnippet>958</a>        map.insert(<span class="string">"mstateen1h"</span>, <span class="number">0x31D</span>);
+<a href=#959 id=959 data-nosnippet>959</a>        map.insert(<span class="string">"mstateen2h"</span>, <span class="number">0x31E</span>);
+<a href=#960 id=960 data-nosnippet>960</a>        map.insert(<span class="string">"mstateen3h"</span>, <span class="number">0x31F</span>);
+<a href=#961 id=961 data-nosnippet>961</a>        map.insert(<span class="string">"miph"</span>, <span class="number">0x354</span>);
+<a href=#962 id=962 data-nosnippet>962</a>        map.insert(<span class="string">"mcyclecfgh"</span>, <span class="number">0x721</span>);
+<a href=#963 id=963 data-nosnippet>963</a>        map.insert(<span class="string">"minstretcfgh"</span>, <span class="number">0x722</span>);
+<a href=#964 id=964 data-nosnippet>964</a>        map.insert(<span class="string">"mhpmevent3h"</span>, <span class="number">0x723</span>);
+<a href=#965 id=965 data-nosnippet>965</a>        map.insert(<span class="string">"mhpmevent4h"</span>, <span class="number">0x724</span>);
+<a href=#966 id=966 data-nosnippet>966</a>        map.insert(<span class="string">"mhpmevent5h"</span>, <span class="number">0x725</span>);
+<a href=#967 id=967 data-nosnippet>967</a>        map.insert(<span class="string">"mhpmevent6h"</span>, <span class="number">0x726</span>);
+<a href=#968 id=968 data-nosnippet>968</a>        map.insert(<span class="string">"mhpmevent7h"</span>, <span class="number">0x727</span>);
+<a href=#969 id=969 data-nosnippet>969</a>        map.insert(<span class="string">"mhpmevent8h"</span>, <span class="number">0x728</span>);
+<a href=#970 id=970 data-nosnippet>970</a>        map.insert(<span class="string">"mhpmevent9h"</span>, <span class="number">0x729</span>);
+<a href=#971 id=971 data-nosnippet>971</a>        map.insert(<span class="string">"mhpmevent10h"</span>, <span class="number">0x72A</span>);
+<a href=#972 id=972 data-nosnippet>972</a>        map.insert(<span class="string">"mhpmevent11h"</span>, <span class="number">0x72B</span>);
+<a href=#973 id=973 data-nosnippet>973</a>        map.insert(<span class="string">"mhpmevent12h"</span>, <span class="number">0x72C</span>);
+<a href=#974 id=974 data-nosnippet>974</a>        map.insert(<span class="string">"mhpmevent13h"</span>, <span class="number">0x72D</span>);
+<a href=#975 id=975 data-nosnippet>975</a>        map.insert(<span class="string">"mhpmevent14h"</span>, <span class="number">0x72E</span>);
+<a href=#976 id=976 data-nosnippet>976</a>        map.insert(<span class="string">"mhpmevent15h"</span>, <span class="number">0x72F</span>);
+<a href=#977 id=977 data-nosnippet>977</a>        map.insert(<span class="string">"mhpmevent16h"</span>, <span class="number">0x730</span>);
+<a href=#978 id=978 data-nosnippet>978</a>        map.insert(<span class="string">"mhpmevent17h"</span>, <span class="number">0x731</span>);
+<a href=#979 id=979 data-nosnippet>979</a>        map.insert(<span class="string">"mhpmevent18h"</span>, <span class="number">0x732</span>);
+<a href=#980 id=980 data-nosnippet>980</a>        map.insert(<span class="string">"mhpmevent19h"</span>, <span class="number">0x733</span>);
+<a href=#981 id=981 data-nosnippet>981</a>        map.insert(<span class="string">"mhpmevent20h"</span>, <span class="number">0x734</span>);
+<a href=#982 id=982 data-nosnippet>982</a>        map.insert(<span class="string">"mhpmevent21h"</span>, <span class="number">0x735</span>);
+<a href=#983 id=983 data-nosnippet>983</a>        map.insert(<span class="string">"mhpmevent22h"</span>, <span class="number">0x736</span>);
+<a href=#984 id=984 data-nosnippet>984</a>        map.insert(<span class="string">"mhpmevent23h"</span>, <span class="number">0x737</span>);
+<a href=#985 id=985 data-nosnippet>985</a>        map.insert(<span class="string">"mhpmevent24h"</span>, <span class="number">0x738</span>);
+<a href=#986 id=986 data-nosnippet>986</a>        map.insert(<span class="string">"mhpmevent25h"</span>, <span class="number">0x739</span>);
+<a href=#987 id=987 data-nosnippet>987</a>        map.insert(<span class="string">"mhpmevent26h"</span>, <span class="number">0x73A</span>);
+<a href=#988 id=988 data-nosnippet>988</a>        map.insert(<span class="string">"mhpmevent27h"</span>, <span class="number">0x73B</span>);
+<a href=#989 id=989 data-nosnippet>989</a>        map.insert(<span class="string">"mhpmevent28h"</span>, <span class="number">0x73C</span>);
+<a href=#990 id=990 data-nosnippet>990</a>        map.insert(<span class="string">"mhpmevent29h"</span>, <span class="number">0x73D</span>);
+<a href=#991 id=991 data-nosnippet>991</a>        map.insert(<span class="string">"mhpmevent30h"</span>, <span class="number">0x73E</span>);
+<a href=#992 id=992 data-nosnippet>992</a>        map.insert(<span class="string">"mhpmevent31h"</span>, <span class="number">0x73F</span>);
+<a href=#993 id=993 data-nosnippet>993</a>        map.insert(<span class="string">"mnscratch"</span>, <span class="number">0x740</span>);
+<a href=#994 id=994 data-nosnippet>994</a>        map.insert(<span class="string">"mnepc"</span>, <span class="number">0x741</span>);
+<a href=#995 id=995 data-nosnippet>995</a>        map.insert(<span class="string">"mncause"</span>, <span class="number">0x742</span>);
+<a href=#996 id=996 data-nosnippet>996</a>        map.insert(<span class="string">"mnstatus"</span>, <span class="number">0x744</span>);
+<a href=#997 id=997 data-nosnippet>997</a>        map.insert(<span class="string">"mseccfgh"</span>, <span class="number">0x757</span>);
+<a href=#998 id=998 data-nosnippet>998</a>        map.insert(<span class="string">"mcycleh"</span>, <span class="number">0xB80</span>);
+<a href=#999 id=999 data-nosnippet>999</a>        map.insert(<span class="string">"minstreth"</span>, <span class="number">0xB82</span>);
+<a href=#1000 id=1000 data-nosnippet>1000</a>        map.insert(<span class="string">"mhpmcounter3h"</span>, <span class="number">0xB83</span>);
+<a href=#1001 id=1001 data-nosnippet>1001</a>        map.insert(<span class="string">"mhpmcounter4h"</span>, <span class="number">0xB84</span>);
+<a href=#1002 id=1002 data-nosnippet>1002</a>        map.insert(<span class="string">"mhpmcounter5h"</span>, <span class="number">0xB85</span>);
+<a href=#1003 id=1003 data-nosnippet>1003</a>        map.insert(<span class="string">"mhpmcounter6h"</span>, <span class="number">0xB86</span>);
+<a href=#1004 id=1004 data-nosnippet>1004</a>        map.insert(<span class="string">"mhpmcounter7h"</span>, <span class="number">0xB87</span>);
+<a href=#1005 id=1005 data-nosnippet>1005</a>        map.insert(<span class="string">"mhpmcounter8h"</span>, <span class="number">0xB88</span>);
+<a href=#1006 id=1006 data-nosnippet>1006</a>        map.insert(<span class="string">"mhpmcounter9h"</span>, <span class="number">0xB89</span>);
+<a href=#1007 id=1007 data-nosnippet>1007</a>        map.insert(<span class="string">"mhpmcounter10h"</span>, <span class="number">0xB8A</span>);
+<a href=#1008 id=1008 data-nosnippet>1008</a>        map.insert(<span class="string">"mhpmcounter11h"</span>, <span class="number">0xB8B</span>);
+<a href=#1009 id=1009 data-nosnippet>1009</a>        map.insert(<span class="string">"mhpmcounter12h"</span>, <span class="number">0xB8C</span>);
+<a href=#1010 id=1010 data-nosnippet>1010</a>        map.insert(<span class="string">"mhpmcounter13h"</span>, <span class="number">0xB8D</span>);
+<a href=#1011 id=1011 data-nosnippet>1011</a>        map.insert(<span class="string">"mhpmcounter14h"</span>, <span class="number">0xB8E</span>);
+<a href=#1012 id=1012 data-nosnippet>1012</a>        map.insert(<span class="string">"mhpmcounter15h"</span>, <span class="number">0xB8F</span>);
+<a href=#1013 id=1013 data-nosnippet>1013</a>        map.insert(<span class="string">"mhpmcounter16h"</span>, <span class="number">0xB90</span>);
+<a href=#1014 id=1014 data-nosnippet>1014</a>        map.insert(<span class="string">"mhpmcounter17h"</span>, <span class="number">0xB91</span>);
+<a href=#1015 id=1015 data-nosnippet>1015</a>        map.insert(<span class="string">"mhpmcounter18h"</span>, <span class="number">0xB92</span>);
+<a href=#1016 id=1016 data-nosnippet>1016</a>        map.insert(<span class="string">"mhpmcounter19h"</span>, <span class="number">0xB93</span>);
+<a href=#1017 id=1017 data-nosnippet>1017</a>        map.insert(<span class="string">"mhpmcounter20h"</span>, <span class="number">0xB94</span>);
+<a href=#1018 id=1018 data-nosnippet>1018</a>        map.insert(<span class="string">"mhpmcounter21h"</span>, <span class="number">0xB95</span>);
+<a href=#1019 id=1019 data-nosnippet>1019</a>        map.insert(<span class="string">"mhpmcounter22h"</span>, <span class="number">0xB96</span>);
+<a href=#1020 id=1020 data-nosnippet>1020</a>        map.insert(<span class="string">"mhpmcounter23h"</span>, <span class="number">0xB97</span>);
+<a href=#1021 id=1021 data-nosnippet>1021</a>        map.insert(<span class="string">"mhpmcounter24h"</span>, <span class="number">0xB98</span>);
+<a href=#1022 id=1022 data-nosnippet>1022</a>        map.insert(<span class="string">"mhpmcounter25h"</span>, <span class="number">0xB99</span>);
+<a href=#1023 id=1023 data-nosnippet>1023</a>        map.insert(<span class="string">"mhpmcounter26h"</span>, <span class="number">0xB9A</span>);
+<a href=#1024 id=1024 data-nosnippet>1024</a>        map.insert(<span class="string">"mhpmcounter27h"</span>, <span class="number">0xB9B</span>);
+<a href=#1025 id=1025 data-nosnippet>1025</a>        map.insert(<span class="string">"mhpmcounter28h"</span>, <span class="number">0xB9C</span>);
+<a href=#1026 id=1026 data-nosnippet>1026</a>        map.insert(<span class="string">"mhpmcounter29h"</span>, <span class="number">0xB9D</span>);
+<a href=#1027 id=1027 data-nosnippet>1027</a>        map.insert(<span class="string">"mhpmcounter30h"</span>, <span class="number">0xB9E</span>);
+<a href=#1028 id=1028 data-nosnippet>1028</a>        map.insert(<span class="string">"mhpmcounter31h"</span>, <span class="number">0xB9F</span>);
+<a href=#1029 id=1029 data-nosnippet>1029</a>
+<a href=#1030 id=1030 data-nosnippet>1030</a>        map
+<a href=#1031 id=1031 data-nosnippet>1031</a>    };
+<a href=#1032 id=1032 data-nosnippet>1032</a>
+<a href=#1033 id=1033 data-nosnippet>1033</a>
+<a href=#1034 id=1034 data-nosnippet>1034</a>
+<a href=#1035 id=1035 data-nosnippet>1035</a>
+<a href=#1036 id=1036 data-nosnippet>1036</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>FP_IMM_IDENT_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u8&gt; = {
+<a href=#1037 id=1037 data-nosnippet>1037</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
+<a href=#1038 id=1038 data-nosnippet>1038</a>
+<a href=#1039 id=1039 data-nosnippet>1039</a>        map.insert(<span class="string">"min"</span>, <span class="number">1</span>);
+<a href=#1040 id=1040 data-nosnippet>1040</a>        map.insert(<span class="string">"inf"</span>, <span class="number">30</span>);
+<a href=#1041 id=1041 data-nosnippet>1041</a>        map.insert(<span class="string">"nan"</span>, <span class="number">31</span>);
+<a href=#1042 id=1042 data-nosnippet>1042</a>
+<a href=#1043 id=1043 data-nosnippet>1043</a>        map
+<a href=#1044 id=1044 data-nosnippet>1044</a>    };
 <a href=#1045 id=1045 data-nosnippet>1045</a>
-<a href=#1046 id=1046 data-nosnippet>1046</a>
-<a href=#1047 id=1047 data-nosnippet>1047</a>
-<a href=#1048 id=1048 data-nosnippet>1048</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>FP_IMM_IDENT_MAP: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u8&gt; = {
-<a href=#1049 id=1049 data-nosnippet>1049</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::new();
-<a href=#1050 id=1050 data-nosnippet>1050</a>
-<a href=#1051 id=1051 data-nosnippet>1051</a>        map.insert(<span class="string">"min"</span>, <span class="number">1</span>);
-<a href=#1052 id=1052 data-nosnippet>1052</a>        map.insert(<span class="string">"inf"</span>, <span class="number">30</span>);
-<a href=#1053 id=1053 data-nosnippet>1053</a>        map.insert(<span class="string">"nan"</span>, <span class="number">31</span>);
-<a href=#1054 id=1054 data-nosnippet>1054</a>
-<a href=#1055 id=1055 data-nosnippet>1055</a>        map
-<a href=#1056 id=1056 data-nosnippet>1056</a>    };
-<a href=#1057 id=1057 data-nosnippet>1057</a>
-<a href=#1058 id=1058 data-nosnippet>1058</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>FP_IMM_VALUE_MAP: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[(f32, u8)] = <span class="kw-2">&amp;</span>[
-<a href=#1059 id=1059 data-nosnippet>1059</a>        (-<span class="number">1.0</span>, <span class="number">0</span>),
-<a href=#1060 id=1060 data-nosnippet>1060</a>        (<span class="number">1.52587890625e-05</span>, <span class="number">2</span>),
-<a href=#1061 id=1061 data-nosnippet>1061</a>        (<span class="number">3.0517578125e-05</span>, <span class="number">3</span>),
-<a href=#1062 id=1062 data-nosnippet>1062</a>        (<span class="number">3.90625e-03</span>, <span class="number">4</span>),
-<a href=#1063 id=1063 data-nosnippet>1063</a>        (<span class="number">7.8125e-03</span>, <span class="number">5</span>),
-<a href=#1064 id=1064 data-nosnippet>1064</a>        (<span class="number">0.0625</span>, <span class="number">6</span>),
-<a href=#1065 id=1065 data-nosnippet>1065</a>        (<span class="number">0.125</span>, <span class="number">7</span>),
-<a href=#1066 id=1066 data-nosnippet>1066</a>        (<span class="number">0.25</span>, <span class="number">8</span>),
-<a href=#1067 id=1067 data-nosnippet>1067</a>        (<span class="number">0.3125</span>, <span class="number">9</span>),
-<a href=#1068 id=1068 data-nosnippet>1068</a>        (<span class="number">0.375</span>, <span class="number">10</span>),
-<a href=#1069 id=1069 data-nosnippet>1069</a>        (<span class="number">0.4375</span>, <span class="number">11</span>),
-<a href=#1070 id=1070 data-nosnippet>1070</a>        (<span class="number">0.5</span>, <span class="number">12</span>),
-<a href=#1071 id=1071 data-nosnippet>1071</a>        (<span class="number">0.625</span>, <span class="number">13</span>),
-<a href=#1072 id=1072 data-nosnippet>1072</a>        (<span class="number">0.75</span>, <span class="number">14</span>),
-<a href=#1073 id=1073 data-nosnippet>1073</a>        (<span class="number">0.875</span>, <span class="number">15</span>),
-<a href=#1074 id=1074 data-nosnippet>1074</a>        (<span class="number">1.0</span>, <span class="number">16</span>),
-<a href=#1075 id=1075 data-nosnippet>1075</a>        (<span class="number">1.25</span>, <span class="number">17</span>),
-<a href=#1076 id=1076 data-nosnippet>1076</a>        (<span class="number">1.5</span>, <span class="number">18</span>),
-<a href=#1077 id=1077 data-nosnippet>1077</a>        (<span class="number">1.75</span>, <span class="number">19</span>),
-<a href=#1078 id=1078 data-nosnippet>1078</a>        (<span class="number">2.0</span>, <span class="number">20</span>),
-<a href=#1079 id=1079 data-nosnippet>1079</a>        (<span class="number">2.5</span>, <span class="number">21</span>),
-<a href=#1080 id=1080 data-nosnippet>1080</a>        (<span class="number">3.0</span>, <span class="number">22</span>),
-<a href=#1081 id=1081 data-nosnippet>1081</a>        (<span class="number">4.0</span>, <span class="number">23</span>),
-<a href=#1082 id=1082 data-nosnippet>1082</a>        (<span class="number">8.0</span>, <span class="number">24</span>),
-<a href=#1083 id=1083 data-nosnippet>1083</a>        (<span class="number">16.0</span>, <span class="number">25</span>),
-<a href=#1084 id=1084 data-nosnippet>1084</a>        (<span class="number">128.0</span>, <span class="number">26</span>),
-<a href=#1085 id=1085 data-nosnippet>1085</a>        (<span class="number">256.0</span>, <span class="number">27</span>),
-<a href=#1086 id=1086 data-nosnippet>1086</a>        (<span class="number">32768.0</span>, <span class="number">28</span>),
-<a href=#1087 id=1087 data-nosnippet>1087</a>        (<span class="number">65536.0</span>, <span class="number">29</span>),
-<a href=#1088 id=1088 data-nosnippet>1088</a>    ];
-<a href=#1089 id=1089 data-nosnippet>1089</a>}</code></pre></div></section></main></body></html>
+<a href=#1046 id=1046 data-nosnippet>1046</a>    <span class="kw">pub static </span><span class="kw-2">ref </span>FP_IMM_VALUE_MAP: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[(f32, u8)] = <span class="kw-2">&amp;</span>[
+<a href=#1047 id=1047 data-nosnippet>1047</a>        (-<span class="number">1.0</span>, <span class="number">0</span>),
+<a href=#1048 id=1048 data-nosnippet>1048</a>        (<span class="number">1.52587890625e-05</span>, <span class="number">2</span>),
+<a href=#1049 id=1049 data-nosnippet>1049</a>        (<span class="number">3.0517578125e-05</span>, <span class="number">3</span>),
+<a href=#1050 id=1050 data-nosnippet>1050</a>        (<span class="number">3.90625e-03</span>, <span class="number">4</span>),
+<a href=#1051 id=1051 data-nosnippet>1051</a>        (<span class="number">7.8125e-03</span>, <span class="number">5</span>),
+<a href=#1052 id=1052 data-nosnippet>1052</a>        (<span class="number">0.0625</span>, <span class="number">6</span>),
+<a href=#1053 id=1053 data-nosnippet>1053</a>        (<span class="number">0.125</span>, <span class="number">7</span>),
+<a href=#1054 id=1054 data-nosnippet>1054</a>        (<span class="number">0.25</span>, <span class="number">8</span>),
+<a href=#1055 id=1055 data-nosnippet>1055</a>        (<span class="number">0.3125</span>, <span class="number">9</span>),
+<a href=#1056 id=1056 data-nosnippet>1056</a>        (<span class="number">0.375</span>, <span class="number">10</span>),
+<a href=#1057 id=1057 data-nosnippet>1057</a>        (<span class="number">0.4375</span>, <span class="number">11</span>),
+<a href=#1058 id=1058 data-nosnippet>1058</a>        (<span class="number">0.5</span>, <span class="number">12</span>),
+<a href=#1059 id=1059 data-nosnippet>1059</a>        (<span class="number">0.625</span>, <span class="number">13</span>),
+<a href=#1060 id=1060 data-nosnippet>1060</a>        (<span class="number">0.75</span>, <span class="number">14</span>),
+<a href=#1061 id=1061 data-nosnippet>1061</a>        (<span class="number">0.875</span>, <span class="number">15</span>),
+<a href=#1062 id=1062 data-nosnippet>1062</a>        (<span class="number">1.0</span>, <span class="number">16</span>),
+<a href=#1063 id=1063 data-nosnippet>1063</a>        (<span class="number">1.25</span>, <span class="number">17</span>),
+<a href=#1064 id=1064 data-nosnippet>1064</a>        (<span class="number">1.5</span>, <span class="number">18</span>),
+<a href=#1065 id=1065 data-nosnippet>1065</a>        (<span class="number">1.75</span>, <span class="number">19</span>),
+<a href=#1066 id=1066 data-nosnippet>1066</a>        (<span class="number">2.0</span>, <span class="number">20</span>),
+<a href=#1067 id=1067 data-nosnippet>1067</a>        (<span class="number">2.5</span>, <span class="number">21</span>),
+<a href=#1068 id=1068 data-nosnippet>1068</a>        (<span class="number">3.0</span>, <span class="number">22</span>),
+<a href=#1069 id=1069 data-nosnippet>1069</a>        (<span class="number">4.0</span>, <span class="number">23</span>),
+<a href=#1070 id=1070 data-nosnippet>1070</a>        (<span class="number">8.0</span>, <span class="number">24</span>),
+<a href=#1071 id=1071 data-nosnippet>1071</a>        (<span class="number">16.0</span>, <span class="number">25</span>),
+<a href=#1072 id=1072 data-nosnippet>1072</a>        (<span class="number">128.0</span>, <span class="number">26</span>),
+<a href=#1073 id=1073 data-nosnippet>1073</a>        (<span class="number">256.0</span>, <span class="number">27</span>),
+<a href=#1074 id=1074 data-nosnippet>1074</a>        (<span class="number">32768.0</span>, <span class="number">28</span>),
+<a href=#1075 id=1075 data-nosnippet>1075</a>        (<span class="number">65536.0</span>, <span class="number">29</span>),
+<a href=#1076 id=1076 data-nosnippet>1076</a>    ];
+<a href=#1077 id=1077 data-nosnippet>1077</a>}
+</code></pre></div></section></main></body></html>

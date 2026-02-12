@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\components.rs`."><title>components.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasmrt/</div>components.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! This module provides several reusable compoments for implementing assemblers
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\components.rs`."><title>components.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasmrt/</div>components.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! This module provides several reusable compoments for implementing assemblers
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>std::io;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>std::collections::hash_map::Entry;
@@ -53,13 +53,13 @@
 <a href=#53 id=53 data-nosnippet>53</a>
 <a href=#54 id=54 data-nosnippet>54</a>    <span class="doccomment">/// Returns if this static label represents a local label
 <a href=#55 id=55 data-nosnippet>55</a>    </span><span class="kw">pub fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-<a href=#56 id=56 data-nosnippet>56</a>        <span class="self">self</span>.version != <span class="number">0
+<a href=#56 id=56 data-nosnippet>56</a>        <span class="self">self</span>.<span class="macro">version !</span>= <span class="number">0
 <a href=#57 id=57 data-nosnippet>57</a>    </span>}
 <a href=#58 id=58 data-nosnippet>58</a>
 <a href=#59 id=59 data-nosnippet>59</a>    <span class="doccomment">/// Returns the static label targetting the label with the same name, after this one.
 <a href=#60 id=60 data-nosnippet>60</a>    /// if it is a global label, returns a copy of itself.
 <a href=#61 id=61 data-nosnippet>61</a>    </span><span class="kw">pub fn </span>next(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; StaticLabel {
-<a href=#62 id=62 data-nosnippet>62</a>        <span class="self">self</span>.version += (<span class="self">self</span>.version != <span class="number">0</span>) <span class="kw">as </span>usize;
+<a href=#62 id=62 data-nosnippet>62</a>        <span class="self">self</span>.version += (<span class="self">self</span>.<span class="macro">version !</span>= <span class="number">0</span>) <span class="kw">as </span>usize;
 <a href=#63 id=63 data-nosnippet>63</a>        <span class="self">self
 <a href=#64 id=64 data-nosnippet>64</a>    </span>}
 <a href=#65 id=65 data-nosnippet>65</a>
@@ -342,354 +342,397 @@
 <a href=#342 id=342 data-nosnippet>342</a>    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, target: usize, buf_addr: usize) -&gt; isize {
 <a href=#343 id=343 data-nosnippet>343</a>        (<span class="kw">match </span><span class="self">self</span>.relocation.kind() {
 <a href=#344 id=344 data-nosnippet>344</a>            RelocationKind::Relative =&gt; target.wrapping_sub(<span class="self">self</span>.location.<span class="number">0 </span>- <span class="self">self</span>.ref_offset <span class="kw">as </span>usize),
-<a href=#345 id=345 data-nosnippet>345</a>            RelocationKind::RelToAbs =&gt; target.wrapping_sub(<span class="self">self</span>.location.<span class="number">0 </span>- <span class="self">self</span>.ref_offset <span class="kw">as </span>usize + buf_addr),
-<a href=#346 id=346 data-nosnippet>346</a>            RelocationKind::AbsToRel =&gt; target + buf_addr
-<a href=#347 id=347 data-nosnippet>347</a>        }) <span class="kw">as </span>isize + <span class="self">self</span>.target_offset
-<a href=#348 id=348 data-nosnippet>348</a>    }
-<a href=#349 id=349 data-nosnippet>349</a>
-<a href=#350 id=350 data-nosnippet>350</a>    <span class="doccomment">/// Patch `buffer` so that this relocation patch will point to `target`.
-<a href=#351 id=351 data-nosnippet>351</a>    /// `buf_addr` is the address that the assembling buffer will come to reside at when it is assembled.
-<a href=#352 id=352 data-nosnippet>352</a>    /// `target` is the offset that this relocation will be targetting.
-<a href=#353 id=353 data-nosnippet>353</a>    </span><span class="kw">pub fn </span>patch(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], buf_addr: usize, target: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), ImpossibleRelocation&gt; {
-<a href=#354 id=354 data-nosnippet>354</a>        <span class="kw">let </span>value = <span class="self">self</span>.value(target, buf_addr);
-<a href=#355 id=355 data-nosnippet>355</a>        <span class="self">self</span>.relocation.write_value(buffer, value)
-<a href=#356 id=356 data-nosnippet>356</a>    }
-<a href=#357 id=357 data-nosnippet>357</a>
-<a href=#358 id=358 data-nosnippet>358</a>    <span class="doccomment">/// Patch `buffer` so that this relocation will still point to the right location due to a change in the address of the containing buffer.
-<a href=#359 id=359 data-nosnippet>359</a>    /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
-<a href=#360 id=360 data-nosnippet>360</a>    /// `adjustment` is `new_buf_addr - old_buf_addr`.
-<a href=#361 id=361 data-nosnippet>361</a>    </span><span class="kw">pub fn </span>adjust(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], adjustment: isize) -&gt; <span class="prelude-ty">Result</span>&lt;(), ImpossibleRelocation&gt; {
-<a href=#362 id=362 data-nosnippet>362</a>        <span class="kw">let </span>value = <span class="kw">match </span><span class="self">self</span>.relocation.kind() {
-<a href=#363 id=363 data-nosnippet>363</a>            RelocationKind::Relative =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
-<a href=#364 id=364 data-nosnippet>364</a>            RelocationKind::RelToAbs =&gt; <span class="self">self</span>.relocation.read_value(buffer).wrapping_sub(adjustment),
-<a href=#365 id=365 data-nosnippet>365</a>            RelocationKind::AbsToRel =&gt; <span class="self">self</span>.relocation.read_value(buffer).wrapping_add(adjustment),
-<a href=#366 id=366 data-nosnippet>366</a>        };
-<a href=#367 id=367 data-nosnippet>367</a>        <span class="self">self</span>.relocation.write_value(buffer, value)
-<a href=#368 id=368 data-nosnippet>368</a>    }
-<a href=#369 id=369 data-nosnippet>369</a>
-<a href=#370 id=370 data-nosnippet>370</a>    <span class="doccomment">/// Returns if this patch requires adjustment when the address of the buffer it resides in is altered.
-<a href=#371 id=371 data-nosnippet>371</a>    </span><span class="kw">pub fn </span>needs_adjustment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-<a href=#372 id=372 data-nosnippet>372</a>        <span class="kw">match </span><span class="self">self</span>.relocation.kind() {
-<a href=#373 id=373 data-nosnippet>373</a>            RelocationKind::Relative =&gt; <span class="bool-val">false</span>,
-<a href=#374 id=374 data-nosnippet>374</a>            RelocationKind::RelToAbs
-<a href=#375 id=375 data-nosnippet>375</a>            | RelocationKind::AbsToRel =&gt; <span class="bool-val">true</span>,
-<a href=#376 id=376 data-nosnippet>376</a>        }
-<a href=#377 id=377 data-nosnippet>377</a>    }
-<a href=#378 id=378 data-nosnippet>378</a>}
-<a href=#379 id=379 data-nosnippet>379</a>
-<a href=#380 id=380 data-nosnippet>380</a>
-<a href=#381 id=381 data-nosnippet>381</a><span class="doccomment">/// A registry of relocations and the respective labels they point towards.
-<a href=#382 id=382 data-nosnippet>382</a></span><span class="attr">#[derive(Debug, Default)]
-<a href=#383 id=383 data-nosnippet>383</a></span><span class="kw">pub struct </span>RelocRegistry&lt;R: Relocation&gt; {
-<a href=#384 id=384 data-nosnippet>384</a>    static_targets: Vec&lt;(PatchLoc&lt;R&gt;, StaticLabel)&gt;,
-<a href=#385 id=385 data-nosnippet>385</a>    dynamic_targets: Vec&lt;(PatchLoc&lt;R&gt;, DynamicLabel)&gt;,
-<a href=#386 id=386 data-nosnippet>386</a>}
-<a href=#387 id=387 data-nosnippet>387</a>
-<a href=#388 id=388 data-nosnippet>388</a><span class="kw">impl</span>&lt;R: Relocation&gt; RelocRegistry&lt;R&gt; {
-<a href=#389 id=389 data-nosnippet>389</a>    <span class="doccomment">/// Create a new, empty relocation registry.
-<a href=#390 id=390 data-nosnippet>390</a>    </span><span class="kw">pub fn </span>new() -&gt; RelocRegistry&lt;R&gt; {
-<a href=#391 id=391 data-nosnippet>391</a>        RelocRegistry {
-<a href=#392 id=392 data-nosnippet>392</a>            static_targets: Vec::new(),
-<a href=#393 id=393 data-nosnippet>393</a>            dynamic_targets: Vec::new(),
-<a href=#394 id=394 data-nosnippet>394</a>        }
-<a href=#395 id=395 data-nosnippet>395</a>    }
-<a href=#396 id=396 data-nosnippet>396</a>
-<a href=#397 id=397 data-nosnippet>397</a>    <span class="doccomment">/// Create a new, empty relocation registry with reserved space for the specified amount of static and dynamic references
-<a href=#398 id=398 data-nosnippet>398</a>    </span><span class="kw">pub fn </span>with_capacity(static_references: usize, dynamic_references: usize) -&gt; RelocRegistry&lt;R&gt; {
-<a href=#399 id=399 data-nosnippet>399</a>        RelocRegistry {
-<a href=#400 id=400 data-nosnippet>400</a>            static_targets: Vec::with_capacity(static_references),
-<a href=#401 id=401 data-nosnippet>401</a>            dynamic_targets: Vec::with_capacity(dynamic_references),
-<a href=#402 id=402 data-nosnippet>402</a>        }
-<a href=#403 id=403 data-nosnippet>403</a>    }
-<a href=#404 id=404 data-nosnippet>404</a>
-<a href=#405 id=405 data-nosnippet>405</a>    <span class="doccomment">/// Add a new patch targetting a static label (either global or local).
-<a href=#406 id=406 data-nosnippet>406</a>    </span><span class="kw">pub fn </span>add_static(<span class="kw-2">&amp;mut </span><span class="self">self</span>, label: StaticLabel, patchloc: PatchLoc&lt;R&gt;) {
-<a href=#407 id=407 data-nosnippet>407</a>        <span class="self">self</span>.static_targets.push((patchloc, label));
-<a href=#408 id=408 data-nosnippet>408</a>    }
-<a href=#409 id=409 data-nosnippet>409</a>
-<a href=#410 id=410 data-nosnippet>410</a>    <span class="doccomment">/// Add a new patch targetting the dynamic label `id`.
-<a href=#411 id=411 data-nosnippet>411</a>    </span><span class="kw">pub fn </span>add_dynamic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel, patchloc: PatchLoc&lt;R&gt;) {
-<a href=#412 id=412 data-nosnippet>412</a>        <span class="self">self</span>.dynamic_targets.push((patchloc, id))
-<a href=#413 id=413 data-nosnippet>413</a>    }
-<a href=#414 id=414 data-nosnippet>414</a>
-<a href=#415 id=415 data-nosnippet>415</a>    <span class="doccomment">/// Return an iterator through all defined relocations targeting global labels and the labels they target.
-<a href=#416 id=416 data-nosnippet>416</a>    /// These relocations are removed from the registry.
-<a href=#417 id=417 data-nosnippet>417</a>    </span><span class="kw">pub fn </span>take_statics&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, StaticLabel)&gt; + <span class="lifetime">'a </span>{
-<a href=#418 id=418 data-nosnippet>418</a>        <span class="self">self</span>.static_targets.drain(..)
-<a href=#419 id=419 data-nosnippet>419</a>    }
-<a href=#420 id=420 data-nosnippet>420</a>
-<a href=#421 id=421 data-nosnippet>421</a>    <span class="doccomment">/// Return an iterator through all defined relocations targeting dynamic labels and the labels they target.
-<a href=#422 id=422 data-nosnippet>422</a>    /// These relocations are removed from the registry.
-<a href=#423 id=423 data-nosnippet>423</a>    </span><span class="kw">pub fn </span>take_dynamics&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, DynamicLabel)&gt; + <span class="lifetime">'a </span>{
-<a href=#424 id=424 data-nosnippet>424</a>        <span class="self">self</span>.dynamic_targets.drain(..)
-<a href=#425 id=425 data-nosnippet>425</a>    }
-<a href=#426 id=426 data-nosnippet>426</a>}
-<a href=#427 id=427 data-nosnippet>427</a>
-<a href=#428 id=428 data-nosnippet>428</a>
-<a href=#429 id=429 data-nosnippet>429</a><span class="doccomment">/// A registry of relocations that have been encoded previously, but need to be adjusted when the address of the buffer they
-<a href=#430 id=430 data-nosnippet>430</a>/// reside in changes.
-<a href=#431 id=431 data-nosnippet>431</a></span><span class="attr">#[derive(Debug, Default)]
-<a href=#432 id=432 data-nosnippet>432</a></span><span class="kw">pub struct </span>ManagedRelocs&lt;R: Relocation&gt; {
-<a href=#433 id=433 data-nosnippet>433</a>    managed: BTreeMap&lt;usize, PatchLoc&lt;R&gt;&gt;
-<a href=#434 id=434 data-nosnippet>434</a>}
-<a href=#435 id=435 data-nosnippet>435</a>
-<a href=#436 id=436 data-nosnippet>436</a><span class="kw">impl</span>&lt;R: Relocation&gt; ManagedRelocs&lt;R&gt; {
-<a href=#437 id=437 data-nosnippet>437</a>    <span class="doccomment">/// Create a new, empty managed relocation registry.
-<a href=#438 id=438 data-nosnippet>438</a>    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-<a href=#439 id=439 data-nosnippet>439</a>        <span class="self">Self </span>{
-<a href=#440 id=440 data-nosnippet>440</a>            managed: BTreeMap::new()
-<a href=#441 id=441 data-nosnippet>441</a>        }
-<a href=#442 id=442 data-nosnippet>442</a>    }
-<a href=#443 id=443 data-nosnippet>443</a>
-<a href=#444 id=444 data-nosnippet>444</a>    <span class="doccomment">/// Add a relocation to this registry.
-<a href=#445 id=445 data-nosnippet>445</a>    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, patchloc: PatchLoc&lt;R&gt;) {
-<a href=#446 id=446 data-nosnippet>446</a>        <span class="self">self</span>.managed.insert(patchloc.location.<span class="number">0 </span>- patchloc.field_offset <span class="kw">as </span>usize, patchloc);
-<a href=#447 id=447 data-nosnippet>447</a>    }
-<a href=#448 id=448 data-nosnippet>448</a>
-<a href=#449 id=449 data-nosnippet>449</a>    <span class="doccomment">/// Take all items from another registry and add them to this registry
-<a href=#450 id=450 data-nosnippet>450</a>    </span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;mut </span>ManagedRelocs&lt;R&gt;) {
-<a href=#451 id=451 data-nosnippet>451</a>        <span class="self">self</span>.managed.append(<span class="kw-2">&amp;mut </span>other.managed);
-<a href=#452 id=452 data-nosnippet>452</a>    }
-<a href=#453 id=453 data-nosnippet>453</a>
-<a href=#454 id=454 data-nosnippet>454</a>    <span class="doccomment">/// Remove all managed relocations whose byte fields start in the range start .. end.
-<a href=#455 id=455 data-nosnippet>455</a>    /// This is useful when implementing an `Assembler::alter` API, as any managed relocations
-<a href=#456 id=456 data-nosnippet>456</a>    /// that were overwritten should be removed from the registry, otherwise the replacement code
-<a href=#457 id=457 data-nosnippet>457</a>    /// would be corrupted when managed relocations are updated.
-<a href=#458 id=458 data-nosnippet>458</a>    </span><span class="kw">pub fn </span>remove_between(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start: usize, end: usize) {
-<a href=#459 id=459 data-nosnippet>459</a>        <span class="kw">if </span>start == end {
-<a href=#460 id=460 data-nosnippet>460</a>            <span class="kw">return</span>;
-<a href=#461 id=461 data-nosnippet>461</a>        }
-<a href=#462 id=462 data-nosnippet>462</a>
-<a href=#463 id=463 data-nosnippet>463</a>        <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self</span>.managed.range(start .. end).map(|(<span class="kw-2">&amp;</span>k, <span class="kw">_</span>)| k).collect();
-<a href=#464 id=464 data-nosnippet>464</a>        <span class="kw">for </span>k <span class="kw">in </span>keys {
-<a href=#465 id=465 data-nosnippet>465</a>            <span class="self">self</span>.managed.remove(<span class="kw-2">&amp;</span>k);
-<a href=#466 id=466 data-nosnippet>466</a>        }
-<a href=#467 id=467 data-nosnippet>467</a>    }
-<a href=#468 id=468 data-nosnippet>468</a>
-<a href=#469 id=469 data-nosnippet>469</a>    <span class="doccomment">/// Iterate through all defined managed relocations.
-<a href=#470 id=470 data-nosnippet>470</a>    </span><span class="kw">pub fn </span>iter&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PatchLoc&lt;R&gt;&gt; + <span class="lifetime">'a </span>{
-<a href=#471 id=471 data-nosnippet>471</a>        <span class="self">self</span>.managed.values()
-<a href=#472 id=472 data-nosnippet>472</a>    } 
-<a href=#473 id=473 data-nosnippet>473</a>}
-<a href=#474 id=474 data-nosnippet>474</a>
-<a href=#475 id=475 data-nosnippet>475</a>
-<a href=#476 id=476 data-nosnippet>476</a><span class="attr">#[derive(Clone, Debug)]
-<a href=#477 id=477 data-nosnippet>477</a></span><span class="kw">enum </span>LitPoolEntry {
-<a href=#478 id=478 data-nosnippet>478</a>    U8(u8),
-<a href=#479 id=479 data-nosnippet>479</a>    U16(u16),
-<a href=#480 id=480 data-nosnippet>480</a>    U32(u32),
-<a href=#481 id=481 data-nosnippet>481</a>    U64(u64),
-<a href=#482 id=482 data-nosnippet>482</a>    Dynamic(RelocationSize, DynamicLabel),
-<a href=#483 id=483 data-nosnippet>483</a>    Global(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
-<a href=#484 id=484 data-nosnippet>484</a>    Forward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
-<a href=#485 id=485 data-nosnippet>485</a>    Backward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
-<a href=#486 id=486 data-nosnippet>486</a>    Align(u8, usize),
-<a href=#487 id=487 data-nosnippet>487</a>}
-<a href=#488 id=488 data-nosnippet>488</a>
-<a href=#489 id=489 data-nosnippet>489</a><span class="doccomment">/// Literal pool implementation. One can programmatically push items in this literal pool and retrieve offsets to them in the pool.
-<a href=#490 id=490 data-nosnippet>490</a>/// Then later, the pool will be encoded into the instruction stream and items can be retrieved using the address of the literal pool.
-<a href=#491 id=491 data-nosnippet>491</a>/// and the previously emitted offsets. Values are always at least aligned to their size.
-<a href=#492 id=492 data-nosnippet>492</a></span><span class="attr">#[derive(Clone, Debug, Default)]
-<a href=#493 id=493 data-nosnippet>493</a></span><span class="kw">pub struct </span>LitPool {
-<a href=#494 id=494 data-nosnippet>494</a>    offset: usize,
-<a href=#495 id=495 data-nosnippet>495</a>    entries: Vec&lt;LitPoolEntry&gt;,
-<a href=#496 id=496 data-nosnippet>496</a>}
-<a href=#497 id=497 data-nosnippet>497</a>
-<a href=#498 id=498 data-nosnippet>498</a><span class="kw">impl </span>LitPool {
-<a href=#499 id=499 data-nosnippet>499</a>    <span class="doccomment">/// Create a new, empty literal pool
-<a href=#500 id=500 data-nosnippet>500</a>    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-<a href=#501 id=501 data-nosnippet>501</a>        LitPool {
-<a href=#502 id=502 data-nosnippet>502</a>            offset: <span class="number">0</span>,
-<a href=#503 id=503 data-nosnippet>503</a>            entries: Vec::new(),
-<a href=#504 id=504 data-nosnippet>504</a>        }
-<a href=#505 id=505 data-nosnippet>505</a>    }
-<a href=#506 id=506 data-nosnippet>506</a>
-<a href=#507 id=507 data-nosnippet>507</a>    <span class="comment">// align the pool to the specified size, record the offset, and bump the offset
-<a href=#508 id=508 data-nosnippet>508</a>    </span><span class="kw">fn </span>bump_offset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: RelocationSize) -&gt; isize {
-<a href=#509 id=509 data-nosnippet>509</a>        <span class="comment">// Correct for alignment
-<a href=#510 id=510 data-nosnippet>510</a>        </span><span class="self">self</span>.align(size <span class="kw">as </span>usize, <span class="number">0</span>);
-<a href=#511 id=511 data-nosnippet>511</a>        <span class="kw">let </span>offset = <span class="self">self</span>.offset;
-<a href=#512 id=512 data-nosnippet>512</a>        <span class="self">self</span>.offset += size <span class="kw">as </span>usize;
-<a href=#513 id=513 data-nosnippet>513</a>        offset <span class="kw">as </span>isize
-<a href=#514 id=514 data-nosnippet>514</a>    }
-<a href=#515 id=515 data-nosnippet>515</a>
-<a href=#516 id=516 data-nosnippet>516</a>    <span class="doccomment">/// Add extra alignment for the next value in the literal pool
-<a href=#517 id=517 data-nosnippet>517</a>    </span><span class="kw">pub fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: usize, with: u8) {
-<a href=#518 id=518 data-nosnippet>518</a>        <span class="kw">let </span>misalign = <span class="self">self</span>.offset % size;
-<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">if </span>misalign == <span class="number">0 </span>{
-<a href=#520 id=520 data-nosnippet>520</a>            <span class="kw">return</span>;
-<a href=#521 id=521 data-nosnippet>521</a>        }
-<a href=#522 id=522 data-nosnippet>522</a>
-<a href=#523 id=523 data-nosnippet>523</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Align(with, size));
-<a href=#524 id=524 data-nosnippet>524</a>        <span class="self">self</span>.offset += size - misalign;
-<a href=#525 id=525 data-nosnippet>525</a>    }
-<a href=#526 id=526 data-nosnippet>526</a>
-<a href=#527 id=527 data-nosnippet>527</a>    <span class="doccomment">/// Encode `value` into the literal pool.
-<a href=#528 id=528 data-nosnippet>528</a>    </span><span class="kw">pub fn </span>push_u8(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; isize {
-<a href=#529 id=529 data-nosnippet>529</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::Byte);
-<a href=#530 id=530 data-nosnippet>530</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U8(value));
-<a href=#531 id=531 data-nosnippet>531</a>        offset
-<a href=#532 id=532 data-nosnippet>532</a>    }
-<a href=#533 id=533 data-nosnippet>533</a>
-<a href=#534 id=534 data-nosnippet>534</a>    <span class="doccomment">/// Encode `value` into the literal pool.
-<a href=#535 id=535 data-nosnippet>535</a>    </span><span class="kw">pub fn </span>push_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; isize {
-<a href=#536 id=536 data-nosnippet>536</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::Word);
-<a href=#537 id=537 data-nosnippet>537</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U16(value));
-<a href=#538 id=538 data-nosnippet>538</a>        offset
-<a href=#539 id=539 data-nosnippet>539</a>    }
-<a href=#540 id=540 data-nosnippet>540</a>
-<a href=#541 id=541 data-nosnippet>541</a>    <span class="doccomment">/// Encode `value` into the literal pool.
-<a href=#542 id=542 data-nosnippet>542</a>    </span><span class="kw">pub fn </span>push_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) -&gt; isize {
-<a href=#543 id=543 data-nosnippet>543</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::DWord);
-<a href=#544 id=544 data-nosnippet>544</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U32(value));
-<a href=#545 id=545 data-nosnippet>545</a>        offset
-<a href=#546 id=546 data-nosnippet>546</a>    }
-<a href=#547 id=547 data-nosnippet>547</a>
-<a href=#548 id=548 data-nosnippet>548</a>    <span class="doccomment">/// Encode `value` into the literal pool.
-<a href=#549 id=549 data-nosnippet>549</a>    </span><span class="kw">pub fn </span>push_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) -&gt; isize {
-<a href=#550 id=550 data-nosnippet>550</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::QWord);
-<a href=#551 id=551 data-nosnippet>551</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U64(value));
-<a href=#552 id=552 data-nosnippet>552</a>        offset
-<a href=#553 id=553 data-nosnippet>553</a>    }
-<a href=#554 id=554 data-nosnippet>554</a>
-<a href=#555 id=555 data-nosnippet>555</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-<a href=#556 id=556 data-nosnippet>556</a>    </span><span class="kw">pub fn </span>push_dynamic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel, size: RelocationSize) -&gt; isize {
-<a href=#557 id=557 data-nosnippet>557</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
-<a href=#558 id=558 data-nosnippet>558</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Dynamic(size, id));
-<a href=#559 id=559 data-nosnippet>559</a>        offset
-<a href=#560 id=560 data-nosnippet>560</a>    }
-<a href=#561 id=561 data-nosnippet>561</a>
-<a href=#562 id=562 data-nosnippet>562</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-<a href=#563 id=563 data-nosnippet>563</a>    </span><span class="kw">pub fn </span>push_global(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize) -&gt; isize {
+<a href=#345 id=345 data-nosnippet>345</a>            RelocationKind::RelToAbs =&gt; target.wrapping_sub(<span class="self">self</span>.location.<span class="number">0 </span>- <span class="self">self</span>.ref_offset <span class="kw">as </span>usize).wrapping_sub(buf_addr),
+<a href=#346 id=346 data-nosnippet>346</a>            RelocationKind::AbsToRel =&gt; target.wrapping_add(buf_addr),
+<a href=#347 id=347 data-nosnippet>347</a>            RelocationKind::Absolute =&gt; target
+<a href=#348 id=348 data-nosnippet>348</a>        }) <span class="kw">as </span>isize + <span class="self">self</span>.target_offset
+<a href=#349 id=349 data-nosnippet>349</a>    }
+<a href=#350 id=350 data-nosnippet>350</a>
+<a href=#351 id=351 data-nosnippet>351</a>    <span class="doccomment">/// Patch `buffer` so that this relocation patch will point to `target`.
+<a href=#352 id=352 data-nosnippet>352</a>    /// `buf_addr` is the address that the assembling buffer will come to reside at when it is assembled.
+<a href=#353 id=353 data-nosnippet>353</a>    /// `target` is the offset that this relocation will be targetting.
+<a href=#354 id=354 data-nosnippet>354</a>    </span><span class="kw">pub fn </span>patch(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], buf_addr: usize, target: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), ImpossibleRelocation&gt; {
+<a href=#355 id=355 data-nosnippet>355</a>        <span class="kw">let </span>value = <span class="self">self</span>.value(target, buf_addr);
+<a href=#356 id=356 data-nosnippet>356</a>        <span class="self">self</span>.relocation.write_value(buffer, value)
+<a href=#357 id=357 data-nosnippet>357</a>    }
+<a href=#358 id=358 data-nosnippet>358</a>
+<a href=#359 id=359 data-nosnippet>359</a>    <span class="doccomment">/// Patch `buffer` so that this relocation will still point to the right location due to a change in the address of the containing buffer.
+<a href=#360 id=360 data-nosnippet>360</a>    /// `buffer` is a subsection of a larger buffer, located at offset `buf_offset` in this larger buffer.
+<a href=#361 id=361 data-nosnippet>361</a>    /// `adjustment` is `new_buf_addr - old_buf_addr`.
+<a href=#362 id=362 data-nosnippet>362</a>    </span><span class="kw">pub fn </span>adjust(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], adjustment: isize) -&gt; <span class="prelude-ty">Result</span>&lt;(), ImpossibleRelocation&gt; {
+<a href=#363 id=363 data-nosnippet>363</a>        <span class="kw">let </span>value = <span class="kw">match </span><span class="self">self</span>.relocation.kind() {
+<a href=#364 id=364 data-nosnippet>364</a>            RelocationKind::Relative
+<a href=#365 id=365 data-nosnippet>365</a>            | RelocationKind::Absolute =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
+<a href=#366 id=366 data-nosnippet>366</a>            RelocationKind::RelToAbs =&gt; <span class="self">self</span>.relocation.read_value(buffer).wrapping_sub(adjustment),
+<a href=#367 id=367 data-nosnippet>367</a>            RelocationKind::AbsToRel =&gt; <span class="self">self</span>.relocation.read_value(buffer).wrapping_add(adjustment),
+<a href=#368 id=368 data-nosnippet>368</a>        };
+<a href=#369 id=369 data-nosnippet>369</a>        <span class="self">self</span>.relocation.write_value(buffer, value)
+<a href=#370 id=370 data-nosnippet>370</a>    }
+<a href=#371 id=371 data-nosnippet>371</a>
+<a href=#372 id=372 data-nosnippet>372</a>    <span class="doccomment">/// Returns if this patch requires adjustment when the address of the buffer it resides in is altered.
+<a href=#373 id=373 data-nosnippet>373</a>    </span><span class="kw">pub fn </span>needs_adjustment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+<a href=#374 id=374 data-nosnippet>374</a>        <span class="kw">match </span><span class="self">self</span>.relocation.kind() {
+<a href=#375 id=375 data-nosnippet>375</a>            RelocationKind::Relative
+<a href=#376 id=376 data-nosnippet>376</a>            | RelocationKind::Absolute =&gt; <span class="bool-val">false</span>,
+<a href=#377 id=377 data-nosnippet>377</a>            RelocationKind::RelToAbs
+<a href=#378 id=378 data-nosnippet>378</a>            | RelocationKind::AbsToRel =&gt; <span class="bool-val">true</span>,
+<a href=#379 id=379 data-nosnippet>379</a>        }
+<a href=#380 id=380 data-nosnippet>380</a>    }
+<a href=#381 id=381 data-nosnippet>381</a>}
+<a href=#382 id=382 data-nosnippet>382</a>
+<a href=#383 id=383 data-nosnippet>383</a>
+<a href=#384 id=384 data-nosnippet>384</a><span class="doccomment">/// A registry of relocations and the respective labels they point towards.
+<a href=#385 id=385 data-nosnippet>385</a></span><span class="attr">#[derive(Debug, Default)]
+<a href=#386 id=386 data-nosnippet>386</a></span><span class="kw">pub struct </span>RelocRegistry&lt;R: Relocation&gt; {
+<a href=#387 id=387 data-nosnippet>387</a>    static_targets: Vec&lt;(PatchLoc&lt;R&gt;, StaticLabel)&gt;,
+<a href=#388 id=388 data-nosnippet>388</a>    dynamic_targets: Vec&lt;(PatchLoc&lt;R&gt;, DynamicLabel)&gt;,
+<a href=#389 id=389 data-nosnippet>389</a>}
+<a href=#390 id=390 data-nosnippet>390</a>
+<a href=#391 id=391 data-nosnippet>391</a><span class="kw">impl</span>&lt;R: Relocation&gt; RelocRegistry&lt;R&gt; {
+<a href=#392 id=392 data-nosnippet>392</a>    <span class="doccomment">/// Create a new, empty relocation registry.
+<a href=#393 id=393 data-nosnippet>393</a>    </span><span class="kw">pub fn </span>new() -&gt; RelocRegistry&lt;R&gt; {
+<a href=#394 id=394 data-nosnippet>394</a>        RelocRegistry {
+<a href=#395 id=395 data-nosnippet>395</a>            static_targets: Vec::new(),
+<a href=#396 id=396 data-nosnippet>396</a>            dynamic_targets: Vec::new(),
+<a href=#397 id=397 data-nosnippet>397</a>        }
+<a href=#398 id=398 data-nosnippet>398</a>    }
+<a href=#399 id=399 data-nosnippet>399</a>
+<a href=#400 id=400 data-nosnippet>400</a>    <span class="doccomment">/// Create a new, empty relocation registry with reserved space for the specified amount of static and dynamic references
+<a href=#401 id=401 data-nosnippet>401</a>    </span><span class="kw">pub fn </span>with_capacity(static_references: usize, dynamic_references: usize) -&gt; RelocRegistry&lt;R&gt; {
+<a href=#402 id=402 data-nosnippet>402</a>        RelocRegistry {
+<a href=#403 id=403 data-nosnippet>403</a>            static_targets: Vec::with_capacity(static_references),
+<a href=#404 id=404 data-nosnippet>404</a>            dynamic_targets: Vec::with_capacity(dynamic_references),
+<a href=#405 id=405 data-nosnippet>405</a>        }
+<a href=#406 id=406 data-nosnippet>406</a>    }
+<a href=#407 id=407 data-nosnippet>407</a>
+<a href=#408 id=408 data-nosnippet>408</a>    <span class="doccomment">/// Add a new patch targetting a static label (either global or local).
+<a href=#409 id=409 data-nosnippet>409</a>    </span><span class="kw">pub fn </span>add_static(<span class="kw-2">&amp;mut </span><span class="self">self</span>, label: StaticLabel, patchloc: PatchLoc&lt;R&gt;) {
+<a href=#410 id=410 data-nosnippet>410</a>        <span class="self">self</span>.static_targets.push((patchloc, label));
+<a href=#411 id=411 data-nosnippet>411</a>    }
+<a href=#412 id=412 data-nosnippet>412</a>
+<a href=#413 id=413 data-nosnippet>413</a>    <span class="doccomment">/// Add a new patch targetting the dynamic label `id`.
+<a href=#414 id=414 data-nosnippet>414</a>    </span><span class="kw">pub fn </span>add_dynamic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel, patchloc: PatchLoc&lt;R&gt;) {
+<a href=#415 id=415 data-nosnippet>415</a>        <span class="self">self</span>.dynamic_targets.push((patchloc, id))
+<a href=#416 id=416 data-nosnippet>416</a>    }
+<a href=#417 id=417 data-nosnippet>417</a>
+<a href=#418 id=418 data-nosnippet>418</a>    <span class="doccomment">/// Return an iterator through all defined relocations targeting global labels and the labels they target.
+<a href=#419 id=419 data-nosnippet>419</a>    /// These relocations are removed from the registry.
+<a href=#420 id=420 data-nosnippet>420</a>    </span><span class="kw">pub fn </span>take_statics&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, StaticLabel)&gt; + <span class="lifetime">'a </span>{
+<a href=#421 id=421 data-nosnippet>421</a>        <span class="self">self</span>.static_targets.drain(..)
+<a href=#422 id=422 data-nosnippet>422</a>    }
+<a href=#423 id=423 data-nosnippet>423</a>
+<a href=#424 id=424 data-nosnippet>424</a>    <span class="doccomment">/// Return an iterator through all defined relocations targeting dynamic labels and the labels they target.
+<a href=#425 id=425 data-nosnippet>425</a>    /// These relocations are removed from the registry.
+<a href=#426 id=426 data-nosnippet>426</a>    </span><span class="kw">pub fn </span>take_dynamics&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=(PatchLoc&lt;R&gt;, DynamicLabel)&gt; + <span class="lifetime">'a </span>{
+<a href=#427 id=427 data-nosnippet>427</a>        <span class="self">self</span>.dynamic_targets.drain(..)
+<a href=#428 id=428 data-nosnippet>428</a>    }
+<a href=#429 id=429 data-nosnippet>429</a>}
+<a href=#430 id=430 data-nosnippet>430</a>
+<a href=#431 id=431 data-nosnippet>431</a>
+<a href=#432 id=432 data-nosnippet>432</a><span class="doccomment">/// A registry of relocations that have been encoded previously, but need to be adjusted when the address of the buffer they
+<a href=#433 id=433 data-nosnippet>433</a>/// reside in changes.
+<a href=#434 id=434 data-nosnippet>434</a></span><span class="attr">#[derive(Debug, Default)]
+<a href=#435 id=435 data-nosnippet>435</a></span><span class="kw">pub struct </span>ManagedRelocs&lt;R: Relocation&gt; {
+<a href=#436 id=436 data-nosnippet>436</a>    managed: BTreeMap&lt;usize, PatchLoc&lt;R&gt;&gt;
+<a href=#437 id=437 data-nosnippet>437</a>}
+<a href=#438 id=438 data-nosnippet>438</a>
+<a href=#439 id=439 data-nosnippet>439</a><span class="kw">impl</span>&lt;R: Relocation&gt; ManagedRelocs&lt;R&gt; {
+<a href=#440 id=440 data-nosnippet>440</a>    <span class="doccomment">/// Create a new, empty managed relocation registry.
+<a href=#441 id=441 data-nosnippet>441</a>    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#442 id=442 data-nosnippet>442</a>        <span class="self">Self </span>{
+<a href=#443 id=443 data-nosnippet>443</a>            managed: BTreeMap::new()
+<a href=#444 id=444 data-nosnippet>444</a>        }
+<a href=#445 id=445 data-nosnippet>445</a>    }
+<a href=#446 id=446 data-nosnippet>446</a>
+<a href=#447 id=447 data-nosnippet>447</a>    <span class="doccomment">/// Add a relocation to this registry.
+<a href=#448 id=448 data-nosnippet>448</a>    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, patchloc: PatchLoc&lt;R&gt;) {
+<a href=#449 id=449 data-nosnippet>449</a>        <span class="self">self</span>.managed.insert(patchloc.location.<span class="number">0 </span>- patchloc.field_offset <span class="kw">as </span>usize, patchloc);
+<a href=#450 id=450 data-nosnippet>450</a>    }
+<a href=#451 id=451 data-nosnippet>451</a>
+<a href=#452 id=452 data-nosnippet>452</a>    <span class="doccomment">/// Take all items from another registry and add them to this registry
+<a href=#453 id=453 data-nosnippet>453</a>    </span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;mut </span>ManagedRelocs&lt;R&gt;) {
+<a href=#454 id=454 data-nosnippet>454</a>        <span class="self">self</span>.managed.append(<span class="kw-2">&amp;mut </span>other.managed);
+<a href=#455 id=455 data-nosnippet>455</a>    }
+<a href=#456 id=456 data-nosnippet>456</a>
+<a href=#457 id=457 data-nosnippet>457</a>    <span class="doccomment">/// Remove all managed relocations whose byte fields start in the range start .. end.
+<a href=#458 id=458 data-nosnippet>458</a>    /// This is useful when implementing an `Assembler::alter` API, as any managed relocations
+<a href=#459 id=459 data-nosnippet>459</a>    /// that were overwritten should be removed from the registry, otherwise the replacement code
+<a href=#460 id=460 data-nosnippet>460</a>    /// would be corrupted when managed relocations are updated.
+<a href=#461 id=461 data-nosnippet>461</a>    </span><span class="kw">pub fn </span>remove_between(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start: usize, end: usize) {
+<a href=#462 id=462 data-nosnippet>462</a>        <span class="kw">if </span>start == end {
+<a href=#463 id=463 data-nosnippet>463</a>            <span class="kw">return</span>;
+<a href=#464 id=464 data-nosnippet>464</a>        }
+<a href=#465 id=465 data-nosnippet>465</a>
+<a href=#466 id=466 data-nosnippet>466</a>        <span class="kw">let </span>keys: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self</span>.managed.range(start .. end).map(|(<span class="kw-2">&amp;</span>k, <span class="kw">_</span>)| k).collect();
+<a href=#467 id=467 data-nosnippet>467</a>        <span class="kw">for </span>k <span class="kw">in </span>keys {
+<a href=#468 id=468 data-nosnippet>468</a>            <span class="self">self</span>.managed.remove(<span class="kw-2">&amp;</span>k);
+<a href=#469 id=469 data-nosnippet>469</a>        }
+<a href=#470 id=470 data-nosnippet>470</a>    }
+<a href=#471 id=471 data-nosnippet>471</a>
+<a href=#472 id=472 data-nosnippet>472</a>    <span class="doccomment">/// Iterate through all defined managed relocations.
+<a href=#473 id=473 data-nosnippet>473</a>    </span><span class="kw">pub fn </span>iter&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item=<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PatchLoc&lt;R&gt;&gt; + <span class="lifetime">'a </span>{
+<a href=#474 id=474 data-nosnippet>474</a>        <span class="self">self</span>.managed.values()
+<a href=#475 id=475 data-nosnippet>475</a>    } 
+<a href=#476 id=476 data-nosnippet>476</a>}
+<a href=#477 id=477 data-nosnippet>477</a>
+<a href=#478 id=478 data-nosnippet>478</a>
+<a href=#479 id=479 data-nosnippet>479</a><span class="attr">#[derive(Clone, Debug)]
+<a href=#480 id=480 data-nosnippet>480</a></span><span class="kw">enum </span>LitPoolEntry {
+<a href=#481 id=481 data-nosnippet>481</a>    U8(u8),
+<a href=#482 id=482 data-nosnippet>482</a>    U16(u16),
+<a href=#483 id=483 data-nosnippet>483</a>    U32(u32),
+<a href=#484 id=484 data-nosnippet>484</a>    U64(u64),
+<a href=#485 id=485 data-nosnippet>485</a>    Dynamic(RelocationSize, DynamicLabel, bool),
+<a href=#486 id=486 data-nosnippet>486</a>    Global(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, bool),
+<a href=#487 id=487 data-nosnippet>487</a>    Forward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, bool),
+<a href=#488 id=488 data-nosnippet>488</a>    Backward(RelocationSize, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, bool),
+<a href=#489 id=489 data-nosnippet>489</a>    Absolute(RelocationSize, usize),
+<a href=#490 id=490 data-nosnippet>490</a>    Relative(RelocationSize, usize),
+<a href=#491 id=491 data-nosnippet>491</a>    Align(u8, usize),
+<a href=#492 id=492 data-nosnippet>492</a>}
+<a href=#493 id=493 data-nosnippet>493</a>
+<a href=#494 id=494 data-nosnippet>494</a><span class="doccomment">/// Literal pool implementation. One can programmatically push items in this literal pool and retrieve offsets to them in the pool.
+<a href=#495 id=495 data-nosnippet>495</a>/// Then later, the pool will be encoded into the instruction stream and items can be retrieved using the address of the literal pool.
+<a href=#496 id=496 data-nosnippet>496</a>/// and the previously emitted offsets. Values are always at least aligned to their size.
+<a href=#497 id=497 data-nosnippet>497</a></span><span class="attr">#[derive(Clone, Debug, Default)]
+<a href=#498 id=498 data-nosnippet>498</a></span><span class="kw">pub struct </span>LitPool {
+<a href=#499 id=499 data-nosnippet>499</a>    offset: usize,
+<a href=#500 id=500 data-nosnippet>500</a>    entries: Vec&lt;LitPoolEntry&gt;,
+<a href=#501 id=501 data-nosnippet>501</a>}
+<a href=#502 id=502 data-nosnippet>502</a>
+<a href=#503 id=503 data-nosnippet>503</a><span class="kw">impl </span>LitPool {
+<a href=#504 id=504 data-nosnippet>504</a>    <span class="doccomment">/// Create a new, empty literal pool
+<a href=#505 id=505 data-nosnippet>505</a>    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#506 id=506 data-nosnippet>506</a>        LitPool {
+<a href=#507 id=507 data-nosnippet>507</a>            offset: <span class="number">0</span>,
+<a href=#508 id=508 data-nosnippet>508</a>            entries: Vec::new(),
+<a href=#509 id=509 data-nosnippet>509</a>        }
+<a href=#510 id=510 data-nosnippet>510</a>    }
+<a href=#511 id=511 data-nosnippet>511</a>
+<a href=#512 id=512 data-nosnippet>512</a>    <span class="comment">// align the pool to the specified size, record the offset, and bump the offset
+<a href=#513 id=513 data-nosnippet>513</a>    </span><span class="kw">fn </span>bump_offset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: RelocationSize) -&gt; isize {
+<a href=#514 id=514 data-nosnippet>514</a>        <span class="comment">// Correct for alignment
+<a href=#515 id=515 data-nosnippet>515</a>        </span><span class="self">self</span>.align(size <span class="kw">as </span>usize, <span class="number">0</span>);
+<a href=#516 id=516 data-nosnippet>516</a>        <span class="kw">let </span>offset = <span class="self">self</span>.offset;
+<a href=#517 id=517 data-nosnippet>517</a>        <span class="self">self</span>.offset += size <span class="kw">as </span>usize;
+<a href=#518 id=518 data-nosnippet>518</a>        offset <span class="kw">as </span>isize
+<a href=#519 id=519 data-nosnippet>519</a>    }
+<a href=#520 id=520 data-nosnippet>520</a>
+<a href=#521 id=521 data-nosnippet>521</a>    <span class="doccomment">/// Add extra alignment for the next value in the literal pool
+<a href=#522 id=522 data-nosnippet>522</a>    </span><span class="kw">pub fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: usize, with: u8) {
+<a href=#523 id=523 data-nosnippet>523</a>        <span class="kw">let </span>misalign = <span class="self">self</span>.offset % size;
+<a href=#524 id=524 data-nosnippet>524</a>        <span class="kw">if </span>misalign == <span class="number">0 </span>{
+<a href=#525 id=525 data-nosnippet>525</a>            <span class="kw">return</span>;
+<a href=#526 id=526 data-nosnippet>526</a>        }
+<a href=#527 id=527 data-nosnippet>527</a>
+<a href=#528 id=528 data-nosnippet>528</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Align(with, size));
+<a href=#529 id=529 data-nosnippet>529</a>        <span class="self">self</span>.offset += size - misalign;
+<a href=#530 id=530 data-nosnippet>530</a>    }
+<a href=#531 id=531 data-nosnippet>531</a>
+<a href=#532 id=532 data-nosnippet>532</a>    <span class="doccomment">/// Encode `value` into the literal pool.
+<a href=#533 id=533 data-nosnippet>533</a>    </span><span class="kw">pub fn </span>push_u8(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; isize {
+<a href=#534 id=534 data-nosnippet>534</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::Byte);
+<a href=#535 id=535 data-nosnippet>535</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U8(value));
+<a href=#536 id=536 data-nosnippet>536</a>        offset
+<a href=#537 id=537 data-nosnippet>537</a>    }
+<a href=#538 id=538 data-nosnippet>538</a>
+<a href=#539 id=539 data-nosnippet>539</a>    <span class="doccomment">/// Encode `value` into the literal pool.
+<a href=#540 id=540 data-nosnippet>540</a>    </span><span class="kw">pub fn </span>push_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) -&gt; isize {
+<a href=#541 id=541 data-nosnippet>541</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::Word);
+<a href=#542 id=542 data-nosnippet>542</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U16(value));
+<a href=#543 id=543 data-nosnippet>543</a>        offset
+<a href=#544 id=544 data-nosnippet>544</a>    }
+<a href=#545 id=545 data-nosnippet>545</a>
+<a href=#546 id=546 data-nosnippet>546</a>    <span class="doccomment">/// Encode `value` into the literal pool.
+<a href=#547 id=547 data-nosnippet>547</a>    </span><span class="kw">pub fn </span>push_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) -&gt; isize {
+<a href=#548 id=548 data-nosnippet>548</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::DWord);
+<a href=#549 id=549 data-nosnippet>549</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U32(value));
+<a href=#550 id=550 data-nosnippet>550</a>        offset
+<a href=#551 id=551 data-nosnippet>551</a>    }
+<a href=#552 id=552 data-nosnippet>552</a>
+<a href=#553 id=553 data-nosnippet>553</a>    <span class="doccomment">/// Encode `value` into the literal pool.
+<a href=#554 id=554 data-nosnippet>554</a>    </span><span class="kw">pub fn </span>push_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) -&gt; isize {
+<a href=#555 id=555 data-nosnippet>555</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(RelocationSize::QWord);
+<a href=#556 id=556 data-nosnippet>556</a>        <span class="self">self</span>.entries.push(LitPoolEntry::U64(value));
+<a href=#557 id=557 data-nosnippet>557</a>        offset
+<a href=#558 id=558 data-nosnippet>558</a>    }
+<a href=#559 id=559 data-nosnippet>559</a>
+<a href=#560 id=560 data-nosnippet>560</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool
+<a href=#561 id=561 data-nosnippet>561</a>    /// if `relative` is true, the encoded value will be the difference between the target
+<a href=#562 id=562 data-nosnippet>562</a>    /// and the address of this relocation. Else, it will be the absolute address of the target.
+<a href=#563 id=563 data-nosnippet>563</a>    </span><span class="kw">pub fn </span>push_dynamic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel, size: RelocationSize, relative: bool) -&gt; isize {
 <a href=#564 id=564 data-nosnippet>564</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
-<a href=#565 id=565 data-nosnippet>565</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Global(size, name));
+<a href=#565 id=565 data-nosnippet>565</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Dynamic(size, id, relative));
 <a href=#566 id=566 data-nosnippet>566</a>        offset
 <a href=#567 id=567 data-nosnippet>567</a>    }
 <a href=#568 id=568 data-nosnippet>568</a>
-<a href=#569 id=569 data-nosnippet>569</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-<a href=#570 id=570 data-nosnippet>570</a>    </span><span class="kw">pub fn </span>push_forward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize) -&gt; isize {
-<a href=#571 id=571 data-nosnippet>571</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
-<a href=#572 id=572 data-nosnippet>572</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Forward(size, name));
-<a href=#573 id=573 data-nosnippet>573</a>        offset
-<a href=#574 id=574 data-nosnippet>574</a>    }
-<a href=#575 id=575 data-nosnippet>575</a>
-<a href=#576 id=576 data-nosnippet>576</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool (relative to the location in the pool)
-<a href=#577 id=577 data-nosnippet>577</a>    </span><span class="kw">pub fn </span>push_backward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize) -&gt; isize {
-<a href=#578 id=578 data-nosnippet>578</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
-<a href=#579 id=579 data-nosnippet>579</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Backward(size, name));
-<a href=#580 id=580 data-nosnippet>580</a>        offset
-<a href=#581 id=581 data-nosnippet>581</a>    }
-<a href=#582 id=582 data-nosnippet>582</a>
-<a href=#583 id=583 data-nosnippet>583</a>    <span class="kw">fn </span>pad_sized&lt;D: DynasmLabelApi&gt;(size: RelocationSize, assembler: <span class="kw-2">&amp;mut </span>D) {
-<a href=#584 id=584 data-nosnippet>584</a>        <span class="kw">match </span>size {
-<a href=#585 id=585 data-nosnippet>585</a>            RelocationSize::Byte =&gt; assembler.push(<span class="number">0</span>),
-<a href=#586 id=586 data-nosnippet>586</a>            RelocationSize::Word =&gt; assembler.push_u16(<span class="number">0</span>),
-<a href=#587 id=587 data-nosnippet>587</a>            RelocationSize::DWord =&gt; assembler.push_u32(<span class="number">0</span>),
-<a href=#588 id=588 data-nosnippet>588</a>            RelocationSize::QWord =&gt; assembler.push_u64(<span class="number">0</span>),
-<a href=#589 id=589 data-nosnippet>589</a>        }
-<a href=#590 id=590 data-nosnippet>590</a>    }
-<a href=#591 id=591 data-nosnippet>591</a>
-<a href=#592 id=592 data-nosnippet>592</a>    <span class="doccomment">/// Emit this literal pool into the specified assembler
-<a href=#593 id=593 data-nosnippet>593</a>    </span><span class="kw">pub fn </span>emit&lt;D: DynasmLabelApi&gt;(<span class="self">self</span>, assembler: <span class="kw-2">&amp;mut </span>D) {
-<a href=#594 id=594 data-nosnippet>594</a>        <span class="kw">for </span>entry <span class="kw">in </span><span class="self">self</span>.entries {
-<a href=#595 id=595 data-nosnippet>595</a>            <span class="kw">match </span>entry {
-<a href=#596 id=596 data-nosnippet>596</a>                LitPoolEntry::U8(value) =&gt; assembler.push(value),
-<a href=#597 id=597 data-nosnippet>597</a>                LitPoolEntry::U16(value) =&gt; assembler.push_u16(value),
-<a href=#598 id=598 data-nosnippet>598</a>                LitPoolEntry::U32(value) =&gt; assembler.push_u32(value),
-<a href=#599 id=599 data-nosnippet>599</a>                LitPoolEntry::U64(value) =&gt; assembler.push_u64(value),
-<a href=#600 id=600 data-nosnippet>600</a>                LitPoolEntry::Dynamic(size, id) =&gt; {
-<a href=#601 id=601 data-nosnippet>601</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
-<a href=#602 id=602 data-nosnippet>602</a>                    assembler.dynamic_relocation(id, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(size));
-<a href=#603 id=603 data-nosnippet>603</a>                },
-<a href=#604 id=604 data-nosnippet>604</a>                LitPoolEntry::Global(size, name) =&gt; {
-<a href=#605 id=605 data-nosnippet>605</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
-<a href=#606 id=606 data-nosnippet>606</a>                    assembler.global_relocation(name, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(size));
-<a href=#607 id=607 data-nosnippet>607</a>                },
-<a href=#608 id=608 data-nosnippet>608</a>                LitPoolEntry::Forward(size, name) =&gt; {
-<a href=#609 id=609 data-nosnippet>609</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
-<a href=#610 id=610 data-nosnippet>610</a>                    assembler.forward_relocation(name, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(size));
-<a href=#611 id=611 data-nosnippet>611</a>                },
-<a href=#612 id=612 data-nosnippet>612</a>                LitPoolEntry::Backward(size, name) =&gt; {
-<a href=#613 id=613 data-nosnippet>613</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
-<a href=#614 id=614 data-nosnippet>614</a>                    assembler.backward_relocation(name, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(size));
-<a href=#615 id=615 data-nosnippet>615</a>                },
-<a href=#616 id=616 data-nosnippet>616</a>                LitPoolEntry::Align(with, alignment) =&gt; assembler.align(alignment, with),
-<a href=#617 id=617 data-nosnippet>617</a>            }
-<a href=#618 id=618 data-nosnippet>618</a>        }
-<a href=#619 id=619 data-nosnippet>619</a>    }
-<a href=#620 id=620 data-nosnippet>620</a>}
-<a href=#621 id=621 data-nosnippet>621</a>
-<a href=#622 id=622 data-nosnippet>622</a><span class="attr">#[cfg(test)]
-<a href=#623 id=623 data-nosnippet>623</a></span><span class="kw">mod </span>tests {
-<a href=#624 id=624 data-nosnippet>624</a>    <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-<a href=#625 id=625 data-nosnippet>625</a>    <span class="kw">use </span>relocations::RelocationSize;
-<a href=#626 id=626 data-nosnippet>626</a>
-<a href=#627 id=627 data-nosnippet>627</a>    <span class="attr">#[test]
-<a href=#628 id=628 data-nosnippet>628</a>    </span><span class="kw">fn </span>test_litpool_size() {
-<a href=#629 id=629 data-nosnippet>629</a>        test_litpool::&lt;RelocationSize&gt;();
-<a href=#630 id=630 data-nosnippet>630</a>    }
-<a href=#631 id=631 data-nosnippet>631</a>
-<a href=#632 id=632 data-nosnippet>632</a>    <span class="attr">#[test]
-<a href=#633 id=633 data-nosnippet>633</a>    </span><span class="kw">fn </span>test_litpool_x64() {
-<a href=#634 id=634 data-nosnippet>634</a>        test_litpool::&lt;x64::X64Relocation&gt;();
-<a href=#635 id=635 data-nosnippet>635</a>    }
-<a href=#636 id=636 data-nosnippet>636</a>
-<a href=#637 id=637 data-nosnippet>637</a>    <span class="attr">#[test]
-<a href=#638 id=638 data-nosnippet>638</a>    </span><span class="kw">fn </span>test_litpool_x86() {
-<a href=#639 id=639 data-nosnippet>639</a>        test_litpool::&lt;x86::X86Relocation&gt;();
-<a href=#640 id=640 data-nosnippet>640</a>    }
-<a href=#641 id=641 data-nosnippet>641</a>
-<a href=#642 id=642 data-nosnippet>642</a>    <span class="attr">#[test]
-<a href=#643 id=643 data-nosnippet>643</a>    </span><span class="kw">fn </span>test_litpool_aarch64() {
-<a href=#644 id=644 data-nosnippet>644</a>        test_litpool::&lt;aarch64::Aarch64Relocation&gt;();
-<a href=#645 id=645 data-nosnippet>645</a>    }
-<a href=#646 id=646 data-nosnippet>646</a>
-<a href=#647 id=647 data-nosnippet>647</a>    <span class="kw">fn </span>test_litpool&lt;R: Relocation + Debug&gt;() {
-<a href=#648 id=648 data-nosnippet>648</a>        <span class="kw">let </span><span class="kw-2">mut </span>ops = Assembler::&lt;R&gt;::new().unwrap();
-<a href=#649 id=649 data-nosnippet>649</a>        <span class="kw">let </span>dynamic1 = ops.new_dynamic_label();
-<a href=#650 id=650 data-nosnippet>650</a>
-<a href=#651 id=651 data-nosnippet>651</a>        <span class="kw">let </span><span class="kw-2">mut </span>pool = components::LitPool::new();
-<a href=#652 id=652 data-nosnippet>652</a>
-<a href=#653 id=653 data-nosnippet>653</a>        ops.local_label(<span class="string">"backward1"</span>);
-<a href=#654 id=654 data-nosnippet>654</a>
-<a href=#655 id=655 data-nosnippet>655</a>        <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x12</span>), <span class="number">0</span>);
-<a href=#656 id=656 data-nosnippet>656</a>        <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x34</span>), <span class="number">1</span>);
-<a href=#657 id=657 data-nosnippet>657</a>        <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x56</span>), <span class="number">2</span>);
-<a href=#658 id=658 data-nosnippet>658</a>
-<a href=#659 id=659 data-nosnippet>659</a>        <span class="macro">assert_eq!</span>(pool.push_u16(<span class="number">0x789A</span>), <span class="number">4</span>);
-<a href=#660 id=660 data-nosnippet>660</a>
-<a href=#661 id=661 data-nosnippet>661</a>        <span class="macro">assert_eq!</span>(pool.push_u32(<span class="number">0xBCDE_F012</span>), <span class="number">8</span>);
-<a href=#662 id=662 data-nosnippet>662</a>
-<a href=#663 id=663 data-nosnippet>663</a>        <span class="macro">assert_eq!</span>(pool.push_u64(<span class="number">0x3456_789A_BCDE_F012</span>), <span class="number">16</span>);
-<a href=#664 id=664 data-nosnippet>664</a>
-<a href=#665 id=665 data-nosnippet>665</a>        <span class="macro">assert_eq!</span>(pool.push_forward(<span class="string">"forward1"</span>, RelocationSize::Byte), <span class="number">24</span>);
-<a href=#666 id=666 data-nosnippet>666</a>
-<a href=#667 id=667 data-nosnippet>667</a>        pool.align(<span class="number">4</span>, <span class="number">0xCC</span>);
+<a href=#569 id=569 data-nosnippet>569</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool
+<a href=#570 id=570 data-nosnippet>570</a>    /// if `relative` is true, the encoded value will be the difference between the target
+<a href=#571 id=571 data-nosnippet>571</a>    /// and the address of this relocation. Else, it will be the absolute address of the target.
+<a href=#572 id=572 data-nosnippet>572</a>    </span><span class="kw">pub fn </span>push_global(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize, relative: bool) -&gt; isize {
+<a href=#573 id=573 data-nosnippet>573</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
+<a href=#574 id=574 data-nosnippet>574</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Global(size, name, relative));
+<a href=#575 id=575 data-nosnippet>575</a>        offset
+<a href=#576 id=576 data-nosnippet>576</a>    }
+<a href=#577 id=577 data-nosnippet>577</a>
+<a href=#578 id=578 data-nosnippet>578</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool
+<a href=#579 id=579 data-nosnippet>579</a>    /// if `relative` is true, the encoded value will be the difference between the target
+<a href=#580 id=580 data-nosnippet>580</a>    /// and the address of this relocation. Else, it will be the absolute address of the target.
+<a href=#581 id=581 data-nosnippet>581</a>    </span><span class="kw">pub fn </span>push_forward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize, relative: bool) -&gt; isize {
+<a href=#582 id=582 data-nosnippet>582</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
+<a href=#583 id=583 data-nosnippet>583</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Forward(size, name, relative));
+<a href=#584 id=584 data-nosnippet>584</a>        offset
+<a href=#585 id=585 data-nosnippet>585</a>    }
+<a href=#586 id=586 data-nosnippet>586</a>
+<a href=#587 id=587 data-nosnippet>587</a>    <span class="doccomment">/// Encode the relative address of a label into the literal pool
+<a href=#588 id=588 data-nosnippet>588</a>    /// if `relative` is true, the encoded value will be the difference between the target
+<a href=#589 id=589 data-nosnippet>589</a>    /// and the address of this relocation. Else, it will be the absolute address of the target.
+<a href=#590 id=590 data-nosnippet>590</a>    </span><span class="kw">pub fn </span>push_backward(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, size: RelocationSize, relative: bool) -&gt; isize {
+<a href=#591 id=591 data-nosnippet>591</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
+<a href=#592 id=592 data-nosnippet>592</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Backward(size, name, relative));
+<a href=#593 id=593 data-nosnippet>593</a>        offset
+<a href=#594 id=594 data-nosnippet>594</a>    }
+<a href=#595 id=595 data-nosnippet>595</a>
+<a href=#596 id=596 data-nosnippet>596</a>    <span class="doccomment">/// Encode a relative offset of an absolute address into the literal pool.
+<a href=#597 id=597 data-nosnippet>597</a>    </span><span class="kw">pub fn </span>push_absolute_as_relative(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, size: RelocationSize) -&gt; isize {
+<a href=#598 id=598 data-nosnippet>598</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
+<a href=#599 id=599 data-nosnippet>599</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Absolute(size, target));
+<a href=#600 id=600 data-nosnippet>600</a>        offset
+<a href=#601 id=601 data-nosnippet>601</a>    }
+<a href=#602 id=602 data-nosnippet>602</a>
+<a href=#603 id=603 data-nosnippet>603</a>    <span class="doccomment">/// Encode the absolute address of a relative offset into the literal pool.
+<a href=#604 id=604 data-nosnippet>604</a>    /// Note: `offset` is an usize, to use a negative offset the value can simply be wrapped.
+<a href=#605 id=605 data-nosnippet>605</a>    </span><span class="kw">pub fn </span>push_relative_as_absolute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, size: RelocationSize) -&gt; isize {
+<a href=#606 id=606 data-nosnippet>606</a>        <span class="kw">let </span>offset = <span class="self">self</span>.bump_offset(size);
+<a href=#607 id=607 data-nosnippet>607</a>        <span class="self">self</span>.entries.push(LitPoolEntry::Relative(size, target));
+<a href=#608 id=608 data-nosnippet>608</a>        offset
+<a href=#609 id=609 data-nosnippet>609</a>    }
+<a href=#610 id=610 data-nosnippet>610</a>
+<a href=#611 id=611 data-nosnippet>611</a>    <span class="kw">fn </span>pad_sized&lt;D: DynasmLabelApi&gt;(size: RelocationSize, assembler: <span class="kw-2">&amp;mut </span>D) {
+<a href=#612 id=612 data-nosnippet>612</a>        <span class="kw">match </span>size {
+<a href=#613 id=613 data-nosnippet>613</a>            RelocationSize::Byte =&gt; assembler.push(<span class="number">0</span>),
+<a href=#614 id=614 data-nosnippet>614</a>            RelocationSize::Word =&gt; assembler.push_u16(<span class="number">0</span>),
+<a href=#615 id=615 data-nosnippet>615</a>            RelocationSize::DWord =&gt; assembler.push_u32(<span class="number">0</span>),
+<a href=#616 id=616 data-nosnippet>616</a>            RelocationSize::QWord =&gt; assembler.push_u64(<span class="number">0</span>),
+<a href=#617 id=617 data-nosnippet>617</a>        }
+<a href=#618 id=618 data-nosnippet>618</a>    }
+<a href=#619 id=619 data-nosnippet>619</a>
+<a href=#620 id=620 data-nosnippet>620</a>    <span class="doccomment">/// Emit this literal pool into the specified assembler
+<a href=#621 id=621 data-nosnippet>621</a>    </span><span class="kw">pub fn </span>emit&lt;D: DynasmLabelApi&gt;(<span class="self">self</span>, assembler: <span class="kw-2">&amp;mut </span>D) {
+<a href=#622 id=622 data-nosnippet>622</a>        <span class="kw">for </span>entry <span class="kw">in </span><span class="self">self</span>.entries {
+<a href=#623 id=623 data-nosnippet>623</a>            <span class="kw">match </span>entry {
+<a href=#624 id=624 data-nosnippet>624</a>                LitPoolEntry::U8(value) =&gt; assembler.push(value),
+<a href=#625 id=625 data-nosnippet>625</a>                LitPoolEntry::U16(value) =&gt; assembler.push_u16(value),
+<a href=#626 id=626 data-nosnippet>626</a>                LitPoolEntry::U32(value) =&gt; assembler.push_u32(value),
+<a href=#627 id=627 data-nosnippet>627</a>                LitPoolEntry::U64(value) =&gt; assembler.push_u64(value),
+<a href=#628 id=628 data-nosnippet>628</a>                LitPoolEntry::Dynamic(size, id, relative) =&gt; {
+<a href=#629 id=629 data-nosnippet>629</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
+<a href=#630 id=630 data-nosnippet>630</a>                    <span class="kw">let </span>kind = <span class="kw">if </span>relative { RelocationKind::Relative } <span class="kw">else </span>{ RelocationKind::AbsToRel };
+<a href=#631 id=631 data-nosnippet>631</a>                    assembler.dynamic_relocation(id, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(kind, size));
+<a href=#632 id=632 data-nosnippet>632</a>                },
+<a href=#633 id=633 data-nosnippet>633</a>                LitPoolEntry::Global(size, name, relative) =&gt; {
+<a href=#634 id=634 data-nosnippet>634</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
+<a href=#635 id=635 data-nosnippet>635</a>                    <span class="kw">let </span>kind = <span class="kw">if </span>relative { RelocationKind::Relative } <span class="kw">else </span>{ RelocationKind::AbsToRel };
+<a href=#636 id=636 data-nosnippet>636</a>                    assembler.global_relocation(name, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(kind, size));
+<a href=#637 id=637 data-nosnippet>637</a>                },
+<a href=#638 id=638 data-nosnippet>638</a>                LitPoolEntry::Forward(size, name, relative) =&gt; {
+<a href=#639 id=639 data-nosnippet>639</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
+<a href=#640 id=640 data-nosnippet>640</a>                    <span class="kw">let </span>kind = <span class="kw">if </span>relative { RelocationKind::Relative } <span class="kw">else </span>{ RelocationKind::AbsToRel };
+<a href=#641 id=641 data-nosnippet>641</a>                    assembler.forward_relocation(name, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(kind, size));
+<a href=#642 id=642 data-nosnippet>642</a>                },
+<a href=#643 id=643 data-nosnippet>643</a>                LitPoolEntry::Backward(size, name, relative) =&gt; {
+<a href=#644 id=644 data-nosnippet>644</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
+<a href=#645 id=645 data-nosnippet>645</a>                    <span class="kw">let </span>kind = <span class="kw">if </span>relative { RelocationKind::Relative } <span class="kw">else </span>{ RelocationKind::AbsToRel };
+<a href=#646 id=646 data-nosnippet>646</a>                    assembler.backward_relocation(name, <span class="number">0</span>, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(kind, size));
+<a href=#647 id=647 data-nosnippet>647</a>                },
+<a href=#648 id=648 data-nosnippet>648</a>                LitPoolEntry::Absolute(size, target) =&gt; {
+<a href=#649 id=649 data-nosnippet>649</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
+<a href=#650 id=650 data-nosnippet>650</a>                    <span class="kw">let </span>kind = RelocationKind::RelToAbs;
+<a href=#651 id=651 data-nosnippet>651</a>                    assembler.value_relocation(target, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(kind, size));
+<a href=#652 id=652 data-nosnippet>652</a>                },
+<a href=#653 id=653 data-nosnippet>653</a>                LitPoolEntry::Relative(size, target) =&gt; {
+<a href=#654 id=654 data-nosnippet>654</a>                    <span class="self">Self</span>::pad_sized(size, assembler);
+<a href=#655 id=655 data-nosnippet>655</a>                    <span class="kw">let </span>kind = RelocationKind::AbsToRel;
+<a href=#656 id=656 data-nosnippet>656</a>                    assembler.value_relocation(target, size <span class="kw">as </span>u8, size <span class="kw">as </span>u8, D::Relocation::from_size(kind, size));
+<a href=#657 id=657 data-nosnippet>657</a>                },
+<a href=#658 id=658 data-nosnippet>658</a>                LitPoolEntry::Align(with, alignment) =&gt; assembler.align(alignment, with),
+<a href=#659 id=659 data-nosnippet>659</a>            }
+<a href=#660 id=660 data-nosnippet>660</a>        }
+<a href=#661 id=661 data-nosnippet>661</a>    }
+<a href=#662 id=662 data-nosnippet>662</a>}
+<a href=#663 id=663 data-nosnippet>663</a>
+<a href=#664 id=664 data-nosnippet>664</a><span class="attr">#[cfg(test)]
+<a href=#665 id=665 data-nosnippet>665</a></span><span class="kw">mod </span>tests {
+<a href=#666 id=666 data-nosnippet>666</a>    <span class="kw">use crate</span>::<span class="kw-2">*</span>;
+<a href=#667 id=667 data-nosnippet>667</a>    <span class="kw">use </span>relocations::{SimpleRelocation, RelocationSize};
 <a href=#668 id=668 data-nosnippet>668</a>
-<a href=#669 id=669 data-nosnippet>669</a>        <span class="macro">assert_eq!</span>(pool.push_global(<span class="string">"global1"</span>, RelocationSize::Word), <span class="number">28</span>);
-<a href=#670 id=670 data-nosnippet>670</a>
-<a href=#671 id=671 data-nosnippet>671</a>        <span class="macro">assert_eq!</span>(pool.push_dynamic(dynamic1, RelocationSize::DWord), <span class="number">32</span>);
-<a href=#672 id=672 data-nosnippet>672</a>
-<a href=#673 id=673 data-nosnippet>673</a>        <span class="macro">assert_eq!</span>(pool.push_backward(<span class="string">"backward1"</span>, RelocationSize::QWord), <span class="number">40</span>);
-<a href=#674 id=674 data-nosnippet>674</a>
-<a href=#675 id=675 data-nosnippet>675</a>        pool.emit(<span class="kw-2">&amp;mut </span>ops);
-<a href=#676 id=676 data-nosnippet>676</a>
-<a href=#677 id=677 data-nosnippet>677</a>        <span class="macro">assert_eq!</span>(ops.offset().<span class="number">0</span>, <span class="number">48</span>);
+<a href=#669 id=669 data-nosnippet>669</a>    <span class="attr">#[test]
+<a href=#670 id=670 data-nosnippet>670</a>    </span><span class="kw">fn </span>test_litpool_simple() {
+<a href=#671 id=671 data-nosnippet>671</a>        test_litpool::&lt;SimpleRelocation&gt;();
+<a href=#672 id=672 data-nosnippet>672</a>    }
+<a href=#673 id=673 data-nosnippet>673</a>
+<a href=#674 id=674 data-nosnippet>674</a>    <span class="attr">#[test]
+<a href=#675 id=675 data-nosnippet>675</a>    </span><span class="kw">fn </span>test_litpool_x64() {
+<a href=#676 id=676 data-nosnippet>676</a>        test_litpool::&lt;x64::X64Relocation&gt;();
+<a href=#677 id=677 data-nosnippet>677</a>    }
 <a href=#678 id=678 data-nosnippet>678</a>
-<a href=#679 id=679 data-nosnippet>679</a>        ops.local_label(<span class="string">"forward1"</span>);
-<a href=#680 id=680 data-nosnippet>680</a>        ops.global_label(<span class="string">"global1"</span>);
-<a href=#681 id=681 data-nosnippet>681</a>        ops.dynamic_label(dynamic1);
-<a href=#682 id=682 data-nosnippet>682</a>
-<a href=#683 id=683 data-nosnippet>683</a>        <span class="macro">assert_eq!</span>(ops.commit(), <span class="prelude-val">Ok</span>(()));
-<a href=#684 id=684 data-nosnippet>684</a>        <span class="kw">let </span>buf = ops.finalize().unwrap();
-<a href=#685 id=685 data-nosnippet>685</a>
-<a href=#686 id=686 data-nosnippet>686</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>buf, <span class="kw-2">&amp;</span>[
-<a href=#687 id=687 data-nosnippet>687</a>            <span class="number">0x12</span>, <span class="number">0x34</span>, <span class="number">0x56</span>, <span class="number">0x00</span>, <span class="number">0x9A</span>, <span class="number">0x78</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
-<a href=#688 id=688 data-nosnippet>688</a>            <span class="number">0x12</span>, <span class="number">0xF0</span>, <span class="number">0xDE</span>, <span class="number">0xBC</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
-<a href=#689 id=689 data-nosnippet>689</a>            <span class="number">0x12</span>, <span class="number">0xF0</span>, <span class="number">0xDE</span>, <span class="number">0xBC</span>, <span class="number">0x9A</span>, <span class="number">0x78</span>, <span class="number">0x56</span>, <span class="number">0x34</span>,
-<a href=#690 id=690 data-nosnippet>690</a>            <span class="number">24  </span>, <span class="number">0xCC</span>, <span class="number">0xCC</span>, <span class="number">0xCC</span>, <span class="number">20  </span>, <span class="number">0   </span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
-<a href=#691 id=691 data-nosnippet>691</a>            <span class="number">16  </span>, <span class="number">0   </span>, <span class="number">0   </span>, <span class="number">0   </span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
-<a href=#692 id=692 data-nosnippet>692</a>            <span class="number">0xD8</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFFu8</span>, 
-<a href=#693 id=693 data-nosnippet>693</a>        ] <span class="kw">as </span><span class="kw-2">&amp;</span>[u8]);
-<a href=#694 id=694 data-nosnippet>694</a>    }
-<a href=#695 id=695 data-nosnippet>695</a>}</code></pre></div></section></main></body></html>
+<a href=#679 id=679 data-nosnippet>679</a>    <span class="attr">#[test]
+<a href=#680 id=680 data-nosnippet>680</a>    </span><span class="kw">fn </span>test_litpool_x86() {
+<a href=#681 id=681 data-nosnippet>681</a>        test_litpool::&lt;x86::X86Relocation&gt;();
+<a href=#682 id=682 data-nosnippet>682</a>    }
+<a href=#683 id=683 data-nosnippet>683</a>
+<a href=#684 id=684 data-nosnippet>684</a>    <span class="attr">#[test]
+<a href=#685 id=685 data-nosnippet>685</a>    </span><span class="kw">fn </span>test_litpool_aarch64() {
+<a href=#686 id=686 data-nosnippet>686</a>        test_litpool::&lt;aarch64::Aarch64Relocation&gt;();
+<a href=#687 id=687 data-nosnippet>687</a>    }
+<a href=#688 id=688 data-nosnippet>688</a>
+<a href=#689 id=689 data-nosnippet>689</a>    <span class="kw">fn </span>test_litpool&lt;R: Relocation + Debug&gt;() {
+<a href=#690 id=690 data-nosnippet>690</a>        <span class="kw">let </span><span class="kw-2">mut </span>ops = Assembler::&lt;R&gt;::new().unwrap();
+<a href=#691 id=691 data-nosnippet>691</a>        <span class="kw">let </span>dynamic1 = ops.new_dynamic_label();
+<a href=#692 id=692 data-nosnippet>692</a>
+<a href=#693 id=693 data-nosnippet>693</a>        <span class="kw">let </span><span class="kw-2">mut </span>pool = components::LitPool::new();
+<a href=#694 id=694 data-nosnippet>694</a>
+<a href=#695 id=695 data-nosnippet>695</a>        ops.local_label(<span class="string">"backward1"</span>);
+<a href=#696 id=696 data-nosnippet>696</a>
+<a href=#697 id=697 data-nosnippet>697</a>        <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x12</span>), <span class="number">0</span>);
+<a href=#698 id=698 data-nosnippet>698</a>        <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x34</span>), <span class="number">1</span>);
+<a href=#699 id=699 data-nosnippet>699</a>        <span class="macro">assert_eq!</span>(pool.push_u8(<span class="number">0x56</span>), <span class="number">2</span>);
+<a href=#700 id=700 data-nosnippet>700</a>
+<a href=#701 id=701 data-nosnippet>701</a>        <span class="macro">assert_eq!</span>(pool.push_u16(<span class="number">0x789A</span>), <span class="number">4</span>);
+<a href=#702 id=702 data-nosnippet>702</a>
+<a href=#703 id=703 data-nosnippet>703</a>        <span class="macro">assert_eq!</span>(pool.push_u32(<span class="number">0xBCDE_F012</span>), <span class="number">8</span>);
+<a href=#704 id=704 data-nosnippet>704</a>
+<a href=#705 id=705 data-nosnippet>705</a>        <span class="macro">assert_eq!</span>(pool.push_u64(<span class="number">0x3456_789A_BCDE_F012</span>), <span class="number">16</span>);
+<a href=#706 id=706 data-nosnippet>706</a>
+<a href=#707 id=707 data-nosnippet>707</a>        <span class="macro">assert_eq!</span>(pool.push_forward(<span class="string">"forward1"</span>, RelocationSize::Byte, <span class="bool-val">true</span>), <span class="number">24</span>);
+<a href=#708 id=708 data-nosnippet>708</a>
+<a href=#709 id=709 data-nosnippet>709</a>        pool.align(<span class="number">4</span>, <span class="number">0xCC</span>);
+<a href=#710 id=710 data-nosnippet>710</a>
+<a href=#711 id=711 data-nosnippet>711</a>        <span class="macro">assert_eq!</span>(pool.push_global(<span class="string">"global1"</span>, RelocationSize::Word, <span class="bool-val">true</span>), <span class="number">28</span>);
+<a href=#712 id=712 data-nosnippet>712</a>
+<a href=#713 id=713 data-nosnippet>713</a>        <span class="macro">assert_eq!</span>(pool.push_dynamic(dynamic1, RelocationSize::DWord, <span class="bool-val">true</span>), <span class="number">32</span>);
+<a href=#714 id=714 data-nosnippet>714</a>
+<a href=#715 id=715 data-nosnippet>715</a>        <span class="macro">assert_eq!</span>(pool.push_backward(<span class="string">"backward1"</span>, RelocationSize::QWord, <span class="bool-val">true</span>), <span class="number">40</span>);
+<a href=#716 id=716 data-nosnippet>716</a>
+<a href=#717 id=717 data-nosnippet>717</a>        pool.emit(<span class="kw-2">&amp;mut </span>ops);
+<a href=#718 id=718 data-nosnippet>718</a>
+<a href=#719 id=719 data-nosnippet>719</a>        <span class="macro">assert_eq!</span>(ops.offset().<span class="number">0</span>, <span class="number">48</span>);
+<a href=#720 id=720 data-nosnippet>720</a>
+<a href=#721 id=721 data-nosnippet>721</a>        ops.local_label(<span class="string">"forward1"</span>);
+<a href=#722 id=722 data-nosnippet>722</a>        ops.global_label(<span class="string">"global1"</span>);
+<a href=#723 id=723 data-nosnippet>723</a>        ops.dynamic_label(dynamic1);
+<a href=#724 id=724 data-nosnippet>724</a>
+<a href=#725 id=725 data-nosnippet>725</a>        <span class="macro">assert_eq!</span>(ops.commit(), <span class="prelude-val">Ok</span>(()));
+<a href=#726 id=726 data-nosnippet>726</a>        <span class="kw">let </span>buf = ops.finalize().unwrap();
+<a href=#727 id=727 data-nosnippet>727</a>
+<a href=#728 id=728 data-nosnippet>728</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>buf, <span class="kw-2">&amp;</span>[
+<a href=#729 id=729 data-nosnippet>729</a>            <span class="number">0x12</span>, <span class="number">0x34</span>, <span class="number">0x56</span>, <span class="number">0x00</span>, <span class="number">0x9A</span>, <span class="number">0x78</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
+<a href=#730 id=730 data-nosnippet>730</a>            <span class="number">0x12</span>, <span class="number">0xF0</span>, <span class="number">0xDE</span>, <span class="number">0xBC</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
+<a href=#731 id=731 data-nosnippet>731</a>            <span class="number">0x12</span>, <span class="number">0xF0</span>, <span class="number">0xDE</span>, <span class="number">0xBC</span>, <span class="number">0x9A</span>, <span class="number">0x78</span>, <span class="number">0x56</span>, <span class="number">0x34</span>,
+<a href=#732 id=732 data-nosnippet>732</a>            <span class="number">24  </span>, <span class="number">0xCC</span>, <span class="number">0xCC</span>, <span class="number">0xCC</span>, <span class="number">20  </span>, <span class="number">0   </span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
+<a href=#733 id=733 data-nosnippet>733</a>            <span class="number">16  </span>, <span class="number">0   </span>, <span class="number">0   </span>, <span class="number">0   </span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
+<a href=#734 id=734 data-nosnippet>734</a>            <span class="number">0xD8</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFFu8</span>, 
+<a href=#735 id=735 data-nosnippet>735</a>        ] <span class="kw">as </span><span class="kw-2">&amp;</span>[u8]);
+<a href=#736 id=736 data-nosnippet>736</a>    }
+<a href=#737 id=737 data-nosnippet>737</a>}
+</code></pre></div></section></main></body></html>

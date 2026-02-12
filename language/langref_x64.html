@@ -43,6 +43,9 @@
         <a href="./tutorial.html">Tutorial</a>
       </li>
       <li>
+        <a href="./dynamic_assembly.html">Dynamic Assembly Basics</a>
+      </li>
+      <li>
         <a href="./langref_common.html">Language</a>
       </li>
       <li>
@@ -171,6 +174,21 @@ Note the <code>reg_number</code> can be of an arbitrary type that implements <co
 </tbody></table>
 </div><h4 id="immediates"><a class="doc-anchor" href="#immediates">§</a>Immediates</h4>
 <p>Any operand which does not match the previously discussed forms will be interpreted as an immediate argument. This operand will be evaluated as an expression at runtime and the resulting value will be encoded. The size of the encoded value can be determined by a size prefix. If such a a prefix is not given, dynasm-rs will try to infer it from the value of the immediate, but this is only possible if the immediate is a simple constant. As this might change in the future, you should use explicit size overrides if the encoded displacement size matters.</p>
+<h2 id="special-instructions"><a class="doc-anchor" href="#special-instructions">§</a>Special instructions</h2><h3 id="64-bit-immediate-mov"><a class="doc-anchor" href="#64-bit-immediate-mov">§</a>64-bit immediate mov</h3>
+<p>There is a single instruction in the <code>x64</code> instruction set capable of loading a full 64-bit value or address in a single instruction. This is <code>mov reg, imm64</code>. To support the large <code>x64</code> code model with more than 2GB of code space, dynasm-rs also supports using label references in this instruction like <code>mov reg, -&gt;label</code>, allowing anywhere in the x64 address space to be called with this instruction with a simple instruction sequence:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code>mov reg, -&gt;label
+call reg</code></pre></div>
+<p>Note that in <code>x86</code> mode this instruction is not needed as full-size 32-bit values can be loaded with <code>mov reg, imm32</code> by default, and 32-bit addresses can be loaded using <code>lea reg, [-&gt;label]</code>.</p>
+<h3 id="64-bit-displacement-movabs"><a class="doc-anchor" href="#64-bit-displacement-movabs">§</a>64-bit displacement movabs</h3>
+<p>The <code>x64</code> instruction set defines another <code>mov</code> variant that allows values to be loaded and stored to a 64-bit absolute address. As this functionality is irregular with the rest of the instruction set, dynasm-rs uses the <code>movabs</code> (move absolute address) mnemonic for this functionality, similar to intel-style disassemblers. This instruction can be used in the following formats:</p>
+<ul>
+<li><code>movabs reg, addr</code> will load from <code>[addr]</code> to <code>reg</code>. I.e. <code>movabs rax, 0x1234</code> will load the value that is stored at address <code>0x1234</code> and store it to <code>rax</code></li>
+<li><code>movabs addr, reg</code> will store from <code>reg</code> to <code>[addr]</code>. I.e. <code>movabs 0x1234, rax</code> will store the value in <code>reg</code> to the memory at address  <code>0x1234</code></li>
+</ul>
+<p><code>reg</code> in this case can only be <code>rax</code>, <code>eax</code>, <code>ax</code>, or <code>al</code>, depending on the size of the value being loaded/stored. <code>addr</code> can also be a label (i.e. <code>-&gt;label</code>), in which case the instruction can be used to load/store to the memory located at this label.</p>
+<p>This instruction is not present in x86 mode, as normal static 32-bit displacement addressing modes can be used to address the full memory space with any instruction that supports memory references.</p>
+<p>A note here is necessary on a crucial difference between Intel and AT&amp;T style syntax. Due to historical reasons, AT&amp;T style x64 assembly also has a <code>movabs</code> mnemonic, but this one is used for the 64-bit immediate variant discussed in the previous section, and it just uses the <code>mov</code> mnemonic for the 64-bit displacement variant. Meanwhile Intel/NASM style syntax uses the <code>movabs</code> mnemonic for the 64-bit displacement variant as shown in this section, and the <code>mov</code> mnemonic for the 64-bit immediate variant.</p>
 
     </section>
 <script type="text/javascript">

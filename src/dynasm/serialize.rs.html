@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\serialize.rs`."><title>serialize.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm/</div>serialize.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>syn::parse;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plugin\src\serialize.rs`."><title>serialize.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasm/</div>serialize.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>syn::parse;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>syn::spanned::Spanned;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>proc_macro2::{Span, TokenStream, TokenTree, Literal};
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>quote::{quote, quote_spanned, ToTokens};
@@ -82,203 +82,214 @@
 <a href=#82 id=82 data-nosnippet>82</a>            Stmt::GlobalLabel(n) =&gt; (<span class="string">"global_label"</span>, <span class="macro">vec!</span>[expr_string_from_ident(<span class="kw-2">&amp;</span>n)]),
 <a href=#83 id=83 data-nosnippet>83</a>            Stmt::LocalLabel(n)  =&gt; (<span class="string">"local_label"</span>, <span class="macro">vec!</span>[expr_string_from_ident(<span class="kw-2">&amp;</span>n)]),
 <a href=#84 id=84 data-nosnippet>84</a>            Stmt::DynamicLabel(expr) =&gt; (<span class="string">"dynamic_label"</span>, <span class="macro">vec!</span>[expr]),
-<a href=#85 id=85 data-nosnippet>85</a>            Stmt::GlobalJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind }) =&gt; 
-<a href=#86 id=86 data-nosnippet>86</a>                (<span class="string">"global_reloc"  </span>, <span class="macro">vec!</span>[expr_string_from_ident(<span class="kw-2">&amp;</span>n), target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-<a href=#87 id=87 data-nosnippet>87</a>            Stmt::ForwardJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind }) =&gt;
-<a href=#88 id=88 data-nosnippet>88</a>                (<span class="string">"forward_reloc" </span>, <span class="macro">vec!</span>[expr_string_from_ident(<span class="kw-2">&amp;</span>n), target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-<a href=#89 id=89 data-nosnippet>89</a>            Stmt::BackwardJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind }) =&gt;
-<a href=#90 id=90 data-nosnippet>90</a>                (<span class="string">"backward_reloc"</span>, <span class="macro">vec!</span>[expr_string_from_ident(<span class="kw-2">&amp;</span>n), target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-<a href=#91 id=91 data-nosnippet>91</a>            Stmt::DynamicJumpTarget(expr, Relocation { target_offset, field_offset, ref_offset, kind }) =&gt;
-<a href=#92 id=92 data-nosnippet>92</a>                (<span class="string">"dynamic_reloc" </span>, <span class="macro">vec!</span>[expr, target_offset, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-<a href=#93 id=93 data-nosnippet>93</a>            Stmt::BareJumpTarget(expr, Relocation { field_offset, ref_offset, kind, .. })    =&gt;
-<a href=#94 id=94 data-nosnippet>94</a>                (<span class="string">"bare_reloc"    </span>, <span class="macro">vec!</span>[expr, Literal::u8_suffixed(field_offset).into(), Literal::u8_suffixed(ref_offset).into(), kind]),
-<a href=#95 id=95 data-nosnippet>95</a>            Stmt::Stmt(s) =&gt; {
-<a href=#96 id=96 data-nosnippet>96</a>                output.extend(<span class="macro">quote!</span> {
-<a href=#97 id=97 data-nosnippet>97</a>                    #s ;
-<a href=#98 id=98 data-nosnippet>98</a>                });
-<a href=#99 id=99 data-nosnippet>99</a>                <span class="kw">continue</span>;
-<a href=#100 id=100 data-nosnippet>100</a>            }
-<a href=#101 id=101 data-nosnippet>101</a>        };
-<a href=#102 id=102 data-nosnippet>102</a>
-<a href=#103 id=103 data-nosnippet>103</a>        <span class="comment">// and construct the appropriate method call
-<a href=#104 id=104 data-nosnippet>104</a>        </span><span class="kw">let </span>method = syn::Ident::new(method, Span::mixed_site());
-<a href=#105 id=105 data-nosnippet>105</a>
-<a href=#106 id=106 data-nosnippet>106</a>        <span class="comment">// work around rustc giving code style warnings about unneeded parenthesis in method calls
-<a href=#107 id=107 data-nosnippet>107</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>args = args;
-<a href=#108 id=108 data-nosnippet>108</a>        args.iter_mut().for_each(strip_parenthesis);
-<a href=#109 id=109 data-nosnippet>109</a>
-<a href=#110 id=110 data-nosnippet>110</a>        output.extend(<span class="macro">quote!</span> {
-<a href=#111 id=111 data-nosnippet>111</a>            #name . #method ( #( #args ),* ) ;
-<a href=#112 id=112 data-nosnippet>112</a>        })
-<a href=#113 id=113 data-nosnippet>113</a>    }
-<a href=#114 id=114 data-nosnippet>114</a>
-<a href=#115 id=115 data-nosnippet>115</a>    <span class="comment">// if we have nothing to emit, expand to nothing. Else, wrap it into a block.
-<a href=#116 id=116 data-nosnippet>116</a>    </span><span class="kw">if </span>output.is_empty() {
-<a href=#117 id=117 data-nosnippet>117</a>        output
-<a href=#118 id=118 data-nosnippet>118</a>    } <span class="kw">else </span>{
-<a href=#119 id=119 data-nosnippet>119</a>        <span class="macro">quote!</span>{
-<a href=#120 id=120 data-nosnippet>120</a>            {
-<a href=#121 id=121 data-nosnippet>121</a>                #output
-<a href=#122 id=122 data-nosnippet>122</a>            }
-<a href=#123 id=123 data-nosnippet>123</a>        }
-<a href=#124 id=124 data-nosnippet>124</a>    }
-<a href=#125 id=125 data-nosnippet>125</a>}
-<a href=#126 id=126 data-nosnippet>126</a>
-<a href=#127 id=127 data-nosnippet>127</a><span class="doccomment">/// Inverts the order of a sequence of Statements, reordering relocations as required
-<a href=#128 id=128 data-nosnippet>128</a></span><span class="kw">pub fn </span>invert(stmts: Vec&lt;Stmt&gt;) -&gt; Vec&lt;Stmt&gt; {
-<a href=#129 id=129 data-nosnippet>129</a>    <span class="comment">// create the output buffer, and iterate through the stmts buffer in reverse
-<a href=#130 id=130 data-nosnippet>130</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>reversed = Vec::new();
+<a href=#85 id=85 data-nosnippet>85</a>            Stmt::GlobalJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind, encoding }) =&gt; 
+<a href=#86 id=86 data-nosnippet>86</a>                (<span class="string">"global_reloc"  </span>, <span class="macro">vec!</span>[
+<a href=#87 id=87 data-nosnippet>87</a>                    expr_string_from_ident(<span class="kw-2">&amp;</span>n),
+<a href=#88 id=88 data-nosnippet>88</a>                    target_offset,
+<a href=#89 id=89 data-nosnippet>89</a>                    Literal::u8_suffixed(field_offset).into(),
+<a href=#90 id=90 data-nosnippet>90</a>                    Literal::u8_suffixed(ref_offset).into(),
+<a href=#91 id=91 data-nosnippet>91</a>                    Literal::u8_suffixed(encoding.encode(kind)).into()
+<a href=#92 id=92 data-nosnippet>92</a>                ]),
+<a href=#93 id=93 data-nosnippet>93</a>            Stmt::ForwardJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind, encoding }) =&gt;
+<a href=#94 id=94 data-nosnippet>94</a>                (<span class="string">"forward_reloc" </span>, <span class="macro">vec!</span>[
+<a href=#95 id=95 data-nosnippet>95</a>                    expr_string_from_ident(<span class="kw-2">&amp;</span>n),
+<a href=#96 id=96 data-nosnippet>96</a>                    target_offset,
+<a href=#97 id=97 data-nosnippet>97</a>                    Literal::u8_suffixed(field_offset).into(),
+<a href=#98 id=98 data-nosnippet>98</a>                    Literal::u8_suffixed(ref_offset).into(),
+<a href=#99 id=99 data-nosnippet>99</a>                    Literal::u8_suffixed(encoding.encode(kind)).into()
+<a href=#100 id=100 data-nosnippet>100</a>                ]),
+<a href=#101 id=101 data-nosnippet>101</a>            Stmt::BackwardJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind, encoding }) =&gt;
+<a href=#102 id=102 data-nosnippet>102</a>                (<span class="string">"backward_reloc"</span>, <span class="macro">vec!</span>[
+<a href=#103 id=103 data-nosnippet>103</a>                    expr_string_from_ident(<span class="kw-2">&amp;</span>n),
+<a href=#104 id=104 data-nosnippet>104</a>                    target_offset,
+<a href=#105 id=105 data-nosnippet>105</a>                    Literal::u8_suffixed(field_offset).into(),
+<a href=#106 id=106 data-nosnippet>106</a>                    Literal::u8_suffixed(ref_offset).into(),
+<a href=#107 id=107 data-nosnippet>107</a>                    Literal::u8_suffixed(encoding.encode(kind)).into()
+<a href=#108 id=108 data-nosnippet>108</a>                ]),
+<a href=#109 id=109 data-nosnippet>109</a>            Stmt::DynamicJumpTarget(expr, Relocation { target_offset, field_offset, ref_offset, kind, encoding }) =&gt;
+<a href=#110 id=110 data-nosnippet>110</a>                (<span class="string">"dynamic_reloc" </span>, <span class="macro">vec!</span>[
+<a href=#111 id=111 data-nosnippet>111</a>                    expr,
+<a href=#112 id=112 data-nosnippet>112</a>                    target_offset,
+<a href=#113 id=113 data-nosnippet>113</a>                    Literal::u8_suffixed(field_offset).into(),
+<a href=#114 id=114 data-nosnippet>114</a>                    Literal::u8_suffixed(ref_offset).into(),
+<a href=#115 id=115 data-nosnippet>115</a>                    Literal::u8_suffixed(encoding.encode(kind)).into()
+<a href=#116 id=116 data-nosnippet>116</a>                ]),
+<a href=#117 id=117 data-nosnippet>117</a>            Stmt::ValueJumpTarget(expr, Relocation { field_offset, ref_offset, kind, encoding, .. })    =&gt;
+<a href=#118 id=118 data-nosnippet>118</a>                (<span class="string">"value_reloc"    </span>, <span class="macro">vec!</span>[
+<a href=#119 id=119 data-nosnippet>119</a>                    expr,
+<a href=#120 id=120 data-nosnippet>120</a>                    Literal::u8_suffixed(field_offset).into(),
+<a href=#121 id=121 data-nosnippet>121</a>                    Literal::u8_suffixed(ref_offset).into(),
+<a href=#122 id=122 data-nosnippet>122</a>                    Literal::u8_suffixed(encoding.encode(kind)).into()
+<a href=#123 id=123 data-nosnippet>123</a>                ]),
+<a href=#124 id=124 data-nosnippet>124</a>            Stmt::Stmt(s) =&gt; {
+<a href=#125 id=125 data-nosnippet>125</a>                output.extend(<span class="macro">quote!</span> {
+<a href=#126 id=126 data-nosnippet>126</a>                    #s ;
+<a href=#127 id=127 data-nosnippet>127</a>                });
+<a href=#128 id=128 data-nosnippet>128</a>                <span class="kw">continue</span>;
+<a href=#129 id=129 data-nosnippet>129</a>            }
+<a href=#130 id=130 data-nosnippet>130</a>        };
 <a href=#131 id=131 data-nosnippet>131</a>
-<a href=#132 id=132 data-nosnippet>132</a>    <span class="comment">// vector to store relocation stmts in while we deal with them
-<a href=#133 id=133 data-nosnippet>133</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>relocation_buf = Vec::new();
-<a href=#134 id=134 data-nosnippet>134</a>    <span class="kw">let </span><span class="kw-2">mut </span>counter = <span class="number">0usize</span>;
-<a href=#135 id=135 data-nosnippet>135</a>
-<a href=#136 id=136 data-nosnippet>136</a>    <span class="kw">let </span><span class="kw-2">mut </span>iter = stmts.into_iter().rev().peekable();
-<a href=#137 id=137 data-nosnippet>137</a>
-<a href=#138 id=138 data-nosnippet>138</a>    <span class="kw">while let </span><span class="prelude-val">Some</span>(stmt) = iter.next() {
-<a href=#139 id=139 data-nosnippet>139</a>        <span class="comment">// if we find a relocation, note it down together with the current counter value and the value at which it can be safely emitted
-<a href=#140 id=140 data-nosnippet>140</a>        </span><span class="kw">match </span>stmt {
-<a href=#141 id=141 data-nosnippet>141</a>            Stmt::GlobalJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#142 id=142 data-nosnippet>142</a>            | Stmt::ForwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#143 id=143 data-nosnippet>143</a>            | Stmt::BackwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#144 id=144 data-nosnippet>144</a>            | Stmt::DynamicJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#145 id=145 data-nosnippet>145</a>            | Stmt::BareJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } ) =&gt; {
-<a href=#146 id=146 data-nosnippet>146</a>                <span class="kw">let </span>trigger = counter + std::cmp::max(field_offset, ref_offset) <span class="kw">as </span>usize;
-<a href=#147 id=147 data-nosnippet>147</a>                relocation_buf.push((trigger, counter, stmt));
-<a href=#148 id=148 data-nosnippet>148</a>                <span class="kw">continue</span>;
-<a href=#149 id=149 data-nosnippet>149</a>            },
-<a href=#150 id=150 data-nosnippet>150</a>            <span class="kw">_ </span>=&gt; ()
-<a href=#151 id=151 data-nosnippet>151</a>        };
-<a href=#152 id=152 data-nosnippet>152</a>
-<a href=#153 id=153 data-nosnippet>153</a>        <span class="comment">// otherwise, calculate the size of the current statement and add that to the counter
-<a href=#154 id=154 data-nosnippet>154</a>        </span><span class="kw">let </span>size = <span class="kw">match </span><span class="kw-2">&amp;</span>stmt {
-<a href=#155 id=155 data-nosnippet>155</a>            Stmt::Const(<span class="kw">_</span>, size)
-<a href=#156 id=156 data-nosnippet>156</a>            | Stmt::ExprUnsigned(<span class="kw">_</span>, size)
-<a href=#157 id=157 data-nosnippet>157</a>            | Stmt::ExprSigned(<span class="kw">_</span>, size) =&gt; size.in_bytes() <span class="kw">as </span>usize,
-<a href=#158 id=158 data-nosnippet>158</a>            Stmt::Extend(buf) =&gt; buf.len(),
-<a href=#159 id=159 data-nosnippet>159</a>            Stmt::ExprExtend(<span class="kw">_</span>)
-<a href=#160 id=160 data-nosnippet>160</a>            | Stmt::Align(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-<a href=#161 id=161 data-nosnippet>161</a>                <span class="macro">assert!</span>(relocation_buf.is_empty(), <span class="string">"Tried to hoist relocation over unknown size"</span>);
-<a href=#162 id=162 data-nosnippet>162</a>                <span class="number">0
-<a href=#163 id=163 data-nosnippet>163</a>            </span>},
-<a href=#164 id=164 data-nosnippet>164</a>            Stmt::GlobalLabel(<span class="kw">_</span>)
-<a href=#165 id=165 data-nosnippet>165</a>            | Stmt::LocalLabel(<span class="kw">_</span>)
-<a href=#166 id=166 data-nosnippet>166</a>            | Stmt::DynamicLabel(<span class="kw">_</span>)
-<a href=#167 id=167 data-nosnippet>167</a>            | Stmt::GlobalJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
-<a href=#168 id=168 data-nosnippet>168</a>            | Stmt::ForwardJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
-<a href=#169 id=169 data-nosnippet>169</a>            | Stmt::BackwardJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
-<a href=#170 id=170 data-nosnippet>170</a>            | Stmt::DynamicJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
-<a href=#171 id=171 data-nosnippet>171</a>            | Stmt::BareJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
-<a href=#172 id=172 data-nosnippet>172</a>            | Stmt::Stmt(<span class="kw">_</span>) =&gt; <span class="number">0</span>,
-<a href=#173 id=173 data-nosnippet>173</a>        };
-<a href=#174 id=174 data-nosnippet>174</a>
-<a href=#175 id=175 data-nosnippet>175</a>        counter += size;
-<a href=#176 id=176 data-nosnippet>176</a>        reversed.push(stmt);
-<a href=#177 id=177 data-nosnippet>177</a>
-<a href=#178 id=178 data-nosnippet>178</a>        <span class="comment">// check if we can emit any collected relocations safely. Slightly overcomplicated as drain_filter ain't stable yet.
-<a href=#179 id=179 data-nosnippet>179</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>new_relocation_buf = Vec::new();
-<a href=#180 id=180 data-nosnippet>180</a>        <span class="kw">for </span>(trigger, orig_counter, <span class="kw-2">mut </span>stmt) <span class="kw">in </span>relocation_buf {
-<a href=#181 id=181 data-nosnippet>181</a>            <span class="kw">if </span>counter &lt; trigger {
-<a href=#182 id=182 data-nosnippet>182</a>                new_relocation_buf.push((trigger, orig_counter, stmt));
-<a href=#183 id=183 data-nosnippet>183</a>                <span class="kw">continue</span>;
-<a href=#184 id=184 data-nosnippet>184</a>            }
-<a href=#185 id=185 data-nosnippet>185</a>
-<a href=#186 id=186 data-nosnippet>186</a>            <span class="comment">// apply the fixups and emit
-<a href=#187 id=187 data-nosnippet>187</a>            </span><span class="kw">let </span>change: u8 = (counter - orig_counter).try_into().expect(<span class="string">"Tried to hoist a relocation by over 255 bytes"</span>);
-<a href=#188 id=188 data-nosnippet>188</a>            <span class="kw">match </span><span class="kw-2">&amp;mut </span>stmt {
-<a href=#189 id=189 data-nosnippet>189</a>                Stmt::GlobalJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#190 id=190 data-nosnippet>190</a>                | Stmt::ForwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#191 id=191 data-nosnippet>191</a>                | Stmt::BackwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#192 id=192 data-nosnippet>192</a>                | Stmt::DynamicJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
-<a href=#193 id=193 data-nosnippet>193</a>                | Stmt::BareJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } ) =&gt; {
-<a href=#194 id=194 data-nosnippet>194</a>                    <span class="kw-2">*</span>field_offset = change - <span class="kw-2">*</span>field_offset;
-<a href=#195 id=195 data-nosnippet>195</a>                    <span class="kw-2">*</span>ref_offset = change - <span class="kw-2">*</span>ref_offset;
-<a href=#196 id=196 data-nosnippet>196</a>                },
-<a href=#197 id=197 data-nosnippet>197</a>                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
-<a href=#198 id=198 data-nosnippet>198</a>            }
-<a href=#199 id=199 data-nosnippet>199</a>            reversed.push(stmt);
-<a href=#200 id=200 data-nosnippet>200</a>        }
-<a href=#201 id=201 data-nosnippet>201</a>        relocation_buf = new_relocation_buf;
-<a href=#202 id=202 data-nosnippet>202</a>    }
+<a href=#132 id=132 data-nosnippet>132</a>        <span class="comment">// and construct the appropriate method call
+<a href=#133 id=133 data-nosnippet>133</a>        </span><span class="kw">let </span>method = syn::Ident::new(method, Span::mixed_site());
+<a href=#134 id=134 data-nosnippet>134</a>
+<a href=#135 id=135 data-nosnippet>135</a>        <span class="comment">// work around rustc giving code style warnings about unneeded parenthesis in method calls
+<a href=#136 id=136 data-nosnippet>136</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>args = args;
+<a href=#137 id=137 data-nosnippet>137</a>        args.iter_mut().for_each(strip_parenthesis);
+<a href=#138 id=138 data-nosnippet>138</a>
+<a href=#139 id=139 data-nosnippet>139</a>        output.extend(<span class="macro">quote!</span> {
+<a href=#140 id=140 data-nosnippet>140</a>            #name . #method ( #( #args ),* ) ;
+<a href=#141 id=141 data-nosnippet>141</a>        })
+<a href=#142 id=142 data-nosnippet>142</a>    }
+<a href=#143 id=143 data-nosnippet>143</a>
+<a href=#144 id=144 data-nosnippet>144</a>    <span class="comment">// if we have nothing to emit, expand to nothing. Else, wrap it into a block.
+<a href=#145 id=145 data-nosnippet>145</a>    </span><span class="kw">if </span>output.is_empty() {
+<a href=#146 id=146 data-nosnippet>146</a>        output
+<a href=#147 id=147 data-nosnippet>147</a>    } <span class="kw">else </span>{
+<a href=#148 id=148 data-nosnippet>148</a>        <span class="macro">quote!</span>{
+<a href=#149 id=149 data-nosnippet>149</a>            {
+<a href=#150 id=150 data-nosnippet>150</a>                #output
+<a href=#151 id=151 data-nosnippet>151</a>            }
+<a href=#152 id=152 data-nosnippet>152</a>        }
+<a href=#153 id=153 data-nosnippet>153</a>    }
+<a href=#154 id=154 data-nosnippet>154</a>}
+<a href=#155 id=155 data-nosnippet>155</a>
+<a href=#156 id=156 data-nosnippet>156</a><span class="doccomment">/// Inverts the order of a sequence of Statements, reordering relocations as required
+<a href=#157 id=157 data-nosnippet>157</a></span><span class="kw">pub fn </span>invert(stmts: Vec&lt;Stmt&gt;) -&gt; Vec&lt;Stmt&gt; {
+<a href=#158 id=158 data-nosnippet>158</a>    <span class="comment">// create the output buffer, and iterate through the stmts buffer in reverse
+<a href=#159 id=159 data-nosnippet>159</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>reversed = Vec::new();
+<a href=#160 id=160 data-nosnippet>160</a>
+<a href=#161 id=161 data-nosnippet>161</a>    <span class="comment">// vector to store relocation stmts in while we deal with them
+<a href=#162 id=162 data-nosnippet>162</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>relocation_buf = Vec::new();
+<a href=#163 id=163 data-nosnippet>163</a>    <span class="kw">let </span><span class="kw-2">mut </span>counter = <span class="number">0usize</span>;
+<a href=#164 id=164 data-nosnippet>164</a>
+<a href=#165 id=165 data-nosnippet>165</a>    <span class="kw">let </span><span class="kw-2">mut </span>iter = stmts.into_iter().rev().peekable();
+<a href=#166 id=166 data-nosnippet>166</a>
+<a href=#167 id=167 data-nosnippet>167</a>    <span class="kw">while let </span><span class="prelude-val">Some</span>(stmt) = iter.next() {
+<a href=#168 id=168 data-nosnippet>168</a>        <span class="comment">// if we find a relocation, note it down together with the current counter value and the value at which it can be safely emitted
+<a href=#169 id=169 data-nosnippet>169</a>        </span><span class="kw">match </span>stmt {
+<a href=#170 id=170 data-nosnippet>170</a>            Stmt::GlobalJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#171 id=171 data-nosnippet>171</a>            | Stmt::ForwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#172 id=172 data-nosnippet>172</a>            | Stmt::BackwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#173 id=173 data-nosnippet>173</a>            | Stmt::DynamicJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#174 id=174 data-nosnippet>174</a>            | Stmt::ValueJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } ) =&gt; {
+<a href=#175 id=175 data-nosnippet>175</a>                <span class="kw">let </span>trigger = counter + std::cmp::max(field_offset, ref_offset) <span class="kw">as </span>usize;
+<a href=#176 id=176 data-nosnippet>176</a>                relocation_buf.push((trigger, counter, stmt));
+<a href=#177 id=177 data-nosnippet>177</a>                <span class="kw">continue</span>;
+<a href=#178 id=178 data-nosnippet>178</a>            },
+<a href=#179 id=179 data-nosnippet>179</a>            <span class="kw">_ </span>=&gt; ()
+<a href=#180 id=180 data-nosnippet>180</a>        };
+<a href=#181 id=181 data-nosnippet>181</a>
+<a href=#182 id=182 data-nosnippet>182</a>        <span class="comment">// otherwise, calculate the size of the current statement and add that to the counter
+<a href=#183 id=183 data-nosnippet>183</a>        </span><span class="kw">let </span>size = <span class="kw">match </span><span class="kw-2">&amp;</span>stmt {
+<a href=#184 id=184 data-nosnippet>184</a>            Stmt::Const(<span class="kw">_</span>, size)
+<a href=#185 id=185 data-nosnippet>185</a>            | Stmt::ExprUnsigned(<span class="kw">_</span>, size)
+<a href=#186 id=186 data-nosnippet>186</a>            | Stmt::ExprSigned(<span class="kw">_</span>, size) =&gt; size.in_bytes() <span class="kw">as </span>usize,
+<a href=#187 id=187 data-nosnippet>187</a>            Stmt::Extend(buf) =&gt; buf.len(),
+<a href=#188 id=188 data-nosnippet>188</a>            Stmt::ExprExtend(<span class="kw">_</span>)
+<a href=#189 id=189 data-nosnippet>189</a>            | Stmt::Align(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+<a href=#190 id=190 data-nosnippet>190</a>                <span class="macro">assert!</span>(relocation_buf.is_empty(), <span class="string">"Tried to hoist relocation over unknown size"</span>);
+<a href=#191 id=191 data-nosnippet>191</a>                <span class="number">0
+<a href=#192 id=192 data-nosnippet>192</a>            </span>},
+<a href=#193 id=193 data-nosnippet>193</a>            Stmt::GlobalLabel(<span class="kw">_</span>)
+<a href=#194 id=194 data-nosnippet>194</a>            | Stmt::LocalLabel(<span class="kw">_</span>)
+<a href=#195 id=195 data-nosnippet>195</a>            | Stmt::DynamicLabel(<span class="kw">_</span>)
+<a href=#196 id=196 data-nosnippet>196</a>            | Stmt::GlobalJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
+<a href=#197 id=197 data-nosnippet>197</a>            | Stmt::ForwardJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
+<a href=#198 id=198 data-nosnippet>198</a>            | Stmt::BackwardJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
+<a href=#199 id=199 data-nosnippet>199</a>            | Stmt::DynamicJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
+<a href=#200 id=200 data-nosnippet>200</a>            | Stmt::ValueJumpTarget(<span class="kw">_</span>, <span class="kw">_</span>)
+<a href=#201 id=201 data-nosnippet>201</a>            | Stmt::Stmt(<span class="kw">_</span>) =&gt; <span class="number">0</span>,
+<a href=#202 id=202 data-nosnippet>202</a>        };
 <a href=#203 id=203 data-nosnippet>203</a>
-<a href=#204 id=204 data-nosnippet>204</a>    reversed
-<a href=#205 id=205 data-nosnippet>205</a>}
+<a href=#204 id=204 data-nosnippet>204</a>        counter += size;
+<a href=#205 id=205 data-nosnippet>205</a>        reversed.push(stmt);
 <a href=#206 id=206 data-nosnippet>206</a>
-<a href=#207 id=207 data-nosnippet>207</a><span class="comment">// below here are all kinds of utility functions to quickly generate TokenTree constructs
-<a href=#208 id=208 data-nosnippet>208</a>// this collection is arbitrary and purely based on what special things are needed for assembler
-<a href=#209 id=209 data-nosnippet>209</a>// codegen implementations
-<a href=#210 id=210 data-nosnippet>210</a>
-<a href=#211 id=211 data-nosnippet>211</a>
-<a href=#212 id=212 data-nosnippet>212</a>// expression of value 0. sometimes needed.
-<a href=#213 id=213 data-nosnippet>213</a></span><span class="kw">pub fn </span>expr_zero() -&gt; TokenTree {
-<a href=#214 id=214 data-nosnippet>214</a>    proc_macro2::Literal::u8_unsuffixed(<span class="number">0</span>).into()
-<a href=#215 id=215 data-nosnippet>215</a>}
-<a href=#216 id=216 data-nosnippet>216</a>
-<a href=#217 id=217 data-nosnippet>217</a><span class="comment">// given an ident, makes it into a "string"
-<a href=#218 id=218 data-nosnippet>218</a></span><span class="kw">pub fn </span>expr_string_from_ident(i: <span class="kw-2">&amp;</span>syn::Ident) -&gt; TokenTree {
-<a href=#219 id=219 data-nosnippet>219</a>    <span class="kw">let </span>name = i.to_string();
-<a href=#220 id=220 data-nosnippet>220</a>    proc_macro2::Literal::string(<span class="kw-2">&amp;</span>name).into()
-<a href=#221 id=221 data-nosnippet>221</a>}
-<a href=#222 id=222 data-nosnippet>222</a>
-<a href=#223 id=223 data-nosnippet>223</a><span class="comment">// makes (a, b)
-<a href=#224 id=224 data-nosnippet>224</a></span><span class="kw">pub fn </span>expr_tuple_of_u8s(span: Span, data: <span class="kw-2">&amp;</span>[u8]) -&gt; TokenTree {
-<a href=#225 id=225 data-nosnippet>225</a>    delimited(<span class="kw">if </span>data.len() == <span class="number">1 </span>{
-<a href=#226 id=226 data-nosnippet>226</a>        <span class="kw">let </span>data = data[<span class="number">0</span>];
-<a href=#227 id=227 data-nosnippet>227</a>        <span class="macro">quote_spanned!</span> {span=&gt;
-<a href=#228 id=228 data-nosnippet>228</a>            (#data,)
+<a href=#207 id=207 data-nosnippet>207</a>        <span class="comment">// check if we can emit any collected relocations safely. Slightly overcomplicated as drain_filter ain't stable yet.
+<a href=#208 id=208 data-nosnippet>208</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>new_relocation_buf = Vec::new();
+<a href=#209 id=209 data-nosnippet>209</a>        <span class="kw">for </span>(trigger, orig_counter, <span class="kw-2">mut </span>stmt) <span class="kw">in </span>relocation_buf {
+<a href=#210 id=210 data-nosnippet>210</a>            <span class="kw">if </span>counter &lt; trigger {
+<a href=#211 id=211 data-nosnippet>211</a>                new_relocation_buf.push((trigger, orig_counter, stmt));
+<a href=#212 id=212 data-nosnippet>212</a>                <span class="kw">continue</span>;
+<a href=#213 id=213 data-nosnippet>213</a>            }
+<a href=#214 id=214 data-nosnippet>214</a>
+<a href=#215 id=215 data-nosnippet>215</a>            <span class="comment">// apply the fixups and emit
+<a href=#216 id=216 data-nosnippet>216</a>            </span><span class="kw">let </span>change: u8 = (counter - orig_counter).try_into().expect(<span class="string">"Tried to hoist a relocation by over 255 bytes"</span>);
+<a href=#217 id=217 data-nosnippet>217</a>            <span class="kw">match </span><span class="kw-2">&amp;mut </span>stmt {
+<a href=#218 id=218 data-nosnippet>218</a>                Stmt::GlobalJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#219 id=219 data-nosnippet>219</a>                | Stmt::ForwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#220 id=220 data-nosnippet>220</a>                | Stmt::BackwardJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#221 id=221 data-nosnippet>221</a>                | Stmt::DynamicJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } )
+<a href=#222 id=222 data-nosnippet>222</a>                | Stmt::ValueJumpTarget(<span class="kw">_</span>, Relocation { field_offset, ref_offset, .. } ) =&gt; {
+<a href=#223 id=223 data-nosnippet>223</a>                    <span class="kw-2">*</span>field_offset = change - <span class="kw-2">*</span>field_offset;
+<a href=#224 id=224 data-nosnippet>224</a>                    <span class="kw-2">*</span>ref_offset = change - <span class="kw-2">*</span>ref_offset;
+<a href=#225 id=225 data-nosnippet>225</a>                },
+<a href=#226 id=226 data-nosnippet>226</a>                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>()
+<a href=#227 id=227 data-nosnippet>227</a>            }
+<a href=#228 id=228 data-nosnippet>228</a>            reversed.push(stmt);
 <a href=#229 id=229 data-nosnippet>229</a>        }
-<a href=#230 id=230 data-nosnippet>230</a>    } <span class="kw">else </span>{
-<a href=#231 id=231 data-nosnippet>231</a>        <span class="macro">quote_spanned!</span> {span=&gt;
-<a href=#232 id=232 data-nosnippet>232</a>            (#(#data),<span class="kw-2">*</span>)
-<a href=#233 id=233 data-nosnippet>233</a>        }
-<a href=#234 id=234 data-nosnippet>234</a>    })
-<a href=#235 id=235 data-nosnippet>235</a>}
-<a href=#236 id=236 data-nosnippet>236</a>
-<a href=#237 id=237 data-nosnippet>237</a><span class="comment">// makes sum(exprs)
-<a href=#238 id=238 data-nosnippet>238</a></span><span class="kw">pub fn </span>expr_add_many&lt;T: Iterator&lt;Item=TokenTree&gt;&gt;(span: Span, <span class="kw-2">mut </span>exprs: T) -&gt; <span class="prelude-ty">Option</span>&lt;TokenTree&gt; {
-<a href=#239 id=239 data-nosnippet>239</a>    <span class="kw">let </span>first_expr = exprs.next()<span class="question-mark">?</span>;
+<a href=#230 id=230 data-nosnippet>230</a>        relocation_buf = new_relocation_buf;
+<a href=#231 id=231 data-nosnippet>231</a>    }
+<a href=#232 id=232 data-nosnippet>232</a>
+<a href=#233 id=233 data-nosnippet>233</a>    reversed
+<a href=#234 id=234 data-nosnippet>234</a>}
+<a href=#235 id=235 data-nosnippet>235</a>
+<a href=#236 id=236 data-nosnippet>236</a><span class="comment">// below here are all kinds of utility functions to quickly generate TokenTree constructs
+<a href=#237 id=237 data-nosnippet>237</a>// this collection is arbitrary and purely based on what special things are needed for assembler
+<a href=#238 id=238 data-nosnippet>238</a>// codegen implementations
+<a href=#239 id=239 data-nosnippet>239</a>
 <a href=#240 id=240 data-nosnippet>240</a>
-<a href=#241 id=241 data-nosnippet>241</a>    <span class="kw">let </span>tokens = <span class="macro">quote_spanned!</span>{ span=&gt;
-<a href=#242 id=242 data-nosnippet>242</a>        #first_expr #( + #exprs )*
-<a href=#243 id=243 data-nosnippet>243</a>    };
-<a href=#244 id=244 data-nosnippet>244</a>
-<a href=#245 id=245 data-nosnippet>245</a>    <span class="prelude-val">Some</span>(delimited(tokens))
-<a href=#246 id=246 data-nosnippet>246</a>}
-<a href=#247 id=247 data-nosnippet>247</a>
-<a href=#248 id=248 data-nosnippet>248</a><span class="comment">// makes (size_of&lt;ty&gt;() * value)
-<a href=#249 id=249 data-nosnippet>249</a></span><span class="kw">pub fn </span>expr_size_of_scale(ty: <span class="kw-2">&amp;</span>syn::Path, value: <span class="kw-2">&amp;</span>TokenTree, size: Size) -&gt; TokenTree {
-<a href=#250 id=250 data-nosnippet>250</a>    <span class="kw">let </span>span = value.span();
-<a href=#251 id=251 data-nosnippet>251</a>    <span class="kw">let </span>size = size.as_literal();
-<a href=#252 id=252 data-nosnippet>252</a>
-<a href=#253 id=253 data-nosnippet>253</a>    delimited(<span class="macro">quote_spanned!</span> { span=&gt;
-<a href=#254 id=254 data-nosnippet>254</a>        (::std::mem::size_of::&lt;#ty&gt;() <span class="kw">as </span>#size) * #value
-<a href=#255 id=255 data-nosnippet>255</a>    })
+<a href=#241 id=241 data-nosnippet>241</a>// given an ident, makes it into a "string"
+<a href=#242 id=242 data-nosnippet>242</a></span><span class="kw">pub fn </span>expr_string_from_ident(i: <span class="kw-2">&amp;</span>syn::Ident) -&gt; TokenTree {
+<a href=#243 id=243 data-nosnippet>243</a>    <span class="kw">let </span>name = i.to_string();
+<a href=#244 id=244 data-nosnippet>244</a>    proc_macro2::Literal::string(<span class="kw-2">&amp;</span>name).into()
+<a href=#245 id=245 data-nosnippet>245</a>}
+<a href=#246 id=246 data-nosnippet>246</a>
+<a href=#247 id=247 data-nosnippet>247</a><span class="comment">// makes sum(exprs)
+<a href=#248 id=248 data-nosnippet>248</a></span><span class="kw">pub fn </span>expr_add_many&lt;T: Iterator&lt;Item=TokenTree&gt;&gt;(span: Span, <span class="kw-2">mut </span>exprs: T) -&gt; <span class="prelude-ty">Option</span>&lt;TokenTree&gt; {
+<a href=#249 id=249 data-nosnippet>249</a>    <span class="kw">let </span>first_expr = exprs.next()<span class="question-mark">?</span>;
+<a href=#250 id=250 data-nosnippet>250</a>
+<a href=#251 id=251 data-nosnippet>251</a>    <span class="kw">let </span>tokens = <span class="macro">quote_spanned!</span>{ span=&gt;
+<a href=#252 id=252 data-nosnippet>252</a>        #first_expr #( + #exprs )*
+<a href=#253 id=253 data-nosnippet>253</a>    };
+<a href=#254 id=254 data-nosnippet>254</a>
+<a href=#255 id=255 data-nosnippet>255</a>    <span class="prelude-val">Some</span>(delimited(tokens))
 <a href=#256 id=256 data-nosnippet>256</a>}
 <a href=#257 id=257 data-nosnippet>257</a>
-<a href=#258 id=258 data-nosnippet>258</a><span class="doccomment">/// returns (offset_of!(path, attr) as size)
-<a href=#259 id=259 data-nosnippet>259</a></span><span class="kw">pub fn </span>expr_offset_of(path: <span class="kw-2">&amp;</span>syn::Path, attr: <span class="kw-2">&amp;</span>syn::Ident, size: Size) -&gt; TokenTree {
-<a href=#260 id=260 data-nosnippet>260</a>    <span class="comment">// generate a P&lt;Expr&gt; that resolves into the offset of an attribute to a type.
-<a href=#261 id=261 data-nosnippet>261</a>    // this is somewhat ridiculously complex because we can't expand macros here
+<a href=#258 id=258 data-nosnippet>258</a><span class="comment">// makes (size_of&lt;ty&gt;() * value)
+<a href=#259 id=259 data-nosnippet>259</a></span><span class="kw">pub fn </span>expr_size_of_scale(ty: <span class="kw-2">&amp;</span>syn::Path, value: <span class="kw-2">&amp;</span>TokenTree, size: Size) -&gt; TokenTree {
+<a href=#260 id=260 data-nosnippet>260</a>    <span class="kw">let </span>span = value.span();
+<a href=#261 id=261 data-nosnippet>261</a>    <span class="kw">let </span>size = size.as_literal();
 <a href=#262 id=262 data-nosnippet>262</a>
-<a href=#263 id=263 data-nosnippet>263</a>    </span><span class="kw">let </span>span = path.span();
-<a href=#264 id=264 data-nosnippet>264</a>    <span class="kw">let </span>size = size.as_literal();
-<a href=#265 id=265 data-nosnippet>265</a>
-<a href=#266 id=266 data-nosnippet>266</a>    delimited(<span class="macro">quote_spanned!</span> { span=&gt;
-<a href=#267 id=267 data-nosnippet>267</a>        <span class="macro">::std::mem::offset_of!</span>(#path, #attr) <span class="kw">as </span>#size
-<a href=#268 id=268 data-nosnippet>268</a>    })
-<a href=#269 id=269 data-nosnippet>269</a>}
-<a href=#270 id=270 data-nosnippet>270</a>
-<a href=#271 id=271 data-nosnippet>271</a><span class="comment">// returns std::mem::size_of&lt;path&gt;()
-<a href=#272 id=272 data-nosnippet>272</a></span><span class="kw">pub fn </span>expr_size_of(path: <span class="kw-2">&amp;</span>syn::Path) -&gt; TokenTree {
-<a href=#273 id=273 data-nosnippet>273</a>    <span class="comment">// generate a P&lt;Expr&gt; that returns the size of type at path
-<a href=#274 id=274 data-nosnippet>274</a>    </span><span class="kw">let </span>span = path.span();
+<a href=#263 id=263 data-nosnippet>263</a>    delimited(<span class="macro">quote_spanned!</span> { span=&gt;
+<a href=#264 id=264 data-nosnippet>264</a>        (::std::mem::size_of::&lt;#ty&gt;() <span class="kw">as </span>#size) * #value
+<a href=#265 id=265 data-nosnippet>265</a>    })
+<a href=#266 id=266 data-nosnippet>266</a>}
+<a href=#267 id=267 data-nosnippet>267</a>
+<a href=#268 id=268 data-nosnippet>268</a><span class="doccomment">/// returns (offset_of!(path, attr) as size)
+<a href=#269 id=269 data-nosnippet>269</a></span><span class="kw">pub fn </span>expr_offset_of(path: <span class="kw-2">&amp;</span>syn::Path, attr: <span class="kw-2">&amp;</span>syn::Ident, size: Size) -&gt; TokenTree {
+<a href=#270 id=270 data-nosnippet>270</a>    <span class="comment">// generate a P&lt;Expr&gt; that resolves into the offset of an attribute to a type.
+<a href=#271 id=271 data-nosnippet>271</a>    // this is somewhat ridiculously complex because we can't expand macros here
+<a href=#272 id=272 data-nosnippet>272</a>
+<a href=#273 id=273 data-nosnippet>273</a>    </span><span class="kw">let </span>span = path.span();
+<a href=#274 id=274 data-nosnippet>274</a>    <span class="kw">let </span>size = size.as_literal();
 <a href=#275 id=275 data-nosnippet>275</a>
 <a href=#276 id=276 data-nosnippet>276</a>    delimited(<span class="macro">quote_spanned!</span> { span=&gt;
-<a href=#277 id=277 data-nosnippet>277</a>        ::std::mem::size_of::&lt;#path&gt;()
+<a href=#277 id=277 data-nosnippet>277</a>        <span class="macro">::std::mem::offset_of!</span>(#path, #attr) <span class="kw">as </span>#size
 <a href=#278 id=278 data-nosnippet>278</a>    })
 <a href=#279 id=279 data-nosnippet>279</a>}
 <a href=#280 id=280 data-nosnippet>280</a>
-<a href=#281 id=281 data-nosnippet>281</a><span class="comment">// Reparses a tokentree into an expression
-<a href=#282 id=282 data-nosnippet>282</a></span><span class="kw">pub fn </span>reparse(tt: <span class="kw-2">&amp;</span>TokenTree) -&gt; parse::Result&lt;syn::Expr&gt; {
-<a href=#283 id=283 data-nosnippet>283</a>    syn::parse2(tt.into_token_stream())
-<a href=#284 id=284 data-nosnippet>284</a>}</code></pre></div></section></main></body></html>
+<a href=#281 id=281 data-nosnippet>281</a><span class="comment">// returns std::mem::size_of&lt;path&gt;()
+<a href=#282 id=282 data-nosnippet>282</a></span><span class="kw">pub fn </span>expr_size_of(path: <span class="kw-2">&amp;</span>syn::Path) -&gt; TokenTree {
+<a href=#283 id=283 data-nosnippet>283</a>    <span class="comment">// generate a P&lt;Expr&gt; that returns the size of type at path
+<a href=#284 id=284 data-nosnippet>284</a>    </span><span class="kw">let </span>span = path.span();
+<a href=#285 id=285 data-nosnippet>285</a>
+<a href=#286 id=286 data-nosnippet>286</a>    delimited(<span class="macro">quote_spanned!</span> { span=&gt;
+<a href=#287 id=287 data-nosnippet>287</a>        ::std::mem::size_of::&lt;#path&gt;()
+<a href=#288 id=288 data-nosnippet>288</a>    })
+<a href=#289 id=289 data-nosnippet>289</a>}
+<a href=#290 id=290 data-nosnippet>290</a>
+<a href=#291 id=291 data-nosnippet>291</a><span class="comment">// Reparses a tokentree into an expression
+<a href=#292 id=292 data-nosnippet>292</a></span><span class="kw">pub fn </span>reparse(tt: <span class="kw-2">&amp;</span>TokenTree) -&gt; parse::Result&lt;syn::Expr&gt; {
+<a href=#293 id=293 data-nosnippet>293</a>    syn::parse2(tt.into_token_stream())
+<a href=#294 id=294 data-nosnippet>294</a>}
+</code></pre></div></section></main></body></html>

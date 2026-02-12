@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasmrt/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![warn(missing_docs)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtime\src\lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dynasmrt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dynasmrt/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![warn(missing_docs)]
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="doccomment">//! This crate provides runtime support for dynasm-rs. It contains traits that document the interface used by the dynasm proc_macro to generate code,
 <a href=#4 id=4 data-nosnippet>4</a>//! Assemblers that implement these traits, and relocation models for the various supported architectures. Additionally, it also provides the tools
@@ -130,8 +130,8 @@
 <a href=#130 id=130 data-nosnippet>130</a>    </span>Global(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
 <a href=#131 id=131 data-nosnippet>131</a>    <span class="doccomment">/// This targets the specified dynamic label.
 <a href=#132 id=132 data-nosnippet>132</a>    </span>Dynamic(DynamicLabel),
-<a href=#133 id=133 data-nosnippet>133</a>    <span class="doccomment">/// This targets the specified address.
-<a href=#134 id=134 data-nosnippet>134</a>    </span>Extern(usize),
+<a href=#133 id=133 data-nosnippet>133</a>    <span class="doccomment">/// This targets the specified value.
+<a href=#134 id=134 data-nosnippet>134</a>    </span>Value(usize),
 <a href=#135 id=135 data-nosnippet>135</a>    <span class="doccomment">/// An already resolved relocation that needs to be adjusted when the buffer moves in memory.
 <a href=#136 id=136 data-nosnippet>136</a>    </span>Managed,
 <a href=#137 id=137 data-nosnippet>137</a>}
@@ -142,7 +142,7 @@
 <a href=#142 id=142 data-nosnippet>142</a>            <span class="self">Self</span>::Local(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"target [&gt;&lt;]{}"</span>, s),
 <a href=#143 id=143 data-nosnippet>143</a>            <span class="self">Self</span>::Global(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"target -&gt;{}"</span>, s),
 <a href=#144 id=144 data-nosnippet>144</a>            <span class="self">Self</span>::Dynamic(id) =&gt; <span class="macro">write!</span>(f, <span class="string">"target =&gt;{}"</span>, id.get_id()),
-<a href=#145 id=145 data-nosnippet>145</a>            <span class="self">Self</span>::Extern(value) =&gt; <span class="macro">write!</span>(f, <span class="string">"target extern {}"</span>, value),
+<a href=#145 id=145 data-nosnippet>145</a>            <span class="self">Self</span>::Value(value) =&gt; <span class="macro">write!</span>(f, <span class="string">"target extern {}"</span>, value),
 <a href=#146 id=146 data-nosnippet>146</a>            <span class="self">Self</span>::Managed =&gt; <span class="macro">write!</span>(f, <span class="string">"while adjusting managed relocation"</span>),
 <a href=#147 id=147 data-nosnippet>147</a>        }
 <a href=#148 id=148 data-nosnippet>148</a>    }
@@ -253,24 +253,24 @@
 <a href=#253 id=253 data-nosnippet>253</a>    </span><span class="kw">fn </span>dynamic_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel);
 <a href=#254 id=254 data-nosnippet>254</a>
 <a href=#255 id=255 data-nosnippet>255</a>    <span class="doccomment">/// Record a relocation spot for a forward reference to a local label
-<a href=#256 id=256 data-nosnippet>256</a>    </span><span class="kw">fn </span>forward_reloc( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+<a href=#256 id=256 data-nosnippet>256</a>    </span><span class="kw">fn </span>forward_reloc( <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: u8) {
 <a href=#257 id=257 data-nosnippet>257</a>        <span class="self">self</span>.forward_relocation(name, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
 <a href=#258 id=258 data-nosnippet>258</a>    }
 <a href=#259 id=259 data-nosnippet>259</a>    <span class="doccomment">/// Record a relocation spot for a backward reference to a local label
-<a href=#260 id=260 data-nosnippet>260</a>    </span><span class="kw">fn </span>backward_reloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+<a href=#260 id=260 data-nosnippet>260</a>    </span><span class="kw">fn </span>backward_reloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: u8) {
 <a href=#261 id=261 data-nosnippet>261</a>        <span class="self">self</span>.backward_relocation(name, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
 <a href=#262 id=262 data-nosnippet>262</a>    }
 <a href=#263 id=263 data-nosnippet>263</a>    <span class="doccomment">/// Record a relocation spot for a reference to a global label
-<a href=#264 id=264 data-nosnippet>264</a>    </span><span class="kw">fn </span>global_reloc(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+<a href=#264 id=264 data-nosnippet>264</a>    </span><span class="kw">fn </span>global_reloc(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: u8) {
 <a href=#265 id=265 data-nosnippet>265</a>        <span class="self">self</span>.global_relocation(name, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
 <a href=#266 id=266 data-nosnippet>266</a>    }
 <a href=#267 id=267 data-nosnippet>267</a>    <span class="doccomment">/// Record a relocation spot for a reference to a dynamic label
-<a href=#268 id=268 data-nosnippet>268</a>    </span><span class="kw">fn </span>dynamic_reloc( <span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel,   target_offset: isize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
+<a href=#268 id=268 data-nosnippet>268</a>    </span><span class="kw">fn </span>dynamic_reloc( <span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel,   target_offset: isize, field_offset: u8, ref_offset: u8, kind: u8) {
 <a href=#269 id=269 data-nosnippet>269</a>        <span class="self">self</span>.dynamic_relocation(id, target_offset, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
 <a href=#270 id=270 data-nosnippet>270</a>    }
 <a href=#271 id=271 data-nosnippet>271</a>    <span class="doccomment">/// Record a relocation spot to an arbitrary target.
-<a href=#272 id=272 data-nosnippet>272</a>    </span><span class="kw">fn </span>bare_reloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, field_offset: u8, ref_offset: u8, kind: &lt;<span class="self">Self</span>::Relocation <span class="kw">as </span>Relocation&gt;::Encoding) {
-<a href=#273 id=273 data-nosnippet>273</a>        <span class="self">self</span>.bare_relocation(target, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
+<a href=#272 id=272 data-nosnippet>272</a>    </span><span class="kw">fn </span>value_reloc(   <span class="kw-2">&amp;mut </span><span class="self">self</span>, value: usize, field_offset: u8, ref_offset: u8, kind: u8) {
+<a href=#273 id=273 data-nosnippet>273</a>        <span class="self">self</span>.value_relocation(value, field_offset, ref_offset, <span class="self">Self</span>::Relocation::from_encoding(kind))
 <a href=#274 id=274 data-nosnippet>274</a>    }
 <a href=#275 id=275 data-nosnippet>275</a>
 <a href=#276 id=276 data-nosnippet>276</a>    <span class="doccomment">/// Equivalent of forward_reloc, but takes a non-encoded relocation
@@ -281,8 +281,8 @@
 <a href=#281 id=281 data-nosnippet>281</a>    </span><span class="kw">fn </span>global_relocation(  <span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
 <a href=#282 id=282 data-nosnippet>282</a>    <span class="doccomment">/// Equivalent of dynamic_reloc, but takes a non-encoded relocation
 <a href=#283 id=283 data-nosnippet>283</a>    </span><span class="kw">fn </span>dynamic_relocation( <span class="kw-2">&amp;mut </span><span class="self">self</span>, id: DynamicLabel,   target_offset: isize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
-<a href=#284 id=284 data-nosnippet>284</a>    <span class="doccomment">/// Equivalent of bare_reloc, but takes a non-encoded relocation
-<a href=#285 id=285 data-nosnippet>285</a>    </span><span class="kw">fn </span>bare_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
+<a href=#284 id=284 data-nosnippet>284</a>    <span class="doccomment">/// Equivalent of absolute_reloc, but takes a non-encoded relocation
+<a href=#285 id=285 data-nosnippet>285</a>    </span><span class="kw">fn </span>value_relocation(   <span class="kw-2">&amp;mut </span><span class="self">self</span>, value: usize, field_offset: u8, ref_offset: u8, kind: <span class="self">Self</span>::Relocation);
 <a href=#286 id=286 data-nosnippet>286</a>}
 <a href=#287 id=287 data-nosnippet>287</a>
 <a href=#288 id=288 data-nosnippet>288</a>
@@ -334,7 +334,7 @@
 <a href=#334 id=334 data-nosnippet>334</a>    }
 <a href=#335 id=335 data-nosnippet>335</a>    <span class="kw">fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alignment: usize, with: u8) {
 <a href=#336 id=336 data-nosnippet>336</a>        <span class="kw">let </span>offset = <span class="self">self</span>.offset().<span class="number">0 </span>% alignment;
-<a href=#337 id=337 data-nosnippet>337</a>        <span class="kw">if </span>offset != <span class="number">0 </span>{
+<a href=#337 id=337 data-nosnippet>337</a>        <span class="kw">if </span><span class="macro">offset !</span>= <span class="number">0 </span>{
 <a href=#338 id=338 data-nosnippet>338</a>            <span class="kw">for _ in </span>offset .. alignment {
 <a href=#339 id=339 data-nosnippet>339</a>                <span class="self">self</span>.push(with);
 <a href=#340 id=340 data-nosnippet>340</a>            }
@@ -491,7 +491,7 @@
 <a href=#491 id=491 data-nosnippet>491</a>    }
 <a href=#492 id=492 data-nosnippet>492</a>    <span class="kw">fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alignment: usize, with: u8) {
 <a href=#493 id=493 data-nosnippet>493</a>        <span class="kw">let </span>offset = <span class="self">self</span>.offset().<span class="number">0 </span>% alignment;
-<a href=#494 id=494 data-nosnippet>494</a>        <span class="kw">if </span>offset != <span class="number">0 </span>{
+<a href=#494 id=494 data-nosnippet>494</a>        <span class="kw">if </span><span class="macro">offset !</span>= <span class="number">0 </span>{
 <a href=#495 id=495 data-nosnippet>495</a>            <span class="kw">for _ in </span>offset .. alignment {
 <a href=#496 id=496 data-nosnippet>496</a>                <span class="self">self</span>.push(with);
 <a href=#497 id=497 data-nosnippet>497</a>            }
@@ -546,12 +546,12 @@
 <a href=#546 id=546 data-nosnippet>546</a>        };
 <a href=#547 id=547 data-nosnippet>547</a>        <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
 <a href=#548 id=548 data-nosnippet>548</a>    }
-<a href=#549 id=549 data-nosnippet>549</a>    <span class="kw">fn </span>bare_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, field_offset: u8, ref_offset: u8, kind: R) {
+<a href=#549 id=549 data-nosnippet>549</a>    <span class="kw">fn </span>value_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: usize, field_offset: u8, ref_offset: u8, kind: R) {
 <a href=#550 id=550 data-nosnippet>550</a>        <span class="kw">let </span>location = <span class="self">self</span>.offset();
 <a href=#551 id=551 data-nosnippet>551</a>        <span class="kw">let </span>loc = PatchLoc::new(location, <span class="number">0</span>, field_offset, ref_offset, kind);
 <a href=#552 id=552 data-nosnippet>552</a>        <span class="kw">let </span>buf = <span class="kw-2">&amp;mut </span><span class="self">self</span>.ops[loc.range(<span class="number">0</span>)];
-<a href=#553 id=553 data-nosnippet>553</a>        <span class="kw">if </span>loc.patch(buf, <span class="self">self</span>.baseaddr, target).is_err() {
-<a href=#554 id=554 data-nosnippet>554</a>            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)))
+<a href=#553 id=553 data-nosnippet>553</a>        <span class="kw">if </span>loc.patch(buf, <span class="self">self</span>.baseaddr, value).is_err() {
+<a href=#554 id=554 data-nosnippet>554</a>            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Value(value)))
 <a href=#555 id=555 data-nosnippet>555</a>        }
 <a href=#556 id=556 data-nosnippet>556</a>    }
 <a href=#557 id=557 data-nosnippet>557</a>}
@@ -786,7 +786,7 @@
 <a href=#786 id=786 data-nosnippet>786</a>
 <a href=#787 id=787 data-nosnippet>787</a>    <span class="kw">fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alignment: usize, with: u8) {
 <a href=#788 id=788 data-nosnippet>788</a>        <span class="kw">let </span>misalign = <span class="self">self</span>.offset().<span class="number">0 </span>% alignment;
-<a href=#789 id=789 data-nosnippet>789</a>        <span class="kw">if </span>misalign != <span class="number">0 </span>{
+<a href=#789 id=789 data-nosnippet>789</a>        <span class="kw">if </span><span class="macro">misalign !</span>= <span class="number">0 </span>{
 <a href=#790 id=790 data-nosnippet>790</a>            <span class="kw">for _ in </span>misalign .. alignment {
 <a href=#791 id=791 data-nosnippet>791</a>                <span class="self">self</span>.push(with);
 <a href=#792 id=792 data-nosnippet>792</a>            }
@@ -841,12 +841,12 @@
 <a href=#841 id=841 data-nosnippet>841</a>        };
 <a href=#842 id=842 data-nosnippet>842</a>        <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
 <a href=#843 id=843 data-nosnippet>843</a>    }
-<a href=#844 id=844 data-nosnippet>844</a>    <span class="kw">fn </span>bare_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, field_offset: u8, ref_offset: u8, kind: R) {
+<a href=#844 id=844 data-nosnippet>844</a>    <span class="kw">fn </span>value_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: usize, field_offset: u8, ref_offset: u8, kind: R) {
 <a href=#845 id=845 data-nosnippet>845</a>        <span class="kw">let </span>location = <span class="self">self</span>.offset();
 <a href=#846 id=846 data-nosnippet>846</a>        <span class="kw">let </span>loc = PatchLoc::new(location, <span class="number">0</span>, field_offset, ref_offset, kind);
 <a href=#847 id=847 data-nosnippet>847</a>        <span class="kw">let </span>buf = <span class="kw-2">&amp;mut </span><span class="self">self</span>.ops[loc.range(<span class="self">self</span>.memory.committed())];
-<a href=#848 id=848 data-nosnippet>848</a>        <span class="kw">if </span>loc.patch(buf, <span class="self">self</span>.memory.execbuffer_addr(), target).is_err() {
-<a href=#849 id=849 data-nosnippet>849</a>            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)))
+<a href=#848 id=848 data-nosnippet>848</a>        <span class="kw">if </span>loc.patch(buf, <span class="self">self</span>.memory.execbuffer_addr(), value).is_err() {
+<a href=#849 id=849 data-nosnippet>849</a>            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Value(value)))
 <a href=#850 id=850 data-nosnippet>850</a>        } <span class="kw">else if </span>loc.needs_adjustment() {
 <a href=#851 id=851 data-nosnippet>851</a>            <span class="self">self</span>.managed.add(loc)
 <a href=#852 id=852 data-nosnippet>852</a>        }
@@ -896,7 +896,7 @@
 <a href=#896 id=896 data-nosnippet>896</a>
 <a href=#897 id=897 data-nosnippet>897</a>    <span class="doccomment">/// Check that the modifier cursor is exactly at the specified location.
 <a href=#898 id=898 data-nosnippet>898</a>    </span><span class="kw">pub fn </span>check_exact(<span class="kw-2">&amp;</span><span class="self">self</span>, offset: AssemblyOffset) -&gt; <span class="prelude-ty">Result</span>&lt;(), DynasmError&gt; {
-<a href=#899 id=899 data-nosnippet>899</a>        <span class="kw">if </span><span class="self">self</span>.asmoffset != offset.<span class="number">0 </span>{
+<a href=#899 id=899 data-nosnippet>899</a>        <span class="kw">if </span><span class="self">self</span>.<span class="macro">asmoffset !</span>= offset.<span class="number">0 </span>{
 <a href=#900 id=900 data-nosnippet>900</a>            <span class="prelude-val">Err</span>(DynasmError::CheckFailed)
 <a href=#901 id=901 data-nosnippet>901</a>        } <span class="kw">else </span>{
 <a href=#902 id=902 data-nosnippet>902</a>            <span class="prelude-val">Ok</span>(())
@@ -992,7 +992,7 @@
 <a href=#992 id=992 data-nosnippet>992</a>
 <a href=#993 id=993 data-nosnippet>993</a>    <span class="kw">fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alignment: usize, with: u8) {
 <a href=#994 id=994 data-nosnippet>994</a>        <span class="kw">let </span>mismatch = <span class="self">self</span>.asmoffset % alignment;
-<a href=#995 id=995 data-nosnippet>995</a>        <span class="kw">if </span>mismatch != <span class="number">0 </span>{
+<a href=#995 id=995 data-nosnippet>995</a>        <span class="kw">if </span><span class="macro">mismatch !</span>= <span class="number">0 </span>{
 <a href=#996 id=996 data-nosnippet>996</a>            <span class="kw">for _ in </span>mismatch .. alignment {
 <a href=#997 id=997 data-nosnippet>997</a>                <span class="self">self</span>.push(with)
 <a href=#998 id=998 data-nosnippet>998</a>            }
@@ -1047,13 +1047,13 @@
 <a href=#1047 id=1047 data-nosnippet>1047</a>        };
 <a href=#1048 id=1048 data-nosnippet>1048</a>        <span class="self">self</span>.relocs.add_static(label, PatchLoc::new(location, target_offset, field_offset, ref_offset, kind));
 <a href=#1049 id=1049 data-nosnippet>1049</a>    }
-<a href=#1050 id=1050 data-nosnippet>1050</a>    <span class="kw">fn </span>bare_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: usize, field_offset: u8, ref_offset: u8, kind: R) {
+<a href=#1050 id=1050 data-nosnippet>1050</a>    <span class="kw">fn </span>value_relocation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: usize, field_offset: u8, ref_offset: u8, kind: R) {
 <a href=#1051 id=1051 data-nosnippet>1051</a>        <span class="kw">let </span>location = <span class="self">self</span>.offset();
 <a href=#1052 id=1052 data-nosnippet>1052</a>        <span class="kw">let </span>loc = PatchLoc::new(location, <span class="number">0</span>, field_offset, ref_offset, kind);
 <a href=#1053 id=1053 data-nosnippet>1053</a>            <span class="kw">let </span>buf_addr = <span class="self">self</span>.buffer.as_ptr() <span class="kw">as </span>usize;
 <a href=#1054 id=1054 data-nosnippet>1054</a>        <span class="kw">let </span>buf = <span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer[loc.range(<span class="number">0</span>)];
-<a href=#1055 id=1055 data-nosnippet>1055</a>        <span class="kw">if </span>loc.patch(buf, buf_addr, target).is_err() {
-<a href=#1056 id=1056 data-nosnippet>1056</a>            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Extern(target)));
+<a href=#1055 id=1055 data-nosnippet>1055</a>        <span class="kw">if </span>loc.patch(buf, buf_addr, value).is_err() {
+<a href=#1056 id=1056 data-nosnippet>1056</a>            <span class="self">self</span>.error = <span class="prelude-val">Some</span>(DynasmError::ImpossibleRelocation(TargetKind::Value(value)));
 <a href=#1057 id=1057 data-nosnippet>1057</a>        } <span class="kw">else if </span>loc.needs_adjustment() {
 <a href=#1058 id=1058 data-nosnippet>1058</a>            <span class="self">self</span>.new_managed.add(loc)
 <a href=#1059 id=1059 data-nosnippet>1059</a>        }
@@ -1099,7 +1099,7 @@
 <a href=#1099 id=1099 data-nosnippet>1099</a>
 <a href=#1100 id=1100 data-nosnippet>1100</a>    <span class="doccomment">/// Checks that the current modification offset is exactly the specified offset.
 <a href=#1101 id=1101 data-nosnippet>1101</a>    </span><span class="kw">pub fn </span>check_exact(<span class="kw-2">&amp;mut </span><span class="self">self</span>, offset: AssemblyOffset) -&gt; <span class="prelude-ty">Result</span>&lt;(), DynasmError&gt; {
-<a href=#1102 id=1102 data-nosnippet>1102</a>        <span class="kw">if </span><span class="self">self</span>.offset != offset.<span class="number">0 </span>{
+<a href=#1102 id=1102 data-nosnippet>1102</a>        <span class="kw">if </span><span class="self">self</span>.<span class="macro">offset !</span>= offset.<span class="number">0 </span>{
 <a href=#1103 id=1103 data-nosnippet>1103</a>            <span class="prelude-val">Err</span>(DynasmError::CheckFailed)
 <a href=#1104 id=1104 data-nosnippet>1104</a>        } <span class="kw">else </span>{
 <a href=#1105 id=1105 data-nosnippet>1105</a>            <span class="prelude-val">Ok</span>(())
@@ -1119,7 +1119,7 @@
 <a href=#1119 id=1119 data-nosnippet>1119</a>
 <a href=#1120 id=1120 data-nosnippet>1120</a>    <span class="kw">fn </span>align(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alignment: usize, with: u8) {
 <a href=#1121 id=1121 data-nosnippet>1121</a>        <span class="kw">let </span>mismatch = <span class="self">self</span>.offset % alignment;
-<a href=#1122 id=1122 data-nosnippet>1122</a>        <span class="kw">if </span>mismatch != <span class="number">0 </span>{
+<a href=#1122 id=1122 data-nosnippet>1122</a>        <span class="kw">if </span><span class="macro">mismatch !</span>= <span class="number">0 </span>{
 <a href=#1123 id=1123 data-nosnippet>1123</a>            <span class="kw">for _ in </span>mismatch .. alignment {
 <a href=#1124 id=1124 data-nosnippet>1124</a>                <span class="self">self</span>.push(with)
 <a href=#1125 id=1125 data-nosnippet>1125</a>            }
@@ -1148,4 +1148,5 @@
 <a href=#1148 id=1148 data-nosnippet>1148</a>    <span class="doccomment">/// Returns the integer ID of the register. Usually equivalent to casting
 <a href=#1149 id=1149 data-nosnippet>1149</a>    /// the enum to an u8, but allows you to be generic over the register family.
 <a href=#1150 id=1150 data-nosnippet>1150</a>    </span><span class="kw">fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
-<a href=#1151 id=1151 data-nosnippet>1151</a>}</code></pre></div></section></main></body></html>
+<a href=#1151 id=1151 data-nosnippet>1151</a>}
+</code></pre></div></section></main></body></html>
