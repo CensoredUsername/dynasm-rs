@@ -86,9 +86,13 @@
 
     <h1 class="title">Release notes</h1>
     <p>The <code>dynasm-rs</code> project consists out of two crates: The procedural macro crate <code>dynasm</code> and the runtime support crate <code>dynasmrt</code>. The versions of these two crates are synchronized and should always match. From version 0.7.0 onwards <code>dynasmrt</code> depends on <code>dynasm</code> itself to simplify this relationship. Any version listings below therefore refers to both the <code>dynasm</code> and <code>dynasmrt</code> crate version.</p>
-<h1 id="version-500"><a class="doc-anchor" href="#version-500">§</a>Version 5.0.0</h1><h2 id="summary"><a class="doc-anchor" href="#summary">§</a>Summary</h2>
+<h1 id="version-500"><a class="doc-anchor" href="#version-500">§</a>Version 5.0.0</h1><h2 id="plugin"><a class="doc-anchor" href="#plugin">§</a>Plugin</h2>
+<ul>
+<li>Moves error generation from the unmaintaned <code>proc-macro-error2</code> to the maintained <code>proc-macro-error3</code></li>
+</ul>
+<h1 id="version-500-1"><a class="doc-anchor" href="#version-500-1">§</a>Version 5.0.0</h1><h2 id="summary"><a class="doc-anchor" href="#summary">§</a>Summary</h2>
 <p>This release reworks the internals of relocation handling, allowing for more freedom in how references can be encoded.</p>
-<h2 id="plugin"><a class="doc-anchor" href="#plugin">§</a>Plugin</h2>
+<h2 id="plugin-1"><a class="doc-anchor" href="#plugin-1">§</a>Plugin</h2>
 <ul>
 <li>Added new .abs[32/64] and .rel[8/16/32/64] directives that allow the address or offset of labels to be directly encoded in the instruction stream.</li>
 <li>
@@ -136,7 +140,7 @@
 <ul>
 <li>dependencies have been updated</li>
 </ul>
-<h2 id="plugin-1"><a class="doc-anchor" href="#plugin-1">§</a>Plugin</h2>
+<h2 id="plugin-2"><a class="doc-anchor" href="#plugin-2">§</a>Plugin</h2>
 <ul>
 <li>Dynamic registers now accept any value that is convertible via <code>Into&lt;u8&gt;</code>. This significantly improves the ergonomics of using dynamic register values with custom wrapper types. Unfortunately, this might break code which already does this conversion explicitly, leading to an unknown type error. To remedy this, simply remove the explicit conversion.</li>
 </ul>
@@ -213,7 +217,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>the aarch64 instruction <code>mov w0, immu32</code> now expects a <code>u32</code> as immediate instead of an <code>u64</code>.</li>
 </ul>
 <p>Several of these changes were the result of external contributions, we’d like to thank everyone who contributed to this release.</p>
-<h1 id="version-200"><a class="doc-anchor" href="#version-200">§</a>Version 2.0.0</h1><h2 id="plugin-2"><a class="doc-anchor" href="#plugin-2">§</a>Plugin</h2>
+<h1 id="version-200"><a class="doc-anchor" href="#version-200">§</a>Version 2.0.0</h1><h2 id="plugin-3"><a class="doc-anchor" href="#plugin-3">§</a>Plugin</h2>
 <ul>
 <li>Be stricter on X/W or XSP/WSP differentiation in x64.</li>
 </ul>
@@ -227,7 +231,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Various fixes</li>
 </ul>
-<h1 id="version-123"><a class="doc-anchor" href="#version-123">§</a>Version 1.2.3</h1><h2 id="plugin-3"><a class="doc-anchor" href="#plugin-3">§</a>Plugin</h2>
+<h1 id="version-123"><a class="doc-anchor" href="#version-123">§</a>Version 1.2.3</h1><h2 id="plugin-4"><a class="doc-anchor" href="#plugin-4">§</a>Plugin</h2>
 <ul>
 <li>add x64 ud1 opcode.</li>
 <li>Bugfix the REPNE prefix so it can actually be used.</li>
@@ -254,7 +258,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>First release on rust stable (1.45+)!</li>
 </ul>
-<h2 id="plugin-4"><a class="doc-anchor" href="#plugin-4">§</a>Plugin</h2>
+<h2 id="plugin-5"><a class="doc-anchor" href="#plugin-5">§</a>Plugin</h2>
 <ul>
 <li>Use new Span::mixed_site hygiene to replace call_site hygiene wherever relevant.</li>
 </ul>
@@ -267,7 +271,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Updated everything to the 2018 edition of rust.</li>
 <li>The crate will be able to be used on a rust 1.45 stable compiler!</li>
 </ul>
-<h2 id="plugin-5"><a class="doc-anchor" href="#plugin-5">§</a>Plugin</h2>
+<h2 id="plugin-6"><a class="doc-anchor" href="#plugin-6">§</a>Plugin</h2>
 <ul>
 <li>File-local directives now requires the <code>filelocal</code> feature and a nightly compiler.</li>
 <li>Now compiles and is usable on a stable 1.45 rust compiler.</li>
@@ -288,7 +292,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Reduced compile time significantly by migrating simple instruction format tests to <code>SimpleAssembler</code>.</li>
 </ul>
-<h1 id="version-052"><a class="doc-anchor" href="#version-052">§</a>Version 0.5.2</h1><h2 id="plugin-6"><a class="doc-anchor" href="#plugin-6">§</a>Plugin</h2>
+<h1 id="version-052"><a class="doc-anchor" href="#version-052">§</a>Version 0.5.2</h1><h2 id="plugin-7"><a class="doc-anchor" href="#plugin-7">§</a>Plugin</h2>
 <ul>
 <li>Remove a problematic semicolon that might cause errors in the future.</li>
 <li>README update.</li>
@@ -297,7 +301,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Fix a bug that caused emitted code corruption corruption in Aarch64’s B and ADRP relocation calculations.</li>
 </ul>
-<h1 id="version-050"><a class="doc-anchor" href="#version-050">§</a>Version 0.5.0</h1><h2 id="plugin-7"><a class="doc-anchor" href="#plugin-7">§</a>Plugin</h2>
+<h1 id="version-050"><a class="doc-anchor" href="#version-050">§</a>Version 0.5.0</h1><h2 id="plugin-8"><a class="doc-anchor" href="#plugin-8">§</a>Plugin</h2>
 <ul>
 <li>We now support an arbitrary offset added to any jump. This feature allows direct addressing of literal pools or arrays of values without generating labels for every single item in them.</li>
 </ul>
@@ -311,7 +315,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Added Aarch64 support, thanks to sponsoring from <a href="https://wasmer.io">Wasmer</a>.</li>
 </ul>
-<h2 id="plugin-8"><a class="doc-anchor" href="#plugin-8">§</a>Plugin</h2>
+<h2 id="plugin-9"><a class="doc-anchor" href="#plugin-9">§</a>Plugin</h2>
 <ul>
 <li>Remove use of mem::unitialized when calculating the offsets of members in structs in generated code.
 -Optimization of opmap and register tables to reduce compile time and file size.</li>
@@ -321,12 +325,12 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Split architecture-specific DSL documentation and generic DSL documentation.</li>
 <li>Ported examples to Aarch64.</li>
 </ul>
-<h1 id="version-032"><a class="doc-anchor" href="#version-032">§</a>Version 0.3.2</h1><h2 id="plugin-9"><a class="doc-anchor" href="#plugin-9">§</a>Plugin</h2>
+<h1 id="version-032"><a class="doc-anchor" href="#version-032">§</a>Version 0.3.2</h1><h2 id="plugin-10"><a class="doc-anchor" href="#plugin-10">§</a>Plugin</h2>
 <ul>
 <li>x64/x86: Always escape into SIB encoding with a displacement when a register is used as a memory reference base, to allow RBP to be encoded.</li>
 <li>x64/x86: Properly handle dynamic registers in VEX prefixes</li>
 </ul>
-<h1 id="version-031"><a class="doc-anchor" href="#version-031">§</a>Version 0.3.1</h1><h2 id="plugin-10"><a class="doc-anchor" href="#plugin-10">§</a>Plugin</h2>
+<h1 id="version-031"><a class="doc-anchor" href="#version-031">§</a>Version 0.3.1</h1><h2 id="plugin-11"><a class="doc-anchor" href="#plugin-11">§</a>Plugin</h2>
 <ul>
 <li>Fixed an issue where dynamic registers caused wrong code generation.</li>
 </ul>
@@ -338,7 +342,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Fixed SETB and SETNB not being present in x64/x86</li>
 </ul>
-<h2 id="plugin-11"><a class="doc-anchor" href="#plugin-11">§</a>Plugin</h2>
+<h2 id="plugin-12"><a class="doc-anchor" href="#plugin-12">§</a>Plugin</h2>
 <ul>
 <li>The plugin has been updated to the new procedural macro system. This means it should no longer break when new compiler versions are released.</li>
 <li>Directives are now scoped file-local instead of crate-local.</li>
@@ -347,7 +351,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>The alter API can now return values produced by the user-defined closure.</li>
 </ul>
-<h1 id="versions-021-022-and-023"><a class="doc-anchor" href="#versions-021-022-and-023">§</a>Versions 0.2.1, 0.2.2 and 0.2.3</h1><h2 id="plugin-12"><a class="doc-anchor" href="#plugin-12">§</a>Plugin</h2>
+<h1 id="versions-021-022-and-023"><a class="doc-anchor" href="#versions-021-022-and-023">§</a>Versions 0.2.1, 0.2.2 and 0.2.3</h1><h2 id="plugin-13"><a class="doc-anchor" href="#plugin-13">§</a>Plugin</h2>
 <ul>
 <li>Updates so it stays compatible with rustc as the plugin API changes.</li>
 </ul>
@@ -356,7 +360,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <li>Added support for x86</li>
 <li>Enabled relocation support in x64 when additional immediate fields are present.</li>
 </ul>
-<h2 id="plugin-13"><a class="doc-anchor" href="#plugin-13">§</a>Plugin</h2>
+<h2 id="plugin-14"><a class="doc-anchor" href="#plugin-14">§</a>Plugin</h2>
 <ul>
 <li>Significant refactoring of the x64 backend to also handle x86</li>
 <li>Added x64 feature selection support.</li>
@@ -365,7 +369,7 @@ crate has moved to rust edition 2021. The minimum supported rust version is now 
 <ul>
 <li>Added managed relocation support to handle non-relative relocations.</li>
 </ul>
-<h1 id="versions-014-013-012-011"><a class="doc-anchor" href="#versions-014-013-012-011">§</a>Versions 0.1.4, 0.1.3, 0.1.2, 0.1.1</h1><h2 id="plugin-14"><a class="doc-anchor" href="#plugin-14">§</a>Plugin</h2>
+<h1 id="versions-014-013-012-011"><a class="doc-anchor" href="#versions-014-013-012-011">§</a>Versions 0.1.4, 0.1.3, 0.1.2, 0.1.1</h1><h2 id="plugin-15"><a class="doc-anchor" href="#plugin-15">§</a>Plugin</h2>
 <ul>
 <li>Updates so it stays compatible with rustc as the plugin API changes.</li>
 </ul>
