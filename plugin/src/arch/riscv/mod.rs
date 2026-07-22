@@ -6,7 +6,7 @@
 use std::collections::HashSet;
 
 use syn::parse;
-use proc_macro_error2::emit_error;
+use proc_macro_error3::emit_error;
 
 pub mod riscvdata;
 pub mod ast;

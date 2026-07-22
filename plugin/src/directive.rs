@@ -5,7 +5,7 @@ use syn::Token;
 use syn::spanned::Spanned;
 use quote::quote_spanned;
 use proc_macro2::{TokenTree, Literal, Span};
-use proc_macro_error2::emit_error;
+use proc_macro_error3::emit_error;
 
 use crate::common::{Stmt, Size, delimited, RelocationEncoding, JumpTarget};
 use crate::arch;

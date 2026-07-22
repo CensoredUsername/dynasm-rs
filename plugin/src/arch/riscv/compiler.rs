@@ -5,7 +5,7 @@ use super::ast::{MatchData, FlatArg, RegListFlat, Register};
 use syn::spanned::Spanned;
 use quote::{quote, quote_spanned};
 use proc_macro2::{TokenStream, Span, Literal};
-use proc_macro_error2::emit_error;
+use proc_macro_error3::emit_error;
 
 use crate::parse_helpers::{as_signed_number, as_ident, as_float};
 use crate::common::{Stmt, Size, delimited, bitmask, bitmask64, RelocationEncoding};

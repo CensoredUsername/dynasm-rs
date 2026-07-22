@@ -5,6 +5,13 @@ The `dynasm-rs` project consists out of two crates: The procedural macro crate `
 Version 5.0.0
 =============
 
+Plugin
+------
+- Moves error generation from the unmaintaned `proc-macro-error2` to the maintained `proc-macro-error3`
+
+Version 5.0.0
+=============
+
 Summary
 -------
 This release reworks the internals of relocation handling, allowing for more freedom in how references can be encoded.
