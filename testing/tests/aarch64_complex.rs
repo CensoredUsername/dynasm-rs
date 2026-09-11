@@ -136,6 +136,7 @@ fn complex() {
     println!("");
 }
 
+#[cfg(feature = "runtime_computations")]
 #[test]
 fn opaque_register_type() {
     struct Gpr {

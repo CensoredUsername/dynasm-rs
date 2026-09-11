@@ -35,5 +35,9 @@ version = "1.0.106"
 dynasm_opmap = []
 dynasm_extract = []
 filelocal = []
+# Allow the expansions of `dynasm` macro use runtime-only functions, such as the automatic
+# `.into()` conversions of the dynamic registers. Disabling this featue allows `dynasm!` output to
+# be evaluated in `const {}` contexts.
+runtime_computations = []
 
-default = []
+default = ["runtime_computations"]
