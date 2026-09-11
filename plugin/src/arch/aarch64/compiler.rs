@@ -4,7 +4,7 @@ use super::Context;
 use super::ast::{FlatArg, RegKind, RegId, Modifier};
 use super::encoding_helpers;
 
-use crate::common::{Stmt, Size, delimited, bitmask, RelocationEncoding};
+use crate::common::{Stmt, Size, delimited, bitmask, RelocationEncoding, maybe_into};
 use crate::parse_helpers::{as_ident, as_unsigned_number, as_float, as_signed_number};
 
 use syn::spanned::Spanned;
@@ -90,28 +90,28 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
             FlatArg::Direct { span, reg: RegKind::Dynamic(_, ref expr) } => match *command {
                 Command::R(offset)
                 | Command::RNoZr(offset) => {
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             _dyn_reg & 0x1F
                         }
                     }));
                 },
                 Command::REven(offset) => {
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             _dyn_reg & 0x1E
                         }
                     }));
                 },
                 Command::R4(offset) => {
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             _dyn_reg & 0xF
                         }
                     }));

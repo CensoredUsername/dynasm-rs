@@ -8,7 +8,7 @@ use proc_macro2::{TokenStream, Span, Literal};
 use proc_macro_error3::emit_error;
 
 use crate::parse_helpers::{as_signed_number, as_ident, as_float};
-use crate::common::{Stmt, Size, delimited, bitmask, bitmask64, RelocationEncoding};
+use crate::common::{Stmt, Size, delimited, bitmask, bitmask64, maybe_into, RelocationEncoding};
 
 /// Compile a single instruction. Input is taken from `data`, containing both the arguments
 /// and the encoding template and commands.
@@ -95,10 +95,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 }
                             },
                             Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr), .. }) => {
-                                let expr = delimited(expr);
+                                let expr = maybe_into(expr);
                                 dynamics.push((0, quote_spanned!{ span=>
                                     {
-                                        let _dyn_reg: u8 = #expr.into();
+                                        let _dyn_reg: u8 = #expr;
                                         if _dyn_reg == #code {
                                             ::dynasmrt::riscv::invalid_register(#code);
                                         }
@@ -124,20 +124,20 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
             FlatArg::Register { span, reg: Register::Dynamic(_, ref expr) } => match *command {
                 Command::R(offset) => {
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             (_dyn_reg & 0x1F) as u32
                         }
                     }));
                 },
                 Command::Reven(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg & 0x1 != 0x0 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
@@ -147,10 +147,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rno0(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg == 0x0 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
@@ -160,10 +160,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rno02(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg == 0x0 || _dyn_reg == 0x2 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
@@ -173,10 +173,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rpop(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             if _dyn_reg & 0x18 != 0x8 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
@@ -186,10 +186,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 },
                 Command::Rpops(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
+                    let expr = maybe_into(expr);
                     dynamics.push((offset, quote_spanned!{ span=>
                         {
-                            let _dyn_reg: u8 = #expr.into();
+                            let _dyn_reg: u8 = #expr;
                             if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 || (_dyn_reg & #invalid_reg_mask) != 0 {
                                 ::dynasmrt::riscv::invalid_register(_dyn_reg);
                             }
@@ -201,10 +201,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
                         let code: u8 = id2.code();
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                        let expr = delimited(expr);
+                        let expr = maybe_into(expr);
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
-                                let _dyn_reg: u8 = #expr.into();
+                                let _dyn_reg: u8 = #expr;
                                 if (_dyn_reg == #code) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) || (_dyn_reg & #invalid_reg_mask) != 0 {
                                     ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                 }
@@ -214,12 +214,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     },
                     Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr2), .. }) => {
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                        let expr = delimited(expr);
-                        let expr2 = delimited(expr2);
+                        let expr = maybe_into(expr);
+                        let expr2 = maybe_into(expr2);
                         dynamics.push((offset, quote_spanned!{ span=>
                             {
-                                let _dyn_reg: u8 = #expr.into();
-                                let _dyn_reg_prev: u8 = #expr2.into();
+                                let _dyn_reg: u8 = #expr;
+                                let _dyn_reg_prev: u8 = #expr2;
                                 if (_dyn_reg == _dyn_reg_prev) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) || (_dyn_reg & #invalid_reg_mask) != 0 {
                                     ::dynasmrt::riscv::invalid_register(_dyn_reg);
                                 }
@@ -276,7 +276,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 // This practically means we just don't have to encode anything.
                 Command::UImm(_, _)
                 | Command::SImm(_, _)
-                | Command::BitRange(_, _, _) 
+                | Command::BitRange(_, _, _)
                 | Command::Next => (),
                 _ => panic!("Invalid argument processor")
             },
