@@ -134,7 +134,12 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
 
         // work around rustc giving code style warnings about unneeded parenthesis in method calls
         let mut args = args;
-        args.iter_mut().for_each(strip_parenthesis);
+        for (index, arg) in args.iter_mut().enumerate() {
+            strip_parenthesis(arg);
+            let argident = syn::Ident::new(&format!("a{}", index), arg.span());
+            output.extend(quote! { let #argident = #arg; });
+            *arg = argident.into();
+        }
 
         output.extend(quote! {
             #name . #method ( #( #args ),* ) ;
