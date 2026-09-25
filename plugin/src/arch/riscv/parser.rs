@@ -159,7 +159,11 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<ast:
     let span = input.span();
     let expr: syn::Expr = if eat_pseudo_keyword(input, "dyn") {
         let path: syn::Path = syn::Ident::new("dyn", span).into();
-        syn::ExprPath { attrs: Vec::new(), qself: None, path}.into()
+        syn::Expr::Path(syn::ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            path,
+        })
     } else {
         input.parse()?
     };
