@@ -195,102 +195,6 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, Aarch64Relocation>;
 /// An aarch64 UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
-
-// these should explicitly never be inlined, as this is the slow path.
-// that's also why these aren't made generic.
-
-/// Handler for `f32` out-of-range aarch64 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_unsigned_f32(immediate: f32) -> ! {
-    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
-}
-
-/// Handler for `u64` out-of-range aarch64 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_unsigned_64(immediate: u64) -> ! {
-    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
-}
-
-/// Handler for `u32` out-of-range aarch64 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_unsigned_32(immediate: u32) -> ! {
-    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
-}
-
-/// Handler for `i32` out-of-range aarch64 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_signed_32(immediate: i32) -> ! {
-    panic!("Cannot assemble this Aarch64 instruction. Immediate {immediate} is out of range.")
-}
-
-
-/// Helper function for validating that a given value can be encoded as a 32-bit logical immediate
-pub fn encode_logical_immediate_32bit(value: u32) -> Option<u16> {
-    let transitions = value ^ value.rotate_right(1);
-    let element_size = (64u32).checked_div(transitions.count_ones())?;
-
-    // confirm that the elements are identical
-    if value != value.rotate_left(element_size) {
-        return None;
-    }
-
-    let element = value & 1u32.checked_shl(element_size).unwrap_or(0).wrapping_sub(1);
-    let ones = element.count_ones();
-    let imms = (!((element_size << 1) - 1) & 0x3F) | (ones - 1);
-
-    let immr = if (element & 1) != 0 {
-        ones - (!element).trailing_zeros()
-    } else {
-        element_size - element.trailing_zeros()
-    };
-
-    Some(((immr as u16) << 6) | (imms as u16))
-}
-
-/// Helper function for validating that a given value can be encoded as a 64-bit logical immediate
-pub fn encode_logical_immediate_64bit(value: u64) -> Option<u16> {
-    let transitions = value ^ value.rotate_right(1);
-    let element_size = (128u32).checked_div(transitions.count_ones())?;
-
-    // confirm that the elements are identical
-    if value != value.rotate_left(element_size) {
-        return None;
-    }
-
-    let element = value & 1u64.checked_shl(element_size).unwrap_or(0).wrapping_sub(1);
-    let ones = element.count_ones();
-    let imms = (!((element_size << 1) - 1) & 0x7F) | (ones - 1);
-
-    let immr = if (element & 1) != 0 {
-        ones - (!element).trailing_zeros()
-    } else {
-        element_size - element.trailing_zeros()
-    };
-
-    let n = imms & 0x40 == 0;
-    let imms = imms & 0x3F;
-
-    Some(((n as u16) << 12) | ((immr as u16) << 6) | (imms as u16))
-}
-
-/// Helper function for validating that a given value can be encoded as a floating point immediate
-pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
-    // floating point ARM immediates are encoded as
-    // abcdefgh => aBbbbbbc defgh000 00000000 00000000
-    // where B = !b
-    // which means we can just slice out "a" and "bcdefgh" and assume the rest was correct
-
-    let bits = value.to_bits();
-
-    let check = (bits >> 25) & 0x3F;
-    if (check == 0b10_0000 || check == 0b01_1111) && (bits & 0x7_FFFF) == 0 {
-        Some((((bits >> 24) & 0x80) | ((bits >> 19) & 0x7F)) as u8)
-    } else {
-        None
-    }
-}
-
-
 /// 4 or 8-byte general purpopse registers, where X31 is the zero register.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -322,7 +226,7 @@ pub enum RXSP {
 }
 reg_impls!(RXSP);
 
-/// 1, 2, 4, 8 or 16-bytes scalar FP / vector SIMD registers. 
+/// 1, 2, 4, 8 or 16-bytes scalar FP / vector SIMD registers.
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RV {

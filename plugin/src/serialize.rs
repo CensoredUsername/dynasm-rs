@@ -11,7 +11,7 @@ use std::convert::TryInto;
 
 
 /// Converts a sequence of abstract Statements to actual tokens
-pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
+pub fn serialize(output_assembler: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
     // first, try to fold constants into a byte stream
     let mut folded_stmts = Vec::new();
     let mut const_buffer = Vec::new();
@@ -82,7 +82,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
             Stmt::GlobalLabel(n) => ("global_label", vec![expr_string_from_ident(&n)]),
             Stmt::LocalLabel(n)  => ("local_label", vec![expr_string_from_ident(&n)]),
             Stmt::DynamicLabel(expr) => ("dynamic_label", vec![expr]),
-            Stmt::GlobalJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind, encoding }) => 
+            Stmt::GlobalJumpTarget(n, Relocation { target_offset, field_offset, ref_offset, kind, encoding }) =>
                 ("global_reloc"  , vec![
                     expr_string_from_ident(&n),
                     target_offset,
@@ -121,6 +121,14 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
                     Literal::u8_suffixed(ref_offset).into(),
                     Literal::u8_suffixed(encoding.encode(kind)).into()
                 ]),
+            Stmt::MaybeRuntimeError(expr, msg) => {
+                output.extend(quote! {
+                    if #expr {
+                        #output_assembler.runtime_error(#msg);
+                    }
+                });
+                continue;
+            }
             Stmt::Stmt(s) => {
                 output.extend(quote! {
                     #s ;
@@ -137,7 +145,7 @@ pub fn serialize(name: &TokenTree, stmts: Vec<Stmt>) -> TokenStream {
         args.iter_mut().for_each(strip_parenthesis);
 
         output.extend(quote! {
-            #name . #method ( #( #args ),* ) ;
+            #output_assembler . #method ( #( #args ),* ) ;
         })
     }
 
@@ -198,6 +206,7 @@ pub fn invert(stmts: Vec<Stmt>) -> Vec<Stmt> {
             | Stmt::BackwardJumpTarget(_, _)
             | Stmt::DynamicJumpTarget(_, _)
             | Stmt::ValueJumpTarget(_, _)
+            | Stmt::MaybeRuntimeError(_, _)
             | Stmt::Stmt(_) => 0,
         };
 

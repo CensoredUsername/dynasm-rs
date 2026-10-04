@@ -288,6 +288,9 @@ pub enum Stmt {
     DynamicJumpTarget(TokenTree, Relocation),
     ValueJumpTarget(TokenTree, Relocation),
 
+    // a test that if failing results in the runtime_error() being called
+    MaybeRuntimeError(syn::Expr, &'static str),
+
     // a random statement that has to be inserted between assembly hunks
     Stmt(TokenStream)
 }
@@ -389,4 +392,20 @@ pub fn bitmask(scale: u8) -> u32 {
 /// Create a bitmask with `scale` bits set
 pub fn bitmask64(scale: u8) -> u64 {
     1u64.checked_shl(u32::from(scale)).unwrap_or(0).wrapping_sub(1)
+}
+
+/// Wrap the provided expression in an `Into::into` call.
+///
+/// This is only done when the crate is built with the operand_conversions feature enabled.
+#[cfg(feature = "runtime_computations")]
+pub fn maybe_into(expr: impl quote::ToTokens) -> proc_macro2::TokenStream {
+    let delimited = delimited(expr);
+    quote::quote_spanned! { expr.span()=>
+        #delimited.into()
+    }
+}
+
+#[cfg(not(feature = "runtime_computations"))]
+pub fn maybe_into(expr: impl quote::ToTokens) -> proc_macro2::TokenStream {
+    quote::ToTokens::into_token_stream(delimited(expr))
 }

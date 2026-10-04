@@ -231,7 +231,9 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
         self.extend(&value.to_le_bytes());
     }
     /// This function is called in when a runtime error has to be generated. It panics.
-    #[inline]
+    #[cold]
+    #[inline(never)]
+    #[track_caller]
     fn runtime_error(&self, msg: &'static str) -> ! {
         panic!("{}", msg);
     }
@@ -242,7 +244,7 @@ pub trait DynasmApi: Extend<u8> + for<'a> Extend<&'a u8> {
 /// For information on the different kinds of label, consult the common language reference in the
 /// dynasm-rs docs.
 pub trait DynasmLabelApi : DynasmApi {
-    /// The relocation info type this assembler uses. 
+    /// The relocation info type this assembler uses.
     type Relocation: Relocation;
 
     /// Record the definition of a local label

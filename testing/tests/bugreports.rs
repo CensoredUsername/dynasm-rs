@@ -120,6 +120,7 @@ fn bugreport_6() {
 }
 
 
+#[cfg(feature = "runtime_computations")]
 #[test]
 fn rustc_does_not_properly_respect_macro_expr_grouping_for_precedence() {
     // the issue here is that code for emitting dynamic registers ends up emitting code like this

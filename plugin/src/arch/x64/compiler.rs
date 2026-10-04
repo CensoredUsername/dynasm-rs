@@ -3,7 +3,7 @@ use proc_macro2::{Span, Literal};
 use quote::{quote_spanned, quote};
 use proc_macro_error3::emit_error;
 
-use crate::common::{Stmt, Size, JumpTarget, JumpTargetKind, RelocationEncoding, delimited, strip_parenthesis};
+use crate::common::{Stmt, Size, JumpTarget, JumpTargetKind, RelocationEncoding, delimited, strip_parenthesis, maybe_into};
 use crate::serialize;
 
 use super::{Context, X86Mode};
@@ -240,9 +240,10 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         buffer.push(match rm_k {
             RegKind::Dynamic(_, expr) => {
+                let expr = maybe_into(expr);
                 Stmt::ExprUnsigned(delimited(quote_spanned!{ expr.span()=>
                     {
-                        let _dyn_reg: u8 = #expr.into();
+                        let _dyn_reg: u8 = #expr;
                         (_dyn_reg & 7) + #last
                     }
                 }), Size::BYTE)
@@ -446,7 +447,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
     // register in immediate argument
     if let Some(SizedArg::Direct {reg: ireg, ..}) = ireg {
         let ireg = ireg.kind;
-        
+
         let immediate = if !args.is_empty() {
             if let SizedArg::Immediate {value, size: Size::BYTE} = args.remove(0) {
                 Some(delimited(value))
@@ -459,17 +460,19 @@ pub(super) fn compile_instruction(ctx: &mut Context, instruction: Instruction, a
 
         let expr = match (ireg, immediate) {
             (RegKind::Dynamic(_, expr), None) => {
-                delimited(quote_spanned!{ expr.span()=> 
+                let expr = maybe_into(expr);
+                delimited(quote_spanned!{ expr.span()=>
                     {
-                        let _dyn_reg: u8 = #expr.into();
+                        let _dyn_reg: u8 = #expr;
                         ((_dyn_reg & 0xF) << 4)
                     }
                 })
             },
             (RegKind::Dynamic(_, expr), Some(imm)) => {
-                delimited(quote_spanned!{ expr.span()=> 
+                let expr = maybe_into(expr);
+                delimited(quote_spanned!{ expr.span()=>
                     {
-                        let _dyn_reg: u8 = #expr.into();
+                        let _dyn_reg: u8 = #expr;
                         ((_dyn_reg & 0xF) << 4) | (#imm & 0xF)
                     }
                 })
@@ -1526,27 +1529,27 @@ fn compile_rex(buffer: &mut Vec<Stmt>, rex_w: bool, reg: &Option<SizedArg>, rm: 
     let mut dyn_items = Vec::new();
 
     if let RegKind::Dynamic(_, expr) = reg_k {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_reg: u8 = #expr.into();
+            let _dyn_reg: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             ((_dyn_reg & 8) >> 1)
         });
     }
     if let RegKind::Dynamic(_, expr) = index_k {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_index: u8 = #expr.into();
+            let _dyn_index: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             ((_dyn_index & 8) >> 2)
         });
     }
     if let RegKind::Dynamic(_, expr) = base_k {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_base: u8 = #expr.into();
+            let _dyn_base: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             ((_dyn_base & 8) >> 3)
@@ -1620,18 +1623,18 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         let mut dyn_items = Vec::new();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
-            let expr = delimited(expr);
+            let expr = maybe_into(expr);
             dyn_regs.push(quote_spanned! { expr.span()=>
-                let _dyn_reg: u8 = #expr.into();
+                let _dyn_reg: u8 = #expr;
             });
             dyn_items.push(quote_spanned! { expr.span()=>
                 !((_dyn_reg & 8) << 4)
             });
         }
         if let RegKind::Dynamic(_, expr) = vvvv_k {
-            let expr = delimited(expr);
+            let expr = maybe_into(expr);
             dyn_regs.push(quote_spanned! { expr.span()=>
-                let _dyn_vvvv: u8 = #expr.into();
+                let _dyn_vvvv: u8 = #expr;
             });
             dyn_items.push(quote_spanned! { expr.span()=>
                 !((_dyn_vvvv & 0xF) << 3)
@@ -1655,27 +1658,27 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
         let mut dyn_items = Vec::new();
 
         if let RegKind::Dynamic(_, expr) = reg_k {
-            let expr = delimited(expr);
+            let expr = maybe_into(expr);
             dyn_regs.push(quote_spanned! { expr.span()=>
-                let _dyn_reg: u8 = #expr.into();
+                let _dyn_reg: u8 = #expr;
             });
             dyn_items.push(quote_spanned! { expr.span()=>
                 !((_dyn_reg & 8) << 4)
             });
         }
         if let RegKind::Dynamic(_, expr) = index_k {
-            let expr = delimited(expr);
+            let expr = maybe_into(expr);
             dyn_regs.push(quote_spanned! { expr.span()=>
-                let _dyn_index: u8 = #expr.into();
+                let _dyn_index: u8 = #expr;
             });
             dyn_items.push(quote_spanned! { expr.span()=>
                 !((_dyn_index & 8) << 3)
             });
         }
         if let RegKind::Dynamic(_, expr) = base_k {
-            let expr = delimited(expr);
+            let expr = maybe_into(expr);
             dyn_regs.push(quote_spanned! { expr.span()=>
-                let _dyn_base: u8 = #expr.into();
+                let _dyn_base: u8 = #expr;
             });
             dyn_items.push(quote_spanned! { expr.span()=>
                 !((_dyn_base & 8) << 2)
@@ -1695,10 +1698,10 @@ rm: &Option<SizedArg>, map_sel: u8, rex_w: bool, vvvv: &Option<SizedArg>, vex_l:
 
     if let RegKind::Dynamic(_, expr) = vvvv_k {
         let byte2 = Literal::u8_suffixed(byte2);
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         buffer.push(Stmt::ExprUnsigned(delimited(quote! {
             {
-                let _dyn_vvvv: u8 = #expr.into();
+                let _dyn_vvvv: u8 = #expr;
                 #byte2 & !((_dyn_vvvv & 0xF) << 3)
             }
         }), Size::BYTE));
@@ -1721,18 +1724,18 @@ fn compile_modrm_sib(buffer: &mut Vec<Stmt>, mode: u8, reg1: RegKind, reg2: RegK
     let mut dyn_items = Vec::new();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_reg1: u8 = #expr.into();
+            let _dyn_reg1: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             ((_dyn_reg1 & 7) << 3)
         });
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_reg2: u8 = #expr.into();
+            let _dyn_reg2: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             (_dyn_reg2 & 7)
@@ -1756,18 +1759,18 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr
     let mut dyn_items = Vec::new();
 
     if let RegKind::Dynamic(_, expr) = reg1 {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_reg1: u8 = #expr.into();
+            let _dyn_reg1: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             ((_dyn_reg1 & 7) << 3)
         });
     }
     if let RegKind::Dynamic(_, expr) = reg2 {
-        let expr = delimited(expr);
+        let expr = maybe_into(expr);
         dyn_regs.push(quote_spanned! { expr.span()=>
-            let _dyn_reg2: u8 = #expr.into();
+            let _dyn_reg2: u8 = #expr;
         });
         dyn_items.push(quote_spanned! { expr.span()=>
             (_dyn_reg2 & 7)
@@ -1776,7 +1779,7 @@ fn compile_sib_dynscale(buffer: &mut Vec<Stmt>, scale: u8, scale_expr: syn::Expr
 
     let scale_expr = delimited(scale_expr);
     let scale = Literal::u8_unsuffixed(scale);
-    dyn_regs.push(quote_spanned!{ scale_expr.span()=> 
+    dyn_regs.push(quote_spanned!{ scale_expr.span()=>
         let _dyn_scale = match #scale_expr * #scale {
             8 => 3,
             4 => 2,

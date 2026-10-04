@@ -1,3 +1,6 @@
+use proc_macro2::TokenStream;
+use quote::quote_spanned;
+
 use crate::common::{bitmask, bitmask64};
 
 pub fn encode_floating_point_immediate(value: f32) -> Option<u8> {
@@ -100,4 +103,56 @@ pub fn encode_wide_immediate_32bit(value: u32) -> Option<u32> {
     } else {
         None
     }
+}
+
+pub fn runtime_encode_logical_immediate_32bit(span: proc_macro2::Span, imm: &proc_macro2::Ident) -> TokenStream {
+    quote_spanned! { span=> 'encode: {
+        let transitions = #imm ^ #imm.rotate_right(1);
+        let Some(element_size) = (64u32).checked_div(transitions.count_ones()) else { break 'encode None };
+
+        // confirm that the elements are identical
+        if #imm != #imm.rotate_left(element_size) {
+            break 'encode None;
+        }
+
+        let shifted = if let Some(shifted) = 1u32.checked_shl(element_size) { shifted } else { 0 };
+        let element = #imm & shifted.wrapping_sub(1);
+        let ones = element.count_ones();
+        let imms = (!((element_size << 1) - 1) & 0x3F) | (ones - 1);
+
+        let immr = if (element & 1) != 0 {
+            ones - (!element).trailing_zeros()
+        } else {
+            element_size - element.trailing_zeros()
+        };
+
+        Some(((immr as u16) << 6) | (imms as u16))
+    } }
+}
+
+pub fn runtime_encode_logical_immediate_64bit(span: proc_macro2::Span, imm: &proc_macro2::Ident) -> TokenStream {
+    quote_spanned! { span=> 'encode: {
+        let transitions = #imm ^ #imm.rotate_right(1);
+        let Some(element_size) = (128u32).checked_div(transitions.count_ones()) else { break 'encode None };
+
+        // confirm that the elements are identical
+        if #imm != #imm.rotate_left(element_size) {
+            break 'encode None;
+        }
+
+        let element = #imm & 1u64.checked_shl(element_size).unwrap_or(0).wrapping_sub(1);
+        let ones = element.count_ones();
+        let imms = (!((element_size << 1) - 1) & 0x7F) | (ones - 1);
+
+        let immr = if (element & 1) != 0 {
+            ones - (!element).trailing_zeros()
+        } else {
+            element_size - element.trailing_zeros()
+        };
+
+        let n = imms & 0x40 == 0;
+        let imms = imms & 0x3F;
+
+        Some(((n as u16) << 12) | ((immr as u16) << 6) | (imms as u16))
+    }}
 }

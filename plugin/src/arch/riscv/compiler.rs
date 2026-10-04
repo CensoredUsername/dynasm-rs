@@ -8,7 +8,7 @@ use proc_macro2::{TokenStream, Span, Literal};
 use proc_macro_error3::emit_error;
 
 use crate::parse_helpers::{as_signed_number, as_ident, as_float};
-use crate::common::{Stmt, Size, delimited, bitmask, bitmask64, RelocationEncoding};
+use crate::common::{Stmt, Size, delimited, bitmask, bitmask64, maybe_into, RelocationEncoding};
 
 /// Compile a single instruction. Input is taken from `data`, containing both the arguments
 /// and the encoding template and commands.
@@ -21,10 +21,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
     // All static bitfields (compile-time constant) will be encoded into this map of (offset, bitfield)
     let mut statics = Vec::new();
-    // All dynamic bitfields (run-time determined) will be encoded into this map of (offset, TokenStream)
+    // All dynamic bitfields (run-time determined) will be encoded into this map of (assignments,
+    // (runtime_check, check_failure_msg), offset, TokenStream)
     let mut dynamics = Vec::new();
     // Any relocation will be encoded in this list
     let mut relocations = Vec::new();
+    let mut var_count = 0;
+    let mut new_var = || { var_count += 1; quote::format_ident!("_{var_count}") };
 
     for (i, command) in data.data.commands.iter().enumerate() {
         // meta commands
@@ -95,16 +98,17 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                                 }
                             },
                             Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr), .. }) => {
-                                let expr = delimited(expr);
-                                dynamics.push((0, quote_spanned!{ span=>
-                                    {
-                                        let _dyn_reg: u8 = #expr.into();
-                                        if _dyn_reg == #code {
-                                            ::dynasmrt::riscv::invalid_register(#code);
-                                        }
-                                        0u32
-                                    }
-                                }));
+                                let expr = maybe_into(expr);
+                                let var = new_var();
+                                dynamics.push((
+                                    quote_spanned!{ span=> let #var: u8 = #expr; },
+                                    Some((
+                                        quote_spanned!{ span=> #var == #code },
+                                        "register cannot be encoded"
+                                    )),
+                                    0,
+                                    quote_spanned!{ span=> 0u32 }
+                                ));
                             },
                             _ => panic!("Invalid encoding data, expected a register before")
                         }
@@ -124,108 +128,115 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
             FlatArg::Register { span, reg: Register::Dynamic(_, ref expr) } => match *command {
                 Command::R(offset) => {
-                    let expr = delimited(expr);
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            let _dyn_reg: u8 = #expr.into();
-                            (_dyn_reg & 0x1F) as u32
-                        }
-                    }));
+                    let expr = maybe_into(expr);
+                    let var = new_var();
+                    dynamics.push((
+                        quote_spanned!{ span=> let #var: u8 = #expr; },
+                        None,
+                        offset,
+                        quote_spanned!{ span=> (#var & 0x1F) as u32 },
+                    ));
                 },
                 Command::Reven(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            let _dyn_reg: u8 = #expr.into();
-                            if _dyn_reg & 0x1 != 0x0 || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                            }
-                            (_dyn_reg & 0x1E) as u32
-                        }
-                    }));
+                    let expr = maybe_into(expr);
+                    let var = new_var();
+                    dynamics.push((
+                        quote_spanned!{ span=> let #var: u8 = #expr; },
+                        Some((
+                            quote_spanned!{ span=> #var & 0x1 != 0x0 || ( #var & #invalid_reg_mask) != 0 },
+                            "register cannot be encoded",
+                        )),
+                        offset,
+                        quote_spanned!{ span=> (#var & 0x1E) as u32 },
+                    ));
                 },
                 Command::Rno0(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            let _dyn_reg: u8 = #expr.into();
-                            if _dyn_reg == 0x0 || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                            }
-                            (_dyn_reg & 0x1F) as u32
-                        }
-                    }));
+                    let expr = maybe_into(expr);
+                    let var = new_var();
+                    dynamics.push((
+                        quote_spanned!{ span=> let #var: u8 = #expr; },
+                        Some((
+                            quote_spanned!{ span => #var == 0x0 || (#var & #invalid_reg_mask) != 0 },
+                            "register cannot be encoded",
+                        )),
+                        offset,
+                        quote_spanned!{ span=> (#var & 0x1F) as u32 }
+                    ));
                 },
                 Command::Rno02(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            let _dyn_reg: u8 = #expr.into();
-                            if _dyn_reg == 0x0 || _dyn_reg == 0x2 || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                            }
-                            (_dyn_reg & 0x1F) as u32
-                        }
-                    }));
+                    let expr = maybe_into(expr);
+                    let var = new_var();
+                    dynamics.push((
+                        quote_spanned!{ span=> let #var: u8 = #expr; },
+                        Some((
+                            quote_spanned! { span=> #var == 0x0 || #var == 0x2 || (#var & #invalid_reg_mask) != 0 },
+                            "register cannot be encoded",
+                        )),
+                        offset,
+                        quote_spanned!{ span=> (#var & 0x1F) as u32 },
+                    ));
                 },
                 Command::Rpop(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            let _dyn_reg: u8 = #expr.into();
-                            if _dyn_reg & 0x18 != 0x8 || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                            }
-                            (_dyn_reg & 0x7) as u32
-                        }
-                    }));
+                    let expr = maybe_into(expr);
+                    let var = new_var();
+                    dynamics.push((
+                        quote_spanned!{ span=> let #var: u8 = #expr; },
+                        Some((
+                            quote_spanned! { span=> #var & 0x18 != 0x8 || (#var & #invalid_reg_mask) != 0 },
+                            "register cannot be encoded",
+                        )),
+                        offset,
+                        quote_spanned!{ span=> (#var & 0x7) as u32 }
+                    ));
                 },
                 Command::Rpops(offset) => {
                     let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                    let expr = delimited(expr);
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            let _dyn_reg: u8 = #expr.into();
-                            if (1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0 || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                            }
-                            (_dyn_reg & 0x7) as u32
-                        }
-                    }));
+                    let expr = maybe_into(expr);
+                    let var = new_var();
+                    dynamics.push((
+                        quote_spanned!{ span=> let #var: u8 = #expr; },
+                        Some((
+                            quote_spanned! { span=> (1u32 << (#var & 0x1F)) & 0x00_FC_03_00 == 0 || (#var & #invalid_reg_mask) != 0 },
+                            "register cannot be encoded",
+                        )),
+                        offset,
+                        quote_spanned!{ span=> (#var & 0x7) as u32 }
+                    ));
                 },
                 Command::Rpops2(offset) => match data.args.get(cursor - 1) {
                     Some(FlatArg::Register { reg: Register::Static(id2), .. } ) => {
                         let code: u8 = id2.code();
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                        let expr = delimited(expr);
-                        dynamics.push((offset, quote_spanned!{ span=>
-                            {
-                                let _dyn_reg: u8 = #expr.into();
-                                if (_dyn_reg == #code) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                    ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                                }
-                                (_dyn_reg & 0x7) as u32
-                            }
-                        }));
+                        let expr = maybe_into(expr);
+                        let var = new_var();
+                        dynamics.push((
+                            quote_spanned!{ span=> let #var: u8 = #expr; },
+                            Some((
+                                quote_spanned! { span=> (#var == #code) || ((1u32 << (#var & 0x1F)) & 0x00_FC_03_00 == 0) || (#var & #invalid_reg_mask) != 0 },
+                                "register cannot be encoded",
+                            )),
+                            offset,
+                            quote_spanned!{ span=> (#var & 0x7) as u32 }
+                        ));
                     },
                     Some(FlatArg::Register { reg: Register::Dynamic(_, ref expr2), .. }) => {
                         let invalid_reg_mask: u8 = if ctx.target.is_embedded() { 0xF0 } else { 0xE0 };
-                        let expr = delimited(expr);
-                        let expr2 = delimited(expr2);
-                        dynamics.push((offset, quote_spanned!{ span=>
-                            {
-                                let _dyn_reg: u8 = #expr.into();
-                                let _dyn_reg_prev: u8 = #expr2.into();
-                                if (_dyn_reg == _dyn_reg_prev) || ((1u32 << (_dyn_reg & 0x1F)) & 0x00_FC_03_00 == 0) || (_dyn_reg & #invalid_reg_mask) != 0 {
-                                    ::dynasmrt::riscv::invalid_register(_dyn_reg);
-                                }
-                                (_dyn_reg & 0x7) as u32
-                            }
-                        }));
+                        let expr = maybe_into(expr);
+                        let expr2 = maybe_into(expr2);
+                        let (var1, var2) = (new_var(), new_var());
+                        dynamics.push((
+                            quote_spanned!{ span=> let #var1: u8 = #expr; let #var2: u8 = #expr2; },
+                            Some((
+                                quote_spanned! { span=> (#var1 == #var2) || ((1u32 << (#var1 & 0x1F)) & 0x00_FC_03_00 == 0) || (#var1 & #invalid_reg_mask) != 0  },
+                                "register cannot be encoded",
+                            )),
+                            offset,
+                            quote_spanned!{ span=> (#var1 & 0x7) as u32 },
+                        ));
                     },
                     _ => panic!("Invalid encoding data, expected a register before")
                 },
@@ -255,16 +266,16 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         } else {
                             // okay, so we're given an expression here, with legal input values
                             // being 0-10 and 12, which should be mapped to 4-14 and 15
-                            // note: this isn't quite the right register error
-                            dynamics.push((offset, quote_spanned!{ span=>
-                                {
-                                    let _dyn_reg: u32 = #expr;
-                                    if _dyn_reg == 11 || _dyn_reg > 12 {
-                                        ::dynasmrt::riscv::invalid_register(_dyn_reg as u8);
-                                    }
-                                    (_dyn_reg + if (_dyn_reg == 12) { 3 } else { 4 }) & 0xF
-                                }
-                            }));
+                            let var = new_var();
+                            dynamics.push((
+                                quote_spanned!{ span=> let #var: u32 = #expr; },
+                                Some((
+                                    quote_spanned!{ span=> #var == 11 || #var > 12 },
+                                    "register must be 0-10 or 12",
+                                )),
+                                offset,
+                                quote_spanned!{ span=> (#var + if (#var == 12) { 3 } else { 4 }) & 0xF },
+                            ));
                         }
                     }
                 },
@@ -276,7 +287,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                 // This practically means we just don't have to encode anything.
                 Command::UImm(_, _)
                 | Command::SImm(_, _)
-                | Command::BitRange(_, _, _) 
+                | Command::BitRange(_, _, _)
                 | Command::Next => (),
                 _ => panic!("Invalid argument processor")
             },
@@ -287,7 +298,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let span = value.span();
                     let range: u32 = bitmask(bits);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -297,12 +309,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         None => {
                             let check = if scaling == 0 {
                                 quote_spanned!{ span =>
-                                    _dyn_imm > #range
+                                    #var > #range
                                 }
                             } else {
                                 let zeromask: u32 = bitmask(scaling);
                                 quote_spanned!{ span =>
-                                    _dyn_imm > #range || _dyn_imm & #zeromask != 0u32
+                                    #var > #range || #var & #zeromask != 0u32
                                 }
                             };
                             imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
@@ -314,7 +326,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
                     let min: i32 = (-1) << (bits - 1);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -324,12 +337,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         None => {
                             let check = if scaling == 0 {
                                 quote_spanned!{ span =>
-                                    _dyn_imm.wrapping_sub(#min) as u32 > #range
+                                    #var.wrapping_sub(#min) as u32 > #range
                                 }
                             } else {
                                 let zeromask = bitmask(scaling) as i32;
                                 quote_spanned!{ span =>
-                                    _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32
+                                    #var.wrapping_sub(#min) as u32 > #range || #var & #zeromask != 0i32
                                 }
                             };
                             imm_encoder.emit_dynamic(true, false, check, &mut dynamics);
@@ -341,7 +354,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask64(bits);
                     let min: i64 = (-1) << (bits - 1);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -357,7 +371,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         },
                         None => {
                             let check = quote_spanned!{ span =>
-                                _dyn_imm.wrapping_sub(#min) as u64 > #range
+                                #var.wrapping_sub(#min) as u64 > #range
                             };
                             imm_encoder.emit_dynamic(true, true, check, &mut dynamics);
                         }
@@ -367,7 +381,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let span = value.span();
                     let range = bitmask(bits);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -381,12 +396,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         None => {
                             let check = if scaling == 0 {
                                 quote_spanned!{ span =>
-                                    _dyn_imm > #range || _dyn_imm == 0u32
+                                    #var > #range || #var == 0u32
                                 }
                             } else {
                                 let zeromask: u32 = bitmask(scaling);
                                 quote_spanned!{ span =>
-                                    _dyn_imm > #range || _dyn_imm & #zeromask != 0u32 || _dyn_imm == 0u32
+                                    #var > #range || #var & #zeromask != 0u32 || #var == 0u32
                                 }
                             };
                             imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
@@ -398,7 +413,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
                     let min: i32 = (-1) << (bits - 1);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -412,12 +428,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         None => {
                             let check = if scaling == 0 {
                                 quote_spanned!{ span =>
-                                    _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm == 0i32
+                                    #var.wrapping_sub(#min) as u32 > #range || #var == 0i32
                                 }
                             } else {
                                 let zeromask = bitmask(scaling) as i32;
                                 quote_spanned!{ span =>
-                                    _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32 || _dyn_imm == 0i32
+                                    #var.wrapping_sub(#min) as u32 > #range || #var & #zeromask != 0i32 || #var == 0i32
                                 }
                             };
                             imm_encoder.emit_dynamic(true, false, check, &mut dynamics);
@@ -429,7 +445,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let range = bitmask(bits);
                     let zeromask: u32 = bitmask(scaling);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -443,11 +460,11 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         None => {
                             let check = if scaling == 0 {
                                 quote_spanned!{ span =>
-                                    _dyn_imm > #range
+                                    #var > #range
                                 }
                             } else {
                                 quote_spanned!{ span =>
-                                    _dyn_imm > #range || _dyn_imm & #zeromask != #zeromask
+                                    #var > #range || #var & #zeromask != #zeromask
                                 }
                             };
                             imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
@@ -459,7 +476,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let min = u32::from(min);
                     let max = u32::from(max);
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(data.data.commands, i + 1, &mut statics);
 
                     match imm_encoder.static_value {
@@ -475,7 +493,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         },
                         None => {
                             let check = quote_spanned!{ span=>
-                                _dyn_imm < #min || _dyn_imm > #max
+                                #var < #min || #var > #max
                             };
                             imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         }
@@ -614,7 +632,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         range = 0xFFFF_F7FF;
                     }
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(commands, 0, &mut statics);
 
                     match imm_encoder.static_value {
@@ -624,12 +643,12 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         None => {
                             let check = if scaling == 0 {
                                 quote_spanned!{ span =>
-                                    _dyn_imm.wrapping_sub(#min) as u32 > #range
+                                    #var.wrapping_sub(#min) as u32 > #range
                                 }
                             } else {
                                 let zeromask = bitmask(scaling) as i32;
                                 quote_spanned!{ span =>
-                                    _dyn_imm.wrapping_sub(#min) as u32 > #range || _dyn_imm & #zeromask != 0i32
+                                    #var.wrapping_sub(#min) as u32 > #range || #var & #zeromask != 0i32
                                 }
                             };
 
@@ -675,7 +694,8 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                         Command::Next
                     ];
 
-                    let mut imm_encoder = ImmediateEncoder::new(value);
+                    let var = new_var();
+                    let mut imm_encoder = ImmediateEncoder::new(var.clone(), value);
                     imm_encoder.gather_fields(commands, 0, &mut statics);
 
                     match imm_encoder.static_value {
@@ -683,9 +703,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             static_range_check(static_value, 0, range, 0, span)?;
                         },
                         None => {
-                            let check = quote_spanned!{ span =>
-                                _dyn_imm > #range
-                            };
+                            let check = quote_spanned!{ span => #var > #range };
                             imm_encoder.emit_dynamic(false, false, check, &mut dynamics);
                         }
                     }
@@ -726,7 +744,9 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                     let span = value.span();
 
                     // either statically encode it, or return an expression for the register list bias
-                    let bias_expr = match count {
+                    let bias_var = new_var();
+                    let reglist_var = new_var();
+                    let bias_assigns = match count {
                         RegListFlat::Static(code) => {
                             let code = if *code == 15 {16} else {*code};
 
@@ -749,7 +769,7 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 
                             } else {
                                 quote_spanned!{ span=>
-                                    let _reglist_bias: i32 = #bias;
+                                    let #bias_var: i32 = #bias;
                                 }
                             }
                         },
@@ -767,39 +787,41 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
                             }
                             if ctx.target.is_32_bit() {
                                 quote_spanned!{ span=>
-                                    let _reglist_expr: u8 = #expr;
-                                    let _reglist_bias: i32 = (_reglist_expr as i32) / 4 * 16 + 16;
+                                    let #reglist_var: u8 = #expr;
+                                    let #bias_var: i32 = (#reglist_var as i32) / 4 * 16 + 16;
                                 }
                             } else {
                                 quote_spanned!{ span=>
-                                    let _reglist_expr: u8 = #expr;
-                                    let _reglist_bias: i32 = (_reglist_expr as i32) / 2 * 16 + 16;
+                                    let #reglist_var: u8 = #expr;
+                                    let #bias_var: i32 = (#reglist_var as i32) / 2 * 16 + 16;
                                 }
                             }
                         }
                     };
 
-                    let imm_expr = if negated {
+                    let var = new_var();
+                    let assignments = if negated {
                         let value = delimited(value);
                         quote_spanned!{ span=>
-                            let _dyn_imm: i32 = -#value;
+                            let #var: i32 = -#value;
+                            #bias_assigns
                         }
                     } else {
                         quote_spanned!{ span=>
-                            let _dyn_imm: i32 = #value;
+                            let #var: i32 = #value;
+                            #bias_assigns
                         }
                     };
 
-                    dynamics.push((offset, quote_spanned!{ span=>
-                        {
-                            #imm_expr
-                            #bias_expr
-                            if (_dyn_imm < _reglist_bias) || ((_dyn_imm - _reglist_bias) > 48) || ((_dyn_imm & 15) != 0) {
-                                ::dynasmrt::riscv::immediate_out_of_range_signed_32(_dyn_imm);
-                            }
-                            (_dyn_imm - _reglist_bias) as u32 >> 4
-                        }
-                    }));
+                    dynamics.push((
+                        assignments,
+                        Some((
+                            quote_spanned!{ span=> (#var < #bias_var) || ((#var - #bias_var) > 48) || ((#var & 15) != 0) },
+                            "immediate out of range",
+                        )),
+                        offset,
+                        quote_spanned!{ span=> (#var - #bias_var) as u32 >> 4 },
+                    ));
                 },
                 _ => panic!("Invalid argument processor")
             },
@@ -857,10 +879,14 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
     }
 
     // and process all dynamics
-    for (offset, expr) in dynamics {
+    for (assignments, test, offset, expr) in dynamics {
         let index = usize::from(offset >> 5);
         let offset = offset & 0x1F;
-
+        let expr = delimited(expr);
+        ctx.state.stmts.push(Stmt::Stmt(assignments));
+        if let Some((cond, msg)) = test {
+            ctx.state.stmts.push(Stmt::MaybeRuntimeError(syn::parse2(cond).unwrap(), msg));
+        }
         exprs[index] = match exprs[index].take() {
             Some(prev_expr) => {
                 Some(if offset == 0 {
@@ -922,12 +948,13 @@ pub(super) fn compile_instruction(ctx: &mut Context, data: MatchData) -> Result<
 struct ImmediateEncoder<'a> {
     pub dynamic_value: &'a syn::Expr,
     pub static_value: Option<i64>,
+    pub imm_variable: syn::Ident,
     pub encodes: Vec<(u8, TokenStream)>, // encoding_offset, expression
     pub span: Span
 }
 
 impl<'a> ImmediateEncoder<'a> {
-    pub fn new(dynamic_value: &'a syn::Expr) -> ImmediateEncoder<'a> {
+    pub fn new(imm_variable: syn::Ident, dynamic_value: &'a syn::Expr) -> ImmediateEncoder<'a> {
         #![allow(unexpected_cfgs)]
         let static_value;
 
@@ -946,12 +973,14 @@ impl<'a> ImmediateEncoder<'a> {
         ImmediateEncoder {
             dynamic_value,
             static_value,
+            imm_variable,
             encodes: Vec::new(),
             span
         }
     }
 
     pub fn gather_fields(&mut self, commands: &[Command], mut index: usize, statics: &mut Vec<(u8, u32)>) {
+        let var = &self.imm_variable;
         loop {
             match commands.get(index) {
                 Some(&Command::BitRange(offset, bits, scaling)) => {
@@ -963,7 +992,7 @@ impl<'a> ImmediateEncoder<'a> {
 
                     } else {
                         self.encodes.push((offset, quote_spanned!{ self.span=>
-                            ((_dyn_imm >> #scaling) as u32 & #mask)
+                            ((#var >> #scaling) as u32 & #mask)
                         }));
                     }
                 },
@@ -980,7 +1009,7 @@ impl<'a> ImmediateEncoder<'a> {
                         // types of number
                         let round_offset = Literal::i64_unsuffixed(round_offset);
                         self.encodes.push((offset, quote_spanned!{ self.span=>
-                            ((_dyn_imm.wrapping_add(#round_offset) >> #scaling) as u32 & #mask)
+                            ((#var.wrapping_add(#round_offset) >> #scaling) as u32 & #mask)
                         }));
                     }
                 },
@@ -992,11 +1021,19 @@ impl<'a> ImmediateEncoder<'a> {
         }
     }
 
-    pub fn emit_dynamic(mut self, is_signed: bool, is_64bit: bool, check: TokenStream, dynamics: &mut Vec<(u8, TokenStream)>) {
+    pub fn emit_dynamic(
+        mut self,
+        is_signed: bool,
+        is_64bit: bool,
+        check: TokenStream,
+        dynamics: &mut Vec<(TokenStream, Option<(TokenStream, &'static str)>, u8, TokenStream)>
+    ) {
         // assemble encoding chunks
         let mut exprs = [None, None, None, None, None, None, None, None];
         let dynamic_value = self.dynamic_value;
         let span = self.span;
+        let var = self.imm_variable;
+
 
         for (offset, expr) in self.encodes.drain(..) {
             let index = usize::from(offset >> 5);
@@ -1039,40 +1076,26 @@ impl<'a> ImmediateEncoder<'a> {
 
             if first {
                 first = false;
-                let error_expr = match (is_64bit, is_signed) {
-                    (false, false) => quote_spanned!{ span=>
-                        ::dynasmrt::riscv::immediate_out_of_range_unsigned_32
-                    },
-                    (false, true)  => quote_spanned!{ span=>
-                        ::dynasmrt::riscv::immediate_out_of_range_signed_32
-                    },
-                    (true, false)  => quote_spanned!{ span=>
-                        ::dynasmrt::riscv::immediate_out_of_range_unsigned_64
-                    },
-                    (true, true)   => quote_spanned!{ span=>
-                        ::dynasmrt::riscv::immediate_out_of_range_signed_64
-                    }
+                let error_msg = match (is_64bit, is_signed) {
+                    (false, false) => "unsigned 32-bit immediate out of range",
+                    (false, true)  => "signed 32-bit immediate out of range",
+                    (true, false)  => "unsigned 64-bit immediate out of range",
+                    (true, true)   => "signed 64-bit immediate out of range",
                 };
 
-                dynamics.push((offset, quote_spanned!{ span=>
-                    {
-                        let _dyn_imm: #imm_ty = #dynamic_value;
-
-                        if #check {
-                            #error_expr(_dyn_imm);
-                        }
-
-                        #encodes
-                    }
-                }));
-
+                dynamics.push((
+                    quote_spanned!{ span=> let #var: #imm_ty = #dynamic_value; },
+                    Some((check.clone(), error_msg)),
+                    offset,
+                    quote_spanned!{ span=> #encodes },
+                ));
             } else {
-                dynamics.push((offset, quote_spanned!{ span=>
-                    {
-                        let _dyn_imm: #imm_ty = #dynamic_value;
-                        #encodes
-                    }
-                }));
+                dynamics.push((
+                    quote_spanned!{ span=> let #var: #imm_ty = #dynamic_value; },
+                    None,
+                    offset,
+                    quote_spanned!{ span=> #encodes },
+                ));
             }
         }
     }

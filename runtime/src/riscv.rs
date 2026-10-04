@@ -393,39 +393,6 @@ pub type AssemblyModifier<'a> = crate::Modifier<'a, RiscvRelocation>;
 /// A RISC-V UncommittedModifier. This is aliased here for backwards compatability.
 pub type UncommittedModifier<'a> = crate::UncommittedModifier<'a>;
 
-// these should explicitly never be inlined, as this is the slow path.
-// that's also why these aren't made generic.
-
-/// Handler for `u32` out-of-range riscv64 & riscv32 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_unsigned_32(immediate: u32) -> ! {
-    panic!("Cannot assemble this RISC-V instruction. Immediate {immediate} is out of range.")
-}
-
-/// Handler for `i32` out-of-range riscv64 & riscv32 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_signed_32(immediate: i32) -> ! {
-    panic!("Cannot assemble this RISC-V instruction. Immediate {immediate} is out of range.")
-}
-/// Handler for `u64` out-of-range riscv64 & riscv32 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_unsigned_64(immediate: u64) -> ! {
-    panic!("Cannot assemble this RISC-V instruction. Immediate {immediate} is out of range.")
-}
-
-/// Handler for `i64` out-of-range riscv64 & riscv32 immediates.
-#[inline(never)]
-pub fn immediate_out_of_range_signed_64(immediate: i64) -> ! {
-    panic!("Cannot assemble this RISC-V instruction. Immediate {immediate} is out of range.")
-}
-
-/// Handler for invalid riscv64 & riscv32 registers.
-#[inline(never)]
-pub fn invalid_register(register: u8) -> ! {
-    panic!("Cannot assemble this RISC-V instruction. Register x{register} cannot be encoded.")
-}
-
-
 /// 4 or 8-byte general purpopse registers, where X0 is the zero register
 /// When using the RV32/64E profile, only the first 16 registers are valid
 #[allow(missing_docs)]

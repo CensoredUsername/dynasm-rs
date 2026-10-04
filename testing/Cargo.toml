@@ -9,3 +9,8 @@ itertools = "0.14.0"
 
 [dependencies.dynasmrt]
 path = "../runtime"
+default-features = false
+
+[features]
+default = ["runtime_computations"]
+runtime_computations = ["dynasmrt/runtime_computations"]
