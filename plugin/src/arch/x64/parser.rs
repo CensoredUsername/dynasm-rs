@@ -6,7 +6,7 @@ use proc_macro_error3::emit_error;
 use lazy_static::lazy_static;
 
 use crate::common::Size;
-use crate::parse_helpers::{eat_pseudo_keyword, parse_ident_or_rust_keyword, as_ident, ParseOptExt};
+use crate::parse_helpers::{eat_pseudo_keyword, parse_until_separator, parse_ident_or_rust_keyword, as_ident, ParseOptExt};
 
 use super::{Context, X86Mode};
 use super::ast::{Instruction, RawArg, Register, RegId, RegFamily, MemoryRefItem};
@@ -169,7 +169,7 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
             return Ok(RawArg::Invalid);
         };
 
-        let ty: syn::Path = input.parse()?;
+        let ty: syn::Type = input.parse()?;
 
         // any attribute, register as index and immediate in index
         let mut nosplit = false;
@@ -189,11 +189,19 @@ fn parse_arg(ctx: &mut Context, input: parse::ParseStream) -> parse::Result<RawA
             Vec::new()
         };
 
-        let attr: Option<syn::Ident> = if input.peek(Token![.]) {
-            let _: Token![.] = input.parse()?;
-            Some(input.parse()?)
-        } else {
-            None
+        // Whatever follows the `.` is handed to offset_of! as-is, so that new syntax it gains
+        // (nested fields, tuple indices, enum variants, ...) works without changes here. This is
+        // unambiguous as nothing in the field specifier of offset_of! can contain a top level
+        // `,` or `;`, which are what terminate an argument / instruction in dynasm.
+        let attr = match input.parse::<Option<Token![.]>>()? {
+            Some(dot) => {
+                let fields = parse_until_separator(input)?;
+                if fields.is_empty() {
+                    return Err(parse::Error::new(dot.span(), "Expected a field specifier after '.'"));
+                }
+                Some(fields)
+            },
+            None => None
         };
 
         return Ok(RawArg::TypeMappedRaw {

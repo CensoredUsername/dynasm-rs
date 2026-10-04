@@ -256,7 +256,7 @@ pub fn expr_add_many<T: Iterator<Item=TokenTree>>(span: Span, mut exprs: T) -> O
 }
 
 // makes (size_of<ty>() * value)
-pub fn expr_size_of_scale(ty: &syn::Path, value: &TokenTree, size: Size) -> TokenTree {
+pub fn expr_size_of_scale(ty: &syn::Type, value: &TokenTree, size: Size) -> TokenTree {
     let span = value.span();
     let size = size.as_literal();
 
@@ -265,8 +265,8 @@ pub fn expr_size_of_scale(ty: &syn::Path, value: &TokenTree, size: Size) -> Toke
     })
 }
 
-/// returns (offset_of!(path, attr) as size)
-pub fn expr_offset_of(path: &syn::Path, attr: &syn::Ident, size: Size) -> TokenTree {
+/// returns (offset_of!(path, attr) as size), where attr is passed to offset_of! as-is
+pub fn expr_offset_of(path: &syn::Type, attr: &TokenStream, size: Size) -> TokenTree {
     // generate a P<Expr> that resolves into the offset of an attribute to a type.
     // this is somewhat ridiculously complex because we can't expand macros here
 
@@ -279,7 +279,7 @@ pub fn expr_offset_of(path: &syn::Path, attr: &syn::Ident, size: Size) -> TokenT
 }
 
 // returns std::mem::size_of<path>()
-pub fn expr_size_of(path: &syn::Path) -> TokenTree {
+pub fn expr_size_of(path: &syn::Type) -> TokenTree {
     // generate a P<Expr> that returns the size of type at path
     let span = path.span();
 

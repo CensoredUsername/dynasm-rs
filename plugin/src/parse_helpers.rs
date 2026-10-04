@@ -1,4 +1,5 @@
 //! This file contains parsing helpers used by multiple parsing backends
+use proc_macro2::{TokenStream, TokenTree};
 use syn::parse;
 use std::convert::TryInto;
 use syn::ext::IdentExt;
@@ -33,6 +34,24 @@ pub fn eat_pseudo_keyword(input: parse::ParseStream, kw: &str) -> bool {
         }
         Err(cursor.error("expected identifier"))
     }).is_ok()
+}
+
+/// Collects all remaining tokens up to, but not including, the next top level `,` or `;`, or the
+/// end of the input. Delimited groups count as a single token, so separators nested in them are
+/// not considered. The result is empty if there were no tokens before the separator.
+pub fn parse_until_separator(input: parse::ParseStream) -> parse::Result<TokenStream> {
+    input.step(|cursor| {
+        let mut rest = *cursor;
+        let mut tokens = TokenStream::new();
+        while let Some((tt, next)) = rest.token_tree() {
+            if matches!(&tt, TokenTree::Punct(p) if matches!(p.as_char(), ',' | ';')) {
+                break;
+            }
+            tokens.extend([tt]);
+            rest = next;
+        }
+        Ok((tokens, rest))
+    })
 }
 
 /// parses an ident, but instead of syn's Parse impl it does also parse keywords as idents

@@ -259,9 +259,11 @@ pub enum RawArg {
         value_size: Option<Size>,
         disp_size: Option<Size>,
         base_reg: Register,
-        scale: syn::Path,
+        scale: syn::Type,
         scaled_items: Vec<MemoryRefItem>,
-        attribute: Option<syn::Ident>,
+        // everything following the `.` after the type, passed verbatim as the field specifier of
+        // offset_of! so that we automatically accept whatever syntax it supports
+        attribute: Option<proc_macro2::TokenStream>,
     },
     // unprocessed memory reference argument
     IndirectRaw {

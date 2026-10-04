@@ -22,7 +22,9 @@ The following base syntax units are recognized by the parser.
 
 `arg : register | (size? ( memoryref | labelref | typemap | expr ));`
 
-`typemap : register "=>" expr_path ("." ident | "[" size? regref "]" ("." ident)?) ;`
+`typemap : register "=>" type ("." fields | "[" size? regref "]" ("." fields)?) ;`
+
+`fields : <any tokens up to the next "," or ";"> ;`
 
 `memoryref : "[" nosplit? size? (regref | labelref) "]" ;`
 
@@ -117,6 +119,8 @@ To ease interoperation with Rust structures, dynasm-rs supports the following sy
 
 Just like memory references, type mapped references support displacement size overrides after the opening square bracket. However, as the first register is always encoded as index, they do not support `NOSPLIT`.
 
+The type can be any Rust type, and everything after the `.` is passed as-is to [`offset_of!`](https://doc.rust-lang.org/std/mem/macro.offset_of.html) as its field specifier. Nested fields (`Type.a.b`) and tuple indices (`Type.0`) are therefore supported, along with any other syntax `offset_of!` accepts.
+
 The syntax for type maps is as follows:
 
 Table 3: dynasm-rs type map formats
@@ -124,6 +128,7 @@ Table 3: dynasm-rs type map formats
 Syntax | Equivalent expression
 :------|:-----------
 `rax => Type.attr`             | `(rax as *mut Type).attr`
+`rax => Type.attr.attr`        | `(rax as *mut Type).attr.attr`
 `rax => Type[expr]`            | `(rax as *mut [Type])[expr]`
 `rax => Type[rbx]`             | `(rax as *mut [Type])[rbx]`
 `rax => Type[rbx + expr].attr` | `(rax as *mut [Type])[rbx + expr].attr `
